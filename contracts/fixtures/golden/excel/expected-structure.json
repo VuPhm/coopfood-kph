@@ -1,0 +1,11 @@
+{
+  "id":"XLSX-STRUCT-01",
+  "trace":"XLSX-02/XLSX-04/XLSX-05/XLSX-07",
+  "logicalColumns":["STT","Ngày phát hiện","SKU/UPC","Tên hàng","NCC","ĐVT","Số lượng","Tình trạng","Người phát hiện","HỦY","ĐỔI","XUẤT TRẢ","KHÁC","Ngày xử lý","Ảnh","Người duyệt"],
+  "imageColumns":["O","P","Q"],
+  "approverColumn":"R",
+  "formulaInputs":["=1+1","+SUM(A1)","-danger","@mention","  =leading"],
+  "formulaExpected":["'=1+1","'+SUM(A1)","'-danger","'@mention","'  =leading"],
+  "safeInputs":["SKU-000042","Sản phẩm thử nghiệm 01","NCC-0007","  plain text"],
+  "safeExpected":["SKU-000042","Sản phẩm thử nghiệm 01","NCC-0007","  plain text"]
+}

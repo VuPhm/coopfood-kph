@@ -1,0 +1,4 @@
+NCC,Tên NCC,UPC,SKU,Tên sản phẩm
+0007,NCC Demo,0890123456789,SKU-000042,Sản phẩm thử nghiệm 01
+0007,NCC Demo,12345678901234,SKU-000042,Sản phẩm thử nghiệm 01
+0042,NCC Khác,000123456789012,SKU-000099,Sản phẩm có leading zero

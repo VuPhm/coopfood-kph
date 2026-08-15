@@ -1,0 +1,17 @@
+{
+  "user": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "username": "manager.demo",
+    "displayName": "Nguyễn Văn Demo",
+    "globalRoles": [],
+    "stores": [
+      {
+        "id": "20000000-0000-4000-8000-000000000001",
+        "code": "CF-DEMO-001",
+        "name": "Nguyễn Kiệm",
+        "role": "STORE_MANAGER"
+      }
+    ]
+  },
+  "csrfToken": "synthetic-csrf-token-not-for-runtime"
+}

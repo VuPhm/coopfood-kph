@@ -1,0 +1,729 @@
+openapi: 3.1.0
+info:
+  title: Co.op Food KPH API
+  version: 1.0.0-foundation
+  description: |
+    Contract-first boundary for the Store PWA and backend foundation.
+    Business dates use ISO `yyyy-mm-dd` on the wire and `dd/mm/yyyy` in the UI.
+    The business timezone is `Asia/Ho_Chi_Minh`. Store and actor authority always
+    comes from the authenticated server-side session, never from mutation bodies.
+servers:
+  - url: http://localhost:8080
+    description: Local backend
+tags:
+  - name: Operations
+  - name: Auth
+  - name: Stores
+  - name: Catalog
+  - name: KPH
+security:
+  - sessionCookie: []
+paths:
+  /actuator/health:
+    get:
+      tags: [Operations]
+      operationId: getHealth
+      summary: Liveness check
+      security: []
+      responses:
+        '200':
+          description: Process is available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Create a server-side session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated session and CSRF token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/auth/session:
+    get:
+      tags: [Auth]
+      operationId: getSession
+      summary: Read current actor, roles and store memberships
+      responses:
+        '200':
+          description: Current authenticated session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Invalidate the current session
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '204':
+          description: Session invalidated.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/stores:
+    get:
+      tags: [Stores]
+      operationId: listMyStores
+      summary: List active store memberships of the current actor
+      responses:
+        '200':
+          description: Memberships visible to the session actor.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StoreContext'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/catalog/barcodes/{barcode}:
+    get:
+      tags: [Catalog]
+      operationId: lookupBarcode
+      summary: Resolve a barcode to zero or one current active product
+      description: |
+        Reads only the published current catalog. `NOT_FOUND` never includes a
+        guessed product and the response is never a collection.
+      parameters:
+        - $ref: '#/components/parameters/BarcodePath'
+      responses:
+        '200':
+          description: Deterministic `FOUND` or `NOT_FOUND` result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BarcodeLookupResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/stores/{storeId}/kph:
+    get:
+      tags: [KPH]
+      operationId: listKphRecords
+      summary: List KPH records for one authorized store
+      description: Store membership is revalidated by the backend.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - name: type
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KphType'
+      responses:
+        '200':
+          description: Store-scoped history, newest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KphRecord'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [KPH]
+      operationId: createKphRecord
+      summary: Create one KPH record with one to three evidence photos
+      description: |
+        The backend resolves the barcode against the current catalog again and
+        persists a catalog snapshot. If it is not found, manual values are stored
+        with `NOT_FOUND`; the backend must not infer a product. Store and actor
+        values are derived from the authorized session.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [payload, photos]
+              properties:
+                payload:
+                  $ref: '#/components/schemas/KphCreateRequest'
+                photos:
+                  type: array
+                  minItems: 1
+                  maxItems: 3
+                  items:
+                    type: string
+                    format: binary
+            encoding:
+              payload:
+                contentType: application/json
+      responses:
+        '201':
+          description: Record persisted with immutable catalog/store/actor snapshots.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KphRecord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/stores/{storeId}/kph/{recordId}/photos/{ordinal}:
+    get:
+      tags: [KPH]
+      operationId: getStampedKphPhoto
+      summary: Read one private stamped evidence photo
+      description: Original evidence remains private and is not exposed by this endpoint.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - name: recordId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: ordinal
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 3
+      responses:
+        '200':
+          description: Private stamped JPEG with no-store cache policy.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: KPH_SESSION
+
+  parameters:
+    StoreIdPath:
+      name: storeId
+      in: path
+      required: true
+      description: Requested scope; membership remains authoritative on the server.
+      schema:
+        type: string
+        format: uuid
+    BarcodePath:
+      name: barcode
+      in: path
+      required: true
+      description: Exact string identifier; leading zeroes are significant.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    CsrfHeader:
+      name: X-CSRF-TOKEN
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Client-generated opaque key scoped to the authenticated actor.
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
+
+  responses:
+    BadRequest:
+      description: Malformed request.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthorized:
+      description: Authentication required or credentials invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Forbidden:
+      description: CSRF validation failed or the actor lacks authority.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Resource does not exist in the authorized scope.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: Idempotency key conflict or concurrent state conflict.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnprocessableEntity:
+      description: Business validation failed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblem'
+    ServiceUnavailable:
+      description: Required infrastructure is unavailable.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: UP
+
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+        password:
+          type: string
+          format: password
+          minLength: 1
+          maxLength: 256
+
+    SessionResponse:
+      type: object
+      additionalProperties: false
+      required: [user, csrfToken]
+      properties:
+        user:
+          $ref: '#/components/schemas/SessionUser'
+        csrfToken:
+          type: string
+
+    SessionUser:
+      type: object
+      additionalProperties: false
+      required: [id, username, displayName, globalRoles, stores]
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        displayName:
+          type: string
+        globalRoles:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/GlobalRole'
+        stores:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoreContext'
+
+    GlobalRole:
+      type: string
+      enum: [CATALOG_ADMIN, CHAIN_ADMIN]
+
+    StoreRole:
+      type: string
+      enum: [EMPLOYEE, STORE_MANAGER]
+
+    StoreContext:
+      type: object
+      additionalProperties: false
+      required: [id, code, name, role]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: String identifier; leading zeroes are significant.
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/StoreRole'
+
+    BarcodeLookupResponse:
+      oneOf:
+        - $ref: '#/components/schemas/BarcodeFound'
+        - $ref: '#/components/schemas/BarcodeNotFound'
+      discriminator:
+        propertyName: status
+        mapping:
+          FOUND: '#/components/schemas/BarcodeFound'
+          NOT_FOUND: '#/components/schemas/BarcodeNotFound'
+
+    BarcodeFound:
+      type: object
+      additionalProperties: false
+      required: [status, barcode, product]
+      properties:
+        status:
+          type: string
+          const: FOUND
+        barcode:
+          type: string
+        product:
+          $ref: '#/components/schemas/CatalogProduct'
+
+    BarcodeNotFound:
+      type: object
+      additionalProperties: false
+      required: [status, barcode]
+      properties:
+        status:
+          type: string
+          const: NOT_FOUND
+        barcode:
+          type: string
+
+    CatalogProduct:
+      type: object
+      additionalProperties: false
+      required: [id, barcode, skuCode, name, primarySupplier]
+      properties:
+        id:
+          type: string
+          format: uuid
+        barcode:
+          type: string
+        skuCode:
+          type: string
+        name:
+          type: string
+        primarySupplier:
+          $ref: '#/components/schemas/SupplierSnapshot'
+
+    SupplierSnapshot:
+      type: object
+      additionalProperties: false
+      required: [code, name]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+
+    KphType:
+      type: string
+      enum: [TPCN, TPTS]
+
+    KphUnit:
+      type: string
+      enum: [EA, kg]
+
+    KphCondition:
+      type: string
+      enum: [DAMAGED, NEAR_EXPIRY, EXPIRED, OTHER]
+
+    KphResolution:
+      type: string
+      enum: [CANCEL, EXCHANGE, RETURN, OTHER]
+
+    KphLookupStatus:
+      type: string
+      enum: [FOUND, NOT_FOUND, MANUAL]
+
+    KphLifecycleState:
+      type: string
+      enum: [SUBMITTED, INVALIDATED]
+
+    KphCreateRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - type
+        - detectedDate
+        - quantity
+        - unit
+        - condition
+        - resolution
+      description: |
+        TPCN conditions: NEAR_EXPIRY, EXPIRED, OTHER; resolutions: CANCEL,
+        EXCHANGE, RETURN, OTHER. TPTS adds DAMAGED but only allows CANCEL or OTHER.
+        OTHER detail is optional and normalizes to the Vietnamese legacy label
+        when blank. At least one of barcode/manualSkuCode/manualProductName is
+        required. Actor and store fields are deliberately absent.
+      properties:
+        type:
+          $ref: '#/components/schemas/KphType'
+        detectedDate:
+          type: string
+          format: date
+        processedDate:
+          type: [string, 'null']
+          format: date
+        quantity:
+          type: number
+          exclusiveMinimum: 0
+        unit:
+          $ref: '#/components/schemas/KphUnit'
+        condition:
+          $ref: '#/components/schemas/KphCondition'
+        conditionDetail:
+          type: [string, 'null']
+          maxLength: 255
+        resolution:
+          $ref: '#/components/schemas/KphResolution'
+        resolutionDetail:
+          type: [string, 'null']
+          maxLength: 255
+        barcode:
+          type: [string, 'null']
+          maxLength: 128
+        manualSkuCode:
+          type: [string, 'null']
+          maxLength: 50
+        manualProductName:
+          type: [string, 'null']
+          maxLength: 200
+        manualSupplierName:
+          type: [string, 'null']
+          maxLength: 150
+        note:
+          type: [string, 'null']
+          maxLength: 255
+        photoLastModified:
+          type: array
+          maxItems: 3
+          description: |
+            Values align by photo ordinal. They are an evidence-stamp fallback,
+            never an audit timestamp.
+          items:
+            type: [string, 'null']
+            format: date-time
+
+    KphRecord:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - type
+        - detectedDate
+        - quantity
+        - unit
+        - condition
+        - resolution
+        - lookupStatus
+        - catalogSnapshot
+        - lifecycleState
+        - store
+        - detectedBy
+        - photos
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/KphType'
+        detectedDate:
+          type: string
+          format: date
+        processedDate:
+          type: [string, 'null']
+          format: date
+        quantity:
+          type: number
+        unit:
+          $ref: '#/components/schemas/KphUnit'
+        condition:
+          $ref: '#/components/schemas/KphCondition'
+        conditionDetail:
+          type: [string, 'null']
+        resolution:
+          $ref: '#/components/schemas/KphResolution'
+        resolutionDetail:
+          type: [string, 'null']
+        barcode:
+          type: [string, 'null']
+        lookupStatus:
+          $ref: '#/components/schemas/KphLookupStatus'
+        catalogSnapshot:
+          $ref: '#/components/schemas/KphCatalogSnapshot'
+        lifecycleState:
+          $ref: '#/components/schemas/KphLifecycleState'
+        note:
+          type: [string, 'null']
+        store:
+          $ref: '#/components/schemas/KphStoreSnapshot'
+        detectedBy:
+          $ref: '#/components/schemas/ActorSnapshot'
+        photos:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/KphPhoto'
+        createdAt:
+          type: string
+          format: date-time
+
+    KphCatalogSnapshot:
+      type: object
+      additionalProperties: false
+      required: [skuCode, productName, supplierCode, supplierName]
+      description: Immutable values captured when the KPH record is created.
+      properties:
+        skuCode:
+          type: [string, 'null']
+        productName:
+          type: [string, 'null']
+        supplierCode:
+          type: [string, 'null']
+        supplierName:
+          type: [string, 'null']
+
+    KphStoreSnapshot:
+      type: object
+      additionalProperties: false
+      required: [id, code, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+
+    ActorSnapshot:
+      type: object
+      additionalProperties: false
+      required: [id, displayName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+
+    KphPhoto:
+      type: object
+      additionalProperties: false
+      required: [ordinal, stampedContentPath, capturedAt]
+      properties:
+        ordinal:
+          type: integer
+          minimum: 1
+          maximum: 3
+        stampedContentPath:
+          type: string
+          description: Relative authenticated API path; never a public object URL.
+        capturedAt:
+          type: string
+          format: date-time
+          description: Evidence timestamp selected by precedence rules, not audit time.
+
+    Problem:
+      type: object
+      additionalProperties: true
+      required: [type, title, status, code]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+        code:
+          type: string
+          description: Stable machine-readable application error code.
+
+    ValidationProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          required: [violations]
+          properties:
+            violations:
+              type: array
+              items:
+                $ref: '#/components/schemas/FieldViolation'
+
+    FieldViolation:
+      type: object
+      additionalProperties: false
+      required: [field, code, message]
+      properties:
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string

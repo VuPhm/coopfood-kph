@@ -1,0 +1,21 @@
+{
+  "name": "coopfood-kph",
+  "private": true,
+  "packageManager": "npm@11.16.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "check": "npm run check --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "generate:api": "npm --workspace @coopfood-kph/api run generate",
+    "check:api": "npm run generate:api && git diff --exit-code -- packages/api/src/generated/schema.d.ts",
+    "check:docs": "node scripts/check-docs.mjs",
+    "verify": "npm run check:docs && npm run check:api && npm run check && npm test && npm run build"
+  },
+  "devDependencies": {
+    "vite": "^8.2.1"
+  }
+}

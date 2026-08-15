@@ -1,0 +1,4 @@
+[
+  {"id":"D-011","trace":"DATE-02","manufactured":"2026-01-01","expiry":"2026-01-01","expectedError":"HSD phải sau NSX"},
+  {"id":"D-012","trace":"DATE-02","manufactured":"2026-01-02","expiry":"2026-01-01","expectedError":"HSD phải sau NSX"}
+]

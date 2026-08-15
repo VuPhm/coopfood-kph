@@ -1,0 +1,21 @@
+{
+  "id":"KPH-CONTRACT-BASELINE-01",
+  "provenance":"synthetic",
+  "approvalStatus":"accepted-baseline",
+  "approved":true,
+  "acceptedBy":"platform ADR-0013; imported for repository reboot 2026-08-15",
+  "syntheticIdentifiers":["CF-DEMO-001","NCC-0007","SKU-000042","0890123456789"],
+  "fixtures":[
+    {"resource":"catalog/valid-identifiers.csv","tracePrefix":"SCAN-"},
+    {"resource":"catalog/conflicting-barcode.csv","tracePrefix":"SCAN-"},
+    {"resource":"golden/dates/return-date-cases.json","tracePrefix":"DATE-"},
+    {"resource":"golden/dates/invalid-date-cases.json","tracePrefix":"DATE-"},
+    {"resource":"golden/kph/field-policy-cases.json","tracePrefix":"KPH-"},
+    {"resource":"golden/images/expected-manifest.json","tracePrefix":"IMG-"},
+    {"resource":"golden/excel/expected-structure.json","tracePrefix":"XLSX-"},
+    {"resource":"api/session.json","tracePrefix":"ID-"},
+    {"resource":"api/barcode-found.json","tracePrefix":"SCAN-"},
+    {"resource":"api/barcode-not-found.json","tracePrefix":"SCAN-"},
+    {"resource":"api/kph-record.json","tracePrefix":"KPH-"}
+  ]
+}

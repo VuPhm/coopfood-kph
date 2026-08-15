@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "css": "apps/store-pwa/src/styles.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@coopfood-kph/ui",
+    "utils": "@coopfood-kph/ui",
+    "ui": "@coopfood-kph/ui",
+    "lib": "@coopfood-kph/ui"
+  }
+}

@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@source "../../../packages/ui/src";
+
+@theme {
+  --color-brand: #006633;
+  --color-brand-hover: #005229;
+  --color-brand-active: #004221;
+  --color-brand-soft: #eff7f2;
+  --color-lime: #93c11f;
+  --color-danger: #e20514;
+  --color-canvas: #f4f6f4;
+  --color-ink: #1c261c;
+  --color-ink-muted: #667366;
+  --color-line: #dce4dc;
+  --shadow-panel: 0 8px 24px rgba(0, 66, 33, 0.06);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+@layer base {
+  html { font-family: var(--font-sans); background: var(--color-canvas); }
+  body { margin: 0; min-width: 320px; }
+  * { box-sizing: border-box; }
+}

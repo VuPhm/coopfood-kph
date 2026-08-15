@@ -1,0 +1,14 @@
+{
+  "status": "FOUND",
+  "barcode": "0890123456789",
+  "product": {
+    "id": "30000000-0000-4000-8000-000000000001",
+    "barcode": "0890123456789",
+    "skuCode": "SKU-000042",
+    "name": "Sản phẩm thử nghiệm 01",
+    "primarySupplier": {
+      "code": "NCC-0007",
+      "name": "NCC Demo"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "40000000-0000-4000-8000-000000000001",
+  "type": "TPCN",
+  "detectedDate": "2026-01-16",
+  "processedDate": null,
+  "quantity": 1,
+  "unit": "EA",
+  "condition": "NEAR_EXPIRY",
+  "conditionDetail": null,
+  "resolution": "CANCEL",
+  "resolutionDetail": null,
+  "barcode": "0890123456789",
+  "lookupStatus": "FOUND",
+  "catalogSnapshot": {
+    "skuCode": "SKU-000042",
+    "productName": "Sản phẩm thử nghiệm 01",
+    "supplierCode": "NCC-0007",
+    "supplierName": "NCC Demo"
+  },
+  "lifecycleState": "SUBMITTED",
+  "note": null,
+  "store": {
+    "id": "20000000-0000-4000-8000-000000000001",
+    "code": "CF-DEMO-001",
+    "name": "Nguyễn Kiệm"
+  },
+  "detectedBy": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "displayName": "Nguyễn Văn Demo"
+  },
+  "photos": [
+    {
+      "ordinal": 1,
+      "stampedContentPath": "/api/v1/stores/20000000-0000-4000-8000-000000000001/kph/40000000-0000-4000-8000-000000000001/photos/1",
+      "capturedAt": "2026-01-16T08:30:00+07:00"
+    }
+  ],
+  "createdAt": "2026-01-16T08:31:05+07:00"
+}
