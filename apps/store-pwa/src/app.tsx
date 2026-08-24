@@ -156,7 +156,7 @@ function RecordRow({ onToggle, record, selected }: RecordProps) {
 
 function RecordCard({ onToggle, record, selected }: RecordProps) {
   return <article className={cn("record-card", selected && "is-selected")}>
-    <header className="flex items-start justify-between gap-3"><div><p className="font-mono text-xs font-bold text-brand">{record.sku}</p><h3 className="mt-1 font-black">{record.productName}</h3></div><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></header>
+    <header className="flex min-h-11 items-center justify-between gap-3"><div><p className="font-mono text-xs font-bold text-brand">{record.sku}</p><h3 className="mt-1 font-black">{record.productName}</h3></div><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></header>
     <dl className="mt-3 grid grid-cols-2 gap-3 text-sm"><div><dt className="text-xs text-ink-muted">Phát hiện</dt><dd className="font-bold">{record.detectedDate}<br />{record.detectedBy}</dd></div><div><dt className="text-xs text-ink-muted">Số lượng · NCC</dt><dd className="font-bold">{record.quantity}<br /><span className="font-normal text-ink-muted">{record.supplier}</span></dd></div></dl>
     <footer className="record-card-footer"><span className="status-badge">{record.condition}</span><span className="text-xs font-black text-brand">{record.resolution} · {record.photos} ảnh</span></footer>
   </article>;

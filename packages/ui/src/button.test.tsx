@@ -9,10 +9,9 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: "Thêm phiếu" })).toBeEnabled();
   });
 
-  it("uses a filled surface instead of a thin border for secondary actions", () => {
+  it("uses a filled surface with a moderate border for secondary actions", () => {
     render(<Button variant="secondary">Xuất Excel</Button>);
     const button = screen.getByRole("button", { name: "Xuất Excel" });
-    expect(button).toHaveClass("bg-brand-soft", "rounded-xl", "focus-visible:ring-3");
-    expect(button.className.split(/\s+/)).not.toContain("border");
+    expect(button).toHaveClass("bg-brand-soft", "rounded-xl", "border-2", "focus-visible:ring-3");
   });
 });

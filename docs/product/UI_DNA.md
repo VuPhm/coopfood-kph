@@ -56,20 +56,25 @@ lập inventory. Bộ screenshot tổng hợp cần được tạo theo
 | Shadow | panel `0 12px 32px rgba(0,66,33,.08)` | Chỉ panel/overlay; control nhỏ không tự đổ bóng |
 | Focus | indicator xanh-lime 3px, offset 2–3px | Không được loại bỏ focus visible |
 
-### Visual refresh block-first — 2026-08-24
+### Visual refresh block-first cân bằng — 2026-08-24
 
-Ghi chú thiết kế mới được hiểu là loại bỏ viền, outline và đường kẻ mảnh dùng
-để trang trí. Phân cấp giao diện dùng surface fill, khoảng trắng, radius và hai
-cấp elevation. Viền/nét chỉ còn khi mang nghĩa tương tác hoặc dữ liệu:
+Ghi chú thiết kế mới ưu tiên surface fill, khoảng trắng, radius và hai cấp
+elevation nhưng không loại bỏ viền một cách cực đoan. Viền neutral vừa phải
+được dùng để tăng affordance và tách các khối gần màu; tránh mạng divider mảnh
+dày đặc hoặc dùng đường kẻ làm cách phân cấp duy nhất:
 
 - Focus bàn phím luôn có indicator 3px tương phản rõ; “không outline” không áp
   dụng cho `:focus-visible`.
-- Trạng thái selected/error có thể dùng inset stroke tối thiểu 3px khi fill đơn
-  thuần chưa đủ phân biệt, nhưng không dùng border 1px mặc định.
+- Panel/group có thể dùng border neutral 1px; input, choice và upload affordance
+  dùng border 2px; selected/error kết hợp màu nền với tổng stroke 2–3px.
 - Icon dùng stroke khoảng `2.25–2.5`; timeline tối thiểu `6px`; marker tối thiểu
-  `2px`. Divider 1px được thay bằng spacing hoặc surface khác màu.
+  `2px`. Divider giữa mọi dòng vẫn được thay bằng spacing hoặc surface khác màu.
 - Pill chỉ dành cho badge, count và switch. Control/card/panel lần lượt dùng
   radius `12/16/24px` để tránh nhiều mức bo tùy ý.
+- Các phần tử cùng hàng dùng height contract: control/action `44px`, action tạo
+  phiếu và store context desktop `72px`, action tạo phiếu mobile `56px`; label +
+  control form `72px`. Các item có nội dung khác chiều cao phải căn giữa theo
+  cross-axis, không căn top tùy ý.
 
 Typography legacy không hoàn toàn nhất quán: bundle có Montserrat nhúng, trong
 khi các nhãn loại thực phẩm và workspace refresh dùng system UI stack. Hệ thống

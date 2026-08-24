@@ -214,8 +214,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
                 <Field label="Số lượng" htmlFor="quantity" required error={errors.quantity?.message}>
                   <Input id="quantity" inputMode="decimal" {...register("quantity")} />
                 </Field>
-                <fieldset>
-                  <legend className="mb-1.5 text-sm font-bold">Đơn vị</legend>
+                <fieldset className="unit-fieldset">
+                  <legend className="text-sm font-bold">Đơn vị</legend>
                   <div className="unit-options">
                     {(["EA", "kg"] as const).map((unit) => <label key={unit}><input className="sr-only" type="radio" value={unit} {...register("unit")} /><span>{unit}</span></label>)}
                   </div>
@@ -253,7 +253,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
                 </p>
               </div>
               <Field className="mt-3" label="Ghi chú" htmlFor="note" error={errors.note?.message}>
-                <textarea id="note" rows={3} className="w-full resize-y rounded-xl bg-white px-3 py-3 text-base outline-none transition-[background-color,box-shadow] placeholder:text-ink-muted/70 hover:bg-brand-soft/40 focus-visible:ring-3 focus-visible:ring-focus" placeholder="Nhập ghi chú..." {...register("note")} />
+                <textarea id="note" rows={3} className="w-full resize-y rounded-xl border-2 border-surface-strong bg-white px-3 py-3 text-base outline-none transition-[background-color,border-color,box-shadow] placeholder:text-ink-muted/70 hover:border-brand/25 hover:bg-brand-soft/40 focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-focus" placeholder="Nhập ghi chú..." {...register("note")} />
               </Field>
             </FormSection>
 
