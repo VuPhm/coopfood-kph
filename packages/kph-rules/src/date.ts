@@ -34,8 +34,45 @@ export function addDays(value: LocalDate, amount: number): LocalDate {
   return result.toISOString().slice(0, 10) as LocalDate;
 }
 
+export function addMonths(value: LocalDate, amount: number): LocalDate {
+  if (!Number.isInteger(amount)) throw new Error("Số tháng phải là số nguyên");
+
+  const { day, month, year } = parts(value);
+  const targetMonthIndex = year * 12 + month - 1 + amount;
+  const targetYear = Math.floor(targetMonthIndex / 12);
+  const targetMonthIndexInYear = ((targetMonthIndex % 12) + 12) % 12;
+  const lastDayInTargetMonth = new Date(Date.UTC(targetYear, targetMonthIndexInYear + 1, 0)).getUTCDate();
+  const targetDay = Math.min(day, lastDayInTargetMonth);
+
+  return `${targetYear}-${String(targetMonthIndexInYear + 1).padStart(2, "0")}-${String(targetDay).padStart(2, "0")}` as LocalDate;
+}
+
 export function daysBetween(start: LocalDate, end: LocalDate) {
   return Math.round((parts(end).epoch - parts(start).epoch) / DAY_MS);
+}
+
+function requirePositiveWholeNumber(value: number, label: string) {
+  if (!Number.isInteger(value) || value <= 0) throw new Error(`${label} phải là số nguyên lớn hơn 0`);
+}
+
+export function expiryFromDays(nsx: LocalDate, shelfLifeDays: number): LocalDate {
+  requirePositiveWholeNumber(shelfLifeDays, "Số ngày HSD");
+  return addDays(nsx, shelfLifeDays - 1);
+}
+
+export function manufactureFromDays(hsd: LocalDate, shelfLifeDays: number): LocalDate {
+  requirePositiveWholeNumber(shelfLifeDays, "Số ngày HSD");
+  return addDays(hsd, -(shelfLifeDays - 1));
+}
+
+export function expiryFromMonths(nsx: LocalDate, shelfLifeMonths: number): LocalDate {
+  requirePositiveWholeNumber(shelfLifeMonths, "Số tháng HSD");
+  return addMonths(nsx, shelfLifeMonths);
+}
+
+export function manufactureFromMonths(hsd: LocalDate, shelfLifeMonths: number): LocalDate {
+  requirePositiveWholeNumber(shelfLifeMonths, "Số tháng HSD");
+  return addMonths(hsd, -shelfLifeMonths);
 }
 
 export type ExpiryStatus = "SAFE" | "WARNING" | "DANGER" | "EXPIRED";
