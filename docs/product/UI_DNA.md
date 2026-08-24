@@ -44,17 +44,32 @@ lập inventory. Bộ screenshot tổng hợp cần được tạo theo
 | Brand secondary | `#93c11f` | Focus/nhấn phụ, không dùng thay semantic state |
 | Accent nguy hiểm | `#e20514` | Hết hạn, xóa, hạn lùi cần chú ý |
 | Accent cảnh báo | `#f29200` | Cận date/cảnh báo |
-| Nền/surface | `#f4f6f4` / `#ffffff` | Giữ tương phản nền–panel sáng |
+| Nền/surface | canvas `#eef3ef`; muted `#f3f7f4`; strong `#e4ece6`; trắng `#ffffff` | Phân cấp khối không cần viền |
 | Text | `#1c261c` / `#667366` | Nội dung chính/phụ |
-| Semantic green | nền `#eff7f2`, border xanh 20% | Safe/success |
-| Semantic yellow | nền `#fdf8f0`, border cam 20% | Warning |
-| Semantic red | nền `#fdf3f3`, border đỏ 15% | Danger/error |
-| Spacing bổ sung | `4, 8, 12, 16px` | Dùng như thang cơ sở, chưa phải token system đã chốt |
-| Control | cao `44px`, radius `10px` | Tối thiểu cho input/nút thường |
-| Panel | radius `16–20px` | Workspace, modal card, result card |
-| Item | radius `12px` | Card/table container |
-| Shadow | `0 8px 24px rgba(0,66,33,.04)` | Panel nhẹ; modal/lightbox dùng shadow mạnh hơn |
-| Focus | outline xanh 3px, offset 2–3px | Phải giữ focus visible rõ |
+| Semantic green | nền `#e9f5ed`, nhấn bằng fill | Safe/success |
+| Semantic yellow | nền `#fff1dc`, nhấn bằng fill | Warning |
+| Semantic red | nền `#fdebec`, nhấn bằng fill | Danger/error |
+| Spacing | `4, 8, 12, 16, 24, 32, 40px` | Không thêm spacing lẻ ngoài thang nếu chưa có lý do |
+| Control | cao tối thiểu `44px`, radius `12px` | Input/nút thường |
+| Panel | radius `24px` | Workspace, modal card, result card |
+| Item | radius `16px`; compact item `12px` | Card, choice, table row, icon button |
+| Shadow | panel `0 12px 32px rgba(0,66,33,.08)` | Chỉ panel/overlay; control nhỏ không tự đổ bóng |
+| Focus | indicator xanh-lime 3px, offset 2–3px | Không được loại bỏ focus visible |
+
+### Visual refresh block-first — 2026-08-24
+
+Ghi chú thiết kế mới được hiểu là loại bỏ viền, outline và đường kẻ mảnh dùng
+để trang trí. Phân cấp giao diện dùng surface fill, khoảng trắng, radius và hai
+cấp elevation. Viền/nét chỉ còn khi mang nghĩa tương tác hoặc dữ liệu:
+
+- Focus bàn phím luôn có indicator 3px tương phản rõ; “không outline” không áp
+  dụng cho `:focus-visible`.
+- Trạng thái selected/error có thể dùng inset stroke tối thiểu 3px khi fill đơn
+  thuần chưa đủ phân biệt, nhưng không dùng border 1px mặc định.
+- Icon dùng stroke khoảng `2.25–2.5`; timeline tối thiểu `6px`; marker tối thiểu
+  `2px`. Divider 1px được thay bằng spacing hoặc surface khác màu.
+- Pill chỉ dành cho badge, count và switch. Control/card/panel lần lượt dùng
+  radius `12/16/24px` để tránh nhiều mức bo tùy ý.
 
 Typography legacy không hoàn toàn nhất quán: bundle có Montserrat nhúng, trong
 khi các nhãn loại thực phẩm và workspace refresh dùng system UI stack. Hệ thống

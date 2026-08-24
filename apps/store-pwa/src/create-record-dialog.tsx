@@ -179,14 +179,14 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0" aria-describedby="create-description">
-          <DialogHeader className="border-b border-brand px-5 py-4 pr-16 sm:px-6 sm:pr-16">
+          <DialogHeader className="create-dialog-header">
             <DialogTitle className="create-dialog-title">Tạo phiếu KPH · {kindLabels[kind]}</DialogTitle>
             <DialogDescription id="create-description" className="sr-only">
               Tạo phiếu hàng không phù hợp; trường có dấu sao là bắt buộc.
             </DialogDescription>
           </DialogHeader>
 
-          <form className="grid gap-3 px-4 pb-5 sm:px-5" onSubmit={submit}>
+          <form className="create-dialog-form" onSubmit={submit}>
             <FormSection number="1" title="Thông tin phát hiện">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
@@ -253,11 +253,11 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
                 </p>
               </div>
               <Field className="mt-3" label="Ghi chú" htmlFor="note" error={errors.note?.message}>
-                <textarea id="note" rows={3} className="w-full resize-y rounded-[10px] border border-line bg-white px-3 py-2 text-base outline-none focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-lime-300/70" placeholder="Nhập ghi chú..." {...register("note")} />
+                <textarea id="note" rows={3} className="w-full resize-y rounded-xl bg-white px-3 py-3 text-base outline-none transition-[background-color,box-shadow] placeholder:text-ink-muted/70 hover:bg-brand-soft/40 focus-visible:ring-3 focus-visible:ring-focus" placeholder="Nhập ghi chú..." {...register("note")} />
               </Field>
             </FormSection>
 
-            <footer className="sticky bottom-0 -mx-4 -mb-5 flex flex-col-reverse gap-2 border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:flex-row sm:justify-end sm:px-5">
+            <footer className="create-dialog-footer">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Hủy</Button>
               <Button type="submit">Lưu phiếu</Button>
             </footer>

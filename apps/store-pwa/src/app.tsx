@@ -112,9 +112,9 @@ export function App() {
             </div>
           </header>
 
-          <div className="overflow-x-auto rounded-xl border border-line desktop-history">
-            <table className="w-full min-w-[980px] border-collapse text-left text-sm">
-              <thead className="bg-canvas text-xs uppercase tracking-wide text-ink-muted">
+          <div className="overflow-x-auto desktop-history">
+            <table className="w-full min-w-[980px] text-left text-sm">
+              <thead className="text-xs uppercase tracking-wide text-ink-muted">
                 <tr>
                   <th className="w-12 p-3"><input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu trong loại hiện tại" /></th>
                   <th className="p-3">Phát hiện</th><th className="p-3">SKU/UPC · Tên hàng hóa</th><th className="p-3">NCC</th><th className="p-3">SL · ĐVT</th><th className="p-3">Tình trạng KPH</th><th className="p-3">Biện pháp xử lý</th><th className="p-3">Ảnh</th>
@@ -142,7 +142,7 @@ export function App() {
 type RecordProps = { record: DemoRecord; selected: boolean; onToggle: (id: string) => void };
 
 function RecordRow({ onToggle, record, selected }: RecordProps) {
-  return <tr className={cn("border-t border-line", selected && "bg-brand-soft")}>
+  return <tr className={cn("record-row", selected && "is-selected")}>
     <td className="p-3"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
     <td className="p-3"><span className="font-mono text-xs font-bold text-brand">{record.sku}</span><br /><strong>{record.productName}</strong></td>
@@ -155,9 +155,9 @@ function RecordRow({ onToggle, record, selected }: RecordProps) {
 }
 
 function RecordCard({ onToggle, record, selected }: RecordProps) {
-  return <article className={cn("rounded-2xl border border-line bg-white p-4", selected && "border-brand bg-brand-soft")}>
+  return <article className={cn("record-card", selected && "is-selected")}>
     <header className="flex items-start justify-between gap-3"><div><p className="font-mono text-xs font-bold text-brand">{record.sku}</p><h3 className="mt-1 font-black">{record.productName}</h3></div><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></header>
     <dl className="mt-3 grid grid-cols-2 gap-3 text-sm"><div><dt className="text-xs text-ink-muted">Phát hiện</dt><dd className="font-bold">{record.detectedDate}<br />{record.detectedBy}</dd></div><div><dt className="text-xs text-ink-muted">Số lượng · NCC</dt><dd className="font-bold">{record.quantity}<br /><span className="font-normal text-ink-muted">{record.supplier}</span></dd></div></dl>
-    <footer className="mt-3 flex items-center justify-between border-t border-line pt-3"><span className="status-badge">{record.condition}</span><span className="text-xs font-black text-brand">{record.resolution} · {record.photos} ảnh</span></footer>
+    <footer className="record-card-footer"><span className="status-badge">{record.condition}</span><span className="text-xs font-black text-brand">{record.resolution} · {record.photos} ảnh</span></footer>
   </article>;
 }
