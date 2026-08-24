@@ -24,11 +24,10 @@ import {
   ChevronRight,
   CircleAlert,
   Clock3,
-  Eye,
-  EyeOff,
   RotateCcw,
   Search,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 
@@ -268,16 +267,31 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
     <aside className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra hạn nhanh">
       <button
         type="button"
-        className="expiry-workbench-toggle"
+        className={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger")}
         aria-controls="expiry-workbench-content"
         aria-expanded={expanded}
+        aria-label={expanded ? "Đóng tra hạn nhanh" : undefined}
+        title={expanded ? "Đóng" : undefined}
         onClick={toggleWorkbench}
       >
-        {expanded ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
-        <span>{expanded ? "Ẩn tra hạn" : "Hiện tra hạn"}</span>
+        {expanded ? <X size={20} aria-hidden="true" /> : (
+          <>
+            <CalendarDays size={18} aria-hidden="true" />
+            <span>Tra hạn nhanh</span>
+          </>
+        )}
       </button>
 
       {expanded ? <div id="expiry-workbench-content" className="expiry-workbench-body">
+        <header className="expiry-workbench-header">
+          <span className="expiry-workbench-header-icon" aria-hidden="true">
+            <CalendarDays />
+          </span>
+          <div>
+            <p>Tiện ích</p>
+            <h2>Tra hạn nhanh</h2>
+          </div>
+        </header>
         <form className="expiry-form" onSubmit={submit} aria-label="Thông tin hạn sử dụng và tra cứu">
           <section className="expiry-focus-zone">
             <DateControl

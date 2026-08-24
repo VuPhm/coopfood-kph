@@ -62,11 +62,13 @@ describe("Expiry lookup", () => {
     fireEvent.change(screen.getByLabelText("Hạn sử dụng (HSD)"), { target: { value: "30082026" } });
     expect(screen.getByText("Ngày lùi hàng")).toBeVisible();
 
-    fireEvent.click(screen.getByRole("button", { name: "Ẩn tra hạn" }));
+    const closeButton = screen.getByRole("button", { name: "Đóng tra hạn nhanh" });
+    expect(closeButton).not.toHaveTextContent("Ẩn tra hạn");
+    fireEvent.click(closeButton);
     expect(screen.queryByLabelText("Ngày sản xuất")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Hiện tra hạn" })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByRole("button", { name: "Tra hạn nhanh" })).toHaveAttribute("aria-expanded", "false");
 
-    fireEvent.click(screen.getByRole("button", { name: "Hiện tra hạn" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tra hạn nhanh" }));
     expect(screen.getByLabelText("Ngày sản xuất")).toHaveValue("01/08/2026");
     expect(screen.getByLabelText("Hạn sử dụng (HSD)")).toHaveValue("30/08/2026");
     expect(screen.getByText("Ngày lùi hàng")).toBeVisible();

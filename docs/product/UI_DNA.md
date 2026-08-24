@@ -144,7 +144,12 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
 - Locale Việt, tuần bắt đầu thứ Hai, không dùng native mobile date picker.
 - Mở tra hạn không auto-focus NSX; focus vào nút đóng để tránh keyboard mobile
   bật lên ngoài ý muốn.
-- FAB tra hạn tự mở rộng label một lần rồi thu tròn; reduced-motion bỏ animation.
+- Khi mở, panel có header và nút đóng icon `X` duy nhất với accessible name;
+  khi đóng, giữ một disclosure trigger có icon và nhãn “Tra hạn nhanh”. Cùng một
+  button node đổi presentation để focus không rơi về `body` sau khi thu panel.
+- Desktop giữ side panel trong workspace. Mobile dùng floating sheet nằm dưới
+  brand header; khi thu, trigger cố định ở góc dưới có safe-area để tiện ích
+  luôn sẵn mà không chiếm chiều dài nội dung.
 - Tra thuận/ngược bằng toggle “Đã biết/Chưa biết” NSX; ngày, số ngày và số tháng
   đồng bộ. Kết quả cập nhật live khi đủ dữ liệu.
 - Result card giữ chiều cao ổn định, có placeholder/error/safe/warning/danger và
