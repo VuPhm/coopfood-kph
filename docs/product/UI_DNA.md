@@ -46,7 +46,7 @@ lập inventory. Bộ screenshot tổng hợp cần được tạo theo
 | Accent cảnh báo | `#f29200` | Cận date/cảnh báo |
 | Nền/surface | canvas `#eef3ef`; muted `#f3f7f4`; strong `#e4ece6`; trắng `#ffffff` | Phân cấp khối không cần viền |
 | Text | `#1c261c` / `#667366` | Nội dung chính/phụ |
-| Semantic green | nền `#e9f5ed`, nhấn bằng fill | Safe/success |
+| Semantic green | nền trắng, inset glow xanh ngắn sát mép; nhấn bằng fill | Safe/success |
 | Semantic yellow | nền `#fff1dc`, nhấn bằng fill | Warning |
 | Semantic red | nền `#fdebec`, nhấn bằng fill | Danger/error |
 | Spacing | `4, 8, 12, 16, 24, 32, 40px` | Không thêm spacing lẻ ngoài thang nếu chưa có lý do |
@@ -69,6 +69,9 @@ dày đặc hoặc dùng đường kẻ làm cách phân cấp duy nhất:
   dùng border 2px; selected/error kết hợp màu nền với tổng stroke 2–3px.
 - Icon dùng stroke khoảng `2.25–2.5`; timeline tối thiểu `6px`; marker tối thiểu
   `2px`. Divider giữa mọi dòng vẫn được thay bằng spacing hoặc surface khác màu.
+- Surface lớn từng dùng nền xanh nhạt chuyển sang nền trắng với inset glow xanh
+  ngắn sát mép. Badge nhỏ vẫn được dùng tint để giữ khả năng quét; warning và
+  danger giữ màu semantic riêng, không kế thừa glow xanh.
 - Pill chỉ dành cho badge, count và switch. Control/card/panel lần lượt dùng
   radius `12/16/24px` để tránh nhiều mức bo tùy ý.
 - Các phần tử cùng hàng dùng height contract: control/action `44px`, action tạo
