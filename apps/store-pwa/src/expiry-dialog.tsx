@@ -71,6 +71,7 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
 
   useEffect(() => {
     if (!expanded) return;
+    if (workbenchRef.current) workbenchRef.current.scrollTop = 0;
 
     function closeOnOutsidePointer(event: PointerEvent) {
       if (window.innerWidth >= 1280) return;
