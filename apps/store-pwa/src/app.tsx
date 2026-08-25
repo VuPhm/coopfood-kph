@@ -1,6 +1,6 @@
-import type { KphKind } from "@coopfood-kph/kph-rules";
-import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
-import { ArrowDown, ArrowUp, ArrowUpDown, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, ClipboardList, FileDown, Filter, PackagePlus, RotateCcw, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
+import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
+import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
+import { ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useState } from "react";
 
 import { CreateRecordDialog } from "./create-record-dialog";
@@ -10,8 +10,8 @@ import { EvidenceImageViewer } from "./image-viewer";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
 const kindCopy: Record<KphKind, { action: string; short: string }> = {
-  TPCN: { action: "Thực phẩm khô & khác", short: "TP Khô & khác" },
-  TPTS: { action: "Thực phẩm tươi sống", short: "TP Tươi sống" },
+  TPCN: { action: "TP khô & khác", short: "TP Khô & khác" },
+  TPTS: { action: "TP tươi sống", short: "TP Tươi sống" },
 };
 const kphKinds: KphKind[] = ["TPCN", "TPTS"];
 const approvalLabels: Record<DemoApprovalStatus, string> = {
@@ -110,7 +110,6 @@ export function App() {
   const [approvalByRecord, setApprovalByRecord] = useState<Record<string, DemoApprovalStatus>>(() => Object.fromEntries(DEMO_RECORDS.map(({ approvalStatus, id }) => [id, approvalStatus])));
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
-  const [desktopHistoryControlsOpen, setDesktopHistoryControlsOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const visibleRecords = useMemo(() => {
     const records = DEMO_RECORDS.filter(({ kind, id, approvalStatus }) => {
@@ -252,47 +251,40 @@ export function App() {
       </header>
 
       <main className="workspace-layout mx-auto max-w-[1440px] px-3 py-5 sm:px-6 sm:py-7">
-        <div className="kph-workspace-stack">
-          <section className="workspace-header" aria-labelledby="workspace-title">
-          <div className="workspace-title">
-            <span className="workspace-title-icon" aria-hidden="true">
-              <ClipboardList />
-            </span>
-            <div>
-              <p>quản lý</p>
-              <h1 id="workspace-title">Phiếu theo dõi hàng không phù hợp</h1>
+        <section className="history-board" aria-labelledby="workspace-title">
+          <div className="workspace-header">
+            <div className="utility-panel-meta workspace-header-meta">
+              <p id="workspace-title">Phiếu theo dõi hàng không phù hợp</p>
             </div>
-          </div>
 
-          <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
-            {kphKinds.map((kind) => (
-              <button key={kind} type="button" className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
-                {kind === "TPCN" ? <PackagePlus aria-hidden="true" /> : <Salad aria-hidden="true" />}
-                <span><small>Tạo phiếu</small>{kindCopy[kind].action}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="store-context" aria-label="Cửa hàng và tài khoản hiện tại">
-            <ShieldCheck className="store-context-icon" size={20} aria-hidden="true" />
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">Cửa hàng hiện tại</p>
-              <p className="truncate text-sm font-black text-brand">Co.op Food Nguyễn Kiệm · CF-DEMO-001</p>
-              <p className="mt-0.5 truncate text-xs text-ink-muted">Nguyễn Văn Demo · Cửa hàng trưởng</p>
+            <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
+              {kphKinds.map((kind) => (
+                <button key={kind} type="button" className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
+                  {kind === "TPCN" ? <PackagePlus aria-hidden="true" /> : <Salad aria-hidden="true" />}
+                  <span><small>Tạo phiếu</small>{kindCopy[kind].action}</span>
+                </button>
+              ))}
             </div>
-          </div>
-          </section>
 
-          <section className="history-board" aria-labelledby="history-title">
-          <header className="history-header">
-            <div className="history-heading-group">
-              <div className="history-title-row">
-                <h2 id="history-title" className="history-title">Phiếu đã khai báo</h2>
-                <div className="history-title-tools">
-                  <span className="history-total-count" aria-label={`${visibleRecords.length} phiếu`}>{visibleRecords.length}</span>
-                  <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
-                </div>
+            <div className="store-context" aria-label="Cửa hàng và tài khoản hiện tại">
+              <ShieldCheck className="store-context-icon" size={20} aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">Cửa hàng hiện tại</p>
+                <p className="truncate text-sm font-black text-brand">Co.op Food Nguyễn Kiệm · CF-DEMO-001</p>
+                <p className="mt-0.5 truncate text-xs text-ink-muted">Nguyễn Văn Demo · Cửa hàng trưởng</p>
               </div>
+            </div>
+          </div>
+          <header className="history-header">
+            <div className="history-title-row">
+              <h2 id="history-title" className="history-title">
+                <span className="history-total-count" aria-label={`${visibleRecords.length} phiếu`}>{visibleRecords.length}</span>
+                Phiếu đã khai báo
+              </h2>
+              <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
+            </div>
+
+            <div className="history-controls-row">
               <div className="history-tabs" role="tablist" aria-label="Loại phiếu">
                 {kphKinds.map((kind) => {
                   const count = DEMO_RECORDS.filter((record) => record.kind === kind).length;
@@ -314,24 +306,31 @@ export function App() {
                   );
                 })}
               </div>
-            </div>
 
-            <div className="history-actions">
-              <div className="history-list-controls">
-                <button type="button" className="expand-all-mobile" onClick={toggleAllVisibleExpansion}>
-                  {allVisibleExpanded ? <ChevronsUp size={16} aria-hidden="true" /> : <ChevronsDown size={16} aria-hidden="true" />}
-                  {allVisibleExpanded ? "Thu gọn tất cả" : "Mở rộng tất cả"}
-                </button>
-                <label className="select-all-history">
-                  <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} />
-                  Chọn tất cả
-                </label>
+              <div className="history-actions">
+                <div className="history-list-controls">
+                  <button type="button" className="expand-all-mobile" onClick={toggleAllVisibleExpansion}>
+                    {allVisibleExpanded ? <ChevronsUp size={16} aria-hidden="true" /> : <ChevronsDown size={16} aria-hidden="true" />}
+                    {allVisibleExpanded ? "Thu gọn tất cả" : "Mở rộng tất cả"}
+                  </button>
+                </div>
+                <div className="history-action-buttons">
+                  <div className="history-selection-slot">
+                    {selected.size > 0
+                      ? <button type="button" className="selection-count selection-approve" onClick={approveSelected}>Duyệt <strong>{selected.size}</strong> phiếu</button>
+                      : <span className="selection-count" aria-live="polite">Đã chọn <strong>0</strong></span>}
+                    <label className="select-all-history" aria-label="Chọn tất cả phiếu" title="Chọn tất cả">
+                      <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
+                    </label>
+                  </div>
+                  {selected.size > 0 ? (
+                    <div className="history-action-tools">
+                      <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={() => setNotice("Luồng xuất Excel sẽ được nối backend trong slice riêng.")}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
+                      <Button variant="ghost" className="history-invalidate text-danger" aria-label="Vô hiệu hóa" title="Vô hiệu hóa" onClick={() => setNotice("Vô hiệu hóa cần lý do và kiểm tra quyền Cửa hàng trưởng ở backend.")}><Trash2 size={17} aria-hidden="true" /><span className="history-invalidate-label">Xóa</span></Button>
+                    </div>
+                  ) : null}
+                </div>
               </div>
-              {selected.size > 0
-                ? <button type="button" className="selection-count selection-approve" onClick={approveSelected}>Duyệt <strong>{selected.size}</strong> dòng</button>
-                : <span className="selection-count" aria-live="polite">Đã chọn <strong>0</strong> dòng</span>}
-              <Button variant="secondary" className="history-export" disabled={selected.size === 0} aria-label="Xuất Excel" onClick={() => setNotice("Luồng xuất Excel sẽ được nối backend trong slice riêng.")}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
-              <Button variant="ghost" className="history-invalidate text-danger" aria-label="Vô hiệu hóa" title="Vô hiệu hóa" disabled={selected.size === 0} onClick={() => setNotice("Vô hiệu hóa cần lý do và kiểm tra quyền Cửa hàng trưởng ở backend.")}><Trash2 size={17} aria-hidden="true" /><span className="history-invalidate-label">Xóa</span></Button>
             </div>
           </header>
 
@@ -339,7 +338,7 @@ export function App() {
             <table className="w-full min-w-[1160px] text-left text-sm">
               <thead className="text-xs uppercase tracking-wide text-ink-muted">
                 <tr>
-                  <th className="w-12 px-3 py-0"><span className="sr-only">Chọn phiếu</span></th>
+                  <th className="w-12 px-3 py-0 text-center"><input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả" /></th>
                   <SortableHeader label="Phát hiện" onSort={toggleRecordSort} sort={recordSort} sortKey="detectedDate" />
                   <SortableHeader label="SKU/UPC · Tên hàng hóa" onSort={toggleRecordSort} sort={recordSort} sortKey="product" />
                   <SortableHeader label="NCC" onSort={toggleRecordSort} sort={recordSort} sortKey="supplier" />
@@ -347,17 +346,8 @@ export function App() {
                   <SortableHeader label="Tình trạng KPH" onSort={toggleRecordSort} sort={recordSort} sortKey="condition" />
                   <SortableHeader label="Biện pháp xử lý" onSort={toggleRecordSort} sort={recordSort} sortKey="resolution" />
                   <th className="px-3 py-0">Ảnh</th>
-                  <SortableHeader label="Thao tác" onSort={toggleRecordSort} sort={recordSort} sortKey="approval" />
-                  <th className="history-filter-heading w-16 px-3 py-0 text-center">
-                    <HistoryControlsTrigger
-                      active={approvalFilter !== "ALL" || recordSort !== null}
-                      className="history-controls-desktop"
-                      controls="desktop-history-controls-panel"
-                      expanded={desktopHistoryControlsOpen}
-                      label="Mở lọc và sắp xếp trên desktop"
-                      onClick={() => setDesktopHistoryControlsOpen((current) => !current)}
-                    />
-                  </th>
+                  <SortableHeader label="Duyệt" onSort={toggleRecordSort} sort={recordSort} sortKey="approval" />
+                  <th className="w-12 px-3 py-0 text-center"><span className="sr-only">Thao tác dòng</span></th>
                 </tr>
               </thead>
               <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onInvalidate={invalidateRecord} onToggle={toggleSelection} />)}</tbody>
@@ -367,20 +357,9 @@ export function App() {
           <div className="grid gap-3 mobile-history">
             {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onExpansionChange={setMobileRecordExpanded} onInvalidate={invalidateRecord} onToggle={toggleSelection} />)}
           </div>
-          </section>
-        </div>
+        </section>
 
         <div className="workspace-side-stack">
-          {desktopHistoryControlsOpen ? (
-            <DesktopHistoryControlsPanel
-              filter={approvalFilter}
-              onClose={() => setDesktopHistoryControlsOpen(false)}
-              onFilterChange={changeApprovalFilter}
-              onSort={cycleMobileRecordSort}
-              onSortReset={() => setRecordSort(null)}
-              sort={recordSort}
-            />
-          ) : null}
           <ExpiryWorkbench />
         </div>
       </main>
@@ -422,23 +401,16 @@ function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, so
 
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogTrigger asChild>
-      <HistoryControlsTrigger active={active} className="history-controls-mobile" label="Mở lọc và sắp xếp trên mobile" />
+      <HistoryControlsTrigger active={active} className="history-controls-mobile pr-3" label="Mở lọc và sắp xếp trên mobile" />
     </DialogTrigger>
     <DialogContent className="mobile-history-dialog" aria-describedby="mobile-history-dialog-description">
       <DialogTitle className="sr-only">Lọc và sắp xếp</DialogTitle>
       <DialogDescription id="mobile-history-dialog-description" className="sr-only">Chọn trạng thái duyệt, cột và chiều sắp xếp cho danh sách phiếu.</DialogDescription>
-      <UtilityPanelMeta actionLabel="Đóng lọc và sắp xếp" dialogClose label="Danh sách phiếu" />
+      <UtilityPanelMeta actionLabel="Đóng lọc và sắp xếp" dialogClose label="Tùy chọn lọc" />
 
       <HistoryControlsContent filter={filter} idPrefix="mobile" onFilterChange={onFilterChange} onSort={onSort} onSortReset={onSortReset} sort={sort} />
     </DialogContent>
   </Dialog>;
-}
-
-function DesktopHistoryControlsPanel({ filter, onClose, onFilterChange, onSort, onSortReset, sort }: Omit<HistoryControlsContentProps, "idPrefix"> & { onClose: () => void }) {
-  return <section id="desktop-history-controls-panel" className="desktop-history-controls-panel" aria-label="Lọc và sắp xếp">
-    <UtilityPanelMeta actionLabel="Đóng lọc và sắp xếp" label="Danh sách phiếu" onAction={onClose} />
-    <HistoryControlsContent filter={filter} idPrefix="desktop" onFilterChange={onFilterChange} onSort={onSort} onSortReset={onSortReset} showSort={false} sort={sort} />
-  </section>;
 }
 
 function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSortReset, showSort = true, sort }: HistoryControlsContentProps) {
@@ -447,14 +419,7 @@ function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSo
   }
 
   return <div className="mobile-history-dialog-body">
-        <section className="expiry-focus-zone" aria-labelledby={`${idPrefix}-filter-title`}>
-          <div className="expiry-field-heading">
-            <h3 id={`${idPrefix}-filter-title`}>Lọc trạng thái</h3>
-            <div className="history-section-actions">
-              <span className="utility-panel-action-visual" aria-hidden="true"><Filter /></span>
-              <button type="button" className="mobile-history-section-reset" aria-label="Làm mới lọc trạng thái" title="Làm mới lọc trạng thái" disabled={filter === "ALL"} onClick={() => onFilterChange("ALL")}><RotateCcw aria-hidden="true" /></button>
-            </div>
-          </div>
+        <section className="expiry-focus-zone" aria-label="Lọc trạng thái">
           <div className="mobile-history-choice-grid mobile-history-filter-grid" role="group" aria-label="Lọc theo trạng thái duyệt">
             {approvalFilterOptions.slice(1).map(({ label, value }) => {
               const selected = filter === value;
@@ -465,14 +430,7 @@ function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSo
           </div>
         </section>
 
-        {showSort ? <section className="expiry-focus-zone" aria-labelledby={`${idPrefix}-sort-title`}>
-          <div className="expiry-field-heading">
-            <h3 id={`${idPrefix}-sort-title`}>Sắp xếp</h3>
-            <div className="history-section-actions">
-              <span className="utility-panel-action-visual" aria-hidden="true"><ArrowUpDown /></span>
-              <button type="button" className="mobile-history-section-reset" aria-label="Làm mới sắp xếp" title="Làm mới sắp xếp" disabled={sort === null} onClick={onSortReset}><RotateCcw aria-hidden="true" /></button>
-            </div>
-          </div>
+        {showSort ? <section className="expiry-focus-zone" aria-label="Sắp xếp">
           <div className="mobile-history-choice-grid mobile-history-sort-grid" role="group" aria-label="Sắp xếp danh sách phiếu">
             {recordSortOptions.map(({ label, value }) => {
               const selected = sort?.key === value;
@@ -492,11 +450,11 @@ function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSo
 function SortableHeader({ label, onSort, sort, sortKey }: { label: string; onSort: (key: RecordSortKey) => void; sort: RecordSort | null; sortKey: RecordSortKey }) {
   const active = sort?.key === sortKey;
   const direction = active ? sort.direction : "none";
-  const SortIcon = !active ? ArrowUpDown : sort.direction === "ascending" ? ArrowUp : ArrowDown;
+  const SortIcon = sort?.direction === "ascending" ? ArrowUp : ArrowDown;
 
   return <th className="px-3 py-0" aria-sort={direction}>
     <button type="button" className={cn("table-sort", active && "is-active")} aria-label={`Sắp xếp theo ${label}`} onClick={() => onSort(sortKey)}>
-      <span>{label}</span><SortIcon aria-hidden="true" />
+      <span>{label}</span>{active ? <SortIcon aria-hidden="true" /> : null}
     </button>
   </th>;
 }
@@ -514,13 +472,13 @@ type RecordProps = {
 
 function RecordRow({ approvalStatus, onApprovalChange, onInvalidate, onToggle, record, selected }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
-    <td className="p-3"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
+    <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
     <td className="p-3"><span className="font-mono text-xs font-bold text-brand">{record.sku}</span><br /><strong>{record.productName}</strong></td>
     <td className="max-w-56 p-3 text-ink-muted">{record.supplier}</td>
     <td className="p-3 font-bold">{record.quantity}</td>
-    <td className="p-3"><span className="status-badge">{record.condition}</span></td>
-    <td className="p-3 text-xs font-black text-brand">{record.resolution}</td>
+    <td className="p-3"><Tag className="status-badge" tone={getConditionTone(record.condition)}>{record.condition}</Tag></td>
+    <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
     <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
     <td className="p-3"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></td>
     <td className="p-3 text-center"><RecordInvalidateButton recordId={record.id} onInvalidate={onInvalidate} /></td>
@@ -547,7 +505,9 @@ function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpa
         <button type="button" className="record-card-expand" aria-expanded={expanded} aria-label={`${expanded ? "Thu gọn" : "Mở rộng"} phiếu ${record.id}`} title={expanded ? "Thu gọn phiếu" : "Mở rộng phiếu"} onClick={() => onExpansionChange?.(record.id, !expanded)}>
           {expanded ? <ChevronUp size={18} aria-hidden="true" /> : <ChevronDown size={18} aria-hidden="true" />}
         </button>
-        <input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} />
+        <label className="record-card-select-slot">
+          <input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} />
+        </label>
       </div>
     </header>
 
@@ -558,10 +518,22 @@ function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpa
         <span className="record-card-meta-item" aria-label={`Số lượng ${record.quantity}`} title="Số lượng"><Scale aria-hidden="true" /><strong>{record.quantity}</strong></span>
         <span className="record-card-meta-item is-supplier" aria-label={`Nhà cung cấp ${record.supplier}`} title="Nhà cung cấp"><Building2 aria-hidden="true" /><span>{record.supplier}</span></span>
       </div>
+      <div className="record-card-outcomes" aria-label="Tình trạng và biện pháp">
+        <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
+        <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
+      </div>
       <RecordPhotoGallery photos={record.photos} recordId={record.id} variant="card" />
+      <div className="record-card-note" aria-label={`Ghi chú: ${record.note || "Không có ghi chú"}`}>
+        <span className="record-card-note-label">Ghi chú:</span>
+        <span className="record-card-note-content">{record.note || "—"}</span>
+      </div>
     </> : null}
     <footer className="record-card-footer">
-      <RecordCardStatuses approvalStatus={approvalStatus} compact={!expanded} onApprovalChange={onApprovalChange} record={record} />
+      {!expanded ? (
+        <RecordCardStatuses approvalStatus={approvalStatus} compact onApprovalChange={onApprovalChange} record={record} />
+      ) : (
+        <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
+      )}
       <RecordInvalidateButton recordId={record.id} onInvalidate={onInvalidate} />
     </footer>
   </article>;
@@ -569,8 +541,8 @@ function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpa
 
 function RecordCardStatuses({ approvalStatus, compact = false, onApprovalChange, record }: { approvalStatus: DemoApprovalStatus; compact?: boolean; onApprovalChange: RecordProps["onApprovalChange"]; record: DemoRecord }) {
   return <div className={cn("record-card-statuses", compact && "record-card-compact-outcomes")} aria-label="Tình trạng, biện pháp và duyệt">
-    <strong className="status-badge" title={`Tình trạng: ${record.condition}`}>{record.condition}</strong>
-    <strong className="resolution-badge" title={`Biện pháp: ${record.resolution}`}>{record.resolution}</strong>
+    <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
+    <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
     <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
   </div>;
 }

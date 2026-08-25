@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import fieldPolicyCases from "../../../contracts/fixtures/golden/kph/field-policy-cases.json";
 
-import { KPH_OPTIONS, resolveChoiceLabel, type KphKind } from "./kph-options";
+import { getApprovalTone, getConditionTone, getResolutionTone, KPH_OPTIONS, resolveChoiceLabel, type KphKind } from "./kph-options";
 
 describe("KPH option matrix", () => {
   it.each(fieldPolicyCases)("keeps shared option fixture $id", (fixture) => {
@@ -19,5 +19,20 @@ describe("KPH option matrix", () => {
     if (!other) return;
     expect(resolveChoiceLabel(other, "  ")).toBe("Khác");
     expect(resolveChoiceLabel(other, "Bao bì sai nhãn")).toBe("Bao bì sai nhãn");
+  });
+
+  it("resolves correct tones for condition, resolution, and approval", () => {
+    expect(getConditionTone("Cận date")).toBe("orange");
+    expect(getConditionTone("Hư hỏng")).toBe("red");
+    expect(getConditionTone("Hết HSD")).toBe("gray");
+
+    expect(getResolutionTone("HỦY")).toBe("red");
+    expect(getResolutionTone("ĐỔI")).toBe("green");
+    expect(getResolutionTone("XUẤT TRẢ")).toBe("blue");
+    expect(getResolutionTone("KHÁC")).toBe("gray");
+
+    expect(getApprovalTone("PENDING")).toBe("orange");
+    expect(getApprovalTone("APPROVED")).toBe("green");
+    expect(getApprovalTone("REJECTED")).toBe("red");
   });
 });

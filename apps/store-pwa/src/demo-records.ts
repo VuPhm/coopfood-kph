@@ -15,6 +15,7 @@ export type DemoRecord = {
   resolution: string;
   approvalStatus: DemoApprovalStatus;
   photos: readonly DemoPhoto[];
+  note?: string;
 };
 
 export type DemoPhoto = {
@@ -40,6 +41,7 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
       { id: "cookie-front", src: "/demo/evidence-cookie-front.svg", alt: "Mặt trước hộp bánh quy tại quầy" },
       { id: "cookie-expiry", src: "/demo/evidence-cookie-expiry.svg", alt: "Thông tin hạn dùng trên hộp bánh quy" },
     ],
+    note: "Hàng cận hạn dùng còn 3 ngày, đã liên hệ NCC đổi lô mới.",
   },
   {
     id: "KPH-260815-017",
@@ -56,5 +58,6 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     photos: [
       { id: "vegetable-damage", src: "/demo/evidence-vegetable.svg", alt: "Tình trạng cải thìa tại quầy" },
     ],
+    note: "Dập úa lá ngoài khi kiểm hàng đầu ca sáng.",
   },
 ];

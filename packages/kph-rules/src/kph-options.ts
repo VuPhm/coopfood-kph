@@ -55,3 +55,29 @@ export function resolveChoiceLabel<T extends string>(choice: Choice<T>, detail?:
   if (choice.value !== "OTHER") return choice.label;
   return detail?.trim() || choice.label;
 }
+
+export type ChoiceTone = "orange" | "green" | "red" | "blue" | "gray";
+
+export function getConditionTone(condition: string): ChoiceTone {
+  const norm = condition.trim().toLowerCase();
+  if (norm === "cận date" || norm === "near_expiry") return "orange";
+  if (norm === "hư hỏng" || norm === "damaged") return "red";
+  if (norm === "hết hsd" || norm === "expired") return "gray";
+  return "gray";
+}
+
+export function getResolutionTone(resolution: string): ChoiceTone {
+  const norm = resolution.trim().toUpperCase();
+  if (norm === "HỦY" || norm === "CANCEL") return "red";
+  if (norm === "ĐỔI" || norm === "EXCHANGE") return "green";
+  if (norm === "XUẤT TRẢ" || norm === "RETURN") return "blue";
+  return "gray";
+}
+
+export function getApprovalTone(status: string): ChoiceTone {
+  const norm = status.trim().toUpperCase();
+  if (norm === "PENDING" || norm === "CHỜ DUYỆT") return "orange";
+  if (norm === "APPROVED" || norm === "ĐÃ DUYỆT") return "green";
+  if (norm === "REJECTED" || norm === "KHÔNG DUYỆT") return "red";
+  return "gray";
+}

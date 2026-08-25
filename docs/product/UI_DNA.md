@@ -57,10 +57,11 @@ lập inventory. Bộ screenshot tổng hợp cần được tạo theo
 | Focus | indicator xanh-lime 3px, offset 2–3px | Không được loại bỏ focus visible |
 
 Spacing triển khai dùng các token `--space-1/1-5/2/2-5/3/3-5/4/5/6` tương ứng
-nhịp `4/6/8/10/12/14/16/20/24px`. Các alias `--control-gap`,
-`--panel-inset` và `--workspace-panel-gap` biểu diễn khoảng cách theo vai trò,
-tránh lặp literal trong component. Trên desktop, bốn panel lớn dùng chung
-`--workspace-panel-gap` cho cả khoảng cách ngang lẫn dọc.
+nhịp `4/6/8/10/12/14/16/20/24px`. Dùng trực tiếp scale `--space-*` (ví dụ khoảng cách
+layout panel dùng `--space-4`), chỉ giữ alias thực sự cần thiết (`--control-gap`,
+`--panel-inset`) biểu diễn khoảng cách theo vai trò, tránh tạo thêm alias biến thừa.
+Bốn khối panel lớn (workspace header, history board, desktop filter, tra hạn nhanh)
+đồng bộ dùng chung padding `--panel-inset` và gap dọc cấp cao nhất của khối `--space-2`.
 
 ### Visual refresh block-first cân bằng — 2026-08-24
 
@@ -84,6 +85,14 @@ dày đặc hoặc dùng đường kẻ làm cách phân cấp duy nhất:
   phiếu và store context desktop `72px`, action tạo phiếu mobile `56px`; label +
   control form `72px`. Các item có nội dung khác chiều cao phải căn giữa theo
   cross-axis, không căn top tùy ý.
+- **Không dùng số layout fix cứng**: Tuyệt đối không hardcode các số pixel tùy ý
+  (magic numbers) trực tiếp trong inline styles hay class cục bộ khi dựng layout.
+  Mọi kích thước, khoảng cách và màu sắc phải gắn với token và CSS variables
+  (`--space-*`, `--control-gap`, `--panel-inset`, `--color-*`).
+- **Không sinh thêm class hoặc biến thừa trùng lặp**: Tránh tạo biến/alias CSS thừa
+  (như các alias bọc lại `--space-*` không cần thiết) hoặc class/selector mới khi
+  đã có utility và token tương đương; ưu tiên dùng trực tiếp thang `--space-*` và
+  tái sử dụng component, class hệ thống đã định nghĩa sẵn.
 
 Typography legacy không hoàn toàn nhất quán: bundle có Montserrat nhúng, trong
 khi các nhãn loại thực phẩm và workspace refresh dùng system UI stack. Hệ thống

@@ -15,8 +15,8 @@ describe("Store workspace", () => {
 
   it("keeps both KPH entry actions visible", () => {
     render(<App />);
-    expect(screen.getByRole("button", { name: /Tạo phiếu Thực phẩm khô & khác/i })).toBeVisible();
-    expect(screen.getByRole("button", { name: /Tạo phiếu Thực phẩm tươi sống/i })).toBeVisible();
+    expect(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i })).toBeVisible();
+    expect(screen.getByRole("button", { name: /Tạo phiếu TP tươi sống/i })).toBeVisible();
   });
 
   it("keeps expiry lookup inside main as the parallel workbench", () => {
@@ -58,41 +58,16 @@ describe("Store workspace", () => {
     expect(heading).toHaveAttribute("aria-sort", "descending");
   });
 
-  it("keeps the desktop filter panel inline until its trigger or close button is used", () => {
+  it("sorts records by approval status from the desktop table header", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
-    const trigger = screen.getByRole("button", { name: "Mở lọc và sắp xếp trên desktop" });
-    fireEvent.click(trigger);
-    const panel = screen.getByRole("region", { name: "Lọc và sắp xếp" });
+    const sortBtn = screen.getByRole("button", { name: "Sắp xếp theo Duyệt" });
+    const th = sortBtn.closest("th");
 
-    expect(panel.parentElement).toHaveClass("workspace-side-stack");
-    expect(panel.nextElementSibling).toHaveAccessibleName("Tra hạn nhanh");
-    expect(within(panel).getByText("Danh sách phiếu")).toBeVisible();
-    expect(panel.querySelector(".utility-panel-meta")).not.toBeNull();
-    expect(within(panel).queryByRole("heading", { name: "Lọc và sắp xếp" })).not.toBeInTheDocument();
-    expect(within(panel).queryByText("Sắp xếp")).not.toBeInTheDocument();
-    expect(within(panel).queryByRole("button", { name: "Sắp xếp theo Nhà cung cấp" })).not.toBeInTheDocument();
-    expect(trigger).toHaveAttribute("aria-expanded", "true");
-    fireEvent.pointerDown(document.body);
-    expect(screen.getByRole("region", { name: "Lọc và sắp xếp" })).toBeVisible();
-
-    fireEvent.click(within(panel).getByRole("button", { name: "Lọc Đã duyệt" }));
-
-    expect(within(panel).getByRole("button", { name: "Bỏ lọc Đã duyệt" })).toHaveAttribute("aria-pressed", "true");
-    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0 dòng");
-    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
-
-    fireEvent.click(within(panel).getByRole("button", { name: "Đóng lọc và sắp xếp" }));
-    expect(screen.queryByRole("region", { name: "Lọc và sắp xếp" })).not.toBeInTheDocument();
-    expect(trigger).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
-    expect(screen.getAllByText("Cải thìa VietGAP 500 g")).toHaveLength(2);
-
-    fireEvent.click(trigger);
-    expect(screen.getByRole("region", { name: "Lọc và sắp xếp" })).toBeVisible();
-    fireEvent.click(trigger);
-    expect(screen.queryByRole("region", { name: "Lọc và sắp xếp" })).not.toBeInTheDocument();
+    expect(th).toHaveAttribute("aria-sort", "none");
+    fireEvent.click(sortBtn);
+    expect(th).toHaveAttribute("aria-sort", "ascending");
+    fireEvent.click(sortBtn);
+    expect(th).toHaveAttribute("aria-sort", "descending");
   });
 
   it("toggles mobile approval filters and sort direction from radio-style grids", () => {
@@ -101,39 +76,27 @@ describe("Store workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" }));
     const dialog = screen.getByRole("dialog", { name: "Lọc và sắp xếp" });
     const approvedFilter = within(dialog).getByRole("button", { name: "Lọc Đã duyệt" });
-    const filterReset = within(dialog).getByRole("button", { name: "Làm mới lọc trạng thái" });
-    const sortReset = within(dialog).getByRole("button", { name: "Làm mới sắp xếp" });
 
     expect(dialog.querySelector(".utility-panel-meta")).not.toBeNull();
-    expect(within(dialog).getByText("Danh sách phiếu")).toBeVisible();
+    expect(within(dialog).getByText("Tùy chọn lọc")).toBeVisible();
     expect(within(dialog).queryByText("Cột sắp xếp")).not.toBeInTheDocument();
-    expect(filterReset).toBeDisabled();
-    expect(sortReset).toBeDisabled();
     fireEvent.click(approvedFilter);
 
     expect(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" })).toHaveAttribute("aria-pressed", "true");
-    expect(filterReset).toBeEnabled();
-    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0 dòng");
+    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
     expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
 
-    fireEvent.click(filterReset);
-    fireEvent.click(within(dialog).getByRole("button", { name: "Lọc Đã duyệt" }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" }));
     expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" }));
     expect(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp tăng dần; bấm để chuyển giảm dần" })).toHaveAttribute("aria-pressed", "true");
-    expect(sortReset).toBeEnabled();
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp tăng dần; bấm để chuyển giảm dần" }));
     expect(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp giảm dần; bấm để huỷ sắp xếp" })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp giảm dần; bấm để huỷ sắp xếp" }));
     expect(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" })).toHaveAttribute("aria-pressed", "false");
-    expect(sortReset).toBeDisabled();
 
-    fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" }));
-    fireEvent.click(sortReset);
-    expect(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" })).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(within(dialog).getByRole("button", { name: "Đóng lọc và sắp xếp" }));
 
     expect(screen.getByRole("button", { name: "Sắp xếp theo NCC" }).closest("th")).toHaveAttribute("aria-sort", "none");
@@ -142,19 +105,22 @@ describe("Store workspace", () => {
 
   it("selects only the records in the active food type", () => {
     render(<App />);
+    expect(document.querySelector(".history-action-tools")).toBeNull();
+
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
-    expect(screen.getByRole("button", { name: "Duyệt 1 dòng" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Duyệt 1 phiếu" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Xuất Excel" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Vô hiệu hóa" })).not.toHaveTextContent("Vô hiệu hóa");
 
     fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
-    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0 dòng");
+    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
+    expect(document.querySelector(".history-action-tools")).toBeNull();
   });
 
   it("approves all selected records from the selection counter", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
-    fireEvent.click(screen.getByRole("button", { name: "Duyệt 1 dòng" }));
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 1 phiếu" }));
 
     const approvalControls = screen.getAllByRole("combobox", { name: "Trạng thái duyệt phiếu KPH-260815-018" });
     expect(approvalControls[0]).toHaveValue("APPROVED");
@@ -200,6 +166,16 @@ describe("Store workspace", () => {
     expect(within(card).getByText("15/08/2026")).toBeVisible();
     expect(within(card).queryByText("Phát hiện")).not.toBeInTheDocument();
     expect(within(card).queryByText("Số lượng · NCC")).not.toBeInTheDocument();
+
+    const outcomes = card.querySelector(".record-card-outcomes");
+    expect(outcomes).not.toBeNull();
+    expect(within(outcomes as HTMLElement).getByText("Cận date")).toBeVisible();
+    expect(within(outcomes as HTMLElement).getByText("ĐỔI")).toBeVisible();
+
+    const note = card.querySelector(".record-card-note");
+    expect(note).not.toBeNull();
+    expect(within(note as HTMLElement).getByText("Ghi chú:")).toBeVisible();
+    expect(within(note as HTMLElement).getByText(/Hàng cận hạn dùng còn 3 ngày/i)).toBeVisible();
 
     fireEvent.click(within(card).getByText("Bánh quy bơ hộp 300 g"));
     expect(card).toHaveClass("is-compact");
