@@ -87,6 +87,18 @@ describe("Expiry lookup", () => {
     expect(screen.getByText("Ngày lùi hàng")).toBeVisible();
   });
 
+  it("returns the mobile sheet to the top when reopened", () => {
+    render(<ExpiryWorkbench />);
+    openWorkbench();
+
+    const workbench = screen.getByRole("complementary", { name: "Tra hạn nhanh" });
+    workbench.scrollTop = 180;
+    fireEvent.click(screen.getByRole("button", { name: "Đóng tra hạn nhanh" }));
+    openWorkbench();
+
+    expect(workbench.scrollTop).toBe(0);
+  });
+
   it("closes the workbench with Escape or an outside pointer", () => {
     render(<ExpiryWorkbench />);
     openWorkbench();
