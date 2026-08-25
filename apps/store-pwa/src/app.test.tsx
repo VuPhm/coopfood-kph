@@ -1,9 +1,18 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { App } from "./app";
+import { App, formatBusinessDate } from "./app";
 
 describe("Store workspace", () => {
+  it("shows the Co.op Food logo and today's business date in the header", () => {
+    render(<App />);
+    const today = formatBusinessDate(new Date());
+
+    expect(screen.getByRole("img", { name: /Co\.op Food/i })).toHaveAttribute("src", "/brand/coopfood-logo.png");
+    expect(screen.getByLabelText(`Hôm nay: ${today.display}`)).toContainElement(screen.getByText(today.display));
+    expect(screen.getByText(today.display)).toHaveAttribute("datetime", today.iso);
+  });
+
   it("keeps both KPH entry actions visible", () => {
     render(<App />);
     expect(screen.getByRole("button", { name: /Tạo phiếu Thực phẩm khô & khác/i })).toBeVisible();
@@ -25,13 +34,209 @@ describe("Store workspace", () => {
     expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
   });
 
+  it("supports arrow-key navigation between the food type tabs", () => {
+    render(<App />);
+    const dryTab = screen.getByRole("tab", { name: /TP Khô & khác/i });
+    const freshTab = screen.getByRole("tab", { name: /TP Tươi sống/i });
+
+    dryTab.focus();
+    fireEvent.keyDown(dryTab, { key: "ArrowRight" });
+
+    expect(freshTab).toHaveFocus();
+    expect(freshTab).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("sorts record columns in both directions from the desktop headers", () => {
+    render(<App />);
+    const productSort = screen.getByRole("button", { name: "Sắp xếp theo SKU/UPC · Tên hàng hóa" });
+    const heading = productSort.closest("th");
+
+    expect(heading).toHaveAttribute("aria-sort", "none");
+    fireEvent.click(productSort);
+    expect(heading).toHaveAttribute("aria-sort", "ascending");
+    fireEvent.click(productSort);
+    expect(heading).toHaveAttribute("aria-sort", "descending");
+  });
+
+  it("keeps the desktop filter panel inline until its trigger or close button is used", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    const trigger = screen.getByRole("button", { name: "Mở lọc và sắp xếp trên desktop" });
+    fireEvent.click(trigger);
+    const panel = screen.getByRole("region", { name: "Lọc và sắp xếp" });
+
+    expect(panel.parentElement).toHaveClass("workspace-side-stack");
+    expect(panel.nextElementSibling).toHaveAccessibleName("Tra hạn nhanh");
+    expect(within(panel).getByText("Danh sách phiếu")).toBeVisible();
+    expect(panel.querySelector(".utility-panel-meta")).not.toBeNull();
+    expect(within(panel).queryByRole("heading", { name: "Lọc và sắp xếp" })).not.toBeInTheDocument();
+    expect(within(panel).queryByText("Sắp xếp")).not.toBeInTheDocument();
+    expect(within(panel).queryByRole("button", { name: "Sắp xếp theo Nhà cung cấp" })).not.toBeInTheDocument();
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    fireEvent.pointerDown(document.body);
+    expect(screen.getByRole("region", { name: "Lọc và sắp xếp" })).toBeVisible();
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Lọc Đã duyệt" }));
+
+    expect(within(panel).getByRole("button", { name: "Bỏ lọc Đã duyệt" })).toHaveAttribute("aria-pressed", "true");
+    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0 dòng");
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Đóng lọc và sắp xếp" }));
+    expect(screen.queryByRole("region", { name: "Lọc và sắp xếp" })).not.toBeInTheDocument();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
+    expect(screen.getAllByText("Cải thìa VietGAP 500 g")).toHaveLength(2);
+
+    fireEvent.click(trigger);
+    expect(screen.getByRole("region", { name: "Lọc và sắp xếp" })).toBeVisible();
+    fireEvent.click(trigger);
+    expect(screen.queryByRole("region", { name: "Lọc và sắp xếp" })).not.toBeInTheDocument();
+  });
+
+  it("toggles mobile approval filters and sort direction from radio-style grids", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" }));
+    const dialog = screen.getByRole("dialog", { name: "Lọc và sắp xếp" });
+    const approvedFilter = within(dialog).getByRole("button", { name: "Lọc Đã duyệt" });
+    const filterReset = within(dialog).getByRole("button", { name: "Làm mới lọc trạng thái" });
+    const sortReset = within(dialog).getByRole("button", { name: "Làm mới sắp xếp" });
+
+    expect(dialog.querySelector(".utility-panel-meta")).not.toBeNull();
+    expect(within(dialog).getByText("Danh sách phiếu")).toBeVisible();
+    expect(within(dialog).queryByText("Cột sắp xếp")).not.toBeInTheDocument();
+    expect(filterReset).toBeDisabled();
+    expect(sortReset).toBeDisabled();
+    fireEvent.click(approvedFilter);
+
+    expect(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" })).toHaveAttribute("aria-pressed", "true");
+    expect(filterReset).toBeEnabled();
+    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0 dòng");
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
+
+    fireEvent.click(filterReset);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Lọc Đã duyệt" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" }));
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" }));
+    expect(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp tăng dần; bấm để chuyển giảm dần" })).toHaveAttribute("aria-pressed", "true");
+    expect(sortReset).toBeEnabled();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp tăng dần; bấm để chuyển giảm dần" }));
+    expect(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp giảm dần; bấm để huỷ sắp xếp" })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp giảm dần; bấm để huỷ sắp xếp" }));
+    expect(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" })).toHaveAttribute("aria-pressed", "false");
+    expect(sortReset).toBeDisabled();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" }));
+    fireEvent.click(sortReset);
+    expect(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" })).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Đóng lọc và sắp xếp" }));
+
+    expect(screen.getByRole("button", { name: "Sắp xếp theo NCC" }).closest("th")).toHaveAttribute("aria-sort", "none");
+    expect(screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" })).not.toHaveClass("is-active");
+  });
+
   it("selects only the records in the active food type", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả phiếu trong loại hiện tại" }));
-    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 1 dòng");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    expect(screen.getByRole("button", { name: "Duyệt 1 dòng" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Xuất Excel" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Vô hiệu hóa" })).not.toHaveTextContent("Vô hiệu hóa");
 
     fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
     expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0 dòng");
+  });
+
+  it("approves all selected records from the selection counter", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 1 dòng" }));
+
+    const approvalControls = screen.getAllByRole("combobox", { name: "Trạng thái duyệt phiếu KPH-260815-018" });
+    expect(approvalControls[0]).toHaveValue("APPROVED");
+    expect(approvalControls[1]).toHaveValue("APPROVED");
+    expect(screen.getByText("Đã duyệt 1 phiếu trong dữ liệu demo.")).toBeVisible();
+  });
+
+  it("shows evidence thumbnails in table and card views and opens the shared viewer", () => {
+    render(<App />);
+    expect(screen.getAllByRole("button", { name: "Xem ảnh minh chứng 1 của phiếu KPH-260815-018" })).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Mở rộng phiếu KPH-260815-018" }));
+    const triggers = screen.getAllByRole("button", { name: "Xem ảnh minh chứng 1 của phiếu KPH-260815-018" });
+    expect(triggers).toHaveLength(2);
+
+    fireEvent.click(triggers[0]!);
+    expect(screen.getByRole("dialog", { name: "Xem ảnh minh chứng" })).toBeVisible();
+    expect(screen.getByAltText("Mặt trước hộp bánh quy tại quầy")).toBeVisible();
+  });
+
+  it("uses the compact mobile card by default with condition, resolution and approval", () => {
+    render(<App />);
+    const card = document.querySelector(".record-card");
+    const outcomes = document.querySelector(".record-card-compact-outcomes");
+
+    expect(card).toHaveClass("is-compact");
+    expect(outcomes).not.toBeNull();
+    expect(within(outcomes as HTMLElement).getByText("Cận date")).toBeVisible();
+    expect(within(outcomes as HTMLElement).getByText("ĐỔI")).toBeVisible();
+    expect(within(outcomes as HTMLElement).getByRole("combobox", { name: "Trạng thái duyệt phiếu KPH-260815-018" })).toBeVisible();
+    expect(card?.querySelector(".record-card-footer")).not.toBeNull();
+    expect(card?.querySelector(".record-card-meta")).toBeNull();
+    expect(card?.querySelector(".record-photo-gallery")).toBeNull();
+    expect(within(card as HTMLElement).getByRole("button", { name: "Vô hiệu hóa phiếu KPH-260815-018" })).toBeVisible();
+    expect(document.querySelector(".mobile-history .approval-control-label")).not.toBeInTheDocument();
+  });
+
+  it("expands a compact card from its content and collapses it from the product row", () => {
+    render(<App />);
+    const card = document.querySelector(".record-card") as HTMLElement;
+
+    fireEvent.click(within(card).getByText("Cận date"));
+    expect(card).not.toHaveClass("is-compact");
+    expect(within(card).getByText("15/08/2026")).toBeVisible();
+    expect(within(card).queryByText("Phát hiện")).not.toBeInTheDocument();
+    expect(within(card).queryByText("Số lượng · NCC")).not.toBeInTheDocument();
+
+    fireEvent.click(within(card).getByText("Bánh quy bơ hộp 300 g"));
+    expect(card).toHaveClass("is-compact");
+  });
+
+  it("expands and collapses every mobile card in the active tab", () => {
+    render(<App />);
+    const card = document.querySelector(".record-card") as HTMLElement;
+
+    fireEvent.click(screen.getByRole("button", { name: "Mở rộng tất cả" }));
+    expect(card).not.toHaveClass("is-compact");
+    expect(screen.getByRole("button", { name: "Thu gọn tất cả" })).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Thu gọn tất cả" }));
+    expect(card).toHaveClass("is-compact");
+  });
+
+  it("updates the approval state consistently in table and mobile card views", () => {
+    render(<App />);
+    const approvalControls = screen.getAllByRole("combobox", { name: "Trạng thái duyệt phiếu KPH-260815-018" });
+
+    expect(approvalControls).toHaveLength(2);
+    expect(approvalControls[0]).toHaveValue("PENDING");
+    fireEvent.change(approvalControls[0]!, { target: { value: "APPROVED" } });
+
+    expect(approvalControls[0]).toHaveValue("APPROVED");
+    expect(approvalControls[1]).toHaveValue("APPROVED");
+    expect(screen.getByText(/Đã chuyển phiếu KPH-260815-018 sang “Đã duyệt”/i)).toBeVisible();
+  });
+
+  it("offers an individual invalidate action for every record presentation", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Mở rộng phiếu KPH-260815-018" }));
+    const invalidateButtons = screen.getAllByRole("button", { name: "Vô hiệu hóa phiếu KPH-260815-018" });
+
+    expect(invalidateButtons).toHaveLength(2);
+    fireEvent.click(invalidateButtons[0]!);
+    expect(screen.getByText(/Vô hiệu hóa phiếu KPH-260815-018 cần lý do/i)).toBeVisible();
   });
 });

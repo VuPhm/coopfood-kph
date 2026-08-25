@@ -1,5 +1,7 @@
 import type { KphKind } from "@coopfood-kph/kph-rules";
 
+export type DemoApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 export type DemoRecord = {
   id: string;
   kind: KphKind;
@@ -11,7 +13,14 @@ export type DemoRecord = {
   quantity: string;
   condition: string;
   resolution: string;
-  photos: number;
+  approvalStatus: DemoApprovalStatus;
+  photos: readonly DemoPhoto[];
+};
+
+export type DemoPhoto = {
+  id: string;
+  src: string;
+  alt: string;
 };
 
 export const DEMO_RECORDS: readonly DemoRecord[] = [
@@ -26,7 +35,11 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     quantity: "2 EA",
     condition: "Cận date",
     resolution: "ĐỔI",
-    photos: 2,
+    approvalStatus: "PENDING",
+    photos: [
+      { id: "cookie-front", src: "/demo/evidence-cookie-front.svg", alt: "Mặt trước hộp bánh quy tại quầy" },
+      { id: "cookie-expiry", src: "/demo/evidence-cookie-expiry.svg", alt: "Thông tin hạn dùng trên hộp bánh quy" },
+    ],
   },
   {
     id: "KPH-260815-017",
@@ -39,6 +52,9 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     quantity: "1.5 kg",
     condition: "Hư hỏng",
     resolution: "HỦY",
-    photos: 1,
+    approvalStatus: "APPROVED",
+    photos: [
+      { id: "vegetable-damage", src: "/demo/evidence-vegetable.svg", alt: "Tình trạng cải thìa tại quầy" },
+    ],
   },
 ];
