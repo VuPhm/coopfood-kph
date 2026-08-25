@@ -330,7 +330,7 @@ function DurationControl({ id, label, onChange, suffix, value }: { id: string; l
     <div className="expiry-field">
       <label htmlFor={id}>{label}</label>
       <div className="relative">
-        <Input id={id} value={value} onChange={(event) => onChange(event.target.value)} inputMode="numeric" placeholder={suffix === "ngày" ? "Ví dụ: 30" : "Ví dụ: 3"} className="pr-16 tabular-nums" />
+        <Input id={id} value={value} onChange={(event) => onChange(event.target.value)} inputMode="numeric" placeholder={suffix === "ngày" ? "Ví dụ: 30" : "Ví dụ: 3"} className="pr-14 tabular-nums" />
         <span className="expiry-input-suffix">{suffix}</span>
       </div>
     </div>
