@@ -27,5 +27,11 @@
   body { margin: 0; min-width: 320px; }
   * { box-sizing: border-box; }
   button { border: 0; }
+  :where(button, input:not(.sr-only), select, textarea):focus { outline: none; }
+  :where(button, input:not(.sr-only), select, textarea):focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+  .sr-only:focus { outline: none; }
   svg { stroke-width: 2.35; }
 }
+
+.dialog-close-hit-area:focus-visible { outline: none; }
+html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px solid var(--color-focus); outline-offset: 0; }

@@ -46,15 +46,21 @@ lập inventory. Bộ screenshot tổng hợp cần được tạo theo
 | Accent cảnh báo | `#f29200` | Cận date/cảnh báo |
 | Nền/surface | canvas `#eef3ef`; muted `#f3f7f4`; strong `#e4ece6`; trắng `#ffffff` | Phân cấp khối không cần viền |
 | Text | `#1c261c` / `#667366` | Nội dung chính/phụ |
-| Semantic green | nền trắng, inset glow xanh ngắn sát mép; nhấn bằng fill | Safe/success |
+| Semantic green | nền trắng, border hoặc outer glow xanh theo cấp surface; nhấn bằng fill | Safe/success |
 | Semantic yellow | nền `#fff1dc`, nhấn bằng fill | Warning |
 | Semantic red | nền `#fdebec`, nhấn bằng fill | Danger/error |
-| Spacing | `4, 8, 12, 16, 24, 32, 40px` | Không thêm spacing lẻ ngoài thang nếu chưa có lý do |
+| Spacing | core `4, 8, 12, 16, 20, 24px`; compact half-step `6, 10, 14px` | Dùng token theo vai trò, không lặp literal trong component |
 | Control | cao tối thiểu `44px`, radius `12px` | Input/nút thường |
 | Panel | radius `24px` | Workspace, modal card, result card |
 | Item | radius `16px`; compact item `12px` | Card, choice, table row, icon button |
 | Shadow | panel `0 12px 32px rgba(0,66,33,.08)` | Chỉ panel/overlay; control nhỏ không tự đổ bóng |
 | Focus | indicator xanh-lime 3px, offset 2–3px | Không được loại bỏ focus visible |
+
+Spacing triển khai dùng các token `--space-1/1-5/2/2-5/3/3-5/4/5/6` tương ứng
+nhịp `4/6/8/10/12/14/16/20/24px`. Các alias `--control-gap`,
+`--panel-inset` và `--workspace-panel-gap` biểu diễn khoảng cách theo vai trò,
+tránh lặp literal trong component. Trên desktop, bốn panel lớn dùng chung
+`--workspace-panel-gap` cho cả khoảng cách ngang lẫn dọc.
 
 ### Visual refresh block-first cân bằng — 2026-08-24
 
@@ -69,9 +75,9 @@ dày đặc hoặc dùng đường kẻ làm cách phân cấp duy nhất:
   dùng border 2px; selected/error kết hợp màu nền với tổng stroke 2–3px.
 - Icon dùng stroke khoảng `2.25–2.5`; timeline tối thiểu `6px`; marker tối thiểu
   `2px`. Divider giữa mọi dòng vẫn được thay bằng spacing hoặc surface khác màu.
-- Surface lớn từng dùng nền xanh nhạt chuyển sang nền trắng với inset glow xanh
-  ngắn sát mép. Badge nhỏ vẫn được dùng tint để giữ khả năng quét; warning và
-  danger giữ màu semantic riêng, không kế thừa glow xanh.
+- Không dùng inner glow. Form group phân cấp bằng nền trắng, border neutral và
+  spacing; khu kết quả tra nền trắng dùng outer glow đúng màu semantic. Badge
+  nhỏ vẫn được dùng tint để giữ khả năng quét; warning và danger giữ màu riêng.
 - Pill chỉ dành cho badge, count và switch. Control/card/panel lần lượt dùng
   radius `12/16/24px` để tránh nhiều mức bo tùy ý.
 - Các phần tử cùng hàng dùng height contract: control/action `44px`, action tạo
@@ -110,6 +116,9 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
 - Header có logo/brand “Co.op Food”, tên tool và ngày hôm nay.
 - Workspace có title “Phiếu theo dõi hàng không phù hợp”, store identity và hai
   nút tạo TPCN/TPTS.
+- Hai nút tạo TPCN/TPTS cùng dùng xanh thương hiệu, phân biệt bằng nhãn và icon
+  kiện hàng/thực phẩm tươi cùng phong cách nét. Trên desktop, cả hai tận dụng
+  chiều cao `72px` bằng nhãn và icon lớn hơn mobile.
 - Legacy cho sửa tên/mã cửa hàng bằng modal và lưu localStorage; tiền tố
   “Co.op Food” là UI cố định, không nằm trong tên lưu.
 - Hệ thống mới giữ vị trí/khả năng nhận biết cửa hàng nhưng lấy giá trị từ
@@ -118,10 +127,54 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
 ### Lịch sử, bảng và card
 
 - Tab TPCN/TPTS kèm count, count tổng của tab đang xem, số dòng đã chọn.
+- Title lịch sử đặt tổng số phiếu trong badge ở mép đối diện để tách count tổng
+  khỏi count từng loại. Hai tab là segmented control cân bằng, nhãn ngắn và
+  count; tab đang chọn dùng fill xanh toàn mặt, không dùng gạch chân.
 - Desktop: checkbox đầu bảng, ngày + người phát hiện, SKU/UPC + tên hàng, NCC,
-  số lượng + đơn vị, tình trạng, biện pháp, ảnh xếp chồng và nút xóa.
-- Mobile: card có checkbox/ngày/SKU ở header; tên/số lượng, tình trạng/biện pháp,
-  ảnh và nút xóa ở body/footer.
+  số lượng + đơn vị, tình trạng, biện pháp, ảnh xếp chồng, trạng thái duyệt và
+  nút vô hiệu từng phiếu.
+- Các cột dữ liệu desktop (trừ checkbox, ảnh và vô hiệu hóa) có nút sort ngay
+  trong header, biểu diễn chiều hiện tại bằng icon và `aria-sort`. Trạng thái
+  duyệt có filter riêng dùng chung state giữa hai breakpoint: desktop đặt
+  `history-controls-trigger` tại header cột vô hiệu hóa thay cho select lọc cũ;
+  mobile đặt cùng trigger bên phải count tổng. Mobile mở hộp thoại nổi; desktop
+  mở panel trong cùng cột tiện ích, ngay phía trên hộp tra hạn. Panel desktop
+  không đóng khi click bên ngoài, chỉ đóng bằng trigger hoặc nút đóng. Desktop
+  chỉ hiện lưới lọc trạng thái và khớp chiều cao workspace header kế bên; mobile
+  giữ đủ cả lọc và sắp xếp. Chạm
+  trạng thái áp dụng ngay, chạm lại lựa chọn đang bật để bỏ lọc; ba lựa chọn dùng
+  tint cam/xanh/đỏ theo chờ duyệt/đã duyệt/không duyệt và không dùng radio tròn.
+  Chạm cột mới sẽ sắp tăng dần, lần hai chuyển giảm dần, lần ba bỏ sắp xếp; chỉ
+  choice-card đang chọn hiện icon chiều và không lặp chữ tăng/giảm. Mỗi tiêu đề
+  vùng có nút làm mới riêng để xóa lọc hoặc sắp xếp. Không lặp label field hoặc
+  tách thêm control chọn chiều. Cả hai breakpoint dùng cùng khuôn meta một dòng;
+  heading vùng và choice-card được compact, choice chưa chọn không tô nền.
+- Filter chạy trước sort, count tổng phản ánh tập đang hiển thị và thay filter
+  phải xóa selection để không giữ thao tác trên dòng đã bị ẩn.
+- Mobile: card có checkbox/ngày/SKU ở header; tên/số lượng, ảnh, tình trạng và
+  biện pháp nằm kế nhau; trạng thái duyệt và nút vô hiệu ở footer.
+- Mobile mặc định dùng card compact giữ nguyên header sản phẩm và footer tình
+  trạng/biện pháp/duyệt/vô hiệu hóa; chỉ ẩn hai phần metadata và gallery ảnh.
+  Chevron mở/thu nằm trước checkbox; chạm vùng card compact mở chi tiết, chạm
+  lại hàng SKU/tên ở card đầy đủ để thu.
+  Có thao tác mở/thu tất cả cạnh “Chọn tất cả”; khi trạng thái card đang lẫn
+  nhau, hành động hiển thị là “Mở rộng tất cả”. Cụm chevron + checkbox nằm trong
+  grid slot cố định với padding dùng chung nên không đổi vị trí khi mở/thu card;
+  scrollbar gutter được giữ ổn định để việc nội dung dài thêm không làm đổi bề
+  rộng card. Không dùng tọa độ tuyệt đối để khóa vị trí.
+- Card đầy đủ giữ cùng dải trạng thái với card compact; ngày phát hiện, người
+  phát hiện, số lượng và NCC dùng icon + giá trị, không lặp các tiêu đề trường
+  vốn đã rõ theo ngữ cảnh. Metadata phụ được phân cách bằng spacing/divider mảnh;
+  ảnh minh chứng ưu tiên lưới hai cột đủ lớn để kiểm tra nhanh.
+- Toolbar thao tác lô dùng cùng phong cách phẳng trên desktop và mobile: chọn
+  tất cả, đếm/duyệt, xuất Excel và vô hiệu hóa; khi có selection, “Duyệt x dòng”
+  là primary action. Desktop bỏ checkbox chọn tất cả khỏi table header để không
+  trùng thao tác. Mobile bổ sung mở/thu tất cả trong hàng điều khiển danh sách;
+  desktop không hiển thị thao tác này. Ở màn hình rất hẹp, nút Excel giữ icon và
+  accessible name nhưng ẩn nhãn hiển thị. Các toolbar không bọc thêm panel nhiều
+  lớp, dùng nhịp dọc tối thiểu và không phóng lớn theo card.
+- Trạng thái duyệt có ba giá trị “Chờ duyệt”, “Đã duyệt”, “Không duyệt”. UI demo
+  cho phép thao tác; backend sau này chỉ cho `STORE_MANAGER` đúng membership.
 - Export/xóa chỉ bật khi có selection; “chọn tất cả” áp dụng trong loại phiếu
   hiện hành, không xuyên tab.
 - Empty state nói rõ dữ liệu “trong phiên”. Hệ thống mới phải đổi copy/state cho
@@ -129,7 +182,9 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
 
 ### Form KPH
 
-- Modal sectioned, header cố định và body cuộn trên mobile.
+- Modal sectioned, header cố định và chỉ body form cuộn; footer phủ kín đến mép
+  dưới, không để lộ nội dung phía sau. Ẩn scrollbar thô nhưng vẫn giữ thao tác
+  wheel, vuốt và cuộn bàn phím.
 - Thứ tự cuối cùng: thông tin phát hiện; số lượng & đơn vị; tình trạng; biện
   pháp; người phát hiện & ảnh/ghi chú.
 - Input cao đồng nhất; date và SKU có icon action ở cạnh phải.
@@ -147,12 +202,14 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
 - Locale Việt, tuần bắt đầu thứ Hai, không dùng native mobile date picker.
 - Mở tra hạn không auto-focus NSX; focus vào nút đóng để tránh keyboard mobile
   bật lên ngoài ý muốn.
-- Khi mở, panel có header và nút đóng icon `X` duy nhất với accessible name;
-  khi đóng, giữ một disclosure trigger có icon và nhãn “Tra hạn nhanh”. Cùng một
-  button node đổi presentation để focus không rơi về `body` sau khi thu panel.
-- Desktop giữ side panel trong workspace. Mobile dùng floating sheet nằm dưới
-  brand header; khi thu, trigger cố định ở góc dưới có safe-area để tiện ích
-  luôn sẵn mà không chiếm chiều dài nội dung.
+- Khi mở, panel dùng cùng khuôn meta một dòng với hộp lọc: nhãn ngữ cảnh bên trái
+  và nút đóng icon `X` bên phải, áp dụng nhất quán trên desktop/mobile. Khi đóng,
+  disclosure trigger chỉ hiện icon và căn trái trong cột tiện ích; button node
+  giữ nguyên để focus không rơi về `body` sau khi thu panel.
+- Desktop giữ side panel trong workspace và không đóng khi click bên ngoài;
+  người dùng thu panel bằng trigger/nút đóng rõ ràng. Mobile dùng floating sheet
+  nằm dưới brand header; khi thu, trigger cố định ở góc dưới có safe-area để
+  tiện ích luôn sẵn mà không chiếm chiều dài nội dung.
 - Tra thuận/ngược bằng toggle “Đã biết/Chưa biết” NSX; ngày, số ngày và số tháng
   đồng bộ. Kết quả cập nhật live khi đủ dữ liệu.
 - Result card giữ chiều cao ổn định, có placeholder/error/safe/warning/danger và

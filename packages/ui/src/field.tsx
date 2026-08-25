@@ -13,7 +13,7 @@ type FieldProps = HTMLAttributes<HTMLDivElement> & {
 export function Field({ className, error, hint, htmlFor, label, required, children, ...props }: FieldProps) {
   const description = error ?? hint;
   return (
-    <div className={cn("grid gap-2", className)} {...props}>
+    <div className={cn("grid gap-1", className)} {...props}>
       <label className="text-sm font-bold text-ink" htmlFor={htmlFor}>
         {label}{required ? <span className="ml-1 text-danger" aria-hidden="true">*</span> : null}
       </label>

@@ -12,6 +12,7 @@ describe("Button", () => {
   it("uses a filled surface with a moderate border for secondary actions", () => {
     render(<Button variant="secondary">Xuất Excel</Button>);
     const button = screen.getByRole("button", { name: "Xuất Excel" });
-    expect(button).toHaveClass("bg-brand-soft", "rounded-xl", "border-2", "focus-visible:ring-3");
+    expect(button).toHaveClass("bg-brand-soft", "rounded-xl", "border-2", "focus-visible:outline-3");
+    expect(button).not.toHaveClass("focus-visible:ring-3");
   });
 });
