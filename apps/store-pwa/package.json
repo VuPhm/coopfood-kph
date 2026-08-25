@@ -15,6 +15,7 @@
     "@coopfood-kph/ui": "*",
     "@hookform/resolvers": "^5.2.1",
     "@tanstack/react-query": "^5.85.3",
+    "exifr": "^7.1.3",
     "lucide-react": "^0.468.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

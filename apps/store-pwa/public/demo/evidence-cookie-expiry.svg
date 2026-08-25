@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Ảnh minh chứng hạn dùng bánh quy</title><desc id="desc">Minh họa tổng hợp nhãn hạn dùng, không phải dữ liệu vận hành thật.</desc>
+  <rect width="1200" height="800" fill="#d9b06d"/><rect x="170" y="120" width="860" height="510" rx="38" fill="#fff8e8" stroke="#8d5a20" stroke-width="14"/>
+  <text x="240" y="240" font-family="system-ui,sans-serif" font-size="40" font-weight="750" fill="#3a2a18">THÔNG TIN SẢN PHẨM</text><line x1="240" y1="275" x2="960" y2="275" stroke="#b7a485" stroke-width="5"/>
+  <text x="240" y="370" font-family="monospace" font-size="58" font-weight="800" fill="#1c261c">NSX: 01/08/2026</text><text x="240" y="470" font-family="monospace" font-size="58" font-weight="800" fill="#b94019">HSD: 30/08/2026</text>
+  <g transform="translate(36 628)"><rect width="500" height="132" rx="22" fill="#002d20" fill-opacity=".84" stroke="#d5f0de" stroke-opacity=".5" stroke-width="3"/><text x="24" y="62" fill="#fff" font-family="monospace" font-size="48" font-weight="700">09:19</text><text x="190" y="43" fill="#fff" font-family="system-ui,sans-serif" font-size="25" font-weight="650">Thứ Bảy</text><text x="190" y="78" fill="#fff" font-family="system-ui,sans-serif" font-size="23">15/08/2026</text><rect x="24" y="94" width="5" height="24" fill="#93c11f"/><text x="42" y="115" fill="#fff" font-family="system-ui,sans-serif" font-size="20">CF-DEMO-001 - Nguyễn Kiệm</text></g>
+</svg>
