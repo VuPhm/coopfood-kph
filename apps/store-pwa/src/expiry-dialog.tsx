@@ -1,6 +1,4 @@
 import {
-  addDays,
-  addMonths,
   calculateShelfLife,
   daysBetween,
   expiryFromDays,
@@ -20,8 +18,6 @@ import {
 import {
   Ban,
   CalendarDays,
-  ChevronLeft,
-  ChevronRight,
   CircleAlert,
   Clock3,
   RotateCcw,
@@ -29,13 +25,15 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
+
+import { CalendarInput } from "./calendar-input";
+import { UtilityPanelMeta } from "./utility-panel-meta";
 
 type DurationSource = "date" | "days" | "months";
-type CalendarTarget = "nsx" | "hsd";
 
 const statusCopy = {
-  SAFE: { label: "Còn an toàn", icon: ShieldCheck },
+  SAFE: { label: "An toàn", icon: ShieldCheck },
   WARNING: { label: "Sắp đến hạn lùi", icon: Clock3 },
   DANGER: { label: "Ngày lùi hàng", icon: CircleAlert },
   EXPIRED: { label: "Đã hết hạn sử dụng", icon: Ban },
@@ -61,37 +59,38 @@ function positiveWholeNumber(value: string) {
   return Number.isInteger(number) && number > 0 ? number : null;
 }
 
-function firstDayOfMonth(value: LocalDate): LocalDate {
-  return `${value.slice(0, 7)}-01` as LocalDate;
-}
-
 export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate }) {
-  const [expanded, setExpanded] = useState(true);
+  const workbenchRef = useRef<HTMLElement>(null);
+  const [expanded, setExpanded] = useState(false);
   const [knownManufactureDate, setKnownManufactureDate] = useState(true);
   const [nsx, setNsx] = useState("");
   const [hsd, setHsd] = useState("");
   const [days, setDays] = useState("");
   const [months, setMonths] = useState("");
   const [durationSource, setDurationSource] = useState<DurationSource>("date");
-  const [calendarTarget, setCalendarTarget] = useState<CalendarTarget | null>(null);
-  const [calendarMonth, setCalendarMonth] = useState<LocalDate>(firstDayOfMonth(today));
 
   useEffect(() => {
-    if (!calendarTarget) return;
-    function closeCalendarOnOutsidePointer(event: PointerEvent) {
-      if (event.target instanceof Element && event.target.closest("[data-expiry-date-control]")) return;
-      setCalendarTarget(null);
+    if (!expanded) return;
+
+    function closeOnOutsidePointer(event: PointerEvent) {
+      if (window.innerWidth >= 1280) return;
+      if (event.target instanceof Node && !workbenchRef.current?.contains(event.target)) setExpanded(false);
     }
-    function closeCalendarOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setCalendarTarget(null);
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      if (workbenchRef.current?.querySelector('[role="dialog"][aria-label="Lịch chọn ngày"]')) return;
+      setExpanded(false);
+      window.setTimeout(() => workbenchRef.current?.querySelector<HTMLButtonElement>(".expiry-workbench-toggle")?.focus(), 0);
     }
-    document.addEventListener("pointerdown", closeCalendarOnOutsidePointer);
-    document.addEventListener("keydown", closeCalendarOnEscape);
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.removeEventListener("pointerdown", closeCalendarOnOutsidePointer);
-      document.removeEventListener("keydown", closeCalendarOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
     };
-  }, [calendarTarget]);
+  }, [expanded]);
 
   const liveState = useMemo(() => {
     const parsedNsx = tryParseDate(nsx);
@@ -237,19 +236,6 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
     setDays("");
     setMonths("");
     setDurationSource("date");
-    setCalendarTarget(null);
-  }
-
-  function openCalendar(target: CalendarTarget) {
-    const selected = tryParseDate(target === "nsx" ? nsx : hsd) ?? today;
-    setCalendarMonth(firstDayOfMonth(selected));
-    setCalendarTarget((current) => current === target ? null : target);
-  }
-
-  function chooseCalendarDate(value: LocalDate) {
-    if (calendarTarget === "nsx") changeNsx(formatDisplayDate(value));
-    if (calendarTarget === "hsd") changeHsd(formatDisplayDate(value));
-    setCalendarTarget(null);
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -257,41 +243,23 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
   }
 
   function toggleWorkbench() {
-    setExpanded((current) => {
-      if (current) setCalendarTarget(null);
-      return !current;
-    });
+    setExpanded((current) => !current);
   }
 
   return (
-    <aside className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra hạn nhanh">
-      <button
-        type="button"
-        className={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger")}
-        aria-controls="expiry-workbench-content"
-        aria-expanded={expanded}
-        aria-label={expanded ? "Đóng tra hạn nhanh" : undefined}
-        title={expanded ? "Đóng" : undefined}
-        onClick={toggleWorkbench}
-      >
-        {expanded ? <X size={20} aria-hidden="true" /> : (
-          <>
-            <CalendarDays size={18} aria-hidden="true" />
-            <span>Tra hạn nhanh</span>
-          </>
-        )}
-      </button>
+    <aside ref={workbenchRef} className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra hạn nhanh">
+      <UtilityPanelMeta
+        actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger")}
+        actionControls="expiry-workbench-content"
+        actionExpanded={expanded}
+        actionIcon={expanded ? <X /> : <CalendarDays />}
+        actionLabel={expanded ? "Đóng tra hạn nhanh" : "Tra hạn nhanh"}
+        className={!expanded ? "is-collapsed" : ""}
+        label={expanded ? "Tra hạn nhanh" : ""}
+        onAction={toggleWorkbench}
+      />
 
       {expanded ? <div id="expiry-workbench-content" className="expiry-workbench-body">
-        <header className="expiry-workbench-header">
-          <span className="expiry-workbench-header-icon" aria-hidden="true">
-            <CalendarDays />
-          </span>
-          <div>
-            <p>Tiện ích</p>
-            <h2>Tra hạn nhanh</h2>
-          </div>
-        </header>
         <form className="expiry-form" onSubmit={submit} aria-label="Thông tin hạn sử dụng và tra cứu">
           <section className="expiry-focus-zone">
             <DateControl
@@ -299,11 +267,7 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
               label="Ngày sản xuất"
               value={nsx}
               readOnly={!knownManufactureDate}
-              calendarOpen={calendarTarget === "nsx"}
-              calendarMonth={calendarMonth}
-              onCalendarMonthChange={setCalendarMonth}
-              onCalendarToggle={() => openCalendar("nsx")}
-              onCalendarSelect={chooseCalendarDate}
+              initialMonth={today}
               onChange={changeNsx}
               action={(
               <button type="button" role="switch" aria-checked={knownManufactureDate} className="expiry-switch" onClick={toggleMode}>
@@ -316,15 +280,11 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
               id="lookup-hsd"
               label="Hạn sử dụng (HSD)"
               value={hsd}
-              calendarOpen={calendarTarget === "hsd"}
-              calendarMonth={calendarMonth}
-              onCalendarMonthChange={setCalendarMonth}
-              onCalendarToggle={() => openCalendar("hsd")}
-              onCalendarSelect={chooseCalendarDate}
+              initialMonth={today}
               onChange={changeHsd}
             />
 
-            <div className="expiry-or"><span>hoặc nhập thời hạn</span></div>
+            <div className="expiry-or"><span>hoặc</span></div>
             <div className="expiry-duration-grid">
               <DurationControl id="lookup-days" label="HSD (Số ngày)" suffix="ngày" value={days} onChange={changeDays} />
               <DurationControl id="lookup-months" label="HSD (Số tháng)" suffix="tháng" value={months} onChange={changeMonths} />
@@ -346,48 +306,21 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
 type DateControlProps = {
   action?: ReactNode;
   id: string;
+  initialMonth: LocalDate;
   label: string;
   value: string;
   readOnly?: boolean;
-  calendarOpen: boolean;
-  calendarMonth: LocalDate;
-  onCalendarMonthChange: (value: LocalDate) => void;
-  onCalendarSelect: (value: LocalDate) => void;
-  onCalendarToggle: () => void;
   onChange: (value: string) => void;
 };
 
-function DateControl({ action, calendarMonth, calendarOpen, id, label, onCalendarMonthChange, onCalendarSelect, onCalendarToggle, onChange, readOnly, value }: DateControlProps) {
+function DateControl({ action, id, initialMonth, label, onChange, readOnly, value }: DateControlProps) {
   return (
-    <div className="expiry-field" data-expiry-date-control>
+    <div className="expiry-field">
       <div className="expiry-field-heading">
         <label htmlFor={id}>{label}</label>
         {action}
       </div>
-      <div className="relative">
-        <Input
-          id={id}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          inputMode="numeric"
-          maxLength={10}
-          placeholder="dd/mm/yyyy"
-          readOnly={readOnly}
-          aria-readonly={readOnly}
-          className={cn("pr-12 tabular-nums", readOnly && "text-ink-muted")}
-        />
-        <button type="button" className="expiry-calendar-trigger" aria-label={`Chọn ${label.toLowerCase()}`} aria-expanded={calendarOpen} onClick={onCalendarToggle} disabled={readOnly}>
-          <CalendarDays size={18} aria-hidden="true" />
-        </button>
-        {calendarOpen ? (
-          <CalendarPopover
-            month={calendarMonth}
-            selected={tryParseDate(value)}
-            onMonthChange={onCalendarMonthChange}
-            onSelect={onCalendarSelect}
-          />
-        ) : null}
-      </div>
+      <CalendarInput id={id} initialMonth={initialMonth} label={label} value={value} readOnly={readOnly ?? false} onValueChange={onChange} />
     </div>
   );
 }
@@ -400,31 +333,6 @@ function DurationControl({ id, label, onChange, suffix, value }: { id: string; l
         <Input id={id} value={value} onChange={(event) => onChange(event.target.value)} inputMode="numeric" placeholder={suffix === "ngày" ? "Ví dụ: 30" : "Ví dụ: 3"} className="pr-16 tabular-nums" />
         <span className="expiry-input-suffix">{suffix}</span>
       </div>
-    </div>
-  );
-}
-
-function CalendarPopover({ month, onMonthChange, onSelect, selected }: { month: LocalDate; onMonthChange: (value: LocalDate) => void; onSelect: (value: LocalDate) => void; selected: LocalDate | null }) {
-  const monthDate = new Date(`${month}T00:00:00Z`);
-  const mondayOffset = (monthDate.getUTCDay() + 6) % 7;
-  const gridStart = addDays(month, -mondayOffset);
-  const days = Array.from({ length: 42 }, (_, index) => addDays(gridStart, index));
-  const monthKey = month.slice(0, 7);
-  const monthLabel = new Intl.DateTimeFormat("vi-VN", { month: "long", timeZone: "UTC", year: "numeric" }).format(monthDate);
-
-  return (
-    <div className="expiry-calendar" role="dialog" aria-label="Lịch chọn ngày">
-      <header>
-        <button type="button" aria-label="Tháng trước" onClick={() => onMonthChange(firstDayOfMonth(addMonths(month, -1)))}><ChevronLeft size={18} aria-hidden="true" /></button>
-        <strong>{monthLabel}</strong>
-        <button type="button" aria-label="Tháng sau" onClick={() => onMonthChange(firstDayOfMonth(addMonths(month, 1)))}><ChevronRight size={18} aria-hidden="true" /></button>
-      </header>
-      <div className="expiry-calendar-grid expiry-calendar-weekdays" aria-hidden="true">{["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((day) => <span key={day}>{day}</span>)}</div>
-      <div className="expiry-calendar-grid">{days.map((day) => {
-        const dayDate = new Date(`${day}T00:00:00Z`);
-        const label = new Intl.DateTimeFormat("vi-VN", { day: "numeric", month: "long", timeZone: "UTC", year: "numeric" }).format(dayDate);
-        return <button key={day} type="button" className={cn(day.slice(0, 7) !== monthKey && "is-outside", selected === day && "is-selected")} aria-label={label} aria-pressed={selected === day} onClick={() => onSelect(day)}>{dayDate.getUTCDate()}</button>;
-      })}</div>
     </div>
   );
 }
@@ -451,17 +359,26 @@ function LookupResult({ error, hsd, nsx, result, today }: { error: string; hsd: 
   const mainDate = result.status === "EXPIRED" ? hsd : result.withdrawalDate;
   const daysToHsd = daysBetween(today, hsd);
   const daysToWithdrawal = daysBetween(today, result.withdrawalDate);
-  const detail = result.status === "EXPIRED"
-    ? `Đã qua HSD ${Math.abs(daysToHsd)} ngày`
-    : result.status === "DANGER"
-      ? `${daysToWithdrawal < 0 ? `Đã qua hạn lùi ${Math.abs(daysToWithdrawal)} ngày` : "Đến hạn lùi hàng"} · HSD còn ${Math.max(0, daysToHsd)} ngày`
-      : `${daysToWithdrawal} ngày đến hạn lùi · Vòng đời ${result.shelfLifeDays} ngày`;
+  const detailLines = result.status === "EXPIRED"
+    ? [`Đã qua HSD ${Math.abs(daysToHsd)} ngày`]
+    : [
+        daysToWithdrawal < 0
+          ? `Đã qua hạn lùi ${Math.abs(daysToWithdrawal)} ngày`
+          : `${daysToWithdrawal} ngày đến hạn lùi`,
+        `HSD còn ${Math.max(0, daysToHsd)} ngày`,
+      ];
 
   return (
     <section className={cn("expiry-result", `is-${result.status.toLowerCase()}`)} aria-live="polite">
       <div className="expiry-result-summary">
         <span className="expiry-result-icon" aria-hidden="true"><StatusIcon /></span>
-        <div><p>{copy.label}</p><strong>{formatDisplayDate(mainDate)}</strong><small>{detail}</small></div>
+        <div>
+          <p>{copy.label}</p>
+          <strong>{formatDisplayDate(mainDate)}</strong>
+          <small className="expiry-result-detail">
+            {detailLines.map((line) => <span key={line}>{line}</span>)}
+          </small>
+        </div>
       </div>
       <Timeline hsd={hsd} nsx={nsx} result={result} today={today} />
     </section>

@@ -18,6 +18,7 @@ import {
   CircleAlert,
   Images,
   Image as ImageIcon,
+  LoaderCircle,
   MoreHorizontal,
   Repeat2,
   ScanLine,
@@ -27,6 +28,10 @@ import {
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
+
+import { CalendarInput } from "./calendar-input";
+import { processEvidencePhoto } from "./image-processing";
+import { EvidenceImageViewer } from "./image-viewer";
 
 function isDisplayDate(value: string) {
   try {
@@ -57,7 +62,14 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-type PhotoDraft = { id: string; fileName: string; url: string };
+type PhotoDraft = {
+  id: string;
+  fileName: string;
+  originalFile: File;
+  stampedBlob: Blob;
+  capturedAt: Date;
+  url: string;
+};
 
 type CreateRecordDialogProps = {
   kind: KphKind | null;
@@ -70,6 +82,8 @@ const kindLabels: Record<KphKind, string> = {
   TPCN: "Thực phẩm khô & khác",
   TPTS: "Thực phẩm tươi sống",
 };
+
+const DEMO_STORE_STAMP = { storeCode: "CF-DEMO-001", storeName: "Nguyễn Kiệm" };
 
 function defaultValues(kind: KphKind): FormData {
   const options = KPH_OPTIONS[kind];
@@ -96,6 +110,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
   const photoRef = useRef<PhotoDraft[]>([]);
   const [photoError, setPhotoError] = useState("");
+  const [processingPhotos, setProcessingPhotos] = useState(false);
+  const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const {
     formState: { errors },
@@ -103,6 +119,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     register,
     reset,
     setFocus,
+    setValue,
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -111,6 +128,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
   const selectedCondition = watch("condition");
   const selectedResolution = watch("resolution");
+  const detectedDate = watch("detectedDate");
+  const treatmentDate = watch("treatmentDate");
 
   function clearPhotos() {
     for (const photo of photoRef.current) {
@@ -118,6 +137,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     }
     photoRef.current = [];
     setPhotos([]);
+    setActivePhoto(null);
   }
 
   useEffect(() => {
@@ -136,6 +156,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
   if (!kind) return null;
 
   const submit = handleSubmit(() => {
+    if (processingPhotos) {
+      setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
+      return;
+    }
     if (photos.length < 1) {
       setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
       return;
@@ -147,24 +171,38 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     onOpenChange(false);
   });
 
-  function selectPhotos(event: ChangeEvent<HTMLInputElement>) {
+  async function selectPhotos(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
+    event.target.value = "";
     if (!files.length) return;
-    if (photos.length + files.length > 3) {
+    if (photoRef.current.length + files.length > 3) {
       setPhotoError("Mỗi phiếu chỉ được tối đa 3 ảnh");
-      event.target.value = "";
       return;
     }
-    const additions = files.map((file, index) => ({
-      id: `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
-      fileName: file.name,
-      url: typeof URL.createObjectURL === "function" ? URL.createObjectURL(file) : "",
-    }));
-    const next = [...photos, ...additions];
-    photoRef.current = next;
-    setPhotos(next);
+    setProcessingPhotos(true);
     setPhotoError("");
-    event.target.value = "";
+    const additions: PhotoDraft[] = [];
+    try {
+      for (const [index, file] of files.entries()) {
+        const processed = await processEvidencePhoto(file, DEMO_STORE_STAMP);
+        additions.push({
+          id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
+          fileName: file.name,
+          originalFile: file,
+          stampedBlob: processed.blob,
+          capturedAt: processed.capturedAt,
+          url: URL.createObjectURL(processed.blob),
+        });
+      }
+      const next = [...photoRef.current, ...additions];
+      photoRef.current = next;
+      setPhotos(next);
+    } catch (error) {
+      additions.forEach((photo) => URL.revokeObjectURL(photo.url));
+      setPhotoError(error instanceof Error ? error.message : "Không thể tối ưu và đóng tem ảnh minh chứng");
+    } finally {
+      setProcessingPhotos(false);
+    }
   }
 
   function removePhoto(id: string) {
@@ -173,12 +211,13 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     const next = photos.filter((photo) => photo.id !== id);
     photoRef.current = next;
     setPhotos(next);
+    if (activePhoto?.id === id) setActivePhoto(null);
   }
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0" aria-describedby="create-description">
+        <DialogContent className="create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0" aria-describedby="create-description">
           <DialogHeader className="create-dialog-header">
             <DialogTitle className="create-dialog-title">Tạo phiếu KPH · {kindLabels[kind]}</DialogTitle>
             <DialogDescription id="create-description" className="sr-only">
@@ -190,14 +229,14 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
             <FormSection number="1" title="Thông tin phát hiện">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
-                  <Input id="detected-date" inputMode="numeric" placeholder="dd/mm/yyyy" {...register("detectedDate")} />
+                  <CalendarInput id="detected-date" initialMonth="2026-08-15" label="Ngày phát hiện" value={detectedDate} onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
-                  <div className="flex gap-2">
-                    <Input id="barcode" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode")} />
-                    <Button type="button" size="icon" variant="secondary" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
-                      <ScanLine aria-hidden="true" size={20} />
-                    </Button>
+                  <div className="relative">
+                    <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode")} />
+                    <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
+                      <ScanLine aria-hidden="true" size={18} />
+                    </button>
                   </div>
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
@@ -232,7 +271,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
               <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} />
               {selectedResolution === "OTHER" ? <Field className="mt-3" label="Nội dung biện pháp khác" htmlFor="resolution-detail" error={errors.resolutionDetail?.message}><Input id="resolution-detail" placeholder="Để trống sẽ giữ nhãn “KHÁC”" {...register("resolutionDetail")} /></Field> : null}
               <Field className="mt-3" label="Ngày xử lý (nếu có)" htmlFor="treatment-date" error={errors.treatmentDate?.message}>
-                <Input id="treatment-date" inputMode="numeric" placeholder="dd/mm/yyyy" {...register("treatmentDate")} />
+                <CalendarInput id="treatment-date" initialMonth="2026-08-15" label="Ngày xử lý (nếu có)" value={treatmentDate} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
               </Field>
             </FormSection>
 
@@ -244,26 +283,28 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
                 <p className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                  <PhotoPicker icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
-                  <PhotoPicker icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
+                  <PhotoPicker disabled={processingPhotos || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
+                  <PhotoPicker disabled={processingPhotos || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
                 </div>
-                {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview">{photo.url ? <img src={photo.url} alt={`Ảnh minh chứng ${index + 1}`} /> : <ImageIcon aria-hidden="true" />}<figcaption>{index + 1}</figcaption><button type="button" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
+                {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
                 <p className={cn("mt-2 text-xs font-semibold", photoError ? "text-danger" : "text-ink-muted")} role={photoError ? "alert" : "status"}>
-                  {photoError || (photos.length ? `Đã chọn ${photos.length}/3 ảnh` : "Chưa chọn ảnh")}
+                  {photoError || (processingPhotos ? "Đang tối ưu và đóng tem ảnh…" : photos.length ? `Đã xử lý ${photos.length}/3 ảnh · chạm ảnh để xem chi tiết` : "Chưa chọn ảnh")}
                 </p>
               </div>
               <Field className="mt-3" label="Ghi chú" htmlFor="note" error={errors.note?.message}>
-                <textarea id="note" rows={3} className="w-full resize-y rounded-xl border-2 border-surface-strong bg-white px-3 py-3 text-base outline-none transition-[background-color,border-color,box-shadow] placeholder:text-ink-muted/70 hover:border-brand/25 hover:bg-brand-soft/40 focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-focus" placeholder="Nhập ghi chú..." {...register("note")} />
+                <textarea id="note" rows={3} className="w-full resize-y rounded-xl border-2 border-surface-strong bg-white px-3 py-3 text-base outline-none transition-[background-color,border-color] placeholder:text-ink-muted/70 hover:border-brand/25 hover:bg-brand-soft/40 focus-visible:outline-3 focus-visible:outline-focus focus-visible:outline-offset-2" placeholder="Nhập ghi chú..." {...register("note")} />
               </Field>
             </FormSection>
 
             <footer className="create-dialog-footer">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Hủy</Button>
-              <Button type="submit">Lưu phiếu</Button>
+              <Button type="submit" disabled={processingPhotos}>{processingPhotos ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xử lý ảnh</> : "Lưu phiếu"}</Button>
             </footer>
           </form>
         </DialogContent>
       </Dialog>
+
+      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
 
       <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
         <DialogContent className="max-w-md">
@@ -318,6 +359,6 @@ function choiceIcon(value: string) {
   return <MoreHorizontal aria-hidden="true" />;
 }
 
-function PhotoPicker({ capture, icon, label, multiple, onChange }: { capture?: "environment"; icon: ReactNode; label: string; multiple?: boolean; onChange: (event: ChangeEvent<HTMLInputElement>) => void }) {
-  return <label className="photo-picker"><span>{icon}{label}</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/heic,image/heif,.heic,.heif" capture={capture} multiple={multiple} onChange={onChange} /></label>;
+function PhotoPicker({ capture, disabled, icon, label, multiple, onChange }: { capture?: "environment"; disabled?: boolean; icon: ReactNode; label: string; multiple?: boolean; onChange: (event: ChangeEvent<HTMLInputElement>) => void }) {
+  return <label className={cn("photo-picker", disabled && "is-disabled")}><span>{icon}{label}</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/heic,image/heif,.heic,.heif" capture={capture} multiple={multiple} disabled={disabled} onChange={onChange} /></label>;
 }

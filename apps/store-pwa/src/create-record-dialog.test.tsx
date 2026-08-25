@@ -2,6 +2,9 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { CreateRecordDialog } from "./create-record-dialog";
+import { processEvidencePhoto } from "./image-processing";
+
+vi.mock("./image-processing", () => ({ processEvidencePhoto: vi.fn() }));
 
 function renderDialog(kind: "TPCN" | "TPTS" = "TPCN") {
   render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={vi.fn()} />);
@@ -53,10 +56,41 @@ describe("Create KPH record", () => {
     expect(screen.queryByLabelText("Ảnh đã chọn")).not.toBeInTheDocument();
   });
 
+  it("prepares a stamped JPEG before previewing and opens that result in the viewer", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:stamped-photo") });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
+    vi.mocked(processEvidencePhoto).mockResolvedValue({
+      blob: new Blob(["stamped"], { type: "image/jpeg" }),
+      capturedAt: new Date("2026-08-15T02:18:00.000Z"),
+      width: 1280,
+      height: 720,
+    });
+    renderDialog();
+    const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+    const file = new File(["original"], "evidence.jpg", { type: "image/jpeg", lastModified: 1_776_220_280_000 });
+
+    fireEvent.change(picker!, { target: { files: [file] } });
+
+    expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
+    expect(processEvidencePhoto).toHaveBeenCalledWith(file, { storeCode: "CF-DEMO-001", storeName: "Nguyễn Kiệm" });
+    fireEvent.click(screen.getByRole("button", { name: "Xem ảnh minh chứng 1" }));
+    expect(screen.getByAltText("Ảnh minh chứng evidence.jpg đã đóng tem")).toHaveAttribute("src", "blob:stamped-photo");
+  });
+
   it("keeps a manual-entry escape hatch when the camera is unavailable", () => {
     renderDialog();
     fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
     expect(screen.getByRole("dialog", { name: "Quét mã SKU / UPC" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Nhập mã thủ công" })).toBeVisible();
+  });
+
+  it("uses the shared calendar trigger for every date field", () => {
+    renderDialog();
+    expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" })).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" }));
+    fireEvent.click(screen.getByRole("button", { name: "20 tháng 8, 2026" }));
+    expect(screen.getByRole("textbox", { name: "Ngày xử lý (nếu có)" })).toHaveValue("20/08/2026");
   });
 });
