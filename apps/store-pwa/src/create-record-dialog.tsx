@@ -263,7 +263,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
             <FormSection number="1" title="Thông tin phát hiện">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
-                  <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
+                  <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} readOnly onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
@@ -371,7 +371,7 @@ function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
   return (
     <fieldset>
       <legend className="sr-only">{legend}</legend>
-      <div className={cn("choice-grid", choices.length === 2 && "choice-grid-two")}>
+      <div className={cn("choice-grid", choices.length === 2 && "choice-grid-two", choices.length === 5 && "choice-grid-five")}>
         {choices.map((choice) => (
           <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`)}>
             <input className="sr-only" type="radio" value={choice.value} {...register(name)} />
@@ -386,7 +386,7 @@ function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
 
 function choiceIcon(value: string) {
   if (value === "NEAR_EXPIRY") return <CalendarClock aria-hidden="true" />;
-  if (value === "EXPIRED" || value === "DAMAGED") return <CircleAlert aria-hidden="true" />;
+  if (["EXPIRED", "TORN_PACKAGING", "VACUUM_LEAK", "BRUISED_WATERLOGGED", "ROTTEN_MOLDY"].includes(value)) return <CircleAlert aria-hidden="true" />;
   if (value === "CANCEL") return <Ban aria-hidden="true" />;
   if (value === "EXCHANGE") return <Repeat2 aria-hidden="true" />;
   if (value === "RETURN") return <Truck aria-hidden="true" />;

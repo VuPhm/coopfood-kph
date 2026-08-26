@@ -60,7 +60,7 @@ Spacing triển khai dùng các token `--space-1/1-5/2/2-5/3/3-5/4/5/6` tương 
 nhịp `4/6/8/10/12/14/16/20/24px`. Dùng trực tiếp scale `--space-*` (ví dụ khoảng cách
 layout panel dùng `--space-4`), chỉ giữ alias thực sự cần thiết (`--control-gap`,
 `--panel-inset`) biểu diễn khoảng cách theo vai trò, tránh tạo thêm alias biến thừa.
-Bốn khối panel lớn (workspace header, history board, desktop filter, tra hạn nhanh)
+Bốn khối panel lớn (workspace header, history board, desktop filter, tra cứu lùi hàng)
 đồng bộ dùng chung padding `--panel-inset` và gap dọc cấp cao nhất của khối `--space-2`.
 
 ### Visual refresh block-first cân bằng — 2026-08-24
@@ -140,8 +140,8 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   khỏi count từng loại. Hai tab là segmented control cân bằng, nhãn ngắn và
   count; tab đang chọn dùng fill xanh toàn mặt, không dùng gạch chân.
 - Desktop: checkbox đầu bảng, ngày + người phát hiện, SKU/UPC + tên hàng, NCC,
-  số lượng + đơn vị, tình trạng, biện pháp, ảnh xếp chồng, trạng thái duyệt và
-  nút vô hiệu từng phiếu.
+  số lượng + đơn vị, tình trạng, biện pháp, ảnh xếp chồng và trạng thái duyệt;
+  không có nút xóa/vô hiệu hóa cho CHT.
 - Các cột dữ liệu desktop (trừ checkbox, ảnh và vô hiệu hóa) có nút sort ngay
   trong header, biểu diễn chiều hiện tại bằng icon và `aria-sort`. Trạng thái
   duyệt có filter riêng dùng chung state giữa hai breakpoint: desktop đặt
@@ -161,9 +161,9 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
 - Filter chạy trước sort, count tổng phản ánh tập đang hiển thị và thay filter
   phải xóa selection để không giữ thao tác trên dòng đã bị ẩn.
 - Mobile: card có checkbox/ngày/SKU ở header; tên/số lượng, ảnh, tình trạng và
-  biện pháp nằm kế nhau; trạng thái duyệt và nút vô hiệu ở footer.
+  biện pháp nằm kế nhau; footer chỉ giữ trạng thái duyệt.
 - Mobile mặc định dùng card compact giữ nguyên header sản phẩm và footer tình
-  trạng/biện pháp/duyệt/vô hiệu hóa; chỉ ẩn hai phần metadata và gallery ảnh.
+  trạng/biện pháp/duyệt; chỉ ẩn hai phần metadata và gallery ảnh.
   Chevron mở/thu nằm trước checkbox; chạm vùng card compact mở chi tiết, chạm
   lại hàng SKU/tên ở card đầy đủ để thu.
   Có thao tác mở/thu tất cả cạnh “Chọn tất cả”; khi trạng thái card đang lẫn
@@ -176,7 +176,7 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   vốn đã rõ theo ngữ cảnh. Metadata phụ được phân cách bằng spacing/divider mảnh;
   ảnh minh chứng ưu tiên lưới hai cột đủ lớn để kiểm tra nhanh.
 - Toolbar thao tác lô dùng cùng phong cách phẳng trên desktop và mobile: chọn
-  tất cả, đếm/duyệt, xuất Excel và vô hiệu hóa; khi có selection, “Duyệt x dòng”
+  tất cả, đếm/duyệt và xuất Excel; khi có selection, “Duyệt x dòng”
   là primary action. Desktop bỏ checkbox chọn tất cả khỏi table header để không
   trùng thao tác. Mobile bổ sung mở/thu tất cả trong hàng điều khiển danh sách;
   desktop không hiển thị thao tác này. Ở màn hình rất hẹp, nút Excel giữ icon và
@@ -184,8 +184,8 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   lớp, dùng nhịp dọc tối thiểu và không phóng lớn theo card.
 - Trạng thái duyệt có ba giá trị “Chờ duyệt”, “Đã duyệt”, “Không duyệt”. UI demo
   cho phép thao tác; backend sau này chỉ cho `STORE_MANAGER` đúng membership.
-- Export/xóa chỉ bật khi có selection; “chọn tất cả” áp dụng trong loại phiếu
-  hiện hành, không xuyên tab.
+- Export chỉ bật khi có selection; “chọn tất cả” áp dụng trong loại phiếu hiện
+  hành, không xuyên tab. Store PWA không hiển thị xóa/vô hiệu hóa cho CHT.
 - Empty state nói rõ dữ liệu “trong phiên”. Hệ thống mới phải đổi copy/state cho
   dữ liệu server/offline nhưng giữ khả năng hiểu ngay phạm vi danh sách.
 
@@ -197,12 +197,15 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
 - Thứ tự cuối cùng: thông tin phát hiện; số lượng & đơn vị; tình trạng; biện
   pháp; người phát hiện & ảnh/ghi chú.
 - Input cao đồng nhất; date và SKU có icon action ở cạnh phải.
-- Tình trạng/biện pháp dùng radio-card 2–4 lựa chọn; selected state có border và
+- Tình trạng dùng 5 radio-card theo từng loại phiếu; biện pháp dùng 2–4 lựa chọn;
+  selected state có border và
   focus ring theo màu semantic.
+- Ngày phát hiện lấy ngày nghiệp vụ hiện tại theo `Asia/Ho_Chi_Minh`, hiển thị
+  read-only và khóa nút lịch; người dùng không thể gõ hoặc chọn ngày khác.
 - Hai upload card “Chụp ảnh” và “Chọn ảnh”; preview vuông có nút xóa riêng.
 - Footer có Hủy và Lưu phiếu; lỗi form hiện trong vùng status gần actions.
 
-### Date input và tra hạn
+### Date input và tra cứu lùi hàng
 
 - Gõ ngày tự chèn `/`, giữ cursor theo số digit, không tự sửa một ngày chưa hợp
   lệ thành giá trị khác.

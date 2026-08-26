@@ -22,14 +22,18 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
 
 - Hai loại: Thực phẩm khô & khác (`TPCN`) và Thực phẩm tươi sống (`TPTS`).
 - Tối đa ba ảnh minh chứng.
-- Các lựa chọn tình trạng/biện pháp hiện tại phải được inventory từ hệ thống cũ
-  trước milestone KPH.
+- TPCN có tình trạng `Cận date`, `Hết HSD`, `Rách bao bì`, `Xì chân không`,
+  `Khác`; mặc định `Cận date`. TPTS có `Dập úng`, `Thối mốc`, `Cận date`,
+  `Hết HSD`, `Khác`; mặc định `Dập úng`.
+- Ngày phát hiện là ngày nghiệp vụ hiện tại theo `Asia/Ho_Chi_Minh`; Store PWA
+  hiển thị read-only và không cho người dùng sửa.
 - Phiếu lưu người/cửa hàng/thời điểm tạo và catalog snapshot.
 - Condition hoặc biện pháp `Khác` có nội dung chi tiết optional; khi trống giữ nhãn
   `Khác`/`KHÁC` tương ứng thay vì báo lỗi.
 - Không xóa cứng phiếu đã đồng bộ; vô hiệu hóa phải có lý do và audit.
-- Tạm thời chỉ `STORE_MANAGER` (CHT) có membership đúng cửa hàng được sửa, duyệt
-  hoặc vô hiệu hóa phiếu; backend phải cưỡng chế, không chỉ ẩn nút UI.
+- Tạm thời `STORE_MANAGER` (CHT) có membership đúng cửa hàng chỉ thao tác duyệt
+  trong UI lịch sử; không được xóa hoặc vô hiệu hóa phiếu. Quyền vô hiệu hóa cho
+  cấp quản trị tương lai chưa chốt và không được suy diễn cho `CHAIN_ADMIN`.
 - Cửa sổ thời gian sửa/duyệt chưa chốt; implementation không được tự đặt giới hạn.
 - Ảnh gốc upload và bản stamped dẫn xuất đều private, giữ theo vòng đời phiếu;
   stamped không thay thế evidence gốc. Baseline tem: JPEG output, resize giữ tỷ

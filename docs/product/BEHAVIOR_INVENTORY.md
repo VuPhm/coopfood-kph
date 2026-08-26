@@ -22,19 +22,19 @@ phải API identifier.
 | ID | Hành vi quan sát được | Phân loại / hợp đồng mới |
 |---|---|---|
 | KPH-01 | Workspace có hai entry “Thực phẩm khô & khác” (`TPCN`) và “Thực phẩm tươi sống” (`TPTS`) | Giữ; chọn loại trước khi mở form |
-| KPH-02 | TPCN chỉ hiện tình trạng Cận date, Hết HSD, Khác; mặc định Cận date | Giữ; golden test conditional options |
-| KPH-03 | TPTS hiện Hư hỏng, Cận date, Hết HSD, Khác; mặc định Hư hỏng | Giữ |
+| KPH-02 | TPCN chỉ hiện tình trạng Cận date, Hết HSD, Rách bao bì, Xì chân không, Khác; mặc định Cận date | Cải tiến đã xác nhận 2026-08-27; khóa bằng golden test conditional options |
+| KPH-03 | TPTS hiện Dập úng, Thối mốc, Cận date, Hết HSD, Khác; mặc định Dập úng; không còn lựa chọn Hư hỏng | Cải tiến đã xác nhận 2026-08-27 |
 | KPH-04 | TPCN hiện biện pháp HỦY, ĐỔI, XUẤT TRẢ, KHÁC; mặc định hiện hành là HỦY sau reset form | Giữ danh sách và mặc định HỦY; đã khóa bằng fixture `KPH-OPT-01` |
 | KPH-05 | TPTS chỉ hiện HỦY và KHÁC; mặc định HỦY | Giữ |
 | KPH-06 | Chọn tình trạng Khác mới hiện nội dung tình trạng; trống được normalize thành “Khác” | Giữ interaction; nội dung là optional, trống giữ nhãn “Khác” |
 | KPH-07 | Chọn biện pháp KHÁC mới hiện nội dung xử lý; trống được normalize thành “KHÁC” | Giữ interaction; nội dung là optional, trống giữ nhãn “KHÁC” |
-| KPH-08 | Ngày phát hiện mặc định là ngày local hiện tại; số lượng mặc định `1`; đơn vị mặc định `EA`, lựa chọn `EA` hoặc `kg` | Giữ với timezone `Asia/Ho_Chi_Minh` |
+| KPH-08 | Ngày phát hiện là ngày local hiện tại và không cho sửa; số lượng mặc định `1`; đơn vị mặc định `EA`, lựa chọn `EA` hoặc `kg` | Cải tiến đã xác nhận 2026-08-27; timezone `Asia/Ho_Chi_Minh` |
 | KPH-09 | Ngày phát hiện, người phát hiện, số lượng > 0 và ít nhất một ảnh là bắt buộc | Giữ; backend validation là nguồn quyết định |
 | KPH-10 | Cần ít nhất một trong SKU/UPC hoặc tên hàng hóa; SKU tối đa 50, tên hàng 200, NCC 150, người phát hiện 100, note/nội dung xử lý 255 | Giữ làm baseline; catalog lookup có thể làm SKU/product snapshot bắt buộc theo policy mới |
 | KPH-11 | Ngày xử lý optional nhưng nếu có phải đúng `dd/mm/yyyy`; không thấy validation quan hệ với ngày phát hiện | Giữ format; quan hệ ngày là `Chưa chốt` |
 | KPH-12 | Record mới được prepend, tự selected, chuyển tab sang đúng loại và đóng/reset form | Giữ luồng nhanh; server mutation phải idempotent |
 | KPH-13 | Danh sách và ảnh record chỉ sống trong memory của tab; reload làm mất dữ liệu | Loại bỏ; PostgreSQL là nguồn thật, IndexedDB chỉ cache/outbox |
-| KPH-14 | Xóa một hoặc nhiều record là hard delete trong memory sau confirm | Loại bỏ; record đã sync không xóa cứng, cần reason/audit và policy role |
+| KPH-14 | Xóa một hoặc nhiều record là hard delete trong memory sau confirm | Loại bỏ; Store PWA không hiện xóa/vô hiệu hóa cho CHT. Quyền quản trị tương lai phải dùng reason/audit, không xóa cứng |
 | KPH-15 | Phiếu hiện không có product reference/catalog snapshot chuẩn hóa | Cải tiến bắt buộc; lưu barcode và snapshot SKU/tên/NCC tại thời điểm tạo |
 
 ## Store identity, detected-by và authorization
@@ -46,7 +46,7 @@ phải API identifier.
 | ID-03 | Tối đa 5 tên người phát hiện gần nhất lưu localStorage, de-duplicate không phân biệt hoa/thường; tên mới nhất làm default | Cải tiến; mặc định actor từ account, lịch sử/ghi thay chỉ khi role cho phép |
 | ID-04 | Legacy không login, role, session hoặc tenant check | Cải tiến bắt buộc; backend kiểm membership cho mọi request store-scoped |
 | ID-05 | Store identity được đóng trực tiếp vào ảnh và đưa vào tóm tắt/Excel | Giữ snapshot presentation; nguồn store phải là session-authorized context |
-| ID-06 | Policy nhân viên/manager sửa, duyệt, vô hiệu hóa phiếu chưa tồn tại | Cải tiến bắt buộc: tạm thời chỉ `STORE_MANAGER` (CHT) đúng membership được thực hiện; backend matrix phải chặn mọi role khác, gồm `CHAIN_ADMIN` |
+| ID-06 | Policy nhân viên/manager sửa, duyệt, vô hiệu hóa phiếu chưa tồn tại | Cải tiến bắt buộc: `STORE_MANAGER` (CHT) đúng membership chỉ được duyệt trong UI lịch sử; không được xóa/vô hiệu hóa. Quyền quản trị tương lai chưa chốt; `CHAIN_ADMIN` không bypass ngầm |
 
 Login mới không được thêm bước chọn store/người phát hiện lặp lại trên mỗi phiếu.
 Sau login, cửa hàng hợp lệ và actor mặc định phải sẵn ngay trong workspace; chỉ
@@ -103,8 +103,8 @@ sau khi validation xác nhận `HSD > NSX`; `HSD == NSX` phải trả lỗi.
 | ID | Hành vi quan sát được | Phân loại / hợp đồng mới |
 |---|---|---|
 | UI-01 | Tab loại phiếu có count; selection và select-all chỉ tác động list của tab hiện hành | Giữ |
-| UI-02 | Export/xóa disabled khi chưa chọn; selected row/card có visual state | Giữ |
-| UI-03 | Export và delete có confirm modal; delete copy phân biệt 1/nhiều phiếu | Giữ |
+| UI-02 | Export/xóa disabled khi chưa chọn; selected row/card có visual state | Giữ selection/export; loại bỏ xóa khỏi Store PWA |
+| UI-03 | Export và delete có confirm modal; delete copy phân biệt 1/nhiều phiếu | Giữ confirm export; loại bỏ delete/invalidate khỏi UI CHT |
 | UI-04 | Overlay/modal khóa body scroll; mobile body modal cuộn và chứa overscroll | Giữ outcome |
 | UI-05 | Escape đóng picker/image/scanner/settings/export/delete/lookup theo ưu tiên | Giữ nguyên tắc; chuẩn hóa cho mọi modal |
 | UI-06 | Focus đôi lúc được đưa vào close/field và trả trigger; không có focus trap nhất quán, KPH modal không đóng bằng Escape chung | Loại bỏ nợ kỹ thuật; thêm focus trap/restore focus có test |

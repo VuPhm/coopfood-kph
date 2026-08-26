@@ -23,8 +23,8 @@ describe("Store workspace", () => {
     render(<App />);
     const main = document.querySelector("main");
     expect(main).not.toBeNull();
-    expect(within(main as HTMLElement).getByRole("complementary", { name: "Tra hạn nhanh" })).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Mở tra hạn nhanh" })).not.toBeInTheDocument();
+    expect(within(main as HTMLElement).getByRole("complementary", { name: "Tra cứu lùi hàng" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Mở tra cứu lùi hàng" })).not.toBeInTheDocument();
   });
 
   it("changes the scoped history tab", () => {
@@ -110,7 +110,7 @@ describe("Store workspace", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
     expect(screen.getByRole("button", { name: "Duyệt 1 phiếu" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Xuất Excel" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Vô hiệu hóa" })).toHaveTextContent("Vô hiệu hóa");
+    expect(screen.queryByRole("button", { name: "Vô hiệu hóa" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
     expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
@@ -153,7 +153,7 @@ describe("Store workspace", () => {
     expect(card?.querySelector(".record-card-footer")).not.toBeNull();
     expect(card?.querySelector(".record-card-meta")).toBeNull();
     expect(card?.querySelector(".record-photo-gallery")).toBeNull();
-    expect(within(card as HTMLElement).getByRole("button", { name: "Vô hiệu hóa phiếu KPH-260815-018" })).toBeVisible();
+    expect(within(card as HTMLElement).queryByRole("button", { name: "Vô hiệu hóa phiếu KPH-260815-018" })).not.toBeInTheDocument();
     expect(document.querySelector(".mobile-history .approval-control-label")).not.toBeInTheDocument();
   });
 
@@ -206,22 +206,10 @@ describe("Store workspace", () => {
     expect(screen.getByText(/Đã chuyển phiếu KPH-260815-018 sang “Đã duyệt”/i)).toBeVisible();
   });
 
-  it("requires a reason and removes an individually invalidated record", () => {
+  it("does not expose record invalidation to the store manager", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Mở rộng phiếu KPH-260815-018" }));
-    const invalidateButtons = screen.getAllByRole("button", { name: "Vô hiệu hóa phiếu KPH-260815-018" });
-
-    expect(invalidateButtons).toHaveLength(2);
-    fireEvent.click(invalidateButtons[0]!);
-    const dialog = screen.getByRole("dialog", { name: "Vô hiệu hóa 1 phiếu?" });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Vô hiệu hóa" }));
-    expect(within(dialog).getByRole("alert")).toHaveTextContent("Cần nhập lý do");
-
-    fireEvent.change(within(dialog).getByRole("textbox", { name: /Lý do vô hiệu hóa/i }), { target: { value: "Phiếu tạo nhầm" } });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Vô hiệu hóa" }));
-
-    expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
-    expect(screen.getByText(/Đã vô hiệu hóa 1 phiếu.*Phiếu tạo nhầm/i)).toBeVisible();
+    expect(screen.queryByRole("button", { name: /Vô hiệu hóa phiếu/i })).not.toBeInTheDocument();
   });
 
   it("summarizes selected rows and images before exporting Excel", () => {

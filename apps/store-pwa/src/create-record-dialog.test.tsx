@@ -41,11 +41,20 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("textbox", { name: "Nội dung biện pháp khác" })).toHaveAttribute("placeholder", expect.stringContaining("KHÁC"));
   });
 
-  it("uses the TPTS option matrix", () => {
+  it("uses the reviewed TPCN condition matrix", () => {
+    renderDialog("TPCN");
+    const condition = screen.getByRole("group", { name: "Tình trạng" });
+    expect(within(condition).getByRole("radio", { name: "Rách bao bì" })).toBeVisible();
+    expect(within(condition).getByRole("radio", { name: "Xì chân không" })).toBeVisible();
+  });
+
+  it("uses the reviewed TPTS option matrix", () => {
     renderDialog("TPTS");
     const condition = screen.getByRole("group", { name: "Tình trạng" });
     const resolution = screen.getByRole("group", { name: "Biện pháp xử lý" });
-    expect(within(condition).getByRole("radio", { name: "Hư hỏng" })).toBeChecked();
+    expect(within(condition).getByRole("radio", { name: "Dập úng" })).toBeChecked();
+    expect(within(condition).getByRole("radio", { name: "Thối mốc" })).toBeVisible();
+    expect(within(condition).queryByRole("radio", { name: "Hư hỏng" })).not.toBeInTheDocument();
     expect(within(resolution).getAllByRole("radio")).toHaveLength(2);
     expect(within(resolution).queryByRole("radio", { name: "ĐỔI" })).not.toBeInTheDocument();
   });
@@ -88,23 +97,12 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("button", { name: "Nhập mã thủ công" })).toBeVisible();
   });
 
-  it("uses the shared calendar trigger for every date field", () => {
+  it("locks the detected date and keeps the treatment date calendar", () => {
     renderDialog();
-    expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" })).toBeVisible();
-
-    fireEvent.click(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" }));
-    fireEvent.click(screen.getByRole("button", { name: "20 tháng 8, 2026" }));
-    expect(screen.getByRole("textbox", { name: "Ngày xử lý (nếu có)" })).toHaveValue("20/08/2026");
-  });
-
-  it("defaults the detected date and calendar to the current Ho Chi Minh business day", () => {
-    renderDialog();
-    const today = formatBusinessDate(new Date());
-    expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveValue(today.display);
-
-    fireEvent.click(screen.getByRole("button", { name: "Chọn ngày phát hiện" }));
-    expect(screen.getByRole("button", { name: new Intl.DateTimeFormat("vi-VN", { day: "numeric", month: "long", timeZone: "UTC", year: "numeric" }).format(new Date(`${today.iso}T00:00:00Z`)) })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveValue(formatBusinessDate(new Date()).display);
+    expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveAttribute("readonly");
+    expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" })).toBeEnabled();
   });
 
   it("saves the entered values and stamped evidence instead of a placeholder", async () => {

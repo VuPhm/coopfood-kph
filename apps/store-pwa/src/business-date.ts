@@ -1,3 +1,5 @@
+import type { LocalDate } from "@coopfood-kph/kph-rules";
+
 const businessDateFormatter = new Intl.DateTimeFormat("vi-VN", {
   day: "2-digit",
   month: "2-digit",
@@ -22,4 +24,3 @@ export function formatBusinessDate(now: Date) {
     iso: `${parts.year}-${parts.month}-${parts.day}` as LocalDate,
   };
 }
-import type { LocalDate } from "@coopfood-kph/kph-rules";

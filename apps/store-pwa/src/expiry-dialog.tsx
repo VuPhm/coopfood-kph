@@ -258,16 +258,16 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
   }
 
   return (
-    <aside ref={workbenchRef} className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra hạn nhanh">
+    <aside ref={workbenchRef} className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra cứu lùi hàng">
       <UtilityPanelMeta
         actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger", !expanded && showInitialHint && "has-entry-hint")}
         actionControls="expiry-workbench-content"
         actionExpanded={expanded}
         actionIcon={expanded ? <X /> : <CalendarDays />}
-        actionLabel={expanded ? "Đóng tra hạn nhanh" : "Tra hạn nhanh"}
-        actionText={!expanded && showInitialHint ? "Tra hạn nhanh" : undefined}
+        actionLabel={expanded ? "Đóng tra cứu lùi hàng" : "Tra cứu lùi hàng"}
+        actionText={!expanded && showInitialHint ? "Tra cứu lùi hàng" : undefined}
         className={!expanded ? "is-collapsed" : ""}
-        label={expanded ? "Tra hạn nhanh" : ""}
+        label={expanded ? "Tra cứu lùi hàng" : ""}
         onAction={toggleWorkbench}
       />
 

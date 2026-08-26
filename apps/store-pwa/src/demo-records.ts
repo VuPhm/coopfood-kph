@@ -63,7 +63,7 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     quantity: "1.5 kg",
     quantityValue: 1.5,
     unit: "kg",
-    condition: "Hư hỏng",
+    condition: "Dập úng",
     resolution: "HỦY",
     treatmentDate: "15/08/2026",
     approvalStatus: "APPROVED",

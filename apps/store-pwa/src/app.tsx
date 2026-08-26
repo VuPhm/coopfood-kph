@@ -1,6 +1,6 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, LoaderCircle, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
+import { ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, LoaderCircle, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
@@ -11,6 +11,8 @@ import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import { EvidenceImageViewer } from "./image-viewer";
 import { UtilityPanelMeta } from "./utility-panel-meta";
+
+export { formatBusinessDate } from "./business-date";
 
 const kindCopy: Record<KphKind, { action: string; short: string }> = {
   TPCN: { action: "TP khô & khác", short: "TP Khô & khác" },
@@ -41,7 +43,6 @@ const recordSortOptions: readonly { label: string; value: RecordSortKey }[] = [
   { label: "Trạng thái duyệt", value: "approval" },
 ];
 const recordCollator = new Intl.Collator("vi", { numeric: true, sensitivity: "base" });
-export { formatBusinessDate } from "./business-date";
 
 function TodayDate() {
   const [now, setNow] = useState(() => new Date());
@@ -93,9 +94,6 @@ export function App() {
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
   const [notice, setNotice] = useState("");
-  const [invalidateIds, setInvalidateIds] = useState<readonly string[]>([]);
-  const [invalidationReason, setInvalidationReason] = useState("");
-  const [invalidationError, setInvalidationError] = useState("");
   const [exportOpen, setExportOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
@@ -213,39 +211,6 @@ export function App() {
     setSelected(new Set());
   }
 
-  function invalidateRecord(recordId: string) {
-    setInvalidateIds([recordId]);
-    setInvalidationReason("");
-    setInvalidationError("");
-  }
-
-  function invalidateSelected() {
-    setInvalidateIds(selectedRecords.map(({ id }) => id));
-    setInvalidationReason("");
-    setInvalidationError("");
-  }
-
-  function confirmInvalidation() {
-    const reason = invalidationReason.trim();
-    if (!reason) {
-      setInvalidationError("Cần nhập lý do vô hiệu hóa");
-      return;
-    }
-    const targetIds = new Set(invalidateIds);
-    const removed = records.filter(({ id }) => targetIds.has(id));
-    removed.flatMap(({ photos }) => photos).forEach(({ src }) => {
-      if (ownedPhotoUrls.current.delete(src)) URL.revokeObjectURL(src);
-    });
-    setRecords((current) => current.filter(({ id }) => !targetIds.has(id)));
-    setSelected((current) => new Set([...current].filter((id) => !targetIds.has(id))));
-    setExpandedMobileRecords((current) => new Set([...current].filter((id) => !targetIds.has(id))));
-    setApprovalByRecord((current) => Object.fromEntries(Object.entries(current).filter(([id]) => !targetIds.has(id))));
-    setInvalidateIds([]);
-    setInvalidationReason("");
-    setInvalidationError("");
-    setNotice(`Đã vô hiệu hóa ${removed.length} phiếu trong bản demo · Lý do: ${reason}`);
-  }
-
   function saveCreatedRecord(draft: CreatedRecordDraft) {
     const dateDigits = draft.detectedDate.split("/").reverse().join("").slice(2);
     const suffix = Math.floor(100 + Math.random() * 900);
@@ -294,7 +259,6 @@ export function App() {
       setExporting(false);
     }
   }
-
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, kind: KphKind) {
     const currentIndex = kphKinds.indexOf(kind);
     const nextKind = event.key === "ArrowRight"
@@ -402,7 +366,6 @@ export function App() {
                   {selected.size > 0 ? (
                     <div className="history-action-tools">
                       <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={() => { setExportError(""); setExportOpen(true); }}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
-                      <Button variant="ghost" className="history-invalidate text-danger" aria-label="Vô hiệu hóa" title="Vô hiệu hóa" onClick={invalidateSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-invalidate-label">Vô hiệu hóa</span></Button>
                     </div>
                   ) : null}
                 </div>
@@ -423,15 +386,14 @@ export function App() {
                   <SortableHeader label="Biện pháp xử lý" onSort={toggleRecordSort} sort={recordSort} sortKey="resolution" />
                   <th className="px-3 py-0">Ảnh</th>
                   <SortableHeader label="Duyệt" onSort={toggleRecordSort} sort={recordSort} sortKey="approval" />
-                  <th className="w-12 px-3 py-0 text-center"><span className="sr-only">Thao tác dòng</span></th>
                 </tr>
               </thead>
-              <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onInvalidate={invalidateRecord} onToggle={toggleSelection} />)}</tbody>
+              <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onToggle={toggleSelection} />)}</tbody>
             </table>
           </div>
 
           <div className="grid gap-3 mobile-history">
-            {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onExpansionChange={setMobileRecordExpanded} onInvalidate={invalidateRecord} onToggle={toggleSelection} />)}
+            {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)}
           </div>
         </section>
 
@@ -441,25 +403,6 @@ export function App() {
       </main>
 
       <CreateRecordDialog kind={createKind} open={dialogOpen} onOpenChange={setDialogOpen} onSaved={saveCreatedRecord} />
-
-      <Dialog open={invalidateIds.length > 0} onOpenChange={(open) => { if (!open) { setInvalidateIds([]); setInvalidationReason(""); setInvalidationError(""); } }}>
-        <DialogContent className="action-dialog" aria-describedby="invalidate-description">
-          <div className="action-dialog-icon is-danger"><AlertTriangle aria-hidden="true" /></div>
-          <DialogTitle>Vô hiệu hóa {invalidateIds.length} phiếu?</DialogTitle>
-          <DialogDescription id="invalidate-description">
-            Phiếu sẽ biến mất khỏi danh sách demo. Trên hệ thống thật, thao tác này lưu lý do và audit; dữ liệu không bị xóa cứng.
-          </DialogDescription>
-          <label className="action-dialog-field" htmlFor="invalidation-reason">
-            <span>Lý do vô hiệu hóa <strong aria-hidden="true">*</strong></span>
-            <textarea id="invalidation-reason" rows={3} maxLength={255} value={invalidationReason} placeholder="Ví dụ: Phiếu tạo nhầm" onChange={(event) => { setInvalidationReason(event.target.value); if (event.target.value.trim()) setInvalidationError(""); }} />
-          </label>
-          {invalidationError ? <p className="action-dialog-error" role="alert">{invalidationError}</p> : null}
-          <div className="action-dialog-actions">
-            <Button type="button" variant="ghost" onClick={() => setInvalidateIds([])}>Hủy</Button>
-            <Button type="button" className="action-danger-button" onClick={confirmInvalidation}><Trash2 size={17} aria-hidden="true" />Vô hiệu hóa</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={exportOpen} onOpenChange={(open) => { if (!exporting) { setExportOpen(open); if (!open) setExportError(""); } }}>
         <DialogContent className="action-dialog export-dialog" aria-describedby="export-description">
@@ -584,11 +527,10 @@ type RecordProps = {
   selected: boolean;
   onApprovalChange: (id: string, status: DemoApprovalStatus) => void;
   onExpansionChange?: (id: string, expanded: boolean) => void;
-  onInvalidate: (id: string) => void;
   onToggle: (id: string) => void;
 };
 
-function RecordRow({ approvalStatus, onApprovalChange, onInvalidate, onToggle, record, selected }: RecordProps) {
+function RecordRow({ approvalStatus, onApprovalChange, onToggle, record, selected }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
     <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
@@ -599,11 +541,10 @@ function RecordRow({ approvalStatus, onApprovalChange, onInvalidate, onToggle, r
     <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
     <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
     <td className="p-3"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></td>
-    <td className="p-3 text-center"><RecordInvalidateButton recordId={record.id} onInvalidate={onInvalidate} /></td>
   </tr>;
 }
 
-function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpansionChange, onInvalidate, onToggle, record, selected }: RecordProps) {
+function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpansionChange, onToggle, record, selected }: RecordProps) {
   function isInteractiveTarget(event: MouseEvent<HTMLElement>) {
     return event.target instanceof HTMLElement && event.target.closest("button, input, select, label") !== null;
   }
@@ -652,7 +593,6 @@ function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpa
       ) : (
         <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
       )}
-      <RecordInvalidateButton recordId={record.id} onInvalidate={onInvalidate} />
     </footer>
   </article>;
 }
@@ -675,10 +615,6 @@ function ApprovalControl({ onChange, recordId, status }: { onChange: (id: string
       <ChevronDown className="approval-select-icon" size={13} strokeWidth={2.5} aria-hidden="true" />
     </span>
   </label>;
-}
-
-function RecordInvalidateButton({ onInvalidate, recordId }: { onInvalidate: (id: string) => void; recordId: string }) {
-  return <Button variant="ghost" size="icon" className="record-invalidate text-danger" aria-label={`Vô hiệu hóa phiếu ${recordId}`} title="Vô hiệu hóa phiếu" onClick={() => onInvalidate(recordId)}><Trash2 size={17} aria-hidden="true" /></Button>;
 }
 
 function RecordPhotoGallery({ photos, recordId, variant }: { photos: readonly DemoPhoto[]; recordId: string; variant: "table" | "card" }) {
