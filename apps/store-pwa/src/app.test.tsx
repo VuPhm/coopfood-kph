@@ -110,7 +110,7 @@ describe("Store workspace", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
     expect(screen.getByRole("button", { name: "Duyệt 1 phiếu" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Xuất Excel" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Vô hiệu hóa" })).not.toHaveTextContent("Vô hiệu hóa");
+    expect(screen.getByRole("button", { name: "Vô hiệu hóa" })).toHaveTextContent("Vô hiệu hóa");
 
     fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
     expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
@@ -206,13 +206,32 @@ describe("Store workspace", () => {
     expect(screen.getByText(/Đã chuyển phiếu KPH-260815-018 sang “Đã duyệt”/i)).toBeVisible();
   });
 
-  it("offers an individual invalidate action for every record presentation", () => {
+  it("requires a reason and removes an individually invalidated record", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Mở rộng phiếu KPH-260815-018" }));
     const invalidateButtons = screen.getAllByRole("button", { name: "Vô hiệu hóa phiếu KPH-260815-018" });
 
     expect(invalidateButtons).toHaveLength(2);
     fireEvent.click(invalidateButtons[0]!);
-    expect(screen.getByText(/Vô hiệu hóa phiếu KPH-260815-018 cần lý do/i)).toBeVisible();
+    const dialog = screen.getByRole("dialog", { name: "Vô hiệu hóa 1 phiếu?" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Vô hiệu hóa" }));
+    expect(within(dialog).getByRole("alert")).toHaveTextContent("Cần nhập lý do");
+
+    fireEvent.change(within(dialog).getByRole("textbox", { name: /Lý do vô hiệu hóa/i }), { target: { value: "Phiếu tạo nhầm" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Vô hiệu hóa" }));
+
+    expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
+    expect(screen.getByText(/Đã vô hiệu hóa 1 phiếu.*Phiếu tạo nhầm/i)).toBeVisible();
+  });
+
+  it("summarizes selected rows and images before exporting Excel", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Xuất phiếu ra Excel" });
+    expect(within(dialog).getByText("TP Khô & khác")).toBeVisible();
+    expect(within(dialog).getByText("Co.op Food Nguyễn Kiệm · CF-DEMO-001")).toBeVisible();
+    expect(within(dialog).getByRole("button", { name: "Xuất 1 dòng" })).toBeEnabled();
   });
 });

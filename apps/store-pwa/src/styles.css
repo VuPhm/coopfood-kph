@@ -400,6 +400,26 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 .photo-preview-remove:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .create-dialog-footer { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--space-4)); display: flex; flex-direction: column-reverse; gap: var(--control-gap); border-radius: 0 0 24px 24px; background: #fff; padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom)); box-shadow: 0 -10px 24px rgb(0 66 33 / .08); }
 
+.action-dialog { width: min(30rem, calc(100% - 2rem)); gap: var(--space-3); padding: var(--space-5); }
+.action-dialog-icon { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 16px; }
+.action-dialog-icon svg { width: 1.5rem; height: 1.5rem; }
+.action-dialog-icon.is-danger { background: var(--color-danger-soft); color: var(--color-danger); }
+.action-dialog-icon.is-export { background: var(--color-brand-soft); color: var(--color-brand); }
+.action-dialog-field { display: grid; gap: var(--space-1-5); color: var(--color-ink); font-size: .8125rem; font-weight: 800; }
+.action-dialog-field strong { color: var(--color-danger); }
+.action-dialog-field textarea { width: 100%; resize: vertical; border: 2px solid var(--color-border); border-radius: 14px; background: #fff; padding: var(--space-3); color: var(--color-ink); font-size: 1rem; font-weight: 500; }
+.action-dialog-field textarea:hover { border-color: rgb(0 102 51 / .32); }
+.action-dialog-field textarea:focus-visible { border-color: var(--color-brand); }
+.action-dialog-error { margin: 0; border-radius: 12px; background: var(--color-danger-soft); padding: var(--space-2-5) var(--space-3); color: var(--color-danger); font-size: .75rem; font-weight: 800; }
+.action-dialog-actions { display: flex; justify-content: flex-end; gap: var(--control-gap); margin-top: var(--space-1); }
+.action-danger-button { background: var(--color-danger); }
+.action-danger-button:hover { background: #bd0010; }
+.export-summary { display: grid; gap: 0; overflow: hidden; margin: 0; border: 1px solid var(--color-border); border-radius: 16px; background: var(--color-surface-muted); }
+.export-summary div { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: var(--space-3); padding: var(--space-2-5) var(--space-3); }
+.export-summary div + div { border-top: 1px solid var(--color-line); }
+.export-summary dt { color: var(--color-ink-muted); font-size: .75rem; font-weight: 750; }
+.export-summary dd { min-width: 0; margin: 0; color: var(--color-ink); font-size: .8125rem; font-weight: 850; text-align: right; }
+
 .evidence-viewer-content { display: flex; width: min(94vw, 72rem); max-width: 72rem; height: min(90dvh, 54rem); max-height: 90dvh; flex-direction: column; gap: 0; overflow: clip; border-color: rgb(255 255 255 / .18); background: #101713; padding: var(--panel-inset); }
 .evidence-viewer-content > .dialog-close-hit-area { z-index: 3; background: transparent; color: #fff; box-shadow: none; }
 .evidence-viewer-content > .dialog-close-hit-area .dialog-close-visual { background: rgb(16 23 19 / .78); box-shadow: 0 3px 10px rgb(0 0 0 / .28); }

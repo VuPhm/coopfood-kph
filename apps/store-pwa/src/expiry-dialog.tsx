@@ -28,6 +28,7 @@ import {
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 
 import { CalendarInput } from "./calendar-input";
+import { formatBusinessDate } from "./business-date";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
 type DurationSource = "date" | "days" | "months";
@@ -60,7 +61,8 @@ function positiveWholeNumber(value: string) {
   return Number.isInteger(number) && number > 0 ? number : null;
 }
 
-export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate }) {
+export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
+  const businessToday = today ?? formatBusinessDate(new Date()).iso;
   const workbenchRef = useRef<HTMLElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [showInitialHint, setShowInitialHint] = useState(true);
@@ -112,14 +114,14 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
     }
 
     try {
-      return { error: "", result: calculateShelfLife(parsedNsx, parsedHsd, today) };
+      return { error: "", result: calculateShelfLife(parsedNsx, parsedHsd, businessToday) };
     } catch (caught) {
       return {
         error: caught instanceof Error ? caught.message : "Không thể tra cứu thời hạn.",
         result: null,
       };
     }
-  }, [days, hsd, knownManufactureDate, months, nsx, today]);
+  }, [businessToday, days, hsd, knownManufactureDate, months, nsx]);
 
   function syncFromKnownNsx(nextNsx: string, source = durationSource) {
     const parsedNsx = tryParseDate(nextNsx);
@@ -277,7 +279,7 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
               label="Ngày sản xuất"
               value={nsx}
               readOnly={!knownManufactureDate}
-              initialMonth={today}
+              initialMonth={businessToday}
               onChange={changeNsx}
               action={(
               <button type="button" role="switch" aria-checked={knownManufactureDate} className="expiry-switch" onClick={toggleMode}>
@@ -290,7 +292,7 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
               id="lookup-hsd"
               label="Hạn sử dụng (HSD)"
               value={hsd}
-              initialMonth={today}
+              initialMonth={businessToday}
               onChange={changeHsd}
             />
 
@@ -307,7 +309,7 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
           </section>
         </form>
 
-        <LookupResult error={liveState.error} hsd={tryParseDate(hsd)} nsx={tryParseDate(nsx)} result={liveState.result} today={today} />
+        <LookupResult error={liveState.error} hsd={tryParseDate(hsd)} nsx={tryParseDate(nsx)} result={liveState.result} today={businessToday} />
       </div> : null}
     </aside>
   );

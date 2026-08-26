@@ -13,8 +13,11 @@ export type DemoRecord = {
   productName: string;
   supplier: string;
   quantity: string;
+  quantityValue: number;
+  unit: "EA" | "kg";
   condition: string;
   resolution: string;
+  treatmentDate: string;
   approvalStatus: DemoApprovalStatus;
   photos: readonly DemoPhoto[];
   note?: string;
@@ -24,6 +27,7 @@ export type DemoPhoto = {
   id: string;
   src: string;
   alt: string;
+  blob?: Blob;
 };
 
 export const DEMO_RECORDS: readonly DemoRecord[] = [
@@ -36,8 +40,11 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     productName: "Bánh quy bơ hộp 300 g",
     supplier: "NCC-0042 · Công ty Thực phẩm An Việt",
     quantity: "2 EA",
+    quantityValue: 2,
+    unit: "EA",
     condition: "Cận date",
     resolution: "ĐỔI",
+    treatmentDate: "16/08/2026",
     approvalStatus: "PENDING",
     photos: [
       { id: "cookie-front", src: assetUrl("demo/evidence-cookie-front.svg"), alt: "Mặt trước hộp bánh quy tại quầy" },
@@ -54,8 +61,11 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     productName: "Cải thìa VietGAP 500 g",
     supplier: "NCC-0108 · Nông sản Miền Đông",
     quantity: "1.5 kg",
+    quantityValue: 1.5,
+    unit: "kg",
     condition: "Hư hỏng",
     resolution: "HỦY",
+    treatmentDate: "15/08/2026",
     approvalStatus: "APPROVED",
     photos: [
       { id: "vegetable-damage", src: assetUrl("demo/evidence-vegetable.svg"), alt: "Tình trạng cải thìa tại quầy" },

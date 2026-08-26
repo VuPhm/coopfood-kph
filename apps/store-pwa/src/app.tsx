@@ -1,11 +1,13 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
-import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useState } from "react";
+import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, LoaderCircle, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
+import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
-import { CreateRecordDialog } from "./create-record-dialog";
+import { formatBusinessDate } from "./business-date";
+import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
 import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord } from "./demo-records";
+import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import { EvidenceImageViewer } from "./image-viewer";
 import { UtilityPanelMeta } from "./utility-panel-meta";
@@ -39,29 +41,7 @@ const recordSortOptions: readonly { label: string; value: RecordSortKey }[] = [
   { label: "Trạng thái duyệt", value: "approval" },
 ];
 const recordCollator = new Intl.Collator("vi", { numeric: true, sensitivity: "base" });
-const businessDateFormatter = new Intl.DateTimeFormat("vi-VN", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: "Asia/Ho_Chi_Minh",
-});
-const businessDatePartFormatter = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: "Asia/Ho_Chi_Minh",
-});
-
-export function formatBusinessDate(now: Date) {
-  const parts = Object.fromEntries(
-    businessDatePartFormatter.formatToParts(now).map(({ type, value }) => [type, value]),
-  );
-
-  return {
-    display: businessDateFormatter.format(now),
-    iso: `${parts.year}-${parts.month}-${parts.day}`,
-  };
-}
+export { formatBusinessDate } from "./business-date";
 
 function TodayDate() {
   const [now, setNow] = useState(() => new Date());
@@ -103,6 +83,7 @@ function sortValue(record: DemoRecord, key: RecordSortKey, approvalStatus: DemoA
 }
 
 export function App() {
+  const [records, setRecords] = useState<readonly DemoRecord[]>(DEMO_RECORDS);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [createKind, setCreateKind] = useState<KphKind | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -112,15 +93,22 @@ export function App() {
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
   const [notice, setNotice] = useState("");
+  const [invalidateIds, setInvalidateIds] = useState<readonly string[]>([]);
+  const [invalidationReason, setInvalidationReason] = useState("");
+  const [invalidationError, setInvalidationError] = useState("");
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+  const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
-    const records = DEMO_RECORDS.filter(({ kind, id, approvalStatus }) => {
+    const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
       const currentApproval = approvalByRecord[id] ?? approvalStatus;
       return kind === activeKind && (approvalFilter === "ALL" || currentApproval === approvalFilter);
     });
 
-    if (!recordSort) return records;
+    if (!recordSort) return scopedRecords;
 
-    return [...records].sort((left, right) => {
+    return [...scopedRecords].sort((left, right) => {
       const leftApproval = approvalByRecord[left.id] ?? left.approvalStatus;
       const rightApproval = approvalByRecord[right.id] ?? right.approvalStatus;
       const leftValue = sortValue(left, recordSort.key, leftApproval);
@@ -130,9 +118,18 @@ export function App() {
         : recordCollator.compare(String(leftValue), String(rightValue));
       return recordSort.direction === "ascending" ? comparison : -comparison;
     });
-  }, [activeKind, approvalByRecord, approvalFilter, recordSort]);
+  }, [activeKind, approvalByRecord, approvalFilter, recordSort, records]);
+  const selectedRecords = useMemo(
+    () => records.filter(({ id, kind }) => kind === activeKind && selected.has(id)),
+    [activeKind, records, selected],
+  );
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
+
+  useEffect(() => () => {
+    ownedPhotoUrls.current.forEach((url) => URL.revokeObjectURL(url));
+    ownedPhotoUrls.current.clear();
+  }, []);
 
   function openCreate(kind: KphKind) {
     setCreateKind(kind);
@@ -217,7 +214,85 @@ export function App() {
   }
 
   function invalidateRecord(recordId: string) {
-    setNotice(`Vô hiệu hóa phiếu ${recordId} cần lý do, audit và kiểm tra quyền Cửa hàng trưởng ở backend.`);
+    setInvalidateIds([recordId]);
+    setInvalidationReason("");
+    setInvalidationError("");
+  }
+
+  function invalidateSelected() {
+    setInvalidateIds(selectedRecords.map(({ id }) => id));
+    setInvalidationReason("");
+    setInvalidationError("");
+  }
+
+  function confirmInvalidation() {
+    const reason = invalidationReason.trim();
+    if (!reason) {
+      setInvalidationError("Cần nhập lý do vô hiệu hóa");
+      return;
+    }
+    const targetIds = new Set(invalidateIds);
+    const removed = records.filter(({ id }) => targetIds.has(id));
+    removed.flatMap(({ photos }) => photos).forEach(({ src }) => {
+      if (ownedPhotoUrls.current.delete(src)) URL.revokeObjectURL(src);
+    });
+    setRecords((current) => current.filter(({ id }) => !targetIds.has(id)));
+    setSelected((current) => new Set([...current].filter((id) => !targetIds.has(id))));
+    setExpandedMobileRecords((current) => new Set([...current].filter((id) => !targetIds.has(id))));
+    setApprovalByRecord((current) => Object.fromEntries(Object.entries(current).filter(([id]) => !targetIds.has(id))));
+    setInvalidateIds([]);
+    setInvalidationReason("");
+    setInvalidationError("");
+    setNotice(`Đã vô hiệu hóa ${removed.length} phiếu trong bản demo · Lý do: ${reason}`);
+  }
+
+  function saveCreatedRecord(draft: CreatedRecordDraft) {
+    const dateDigits = draft.detectedDate.split("/").reverse().join("").slice(2);
+    const suffix = Math.floor(100 + Math.random() * 900);
+    const id = `KPH-${dateDigits}-${suffix}`;
+    const photos = draft.photos.map(({ id: photoId, fileName, blob }) => {
+      const src = URL.createObjectURL(blob);
+      ownedPhotoUrls.current.add(src);
+      return { id: photoId, src, alt: `Ảnh minh chứng ${fileName} đã đóng tem`, blob };
+    });
+    const record: DemoRecord = {
+      id,
+      kind: draft.kind,
+      detectedDate: draft.detectedDate,
+      detectedBy: draft.detectedBy,
+      sku: draft.barcode || "NHẬP TAY",
+      productName: draft.productName || `Sản phẩm ${draft.barcode}`,
+      supplier: draft.supplier || "Chưa nhập nhà cung cấp",
+      quantity: `${draft.quantity} ${draft.unit}`,
+      quantityValue: draft.quantity,
+      unit: draft.unit,
+      condition: draft.condition,
+      resolution: draft.resolution,
+      treatmentDate: draft.treatmentDate,
+      approvalStatus: "PENDING",
+      photos,
+      note: draft.note,
+    };
+    setRecords((current) => [record, ...current]);
+    setApprovalByRecord((current) => ({ ...current, [id]: "PENDING" }));
+    setActiveKind(draft.kind);
+    setSelected(new Set([id]));
+    setNotice(`Đã tạo phiếu ${id} trong bản demo.`);
+  }
+
+  async function exportSelected() {
+    if (!selectedRecords.length) return;
+    setExporting(true);
+    setExportError("");
+    try {
+      await downloadKphWorkbook(activeKind, selectedRecords);
+      setExportOpen(false);
+      setNotice(`Đã xuất ${selectedRecords.length} phiếu ${kindCopy[activeKind].short} ra Excel.`);
+    } catch (error) {
+      setExportError(error instanceof Error ? error.message : "Không thể xuất file Excel");
+    } finally {
+      setExporting(false);
+    }
   }
 
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, kind: KphKind) {
@@ -288,7 +363,7 @@ export function App() {
             <div className="history-controls-row">
               <div className="history-tabs" role="tablist" aria-label="Loại phiếu">
                 {kphKinds.map((kind) => {
-                  const count = DEMO_RECORDS.filter((record) => record.kind === kind).length;
+                  const count = records.filter((record) => record.kind === kind).length;
                   return (
                     <button
                       key={kind}
@@ -326,8 +401,8 @@ export function App() {
                   </div>
                   {selected.size > 0 ? (
                     <div className="history-action-tools">
-                      <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={() => setNotice("Luồng xuất Excel sẽ được nối backend trong slice riêng.")}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
-                      <Button variant="ghost" className="history-invalidate text-danger" aria-label="Vô hiệu hóa" title="Vô hiệu hóa" onClick={() => setNotice("Vô hiệu hóa cần lý do và kiểm tra quyền Cửa hàng trưởng ở backend.")}><Trash2 size={17} aria-hidden="true" /><span className="history-invalidate-label">Xóa</span></Button>
+                      <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={() => { setExportError(""); setExportOpen(true); }}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
+                      <Button variant="ghost" className="history-invalidate text-danger" aria-label="Vô hiệu hóa" title="Vô hiệu hóa" onClick={invalidateSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-invalidate-label">Vô hiệu hóa</span></Button>
                     </div>
                   ) : null}
                 </div>
@@ -365,7 +440,49 @@ export function App() {
         </div>
       </main>
 
-      <CreateRecordDialog kind={createKind} open={dialogOpen} onOpenChange={setDialogOpen} onSaved={(kind) => { setNotice(`Đã kiểm tra luồng lưu ${kind} ở chế độ demo.`); setActiveKind(kind); setSelected(new Set()); }} />
+      <CreateRecordDialog kind={createKind} open={dialogOpen} onOpenChange={setDialogOpen} onSaved={saveCreatedRecord} />
+
+      <Dialog open={invalidateIds.length > 0} onOpenChange={(open) => { if (!open) { setInvalidateIds([]); setInvalidationReason(""); setInvalidationError(""); } }}>
+        <DialogContent className="action-dialog" aria-describedby="invalidate-description">
+          <div className="action-dialog-icon is-danger"><AlertTriangle aria-hidden="true" /></div>
+          <DialogTitle>Vô hiệu hóa {invalidateIds.length} phiếu?</DialogTitle>
+          <DialogDescription id="invalidate-description">
+            Phiếu sẽ biến mất khỏi danh sách demo. Trên hệ thống thật, thao tác này lưu lý do và audit; dữ liệu không bị xóa cứng.
+          </DialogDescription>
+          <label className="action-dialog-field" htmlFor="invalidation-reason">
+            <span>Lý do vô hiệu hóa <strong aria-hidden="true">*</strong></span>
+            <textarea id="invalidation-reason" rows={3} maxLength={255} value={invalidationReason} placeholder="Ví dụ: Phiếu tạo nhầm" onChange={(event) => { setInvalidationReason(event.target.value); if (event.target.value.trim()) setInvalidationError(""); }} />
+          </label>
+          {invalidationError ? <p className="action-dialog-error" role="alert">{invalidationError}</p> : null}
+          <div className="action-dialog-actions">
+            <Button type="button" variant="ghost" onClick={() => setInvalidateIds([])}>Hủy</Button>
+            <Button type="button" className="action-danger-button" onClick={confirmInvalidation}><Trash2 size={17} aria-hidden="true" />Vô hiệu hóa</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={exportOpen} onOpenChange={(open) => { if (!exporting) { setExportOpen(open); if (!open) setExportError(""); } }}>
+        <DialogContent className="action-dialog export-dialog" aria-describedby="export-description">
+          <div className="action-dialog-icon is-export"><FileSpreadsheet aria-hidden="true" /></div>
+          <DialogTitle>Xuất phiếu ra Excel</DialogTitle>
+          <DialogDescription id="export-description">
+            File BM-331.CF được dàn ngang, khóa định dạng và giữ tối đa ba ảnh minh chứng theo đúng thứ tự.
+          </DialogDescription>
+          <dl className="export-summary">
+            <div><dt>Loại phiếu</dt><dd>{kindCopy[activeKind].short}</dd></div>
+            <div><dt>Số phiếu</dt><dd>{selectedRecords.length}</dd></div>
+            <div><dt>Số ảnh</dt><dd>{selectedRecords.reduce((total, record) => total + record.photos.length, 0)}</dd></div>
+            <div><dt>Cửa hàng</dt><dd>Co.op Food Nguyễn Kiệm · CF-DEMO-001</dd></div>
+          </dl>
+          {exportError ? <p className="action-dialog-error" role="alert">{exportError}</p> : null}
+          <div className="action-dialog-actions">
+            <Button type="button" variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button>
+            <Button type="button" disabled={exporting || selectedRecords.length === 0} onClick={exportSelected}>
+              {exporting ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xuất…</> : <><FileDown size={17} aria-hidden="true" />Xuất {selectedRecords.length} dòng</>}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       {notice ? <button type="button" className="notice-toast fixed bottom-20 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-xl" onClick={() => setNotice("")}>{notice}</button> : null}
     </div>
   );

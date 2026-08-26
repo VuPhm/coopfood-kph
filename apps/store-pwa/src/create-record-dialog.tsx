@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { KPH_OPTIONS, parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
+import { KPH_OPTIONS, parseDisplayDate, resolveChoiceLabel, type KphKind } from "@coopfood-kph/kph-rules";
 import {
   Button,
   Dialog,
@@ -30,6 +30,7 @@ import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
 import { CalendarInput } from "./calendar-input";
+import { formatBusinessDate } from "./business-date";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 
@@ -71,11 +72,27 @@ type PhotoDraft = {
   url: string;
 };
 
+export type CreatedRecordDraft = {
+  kind: KphKind;
+  detectedDate: string;
+  barcode: string;
+  supplier: string;
+  productName: string;
+  quantity: number;
+  unit: "EA" | "kg";
+  condition: string;
+  resolution: string;
+  treatmentDate: string;
+  detectedBy: string;
+  note: string;
+  photos: readonly { id: string; fileName: string; blob: Blob }[];
+};
+
 type CreateRecordDialogProps = {
   kind: KphKind | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSaved: (kind: KphKind) => void;
+  onSaved: (draft: CreatedRecordDraft) => void;
 };
 
 const kindLabels: Record<KphKind, string> = {
@@ -88,7 +105,7 @@ const DEMO_STORE_STAMP = { storeCode: "CF-DEMO-001", storeName: "Nguyễn Kiệm
 function defaultValues(kind: KphKind): FormData {
   const options = KPH_OPTIONS[kind];
   return {
-    detectedDate: "15/08/2026",
+    detectedDate: formatBusinessDate(new Date()).display,
     barcode: "",
     supplier: "",
     productName: "",
@@ -130,6 +147,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
   const selectedResolution = watch("resolution");
   const detectedDate = watch("detectedDate");
   const treatmentDate = watch("treatmentDate");
+  const initialMonth = formatBusinessDate(new Date()).iso;
 
   function clearPhotos() {
     for (const photo of photoRef.current) {
@@ -155,7 +173,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
   if (!kind) return null;
 
-  const submit = handleSubmit(() => {
+  const submit = handleSubmit((values) => {
     if (processingPhotos) {
       setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
       return;
@@ -164,7 +182,23 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
       setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
       return;
     }
-    onSaved(kind);
+    const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
+    const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
+    onSaved({
+      kind,
+      detectedDate: values.detectedDate,
+      barcode: values.barcode.trim(),
+      supplier: values.supplier.trim(),
+      productName: values.productName.trim(),
+      quantity: Number(values.quantity),
+      unit: values.unit,
+      condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
+      resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
+      treatmentDate: values.treatmentDate.trim(),
+      detectedBy: values.detectedBy.trim(),
+      note: values.note.trim(),
+      photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
+    });
     reset(defaultValues(kind));
     clearPhotos();
     setPhotoError("");
@@ -229,7 +263,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
             <FormSection number="1" title="Thông tin phát hiện">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
-                  <CalendarInput id="detected-date" initialMonth="2026-08-15" label="Ngày phát hiện" value={detectedDate} onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
+                  <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
@@ -271,7 +305,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
               <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} />
               {selectedResolution === "OTHER" ? <Field className="mt-3" label="Nội dung biện pháp khác" htmlFor="resolution-detail" error={errors.resolutionDetail?.message}><Input id="resolution-detail" placeholder="Để trống sẽ giữ nhãn “KHÁC”" {...register("resolutionDetail")} /></Field> : null}
               <Field className="mt-3" label="Ngày xử lý (nếu có)" htmlFor="treatment-date" error={errors.treatmentDate?.message}>
-                <CalendarInput id="treatment-date" initialMonth="2026-08-15" label="Ngày xử lý (nếu có)" value={treatmentDate} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
+                <CalendarInput id="treatment-date" initialMonth={initialMonth} label="Ngày xử lý (nếu có)" value={treatmentDate} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
               </Field>
             </FormSection>
 

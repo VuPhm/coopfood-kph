@@ -1,16 +1,20 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { CreateRecordDialog } from "./create-record-dialog";
+import { formatBusinessDate } from "./business-date";
+import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
 import { processEvidencePhoto } from "./image-processing";
 
 vi.mock("./image-processing", () => ({ processEvidencePhoto: vi.fn() }));
 
-function renderDialog(kind: "TPCN" | "TPTS" = "TPCN") {
-  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: CreatedRecordDraft) => void>()) {
+  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={onSaved} />);
+  return onSaved;
 }
 
 describe("Create KPH record", () => {
+  beforeEach(() => vi.clearAllMocks());
+
   it("keeps the accepted section order and operational fields", () => {
     renderDialog();
     const headings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
@@ -92,5 +96,44 @@ describe("Create KPH record", () => {
     fireEvent.click(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" }));
     fireEvent.click(screen.getByRole("button", { name: "20 tháng 8, 2026" }));
     expect(screen.getByRole("textbox", { name: "Ngày xử lý (nếu có)" })).toHaveValue("20/08/2026");
+  });
+
+  it("defaults the detected date and calendar to the current Ho Chi Minh business day", () => {
+    renderDialog();
+    const today = formatBusinessDate(new Date());
+    expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveValue(today.display);
+
+    fireEvent.click(screen.getByRole("button", { name: "Chọn ngày phát hiện" }));
+    expect(screen.getByRole("button", { name: new Intl.DateTimeFormat("vi-VN", { day: "numeric", month: "long", timeZone: "UTC", year: "numeric" }).format(new Date(`${today.iso}T00:00:00Z`)) })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("saves the entered values and stamped evidence instead of a placeholder", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:saved-photo") });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
+    const stampedBlob = new Blob(["stamped"], { type: "image/jpeg" });
+    vi.mocked(processEvidencePhoto).mockResolvedValue({
+      blob: stampedBlob,
+      capturedAt: new Date(),
+      width: 1280,
+      height: 720,
+    });
+    const onSaved = renderDialog();
+    fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Sản phẩm kiểm thử" } });
+    const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+    fireEvent.change(picker!, { target: { files: [new File(["original"], "evidence.jpg", { type: "image/jpeg" })] } });
+    expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({
+        kind: "TPCN",
+        barcode: "000123",
+        productName: "Sản phẩm kiểm thử",
+        detectedDate: formatBusinessDate(new Date()).display,
+        quantity: 1,
+        unit: "EA",
+        photos: [expect.objectContaining({ fileName: "evidence.jpg", blob: stampedBlob })],
+      })));
   });
 });
