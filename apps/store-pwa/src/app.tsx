@@ -3,6 +3,7 @@ import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, Dial
 import { ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useState } from "react";
 
+import { assetUrl } from "./asset-url";
 import { CreateRecordDialog } from "./create-record-dialog";
 import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord } from "./demo-records";
 import { ExpiryWorkbench } from "./expiry-dialog";
@@ -243,7 +244,7 @@ export function App() {
         <div className="app-header-inner">
           <img
             className="app-brand-logo"
-            src="/brand/coopfood-logo.png"
+            src={assetUrl("brand/coopfood-logo.png")}
             alt="Co.op Food - an toàn, tiện lợi, tươi ngon"
           />
           <TodayDate />

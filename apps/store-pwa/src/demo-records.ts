@@ -1,5 +1,7 @@
 import type { KphKind } from "@coopfood-kph/kph-rules";
 
+import { assetUrl } from "./asset-url";
+
 export type DemoApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export type DemoRecord = {
@@ -38,8 +40,8 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     resolution: "ĐỔI",
     approvalStatus: "PENDING",
     photos: [
-      { id: "cookie-front", src: "/demo/evidence-cookie-front.svg", alt: "Mặt trước hộp bánh quy tại quầy" },
-      { id: "cookie-expiry", src: "/demo/evidence-cookie-expiry.svg", alt: "Thông tin hạn dùng trên hộp bánh quy" },
+      { id: "cookie-front", src: assetUrl("demo/evidence-cookie-front.svg"), alt: "Mặt trước hộp bánh quy tại quầy" },
+      { id: "cookie-expiry", src: assetUrl("demo/evidence-cookie-expiry.svg"), alt: "Thông tin hạn dùng trên hộp bánh quy" },
     ],
     note: "Hàng cận hạn dùng còn 3 ngày, đã liên hệ NCC đổi lô mới.",
   },
@@ -56,7 +58,7 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     resolution: "HỦY",
     approvalStatus: "APPROVED",
     photos: [
-      { id: "vegetable-damage", src: "/demo/evidence-vegetable.svg", alt: "Tình trạng cải thìa tại quầy" },
+      { id: "vegetable-damage", src: assetUrl("demo/evidence-vegetable.svg"), alt: "Tình trạng cải thìa tại quầy" },
     ],
     note: "Dập úa lá ngoài khi kiểm hàng đầu ca sáng.",
   },

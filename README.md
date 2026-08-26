@@ -31,3 +31,11 @@ cd backend && ./mvnw verify
 Chạy hai frontend độc lập bằng `npm --workspace @coopfood-kph/store-pwa run dev`
 và `npm --workspace @coopfood-kph/admin-web run dev`. PostgreSQL local nằm trong
 `infra/local/compose.yaml`; Testcontainers tự tạo database sạch khi có Docker.
+
+## GitHub Pages preview
+
+Nhánh `codex/github-pages-pwa` deploy riêng Store PWA bằng workflow
+`.github/workflows/store-pwa-pages.yml`. Trong GitHub, chọn **Settings → Pages →
+Build and deployment → Source: GitHub Actions** một lần; mỗi lần push lên nhánh
+này workflow sẽ build `apps/store-pwa` với base path của Pages và publish thư mục
+`apps/store-pwa/dist`.
