@@ -1,13 +1,16 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
+import { ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, PackagePlus, Salad, Scale, ShieldCheck, SlidersHorizontal, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useState } from "react";
 
 import { CreateRecordDialog } from "./create-record-dialog";
+import { formatBusinessDate } from "./business-date";
 import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord } from "./demo-records";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import { EvidenceImageViewer } from "./image-viewer";
 import { UtilityPanelMeta } from "./utility-panel-meta";
+
+export { formatBusinessDate } from "./business-date";
 
 const kindCopy: Record<KphKind, { action: string; short: string }> = {
   TPCN: { action: "TP khô & khác", short: "TP Khô & khác" },
@@ -38,30 +41,6 @@ const recordSortOptions: readonly { label: string; value: RecordSortKey }[] = [
   { label: "Trạng thái duyệt", value: "approval" },
 ];
 const recordCollator = new Intl.Collator("vi", { numeric: true, sensitivity: "base" });
-const businessDateFormatter = new Intl.DateTimeFormat("vi-VN", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: "Asia/Ho_Chi_Minh",
-});
-const businessDatePartFormatter = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: "Asia/Ho_Chi_Minh",
-});
-
-export function formatBusinessDate(now: Date) {
-  const parts = Object.fromEntries(
-    businessDatePartFormatter.formatToParts(now).map(({ type, value }) => [type, value]),
-  );
-
-  return {
-    display: businessDateFormatter.format(now),
-    iso: `${parts.year}-${parts.month}-${parts.day}`,
-  };
-}
-
 function TodayDate() {
   const [now, setNow] = useState(() => new Date());
   const today = formatBusinessDate(now);
@@ -215,10 +194,6 @@ export function App() {
     setSelected(new Set());
   }
 
-  function invalidateRecord(recordId: string) {
-    setNotice(`Vô hiệu hóa phiếu ${recordId} cần lý do, audit và kiểm tra quyền Cửa hàng trưởng ở backend.`);
-  }
-
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, kind: KphKind) {
     const currentIndex = kphKinds.indexOf(kind);
     const nextKind = event.key === "ArrowRight"
@@ -326,7 +301,6 @@ export function App() {
                   {selected.size > 0 ? (
                     <div className="history-action-tools">
                       <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={() => setNotice("Luồng xuất Excel sẽ được nối backend trong slice riêng.")}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
-                      <Button variant="ghost" className="history-invalidate text-danger" aria-label="Vô hiệu hóa" title="Vô hiệu hóa" onClick={() => setNotice("Vô hiệu hóa cần lý do và kiểm tra quyền Cửa hàng trưởng ở backend.")}><Trash2 size={17} aria-hidden="true" /><span className="history-invalidate-label">Xóa</span></Button>
                     </div>
                   ) : null}
                 </div>
@@ -347,15 +321,14 @@ export function App() {
                   <SortableHeader label="Biện pháp xử lý" onSort={toggleRecordSort} sort={recordSort} sortKey="resolution" />
                   <th className="px-3 py-0">Ảnh</th>
                   <SortableHeader label="Duyệt" onSort={toggleRecordSort} sort={recordSort} sortKey="approval" />
-                  <th className="w-12 px-3 py-0 text-center"><span className="sr-only">Thao tác dòng</span></th>
                 </tr>
               </thead>
-              <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onInvalidate={invalidateRecord} onToggle={toggleSelection} />)}</tbody>
+              <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onToggle={toggleSelection} />)}</tbody>
             </table>
           </div>
 
           <div className="grid gap-3 mobile-history">
-            {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onExpansionChange={setMobileRecordExpanded} onInvalidate={invalidateRecord} onToggle={toggleSelection} />)}
+            {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)}
           </div>
         </section>
 
@@ -466,11 +439,10 @@ type RecordProps = {
   selected: boolean;
   onApprovalChange: (id: string, status: DemoApprovalStatus) => void;
   onExpansionChange?: (id: string, expanded: boolean) => void;
-  onInvalidate: (id: string) => void;
   onToggle: (id: string) => void;
 };
 
-function RecordRow({ approvalStatus, onApprovalChange, onInvalidate, onToggle, record, selected }: RecordProps) {
+function RecordRow({ approvalStatus, onApprovalChange, onToggle, record, selected }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
     <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
@@ -481,11 +453,10 @@ function RecordRow({ approvalStatus, onApprovalChange, onInvalidate, onToggle, r
     <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
     <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
     <td className="p-3"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></td>
-    <td className="p-3 text-center"><RecordInvalidateButton recordId={record.id} onInvalidate={onInvalidate} /></td>
   </tr>;
 }
 
-function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpansionChange, onInvalidate, onToggle, record, selected }: RecordProps) {
+function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpansionChange, onToggle, record, selected }: RecordProps) {
   function isInteractiveTarget(event: MouseEvent<HTMLElement>) {
     return event.target instanceof HTMLElement && event.target.closest("button, input, select, label") !== null;
   }
@@ -534,7 +505,6 @@ function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onExpa
       ) : (
         <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
       )}
-      <RecordInvalidateButton recordId={record.id} onInvalidate={onInvalidate} />
     </footer>
   </article>;
 }
@@ -557,10 +527,6 @@ function ApprovalControl({ onChange, recordId, status }: { onChange: (id: string
       <ChevronDown className="approval-select-icon" size={13} strokeWidth={2.5} aria-hidden="true" />
     </span>
   </label>;
-}
-
-function RecordInvalidateButton({ onInvalidate, recordId }: { onInvalidate: (id: string) => void; recordId: string }) {
-  return <Button variant="ghost" size="icon" className="record-invalidate text-danger" aria-label={`Vô hiệu hóa phiếu ${recordId}`} title="Vô hiệu hóa phiếu" onClick={() => onInvalidate(recordId)}><Trash2 size={17} aria-hidden="true" /></Button>;
 }
 
 function RecordPhotoGallery({ photos, recordId, variant }: { photos: readonly DemoPhoto[]; recordId: string; variant: "table" | "card" }) {

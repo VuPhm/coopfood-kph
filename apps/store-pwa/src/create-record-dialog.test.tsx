@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { CreateRecordDialog } from "./create-record-dialog";
+import { formatBusinessDate } from "./business-date";
 import { processEvidencePhoto } from "./image-processing";
 
 vi.mock("./image-processing", () => ({ processEvidencePhoto: vi.fn() }));
@@ -37,11 +38,20 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("textbox", { name: "Nội dung biện pháp khác" })).toHaveAttribute("placeholder", expect.stringContaining("KHÁC"));
   });
 
-  it("uses the TPTS option matrix", () => {
+  it("uses the reviewed TPCN condition matrix", () => {
+    renderDialog("TPCN");
+    const condition = screen.getByRole("group", { name: "Tình trạng" });
+    expect(within(condition).getByRole("radio", { name: "Rách bao bì" })).toBeVisible();
+    expect(within(condition).getByRole("radio", { name: "Xì chân không" })).toBeVisible();
+  });
+
+  it("uses the reviewed TPTS option matrix", () => {
     renderDialog("TPTS");
     const condition = screen.getByRole("group", { name: "Tình trạng" });
     const resolution = screen.getByRole("group", { name: "Biện pháp xử lý" });
-    expect(within(condition).getByRole("radio", { name: "Hư hỏng" })).toBeChecked();
+    expect(within(condition).getByRole("radio", { name: "Dập úng" })).toBeChecked();
+    expect(within(condition).getByRole("radio", { name: "Thối mốc" })).toBeVisible();
+    expect(within(condition).queryByRole("radio", { name: "Hư hỏng" })).not.toBeInTheDocument();
     expect(within(resolution).getAllByRole("radio")).toHaveLength(2);
     expect(within(resolution).queryByRole("radio", { name: "ĐỔI" })).not.toBeInTheDocument();
   });
@@ -84,9 +94,11 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("button", { name: "Nhập mã thủ công" })).toBeVisible();
   });
 
-  it("uses the shared calendar trigger for every date field", () => {
+  it("locks the detected date and keeps the treatment date calendar", () => {
     renderDialog();
-    expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeVisible();
+    expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveValue(formatBusinessDate(new Date()).display);
+    expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveAttribute("readonly");
+    expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" })).toBeVisible();
 
     fireEvent.click(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" }));

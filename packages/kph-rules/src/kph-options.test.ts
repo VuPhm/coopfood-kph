@@ -14,7 +14,7 @@ describe("KPH option matrix", () => {
   });
 
   it("allows optional detail for Other without losing the legacy label", () => {
-    const other = KPH_OPTIONS.TPCN.conditions[2];
+    const other = KPH_OPTIONS.TPCN.conditions.at(-1);
     expect(other).toBeDefined();
     if (!other) return;
     expect(resolveChoiceLabel(other, "  ")).toBe("Khác");
@@ -23,7 +23,10 @@ describe("KPH option matrix", () => {
 
   it("resolves correct tones for condition, resolution, and approval", () => {
     expect(getConditionTone("Cận date")).toBe("orange");
-    expect(getConditionTone("Hư hỏng")).toBe("red");
+    expect(getConditionTone("Rách bao bì")).toBe("red");
+    expect(getConditionTone("Xì chân không")).toBe("red");
+    expect(getConditionTone("Dập úng")).toBe("red");
+    expect(getConditionTone("Thối mốc")).toBe("red");
     expect(getConditionTone("Hết HSD")).toBe("gray");
 
     expect(getResolutionTone("HỦY")).toBe("red");

@@ -481,7 +481,7 @@ components:
 
     KphCondition:
       type: string
-      enum: [DAMAGED, NEAR_EXPIRY, EXPIRED, OTHER]
+      enum: [NEAR_EXPIRY, EXPIRED, TORN_PACKAGING, VACUUM_LEAK, BRUISED_WATERLOGGED, ROTTEN_MOLDY, OTHER]
 
     KphResolution:
       type: string
@@ -506,8 +506,10 @@ components:
         - condition
         - resolution
       description: |
-        TPCN conditions: NEAR_EXPIRY, EXPIRED, OTHER; resolutions: CANCEL,
-        EXCHANGE, RETURN, OTHER. TPTS adds DAMAGED but only allows CANCEL or OTHER.
+        TPCN conditions: NEAR_EXPIRY, EXPIRED, TORN_PACKAGING, VACUUM_LEAK,
+        OTHER; resolutions: CANCEL, EXCHANGE, RETURN, OTHER. TPTS conditions:
+        BRUISED_WATERLOGGED, ROTTEN_MOLDY, NEAR_EXPIRY, EXPIRED, OTHER; it only
+        allows CANCEL or OTHER.
         OTHER detail is optional and normalizes to the Vietnamese legacy label
         when blank. At least one of barcode/manualSkuCode/manualProductName is
         required. Actor and store fields are deliberately absent.
@@ -517,6 +519,7 @@ components:
         detectedDate:
           type: string
           format: date
+          description: Current Asia/Ho_Chi_Minh business date; the Store PWA does not allow editing it.
         processedDate:
           type: [string, 'null']
           format: date

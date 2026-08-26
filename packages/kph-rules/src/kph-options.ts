@@ -1,5 +1,12 @@
 export type KphKind = "TPCN" | "TPTS";
-export type ConditionCode = "NEAR_EXPIRY" | "EXPIRED" | "DAMAGED" | "OTHER";
+export type ConditionCode =
+  | "NEAR_EXPIRY"
+  | "EXPIRED"
+  | "TORN_PACKAGING"
+  | "VACUUM_LEAK"
+  | "BRUISED_WATERLOGGED"
+  | "ROTTEN_MOLDY"
+  | "OTHER";
 export type ResolutionCode = "CANCEL" | "EXCHANGE" | "RETURN" | "OTHER";
 
 export type Choice<T extends string> = Readonly<{
@@ -28,7 +35,13 @@ const commonResolutions = {
 
 export const KPH_OPTIONS: Readonly<Record<KphKind, KphOptionSet>> = {
   TPCN: {
-    conditions: [commonConditions.nearExpiry, commonConditions.expired, commonConditions.other],
+    conditions: [
+      commonConditions.nearExpiry,
+      commonConditions.expired,
+      { value: "TORN_PACKAGING", label: "Rách bao bì", tone: "red" },
+      { value: "VACUUM_LEAK", label: "Xì chân không", tone: "red" },
+      commonConditions.other,
+    ],
     resolutions: [
       commonResolutions.destroy,
       { value: "EXCHANGE", label: "ĐỔI", tone: "green" },
@@ -40,13 +53,14 @@ export const KPH_OPTIONS: Readonly<Record<KphKind, KphOptionSet>> = {
   },
   TPTS: {
     conditions: [
-      { value: "DAMAGED", label: "Hư hỏng", tone: "red" },
+      { value: "BRUISED_WATERLOGGED", label: "Dập úng", tone: "red" },
+      { value: "ROTTEN_MOLDY", label: "Thối mốc", tone: "red" },
       commonConditions.nearExpiry,
       commonConditions.expired,
       commonConditions.other,
     ],
     resolutions: [commonResolutions.destroy, commonResolutions.other],
-    defaultCondition: "DAMAGED",
+    defaultCondition: "BRUISED_WATERLOGGED",
     defaultResolution: "CANCEL",
   },
 };
@@ -61,7 +75,16 @@ export type ChoiceTone = "orange" | "green" | "red" | "blue" | "gray";
 export function getConditionTone(condition: string): ChoiceTone {
   const norm = condition.trim().toLowerCase();
   if (norm === "cận date" || norm === "near_expiry") return "orange";
-  if (norm === "hư hỏng" || norm === "damaged") return "red";
+  if ([
+    "rách bao bì",
+    "torn_packaging",
+    "xì chân không",
+    "vacuum_leak",
+    "dập úng",
+    "bruised_waterlogged",
+    "thối mốc",
+    "rotten_moldy",
+  ].includes(norm)) return "red";
   if (norm === "hết hsd" || norm === "expired") return "gray";
   return "gray";
 }

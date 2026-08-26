@@ -229,7 +229,7 @@ export interface components {
         /** @enum {string} */
         KphUnit: "EA" | "kg";
         /** @enum {string} */
-        KphCondition: "DAMAGED" | "NEAR_EXPIRY" | "EXPIRED" | "OTHER";
+        KphCondition: "NEAR_EXPIRY" | "EXPIRED" | "TORN_PACKAGING" | "VACUUM_LEAK" | "BRUISED_WATERLOGGED" | "ROTTEN_MOLDY" | "OTHER";
         /** @enum {string} */
         KphResolution: "CANCEL" | "EXCHANGE" | "RETURN" | "OTHER";
         /** @enum {string} */
@@ -237,15 +237,20 @@ export interface components {
         /** @enum {string} */
         KphLifecycleState: "SUBMITTED" | "INVALIDATED";
         /**
-         * @description TPCN conditions: NEAR_EXPIRY, EXPIRED, OTHER; resolutions: CANCEL,
-         *     EXCHANGE, RETURN, OTHER. TPTS adds DAMAGED but only allows CANCEL or OTHER.
+         * @description TPCN conditions: NEAR_EXPIRY, EXPIRED, TORN_PACKAGING, VACUUM_LEAK,
+         *     OTHER; resolutions: CANCEL, EXCHANGE, RETURN, OTHER. TPTS conditions:
+         *     BRUISED_WATERLOGGED, ROTTEN_MOLDY, NEAR_EXPIRY, EXPIRED, OTHER; it only
+         *     allows CANCEL or OTHER.
          *     OTHER detail is optional and normalizes to the Vietnamese legacy label
          *     when blank. At least one of barcode/manualSkuCode/manualProductName is
          *     required. Actor and store fields are deliberately absent.
          */
         KphCreateRequest: {
             type: components["schemas"]["KphType"];
-            /** Format: date */
+            /**
+             * Format: date
+             * @description Current Asia/Ho_Chi_Minh business date; the Store PWA does not allow editing it.
+             */
             detectedDate: string;
             /** Format: date */
             processedDate?: string | null;

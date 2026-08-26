@@ -52,7 +52,7 @@ export const DEMO_RECORDS: readonly DemoRecord[] = [
     productName: "Cải thìa VietGAP 500 g",
     supplier: "NCC-0108 · Nông sản Miền Đông",
     quantity: "1.5 kg",
-    condition: "Hư hỏng",
+    condition: "Dập úng",
     resolution: "HỦY",
     approvalStatus: "APPROVED",
     photos: [

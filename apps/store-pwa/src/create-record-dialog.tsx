@@ -30,6 +30,7 @@ import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
 import { CalendarInput } from "./calendar-input";
+import { formatBusinessDate } from "./business-date";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 
@@ -88,7 +89,7 @@ const DEMO_STORE_STAMP = { storeCode: "CF-DEMO-001", storeName: "Nguyễn Kiệm
 function defaultValues(kind: KphKind): FormData {
   const options = KPH_OPTIONS[kind];
   return {
-    detectedDate: "15/08/2026",
+    detectedDate: formatBusinessDate(new Date()).display,
     barcode: "",
     supplier: "",
     productName: "",
@@ -130,6 +131,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
   const selectedResolution = watch("resolution");
   const detectedDate = watch("detectedDate");
   const treatmentDate = watch("treatmentDate");
+  const initialMonth = formatBusinessDate(new Date()).iso;
 
   function clearPhotos() {
     for (const photo of photoRef.current) {
@@ -229,7 +231,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
             <FormSection number="1" title="Thông tin phát hiện">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
-                  <CalendarInput id="detected-date" initialMonth="2026-08-15" label="Ngày phát hiện" value={detectedDate} onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
+                  <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} readOnly onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
@@ -271,7 +273,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
               <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} />
               {selectedResolution === "OTHER" ? <Field className="mt-3" label="Nội dung biện pháp khác" htmlFor="resolution-detail" error={errors.resolutionDetail?.message}><Input id="resolution-detail" placeholder="Để trống sẽ giữ nhãn “KHÁC”" {...register("resolutionDetail")} /></Field> : null}
               <Field className="mt-3" label="Ngày xử lý (nếu có)" htmlFor="treatment-date" error={errors.treatmentDate?.message}>
-                <CalendarInput id="treatment-date" initialMonth="2026-08-15" label="Ngày xử lý (nếu có)" value={treatmentDate} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
+                <CalendarInput id="treatment-date" initialMonth={initialMonth} label="Ngày xử lý (nếu có)" value={treatmentDate} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
               </Field>
             </FormSection>
 
@@ -337,7 +339,7 @@ function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
   return (
     <fieldset>
       <legend className="sr-only">{legend}</legend>
-      <div className={cn("choice-grid", choices.length === 2 && "choice-grid-two")}>
+      <div className={cn("choice-grid", choices.length === 2 && "choice-grid-two", choices.length === 5 && "choice-grid-five")}>
         {choices.map((choice) => (
           <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`)}>
             <input className="sr-only" type="radio" value={choice.value} {...register(name)} />
@@ -352,7 +354,7 @@ function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
 
 function choiceIcon(value: string) {
   if (value === "NEAR_EXPIRY") return <CalendarClock aria-hidden="true" />;
-  if (value === "EXPIRED" || value === "DAMAGED") return <CircleAlert aria-hidden="true" />;
+  if (["EXPIRED", "TORN_PACKAGING", "VACUUM_LEAK", "BRUISED_WATERLOGGED", "ROTTEN_MOLDY"].includes(value)) return <CircleAlert aria-hidden="true" />;
   if (value === "CANCEL") return <Ban aria-hidden="true" />;
   if (value === "EXCHANGE") return <Repeat2 aria-hidden="true" />;
   if (value === "RETURN") return <Truck aria-hidden="true" />;

@@ -25,7 +25,7 @@ Workspace KPH
 │   ├── Xem ảnh (lightbox)
 │   ├── Xóa (confirm modal)
 │   └── Xuất Excel (summary confirm → download)
-└── Tra hạn nhanh (FAB → modal/panel)
+└── Tra cứu lùi hàng (FAB → modal/panel)
     └── Chọn ngày (popover)
 ```
 
@@ -38,18 +38,18 @@ login hay admin catalog.
 |---|---|---|---|---|
 | Workspace KPH | Mở app | Brand, ngày, store identity, hai nút tạo, lịch sử, FAB tra hạn | Desktop bảng; mobile card | Store PWA authenticated shell; KPH-01, ID-01–05, UI-01 |
 | Empty history | Chưa tạo record | Copy “Chưa có dữ liệu khai báo trong phiên” | Giống layout list | Empty server/offline state, copy theo scope thật; KPH-13 |
-| TPCN history | Tab Khô & khác | Count, selection, export/delete, row/card | Table `>700px`; cards `<=700px` | Store PWA list filtered by type; UI-01–03 |
+| TPCN history | Tab Khô & khác | Count, selection, duyệt/export, row/card | Table `>700px`; cards `<=700px` | Store PWA list filtered by type; không có xóa/vô hiệu hóa cho CHT; UI-01–03 |
 | TPTS history | Tab Tươi sống | Như TPCN, options/data riêng | Như trên | Store PWA list filtered by type |
-| Create TPCN | Nút tạo TPCN | Form sectioned; TPCN condition/resolution; image; save/cancel | Modal body scroll trên mobile | Store PWA create flow; KPH-02,04,06–12 |
-| Create TPTS | Nút tạo TPTS | Cùng form nhưng 4 condition, chỉ HỦY/KHÁC | Modal body scroll | Store PWA create flow; KPH-03,05–12 |
+| Create TPCN | Nút tạo TPCN | Form sectioned; 5 condition, ngày phát hiện khóa theo ngày hiện tại; image; save/cancel | Modal body scroll trên mobile | Store PWA create flow; KPH-02,04,06–12 |
+| Create TPTS | Nút tạo TPTS | Cùng form với 5 condition, chỉ HỦY/KHÁC, không còn Hư hỏng | Modal body scroll | Store PWA create flow; KPH-03,05–12 |
 | Date picker | Nút lịch ở date field | Calendar tiếng Việt, select/close | Popover co về full width rất hẹp | Shared Store PWA control; DATE-10,11 |
 | SKU/UPC scanner | Icon barcode trong form | Camera preview, camera selector, retry/status | Modal preview tối thiểu 210–240px | Store PWA scanner + catalog lookup; SCAN-01–07 |
 | Image preview | Sau chụp/chọn | Thumbnail theo thứ tự, xóa từng ảnh, click để xem | Wrap thumbnail | Store PWA draft image manager; IMG-01–08 |
 | Image lightbox | Click thumbnail | Full image contain, close, desktop/touch zoom | Full viewport + safe gutter | Shared viewer; IMG-07, UI-04–06 |
 | Store settings | Click store identity | Tên/mã store, prefix Co.op Food, save/cancel | Modal | Không còn employee settings; session/membership switcher khi có quyền; ID-01–06 |
 | Export confirm | Chọn dòng → Xuất Excel | Loại, số dòng, số ảnh, Co.op Food/store | Modal | Store PWA export request/preview; XLSX-01–09 |
-| Delete confirm | Một hoặc nhiều dòng → Xóa | Copy count-aware, cancel/confirm | Modal | “Vô hiệu hóa” + reason/audit theo policy; KPH-14, UI-03 |
-| Lookup ready | FAB tra hạn | Toggle biết NSX, date/duration fields, reset | Side panel rộng; modal mobile | Store PWA utility; DATE-01–12 |
+| Delete confirm | Một hoặc nhiều dòng → Xóa | Copy count-aware, cancel/confirm | Modal | Loại khỏi Store PWA của CHT; quyền quản trị tương lai chưa chốt; KPH-14, UI-03 |
+| Lookup ready | FAB “Tra cứu lùi hàng” | Toggle biết NSX, date/duration fields, reset | Side panel rộng; modal mobile | Store PWA utility; DATE-01–12 |
 | Lookup placeholder | Thiếu data | Icon + hướng dẫn nhập | Result card cao ổn định | Giữ |
 | Lookup safe/warning/danger | Đủ data | Date result, detail, timeline bốn mốc | Result card/timeline responsive | Giữ domain result thống nhất |
 | Lookup error | Data invalid | Message có ngữ cảnh | Result card đỏ | Giữ semantic/message tương đương |
@@ -61,7 +61,7 @@ login hay admin catalog.
 | State | Trigger | UI legacy | Acceptance hướng tới |
 |---|---|---|---|
 | Fresh TPCN | Click TPCN | Ngày hôm nay, SL 1, EA, Cận date, detected-by gần nhất | Actor/store từ session đã sẵn, không thêm bước chặn |
-| Fresh TPTS | Click TPTS | Ngày hôm nay, SL 1, EA, Hư hỏng, HỦY | Như trên |
+| Fresh TPTS | Click TPTS | Ngày hôm nay khóa read-only, SL 1, EA, Dập úng, HỦY | Như trên |
 | Catalog found | Chưa có trong legacy | Chỉ field SKU được điền sau scan | Lookup `1`: điền barcode, SKU, product, primary NCC và khóa snapshot khi submit |
 | Catalog not found | Chưa có trong legacy | Không phân biệt với manual value | Lookup `0`: state/message/fallback theo policy đã chốt |
 | Scanner unavailable | Permission/no camera/start error | Message + nhập tay/máy quét cầm tay | Không làm dead-end |
@@ -78,7 +78,7 @@ login hay admin catalog.
 | Login/session/store context | Có | Có, scope toàn chuỗi theo role |
 | Quét barcode/tạo KPH/ảnh | Chính | Xem/duyệt theo policy; không cần copy camera flow mặc định |
 | Danh sách KPH table/card | Có | Table/search/filter mở rộng nhưng giữ semantic/status |
-| Tra hạn nhanh | Có | Có thể dùng lại shared domain control nếu có nhu cầu |
+| Tra cứu lùi hàng | Có | Có thể dùng lại shared domain control nếu có nhu cầu |
 | Export KPH | Có theo quyền | Có theo store/chain scope và audit |
 | Import/publish catalog | Không | Chính; F2 admin UI tối thiểu |
 | Store/profile tự sửa | Không | Store administration riêng theo role, không phải local preference |
