@@ -265,7 +265,7 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
         actionExpanded={expanded}
         actionIcon={expanded ? <X /> : <CalendarDays />}
         actionLabel={expanded ? "Đóng tra cứu lùi hàng" : "Tra cứu lùi hàng"}
-        actionText={!expanded && showInitialHint ? "Tra cứu lùi hàng" : undefined}
+        actionText={!expanded ? "Tra cứu lùi hàng" : undefined}
         className={!expanded ? "is-collapsed" : ""}
         label={expanded ? "Tra cứu lùi hàng" : ""}
         onAction={toggleWorkbench}

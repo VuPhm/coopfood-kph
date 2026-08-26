@@ -139,7 +139,7 @@ describe("Expiry lookup", () => {
     expect(screen.getByRole("button", { name: "Đóng tra cứu lùi hàng" }).closest(".utility-panel-meta")).not.toBeNull();
   });
 
-  it("only shows the lookup hint on the first page load", () => {
+  it("only animates the lookup hint once while keeping its desktop label mounted", () => {
     vi.useFakeTimers();
     render(<ExpiryWorkbench />);
 
@@ -149,12 +149,12 @@ describe("Expiry lookup", () => {
 
     act(() => vi.advanceTimersByTime(2_800));
     expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).not.toHaveClass("has-entry-hint");
-    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveTextContent("");
+    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveTextContent("Tra cứu lùi hàng");
 
     fireEvent.click(screen.getByRole("button", { name: "Tra cứu lùi hàng" }));
     fireEvent.click(screen.getByRole("button", { name: "Đóng tra cứu lùi hàng" }));
 
     expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).not.toHaveClass("has-entry-hint");
-    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveTextContent("");
+    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveTextContent("Tra cứu lùi hàng");
   });
 });

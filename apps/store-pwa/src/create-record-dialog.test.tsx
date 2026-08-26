@@ -44,8 +44,8 @@ describe("Create KPH record", () => {
   it("uses the reviewed TPCN condition matrix", () => {
     renderDialog("TPCN");
     const condition = screen.getByRole("group", { name: "Tình trạng" });
-    expect(within(condition).getByRole("radio", { name: "Rách bao bì" })).toBeVisible();
-    expect(within(condition).getByRole("radio", { name: "Xì chân không" })).toBeVisible();
+    expect(within(condition).getByRole("radio", { name: "Rách bao bì" }).closest("label")?.querySelector(".lucide-package-open")).not.toBeNull();
+    expect(within(condition).getByRole("radio", { name: "Xì chân không" }).closest("label")?.querySelector(".lucide-wind")).not.toBeNull();
   });
 
   it("uses the reviewed TPTS option matrix", () => {
@@ -53,7 +53,8 @@ describe("Create KPH record", () => {
     const condition = screen.getByRole("group", { name: "Tình trạng" });
     const resolution = screen.getByRole("group", { name: "Biện pháp xử lý" });
     expect(within(condition).getByRole("radio", { name: "Dập úng" })).toBeChecked();
-    expect(within(condition).getByRole("radio", { name: "Thối mốc" })).toBeVisible();
+    expect(within(condition).getByRole("radio", { name: "Dập úng" }).closest("label")?.querySelector(".lucide-apple")).not.toBeNull();
+    expect(within(condition).getByRole("radio", { name: "Thối mốc" }).closest("label")?.querySelector(".lucide-biohazard")).not.toBeNull();
     expect(within(condition).queryByRole("radio", { name: "Hư hỏng" })).not.toBeInTheDocument();
     expect(within(resolution).getAllByRole("radio")).toHaveLength(2);
     expect(within(resolution).queryByRole("radio", { name: "ĐỔI" })).not.toBeInTheDocument();

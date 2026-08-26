@@ -12,7 +12,9 @@ import {
   cn,
 } from "@coopfood-kph/ui";
 import {
+  Apple,
   Ban,
+  Biohazard,
   CalendarClock,
   Camera,
   CircleAlert,
@@ -20,10 +22,12 @@ import {
   Image as ImageIcon,
   LoaderCircle,
   MoreHorizontal,
+  PackageOpen,
   Repeat2,
   ScanLine,
   Trash2,
   Truck,
+  Wind,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { useForm, type UseFormRegister } from "react-hook-form";
@@ -386,7 +390,11 @@ function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
 
 function choiceIcon(value: string) {
   if (value === "NEAR_EXPIRY") return <CalendarClock aria-hidden="true" />;
-  if (["EXPIRED", "TORN_PACKAGING", "VACUUM_LEAK", "BRUISED_WATERLOGGED", "ROTTEN_MOLDY"].includes(value)) return <CircleAlert aria-hidden="true" />;
+  if (value === "TORN_PACKAGING") return <PackageOpen aria-hidden="true" />;
+  if (value === "VACUUM_LEAK") return <Wind aria-hidden="true" />;
+  if (value === "BRUISED_WATERLOGGED") return <Apple aria-hidden="true" />;
+  if (value === "ROTTEN_MOLDY") return <Biohazard aria-hidden="true" />;
+  if (value === "EXPIRED") return <CircleAlert aria-hidden="true" />;
   if (value === "CANCEL") return <Ban aria-hidden="true" />;
   if (value === "EXCHANGE") return <Repeat2 aria-hidden="true" />;
   if (value === "RETURN") return <Truck aria-hidden="true" />;

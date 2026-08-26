@@ -75,12 +75,12 @@
 
 @keyframes lookup-trigger-hint {
   0%, 100% { width: 3.5rem; box-shadow: 0 10px 24px rgb(0 66 33 / .24); }
-  18%, 72% { width: 11.75rem; box-shadow: 0 14px 30px rgb(0 66 33 / .32); }
+  18%, 72% { width: 13rem; box-shadow: 0 14px 30px rgb(0 66 33 / .32); }
 }
 
 @keyframes lookup-trigger-text-hint {
   0%, 12%, 88%, 100% { max-width: 0; opacity: 0; }
-  24%, 72% { max-width: 7rem; opacity: 1; }
+  24%, 72% { max-width: 8.25rem; opacity: 1; }
 }
 
 @layer base {
@@ -432,7 +432,8 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 .expiry-workbench-toggle.is-trigger.has-entry-hint { animation: lookup-trigger-hint 2.8s var(--motion-ease-out) both; will-change: width; }
 .expiry-workbench-toggle.is-trigger .utility-panel-action-visual { flex: 0 0 1.5rem; }
 .expiry-workbench-toggle.is-trigger .utility-panel-action-visual svg { width: 1.5rem; height: 1.5rem; }
-.expiry-workbench-toggle.is-trigger.has-entry-hint .utility-panel-action-text { flex: 0 0 auto; animation: lookup-trigger-text-hint 2.8s var(--motion-ease-out) both; }
+.expiry-workbench-toggle.is-trigger .utility-panel-action-text { display: none; }
+.expiry-workbench-toggle.is-trigger.has-entry-hint .utility-panel-action-text { display: inline; flex: 0 0 auto; animation: lookup-trigger-text-hint 2.8s var(--motion-ease-out) both; }
 .expiry-workbench-toggle.is-trigger:hover { transform: translateY(-2px); background: var(--color-brand-hover); color: #fff; box-shadow: 0 14px 30px rgb(0 66 33 / .3); }
 .expiry-workbench-toggle:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .expiry-workbench.is-collapsed { width: auto; border-color: transparent; background: transparent; box-shadow: none; }
@@ -647,6 +648,25 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 @media (min-width: 1280px) {
   .workspace-layout:has(.workspace-side-stack > :not(.expiry-workbench.is-collapsed)) { grid-template-columns: minmax(0, 1fr) minmax(21.5rem, 22.5rem); }
   .expiry-timeline-track { width: 100%; min-width: 0; }
+}
+
+@media (min-width: 1025px) {
+  .expiry-workbench-toggle.is-trigger,
+  .expiry-workbench-toggle.is-trigger.has-entry-hint {
+    width: auto;
+    max-width: calc(100vw - 3rem);
+    animation: none;
+    will-change: auto;
+  }
+  .expiry-workbench-toggle.is-trigger .utility-panel-action-text,
+  .expiry-workbench-toggle.is-trigger.has-entry-hint .utility-panel-action-text {
+    display: inline;
+    max-width: none;
+    flex: 0 0 auto;
+    overflow: visible;
+    opacity: 1;
+    animation: none;
+  }
 }
 
 @media (min-width: 1025px) and (max-width: 1279px) {
