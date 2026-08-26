@@ -31,6 +31,7 @@ import { CalendarInput } from "./calendar-input";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
 type DurationSource = "date" | "days" | "months";
+const LOOKUP_HINT_DURATION_MS = 2_800;
 
 const statusCopy = {
   SAFE: { label: "An toàn", icon: ShieldCheck },
@@ -62,12 +63,18 @@ function positiveWholeNumber(value: string) {
 export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate }) {
   const workbenchRef = useRef<HTMLElement>(null);
   const [expanded, setExpanded] = useState(false);
+  const [showInitialHint, setShowInitialHint] = useState(true);
   const [knownManufactureDate, setKnownManufactureDate] = useState(true);
   const [nsx, setNsx] = useState("");
   const [hsd, setHsd] = useState("");
   const [days, setDays] = useState("");
   const [months, setMonths] = useState("");
   const [durationSource, setDurationSource] = useState<DurationSource>("date");
+
+  useEffect(() => {
+    const hintTimer = window.setTimeout(() => setShowInitialHint(false), LOOKUP_HINT_DURATION_MS);
+    return () => window.clearTimeout(hintTimer);
+  }, []);
 
   useEffect(() => {
     if (!expanded) return;
@@ -244,17 +251,19 @@ export function ExpiryWorkbench({ today = "2026-08-15" }: { today?: LocalDate })
   }
 
   function toggleWorkbench() {
+    setShowInitialHint(false);
     setExpanded((current) => !current);
   }
 
   return (
     <aside ref={workbenchRef} className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra hạn nhanh">
       <UtilityPanelMeta
-        actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger")}
+        actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger", !expanded && showInitialHint && "has-entry-hint")}
         actionControls="expiry-workbench-content"
         actionExpanded={expanded}
         actionIcon={expanded ? <X /> : <CalendarDays />}
         actionLabel={expanded ? "Đóng tra hạn nhanh" : "Tra hạn nhanh"}
+        actionText={!expanded && showInitialHint ? "Tra hạn nhanh" : undefined}
         className={!expanded ? "is-collapsed" : ""}
         label={expanded ? "Tra hạn nhanh" : ""}
         onAction={toggleWorkbench}

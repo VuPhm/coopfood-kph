@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ExpiryWorkbench } from "./expiry-dialog";
@@ -123,11 +123,12 @@ describe("Expiry lookup", () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: previousWidth });
   });
 
-  it("uses an icon-only collapsed trigger and the shared meta row when expanded", () => {
+  it("gives the collapsed trigger a temporary visible hint and keeps the shared meta row when expanded", () => {
     render(<ExpiryWorkbench />);
 
     const trigger = screen.getByRole("button", { name: "Tra hạn nhanh" });
-    expect(trigger).toHaveTextContent("");
+    expect(trigger).toHaveTextContent("Tra hạn nhanh");
+    expect(trigger.querySelector(".utility-panel-action-text")).not.toBeNull();
     expect(trigger).toHaveAttribute("aria-label", "Tra hạn nhanh");
     expect(trigger.closest(".utility-panel-meta")).toHaveClass("is-collapsed");
 
@@ -136,5 +137,24 @@ describe("Expiry lookup", () => {
     expect(workbench.querySelector(".utility-panel-meta")).not.toBeNull();
     expect(screen.getByText("Tra hạn nhanh")).toBeVisible();
     expect(screen.getByRole("button", { name: "Đóng tra hạn nhanh" }).closest(".utility-panel-meta")).not.toBeNull();
+  });
+
+  it("only shows the lookup hint on the first page load", () => {
+    vi.useFakeTimers();
+    render(<ExpiryWorkbench />);
+
+    const initialTrigger = screen.getByRole("button", { name: "Tra hạn nhanh" });
+    expect(initialTrigger).toHaveClass("has-entry-hint");
+    expect(initialTrigger).toHaveTextContent("Tra hạn nhanh");
+
+    act(() => vi.advanceTimersByTime(2_800));
+    expect(screen.getByRole("button", { name: "Tra hạn nhanh" })).not.toHaveClass("has-entry-hint");
+    expect(screen.getByRole("button", { name: "Tra hạn nhanh" })).toHaveTextContent("");
+
+    fireEvent.click(screen.getByRole("button", { name: "Tra hạn nhanh" }));
+    fireEvent.click(screen.getByRole("button", { name: "Đóng tra hạn nhanh" }));
+
+    expect(screen.getByRole("button", { name: "Tra hạn nhanh" })).not.toHaveClass("has-entry-hint");
+    expect(screen.getByRole("button", { name: "Tra hạn nhanh" })).toHaveTextContent("");
   });
 });

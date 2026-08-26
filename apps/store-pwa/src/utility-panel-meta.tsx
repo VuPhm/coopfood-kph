@@ -8,6 +8,7 @@ type UtilityPanelMetaProps = {
   actionExpanded?: boolean;
   actionIcon?: ReactNode;
   actionLabel: string;
+  actionText?: string | undefined;
   className?: string;
   dialogClose?: boolean;
   label?: string;
@@ -20,6 +21,7 @@ export function UtilityPanelMeta({
   actionExpanded,
   actionIcon,
   actionLabel,
+  actionText,
   className,
   dialogClose = false,
   label,
@@ -36,6 +38,7 @@ export function UtilityPanelMeta({
       onClick={onAction}
     >
       <span className="utility-panel-action-visual" aria-hidden="true">{actionIcon ?? <X />}</span>
+      {actionText ? <span className="utility-panel-action-text" aria-hidden="true">{actionText}</span> : null}
     </button>
   );
 
