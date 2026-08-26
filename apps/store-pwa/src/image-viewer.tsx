@@ -1,5 +1,4 @@
 import { Dialog, DialogContent, DialogTitle } from "@coopfood-kph/ui";
-import { Maximize2 } from "lucide-react";
 import { useState, type CSSProperties, type PointerEvent } from "react";
 
 export type ViewableEvidenceImage = { src: string; alt: string };
@@ -72,7 +71,6 @@ export function EvidenceImageViewer({ image, onOpenChange, open }: { image: View
               onPointerCancel={hideLens}
               onLostPointerCapture={hideLens}
             />
-            <figcaption><Maximize2 size={15} aria-hidden="true" />Rê chuột để soi 2.5× · chạm giữ và kéo trên màn hình cảm ứng</figcaption>
           </figure>
         ) : null}
       </DialogContent>

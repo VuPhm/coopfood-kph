@@ -38,4 +38,12 @@ describe("evidence image viewer", () => {
     fireEvent.pointerLeave(image);
     expect(lens).not.toHaveClass("is-visible");
   });
+
+  it("shows only the evidence on a light stage without an operation note", () => {
+    render(<EvidenceImageViewer image={{ src: "/demo/evidence-cookie-front.svg", alt: "Ảnh kiểm tra" }} open onOpenChange={vi.fn()} />);
+
+    expect(screen.getByAltText("Ảnh kiểm tra")).toBeVisible();
+    expect(screen.queryByText(/Rê chuột|chạm giữ|soi 2\.5/i)).not.toBeInTheDocument();
+    expect(document.querySelector(".evidence-viewer-stage figcaption")).not.toBeInTheDocument();
+  });
 });

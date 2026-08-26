@@ -69,9 +69,7 @@ async function normalizePhoto(photo: DemoPhoto) {
   }
 }
 
-function fitImage(width: number, height: number) {
-  const maxWidth = 64;
-  const maxHeight = 132;
+function fitImage(width: number, height: number, maxWidth: number, maxHeight: number) {
   const scale = Math.min(maxWidth / width, maxHeight / height, 1);
   return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
 }
@@ -80,8 +78,6 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
   const module = await import("exceljs");
   const Excel = module.default;
   const workbook = new Excel.Workbook();
-  workbook.creator = "Co.op Food KPH PWA";
-  workbook.created = new Date();
 
   const worksheet = workbook.addWorksheet(SHEET_NAMES[kind], {
     views: [{ showGridLines: true }],
@@ -96,38 +92,34 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
   worksheet.getCell("A1").value = COMPANY;
   worksheet.getCell("A2").value = `CO.OP FOOD: ${STORE.name}`;
   worksheet.getCell("A3").value = `STORE: ${STORE.code}`;
-  worksheet.mergeCells("A1:R1");
-  worksheet.mergeCells("A2:R2");
-  worksheet.mergeCells("A3:R3");
   worksheet.mergeCells("A5:R5");
-  worksheet.getCell("A5").value = `PHIẾU THEO DÕI HÀNG KHÔNG PHÙ HỢP - ${SHEET_NAMES[kind].toUpperCase()}`;
 
   for (const rowNumber of [1, 2, 3]) {
-    worksheet.getCell(`A${rowNumber}`).font = { name: "Times New Roman", size: 11, bold: rowNumber === 1 };
+    worksheet.getCell(`A${rowNumber}`).font = { name: "Times New Roman", size: 9, bold: true };
   }
   worksheet.getCell("A5").font = { name: "Times New Roman", size: 15, bold: true };
   worksheet.getCell("A5").alignment = { horizontal: "center", vertical: "middle" };
-  worksheet.getRow(5).height = 28;
+  worksheet.getCell("A5").value = `PHIẾU THEO DÕI HÀNG KHÔNG PHÙ HỢP (${SHEET_NAMES[kind]})`;
+  worksheet.getRow(5).height = 25;
 
   const headers: Record<string, string> = {
     A7: "STT", B7: "NGÀY\nPHÁT\nHIỆN", C7: "SKU/UPC", D7: "TÊN HÀNG HÓA", E7: "NCC",
     F7: "ĐƠN\nVỊ\nTÍNH", G7: "SỐ\nLƯỢNG", H7: "MÔ TẢ TÌNH\nTRẠNG\nHÀNG KPH",
     I7: "NGƯỜI\nPHÁT HIỆN\nSP KPH\n(ký và ghi rõ\nhọ tên)", J7: "BIỆN PHÁP XỬ LÝ\n(đánh dấu \"X\")",
-    J8: "HỦY", K8: "ĐỔI", L8: "XUẤT TRẢ", M8: "KHÁC", N7: "NGÀY\nXỬ LÝ", O7: "HÌNH ẢNH MINH CHỨNG", R7: "NGƯỜI DUYỆT",
+    J8: "HỦY", K8: "ĐỔI", L8: "XUẤT\nTRẢ", M8: "KHÁC (ghi rõ\nnội dung xử lý)", N7: "Ghi ngày\nxử lý", O7: "ẢNH MINH\nCHỨNG", R7: "BĐH THEO DÕI\nXỬ LÝ\n(ký và ghi rõ họ tên)",
   };
   Object.entries(headers).forEach(([cell, value]) => { worksheet.getCell(cell).value = value; });
   ["A", "B", "C", "D", "E", "F", "G", "H", "I", "N", "R"].forEach((column) => worksheet.mergeCells(`${column}7:${column}8`));
   worksheet.mergeCells("J7:M7");
   worksheet.mergeCells("O7:Q8");
-  worksheet.getRow(7).height = 48;
-  worksheet.getRow(8).height = 30;
+  worksheet.getRow(7).height = 25;
+  worksheet.getRow(8).height = 25;
 
   for (let row = 7; row <= 8; row += 1) {
     for (let column = 1; column <= 18; column += 1) {
       const cell = worksheet.getCell(row, column);
-      cell.font = { name: "Times New Roman", size: 9, bold: true };
+      cell.font = { name: "Times New Roman", size: 8.5, bold: true, color: { argb: "000000" } };
       cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE9F5ED" } };
       cell.border = {
         top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" },
       };
@@ -158,18 +150,37 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
 
     for (let column = 1; column <= 18; column += 1) {
       const cell = row.getCell(column);
-      cell.font = { name: "Times New Roman", size: 10 };
+      cell.font = { name: "Times New Roman", size: 9 };
       cell.alignment = { horizontal: column === 4 || column === 5 || column === 8 || column === 9 || column === 13 ? "left" : "center", vertical: "middle", wrapText: true };
       cell.border = {
         top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" },
       };
     }
 
+    const imageCells = [row.getCell(15), row.getCell(16), row.getCell(17)];
+    imageCells.forEach((cell) => {
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFFF" } };
+    });
+    imageCells[0]!.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" } };
+    imageCells[1]!.border = { top: { style: "thin" }, bottom: { style: "thin" } };
+    imageCells[2]!.border = { top: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" } };
+
     for (const [photoIndex, photo] of record.photos.slice(0, 3).entries()) {
       const normalized = await normalizePhoto(photo);
       const buffer = await normalized.blob.arrayBuffer();
       const imageId = workbook.addImage({ buffer: buffer as never, extension: normalized.extension });
-      worksheet.addImage(imageId, { tl: { col: 14 + photoIndex + 0.08, row: rowNumber - 1 + 0.08 }, ext: fitImage(normalized.width, normalized.height), editAs: "oneCell" });
+      const columnPixels = (worksheet.getColumn(15 + photoIndex).width ?? 10) * 7;
+      const rowPixels = 105 * (96 / 72);
+      const imagePadding = 8;
+      const fitted = fitImage(normalized.width, normalized.height, columnPixels - imagePadding * 2, rowPixels - imagePadding * 2);
+      worksheet.addImage(imageId, {
+        tl: {
+          col: 14 + photoIndex + (columnPixels - fitted.width) / 2 / columnPixels,
+          row: rowNumber - 1 + (rowPixels - fitted.height) / 2 / rowPixels,
+        },
+        ext: fitted,
+        editAs: "oneCell",
+      });
     }
   }
 
@@ -188,6 +199,8 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
     sort: false,
     autoFilter: false,
     pivotTables: false,
+    objects: false,
+    scenarios: false,
   });
 
   return workbook;
