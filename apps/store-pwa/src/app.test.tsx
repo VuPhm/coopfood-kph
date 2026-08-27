@@ -73,7 +73,9 @@ describe("Store workspace", () => {
   it("toggles mobile approval filters and sort direction from radio-style grids", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
-    fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" }));
+    const filterTrigger = screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" });
+    expect(filterTrigger.querySelector(".lucide-list-filter")).not.toBeNull();
+    fireEvent.click(filterTrigger);
     const dialog = screen.getByRole("dialog", { name: "Lọc và sắp xếp" });
     const approvedFilter = within(dialog).getByRole("button", { name: "Lọc Đã duyệt" });
 
@@ -206,44 +208,19 @@ describe("Store workspace", () => {
     expect(screen.getByText(/Đã chuyển phiếu KPH-260815-018 sang “Đã duyệt”/i)).toBeVisible();
   });
 
-  it("moves selected records to the recoverable trash without permanent deletion", () => {
+  it("keeps both delete entry points and only marks a record as deleted", () => {
     render(<App />);
-    expect(screen.getAllByRole("button", { name: "Xóa phiếu KPH-260815-018" })).toHaveLength(2);
+    const rowDeleteButtons = screen.getAllByRole("button", { name: "Xóa phiếu KPH-260815-018" });
+    expect(rowDeleteButtons).toHaveLength(2);
+    fireEvent.click(rowDeleteButtons[0]!);
 
-    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
-    fireEvent.click(screen.getByRole("button", { name: "Xóa phiếu đã chọn" }));
-    const dialog = screen.getByRole("dialog", { name: "Chuyển 1 phiếu vào thùng rác?" });
-    expect(within(dialog).getByText(/không hỗ trợ xoá vĩnh viễn/i)).toBeVisible();
-    fireEvent.click(within(dialog).getByRole("button", { name: "Chuyển vào thùng rác" }));
+    const dialog = screen.getByRole("dialog", { name: "Chuyển 1 phiếu sang trạng thái đã xoá?" });
+    expect(within(dialog).getByText(/không có thao tác xoá vĩnh viễn/i)).toBeVisible();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Xóa phiếu" }));
 
     expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
-    const trashToggle = screen.getByRole("button", { name: "Mở thùng rác, có 1 phiếu" });
-    expect(trashToggle).toHaveClass("pr-3");
-    expect(trashToggle.querySelector(".lucide-history")).not.toBeNull();
-    fireEvent.click(trashToggle);
-    expect(trashToggle).toHaveAttribute("aria-pressed", "true");
-    expect(trashToggle.querySelector(".lucide-history")).not.toBeNull();
-    expect(screen.getByRole("heading", { name: /Phiếu đã xoá/i })).toBeVisible();
-    expect(document.querySelector(".history-board")).toHaveClass("is-trash-mode");
-    expect(screen.queryByRole("combobox", { name: "Trạng thái duyệt phiếu KPH-260815-018" })).not.toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Khôi phục phiếu KPH-260815-018" })).toHaveLength(2);
-    expect(screen.queryByRole("button", { name: /xoá vĩnh viễn/i })).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Khôi phục tất cả" }));
-    expect(screen.getByText("Thùng rác chưa có phiếu trong loại này.")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Quay lại phiếu đã khai báo" }));
-    expect(screen.getAllByText("Bánh quy bơ hộp 300 g")).toHaveLength(2);
-  });
-
-  it("restores one deleted record from the row-level action", () => {
-    render(<App />);
-    fireEvent.click(screen.getAllByRole("button", { name: "Xóa phiếu KPH-260815-018" })[0]!);
-    fireEvent.click(within(screen.getByRole("dialog", { name: "Chuyển 1 phiếu vào thùng rác?" })).getByRole("button", { name: "Chuyển vào thùng rác" }));
-    fireEvent.click(screen.getByRole("button", { name: "Mở thùng rác, có 1 phiếu" }));
-    fireEvent.click(screen.getAllByRole("button", { name: "Khôi phục phiếu KPH-260815-018" })[0]!);
-
-    expect(screen.getByText("Thùng rác chưa có phiếu trong loại này.")).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Khôi phục tất cả" })).not.toBeInTheDocument();
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
+    expect(screen.getByText(/Đã chuyển 1 phiếu sang trạng thái đã xoá/i)).toBeVisible();
   });
 
   it("summarizes selected rows and images before exporting Excel", () => {
