@@ -1,6 +1,6 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, ListFilter, LoaderCircle, PackagePlus, Salad, Scale, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
@@ -96,6 +96,7 @@ export function App() {
   const [notice, setNotice] = useState("");
   const [deletedIds, setDeletedIds] = useState<ReadonlySet<string>>(new Set());
   const [deleteIds, setDeleteIds] = useState<readonly string[]>([]);
+  const [trashMode, setTrashMode] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
@@ -103,7 +104,8 @@ export function App() {
   const visibleRecords = useMemo(() => {
     const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
       const currentApproval = approvalByRecord[id] ?? approvalStatus;
-      return kind === activeKind && !deletedIds.has(id) && (approvalFilter === "ALL" || currentApproval === approvalFilter);
+      const hasExpectedDeletionState = trashMode ? deletedIds.has(id) : !deletedIds.has(id);
+      return kind === activeKind && hasExpectedDeletionState && (approvalFilter === "ALL" || currentApproval === approvalFilter);
     });
 
     if (!recordSort) return scopedRecords;
@@ -118,10 +120,10 @@ export function App() {
         : recordCollator.compare(String(leftValue), String(rightValue));
       return recordSort.direction === "ascending" ? comparison : -comparison;
     });
-  }, [activeKind, approvalByRecord, approvalFilter, deletedIds, recordSort, records]);
+  }, [activeKind, approvalByRecord, approvalFilter, deletedIds, recordSort, records, trashMode]);
   const selectedRecords = useMemo(
-    () => records.filter(({ id, kind }) => kind === activeKind && !deletedIds.has(id) && selected.has(id)),
-    [activeKind, deletedIds, records, selected],
+    () => records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
+    [activeKind, deletedIds, records, selected, trashMode],
   );
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
@@ -213,6 +215,14 @@ export function App() {
     setSelected(new Set());
   }
 
+  function toggleTrashMode() {
+    setTrashMode((current) => !current);
+    setSelected(new Set());
+    setExpandedMobileRecords(new Set());
+    setApprovalFilter("ALL");
+    setRecordSort(null);
+  }
+
   function requestDelete(recordId: string) {
     setDeleteIds([recordId]);
   }
@@ -228,6 +238,25 @@ export function App() {
     setExpandedMobileRecords((current) => new Set([...current].filter((id) => !targetIds.has(id))));
     setDeleteIds([]);
     setNotice(`Đã chuyển ${targetIds.size} phiếu sang trạng thái đã xoá trong dữ liệu demo.`);
+  }
+
+  function restoreRecord(recordId: string) {
+    setDeletedIds((current) => {
+      const next = new Set(current);
+      next.delete(recordId);
+      return next;
+    });
+    setSelected((current) => new Set([...current].filter((id) => id !== recordId)));
+    setExpandedMobileRecords((current) => new Set([...current].filter((id) => id !== recordId)));
+    setNotice(`Đã khôi phục phiếu ${recordId} trong dữ liệu demo.`);
+  }
+
+  function restoreSelected() {
+    const targetIds = new Set(selectedRecords.map(({ id }) => id));
+    setDeletedIds((current) => new Set([...current].filter((id) => !targetIds.has(id))));
+    setSelected((current) => new Set([...current].filter((id) => !targetIds.has(id))));
+    setExpandedMobileRecords((current) => new Set([...current].filter((id) => !targetIds.has(id))));
+    setNotice(`Đã khôi phục ${targetIds.size} phiếu trong dữ liệu demo.`);
   }
 
   function saveCreatedRecord(draft: CreatedRecordDraft) {
@@ -310,7 +339,7 @@ export function App() {
       </header>
 
       <main className="workspace-layout mx-auto max-w-[1440px] px-3 py-5 sm:px-6 sm:py-7">
-        <section className="history-board" aria-labelledby="workspace-title">
+        <section className={cn("history-board", trashMode && "is-trash-mode")} aria-labelledby="workspace-title">
           <div className="workspace-header">
             <div className="utility-panel-meta workspace-header-meta">
               <p id="workspace-title">Phiếu theo dõi hàng không phù hợp</p>
@@ -335,18 +364,30 @@ export function App() {
             </div>
           </div>
           <header className="history-header">
-            <div className="history-title-row">
+            <div className="history-title-row pr-3">
               <h2 id="history-title" className="history-title">
                 <span className="history-total-count" aria-label={`${visibleRecords.length} phiếu`}>{visibleRecords.length}</span>
-                Phiếu đã khai báo
+                {trashMode ? "Phiếu đã xoá" : "Phiếu đã khai báo"}
               </h2>
-              <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
+              <div className="history-title-actions">
+                <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
+                <button
+                  type="button"
+                  className="trash-mode-toggle"
+                  aria-label={trashMode ? "Quay lại phiếu đã khai báo" : `Mở thùng rác, có ${deletedIds.size} phiếu`}
+                  aria-pressed={trashMode}
+                  title={trashMode ? "Quay lại phiếu đã khai báo" : "Mở thùng rác"}
+                  onClick={toggleTrashMode}
+                >
+                  <History aria-hidden="true" />
+                </button>
+              </div>
             </div>
 
             <div className="history-controls-row">
               <div className="history-tabs" role="tablist" aria-label="Loại phiếu">
                 {kphKinds.map((kind) => {
-                  const count = records.filter((record) => record.kind === kind && !deletedIds.has(record.id)).length;
+                  const count = records.filter((record) => record.kind === kind && (trashMode ? deletedIds.has(record.id) : !deletedIds.has(record.id))).length;
                   return (
                     <button
                       key={kind}
@@ -376,7 +417,9 @@ export function App() {
                 <div className="history-action-buttons">
                   <div className="history-selection-slot">
                     {selected.size > 0
-                      ? <button type="button" className="selection-count selection-approve" onClick={approveSelected}>Duyệt <strong>{selected.size}</strong> phiếu</button>
+                      ? trashMode
+                        ? <button type="button" className="selection-count selection-approve selection-restore" onClick={restoreSelected}>Khôi phục <strong>{selected.size}</strong> phiếu</button>
+                        : <button type="button" className="selection-count selection-approve" onClick={approveSelected}>Duyệt <strong>{selected.size}</strong> phiếu</button>
                       : <span className="selection-count" aria-live="polite">Đã chọn <strong>0</strong></span>}
                     <label className="select-all-history" aria-label="Chọn tất cả phiếu" title="Chọn tất cả">
                       <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
@@ -385,7 +428,7 @@ export function App() {
                   {selected.size > 0 ? (
                     <div className="history-action-tools">
                       <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={() => { setExportError(""); setExportOpen(true); }}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
-                      <Button variant="ghost" className="history-delete" aria-label="Xóa phiếu đã chọn" title="Chuyển sang trạng thái đã xoá" onClick={requestDeleteSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-delete-label">Xóa</span></Button>
+                      <Button variant="ghost" className="history-delete" aria-label="Xóa phiếu đã chọn" title={trashMode ? "Không thể xoá vĩnh viễn" : "Chuyển sang trạng thái đã xoá"} disabled={trashMode} onClick={requestDeleteSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-delete-label">Xóa</span></Button>
                     </div>
                   ) : null}
                 </div>
@@ -409,12 +452,12 @@ export function App() {
                   <th className="w-12 px-3 py-0 text-center"><span className="sr-only">Thao tác dòng</span></th>
                 </tr>
               </thead>
-              <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onDelete={requestDelete} onToggle={toggleSelection} />)}</tbody>
+              <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)}</tbody>
             </table>
           </div>
 
           <div className="grid gap-3 mobile-history">
-            {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} onApprovalChange={updateApproval} onDelete={requestDelete} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)}
+            {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)}
           </div>
         </section>
 
@@ -497,7 +540,7 @@ function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, so
 
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogTrigger asChild>
-      <HistoryControlsTrigger active={active} className="history-controls-mobile pr-3" label="Mở lọc và sắp xếp trên mobile" />
+      <HistoryControlsTrigger active={active} className="history-controls-mobile" label="Mở lọc và sắp xếp trên mobile" />
     </DialogTrigger>
     <DialogContent className="mobile-history-dialog" aria-describedby="mobile-history-dialog-description">
       <DialogTitle className="sr-only">Lọc và sắp xếp</DialogTitle>
@@ -560,13 +603,15 @@ type RecordProps = {
   expanded?: boolean;
   record: DemoRecord;
   selected: boolean;
+  trashMode: boolean;
   onApprovalChange: (id: string, status: DemoApprovalStatus) => void;
   onDelete: (id: string) => void;
   onExpansionChange?: (id: string, expanded: boolean) => void;
+  onRestore: (id: string) => void;
   onToggle: (id: string) => void;
 };
 
-function RecordRow({ approvalStatus, onApprovalChange, onDelete, onToggle, record, selected }: RecordProps) {
+function RecordRow({ approvalStatus, onApprovalChange, onDelete, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
     <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
@@ -577,11 +622,11 @@ function RecordRow({ approvalStatus, onApprovalChange, onDelete, onToggle, recor
     <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
     <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
     <td className="p-3"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></td>
-    <td className="p-3 text-center"><RecordDeleteButton recordId={record.id} onDelete={onDelete} /></td>
+    <td className="p-3 text-center"><RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} /></td>
   </tr>;
 }
 
-function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDelete, onExpansionChange, onToggle, record, selected }: RecordProps) {
+function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDelete, onExpansionChange, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
   function isInteractiveTarget(event: MouseEvent<HTMLElement>) {
     return event.target instanceof HTMLElement && event.target.closest("button, input, select, label") !== null;
   }
@@ -630,7 +675,7 @@ function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDele
       ) : (
         <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
       )}
-      <RecordDeleteButton recordId={record.id} onDelete={onDelete} />
+      <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} />
     </footer>
   </article>;
 }
@@ -655,16 +700,16 @@ function ApprovalControl({ onChange, recordId, status }: { onChange: (id: string
   </label>;
 }
 
-function RecordDeleteButton({ onDelete, recordId }: { onDelete: RecordProps["onDelete"]; recordId: string }) {
+function RecordHistoryActionButton({ onDelete, onRestore, recordId, trashMode }: { onDelete: RecordProps["onDelete"]; onRestore: RecordProps["onRestore"]; recordId: string; trashMode: boolean }) {
   return <Button
     variant="ghost"
     size="icon"
-    className="record-delete"
-    aria-label={`Xóa phiếu ${recordId}`}
-    title="Chuyển sang trạng thái đã xoá"
-    onClick={() => onDelete(recordId)}
+    className={cn("record-delete", trashMode && "is-restore")}
+    aria-label={`${trashMode ? "Khôi phục" : "Xóa"} phiếu ${recordId}`}
+    title={trashMode ? "Khôi phục phiếu" : "Chuyển sang trạng thái đã xoá"}
+    onClick={() => trashMode ? onRestore(recordId) : onDelete(recordId)}
   >
-    <Trash2 size={17} aria-hidden="true" />
+    {trashMode ? <RotateCcw size={17} aria-hidden="true" /> : <Trash2 size={17} aria-hidden="true" />}
   </Button>;
 }
 

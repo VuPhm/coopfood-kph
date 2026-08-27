@@ -208,7 +208,7 @@ describe("Store workspace", () => {
     expect(screen.getByText(/Đã chuyển phiếu KPH-260815-018 sang “Đã duyệt”/i)).toBeVisible();
   });
 
-  it("keeps both delete entry points and only marks a record as deleted", () => {
+  it("keeps both delete entry points and restores one record from the trash view", () => {
     render(<App />);
     const rowDeleteButtons = screen.getAllByRole("button", { name: "Xóa phiếu KPH-260815-018" });
     expect(rowDeleteButtons).toHaveLength(2);
@@ -221,6 +221,48 @@ describe("Store workspace", () => {
     expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
     expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
     expect(screen.getByText(/Đã chuyển 1 phiếu sang trạng thái đã xoá/i)).toBeVisible();
+
+    const titleRow = document.querySelector(".history-title-row") as HTMLElement;
+    const titleActions = within(titleRow).getAllByRole("button");
+    const filterButton = within(titleRow).getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" });
+    const trashToggle = within(titleRow).getByRole("button", { name: "Mở thùng rác, có 1 phiếu" });
+    expect(titleRow).toHaveClass("pr-3");
+    expect(trashToggle.querySelector(".lucide-history")).not.toBeNull();
+    expect(titleActions.indexOf(filterButton)).toBeLessThan(titleActions.indexOf(trashToggle));
+    fireEvent.click(trashToggle);
+
+    expect(screen.getByText("Phiếu đã xoá")).toBeVisible();
+    expect(document.querySelector(".history-board")).toHaveClass("is-trash-mode");
+    expect(document.querySelector(".grid.gap-3.mobile-history")).not.toBeNull();
+    const restoreButtons = screen.getAllByRole("button", { name: "Khôi phục phiếu KPH-260815-018" });
+    expect(restoreButtons).toHaveLength(2);
+    expect(restoreButtons[0]?.querySelector(".lucide-rotate-ccw")).not.toBeNull();
+    expect(restoreButtons[0]?.querySelector(".lucide-trash-2")).toBeNull();
+
+    fireEvent.click(restoreButtons[0]!);
+    expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
+    expect(screen.getByText(/Đã khôi phục phiếu KPH-260815-018/i)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Quay lại phiếu đã khai báo" }));
+    expect(screen.getAllByText("Bánh quy bơ hộp 300 g")).toHaveLength(2);
+  });
+
+  it("keeps action tools in trash mode and restores every selected record", () => {
+    render(<App />);
+    fireEvent.click(screen.getAllByRole("button", { name: "Xóa phiếu KPH-260815-018" })[0]!);
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Chuyển 1 phiếu sang trạng thái đã xoá?" })).getByRole("button", { name: "Xóa phiếu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mở thùng rác, có 1 phiếu" }));
+
+    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+
+    expect(screen.getByRole("button", { name: "Khôi phục 1 phiếu" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Xuất Excel" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Xóa phiếu đã chọn" })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Khôi phục 1 phiếu" }));
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
+    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
+    expect(screen.getByText(/Đã khôi phục 1 phiếu trong dữ liệu demo/i)).toBeVisible();
   });
 
   it("summarizes selected rows and images before exporting Excel", () => {
