@@ -35,6 +35,7 @@ import { z } from "zod";
 
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
+import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
@@ -352,18 +353,14 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
 
       <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
 
-      <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Quét mã SKU / UPC</DialogTitle>
-            <DialogDescription>Ưu tiên camera sau. Có thể thử lại hoặc dùng máy quét cầm tay dạng bàn phím.</DialogDescription>
-          </DialogHeader>
-          <div className="grid min-h-52 place-items-center rounded-2xl bg-ink p-5 text-center text-white">
-            <div><ScanLine className="mx-auto" size={42} aria-hidden="true" /><p className="mt-3 font-bold">Camera chưa được nối trong foundation</p><p className="mt-1 text-sm text-white/70">Luồng nhập tay vẫn luôn khả dụng, không làm người dùng mắc kẹt.</p></div>
-          </div>
-          <div className="flex justify-end"><Button type="button" onClick={() => { setScannerOpen(false); window.setTimeout(() => setFocus("barcode"), 0); }}>Nhập mã thủ công</Button></div>
-        </DialogContent>
-      </Dialog>
+      <BarcodeScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onScan={(scannedBarcode) => {
+          setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
+          window.setTimeout(() => setFocus("barcode"), 0);
+        }}
+      />
     </>
   );
 }

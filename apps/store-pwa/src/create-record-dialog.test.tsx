@@ -98,6 +98,15 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("button", { name: "Nhập mã thủ công" })).toBeVisible();
   });
 
+  it("fills the barcode input when barcode is scanned", async () => {
+    renderDialog();
+    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" }) as HTMLInputElement;
+    expect(barcodeInput.value).toBe("");
+
+    fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
+    expect(screen.getByRole("dialog", { name: "Quét mã SKU / UPC" })).toBeVisible();
+  });
+
   it("locks the detected date, opens the treatment date calendar and allows date selection", () => {
     renderDialog();
     expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveValue(formatBusinessDate(new Date()).display);
