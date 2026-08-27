@@ -23,10 +23,10 @@ describe("Store workspace", () => {
 
   it("opens the store context and saves the required store settings", async () => {
     render(<App />);
-    const trigger = screen.getByRole("button", { name: /Thiết lập cửa hàng: Co\.op Food Nguyễn Kiệm · 0001/i });
+    const trigger = screen.getByRole("button", { name: /Thiết lập cửa hàng: Chưa thiết lập cửa hàng/i });
 
-    expect(within(trigger).getByText("Co.op Food Nguyễn Kiệm · 0001")).toBeVisible();
-    expect(within(trigger).getByText("Nguyễn Văn Demo · CHT")).toBeVisible();
+    expect(within(trigger).getByText("Chưa thiết lập cửa hàng")).toBeVisible();
+    expect(within(trigger).getByText("Chưa nhập thông tin nhân sự")).toBeVisible();
     expect(within(trigger).getByText("dữ liệu: trên thiết bị")).toBeVisible();
     expect(screen.queryByText("Cửa hàng hiện tại")).not.toBeInTheDocument();
     expect(screen.queryByText("Cửa hàng trưởng")).not.toBeInTheDocument();
@@ -35,12 +35,12 @@ describe("Store workspace", () => {
     const dialog = screen.getByRole("dialog", { name: "Thiết lập cửa hàng" });
     const storeName = within(dialog).getByRole("textbox", { name: "Tên cửa hàng" });
     const storeCode = within(dialog).getByRole("textbox", { name: "Mã cửa hàng" });
-    expect(storeName).toHaveValue("Nguyễn Kiệm");
+    expect(storeName).toHaveValue("");
     expect(within(dialog).getByText("Co.op Food")).toBeVisible();
     expect(storeCode).toHaveAttribute("type", "text");
     expect(storeCode).toHaveAttribute("maxlength", "4");
     expect(within(dialog).queryByText(/giữ được số 0 ở đầu/i)).not.toBeInTheDocument();
-    expect(within(dialog).getByRole("radio", { name: "CHT" })).toBeChecked();
+    expect(within(dialog).getByRole("radio", { name: "Chưa chọn" })).toBeChecked();
 
     fireEvent.change(storeName, { target: { value: "" } });
     fireEvent.change(storeCode, { target: { value: "123" } });
@@ -58,7 +58,9 @@ describe("Store workspace", () => {
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "Thiết lập cửa hàng" })).not.toBeInTheDocument());
     const updated = screen.getByRole("button", { name: /Thiết lập cửa hàng: Co\.op Food Cống Quỳnh · 0123/i });
     expect(within(updated).getByText("Trần An · Nhân viên · NV-08")).toBeVisible();
+    expect(within(updated).getByText("Co.op Food Cống Quỳnh · 0123")).toBeVisible();
   });
+
 
   it("automatically hides a notice after 15 seconds", () => {
     vi.useFakeTimers();
@@ -332,7 +334,7 @@ describe("Store workspace", () => {
 
     const dialog = screen.getByRole("dialog", { name: "Xuất phiếu ra Excel" });
     expect(within(dialog).getByText("TP Khô & khác")).toBeVisible();
-    expect(within(dialog).getByText("Co.op Food Nguyễn Kiệm · 0001")).toBeVisible();
+    expect(within(dialog).getByText("Chưa thiết lập cửa hàng")).toBeVisible();
     expect(within(dialog).getByRole("button", { name: "Xuất 1 dòng" })).toBeEnabled();
   });
 });

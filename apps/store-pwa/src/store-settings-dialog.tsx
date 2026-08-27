@@ -75,7 +75,7 @@ export function StoreSettingsDialog({ onOpenChange, onSaved, open, profile }: St
                 </div>
               </Field>
               <Field label="Mã cửa hàng" htmlFor="store-code" required error={errors.storeCode?.message}>
-                <Input id="store-code" type="text" inputMode="numeric" maxLength={4} autoComplete="off" placeholder="Ví dụ: 0001" aria-invalid={Boolean(errors.storeCode)} {...register("storeCode")} />
+                <Input id="store-code" type="text" inputMode="numeric" maxLength={4} autoComplete="off" placeholder="Ví dụ: 0123" aria-invalid={Boolean(errors.storeCode)} {...register("storeCode")} />
               </Field>
             </div>
           </section>

@@ -15,10 +15,10 @@ export const storeProfileSchema = z.object({
 export type StoreProfile = z.infer<typeof storeProfileSchema>;
 
 export const DEFAULT_STORE_PROFILE: StoreProfile = {
-  storeName: "Nguyễn Kiệm",
-  storeCode: "0001",
-  role: "STORE_MANAGER",
-  fullName: "Nguyễn Văn Demo",
+  storeName: "",
+  storeCode: "",
+  role: "",
+  fullName: "",
   employeeCode: "",
 };
 
@@ -33,7 +33,12 @@ export function normalizeStoreProfile(value: unknown): StoreProfile {
 }
 
 export function storeIdentity(profile: StoreProfile) {
-  return `Co.op Food ${profile.storeName} · ${profile.storeCode}`;
+  const name = profile.storeName?.trim();
+  const code = profile.storeCode?.trim();
+  if (!name && !code) return "Chưa thiết lập cửa hàng";
+  if (name && code) return `Co.op Food ${name} · ${code}`;
+  if (name) return `Co.op Food ${name}`;
+  return `Co.op Food · ${code}`;
 }
 
 export function actorIdentity(profile: StoreProfile) {

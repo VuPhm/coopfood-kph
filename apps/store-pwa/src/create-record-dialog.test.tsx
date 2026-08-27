@@ -4,11 +4,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { formatBusinessDate } from "./business-date";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
 import { processEvidencePhoto } from "./image-processing";
+import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
 vi.mock("./image-processing", () => ({ processEvidencePhoto: vi.fn() }));
 
-function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: CreatedRecordDraft) => void>()) {
-  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={onSaved} />);
+function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: CreatedRecordDraft) => void>(), profile: StoreProfile = DEFAULT_STORE_PROFILE) {
+  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={onSaved} profile={profile} />);
   return onSaved;
 }
 
@@ -79,14 +80,20 @@ describe("Create KPH record", () => {
       width: 1280,
       height: 720,
     });
-    renderDialog();
+    renderDialog("TPCN", undefined, {
+      storeCode: "0123",
+      storeName: "Cống Quỳnh",
+      role: "STORE_MANAGER",
+      fullName: "Trần An",
+      employeeCode: "NV-08",
+    });
     const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
     const file = new File(["original"], "evidence.jpg", { type: "image/jpeg", lastModified: 1_776_220_280_000 });
 
     fireEvent.change(picker!, { target: { files: [file] } });
 
     expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
-    expect(processEvidencePhoto).toHaveBeenCalledWith(file, { storeCode: "0001", storeName: "Nguyễn Kiệm" });
+    expect(processEvidencePhoto).toHaveBeenCalledWith(file, { storeCode: "0123", storeName: "Cống Quỳnh" });
     fireEvent.click(screen.getByRole("button", { name: "Xem ảnh minh chứng 1" }));
     expect(screen.getByAltText("Ảnh minh chứng evidence.jpg đã đóng tem")).toHaveAttribute("src", "blob:stamped-photo");
   });
@@ -142,6 +149,7 @@ describe("Create KPH record", () => {
     const onSaved = renderDialog();
     fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Sản phẩm kiểm thử" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Trần An" } });
     const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
     fireEvent.change(picker!, { target: { files: [new File(["original"], "evidence.jpg", { type: "image/jpeg" })] } });
     expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
@@ -152,6 +160,7 @@ describe("Create KPH record", () => {
         kind: "TPCN",
         barcode: "000123",
         productName: "Sản phẩm kiểm thử",
+        detectedBy: "Trần An",
         detectedDate: formatBusinessDate(new Date()).display,
         quantity: 1,
         unit: "EA",
@@ -159,3 +168,4 @@ describe("Create KPH record", () => {
       })));
   });
 });
+
