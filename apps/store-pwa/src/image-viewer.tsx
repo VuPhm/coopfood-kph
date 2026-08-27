@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from "@coopfood-kph/ui";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type SyntheticEvent } from "react";
+import { createPortal } from "react-dom";
 
 export type ViewableEvidenceImage = { src: string; alt: string };
 
@@ -108,7 +109,9 @@ export function EvidenceImageViewer({ image, onOpenChange, open }: { image: View
           </figure>
         ) : null}
       </DialogContent>
-      <div className={lens.visible ? "evidence-zoom-lens is-visible" : "evidence-zoom-lens"} style={lens} aria-hidden="true" />
+      {open && typeof document !== "undefined"
+        ? createPortal(<div className={lens.visible ? "evidence-zoom-lens is-visible" : "evidence-zoom-lens"} style={lens} aria-hidden="true" />, document.body)
+        : null}
     </Dialog>
   );
 }

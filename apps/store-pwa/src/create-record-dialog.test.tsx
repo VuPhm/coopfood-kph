@@ -98,12 +98,26 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("button", { name: "Nhập mã thủ công" })).toBeVisible();
   });
 
-  it("locks the detected date and keeps the treatment date calendar", () => {
+  it("locks the detected date, opens the treatment date calendar and allows date selection", () => {
     renderDialog();
     expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveValue(formatBusinessDate(new Date()).display);
     expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveAttribute("readonly");
     expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" })).toBeEnabled();
+    const treatmentDateInput = screen.getByRole("textbox", { name: "Ngày xử lý (nếu có)" });
+    const treatmentDateTrigger = screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" });
+    expect(treatmentDateTrigger).toBeEnabled();
+
+    fireEvent.click(treatmentDateTrigger);
+
+    const calendar = screen.getByRole("dialog", { name: "Lịch chọn ngày" });
+    expect(calendar.parentElement).toBe(document.body);
+    expect(calendar).toHaveClass("pointer-events-auto");
+
+    const dayButton = within(calendar).getByRole("button", { name: /18/ });
+    fireEvent.click(dayButton);
+
+    expect(screen.queryByRole("dialog", { name: "Lịch chọn ngày" })).not.toBeInTheDocument();
+    expect((treatmentDateInput as HTMLInputElement).value).toMatch(/^18\/\d{2}\/\d{4}$/);
   });
 
   it("saves the entered values and stamped evidence instead of a placeholder", async () => {

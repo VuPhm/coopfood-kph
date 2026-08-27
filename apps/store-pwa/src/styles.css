@@ -522,7 +522,7 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 .expiry-or span { padding-inline: .25rem; }
 .expiry-duration-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--control-gap); }
 .expiry-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--control-gap); }
-.expiry-calendar { position: absolute; top: calc(100% + var(--space-2)); right: 0; z-index: 60; width: min(20rem, calc(100vw - 3rem)); border: 1px solid var(--color-border); border-radius: 20px; background: #fff; padding: var(--panel-inset); box-shadow: var(--shadow-overlay); transform-origin: top right; animation: content-enter var(--motion-ui) var(--motion-ease-out) both; }
+.expiry-calendar { position: fixed; z-index: 100; pointer-events: auto; width: min(20rem, calc(100vw - 2rem)); border: 1px solid var(--color-border); border-radius: 20px; background: #fff; padding: var(--panel-inset); box-shadow: var(--shadow-overlay); transform-origin: top right; animation: content-enter var(--motion-ui) var(--motion-ease-out) both; }
 .expiry-calendar > header { display: grid; grid-template-columns: 2.5rem 1fr 2.5rem; align-items: center; margin-bottom: .5rem; }
 .expiry-calendar > header strong { color: var(--color-ink); font-size: .82rem; text-align: center; text-transform: capitalize; }
 .expiry-calendar > header button { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border-radius: 12px; color: var(--color-brand); }
@@ -768,7 +768,7 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 }
 
 @media (max-width: 480px) {
-  .expiry-calendar { left: 0; right: 0; width: 100%; max-width: 100%; }
+  .expiry-calendar { width: min(20rem, calc(100vw - 2rem)); max-width: calc(100vw - 2rem); }
   .expiry-result-summary { padding: var(--space-3); gap: var(--space-2-5); }
   .expiry-result-icon { width: 3.25rem; height: 3.25rem; }
   .expiry-timeline-track { min-width: 14rem; }

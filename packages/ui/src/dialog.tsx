@@ -1,4 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { DismissableLayerBranch } from "@radix-ui/react-dismissable-layer";
 import { X } from "lucide-react";
 import type { ComponentProps } from "react";
 
@@ -7,6 +8,7 @@ import { cn } from "./cn";
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
+export { DismissableLayerBranch };
 
 export function DialogContent({ children, className, ...props }: ComponentProps<typeof DialogPrimitive.Content>) {
   return (

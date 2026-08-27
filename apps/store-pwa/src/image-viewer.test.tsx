@@ -33,6 +33,7 @@ describe("evidence image viewer", () => {
     fireEvent.pointerMove(image, { clientX: 400, clientY: 250, pointerId: 1, pointerType: "mouse" });
     const lens = document.querySelector(".evidence-zoom-lens");
     expect(lens).toHaveClass("is-visible");
+    expect(lens?.parentElement).toBe(document.body);
     expect(lens).toHaveStyle({ backgroundSize: "1500px 1000px" });
 
     fireEvent.pointerLeave(image);
