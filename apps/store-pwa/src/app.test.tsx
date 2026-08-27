@@ -110,7 +110,7 @@ describe("Store workspace", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
     expect(screen.getByRole("button", { name: "Duyệt 1 phiếu" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Xuất Excel" })).toBeEnabled();
-    expect(screen.queryByRole("button", { name: "Vô hiệu hóa" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Xóa phiếu đã chọn" })).toBeEnabled();
 
     fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
     expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
@@ -153,7 +153,7 @@ describe("Store workspace", () => {
     expect(card?.querySelector(".record-card-footer")).not.toBeNull();
     expect(card?.querySelector(".record-card-meta")).toBeNull();
     expect(card?.querySelector(".record-photo-gallery")).toBeNull();
-    expect(within(card as HTMLElement).queryByRole("button", { name: "Vô hiệu hóa phiếu KPH-260815-018" })).not.toBeInTheDocument();
+    expect(within(card as HTMLElement).getByRole("button", { name: "Xóa phiếu KPH-260815-018" })).toBeVisible();
     expect(document.querySelector(".mobile-history .approval-control-label")).not.toBeInTheDocument();
   });
 
@@ -206,10 +206,39 @@ describe("Store workspace", () => {
     expect(screen.getByText(/Đã chuyển phiếu KPH-260815-018 sang “Đã duyệt”/i)).toBeVisible();
   });
 
-  it("does not expose record invalidation to the store manager", () => {
+  it("moves selected records to the recoverable trash without permanent deletion", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Mở rộng phiếu KPH-260815-018" }));
-    expect(screen.queryByRole("button", { name: /Vô hiệu hóa phiếu/i })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Xóa phiếu KPH-260815-018" })).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    fireEvent.click(screen.getByRole("button", { name: "Xóa phiếu đã chọn" }));
+    const dialog = screen.getByRole("dialog", { name: "Chuyển 1 phiếu vào thùng rác?" });
+    expect(within(dialog).getByText(/không hỗ trợ xoá vĩnh viễn/i)).toBeVisible();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Chuyển vào thùng rác" }));
+
+    expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Mở thùng rác, có 1 phiếu" }));
+    expect(screen.getByRole("heading", { name: /Phiếu đã xoá/i })).toBeVisible();
+    expect(document.querySelector(".history-board")).toHaveClass("is-trash-mode");
+    expect(screen.queryByRole("combobox", { name: "Trạng thái duyệt phiếu KPH-260815-018" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Khôi phục phiếu KPH-260815-018" })).toHaveLength(2);
+    expect(screen.queryByRole("button", { name: /xoá vĩnh viễn/i })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Khôi phục tất cả" }));
+    expect(screen.getByText("Thùng rác chưa có phiếu trong loại này.")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Quay lại phiếu đã khai báo" }));
+    expect(screen.getAllByText("Bánh quy bơ hộp 300 g")).toHaveLength(2);
+  });
+
+  it("restores one deleted record from the row-level action", () => {
+    render(<App />);
+    fireEvent.click(screen.getAllByRole("button", { name: "Xóa phiếu KPH-260815-018" })[0]!);
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Chuyển 1 phiếu vào thùng rác?" })).getByRole("button", { name: "Chuyển vào thùng rác" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mở thùng rác, có 1 phiếu" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Khôi phục phiếu KPH-260815-018" })[0]!);
+
+    expect(screen.getByText("Thùng rác chưa có phiếu trong loại này.")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Khôi phục tất cả" })).not.toBeInTheDocument();
   });
 
   it("summarizes selected rows and images before exporting Excel", () => {
