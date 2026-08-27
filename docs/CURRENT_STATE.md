@@ -6,6 +6,10 @@ Cập nhật: 2026-08-15
 
 `Foundation — reboot từ baseline đã kiểm chứng`
 
+Nhánh `codex/github-pages-pwa` đồng thời có pilot local-only theo ADR-0002:
+IndexedDB tạm thời là authority trên từng thiết bị, không đồng bộ, và Excel là
+kênh bàn giao cho CHT. Đây không phải topology đích của foundation online.
+
 Repository này là implementation mới. Hai repository tham chiếu
 `coopfood-kph-platform` và `tool-kph` chỉ được đọc để lấy provenance,
 business behavior và UI DNA; không tiếp tục phát triển sản phẩm trong đó.

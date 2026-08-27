@@ -220,6 +220,7 @@ export async function downloadKphWorkbook(kind: KphKind, records: readonly DemoR
   anchor.click();
   anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  return anchor.download;
 }
 
 export type KphWorkbook = ExcelJS.Workbook;

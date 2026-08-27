@@ -10,6 +10,9 @@ import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord 
 import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import { EvidenceImageViewer } from "./image-viewer";
+import { PwaStatus } from "./pwa-status";
+import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord, type PilotRecord } from "./record-store";
+import { readStorageHealth, requestPersistentStorage, storageUsageLabel, type StorageHealth } from "./storage-health";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
 export { formatBusinessDate } from "./business-date";
@@ -43,6 +46,38 @@ const recordSortOptions: readonly { label: string; value: RecordSortKey }[] = [
   { label: "Trạng thái duyệt", value: "approval" },
 ];
 const recordCollator = new Intl.Collator("vi", { numeric: true, sensitivity: "base" });
+const pilotPersistenceEnabled = import.meta.env.MODE !== "test";
+const initialRecords = pilotPersistenceEnabled ? [] : DEMO_RECORDS;
+const initialApproval = Object.fromEntries(initialRecords.map(({ approvalStatus, id }) => [id, approvalStatus]));
+
+function hydrationPhotoUrl(photo: PilotRecord["photos"][number], ownedUrls: Set<string>): DemoPhoto {
+  const src = URL.createObjectURL(photo.blob);
+  ownedUrls.add(src);
+  return { id: photo.id, src, alt: photo.alt, blob: photo.blob, fileName: photo.fileName };
+}
+
+function hydratePilotRecord(record: PilotRecord, ownedUrls: Set<string>): DemoRecord {
+  return {
+    id: record.id,
+    kind: record.kind,
+    detectedDate: record.detectedDate,
+    detectedBy: record.detectedBy,
+    sku: record.sku,
+    productName: record.productName,
+    supplier: record.supplier,
+    quantity: record.quantity,
+    quantityValue: record.quantityValue,
+    unit: record.unit,
+    condition: record.condition,
+    resolution: record.resolution,
+    treatmentDate: record.treatmentDate,
+    approvalStatus: record.approvalStatus,
+    photos: record.photos.map((photo) => hydrationPhotoUrl(photo, ownedUrls)),
+    note: record.note,
+    createdAt: record.createdAt,
+    lastExportedAt: record.lastExportedAt,
+  };
+}
 
 function TodayDate() {
   const [now, setNow] = useState(() => new Date());
@@ -84,13 +119,13 @@ function sortValue(record: DemoRecord, key: RecordSortKey, approvalStatus: DemoA
 }
 
 export function App() {
-  const [records, setRecords] = useState<readonly DemoRecord[]>(DEMO_RECORDS);
+  const [records, setRecords] = useState<readonly DemoRecord[]>(initialRecords);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [createKind, setCreateKind] = useState<KphKind | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [expandedMobileRecords, setExpandedMobileRecords] = useState<ReadonlySet<string>>(new Set());
-  const [approvalByRecord, setApprovalByRecord] = useState<Record<string, DemoApprovalStatus>>(() => Object.fromEntries(DEMO_RECORDS.map(({ approvalStatus, id }) => [id, approvalStatus])));
+  const [approvalByRecord, setApprovalByRecord] = useState<Record<string, DemoApprovalStatus>>(() => initialApproval);
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
   const [notice, setNotice] = useState("");
@@ -100,6 +135,9 @@ export function App() {
   const [exportOpen, setExportOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
+  const [storageHealth, setStorageHealth] = useState<StorageHealth>({ persistent: false, quota: null, usage: null });
+  const [storageReady, setStorageReady] = useState(!pilotPersistenceEnabled);
+  const [storageError, setStorageError] = useState("");
   const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
     const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
@@ -131,6 +169,39 @@ export function App() {
   useEffect(() => () => {
     ownedPhotoUrls.current.forEach((url) => URL.revokeObjectURL(url));
     ownedPhotoUrls.current.clear();
+  }, []);
+
+  useEffect(() => {
+    if (!pilotPersistenceEnabled) return;
+    let cancelled = false;
+
+    async function hydrate() {
+      try {
+        const [storedRecords, health] = await Promise.all([loadPilotRecords(), readStorageHealth()]);
+        if (cancelled) return;
+        const hydrated = storedRecords.map((record) => hydratePilotRecord(record, ownedPhotoUrls.current));
+        setRecords(hydrated);
+        setApprovalByRecord(Object.fromEntries(storedRecords.map(({ approvalStatus, id }) => [id, approvalStatus])));
+        setDeletedIds(new Set(storedRecords.filter(({ trashState }) => trashState === "trash").map(({ id }) => id)));
+        setStorageHealth(health);
+      } catch (error) {
+        if (!cancelled) setStorageError(error instanceof Error ? error.message : "Không thể mở dữ liệu pilot trên thiết bị");
+      } finally {
+        if (!cancelled) setStorageReady(true);
+      }
+    }
+
+    void hydrate();
+    const handleStorageFailure = () => setStorageError("Dữ liệu pilot vừa bị gián đoạn. Hãy đóng các cửa sổ app khác rồi tải lại.");
+    window.addEventListener("kph-storage-blocked", handleStorageFailure);
+    window.addEventListener("kph-storage-version-change", handleStorageFailure);
+    window.addEventListener("kph-storage-terminated", handleStorageFailure);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("kph-storage-blocked", handleStorageFailure);
+      window.removeEventListener("kph-storage-version-change", handleStorageFailure);
+      window.removeEventListener("kph-storage-terminated", handleStorageFailure);
+    };
   }, []);
 
   function openCreate(kind: KphKind) {
@@ -195,23 +266,38 @@ export function App() {
     });
   }
 
-  function updateApproval(recordId: string, status: DemoApprovalStatus) {
+  async function updateApproval(recordId: string, status: DemoApprovalStatus) {
+    try {
+      if (pilotPersistenceEnabled) await patchPilotRecords([recordId], { approvalStatus: status });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Không thể lưu trạng thái duyệt trên thiết bị");
+      return;
+    }
     setApprovalByRecord((current) => ({ ...current, [recordId]: status }));
     setSelected((current) => {
       const next = new Set(current);
       next.delete(recordId);
       return next;
     });
-    setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” trong dữ liệu demo.`);
+    setRecords((current) => current.map((record) => record.id === recordId ? { ...record, approvalStatus: status } : record));
+    setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
   }
 
-  function approveSelected() {
+  async function approveSelected() {
+    const recordIds = [...selected];
+    try {
+      if (pilotPersistenceEnabled) await patchPilotRecords(recordIds, { approvalStatus: "APPROVED" });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Không thể lưu trạng thái duyệt trên thiết bị");
+      return;
+    }
     setApprovalByRecord((current) => {
       const next = { ...current };
       selected.forEach((recordId) => { next[recordId] = "APPROVED"; });
       return next;
     });
-    setNotice(`Đã duyệt ${selected.size} phiếu trong dữ liệu demo.`);
+    setRecords((current) => current.map((record) => recordIds.includes(record.id) ? { ...record, approvalStatus: "APPROVED" } : record));
+    setNotice(`Đã duyệt ${recordIds.length} phiếu ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
     setSelected(new Set());
   }
 
@@ -231,16 +317,28 @@ export function App() {
     setDeleteIds(selectedRecords.map(({ id }) => id));
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     const targetIds = new Set(deleteIds);
+    try {
+      if (pilotPersistenceEnabled) await patchPilotRecords([...targetIds], { trashState: "trash", deletedAt: new Date().toISOString() });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Không thể chuyển phiếu vào thùng rác");
+      return;
+    }
     setDeletedIds((current) => new Set([...current, ...targetIds]));
     setSelected((current) => new Set([...current].filter((id) => !targetIds.has(id))));
     setExpandedMobileRecords((current) => new Set([...current].filter((id) => !targetIds.has(id))));
     setDeleteIds([]);
-    setNotice(`Đã chuyển ${targetIds.size} phiếu sang trạng thái đã xoá trong dữ liệu demo.`);
+    setNotice(`Đã chuyển ${targetIds.size} phiếu sang trạng thái đã xoá ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
   }
 
-  function restoreRecord(recordId: string) {
+  async function restoreRecord(recordId: string) {
+    try {
+      if (pilotPersistenceEnabled) await patchPilotRecords([recordId], { trashState: "active", deletedAt: null });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Không thể khôi phục phiếu");
+      return;
+    }
     setDeletedIds((current) => {
       const next = new Set(current);
       next.delete(recordId);
@@ -248,25 +346,31 @@ export function App() {
     });
     setSelected((current) => new Set([...current].filter((id) => id !== recordId)));
     setExpandedMobileRecords((current) => new Set([...current].filter((id) => id !== recordId)));
-    setNotice(`Đã khôi phục phiếu ${recordId} trong dữ liệu demo.`);
+    setNotice(`Đã khôi phục phiếu ${recordId} ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
   }
 
-  function restoreSelected() {
+  async function restoreSelected() {
     const targetIds = new Set(selectedRecords.map(({ id }) => id));
+    try {
+      if (pilotPersistenceEnabled) await patchPilotRecords([...targetIds], { trashState: "active", deletedAt: null });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Không thể khôi phục các phiếu đã chọn");
+      return;
+    }
     setDeletedIds((current) => new Set([...current].filter((id) => !targetIds.has(id))));
     setSelected((current) => new Set([...current].filter((id) => !targetIds.has(id))));
     setExpandedMobileRecords((current) => new Set([...current].filter((id) => !targetIds.has(id))));
-    setNotice(`Đã khôi phục ${targetIds.size} phiếu trong dữ liệu demo.`);
+    setNotice(`Đã khôi phục ${targetIds.size} phiếu ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
   }
 
-  function saveCreatedRecord(draft: CreatedRecordDraft) {
+  async function saveCreatedRecord(draft: CreatedRecordDraft) {
     const dateDigits = draft.detectedDate.split("/").reverse().join("").slice(2);
-    const suffix = Math.floor(100 + Math.random() * 900);
-    const id = `KPH-${dateDigits}-${suffix}`;
+    const uuid = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+    const id = `KPH-${dateDigits}-${uuid.replaceAll("-", "").slice(0, 6).toUpperCase()}`;
     const photos = draft.photos.map(({ id: photoId, fileName, blob }) => {
       const src = URL.createObjectURL(blob);
       ownedPhotoUrls.current.add(src);
-      return { id: photoId, src, alt: `Ảnh minh chứng ${fileName} đã đóng tem`, blob };
+      return { id: photoId, src, alt: `Ảnh minh chứng ${fileName} đã đóng tem`, blob, fileName };
     });
     const record: DemoRecord = {
       id,
@@ -285,12 +389,26 @@ export function App() {
       approvalStatus: "PENDING",
       photos,
       note: draft.note,
+      createdAt: new Date().toISOString(),
+      lastExportedAt: null,
     };
+    try {
+      if (pilotPersistenceEnabled) {
+        await savePilotRecord(record);
+        setStorageHealth(await requestPersistentStorage());
+      }
+    } catch (error) {
+      photos.forEach(({ src }) => {
+        URL.revokeObjectURL(src);
+        ownedPhotoUrls.current.delete(src);
+      });
+      throw error instanceof Error ? error : new Error("Không thể lưu phiếu trên thiết bị");
+    }
     setRecords((current) => [record, ...current]);
     setApprovalByRecord((current) => ({ ...current, [id]: "PENDING" }));
     setActiveKind(draft.kind);
     setSelected(new Set([id]));
-    setNotice(`Đã tạo phiếu ${id} trong bản demo.`);
+    setNotice(`Đã tạo phiếu ${id} và lưu trên thiết bị này.`);
   }
 
   async function exportSelected() {
@@ -298,9 +416,10 @@ export function App() {
     setExporting(true);
     setExportError("");
     try {
-      await downloadKphWorkbook(activeKind, selectedRecords);
+      const fileName = await downloadKphWorkbook(activeKind, selectedRecords);
+      if (pilotPersistenceEnabled) await recordPilotExport(activeKind, selectedRecords, fileName);
       setExportOpen(false);
-      setNotice(`Đã xuất ${selectedRecords.length} phiếu ${kindCopy[activeKind].short} ra Excel.`);
+      setNotice(`Đã tạo file Excel gồm ${selectedRecords.length} phiếu ${kindCopy[activeKind].short}; hãy gửi file này cho CHT.`);
     } catch (error) {
       setExportError(error instanceof Error ? error.message : "Không thể xuất file Excel");
     } finally {
@@ -347,7 +466,7 @@ export function App() {
 
             <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
               {kphKinds.map((kind) => (
-                <button key={kind} type="button" className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
+                <button key={kind} type="button" disabled={!storageReady} className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
                   {kind === "TPCN" ? <PackagePlus aria-hidden="true" /> : <Salad aria-hidden="true" />}
                   <span><small>Tạo phiếu</small>{kindCopy[kind].action}</span>
                 </button>
@@ -360,9 +479,14 @@ export function App() {
                 <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">Cửa hàng hiện tại</p>
                 <p className="truncate text-sm font-black text-brand">Co.op Food Nguyễn Kiệm · CF-DEMO-001</p>
                 <p className="mt-0.5 truncate text-xs text-ink-muted">Nguyễn Văn Demo · Cửa hàng trưởng</p>
+                <p className="pilot-storage-state" title="Dữ liệu pilot không đồng bộ giữa các thiết bị">
+                  {storageReady ? storageUsageLabel(storageHealth) : "Đang mở dữ liệu trên thiết bị…"}
+                  {storageHealth.persistent ? " · lưu bền" : ""}
+                </p>
               </div>
             </div>
           </div>
+          {storageError ? <p className="storage-error-banner" role="alert">{storageError}</p> : null}
           <header className="history-header">
             <div className="history-title-row pr-3">
               <h2 id="history-title" className="history-title">
@@ -453,12 +577,17 @@ export function App() {
                   <th className="w-12 px-3 py-0 text-center"><span className="sr-only">Thao tác dòng</span></th>
                 </tr>
               </thead>
-              <tbody>{visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)}</tbody>
+              <tbody>{visibleRecords.length > 0
+                ? visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)
+                : <tr><td className="empty-history-cell" colSpan={10}>{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</td></tr>}
+              </tbody>
             </table>
           </div>
 
           <div className="grid gap-3 mobile-history">
-            {visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)}
+            {visibleRecords.length > 0
+              ? visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
+              : <p className="empty-history-card">{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</p>}
           </div>
         </section>
 
@@ -506,6 +635,7 @@ export function App() {
         </DialogContent>
       </Dialog>
       {notice ? <button type="button" className="notice-toast fixed bottom-20 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-xl" onClick={() => setNotice("")}>{notice}</button> : null}
+      <PwaStatus />
     </div>
   );
 }

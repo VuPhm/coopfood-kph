@@ -96,7 +96,7 @@ type CreateRecordDialogProps = {
   kind: KphKind | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSaved: (draft: CreatedRecordDraft) => void;
+  onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
 };
 
 const kindLabels: Record<KphKind, string> = {
@@ -132,6 +132,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
   const photoRef = useRef<PhotoDraft[]>([]);
   const [photoError, setPhotoError] = useState("");
   const [processingPhotos, setProcessingPhotos] = useState(false);
+  const [savingRecord, setSavingRecord] = useState(false);
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const {
@@ -177,7 +178,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
   if (!kind) return null;
 
-  const submit = handleSubmit((values) => {
+  const submit = handleSubmit(async (values) => {
     if (processingPhotos) {
       setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
       return;
@@ -188,25 +189,32 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     }
     const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
     const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
-    onSaved({
-      kind,
-      detectedDate: values.detectedDate,
-      barcode: values.barcode.trim(),
-      supplier: values.supplier.trim(),
-      productName: values.productName.trim(),
-      quantity: Number(values.quantity),
-      unit: values.unit,
-      condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
-      resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
-      treatmentDate: values.treatmentDate.trim(),
-      detectedBy: values.detectedBy.trim(),
-      note: values.note.trim(),
-      photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
-    });
-    reset(defaultValues(kind));
-    clearPhotos();
+    setSavingRecord(true);
     setPhotoError("");
-    onOpenChange(false);
+    try {
+      await onSaved({
+        kind,
+        detectedDate: values.detectedDate,
+        barcode: values.barcode.trim(),
+        supplier: values.supplier.trim(),
+        productName: values.productName.trim(),
+        quantity: Number(values.quantity),
+        unit: values.unit,
+        condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
+        resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
+        treatmentDate: values.treatmentDate.trim(),
+        detectedBy: values.detectedBy.trim(),
+        note: values.note.trim(),
+        photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
+      });
+      reset(defaultValues(kind));
+      clearPhotos();
+      onOpenChange(false);
+    } catch (error) {
+      setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
+    } finally {
+      setSavingRecord(false);
+    }
   });
 
   async function selectPhotos(event: ChangeEvent<HTMLInputElement>) {
@@ -321,8 +329,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
                 <p className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                  <PhotoPicker disabled={processingPhotos || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
-                  <PhotoPicker disabled={processingPhotos || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
+                  <PhotoPicker disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
+                  <PhotoPicker disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
                 </div>
                 {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
                 <p className={cn("mt-2 text-xs font-semibold", photoError ? "text-danger" : "text-ink-muted")} role={photoError ? "alert" : "status"}>
@@ -336,7 +344,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
             <footer className="create-dialog-footer">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Hủy</Button>
-              <Button type="submit" disabled={processingPhotos}>{processingPhotos ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xử lý ảnh</> : "Lưu phiếu"}</Button>
+              <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : "Lưu phiếu"}</Button>
             </footer>
           </form>
         </DialogContent>

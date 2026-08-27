@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { evidenceDimensions } from "./image-processing";
+import { EVIDENCE_TARGET_BYTES, evidenceDimensions } from "./image-processing";
 
 describe("evidence image envelope", () => {
+  it("targets a compact stamped JPEG for local-only pilot storage", () => {
+    expect(EVIDENCE_TARGET_BYTES).toBe(420 * 1024);
+  });
   it.each([
     [1600, 900, 1280, 720],
     [900, 1600, 405, 720],

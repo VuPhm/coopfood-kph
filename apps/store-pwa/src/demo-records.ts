@@ -21,6 +21,8 @@ export type DemoRecord = {
   approvalStatus: DemoApprovalStatus;
   photos: readonly DemoPhoto[];
   note?: string;
+  createdAt?: string;
+  lastExportedAt?: string | null;
 };
 
 export type DemoPhoto = {
@@ -28,6 +30,7 @@ export type DemoPhoto = {
   src: string;
   alt: string;
   blob?: Blob;
+  fileName?: string;
 };
 
 export const DEMO_RECORDS: readonly DemoRecord[] = [
