@@ -1,6 +1,6 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, ShieldCheck, SlidersHorizontal, Trash2, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
@@ -375,14 +375,13 @@ export function App() {
                 <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
                 <button
                   type="button"
-                  className="trash-mode-toggle"
+                  className="trash-mode-toggle pr-3"
                   aria-label={trashMode ? "Quay lại phiếu đã khai báo" : `Mở thùng rác, có ${deletedIds.size} phiếu`}
                   aria-pressed={trashMode}
                   title={trashMode ? "Quay lại phiếu đã khai báo" : "Mở thùng rác"}
                   onClick={toggleTrashMode}
                 >
-                  {trashMode ? <RotateCcw aria-hidden="true" /> : <Trash2 aria-hidden="true" />}
-                  {!trashMode && deletedIds.size > 0 ? <span className="trash-mode-count" aria-hidden="true">{deletedIds.size}</span> : null}
+                  <History aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -417,10 +416,10 @@ export function App() {
                     {allVisibleExpanded ? "Thu gọn tất cả" : "Mở rộng tất cả"}
                   </button>
                 </div>
-                <div className="history-action-buttons">
+                <div className={cn("history-action-buttons", trashMode && "is-trash-actions")}>
                   <div className="history-selection-slot">
                     {trashMode
-                      ? <span className="selection-count trash-selection-count" aria-live="polite">Trong thùng rác <strong>{deletedIds.size}</strong></span>
+                      ? <span className="selection-count trash-selection-count" aria-live="polite">Đã xoá <strong>{deletedIds.size}</strong></span>
                       : <>
                         {selected.size > 0
                           ? <button type="button" className="selection-count selection-approve" onClick={approveSelected}>Duyệt <strong>{selected.size}</strong> phiếu</button>

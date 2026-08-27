@@ -217,7 +217,12 @@ describe("Store workspace", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Chuyển vào thùng rác" }));
 
     expect(screen.queryByText("Bánh quy bơ hộp 300 g")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Mở thùng rác, có 1 phiếu" }));
+    const trashToggle = screen.getByRole("button", { name: "Mở thùng rác, có 1 phiếu" });
+    expect(trashToggle).toHaveClass("pr-3");
+    expect(trashToggle.querySelector(".lucide-history")).not.toBeNull();
+    fireEvent.click(trashToggle);
+    expect(trashToggle).toHaveAttribute("aria-pressed", "true");
+    expect(trashToggle.querySelector(".lucide-history")).not.toBeNull();
     expect(screen.getByRole("heading", { name: /Phiếu đã xoá/i })).toBeVisible();
     expect(document.querySelector(".history-board")).toHaveClass("is-trash-mode");
     expect(screen.queryByRole("combobox", { name: "Trạng thái duyệt phiếu KPH-260815-018" })).not.toBeInTheDocument();
