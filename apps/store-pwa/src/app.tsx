@@ -380,6 +380,7 @@ export function App() {
                   onClick={toggleTrashMode}
                 >
                   <History aria-hidden="true" />
+                  <span className="trash-mode-label">Phiếu đã xoá</span>
                 </button>
               </div>
             </div>
@@ -529,8 +530,10 @@ function HistoryControlsTrigger({ active, className, controls, expanded, label, 
     title="Lọc và sắp xếp"
     onClick={onClick}
   >
-    <ListFilter aria-hidden="true" />
-    {active ? <span className="history-controls-indicator" aria-hidden="true" /> : null}
+    <span className="history-controls-icon" aria-hidden="true">
+      <ListFilter />
+      {active ? <span className="history-controls-indicator" /> : null}
+    </span>
   </button>;
 }
 

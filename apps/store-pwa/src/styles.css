@@ -188,11 +188,12 @@ html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px
 .history-title-actions { display: inline-flex; flex: 0 0 auto; align-items: center; gap: var(--space-1-5); }
 .history-title { display: flex; align-items: center; gap: var(--control-gap); margin: 0; color: var(--color-brand); font-size: .75rem; font-weight: 900; letter-spacing: .045em; text-transform: uppercase; }
 .history-total-count { display: grid; min-width: 1.75rem; height: 1.75rem; place-items: center; border-radius: 10px; background: var(--color-brand); padding-inline: .375rem; color: #fff; font-size: .75rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: 0; }
-.trash-mode-toggle { display: grid; width: 2.25rem; height: 2.25rem; flex: 0 0 2.25rem; place-items: center; border: 0; border-radius: 0; background: transparent; padding: 0; color: var(--color-ink-muted); transition: color var(--motion-fast) ease, transform var(--motion-fast) ease; }
-.trash-mode-toggle:hover, .trash-mode-toggle[aria-pressed="true"] { background: transparent; color: var(--color-danger); }
-.trash-mode-toggle:active { transform: rotate(-12deg); }
+.trash-mode-toggle { display: inline-flex; width: auto; min-width: 2.25rem; height: 2.25rem; flex: 0 0 auto; align-items: center; justify-content: center; gap: var(--space-1-5); border: 0; border-radius: 0; background: transparent; padding: 0 .25rem; color: var(--color-ink-muted); font-size: .75rem; font-weight: 850; white-space: nowrap; transition: color var(--motion-fast) ease; }
+.trash-mode-toggle:hover { background: transparent; color: var(--color-ink); }
+.trash-mode-toggle[aria-pressed="true"], .trash-mode-toggle[aria-pressed="true"]:hover { background: transparent; color: var(--color-danger); }
 .trash-mode-toggle:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.trash-mode-toggle svg { width: 1.125rem; height: 1.125rem; stroke-width: 2.25; }
+.trash-mode-toggle svg { width: 1.125rem; height: 1.125rem; flex: 0 0 auto; stroke-width: 2.25; transition: transform var(--motion-fast) ease; }
+.trash-mode-toggle:active svg { transform: rotate(-12deg); }
 .history-board.is-trash-mode .history-title { color: var(--color-danger); }
 .history-board.is-trash-mode .history-total-count { background: var(--color-danger); }
 .history-controls-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; }
@@ -200,8 +201,9 @@ html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px
 .history-controls-mobile { display: none; }
 .history-controls-trigger:hover, .history-controls-trigger.is-active { border-color: rgb(0 102 51 / .38); background: var(--color-brand-soft); color: var(--color-brand); }
 .history-controls-trigger:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.history-controls-trigger > svg { width: 1.125rem; height: 1.125rem; stroke-width: 2.25; }
-.history-controls-indicator { position: absolute; top: .125rem; right: .125rem; width: .375rem; height: .375rem; border: 1px solid #fff; border-radius: 999px; background: var(--color-brand); animation: content-enter var(--motion-ui) var(--motion-ease-out) both; }
+.history-controls-icon { position: relative; display: grid; width: 1.125rem; height: 1.125rem; place-items: center; }
+.history-controls-icon > svg { width: 1.125rem; height: 1.125rem; stroke-width: 2.25; }
+.history-controls-indicator { position: absolute; top: -.1875rem; right: -.25rem; width: .375rem; height: .375rem; border: 1px solid #fff; border-radius: 999px; background: var(--color-brand); box-shadow: 0 0 0 1px rgb(0 102 51 / .12); animation: content-enter var(--motion-ui) var(--motion-ease-out) both; }
 .mobile-history-dialog { width: min(25rem, calc(100% - var(--space-6))); gap: var(--space-2); border-radius: 20px; padding: var(--panel-inset); }
 .mobile-history-dialog > [data-slot="dialog-close"] { display: none; }
 .mobile-history-dialog-body { display: grid; gap: var(--space-3); }
@@ -547,9 +549,8 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
   .workspace-create svg { width: 1rem; height: 1rem; }
   .history-board { gap: var(--space-4); padding: var(--panel-inset); border-radius: 20px; }
   .history-controls-row { display: flex; flex-direction: column; width: 100%; align-items: stretch; gap: var(--space-2); }
-  .history-controls-mobile { display: inline-grid; width: auto; height: 2.25rem; place-items: center end; border: 0; border-radius: 0; background: transparent; padding: 0; padding-right: var(--space-3); color: var(--color-ink-muted); }
+  .history-controls-mobile { display: inline-grid; width: 2.25rem; height: 2.25rem; place-items: center; border: 0; border-radius: 0; background: transparent; padding: 0; color: var(--color-ink-muted); }
   .history-controls-mobile:hover, .history-controls-mobile.is-active { border: 0; background: transparent; color: var(--color-brand); }
-  .history-controls-mobile > .history-controls-indicator { right: calc(var(--space-3) - .125rem); }
   .history-controls-desktop { display: none; }
   .history-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; min-width: 0; min-height: 2.875rem; align-self: stretch; }
   .history-tab { min-width: 0; min-height: 2.375rem; padding-inline: .375rem; }
@@ -614,6 +615,8 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
   .desktop-history { display: none; }
   .mobile-history { display: grid; }
   .history-controls-mobile { display: grid; padding: 0; }
+  .trash-mode-toggle { width: 2.25rem; flex-basis: 2.25rem; padding: 0; }
+  .trash-mode-label { display: none; }
   .history-list-controls { display: flex; height: 1.75rem; min-height: 1.75rem; align-items: center; }
   .expand-all-mobile { display: inline-flex; height: 1.75rem; min-height: 1.75rem; align-items: center; gap: var(--space-1-5); border-radius: 8px; padding-inline: .25rem; color: var(--color-ink-muted); font-size: .75rem; font-weight: 800; white-space: nowrap; }
   .select-all-history { display: grid; height: 2.75rem; place-items: center; cursor: pointer; }

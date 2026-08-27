@@ -74,7 +74,8 @@ describe("Store workspace", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
     const filterTrigger = screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" });
-    expect(filterTrigger.querySelector(".lucide-list-filter")).not.toBeNull();
+    expect(filterTrigger.querySelector(".history-controls-icon > .lucide-list-filter")).not.toBeNull();
+    expect(filterTrigger.querySelector(".history-controls-indicator")).toBeNull();
     fireEvent.click(filterTrigger);
     const dialog = screen.getByRole("dialog", { name: "Lọc và sắp xếp" });
     const approvedFilter = within(dialog).getByRole("button", { name: "Lọc Đã duyệt" });
@@ -85,11 +86,14 @@ describe("Store workspace", () => {
     fireEvent.click(approvedFilter);
 
     expect(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" })).toHaveAttribute("aria-pressed", "true");
+    expect(filterTrigger).toHaveClass("is-active");
+    expect(filterTrigger.querySelector(".history-controls-icon > .history-controls-indicator")).not.toBeNull();
     expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
     expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" }));
     expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
+    expect(filterTrigger.querySelector(".history-controls-indicator")).toBeNull();
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" }));
     expect(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp tăng dần; bấm để chuyển giảm dần" })).toHaveAttribute("aria-pressed", "true");
@@ -227,11 +231,12 @@ describe("Store workspace", () => {
     const filterButton = within(titleRow).getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" });
     const trashToggle = within(titleRow).getByRole("button", { name: "Mở thùng rác, có 1 phiếu" });
     expect(titleRow).toHaveClass("pr-3");
+    expect(trashToggle).toHaveTextContent("Phiếu đã xoá");
     expect(trashToggle.querySelector(".lucide-history")).not.toBeNull();
     expect(titleActions.indexOf(filterButton)).toBeLessThan(titleActions.indexOf(trashToggle));
     fireEvent.click(trashToggle);
 
-    expect(screen.getByText("Phiếu đã xoá")).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Phiếu đã xoá/i })).toBeVisible();
     expect(document.querySelector(".history-board")).toHaveClass("is-trash-mode");
     expect(document.querySelector(".grid.gap-3.mobile-history")).not.toBeNull();
     const restoreButtons = screen.getAllByRole("button", { name: "Khôi phục phiếu KPH-260815-018" });
