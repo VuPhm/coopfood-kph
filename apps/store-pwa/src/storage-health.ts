@@ -24,8 +24,8 @@ export async function requestPersistentStorage() {
 }
 
 export function storageUsageLabel(health: StorageHealth) {
-  if (health.usage === null || health.quota === null || health.quota <= 0) return "Dữ liệu lưu trên thiết bị này";
+  if (health.usage === null || health.quota === null || health.quota <= 0) return "dữ liệu: trên thiết bị";
   const usageMb = Math.max(0.1, health.usage / 1024 / 1024).toFixed(1);
   const percent = Math.min(100, Math.round((health.usage / health.quota) * 100));
-  return `${usageMb} MB · ${percent}% dung lượng được cấp`;
+  return `dữ liệu: ${usageMb}MB · ${percent}%`;
 }

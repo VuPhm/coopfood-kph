@@ -37,6 +37,7 @@ import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
+import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
 function isDisplayDate(value: string) {
   try {
@@ -95,6 +96,7 @@ export type CreatedRecordDraft = {
 type CreateRecordDialogProps = {
   kind: KphKind | null;
   open: boolean;
+  profile?: StoreProfile;
   onOpenChange: (open: boolean) => void;
   onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
 };
@@ -104,9 +106,7 @@ const kindLabels: Record<KphKind, string> = {
   TPTS: "Thực phẩm tươi sống",
 };
 
-const DEMO_STORE_STAMP = { storeCode: "CF-DEMO-001", storeName: "Nguyễn Kiệm" };
-
-function defaultValues(kind: KphKind): FormData {
+function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   const options = KPH_OPTIONS[kind];
   return {
     detectedDate: formatBusinessDate(new Date()).display,
@@ -120,12 +120,12 @@ function defaultValues(kind: KphKind): FormData {
     resolution: options.defaultResolution,
     resolutionDetail: "",
     treatmentDate: "",
-    detectedBy: "Nguyễn Văn Demo",
+    detectedBy: profile.fullName,
     note: "",
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: CreateRecordDialogProps) {
+export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile = DEFAULT_STORE_PROFILE }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -145,7 +145,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues(activeKind),
+    defaultValues: defaultValues(activeKind, profile),
   });
 
   const selectedCondition = watch("condition");
@@ -165,10 +165,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
   useEffect(() => {
     if (!kind) return;
-    reset(defaultValues(kind));
+    reset(defaultValues(kind, profile));
     clearPhotos();
     setPhotoError("");
-  }, [kind, reset]);
+  }, [kind, profile, reset]);
 
   useEffect(() => () => {
     for (const photo of photoRef.current) {
@@ -207,7 +207,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
         note: values.note.trim(),
         photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
       });
-      reset(defaultValues(kind));
+      reset(defaultValues(kind, profile));
       clearPhotos();
       onOpenChange(false);
     } catch (error) {
@@ -230,7 +230,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     const additions: PhotoDraft[] = [];
     try {
       for (const [index, file] of files.entries()) {
-        const processed = await processEvidencePhoto(file, DEMO_STORE_STAMP);
+        const processed = await processEvidencePhoto(file, { storeCode: profile.storeCode, storeName: profile.storeName });
         additions.push({
           id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
           fileName: file.name,

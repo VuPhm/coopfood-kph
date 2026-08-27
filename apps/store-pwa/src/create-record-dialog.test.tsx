@@ -86,7 +86,7 @@ describe("Create KPH record", () => {
     fireEvent.change(picker!, { target: { files: [file] } });
 
     expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
-    expect(processEvidencePhoto).toHaveBeenCalledWith(file, { storeCode: "CF-DEMO-001", storeName: "Nguyễn Kiệm" });
+    expect(processEvidencePhoto).toHaveBeenCalledWith(file, { storeCode: "0001", storeName: "Nguyễn Kiệm" });
     fireEvent.click(screen.getByRole("button", { name: "Xem ảnh minh chứng 1" }));
     expect(screen.getByAltText("Ảnh minh chứng evidence.jpg đã đóng tem")).toHaveAttribute("src", "blob:stamped-photo");
   });

@@ -1,6 +1,6 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronRight, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, Store, Trash2, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
@@ -13,6 +13,8 @@ import { EvidenceImageViewer } from "./image-viewer";
 import { PwaStatus } from "./pwa-status";
 import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord, type PilotRecord } from "./record-store";
 import { readStorageHealth, requestPersistentStorage, storageUsageLabel, type StorageHealth } from "./storage-health";
+import { actorIdentity, DEFAULT_STORE_PROFILE, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
+import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
 export { formatBusinessDate } from "./business-date";
@@ -135,6 +137,8 @@ export function App() {
   const [exportOpen, setExportOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
+  const [storeProfile, setStoreProfile] = useState<StoreProfile>(DEFAULT_STORE_PROFILE);
+  const [storeSettingsOpen, setStoreSettingsOpen] = useState(false);
   const [storageHealth, setStorageHealth] = useState<StorageHealth>({ persistent: false, quota: null, usage: null });
   const [storageReady, setStorageReady] = useState(!pilotPersistenceEnabled);
   const [storageError, setStorageError] = useState("");
@@ -172,17 +176,24 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    if (!notice) return;
+    const timeoutId = window.setTimeout(() => setNotice(""), 15_000);
+    return () => window.clearTimeout(timeoutId);
+  }, [notice]);
+
+  useEffect(() => {
     if (!pilotPersistenceEnabled) return;
     let cancelled = false;
 
     async function hydrate() {
       try {
-        const [storedRecords, health] = await Promise.all([loadPilotRecords(), readStorageHealth()]);
+        const [storedRecords, health, storedProfile] = await Promise.all([loadPilotRecords(), readStorageHealth(), loadPilotStoreProfile()]);
         if (cancelled) return;
         const hydrated = storedRecords.map((record) => hydratePilotRecord(record, ownedPhotoUrls.current));
         setRecords(hydrated);
         setApprovalByRecord(Object.fromEntries(storedRecords.map(({ approvalStatus, id }) => [id, approvalStatus])));
         setDeletedIds(new Set(storedRecords.filter(({ trashState }) => trashState === "trash").map(({ id }) => id)));
+        setStoreProfile(storedProfile);
         setStorageHealth(health);
       } catch (error) {
         if (!cancelled) setStorageError(error instanceof Error ? error.message : "Không thể mở dữ liệu pilot trên thiết bị");
@@ -207,6 +218,19 @@ export function App() {
   function openCreate(kind: KphKind) {
     setCreateKind(kind);
     setDialogOpen(true);
+  }
+
+  async function saveStoreSettings(profile: StoreProfile) {
+    try {
+      if (pilotPersistenceEnabled) {
+        await savePilotStoreProfile(profile);
+        setStorageHealth(await requestPersistentStorage());
+      }
+    } catch (error) {
+      throw error instanceof Error ? error : new Error("Không thể lưu thiết lập cửa hàng trên thiết bị");
+    }
+    setStoreProfile(profile);
+    setNotice(`Đã cập nhật ${storeIdentity(profile)}.`);
   }
 
   function toggleSelection(id: string) {
@@ -416,7 +440,7 @@ export function App() {
     setExporting(true);
     setExportError("");
     try {
-      const fileName = await downloadKphWorkbook(activeKind, selectedRecords);
+      const fileName = await downloadKphWorkbook(activeKind, selectedRecords, storeProfile);
       if (pilotPersistenceEnabled) await recordPilotExport(activeKind, selectedRecords, fileName);
       setExportOpen(false);
       setNotice(`Đã tạo file Excel gồm ${selectedRecords.length} phiếu ${kindCopy[activeKind].short}; hãy gửi file này cho CHT.`);
@@ -473,18 +497,23 @@ export function App() {
               ))}
             </div>
 
-            <div className="store-context" aria-label="Cửa hàng và tài khoản hiện tại">
-              <ShieldCheck className="store-context-icon" size={20} aria-hidden="true" />
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">Cửa hàng hiện tại</p>
-                <p className="truncate text-sm font-black text-brand">Co.op Food Nguyễn Kiệm · CF-DEMO-001</p>
-                <p className="mt-0.5 truncate text-xs text-ink-muted">Nguyễn Văn Demo · Cửa hàng trưởng</p>
-                <p className="pilot-storage-state" title="Dữ liệu pilot không đồng bộ giữa các thiết bị">
-                  {storageReady ? storageUsageLabel(storageHealth) : "Đang mở dữ liệu trên thiết bị…"}
-                  {storageHealth.persistent ? " · lưu bền" : ""}
-                </p>
-              </div>
-            </div>
+            <button
+              type="button"
+              className="store-context"
+              aria-label={`Thiết lập cửa hàng: ${storeIdentity(storeProfile)}`}
+              disabled={!storageReady}
+              onClick={() => setStoreSettingsOpen(true)}
+            >
+              <Store className="store-context-icon" size={20} aria-hidden="true" />
+              <span className="store-context-copy">
+                <strong>{storeIdentity(storeProfile)}</strong>
+                <span>{actorIdentity(storeProfile)}</span>
+                <small title={storageHealth.persistent ? "Dữ liệu pilot được trình duyệt cấp chế độ lưu bền" : "Dữ liệu pilot chỉ nằm trên thiết bị này và không đồng bộ"}>
+                  {storageReady ? storageUsageLabel(storageHealth) : "dữ liệu: đang mở…"}
+                </small>
+              </span>
+              <ChevronRight className="store-context-disclosure" aria-hidden="true" />
+            </button>
           </div>
           {storageError ? <p className="storage-error-banner" role="alert">{storageError}</p> : null}
           <header className="history-header">
@@ -596,7 +625,8 @@ export function App() {
         </div>
       </main>
 
-      <CreateRecordDialog kind={createKind} open={dialogOpen} onOpenChange={setDialogOpen} onSaved={saveCreatedRecord} />
+      <CreateRecordDialog kind={createKind} open={dialogOpen} profile={storeProfile} onOpenChange={setDialogOpen} onSaved={saveCreatedRecord} />
+      <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} />
 
       <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>
         <DialogContent className="action-dialog" aria-describedby="delete-description">
@@ -623,7 +653,7 @@ export function App() {
             <div><dt>Loại phiếu</dt><dd>{kindCopy[activeKind].short}</dd></div>
             <div><dt>Số phiếu</dt><dd>{selectedRecords.length}</dd></div>
             <div><dt>Số ảnh</dt><dd>{selectedRecords.reduce((total, record) => total + record.photos.length, 0)}</dd></div>
-            <div><dt>Cửa hàng</dt><dd>Co.op Food Nguyễn Kiệm · CF-DEMO-001</dd></div>
+            <div><dt>Cửa hàng</dt><dd>{storeIdentity(storeProfile)}</dd></div>
           </dl>
           {exportError ? <p className="action-dialog-error" role="alert">{exportError}</p> : null}
           <div className="action-dialog-actions">

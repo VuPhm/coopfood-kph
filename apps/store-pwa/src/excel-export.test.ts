@@ -11,12 +11,14 @@ describe("KPH Excel export", () => {
 
   it("builds the accepted BM-331.CF structure and leaves approver blank", async () => {
     const record = { ...DEMO_RECORDS[0]!, productName: "=2+2", photos: [] };
-    const workbook = await buildKphWorkbook("TPCN", [record]);
+    const workbook = await buildKphWorkbook("TPCN", [record], { storeCode: "0123", storeName: "Cống Quỳnh" });
     const worksheet = workbook.getWorksheet("Thực phẩm khô & khác")!;
 
     expect(worksheet.getCell("A1").value).toBe("CÔNG TY TNHH MTV THỰC PHẨM SAIGON CO.OP");
     expect(worksheet.getCell("A1").isMerged).toBe(false);
     expect(worksheet.getCell("A1").font).toMatchObject({ name: "Times New Roman", size: 9, bold: true });
+    expect(worksheet.getCell("A2").value).toBe("CO.OP FOOD: Cống Quỳnh");
+    expect(worksheet.getCell("A3").value).toBe("STORE: 0123");
     expect(worksheet.getCell("A2").font).toMatchObject({ name: "Times New Roman", size: 9, bold: true });
     expect(worksheet.getCell("A3").font).toMatchObject({ name: "Times New Roman", size: 9, bold: true });
     expect(worksheet.getCell("A5").value).toBe("PHIẾU THEO DÕI HÀNG KHÔNG PHÙ HỢP (Thực phẩm khô & khác)");

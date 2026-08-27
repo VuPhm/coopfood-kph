@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-08-15
+Cập nhật: 2026-08-27
 
 ## Giai đoạn
 
@@ -25,6 +25,9 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   KPH create/list. Frontend và backend dùng contract này là ranh giới cộng tác.
 - Store PWA đã có component shell React giữ brand header, store/session context,
   hai entry TPCN/TPTS, lịch sử table/card responsive, form demo và tra hạn.
+- Pilot Store PWA cho cấu hình context cửa hàng/người dùng theo từng thiết bị,
+  lưu trong IndexedDB; tên và mã cửa hàng 4 chữ số là bắt buộc, thông tin nhân
+  sự là tùy chọn. Cấu hình local này không phải authorization của topology đích.
 - Admin Web đã có entry point riêng; `packages/ui` giữ các source component
   shadcn-style trên Radix, không mang DOM/CSS bundle legacy sang.
 - `packages/kph-rules` chạy trực tiếp golden fixture ngày và KPH; API types được

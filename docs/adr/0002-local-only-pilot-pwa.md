@@ -16,6 +16,10 @@ pilot local-only; không thay đổi topology đích của hệ thống chính.
 ## Quyết định
 
 - IndexedDB là source of truth trên từng browser profile trong giai đoạn pilot.
+- Context cửa hàng/người dùng được tự thiết lập và lưu trong `settings` của
+  IndexedDB trên từng thiết bị. Tên cửa hàng và mã cửa hàng 4 chữ số là bắt
+  buộc; vai trò Nhân viên/CHT, họ tên và mã nhân viên là tùy chọn. Context này
+  chỉ phục vụ hiển thị, đóng tem ảnh và Excel; không tạo authorization.
 - Không tạo API giả, offline outbox, background sync hoặc cơ chế merge giữa
   thiết bị. Mỗi thiết bị là một data island độc lập.
 - Phiếu, trạng thái duyệt, trạng thái thùng rác và lịch sử tạo file Excel được
@@ -49,12 +53,11 @@ này cho online MVP nếu chưa có xác nhận nghiệp vụ mới.
 - Mỗi cửa hàng chỉ định thiết bị/browser profile chịu trách nhiệm cho từng tập
   phiếu; không dùng private browsing và không xóa site data.
 - Nếu dùng nhiều thiết bị, CHT chịu trách nhiệm gom các file Excel độc lập.
-- Cấu hình store self-service sẽ là slice riêng; trong slice này vẫn dùng pilot
-  store snapshot hiện hành.
+- Cấu hình store self-service là context local theo thiết bị, không được hiểu là
+  membership hoặc quyền truy cập của topology online.
 
 ## Xem xét lại khi
 
 - Mở backend KPH hoặc cần đồng bộ giữa thiết bị.
 - Cần audit/retention ảnh gốc, central backup hoặc authorization thật.
 - Dung lượng/hiệu năng trên thiết bị pilot không đạt kiểm thử thực tế.
-

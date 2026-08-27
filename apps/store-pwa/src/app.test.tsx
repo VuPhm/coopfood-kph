@@ -1,7 +1,9 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App, formatBusinessDate } from "./app";
+
+afterEach(() => vi.useRealTimers());
 
 describe("Store workspace", () => {
   it("shows the Co.op Food logo and today's business date in the header", () => {
@@ -17,6 +19,59 @@ describe("Store workspace", () => {
     render(<App />);
     expect(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i })).toBeVisible();
     expect(screen.getByRole("button", { name: /Tạo phiếu TP tươi sống/i })).toBeVisible();
+  });
+
+  it("opens the store context and saves the required store settings", async () => {
+    render(<App />);
+    const trigger = screen.getByRole("button", { name: /Thiết lập cửa hàng: Co\.op Food Nguyễn Kiệm · 0001/i });
+
+    expect(within(trigger).getByText("Co.op Food Nguyễn Kiệm · 0001")).toBeVisible();
+    expect(within(trigger).getByText("Nguyễn Văn Demo · CHT")).toBeVisible();
+    expect(within(trigger).getByText("dữ liệu: trên thiết bị")).toBeVisible();
+    expect(screen.queryByText("Cửa hàng hiện tại")).not.toBeInTheDocument();
+    expect(screen.queryByText("Cửa hàng trưởng")).not.toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole("dialog", { name: "Thiết lập cửa hàng" });
+    const storeName = within(dialog).getByRole("textbox", { name: "Tên cửa hàng" });
+    const storeCode = within(dialog).getByRole("textbox", { name: "Mã cửa hàng" });
+    expect(storeName).toHaveValue("Nguyễn Kiệm");
+    expect(within(dialog).getByText("Co.op Food")).toBeVisible();
+    expect(storeCode).toHaveAttribute("type", "text");
+    expect(storeCode).toHaveAttribute("maxlength", "4");
+    expect(within(dialog).queryByText(/giữ được số 0 ở đầu/i)).not.toBeInTheDocument();
+    expect(within(dialog).getByRole("radio", { name: "CHT" })).toBeChecked();
+
+    fireEvent.change(storeName, { target: { value: "" } });
+    fireEvent.change(storeCode, { target: { value: "123" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Lưu thiết lập" }));
+    expect(await within(dialog).findByText("Nhập tên cửa hàng")).toBeVisible();
+    expect(within(dialog).getByText("Mã cửa hàng gồm đúng 4 chữ số")).toBeVisible();
+
+    fireEvent.change(storeName, { target: { value: "Cống Quỳnh" } });
+    fireEvent.change(storeCode, { target: { value: "0123" } });
+    fireEvent.click(within(dialog).getByRole("radio", { name: "Nhân viên" }));
+    fireEvent.change(within(dialog).getByRole("textbox", { name: "Họ tên" }), { target: { value: "Trần An" } });
+    fireEvent.change(within(dialog).getByRole("textbox", { name: "Mã nhân viên" }), { target: { value: "NV-08" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Lưu thiết lập" }));
+
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Thiết lập cửa hàng" })).not.toBeInTheDocument());
+    const updated = screen.getByRole("button", { name: /Thiết lập cửa hàng: Co\.op Food Cống Quỳnh · 0123/i });
+    expect(within(updated).getByText("Trần An · Nhân viên · NV-08")).toBeVisible();
+  });
+
+  it("automatically hides a notice after 15 seconds", () => {
+    vi.useFakeTimers();
+    render(<App />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 1 phiếu" }));
+
+    const notice = screen.getByText("Đã duyệt 1 phiếu trong dữ liệu demo.");
+    expect(notice).toBeVisible();
+    act(() => vi.advanceTimersByTime(14_999));
+    expect(notice).toBeVisible();
+    act(() => vi.advanceTimersByTime(1));
+    expect(screen.queryByText("Đã duyệt 1 phiếu trong dữ liệu demo.")).not.toBeInTheDocument();
   });
 
   it("keeps expiry lookup inside main as the parallel workbench", () => {
@@ -277,7 +332,7 @@ describe("Store workspace", () => {
 
     const dialog = screen.getByRole("dialog", { name: "Xuất phiếu ra Excel" });
     expect(within(dialog).getByText("TP Khô & khác")).toBeVisible();
-    expect(within(dialog).getByText("Co.op Food Nguyễn Kiệm · CF-DEMO-001")).toBeVisible();
+    expect(within(dialog).getByText("Co.op Food Nguyễn Kiệm · 0001")).toBeVisible();
     expect(within(dialog).getByRole("button", { name: "Xuất 1 dòng" })).toBeEnabled();
   });
 });

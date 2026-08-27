@@ -3,8 +3,8 @@ import type ExcelJS from "exceljs";
 
 import { formatBusinessDate } from "./business-date";
 import type { DemoPhoto, DemoRecord } from "./demo-records";
+import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
-const STORE = { code: "CF-DEMO-001", name: "Nguyễn Kiệm" };
 const COMPANY = "CÔNG TY TNHH MTV THỰC PHẨM SAIGON CO.OP";
 const SHEET_NAMES: Record<KphKind, string> = {
   TPCN: "Thực phẩm khô & khác",
@@ -74,7 +74,7 @@ function fitImage(width: number, height: number, maxWidth: number, maxHeight: nu
   return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
 }
 
-export async function buildKphWorkbook(kind: KphKind, records: readonly DemoRecord[]) {
+export async function buildKphWorkbook(kind: KphKind, records: readonly DemoRecord[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
   const module = await import("exceljs");
   const Excel = module.default;
   const workbook = new Excel.Workbook();
@@ -90,8 +90,8 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
   });
 
   worksheet.getCell("A1").value = COMPANY;
-  worksheet.getCell("A2").value = `CO.OP FOOD: ${STORE.name}`;
-  worksheet.getCell("A3").value = `STORE: ${STORE.code}`;
+  worksheet.getCell("A2").value = `CO.OP FOOD: ${store.storeName}`;
+  worksheet.getCell("A3").value = `STORE: ${store.storeCode}`;
   worksheet.mergeCells("A5:R5");
 
   for (const rowNumber of [1, 2, 3]) {
@@ -206,8 +206,8 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
   return workbook;
 }
 
-export async function downloadKphWorkbook(kind: KphKind, records: readonly DemoRecord[]) {
-  const workbook = await buildKphWorkbook(kind, records);
+export async function downloadKphWorkbook(kind: KphKind, records: readonly DemoRecord[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
+  const workbook = await buildKphWorkbook(kind, records, store);
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([new Uint8Array(buffer)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   const url = URL.createObjectURL(blob);

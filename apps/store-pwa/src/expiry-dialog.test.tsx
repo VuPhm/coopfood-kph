@@ -99,7 +99,7 @@ describe("Expiry lookup", () => {
     expect(workbench.scrollTop).toBe(0);
   });
 
-  it("closes the workbench with Escape or an outside pointer", () => {
+  it("closes the workbench with Escape or the real backdrop", () => {
     render(<ExpiryWorkbench />);
     openWorkbench();
 
@@ -107,7 +107,10 @@ describe("Expiry lookup", () => {
     expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveAttribute("aria-expanded", "false");
 
     openWorkbench();
-    fireEvent.pointerDown(document.body);
+    const backdrop = screen.getByRole("button", { name: "Đóng tra cứu lùi hàng từ nền mờ" });
+    fireEvent.pointerDown(backdrop);
+    expect(screen.getByRole("button", { name: "Đóng tra cứu lùi hàng" })).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(backdrop);
     expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveAttribute("aria-expanded", "false");
   });
 

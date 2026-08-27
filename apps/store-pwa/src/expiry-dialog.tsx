@@ -82,11 +82,6 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
     if (!expanded) return;
     if (workbenchRef.current) workbenchRef.current.scrollTop = 0;
 
-    function closeOnOutsidePointer(event: PointerEvent) {
-      if (window.innerWidth >= 1280) return;
-      if (event.target instanceof Node && !workbenchRef.current?.contains(event.target)) setExpanded(false);
-    }
-
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
       if (workbenchRef.current?.querySelector('[role="dialog"][aria-label="Lịch chọn ngày"]')) return;
@@ -94,10 +89,8 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
       window.setTimeout(() => workbenchRef.current?.querySelector<HTMLButtonElement>(".expiry-workbench-toggle")?.focus(), 0);
     }
 
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
     document.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.removeEventListener("pointerdown", closeOnOutsidePointer);
       document.removeEventListener("keydown", closeOnEscape);
     };
   }, [expanded]);
@@ -258,7 +251,16 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
   }
 
   return (
-    <aside ref={workbenchRef} className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra cứu lùi hàng">
+    <>
+      {expanded ? (
+        <button
+          type="button"
+          className="expiry-workbench-overlay fixed inset-0 bg-ink/55 backdrop-blur-[3px]"
+          aria-label="Đóng tra cứu lùi hàng từ nền mờ"
+          onClick={() => setExpanded(false)}
+        />
+      ) : null}
+      <aside ref={workbenchRef} className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra cứu lùi hàng">
       <UtilityPanelMeta
         actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger", !expanded && showInitialHint && "has-entry-hint")}
         actionControls="expiry-workbench-content"
@@ -311,7 +313,8 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
 
         <LookupResult error={liveState.error} hsd={tryParseDate(hsd)} nsx={tryParseDate(nsx)} result={liveState.result} today={businessToday} />
       </div> : null}
-    </aside>
+      </aside>
+    </>
   );
 }
 
