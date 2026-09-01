@@ -8,8 +8,8 @@ Mỗi ADR ngắn gồm: bối cảnh, quyết định, trade-off, hệ quả và
 xem xét lại. Hợp đồng nghiệp vụ không được thay đổi ngầm qua ADR kỹ
 thuật.
 
-Hiện chưa có ADR mới được accepted. Các quyết định legacy đã được
-chọn mang theo nằm trong `docs/product/DOMAIN_RULES.md` và
-`docs/SOURCE_MANIFEST.md`; stack foundation cần được ghi ADR trong milestone
-Foundation-01 nếu file root chưa khóa nó.
+ADR accepted hiện hành:
 
+- `0001-foundation-stack.md`: stack đích của hệ thống online.
+- `0002-local-only-pilot-pwa.md`: ngoại lệ có thời hạn cho nhánh PWA pilot,
+  dùng IndexedDB làm authority trên từng thiết bị và chưa đồng bộ.

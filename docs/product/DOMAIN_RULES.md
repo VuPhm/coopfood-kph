@@ -31,12 +31,17 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
 - Condition hoặc biện pháp `Khác` có nội dung chi tiết optional; khi trống giữ nhãn
   `Khác`/`KHÁC` tương ứng thay vì báo lỗi.
 - Không xóa cứng phiếu đã đồng bộ; vô hiệu hóa phải có lý do và audit.
-- Tạm thời `STORE_MANAGER` (CHT) có membership đúng cửa hàng chỉ thao tác duyệt
-  trong UI lịch sử; không được xóa hoặc vô hiệu hóa phiếu. Quyền vô hiệu hóa cho
-  cấp quản trị tương lai chưa chốt và không được suy diễn cho `CHAIN_ADMIN`.
+- Ngoại lệ pilot local-only theo ADR-0002: phiếu chưa đồng bộ được chuyển vào
+  thùng rác và khôi phục trên cùng thiết bị; Store PWA không có xóa vĩnh viễn.
+- Ngoài ngoại lệ pilot, `STORE_MANAGER` (CHT) có membership đúng cửa hàng chỉ
+  thao tác duyệt trong UI lịch sử; không được xóa hoặc vô hiệu hóa phiếu. Quyền
+  vô hiệu hóa cho cấp quản trị tương lai chưa chốt và không được suy diễn cho
+  `CHAIN_ADMIN`.
 - Cửa sổ thời gian sửa/duyệt chưa chốt; implementation không được tự đặt giới hạn.
 - Ảnh gốc upload và bản stamped dẫn xuất đều private, giữ theo vòng đời phiếu;
-  stamped không thay thế evidence gốc. Baseline tem: JPEG output, resize giữ tỷ
+  stamped không thay thế evidence gốc. Ngoại lệ pilot local-only theo ADR-0002
+  chỉ persist JPEG stamped đã nén để kiểm soát dung lượng thiết bị; không được
+  coi là policy của online MVP. Baseline tem: JPEG output, resize giữ tỷ
   lệ không upscale trong `1280×720`, stamp góc dưới trái gồm giờ/thứ/ngày và
   store code/name; timestamp hiển thị ưu tiên EXIF rồi `lastModified` rồi
   controlled/server clock theo `Asia/Ho_Chi_Minh`. Audit timestamp là server time

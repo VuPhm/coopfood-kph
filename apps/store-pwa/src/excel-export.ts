@@ -1,0 +1,226 @@
+import type { KphKind } from "@coopfood-kph/kph-rules";
+import type ExcelJS from "exceljs";
+
+import { formatBusinessDate } from "./business-date";
+import type { DemoPhoto, DemoRecord } from "./demo-records";
+import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
+
+const COMPANY = "CÔNG TY TNHH MTV THỰC PHẨM SAIGON CO.OP";
+const SHEET_NAMES: Record<KphKind, string> = {
+  TPCN: "Thực phẩm khô & khác",
+  TPTS: "Thực phẩm tươi sống",
+};
+
+export function escapeFormulaText(value: string) {
+  const first = value.trimStart().charAt(0);
+  return ["=", "+", "-", "@"].includes(first) ? `'${value}` : value;
+}
+
+function treatmentMark(record: DemoRecord, resolution: string) {
+  return record.resolution.trim().toUpperCase() === resolution ? "X" : "";
+}
+
+function safeText(value: string) {
+  return escapeFormulaText(value.trim());
+}
+
+function imageDimensions(source: string) {
+  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onerror = () => reject(new Error("Không thể đọc kích thước ảnh minh chứng"));
+    image.src = source;
+  });
+}
+
+async function normalizePhoto(photo: DemoPhoto) {
+  let sourceBlob: Blob;
+  if (photo.blob) {
+    sourceBlob = photo.blob;
+  } else {
+    const response = await fetch(photo.src);
+    if (!response.ok) throw new Error(`Không thể tải ảnh minh chứng (${response.status})`);
+    sourceBlob = await response.blob();
+  }
+  const sourceUrl = URL.createObjectURL(sourceBlob);
+
+  try {
+    const dimensions = await imageDimensions(sourceUrl);
+    if (sourceBlob.type === "image/png" || sourceBlob.type === "image/jpeg") {
+      return { blob: sourceBlob, extension: sourceBlob.type === "image/png" ? "png" as const : "jpeg" as const, ...dimensions };
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = dimensions.width;
+    canvas.height = dimensions.height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Trình duyệt không hỗ trợ chuyển ảnh sang PNG");
+    const image = new Image();
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("Không thể chuyển ảnh minh chứng sang PNG"));
+      image.src = sourceUrl;
+    });
+    context.drawImage(image, 0, 0);
+    const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error("Không thể tạo ảnh PNG")), "image/png"));
+    return { blob, extension: "png" as const, ...dimensions };
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+function fitImage(width: number, height: number, maxWidth: number, maxHeight: number) {
+  const scale = Math.min(maxWidth / width, maxHeight / height, 1);
+  return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
+}
+
+export async function buildKphWorkbook(kind: KphKind, records: readonly DemoRecord[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
+  const module = await import("exceljs");
+  const Excel = module.default;
+  const workbook = new Excel.Workbook();
+
+  const worksheet = workbook.addWorksheet(SHEET_NAMES[kind], {
+    views: [{ showGridLines: true }],
+    pageSetup: { orientation: "landscape", fitToPage: true, fitToWidth: 1, fitToHeight: 0 },
+    headerFooter: { oddFooter: "&L&IBM-331.CF&C&ILần ban hành: 01&R&ITrang &P / &N" },
+  });
+
+  [6, 14, 16, 28, 18, 8, 10, 24, 18, 7, 7, 11, 24, 14, 10, 10, 10, 20].forEach((width, index) => {
+    worksheet.getColumn(index + 1).width = width;
+  });
+
+  worksheet.getCell("A1").value = COMPANY;
+  worksheet.getCell("A2").value = `CO.OP FOOD: ${store.storeName}`;
+  worksheet.getCell("A3").value = `STORE: ${store.storeCode}`;
+  worksheet.mergeCells("A5:R5");
+
+  for (const rowNumber of [1, 2, 3]) {
+    worksheet.getCell(`A${rowNumber}`).font = { name: "Times New Roman", size: 9, bold: true };
+  }
+  worksheet.getCell("A5").font = { name: "Times New Roman", size: 15, bold: true };
+  worksheet.getCell("A5").alignment = { horizontal: "center", vertical: "middle" };
+  worksheet.getCell("A5").value = `PHIẾU THEO DÕI HÀNG KHÔNG PHÙ HỢP (${SHEET_NAMES[kind]})`;
+  worksheet.getRow(5).height = 25;
+
+  const headers: Record<string, string> = {
+    A7: "STT", B7: "NGÀY\nPHÁT\nHIỆN", C7: "SKU/UPC", D7: "TÊN HÀNG HÓA", E7: "NCC",
+    F7: "ĐƠN\nVỊ\nTÍNH", G7: "SỐ\nLƯỢNG", H7: "MÔ TẢ TÌNH\nTRẠNG\nHÀNG KPH",
+    I7: "NGƯỜI\nPHÁT HIỆN\nSP KPH\n(ký và ghi rõ\nhọ tên)", J7: "BIỆN PHÁP XỬ LÝ\n(đánh dấu \"X\")",
+    J8: "HỦY", K8: "ĐỔI", L8: "XUẤT\nTRẢ", M8: "KHÁC (ghi rõ\nnội dung xử lý)", N7: "Ghi ngày\nxử lý", O7: "ẢNH MINH\nCHỨNG", R7: "BĐH THEO DÕI\nXỬ LÝ\n(ký và ghi rõ họ tên)",
+  };
+  Object.entries(headers).forEach(([cell, value]) => { worksheet.getCell(cell).value = value; });
+  ["A", "B", "C", "D", "E", "F", "G", "H", "I", "N", "R"].forEach((column) => worksheet.mergeCells(`${column}7:${column}8`));
+  worksheet.mergeCells("J7:M7");
+  worksheet.mergeCells("O7:Q8");
+  worksheet.getRow(7).height = 25;
+  worksheet.getRow(8).height = 25;
+
+  for (let row = 7; row <= 8; row += 1) {
+    for (let column = 1; column <= 18; column += 1) {
+      const cell = worksheet.getCell(row, column);
+      cell.font = { name: "Times New Roman", size: 8.5, bold: true, color: { argb: "000000" } };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+      cell.border = {
+        top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" },
+      };
+    }
+  }
+
+  for (const [index, record] of records.entries()) {
+    const rowNumber = 9 + index;
+    const row = worksheet.getRow(rowNumber);
+    row.height = 105;
+    row.values = [
+      index + 1,
+      safeText(record.detectedDate),
+      safeText(record.sku),
+      safeText(record.productName),
+      safeText(record.supplier),
+      safeText(record.unit),
+      record.quantityValue,
+      safeText(record.condition),
+      safeText(record.detectedBy),
+      treatmentMark(record, "HỦY"),
+      treatmentMark(record, "ĐỔI"),
+      treatmentMark(record, "XUẤT TRẢ"),
+      ["HỦY", "ĐỔI", "XUẤT TRẢ"].includes(record.resolution.trim().toUpperCase()) ? "" : safeText(record.resolution),
+      safeText(record.treatmentDate),
+      "", "", "", "",
+    ];
+
+    for (let column = 1; column <= 18; column += 1) {
+      const cell = row.getCell(column);
+      cell.font = { name: "Times New Roman", size: 9 };
+      cell.alignment = { horizontal: column === 4 || column === 5 || column === 8 || column === 9 || column === 13 ? "left" : "center", vertical: "middle", wrapText: true };
+      cell.border = {
+        top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" },
+      };
+    }
+
+    const imageCells = [row.getCell(15), row.getCell(16), row.getCell(17)];
+    imageCells.forEach((cell) => {
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFFF" } };
+    });
+    imageCells[0]!.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" } };
+    imageCells[1]!.border = { top: { style: "thin" }, bottom: { style: "thin" } };
+    imageCells[2]!.border = { top: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" } };
+
+    for (const [photoIndex, photo] of record.photos.slice(0, 3).entries()) {
+      const normalized = await normalizePhoto(photo);
+      const buffer = await normalized.blob.arrayBuffer();
+      const imageId = workbook.addImage({ buffer: buffer as never, extension: normalized.extension });
+      const columnPixels = (worksheet.getColumn(15 + photoIndex).width ?? 10) * 7;
+      const rowPixels = 105 * (96 / 72);
+      const imagePadding = 8;
+      const fitted = fitImage(normalized.width, normalized.height, columnPixels - imagePadding * 2, rowPixels - imagePadding * 2);
+      worksheet.addImage(imageId, {
+        tl: {
+          col: 14 + photoIndex + (columnPixels - fitted.width) / 2 / columnPixels,
+          row: rowNumber - 1 + (rowPixels - fitted.height) / 2 / rowPixels,
+        },
+        ext: fitted,
+        editAs: "oneCell",
+      });
+    }
+  }
+
+  await worksheet.protect(globalThis.crypto?.randomUUID?.() ?? `kph-${Date.now()}`, {
+    spinCount: 100_000,
+    selectLockedCells: true,
+    selectUnlockedCells: true,
+    formatCells: false,
+    formatColumns: false,
+    formatRows: false,
+    insertColumns: false,
+    insertRows: false,
+    insertHyperlinks: false,
+    deleteColumns: false,
+    deleteRows: false,
+    sort: false,
+    autoFilter: false,
+    pivotTables: false,
+    objects: false,
+    scenarios: false,
+  });
+
+  return workbook;
+}
+
+export async function downloadKphWorkbook(kind: KphKind, records: readonly DemoRecord[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
+  const workbook = await buildKphWorkbook(kind, records, store);
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([new Uint8Array(buffer)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  const url = URL.createObjectURL(blob);
+  const typeName = kind === "TPCN" ? "Thuc_pham_kho_va_khac" : "Thuc_pham_tuoi_song";
+  const date = formatBusinessDate(new Date()).display.replaceAll("/", "-");
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `Phieu_Theo_Doi_Hang_KPH_${typeName}_${date}.xlsx`;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  return anchor.download;
+}
+
+export type KphWorkbook = ExcelJS.Workbook;

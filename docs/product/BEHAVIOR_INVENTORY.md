@@ -41,7 +41,7 @@ phải API identifier.
 
 | ID | Hành vi quan sát được | Phân loại / hợp đồng mới |
 |---|---|---|
-| ID-01 | Tên/mã cửa hàng được nhập trong modal và lưu localStorage | Loại bỏ authority; hiển thị cùng vị trí nhưng lấy từ session/membership |
+| ID-01 | Tên/mã cửa hàng được nhập trong modal và lưu localStorage | Online target loại bỏ authority và lấy từ session/membership. Riêng pilot local-only theo ADR-0002 có slice thiết lập lưu IndexedDB trên từng thiết bị: tên cửa hàng và mã 4 chữ số bắt buộc; vai trò, họ tên và mã nhân viên tùy chọn. Dữ liệu này không cấp quyền |
 | ID-02 | Prefix “Co.op Food” cố định ở UI; profile chỉ lưu phần tên chi nhánh, mã tối đa 50 | Giữ presentation; store code là chuỗi |
 | ID-03 | Tối đa 5 tên người phát hiện gần nhất lưu localStorage, de-duplicate không phân biệt hoa/thường; tên mới nhất làm default | Cải tiến; mặc định actor từ account, lịch sử/ghi thay chỉ khi role cho phép |
 | ID-04 | Legacy không login, role, session hoặc tenant check | Cải tiến bắt buộc; backend kiểm membership cho mọi request store-scoped |

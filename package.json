@@ -15,6 +15,11 @@
     "check:docs": "node scripts/check-docs.mjs",
     "verify": "npm run check:docs && npm run check:api && npm run check && npm test && npm run build"
   },
+  "overrides": {
+    "exceljs": {
+      "uuid": "^11.1.1"
+    }
+  },
   "devDependencies": {
     "vite": "^8.2.1"
   }

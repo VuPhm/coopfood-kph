@@ -1,6 +1,6 @@
 export const EVIDENCE_MAX_WIDTH = 1280;
 export const EVIDENCE_MAX_HEIGHT = 720;
-export const EVIDENCE_TARGET_BYTES = 550 * 1024;
+export const EVIDENCE_TARGET_BYTES = 420 * 1024;
 
 export type StoreStamp = { storeCode: string; storeName: string };
 

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { KPH_OPTIONS, parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
+import { KPH_OPTIONS, parseDisplayDate, resolveChoiceLabel, type KphKind } from "@coopfood-kph/kph-rules";
 import {
   Button,
   Dialog,
@@ -35,8 +35,10 @@ import { z } from "zod";
 
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
+import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
+import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
 function isDisplayDate(value: string) {
   try {
@@ -76,11 +78,28 @@ type PhotoDraft = {
   url: string;
 };
 
+export type CreatedRecordDraft = {
+  kind: KphKind;
+  detectedDate: string;
+  barcode: string;
+  supplier: string;
+  productName: string;
+  quantity: number;
+  unit: "EA" | "kg";
+  condition: string;
+  resolution: string;
+  treatmentDate: string;
+  detectedBy: string;
+  note: string;
+  photos: readonly { id: string; fileName: string; blob: Blob }[];
+};
+
 type CreateRecordDialogProps = {
   kind: KphKind | null;
   open: boolean;
+  profile?: StoreProfile;
   onOpenChange: (open: boolean) => void;
-  onSaved: (kind: KphKind) => void;
+  onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
 };
 
 const kindLabels: Record<KphKind, string> = {
@@ -88,9 +107,7 @@ const kindLabels: Record<KphKind, string> = {
   TPTS: "Thực phẩm tươi sống",
 };
 
-const DEMO_STORE_STAMP = { storeCode: "CF-DEMO-001", storeName: "Nguyễn Kiệm" };
-
-function defaultValues(kind: KphKind): FormData {
+function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   const options = KPH_OPTIONS[kind];
   return {
     detectedDate: formatBusinessDate(new Date()).display,
@@ -104,18 +121,19 @@ function defaultValues(kind: KphKind): FormData {
     resolution: options.defaultResolution,
     resolutionDetail: "",
     treatmentDate: "",
-    detectedBy: "Nguyễn Văn Demo",
+    detectedBy: profile.fullName,
     note: "",
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: CreateRecordDialogProps) {
+export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile = DEFAULT_STORE_PROFILE }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
   const photoRef = useRef<PhotoDraft[]>([]);
   const [photoError, setPhotoError] = useState("");
   const [processingPhotos, setProcessingPhotos] = useState(false);
+  const [savingRecord, setSavingRecord] = useState(false);
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const {
@@ -128,7 +146,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues(activeKind),
+    defaultValues: defaultValues(activeKind, profile),
   });
 
   const selectedCondition = watch("condition");
@@ -148,10 +166,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
   useEffect(() => {
     if (!kind) return;
-    reset(defaultValues(kind));
+    reset(defaultValues(kind, profile));
     clearPhotos();
     setPhotoError("");
-  }, [kind, reset]);
+  }, [kind, profile, reset]);
 
   useEffect(() => () => {
     for (const photo of photoRef.current) {
@@ -161,7 +179,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
   if (!kind) return null;
 
-  const submit = handleSubmit(() => {
+  const submit = handleSubmit(async (values) => {
     if (processingPhotos) {
       setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
       return;
@@ -170,11 +188,34 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
       setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
       return;
     }
-    onSaved(kind);
-    reset(defaultValues(kind));
-    clearPhotos();
+    const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
+    const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
+    setSavingRecord(true);
     setPhotoError("");
-    onOpenChange(false);
+    try {
+      await onSaved({
+        kind,
+        detectedDate: values.detectedDate,
+        barcode: values.barcode.trim(),
+        supplier: values.supplier.trim(),
+        productName: values.productName.trim(),
+        quantity: Number(values.quantity),
+        unit: values.unit,
+        condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
+        resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
+        treatmentDate: values.treatmentDate.trim(),
+        detectedBy: values.detectedBy.trim(),
+        note: values.note.trim(),
+        photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
+      });
+      reset(defaultValues(kind, profile));
+      clearPhotos();
+      onOpenChange(false);
+    } catch (error) {
+      setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
+    } finally {
+      setSavingRecord(false);
+    }
   });
 
   async function selectPhotos(event: ChangeEvent<HTMLInputElement>) {
@@ -190,7 +231,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
     const additions: PhotoDraft[] = [];
     try {
       for (const [index, file] of files.entries()) {
-        const processed = await processEvidencePhoto(file, DEMO_STORE_STAMP);
+        const processed = await processEvidencePhoto(file, { storeCode: profile.storeCode, storeName: profile.storeName });
         additions.push({
           id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
           fileName: file.name,
@@ -289,8 +330,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
                 <p className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                  <PhotoPicker disabled={processingPhotos || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
-                  <PhotoPicker disabled={processingPhotos || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
+                  <PhotoPicker disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
+                  <PhotoPicker disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
                 </div>
                 {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
                 <p className={cn("mt-2 text-xs font-semibold", photoError ? "text-danger" : "text-ink-muted")} role={photoError ? "alert" : "status"}>
@@ -304,7 +345,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
             <footer className="create-dialog-footer">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Hủy</Button>
-              <Button type="submit" disabled={processingPhotos}>{processingPhotos ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xử lý ảnh</> : "Lưu phiếu"}</Button>
+              <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : "Lưu phiếu"}</Button>
             </footer>
           </form>
         </DialogContent>
@@ -312,18 +353,14 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open }: Create
 
       <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
 
-      <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Quét mã SKU / UPC</DialogTitle>
-            <DialogDescription>Ưu tiên camera sau. Có thể thử lại hoặc dùng máy quét cầm tay dạng bàn phím.</DialogDescription>
-          </DialogHeader>
-          <div className="grid min-h-52 place-items-center rounded-2xl bg-ink p-5 text-center text-white">
-            <div><ScanLine className="mx-auto" size={42} aria-hidden="true" /><p className="mt-3 font-bold">Camera chưa được nối trong foundation</p><p className="mt-1 text-sm text-white/70">Luồng nhập tay vẫn luôn khả dụng, không làm người dùng mắc kẹt.</p></div>
-          </div>
-          <div className="flex justify-end"><Button type="button" onClick={() => { setScannerOpen(false); window.setTimeout(() => setFocus("barcode"), 0); }}>Nhập mã thủ công</Button></div>
-        </DialogContent>
-      </Dialog>
+      <BarcodeScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onScan={(scannedBarcode) => {
+          setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
+          window.setTimeout(() => setFocus("barcode"), 0);
+        }}
+      />
     </>
   );
 }

@@ -1,5 +1,18 @@
 # Công việc kế tiếp
 
+## Ngoại lệ nhánh pilot — local-only Store PWA
+
+Trên `codex/github-pages-pwa`, trước vertical slice online sẽ hoàn thiện một
+pilot không đồng bộ theo ADR-0002:
+
+- Persist phiếu, ảnh stamped, duyệt/thùng rác và lịch sử tạo Excel trong
+  IndexedDB theo schema có migration.
+- Service worker precache app shell/lazy chunk cần thiết, có offline fallback và
+  update prompt an toàn.
+- Xin persistent storage, theo dõi quota và kiểm thử reload/offline/export trên
+  thiết bị thật.
+- Không tạo API giả, outbox, background sync hoặc merge multi-device.
+
 Chỉ có một milestone đang hoạt động.
 
 ## Foundation-01 — vertical slice tạo và xem phiếu KPH
@@ -38,4 +51,3 @@ song song bằng mock sinh từ cùng OpenAPI.
 - Phiếu cần 1–3 ảnh; original và stamped đều private; danh sách reload
   từ backend giữ snapshot và thứ tự ảnh.
 - Test/docs của module đã chạm đều pass từ database sạch.
-

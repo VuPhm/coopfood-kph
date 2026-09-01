@@ -1,19 +1,53 @@
 import { Dialog, DialogContent, DialogTitle } from "@coopfood-kph/ui";
-import { Maximize2 } from "lucide-react";
-import { useState, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type SyntheticEvent } from "react";
+import { createPortal } from "react-dom";
 
 export type ViewableEvidenceImage = { src: string; alt: string };
 
 type LensState = CSSProperties & { visible: boolean; size: number };
 
 const hiddenLens: LensState = { visible: false, size: 0 };
+const VIEWER_MAX_WIDTH_REM = 72;
+const VIEWER_MAX_HEIGHT_REM = 54;
+const VIEWER_VIEWPORT_WIDTH_RATIO = 0.94;
+const VIEWER_VIEWPORT_HEIGHT_RATIO = 0.9;
 
 export function EvidenceImageViewer({ image, onOpenChange, open }: { image: ViewableEvidenceImage | null; onOpenChange: (open: boolean) => void; open: boolean }) {
   const [lens, setLens] = useState<LensState>(hiddenLens);
+  const [frame, setFrame] = useState<{ height: number; width: number } | null>(null);
+  const naturalSize = useRef<{ height: number; width: number } | null>(null);
 
   function hideLens() {
     setLens(hiddenLens);
   }
+
+  function fitFrame(width: number, height: number) {
+    const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+    const maxWidth = Math.min(window.innerWidth * VIEWER_VIEWPORT_WIDTH_RATIO, rootFontSize * VIEWER_MAX_WIDTH_REM);
+    const maxHeight = Math.min(window.innerHeight * VIEWER_VIEWPORT_HEIGHT_RATIO, rootFontSize * VIEWER_MAX_HEIGHT_REM);
+    const scale = Math.min(maxWidth / width, maxHeight / height);
+    setFrame({ width: Math.round(width * scale), height: Math.round(height * scale) });
+  }
+
+  function imageLoaded(event: SyntheticEvent<HTMLImageElement>) {
+    hideLens();
+    naturalSize.current = { width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight };
+    fitFrame(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight);
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    function resizeViewer() {
+      if (naturalSize.current) fitFrame(naturalSize.current.width, naturalSize.current.height);
+    }
+    window.addEventListener("resize", resizeViewer);
+    return () => window.removeEventListener("resize", resizeViewer);
+  }, [open]);
+
+  useEffect(() => {
+    naturalSize.current = null;
+    setFrame(null);
+  }, [image?.src]);
 
   function updateLens(event: PointerEvent<HTMLImageElement>, touch: boolean) {
     if (!image) return;
@@ -55,7 +89,7 @@ export function EvidenceImageViewer({ image, onOpenChange, open }: { image: View
 
   return (
     <Dialog open={open} onOpenChange={(next) => { hideLens(); onOpenChange(next); }}>
-      <DialogContent className="evidence-viewer-content" onPointerDownOutside={hideLens}>
+      <DialogContent className="evidence-viewer-content" style={frame ?? undefined} onPointerDownOutside={hideLens}>
         <DialogTitle className="sr-only">Xem ảnh minh chứng</DialogTitle>
         {image ? (
           <figure className="evidence-viewer-stage">
@@ -64,7 +98,7 @@ export function EvidenceImageViewer({ image, onOpenChange, open }: { image: View
               src={image.src}
               alt={image.alt}
               draggable={false}
-              onLoad={hideLens}
+              onLoad={imageLoaded}
               onPointerDown={pointerDown}
               onPointerMove={pointerMove}
               onPointerLeave={hideLens}
@@ -72,11 +106,12 @@ export function EvidenceImageViewer({ image, onOpenChange, open }: { image: View
               onPointerCancel={hideLens}
               onLostPointerCapture={hideLens}
             />
-            <figcaption><Maximize2 size={15} aria-hidden="true" />Rê chuột để soi 2.5× · chạm giữ và kéo trên màn hình cảm ứng</figcaption>
           </figure>
         ) : null}
       </DialogContent>
-      <div className={lens.visible ? "evidence-zoom-lens is-visible" : "evidence-zoom-lens"} style={lens} aria-hidden="true" />
+      {open && typeof document !== "undefined"
+        ? createPortal(<div className={lens.visible ? "evidence-zoom-lens is-visible" : "evidence-zoom-lens"} style={lens} aria-hidden="true" />, document.body)
+        : null}
     </Dialog>
   );
 }
