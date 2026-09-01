@@ -706,9 +706,13 @@ function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, so
       <HistoryControlsTrigger active={active} className="history-controls-mobile" label="Mở lọc và sắp xếp trên mobile" />
     </DialogTrigger>
     <DialogContent className="mobile-history-dialog" aria-describedby="mobile-history-dialog-description">
-      <DialogTitle className="sr-only">Lọc và sắp xếp</DialogTitle>
-      <DialogDescription id="mobile-history-dialog-description" className="sr-only">Chọn trạng thái duyệt, cột và chiều sắp xếp cho danh sách phiếu.</DialogDescription>
-      <UtilityPanelMeta actionLabel="Đóng lọc và sắp xếp" dialogClose label="Tùy chọn lọc" />
+      <header className="mobile-history-dialog-header">
+        <span className="mobile-history-dialog-icon" aria-hidden="true"><ListFilter /></span>
+        <div>
+          <DialogTitle className="mobile-history-dialog-title">Lọc &amp; sắp xếp</DialogTitle>
+          <DialogDescription id="mobile-history-dialog-description" className="mobile-history-dialog-description">Thay đổi được áp dụng ngay</DialogDescription>
+        </div>
+      </header>
 
       <HistoryControlsContent filter={filter} idPrefix="mobile" onFilterChange={onFilterChange} onSort={onSort} onSortReset={onSortReset} sort={sort} />
     </DialogContent>
@@ -716,23 +720,37 @@ function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, so
 }
 
 function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSortReset, showSort = true, sort }: HistoryControlsContentProps) {
-  function toggleFilter(nextFilter: DemoApprovalStatus) {
-    onFilterChange(filter === nextFilter ? "ALL" : nextFilter);
+  function toggleFilter(event: MouseEvent<HTMLButtonElement>, nextFilter: DemoApprovalStatus) {
+    const clearing = filter === nextFilter;
+    onFilterChange(clearing ? "ALL" : nextFilter);
+    if (clearing && document.documentElement.dataset.focusModality !== "keyboard") event.currentTarget.blur();
   }
 
   return <div className="mobile-history-dialog-body">
-        <section className="expiry-focus-zone" aria-label="Lọc trạng thái">
+        <section className="mobile-history-section" aria-labelledby={`${idPrefix}-filter-title`}>
+          <header className="mobile-history-section-header">
+            <h3 id={`${idPrefix}-filter-title`}>Trạng thái duyệt</h3>
+            <button type="button" className="mobile-history-section-reset" aria-label="Bỏ lọc trạng thái duyệt" disabled={filter === "ALL"} onClick={() => onFilterChange("ALL")}>
+              <RotateCcw aria-hidden="true" /><span>Bỏ lọc</span>
+            </button>
+          </header>
           <div className="mobile-history-choice-grid mobile-history-filter-grid" role="group" aria-label="Lọc theo trạng thái duyệt">
             {approvalFilterOptions.slice(1).map(({ label, value }) => {
               const selected = filter === value;
-              return <button key={value} type="button" className={cn("mobile-history-choice mobile-history-filter-choice", `is-${value.toLowerCase()}`, selected && "is-selected")} aria-label={selected ? `Bỏ lọc ${label}` : `Lọc ${label}`} aria-pressed={selected} onClick={() => toggleFilter(value as DemoApprovalStatus)}>
+              return <button key={value} type="button" className={cn("mobile-history-choice mobile-history-filter-choice", `is-${value.toLowerCase()}`, selected && "is-selected")} aria-label={selected ? `Bỏ lọc ${label}` : `Lọc ${label}`} aria-pressed={selected} onClick={(event) => toggleFilter(event, value as DemoApprovalStatus)}>
                 <span>{label}</span>
               </button>;
             })}
           </div>
         </section>
 
-        {showSort ? <section className="expiry-focus-zone" aria-label="Sắp xếp">
+        {showSort ? <section className="mobile-history-section" aria-labelledby={`${idPrefix}-sort-title`}>
+          <header className="mobile-history-section-header">
+            <h3 id={`${idPrefix}-sort-title`}>Sắp xếp theo</h3>
+            <button type="button" className="mobile-history-section-reset" aria-label="Bỏ sắp xếp" disabled={sort === null} onClick={onSortReset}>
+              <RotateCcw aria-hidden="true" /><span>Bỏ sắp xếp</span>
+            </button>
+          </header>
           <div className="mobile-history-choice-grid mobile-history-sort-grid" role="group" aria-label="Sắp xếp danh sách phiếu">
             {recordSortOptions.map(({ label, value }) => {
               const selected = sort?.key === value;

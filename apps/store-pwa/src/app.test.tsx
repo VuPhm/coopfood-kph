@@ -134,25 +134,33 @@ describe("Store workspace", () => {
     expect(filterTrigger.querySelector(".history-controls-icon > .lucide-list-filter")).not.toBeNull();
     expect(filterTrigger.querySelector(".history-controls-indicator")).toBeNull();
     fireEvent.click(filterTrigger);
-    const dialog = screen.getByRole("dialog", { name: "Lọc và sắp xếp" });
+    const dialog = screen.getByRole("dialog", { name: "Lọc & sắp xếp" });
     const approvedFilter = within(dialog).getByRole("button", { name: "Lọc Đã duyệt" });
 
-    expect(dialog.querySelector(".utility-panel-meta")).not.toBeNull();
-    expect(within(dialog).getByText("Tùy chọn lọc")).toBeVisible();
+    expect(dialog.querySelector(".utility-panel-meta")).toBeNull();
+    expect(within(dialog).getByRole("heading", { name: "Lọc & sắp xếp" })).toBeVisible();
+    expect(within(dialog).getByRole("heading", { name: "Trạng thái duyệt" })).toBeVisible();
+    expect(within(dialog).getByRole("heading", { name: "Sắp xếp theo" })).toBeVisible();
     expect(within(dialog).queryByText("Cột sắp xếp")).not.toBeInTheDocument();
     fireEvent.click(approvedFilter);
 
     expect(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(dialog).getByRole("button", { name: "Bỏ lọc trạng thái duyệt" })).toBeEnabled();
     expect(filterTrigger).toHaveClass("is-active");
     expect(filterTrigger.querySelector(".history-controls-icon > .history-controls-indicator")).not.toBeNull();
     expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
     expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
 
-    fireEvent.click(within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" }));
+    const clearApprovedFilter = within(dialog).getByRole("button", { name: "Bỏ lọc Đã duyệt" });
+    clearApprovedFilter.focus();
+    fireEvent.click(clearApprovedFilter);
     expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
     expect(filterTrigger.querySelector(".history-controls-indicator")).toBeNull();
+    expect(clearApprovedFilter).not.toHaveFocus();
+    expect(within(dialog).getByRole("button", { name: "Bỏ lọc trạng thái duyệt" })).toBeDisabled();
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" }));
+    expect(within(dialog).getByRole("button", { name: "Bỏ sắp xếp" })).toBeEnabled();
     expect(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp tăng dần; bấm để chuyển giảm dần" })).toHaveAttribute("aria-pressed", "true");
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp tăng dần; bấm để chuyển giảm dần" }));
@@ -160,7 +168,7 @@ describe("Store workspace", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Sắp xếp Nhà cung cấp giảm dần; bấm để huỷ sắp xếp" }));
     expect(within(dialog).getByRole("button", { name: "Sắp xếp theo Nhà cung cấp" })).toHaveAttribute("aria-pressed", "false");
 
-    fireEvent.click(within(dialog).getByRole("button", { name: "Đóng lọc và sắp xếp" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Đóng" }));
 
     expect(screen.getByRole("button", { name: "Sắp xếp theo NCC" }).closest("th")).toHaveAttribute("aria-sort", "none");
     expect(screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" })).not.toHaveClass("is-active");
