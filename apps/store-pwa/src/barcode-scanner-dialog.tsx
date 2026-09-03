@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coopfood-kph/ui";
-import { BrowserMultiFormatReader, DecodeHintType, BarcodeFormat, type Result, type Exception } from "@zxing/library";
+import type { BrowserMultiFormatReader, Exception, Result } from "@zxing/library";
 import {
   Camera,
   Flashlight,
@@ -45,6 +45,8 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
   const streamRef = useRef<MediaStream | null>(null);
   const zxingReaderRef = useRef<BrowserMultiFormatReader | null>(null);
   const animationFrameIdRef = useRef<number | null>(null);
+  const successTimeoutRef = useRef<number | null>(null);
+  const scanSessionRef = useRef(0);
   const isScanningRef = useRef(false);
 
   const [status, setStatus] = useState<ScannerStatus>("idle");
@@ -59,7 +61,12 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
   const descId = useId();
 
   const stopStream = useCallback(() => {
+    scanSessionRef.current += 1;
     isScanningRef.current = false;
+    if (successTimeoutRef.current !== null) {
+      window.clearTimeout(successTimeoutRef.current);
+      successTimeoutRef.current = null;
+    }
     if (animationFrameIdRef.current !== null) {
       cancelAnimationFrame(animationFrameIdRef.current);
       animationFrameIdRef.current = null;
@@ -91,9 +98,9 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
 
   const handleScanSuccess = useCallback((code: string) => {
     if (!isScanningRef.current) return;
-    isScanningRef.current = false;
     const trimmed = code.trim();
     if (!trimmed) return;
+    isScanningRef.current = false;
 
     setScannedCode(trimmed);
     setStatus("success");
@@ -107,7 +114,8 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
     }
 
     // Short delay to display success animation/flash before closing
-    window.setTimeout(() => {
+    successTimeoutRef.current = window.setTimeout(() => {
+      successTimeoutRef.current = null;
       stopStream();
       onScan(trimmed);
       onOpenChange(false);
@@ -116,6 +124,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
 
   const startScanning = useCallback(async (deviceId?: string) => {
     stopStream();
+    const scanSession = scanSessionRef.current;
     setStatus("requesting");
     setErrorMessage("");
     setScannedCode(null);
@@ -139,6 +148,10 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (scanSession !== scanSessionRef.current) {
+        for (const track of stream.getTracks()) track.stop();
+        return;
+      }
       streamRef.current = stream;
 
       // Check camera devices
@@ -154,6 +167,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       } catch {
         // Enumerate devices not critical
       }
+      if (scanSession !== scanSessionRef.current) return;
 
       // Check torch capability
       const videoTrack = stream.getVideoTracks()[0];
@@ -166,6 +180,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
+      if (scanSession !== scanSessionRef.current) return;
 
       isScanningRef.current = true;
       setStatus("scanning");
@@ -177,6 +192,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
         try {
           const detectorClass = (window as unknown as { BarcodeDetector: BarcodeDetectorConstructor }).BarcodeDetector;
           const supportedFormats = await detectorClass.getSupportedFormats();
+          if (scanSession !== scanSessionRef.current) return;
           const targetFormats = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "qr_code"].filter((f) => supportedFormats.includes(f));
 
           const detector = targetFormats.length
@@ -214,6 +230,12 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       }
 
       // ZXing fallback engine
+      const {
+        BarcodeFormat,
+        BrowserMultiFormatReader: BrowserMultiFormatReaderConstructor,
+        DecodeHintType,
+      } = await import("@zxing/library");
+      if (scanSession !== scanSessionRef.current) return;
       const hints = new Map();
       const formats = [
         BarcodeFormat.EAN_13,
@@ -227,7 +249,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
       hints.set(DecodeHintType.TRY_HARDER, true);
 
-      const zxingReader = new BrowserMultiFormatReader(hints, 100);
+      const zxingReader = new BrowserMultiFormatReaderConstructor(hints, 100);
       zxingReaderRef.current = zxingReader;
 
       if (videoRef.current) {
@@ -244,6 +266,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
         );
       }
     } catch (err: unknown) {
+      if (scanSession !== scanSessionRef.current) return;
       stopStream();
       setStatus("error");
 

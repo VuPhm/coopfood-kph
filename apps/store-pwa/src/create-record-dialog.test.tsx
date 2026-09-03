@@ -166,5 +166,6 @@ describe("Create KPH record", () => {
         unit: "EA",
         photos: [expect.objectContaining({ fileName: "evidence.jpg", blob: stampedBlob })],
       })));
+    expect(onSaved.mock.calls[0]?.[0].photos[0]).not.toHaveProperty("originalFile");
   });
 });

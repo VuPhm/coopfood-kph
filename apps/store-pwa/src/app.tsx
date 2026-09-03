@@ -12,8 +12,8 @@ import { ExpiryWorkbench } from "./expiry-dialog";
 import { EvidenceImageViewer } from "./image-viewer";
 import { PwaStatus } from "./pwa-status";
 import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord, type PilotRecord } from "./record-store";
-import { readStorageHealth, requestPersistentStorage, storageUsageLabel, type StorageHealth } from "./storage-health";
-import { actorIdentity, DEFAULT_STORE_PROFILE, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
+import { readStorageHealth, requestPersistentStorage, storageHealthWarning, storageUsageLabel, type StorageHealth } from "./storage-health";
+import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
@@ -169,6 +169,8 @@ export function App() {
   );
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
+  const storeConfigured = isStoreProfileConfigured(storeProfile);
+  const storageWarning = storageReady ? storageHealthWarning(storageHealth) : null;
 
   useEffect(() => () => {
     ownedPhotoUrls.current.forEach((url) => URL.revokeObjectURL(url));
@@ -216,8 +218,23 @@ export function App() {
   }, []);
 
   function openCreate(kind: KphKind) {
+    if (!storeConfigured) {
+      setNotice("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
+      setStoreSettingsOpen(true);
+      return;
+    }
     setCreateKind(kind);
     setDialogOpen(true);
+  }
+
+  function openExport() {
+    if (!storeConfigured) {
+      setNotice("Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
+      setStoreSettingsOpen(true);
+      return;
+    }
+    setExportError("");
+    setExportOpen(true);
   }
 
   async function saveStoreSettings(profile: StoreProfile) {
@@ -388,6 +405,7 @@ export function App() {
   }
 
   async function saveCreatedRecord(draft: CreatedRecordDraft) {
+    if (!storeConfigured) throw new Error("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
     const dateDigits = draft.detectedDate.split("/").reverse().join("").slice(2);
     const uuid = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
     const id = `KPH-${dateDigits}-${uuid.replaceAll("-", "").slice(0, 6).toUpperCase()}`;
@@ -437,6 +455,12 @@ export function App() {
 
   async function exportSelected() {
     if (!selectedRecords.length) return;
+    if (!storeConfigured) {
+      setExportOpen(false);
+      setNotice("Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
+      setStoreSettingsOpen(true);
+      return;
+    }
     setExporting(true);
     setExportError("");
     try {
@@ -516,6 +540,12 @@ export function App() {
             </button>
           </div>
           {storageError ? <p className="storage-error-banner" role="alert">{storageError}</p> : null}
+          {storageWarning ? <p className={cn("storage-warning-banner", storageWarning.level === "critical" && "is-critical")} role={storageWarning.level === "critical" ? "alert" : "status"}>{storageWarning.message}</p> : null}
+          <aside className="pilot-local-banner" aria-label="Lưu ý dữ liệu Pilot">
+            <AlertTriangle aria-hidden="true" />
+            <span><strong>Pilot local-only:</strong> dữ liệu chỉ nằm trên thiết bị này, không đồng bộ. Không xóa site data.</span>
+            {!storeConfigured ? <button type="button" onClick={() => setStoreSettingsOpen(true)}>Thiết lập ngay</button> : null}
+          </aside>
           <header className="history-header">
             <div className="history-title-row pr-3">
               <h2 id="history-title" className="history-title">
@@ -581,7 +611,7 @@ export function App() {
                   </div>
                   {selected.size > 0 ? (
                     <div className="history-action-tools">
-                      <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={() => { setExportError(""); setExportOpen(true); }}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
+                      <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={openExport}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
                       <Button variant="ghost" className="history-delete" aria-label="Xóa phiếu đã chọn" title={trashMode ? "Không thể xoá vĩnh viễn" : "Chuyển sang trạng thái đã xoá"} disabled={trashMode} onClick={requestDeleteSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-delete-label">Xóa</span></Button>
                     </div>
                   ) : null}
@@ -658,7 +688,7 @@ export function App() {
           {exportError ? <p className="action-dialog-error" role="alert">{exportError}</p> : null}
           <div className="action-dialog-actions">
             <Button type="button" variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button>
-            <Button type="button" disabled={exporting || selectedRecords.length === 0} onClick={exportSelected}>
+            <Button type="button" disabled={exporting || selectedRecords.length === 0 || !storeConfigured} onClick={exportSelected}>
               {exporting ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xuất…</> : <><FileDown size={17} aria-hidden="true" />Xuất {selectedRecords.length} dòng</>}
             </Button>
           </div>

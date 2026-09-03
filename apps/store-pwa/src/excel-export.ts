@@ -21,7 +21,7 @@ function treatmentMark(record: DemoRecord, resolution: string) {
 }
 
 function safeText(value: string) {
-  return escapeFormulaText(value.trim());
+  return escapeFormulaText(value);
 }
 
 function imageDimensions(source: string) {

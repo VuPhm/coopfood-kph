@@ -1,6 +1,7 @@
 export const EVIDENCE_MAX_WIDTH = 1280;
 export const EVIDENCE_MAX_HEIGHT = 720;
-export const EVIDENCE_TARGET_BYTES = 420 * 1024;
+export const EVIDENCE_TARGET_BYTES = 550 * 1024;
+export const EVIDENCE_QUALITY_FLOOR = 0.54;
 
 export type StoreStamp = { storeCode: string; storeName: string };
 
@@ -28,7 +29,7 @@ export function evidenceDimensions(width: number, height: number) {
   };
 }
 
-async function captureDate(file: File, controlledNow: Date) {
+export async function resolveEvidenceCaptureDate(file: File, controlledNow: Date) {
   try {
     const { parse: parseExif } = await import("exifr/dist/lite.esm.mjs");
     const metadata = await parseExif(file, ["DateTimeOriginal", "DateTimeDigitized", "DateTime"]);
@@ -99,9 +100,9 @@ function canvasBlob(canvas: HTMLCanvasElement, quality: number) {
 
 async function compress(canvas: HTMLCanvasElement) {
   let workingCanvas = canvas;
-  let blob = await canvasBlob(workingCanvas, 0.8);
+  let blob = await canvasBlob(workingCanvas, 0.78);
   for (let pass = 0; pass < 4; pass += 1) {
-    for (const quality of [0.72, 0.64, 0.56]) {
+    for (const quality of [0.7, 0.62, EVIDENCE_QUALITY_FLOOR]) {
       if (blob.size <= EVIDENCE_TARGET_BYTES) return { blob, canvas: workingCanvas };
       blob = await canvasBlob(workingCanvas, quality);
     }
@@ -109,9 +110,11 @@ async function compress(canvas: HTMLCanvasElement) {
     const resized = document.createElement("canvas");
     resized.width = Math.max(1, Math.round(workingCanvas.width * 0.8));
     resized.height = Math.max(1, Math.round(workingCanvas.height * 0.8));
-    resized.getContext("2d")?.drawImage(workingCanvas, 0, 0, resized.width, resized.height);
+    const resizedContext = resized.getContext("2d");
+    if (!resizedContext) return { blob, canvas: workingCanvas };
+    resizedContext.drawImage(workingCanvas, 0, 0, resized.width, resized.height);
     workingCanvas = resized;
-    blob = await canvasBlob(workingCanvas, 0.8);
+    blob = await canvasBlob(workingCanvas, 0.78);
   }
   return { blob, canvas: workingCanvas };
 }
@@ -200,7 +203,7 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
 }
 
 export async function processEvidencePhoto(file: File, store: StoreStamp, controlledNow = new Date()): Promise<ProcessedEvidencePhoto> {
-  const [drawable, capturedAt] = await Promise.all([loadDrawable(file), captureDate(file, controlledNow)]);
+  const [drawable, capturedAt] = await Promise.all([loadDrawable(file), resolveEvidenceCaptureDate(file, controlledNow)]);
   try {
     if (!drawable.width || !drawable.height) throw new Error("Ảnh minh chứng không có kích thước hợp lệ.");
     const dimensions = evidenceDimensions(drawable.width, drawable.height);

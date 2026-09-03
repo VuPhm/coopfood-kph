@@ -39,6 +39,7 @@ describe("BarcodeScannerDialog", () => {
       writable: true,
       value: originalMediaDevices,
     });
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
@@ -89,6 +90,64 @@ describe("BarcodeScannerDialog", () => {
     expect(manualBtn).toBeVisible();
     fireEvent.click(manualBtn);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it.each([
+    ["NotFoundError", /Không tìm thấy máy ảnh/i],
+    ["NotReadableError", /đang được ứng dụng khác sử dụng/i],
+    ["UnexpectedError", /Không thể khởi động máy ảnh/i],
+  ])("maps %s startup failures to an actionable fallback", async (name, expectedCopy) => {
+    const startupError = new Error(name);
+    startupError.name = name;
+    navigator.mediaDevices.getUserMedia = vi.fn().mockRejectedValue(startupError);
+
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+
+    await waitFor(() => expect(screen.getByText(expectedCopy)).toBeVisible());
+    expect(screen.getByRole("button", { name: "Nhập mã thủ công" })).toBeVisible();
+  });
+
+  it("stops every acquired camera track when the dialog unmounts", async () => {
+    const { unmount } = render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    await waitFor(() => expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalled());
+
+    unmount();
+
+    expect(mockTrack.stop).toHaveBeenCalled();
+  });
+
+  it("discards a camera stream that resolves after the dialog has closed", async () => {
+    let resolveStream!: (stream: typeof mockStream) => void;
+    navigator.mediaDevices.getUserMedia = vi.fn(() => new Promise<typeof mockStream>((resolve) => {
+      resolveStream = resolve;
+    })) as unknown as typeof navigator.mediaDevices.getUserMedia;
+    const { rerender } = render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    await waitFor(() => expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalled());
+
+    rerender(<BarcodeScannerDialog open={false} onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    resolveStream(mockStream);
+
+    await waitFor(() => expect(mockTrack.stop).toHaveBeenCalled());
+  });
+
+  it("returns a trimmed barcode from the native detector and closes after success", async () => {
+    const handleOpenChange = vi.fn();
+    const handleScan = vi.fn();
+    class TestBarcodeDetector {
+      static getSupportedFormats = vi.fn().mockResolvedValue(["ean_13"]);
+      detect = vi.fn().mockResolvedValue([{ rawValue: "  8938500000123  " }]);
+    }
+    vi.stubGlobal("BarcodeDetector", TestBarcodeDetector);
+    vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockReturnValue(HTMLMediaElement.HAVE_CURRENT_DATA);
+    vi.stubGlobal("requestAnimationFrame", vi.fn((callback: FrameRequestCallback) => window.setTimeout(() => callback(100), 0)));
+    vi.stubGlobal("cancelAnimationFrame", vi.fn((identifier: number) => window.clearTimeout(identifier)));
+
+    render(<BarcodeScannerDialog open onOpenChange={handleOpenChange} onScan={handleScan} />);
+
+    await waitFor(() => expect(screen.getByText("Đã nhận diện mã")).toBeVisible());
+    await waitFor(() => expect(handleScan).toHaveBeenCalledWith("8938500000123"), { timeout: 1_500 });
+    expect(handleOpenChange).toHaveBeenCalledWith(false);
+    expect(mockTrack.stop).toHaveBeenCalled();
   });
 
   it("supports switching cameras and torch toggle when available", async () => {

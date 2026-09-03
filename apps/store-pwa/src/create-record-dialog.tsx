@@ -72,7 +72,6 @@ type FormData = z.infer<typeof schema>;
 type PhotoDraft = {
   id: string;
   fileName: string;
-  originalFile: File;
   stampedBlob: Blob;
   capturedAt: Date;
   url: string;
@@ -235,7 +234,6 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         additions.push({
           id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
           fileName: file.name,
-          originalFile: file,
           stampedBlob: processed.blob,
           capturedAt: processed.capturedAt,
           url: URL.createObjectURL(processed.blob),

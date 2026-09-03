@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "react";
 
 type ServiceWorkerNotice = "offline-ready" | "offline" | "update" | null;
 
-export function PwaStatus() {
+export type PwaStatusProps = {
+  enableServiceWorker?: boolean;
+};
+
+export function PwaStatus({ enableServiceWorker = import.meta.env.MODE !== "test" }: PwaStatusProps = {}) {
   const [notice, setNotice] = useState<ServiceWorkerNotice>(() => navigator.onLine ? null : "offline");
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const applyingUpdate = useRef(false);
@@ -15,7 +19,7 @@ export function PwaStatus() {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    if (!("serviceWorker" in navigator) || import.meta.env.MODE === "test") {
+    if (!("serviceWorker" in navigator) || !enableServiceWorker) {
       return () => {
         window.removeEventListener("online", handleOnline);
         window.removeEventListener("offline", handleOffline);
@@ -23,12 +27,13 @@ export function PwaStatus() {
     }
 
     let cancelled = false;
+    const serviceWorker = navigator.serviceWorker;
     const handleControllerChange = () => {
       if (applyingUpdate.current) window.location.reload();
     };
-    navigator.serviceWorker.addEventListener("controllerchange", handleControllerChange);
+    serviceWorker.addEventListener("controllerchange", handleControllerChange);
 
-    void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, { scope: import.meta.env.BASE_URL }).then((registration) => {
+    void serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, { scope: import.meta.env.BASE_URL }).then((registration) => {
       if (cancelled) return;
       registrationRef.current = registration;
       if (registration.waiting && navigator.serviceWorker.controller) setNotice("update");
@@ -46,9 +51,9 @@ export function PwaStatus() {
       cancelled = true;
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
-      navigator.serviceWorker.removeEventListener("controllerchange", handleControllerChange);
+      serviceWorker.removeEventListener("controllerchange", handleControllerChange);
     };
-  }, []);
+  }, [enableServiceWorker]);
 
   if (!notice) return null;
 

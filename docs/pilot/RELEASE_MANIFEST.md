@@ -50,4 +50,3 @@ workbook, ảnh hoặc dữ liệu vận hành thật.
 
 Rollback chỉ redeploy immutable artefact trước; không xóa site data và không
 down-migrate IndexedDB. Pilot không migrate dữ liệu sang hệ thống online.
-

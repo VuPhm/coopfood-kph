@@ -74,4 +74,3 @@ trách nhiệm gom file; không ghép dữ liệu bằng cách sửa IndexedDB h
 - Pilot chuyển maintenance-only; chỉ nhận security/critical fix.
 - Không migrate hoặc tự động upload IndexedDB Pilot vào hệ thống online.
 - Hệ thống online bắt đầu với authority mới từ backend và store membership thật.
-

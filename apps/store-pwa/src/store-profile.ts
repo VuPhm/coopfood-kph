@@ -32,6 +32,10 @@ export function normalizeStoreProfile(value: unknown): StoreProfile {
   return result.success ? result.data : DEFAULT_STORE_PROFILE;
 }
 
+export function isStoreProfileConfigured(profile: StoreProfile) {
+  return storeProfileSchema.safeParse(profile).success;
+}
+
 export function storeIdentity(profile: StoreProfile) {
   const name = profile.storeName?.trim();
   const code = profile.storeCode?.trim();

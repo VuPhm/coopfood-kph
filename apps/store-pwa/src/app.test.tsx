@@ -21,6 +21,23 @@ describe("Store workspace", () => {
     expect(screen.getByRole("button", { name: /Tạo phiếu TP tươi sống/i })).toBeVisible();
   });
 
+  it("requires store settings before creating a record", async () => {
+    render(<App />);
+
+    expect(screen.getByLabelText("Lưu ý dữ liệu Pilot")).toHaveTextContent("dữ liệu chỉ nằm trên thiết bị này, không đồng bộ");
+    fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i }));
+
+    const settings = screen.getByRole("dialog", { name: "Thiết lập cửa hàng" });
+    expect(screen.getByText("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.")).toBeVisible();
+    fireEvent.change(within(settings).getByRole("textbox", { name: "Tên cửa hàng" }), { target: { value: "Cống Quỳnh" } });
+    fireEvent.change(within(settings).getByRole("textbox", { name: "Mã cửa hàng" }), { target: { value: "0123" } });
+    fireEvent.click(within(settings).getByRole("button", { name: "Lưu thiết lập" }));
+    await waitFor(() => expect(settings).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i }));
+    expect(screen.getByRole("dialog", { name: /Tạo phiếu KPH · Thực phẩm khô & khác/i })).toBeVisible();
+  });
+
   it("opens the store context and saves the required store settings", async () => {
     render(<App />);
     const trigger = screen.getByRole("button", { name: /Thiết lập cửa hàng: Chưa thiết lập cửa hàng/i });
@@ -335,14 +352,22 @@ describe("Store workspace", () => {
     expect(screen.getByText(/Đã khôi phục 1 phiếu trong dữ liệu demo/i)).toBeVisible();
   });
 
-  it("summarizes selected rows and images before exporting Excel", () => {
+  it("requires store settings before summarizing an Excel export", async () => {
     render(<App />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
     fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
 
+    const settings = screen.getByRole("dialog", { name: "Thiết lập cửa hàng" });
+    expect(screen.getByText("Thiết lập tên và mã cửa hàng trước khi xuất Excel.")).toBeVisible();
+    fireEvent.change(within(settings).getByRole("textbox", { name: "Tên cửa hàng" }), { target: { value: "Cống Quỳnh" } });
+    fireEvent.change(within(settings).getByRole("textbox", { name: "Mã cửa hàng" }), { target: { value: "0123" } });
+    fireEvent.click(within(settings).getByRole("button", { name: "Lưu thiết lập" }));
+    await waitFor(() => expect(settings).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
+
     const dialog = screen.getByRole("dialog", { name: "Xuất phiếu ra Excel" });
     expect(within(dialog).getByText("TP Khô & khác")).toBeVisible();
-    expect(within(dialog).getByText("Chưa thiết lập cửa hàng")).toBeVisible();
+    expect(within(dialog).getByText("Co.op Food Cống Quỳnh · 0123")).toBeVisible();
     expect(within(dialog).getByRole("button", { name: "Xuất 1 dòng" })).toBeEnabled();
   });
 });
