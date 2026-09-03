@@ -1,9 +1,9 @@
 # Công việc kế tiếp
 
-## Ngoại lệ nhánh pilot — local-only Store PWA
+## Active — Pilot-00 closeout
 
-Trên `codex/github-pages-pwa`, trước vertical slice online sẽ hoàn thiện một
-pilot không đồng bộ theo ADR-0002:
+Trước vertical slice online, đóng Pilot local-only theo ADR-0002 thành release
+ổn định. Acceptance ledger và runbook nằm trong `docs/pilot/`.
 
 - Persist phiếu, ảnh stamped, duyệt/thùng rác và lịch sử tạo Excel trong
   IndexedDB theo schema có migration.
@@ -12,8 +12,11 @@ pilot không đồng bộ theo ADR-0002:
 - Xin persistent storage, theo dõi quota và kiểm thử reload/offline/export trên
   thiết bị thật.
 - Không tạo API giả, outbox, background sync hoặc merge multi-device.
+- Chạy device/browser matrix, kiểm workbook trên công cụ mục tiêu và gắn tag.
+- Sau release, nhánh deploy Pilot chỉ nhận security/critical fix.
 
-Chỉ có một milestone đang hoạt động.
+Chỉ có một milestone đang hoạt động. Foundation-01 bắt đầu sau khi Pilot có tag
+và toàn bộ gate P0 trong acceptance ledger đạt.
 
 ## Foundation-01 — vertical slice tạo và xem phiếu KPH
 

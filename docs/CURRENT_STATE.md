@@ -1,14 +1,14 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-08-27
+Cập nhật: 2026-09-04
 
 ## Giai đoạn
 
-`Foundation — reboot từ baseline đã kiểm chứng`
+`Pilot-00 closeout`
 
-Nhánh `codex/github-pages-pwa` đồng thời có pilot local-only theo ADR-0002:
-IndexedDB tạm thời là authority trên từng thiết bị, không đồng bộ, và Excel là
-kênh bàn giao cho CHT. Đây không phải topology đích của foundation online.
+Pilot local-only theo ADR-0002 đã có baseline chức năng và đang được đóng thành
+release/tag ổn định trước khi `main` chuyển sang Foundation online. IndexedDB là
+authority trên từng thiết bị, không đồng bộ, và Excel là kênh bàn giao cho CHT.
 
 Repository này là implementation mới. Hai repository tham chiếu
 `coopfood-kph-platform` và `tool-kph` chỉ được đọc để lấy provenance,
@@ -34,12 +34,17 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   sinh từ OpenAPI và transport dùng `openapi-fetch` với session/CSRF.
 - Backend Java 21/Spring Boot đã có baseline migration 15 bảng, security
   default-deny, ProblemDetail, business clock, ArchUnit và database smoke test.
+- Pilot đã có IndexedDB cho phiếu/stamped image/trash/export history, scanner
+  camera với fallback, image processing/viewer, service worker và Excel baseline.
+- Acceptance ledger và runbook Pilot nằm trong `docs/pilot/`.
 
 ## Chưa hoàn tất
 
 - Chưa có vertical slice chạy end-to-end trong repository mới: UI hiện dùng dữ
   liệu tổng hợp; backend chưa implement login/store/catalog/KPH HTTP handlers.
-- Chưa có pipeline ảnh private/stamp, scanner, Excel hoặc browser E2E.
+- Chưa có browser/device E2E và bằng chứng trên Android/iPhone/desktop cho
+  scanner, IndexedDB reload, offline reopen và update prompt.
+- Chưa có bằng chứng workbook 1–3 ảnh được mở/render trên công cụ mục tiêu.
 - Database migration đã compile nhưng smoke test PostgreSQL cần Docker-compatible
   runtime; môi trường verification hiện tại không có socket nên test được skip.
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,
@@ -53,3 +58,5 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   trong foundation này.
 - Không copy DOM imperative, CSS override, generator API viết tay, JDBC mapping
   hoặc EXIF parser tự viết từ implementation cũ.
+- Không tag/deploy Pilot nếu còn gate P0 `NOT_RUN` hoặc `FAIL`; dữ liệu Pilot
+  không được migrate sang authority online.
