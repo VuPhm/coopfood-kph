@@ -74,7 +74,7 @@ async function loadDrawable(file: File): Promise<DrawableImage> {
 }
 
 function roundedRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
-  const safeRadius = Math.min(radius, width / 2, height / 2);
+  const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
   context.beginPath();
   context.moveTo(x + safeRadius, y);
   context.arcTo(x + width, y, x + width, y + height, safeRadius);
@@ -142,12 +142,14 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
   const { date, time, weekday } = dateParts(capturedAt);
   const storeIdentity = [store.storeCode, store.storeName].filter(Boolean).join(" - ");
   const shortEdge = Math.min(width, height);
-  const unit = Math.min(22, Math.max(13, Math.round(shortEdge * 0.028)));
+  const smallImageScale = Math.min(1, shortEdge / 160);
+  const unit = Math.max(2, Math.round(Math.min(22, Math.max(13, shortEdge * 0.028)) * smallImageScale));
   const padding = Math.round(unit * 0.44);
   const timeSize = Math.round(unit * 1.72);
   const textSize = Math.round(unit * 0.88);
-  const storeTextSize = Math.max(10, Math.round(textSize * 0.78));
-  const margin = Math.min(42, Math.max(12, Math.round(shortEdge * 0.035)));
+  const storeTextSize = Math.max(2, Math.round(textSize * 0.78));
+  const desiredMargin = Math.min(42, Math.max(12, Math.round(shortEdge * 0.035)));
+  const margin = Math.min(desiredMargin, Math.max(0, Math.floor((shortEdge - 1) / 4)));
 
   context.font = `700 ${timeSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
   const timeWidth = context.measureText(time).width;
@@ -157,11 +159,11 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
   const dateWidth = context.measureText(date).width;
   const columnGap = Math.round(unit * 0.55);
   const contentWidth = timeWidth + columnGap + Math.max(weekdayWidth, dateWidth);
-  const baseCardWidth = Math.min(310, Math.max(170, Math.round(contentWidth + padding * 2)));
-  const cardWidth = Math.min(width - margin * 2, Math.round(baseCardWidth * 1.25));
+  const baseCardWidth = Math.min(Math.round(310 * smallImageScale), Math.max(Math.round(170 * smallImageScale), Math.round(contentWidth + padding * 2)));
+  const cardWidth = Math.max(1, Math.min(width - margin * 2, Math.round(baseCardWidth * 1.25)));
   const infoHeight = Math.round(timeSize * 1.24);
   const storeHeight = storeIdentity ? Math.round(unit * 1.08) : 0;
-  const cardHeight = padding * 2 + infoHeight + storeHeight;
+  const cardHeight = Math.max(1, Math.min(height - margin * 2, padding * 2 + infoHeight + storeHeight));
   const x = margin;
   const y = Math.max(margin, height - margin - cardHeight);
 
@@ -197,7 +199,7 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
     context.fillRect(contentX, storeY, Math.max(3, Math.round(unit * 0.18)), Math.round(unit * 0.88));
     context.fillStyle = "#fff";
     context.font = `600 ${storeTextSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-    context.fillText(ellipsis(context, storeIdentity, cardWidth - padding * 2 - Math.round(unit * 0.7)), contentX + Math.round(unit * 0.58), storeY + Math.round(unit * 0.7));
+    context.fillText(ellipsis(context, storeIdentity, Math.max(1, cardWidth - padding * 2 - Math.round(unit * 0.7))), contentX + Math.round(unit * 0.58), storeY + Math.round(unit * 0.7));
   }
   context.restore();
 }
