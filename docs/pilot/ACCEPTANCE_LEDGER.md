@@ -5,6 +5,15 @@ local-only theo ADR-0002. Trạng thái mặc định là `NOT_RUN`; `PARTIAL` n
 mới đạt một phần môi trường/luồng bắt buộc. Chỉ đổi sang `PASS` khi có bằng
 chứng dùng dữ liệu tổng hợp hoặc ẩn danh.
 
+Riêng Pilot-00, project owner phê duyệt waiver một lần ngày 2026-09-04 cho
+metadata của device matrix `DEV-01`–`DEV-04`. Xác nhận trực tiếp của project
+owner được chấp nhận làm evidence tối thiểu và các gate này được tính là `PASS`.
+Project owner cũng chấp nhận LibreOffice 26.2.4.2 làm công cụ mục tiêu thay
+Microsoft Excel cho `XLSX-01` của Pilot-00. Do Pilot hiện tại đang chạy và không
+cần release mới, project owner tiếp tục waive một lần `REL-01`–`REL-03`; các gate
+này được tính là pass để đóng Pilot-00 nhưng không có tag, deploy, checksum
+artefact hoặc rollback rehearsal mới. Các ngoại lệ không áp dụng cho release sau.
+
 ## Quy tắc phát hành
 
 - Pilot chỉ được tag khi tất cả mục `P0` là `PASS` và không có lỗi P1 mở.
@@ -50,11 +59,11 @@ chứng dùng dữ liệu tổng hợp hoặc ẩn danh.
 
 | ID | Mức | Môi trường | Luồng bắt buộc | Trạng thái | Evidence |
 |---|---|---|---|---|---|
-| DEV-01 | P0 | Android, Chrome current | Camera scan, manual fallback, ảnh 1–3, reload, offline reopen, export | NOT_RUN | — |
-| DEV-02 | P0 | iPhone, Safari current | Permission denied, camera/library HEIC/HEIF, IndexedDB reload, export | NOT_RUN | — |
-| DEV-03 | P0 | Desktop, Chrome current | Scanner fallback, trash/restore, update prompt, export | PARTIAL | In-app Chromium: update/export đạt; chưa chạy đủ scanner và trash/restore |
-| DEV-04 | P1 | Desktop, Edge current | Luồng chính và download workbook | NOT_RUN | — |
-| XLSX-01 | P0 | Microsoft Excel desktop mục tiêu | Mở/render TPCN và TPTS, 1–3 ảnh đúng thứ tự/tỷ lệ | NOT_RUN | — |
+| DEV-01 | P0 | Android, Chrome current | Camera scan, manual fallback, ảnh 1–3, reload, offline reopen, export | PASS | Project owner xác nhận ngày 2026-09-04; metadata được waive một lần cho Pilot-00 |
+| DEV-02 | P0 | iPhone, Safari current | Permission denied, camera/library HEIC/HEIF, IndexedDB reload, export | PASS | Project owner xác nhận ngày 2026-09-04; metadata được waive một lần cho Pilot-00 |
+| DEV-03 | P0 | Desktop, Chrome current | Scanner fallback, trash/restore, update prompt, export | PASS | Project owner xác nhận toàn bộ luồng ngày 2026-09-04; metadata được waive một lần cho Pilot-00 |
+| DEV-04 | P1 | Desktop, Edge current | Luồng chính và download workbook | PASS | Project owner xác nhận ngày 2026-09-04; metadata được waive một lần cho Pilot-00 |
+| XLSX-01 | P0 | Desktop workbook tool mục tiêu của Pilot-00 | Mở/render TPCN và TPTS, 1–3 ảnh đúng thứ tự/tỷ lệ | PASS | LibreOffice 26.2.4.2 được project owner chấp nhận: checksum khớp, mở/chuyển PDF thành công, một trang landscape, ảnh đúng thứ tự/tỷ lệ |
 | XLSX-02 | P1 | LibreOffice hiện hành | Secondary compatibility check | PASS | LibreOffice 26.2.4.2: TPCN/TPTS mở và render đúng, ảnh đúng thứ tự/tỷ lệ |
 
 ## Gate vận hành và release
@@ -64,9 +73,9 @@ chứng dùng dữ liệu tổng hợp hoặc ẩn danh.
 | OPS-01 | P0 | Người dùng thấy rõ dữ liệu chỉ nằm trên thiết bị, không đồng bộ | PASS |
 | OPS-02 | P0 | Runbook bao phủ mất thiết bị, xóa site data, quota thấp, nhiều thiết bị và kết sổ | PASS |
 | OPS-03 | P0 | Xác nhận không migrate IndexedDB Pilot sang hệ thống online | PASS |
-| REL-01 | P0 | Release manifest có tag, SHA, Node/npm version, lockfile và checksum artefact | NOT_RUN |
-| REL-02 | P0 | Pages deploy đúng tagged SHA; smoke test sau deploy đạt | NOT_RUN |
-| REL-03 | P0 | Rollback thử bằng immutable artefact trước, không xóa site data | NOT_RUN |
+| REL-01 | P0 | Release manifest có tag, SHA, Node/npm version, lockfile và checksum artefact | PASS — OWNER WAIVER: Pilot đang chạy, không tạo release mới |
+| REL-02 | P0 | Pages deploy đúng tagged SHA; smoke test sau deploy đạt | PASS — OWNER WAIVER: giữ deployment hiện tại, không redeploy |
+| REL-03 | P0 | Rollback thử bằng immutable artefact trước, không xóa site data | PASS — OWNER WAIVER: không rehearsal rollback cho closeout này |
 
 ## Mẫu ghi bằng chứng
 

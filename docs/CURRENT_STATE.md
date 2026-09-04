@@ -4,11 +4,12 @@ Cập nhật: 2026-09-04
 
 ## Giai đoạn
 
-`Pilot-00 closeout`
+`Foundation-01 — vertical slice tạo và xem phiếu KPH`
 
-Pilot local-only theo ADR-0002 đã có baseline chức năng và đang được đóng thành
-release/tag ổn định trước khi `main` chuyển sang Foundation online. IndexedDB là
-authority trên từng thiết bị, không đồng bộ, và Excel là kênh bàn giao cho CHT.
+Pilot local-only theo ADR-0002 đã được project owner đóng ngày 2026-09-04 bằng
+acceptance tối thiểu. Pilot đang chạy được giữ nguyên, không tạo tag/deploy mới
+hoặc rehearsal rollback; `REL-01`–`REL-03` được waive một lần. Foundation-01 là
+milestone active cho vertical slice online.
 
 Repository này là implementation mới. Hai repository tham chiếu
 `coopfood-kph-platform` và `tool-kph` chỉ được đọc để lấy provenance,
@@ -36,17 +37,13 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   default-deny, ProblemDetail, business clock, ArchUnit và database smoke test.
 - Pilot đã có IndexedDB cho phiếu/stamped image/trash/export history, scanner
   camera với fallback, image processing/viewer, service worker và Excel baseline.
-- Acceptance ledger và runbook Pilot nằm trong `docs/pilot/`.
+- Device/browser matrix và workbook TPCN/TPTS đã được đóng theo acceptance tối
+  thiểu của Pilot-00; acceptance ledger và runbook nằm trong `docs/pilot/`.
 
 ## Chưa hoàn tất
 
 - Chưa có vertical slice chạy end-to-end trong repository mới: UI hiện dùng dữ
   liệu tổng hợp; backend chưa implement login/store/catalog/KPH HTTP handlers.
-- Production in-app Chromium đã kiểm IndexedDB v1 → v2, reload, offline reopen,
-  service-worker update prompt và export bằng dữ liệu tổng hợp. Vẫn thiếu device
-  matrix vật lý Android/iPhone và luồng scanner/trash đầy đủ trên Chrome/Edge.
-- Workbook TPCN/TPTS với 1–3 ảnh tổng hợp đã mở/render đúng trên LibreOffice;
-  vẫn thiếu xác nhận bằng Microsoft Excel desktop mục tiêu.
 - Database migration đã compile nhưng smoke test PostgreSQL cần Docker-compatible
   runtime; môi trường verification hiện tại không có socket nên test được skip.
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,
@@ -60,5 +57,5 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   trong foundation này.
 - Không copy DOM imperative, CSS override, generator API viết tay, JDBC mapping
   hoặc EXIF parser tự viết từ implementation cũ.
-- Không tag/deploy Pilot nếu còn gate P0 `NOT_RUN` hoặc `FAIL`; dữ liệu Pilot
+- Pilot đang chạy được freeze, chỉ nhận security/critical fix; dữ liệu Pilot
   không được migrate sang authority online.

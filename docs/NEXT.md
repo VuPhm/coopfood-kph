@@ -1,9 +1,11 @@
 # Công việc kế tiếp
 
-## Active — Pilot-00 closeout
+## Closed — Pilot-00 closeout
 
-Trước vertical slice online, đóng Pilot local-only theo ADR-0002 thành release
-ổn định. Acceptance ledger và runbook nằm trong `docs/pilot/`.
+Pilot local-only theo ADR-0002 được project owner chấp nhận đóng ngày 2026-09-04.
+Device metadata và release mechanics `REL-01`–`REL-03` được waive một lần vì
+Pilot hiện tại đang chạy và không cần tag/deploy/rollback mới. Acceptance ledger,
+evidence và runbook nằm trong `docs/pilot/`.
 
 - Persist phiếu, ảnh stamped, duyệt/thùng rác và lịch sử tạo Excel trong
   IndexedDB theo schema có migration.
@@ -12,13 +14,14 @@ Trước vertical slice online, đóng Pilot local-only theo ADR-0002 thành rel
 - Xin persistent storage, theo dõi quota và kiểm thử reload/offline/export trên
   thiết bị thật.
 - Không tạo API giả, outbox, background sync hoặc merge multi-device.
-- Chạy device/browser matrix, kiểm workbook trên công cụ mục tiêu và gắn tag.
+- Device/browser matrix và workbook đã pass theo acceptance tối thiểu; không tạo
+  tag mới theo owner waiver.
 - Sau release, nhánh deploy Pilot chỉ nhận security/critical fix.
 
-Chỉ có một milestone đang hoạt động. Foundation-01 bắt đầu sau khi Pilot có tag
-và toàn bộ gate P0 trong acceptance ledger đạt.
+Chỉ có một milestone đang hoạt động. Không mang ngoại lệ local-only hoặc waiver
+release của Pilot sang topology online.
 
-## Foundation-01 — vertical slice tạo và xem phiếu KPH
+## Active — Foundation-01 — vertical slice tạo và xem phiếu KPH
 
 ### Mục tiêu
 
