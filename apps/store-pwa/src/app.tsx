@@ -98,6 +98,53 @@ function TodayDate() {
   );
 }
 
+function PilotDataNotice({ configured, onConfigure, warning }: { configured: boolean; onConfigure: () => void; warning: ReturnType<typeof storageHealthWarning> }) {
+  const [hovered, setHovered] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const open = hovered || pinned;
+
+  return (
+    <span
+      className="pilot-data-notice"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setHovered(false);
+      }}
+      onFocus={() => setHovered(true)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          setHovered(false);
+          setPinned(false);
+        }
+      }}
+    >
+      <button
+        type="button"
+        className={cn("pilot-data-notice-trigger", warning?.level === "critical" && "is-critical")}
+        aria-controls="pilot-data-notice-content"
+        aria-expanded={open}
+        aria-label="Xem lưu ý dữ liệu Pilot"
+        title="Lưu ý dữ liệu Pilot"
+        onClick={() => setPinned((value) => {
+          const next = !value;
+          if (!next) setHovered(false);
+          return next;
+        })}
+      >
+        <AlertTriangle aria-hidden="true" />
+      </button>
+      {open ? (
+        <span id="pilot-data-notice-content" className={cn("pilot-data-notice-content", warning?.level === "critical" && "is-critical")} role="note" aria-label="Lưu ý dữ liệu Pilot">
+          <span><strong>Pilot local-only:</strong> dữ liệu chỉ nằm trên thiết bị này, không đồng bộ. Không xóa site data.</span>
+          {warning ? <span>{warning.message}</span> : null}
+          {!configured ? <button type="button" onClick={() => { setPinned(false); onConfigure(); }}>Thiết lập ngay</button> : null}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 function detectedDateValue(value: string) {
   const [day = "", month = "", year = ""] = value.split("/");
   return `${year}${month}${day}`;
@@ -540,18 +587,15 @@ export function App() {
             </button>
           </div>
           {storageError ? <p className="storage-error-banner" role="alert">{storageError}</p> : null}
-          {storageWarning ? <p className={cn("storage-warning-banner", storageWarning.level === "critical" && "is-critical")} role={storageWarning.level === "critical" ? "alert" : "status"}>{storageWarning.message}</p> : null}
-          <aside className="pilot-local-banner" aria-label="Lưu ý dữ liệu Pilot">
-            <AlertTriangle aria-hidden="true" />
-            <span><strong>Pilot local-only:</strong> dữ liệu chỉ nằm trên thiết bị này, không đồng bộ. Không xóa site data.</span>
-            {!storeConfigured ? <button type="button" onClick={() => setStoreSettingsOpen(true)}>Thiết lập ngay</button> : null}
-          </aside>
           <header className="history-header">
             <div className="history-title-row pr-3">
-              <h2 id="history-title" className="history-title">
-                <span className="history-total-count" aria-label={`${visibleRecords.length} phiếu`}>{visibleRecords.length}</span>
-                {trashMode ? "Phiếu đã xoá" : "Phiếu đã khai báo"}
-              </h2>
+              <div className="history-title-group">
+                <h2 id="history-title" className="history-title">
+                  <span className="history-total-count" aria-label={`${visibleRecords.length} phiếu`}>{visibleRecords.length}</span>
+                  {trashMode ? "Phiếu đã xoá" : "Phiếu đã khai báo"}
+                </h2>
+                <PilotDataNotice configured={storeConfigured} warning={storageWarning} onConfigure={() => setStoreSettingsOpen(true)} />
+              </div>
               <div className="history-title-actions">
                 <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
                 <button

@@ -24,7 +24,21 @@ describe("Store workspace", () => {
   it("requires store settings before creating a record", async () => {
     render(<App />);
 
-    expect(screen.getByLabelText("Lưu ý dữ liệu Pilot")).toHaveTextContent("dữ liệu chỉ nằm trên thiết bị này, không đồng bộ");
+    const warningTrigger = screen.getByRole("button", { name: "Xem lưu ý dữ liệu Pilot" });
+    expect(warningTrigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("note", { name: "Lưu ý dữ liệu Pilot" })).not.toBeInTheDocument();
+    fireEvent.mouseEnter(warningTrigger.parentElement!);
+    expect(screen.getByRole("note", { name: "Lưu ý dữ liệu Pilot" })).toHaveTextContent("dữ liệu chỉ nằm trên thiết bị này, không đồng bộ");
+    fireEvent.mouseLeave(warningTrigger.parentElement!);
+    fireEvent.click(warningTrigger);
+    expect(warningTrigger).toHaveAttribute("aria-expanded", "true");
+    const combinedNotice = screen.getByRole("note", { name: "Lưu ý dữ liệu Pilot" });
+    expect(combinedNotice).toHaveTextContent("Không xóa site data");
+    expect(combinedNotice).toHaveTextContent("Trình duyệt chưa xác nhận lưu trữ bền");
+    expect(document.querySelector(".pilot-local-banner, .storage-warning-banner")).not.toBeInTheDocument();
+    fireEvent.click(warningTrigger);
+    expect(warningTrigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("note", { name: "Lưu ý dữ liệu Pilot" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i }));
 
     const settings = screen.getByRole("dialog", { name: "Thiết lập cửa hàng" });
