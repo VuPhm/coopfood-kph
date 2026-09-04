@@ -43,7 +43,8 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
 ## Chưa hoàn tất
 
 - Chưa có vertical slice chạy end-to-end trong repository mới: UI hiện dùng dữ
-  liệu tổng hợp; backend chưa implement login/store/catalog/KPH HTTP handlers.
+  liệu tổng hợp; backend đã có login/session/store context nhưng chưa implement
+  catalog/KPH HTTP handlers.
 - Database migration đã compile nhưng smoke test PostgreSQL cần Docker-compatible
   runtime; môi trường verification hiện tại không có socket nên test được skip.
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,

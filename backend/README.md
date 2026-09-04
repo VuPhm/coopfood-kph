@@ -13,8 +13,15 @@ Set `KPH_DATABASE_URL`, `KPH_DATABASE_USERNAME` and `KPH_DATABASE_PASSWORD`, the
 ```
 
 Public operational endpoints are limited to `/actuator/health`, its probe paths,
-and `/actuator/info`. All other routes are denied until identity endpoints and
-their explicit authorization rules are implemented.
+`/actuator/info` and `POST /api/v1/auth/login`. Authenticated sessions can call
+`GET /api/v1/auth/session`, `GET /api/v1/stores` and
+`POST /api/v1/auth/logout`; all other routes remain denied by default.
+
+Login reads active users, global roles and active store memberships from the
+database. Passwords must be stored as BCrypt hashes. Successful login returns a
+CSRF token for the `X-CSRF-TOKEN` header and creates the HttpOnly
+`KPH_SESSION` cookie. There is intentionally no demo user or provisioning API in
+this slice.
 
 ## Verify
 
