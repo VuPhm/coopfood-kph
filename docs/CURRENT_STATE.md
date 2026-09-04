@@ -42,9 +42,11 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
 
 - Chưa có vertical slice chạy end-to-end trong repository mới: UI hiện dùng dữ
   liệu tổng hợp; backend chưa implement login/store/catalog/KPH HTTP handlers.
-- Chưa có browser/device E2E và bằng chứng trên Android/iPhone/desktop cho
-  scanner, IndexedDB reload, offline reopen và update prompt.
-- Chưa có bằng chứng workbook 1–3 ảnh được mở/render trên công cụ mục tiêu.
+- Production in-app Chromium đã kiểm IndexedDB v1 → v2, reload, offline reopen,
+  service-worker update prompt và export bằng dữ liệu tổng hợp. Vẫn thiếu device
+  matrix vật lý Android/iPhone và luồng scanner/trash đầy đủ trên Chrome/Edge.
+- Workbook TPCN/TPTS với 1–3 ảnh tổng hợp đã mở/render đúng trên LibreOffice;
+  vẫn thiếu xác nhận bằng Microsoft Excel desktop mục tiêu.
 - Database migration đã compile nhưng smoke test PostgreSQL cần Docker-compatible
   runtime; môi trường verification hiện tại không có socket nên test được skip.
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,

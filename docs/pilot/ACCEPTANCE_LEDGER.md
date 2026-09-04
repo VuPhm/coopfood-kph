@@ -24,8 +24,8 @@ chứng dùng dữ liệu tổng hợp hoặc ẩn danh.
 | AUTO-03 | P0 | Store profile hợp lệ trước tạo phiếu và xuất Excel | Component/browser test | PASS |
 | AUTO-04 | P0 | Golden Excel: cấu trúc, formula guard, TPCN/TPTS, 1–3 ảnh | Golden + serialize/read-back test | PASS |
 | AUTO-05 | P0 | Golden ảnh: EXIF fallback, resize, JPEG, stamp, không giữ original | Golden/image test | PASS |
-| AUTO-06 | P0 | IndexedDB fresh-create, upgrade, reload, transaction abort và export history | Browser/IndexedDB test | PARTIAL |
-| AUTO-07 | P0 | Offline reopen và service-worker update prompt | Production-build browser test | PARTIAL |
+| AUTO-06 | P0 | IndexedDB fresh-create, upgrade, reload, transaction abort và export history | Browser/IndexedDB test | PASS |
+| AUTO-07 | P0 | Offline reopen và service-worker update prompt | Production-build browser test | PASS |
 | AUTO-08 | P1 | Scanner permission/no-camera/start failure/success/fallback/cleanup | Component/browser test | PASS |
 | AUTO-09 | P1 | Low-quota và storage API unavailable có cảnh báo xử lý được | Component/browser test | PASS |
 
@@ -37,13 +37,14 @@ chứng dùng dữ liệu tổng hợp hoặc ẩn danh.
   hoặc tên nhân sự fixture và service worker không precache đường dẫn `demo/`.
 - Golden Excel đã serialize/read-back cả TPCN/TPTS, formula guard và ảnh 1–3;
   golden ảnh đã kiểm EXIF fallback, JPEG/stamp/resize và stamped-only payload.
-- IndexedDB test đã kiểm fresh create, v1 → v2 không mất record, close/reopen,
-  rollback transaction nhiều record và export history. Chưa chạy upgrade trên
-  browser thật nên `AUTO-06` còn `PARTIAL`.
-- Component test đã kiểm update prompt và copy offline; production browser đã
-  quan sát cold start rỗng, lưu/reload store profile và update prompt bằng dữ
-  liệu tổng hợp. Chưa chạy offline reopen nên `AUTO-07` còn `PARTIAL`; kết quả
-  browser này là exploratory và không thay thế device matrix.
+- IndexedDB test đã kiểm fresh create, rollback transaction nhiều record và
+  export history. Production browser đã kiểm v1 → v2, close/reopen và giữ lại
+  store profile, record cùng ảnh tổng hợp.
+- Production browser đã kiểm cold start rỗng, reload khi preview server đã dừng
+  và service-worker update prompt. Kết quả này đạt `AUTO-06`/`AUTO-07`, nhưng
+  không thay thế device matrix vật lý.
+- Chi tiết môi trường, SHA và checksum workbook nằm tại
+  `docs/pilot/evidence/2026-09-04-closeout.md`.
 
 ## Device và workbook matrix
 
@@ -51,10 +52,10 @@ chứng dùng dữ liệu tổng hợp hoặc ẩn danh.
 |---|---|---|---|---|---|
 | DEV-01 | P0 | Android, Chrome current | Camera scan, manual fallback, ảnh 1–3, reload, offline reopen, export | NOT_RUN | — |
 | DEV-02 | P0 | iPhone, Safari current | Permission denied, camera/library HEIC/HEIF, IndexedDB reload, export | NOT_RUN | — |
-| DEV-03 | P0 | Desktop, Chrome current | Scanner fallback, trash/restore, update prompt, export | NOT_RUN | — |
+| DEV-03 | P0 | Desktop, Chrome current | Scanner fallback, trash/restore, update prompt, export | PARTIAL | In-app Chromium: update/export đạt; chưa chạy đủ scanner và trash/restore |
 | DEV-04 | P1 | Desktop, Edge current | Luồng chính và download workbook | NOT_RUN | — |
 | XLSX-01 | P0 | Microsoft Excel desktop mục tiêu | Mở/render TPCN và TPTS, 1–3 ảnh đúng thứ tự/tỷ lệ | NOT_RUN | — |
-| XLSX-02 | P1 | LibreOffice hiện hành | Secondary compatibility check | NOT_RUN | — |
+| XLSX-02 | P1 | LibreOffice hiện hành | Secondary compatibility check | PASS | LibreOffice 26.2.4.2: TPCN/TPTS mở và render đúng, ảnh đúng thứ tự/tỷ lệ |
 
 ## Gate vận hành và release
 
