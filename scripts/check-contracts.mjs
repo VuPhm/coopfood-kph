@@ -1,0 +1,345 @@
+import assert from "node:assert/strict";
+import { readdir, readFile, stat } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { createConfig, lint } from "@redocly/openapi-core";
+import Ajv2020 from "ajv/dist/2020.js";
+import yaml from "js-yaml";
+
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const contractPath = path.join(repositoryRoot, "contracts/openapi/kph.openapi.yaml");
+const fixturesRoot = path.join(repositoryRoot, "contracts/fixtures");
+const manifestPath = path.join(fixturesRoot, "golden/fixture-manifest.json");
+const contractSchemaId = "urn:coopfood-kph:openapi";
+const acceptedKphLookupStatuses = ["FOUND", "NOT_FOUND", "MANUAL"];
+
+const apiFixtureSchemas = new Map([
+  ["api/session.json", "SessionResponse"],
+  ["api/barcode-found.json", "BarcodeLookupResponse"],
+  ["api/barcode-not-found.json", "BarcodeLookupResponse"],
+  ["api/kph-record.json", "KphRecord"],
+]);
+
+const acceptedKphPolicies = {
+  TPCN: {
+    conditions: ["NEAR_EXPIRY", "EXPIRED", "TORN_PACKAGING", "VACUUM_LEAK", "OTHER"],
+    defaultCondition: "NEAR_EXPIRY",
+    resolutions: ["CANCEL", "EXCHANGE", "RETURN", "OTHER"],
+    defaultResolution: "CANCEL",
+  },
+  TPTS: {
+    conditions: ["BRUISED_WATERLOGGED", "ROTTEN_MOLDY", "NEAR_EXPIRY", "EXPIRED", "OTHER"],
+    defaultCondition: "BRUISED_WATERLOGGED",
+    resolutions: ["CANCEL", "OTHER"],
+    defaultResolution: "CANCEL",
+  },
+};
+
+async function readJson(filePath) {
+  return JSON.parse(await readFile(filePath, "utf8"));
+}
+
+async function findJsonFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const nestedFiles = await Promise.all(
+    entries.map((entry) => {
+      const entryPath = path.join(directory, entry.name);
+      return entry.isDirectory()
+        ? findJsonFiles(entryPath)
+        : Promise.resolve(entry.name.endsWith(".json") ? [entryPath] : []);
+    }),
+  );
+  return nestedFiles.flat();
+}
+
+function problemLocation(problem) {
+  const start = problem.location?.[0]?.start;
+  return start ? `${start.line}:${start.col}` : "unknown location";
+}
+
+async function validateOpenApiStructure() {
+  const config = await createConfig({
+    rules: {
+      struct: "error",
+      "no-unresolved-refs": "error",
+    },
+  });
+  const problems = await lint({ ref: contractPath, config });
+  const errors = problems.filter((problem) => problem.severity === "error");
+  assert.equal(
+    errors.length,
+    0,
+    errors
+      .map(
+        (problem) =>
+          `${problemLocation(problem)} [${problem.ruleId}] ${problem.message}`,
+      )
+      .join("\n"),
+  );
+}
+
+async function validateManifestAndJsonSyntax() {
+  const manifest = await readJson(manifestPath);
+  assert.ok(Array.isArray(manifest.fixtures), "Fixture manifest must contain a fixtures array.");
+
+  const resources = manifest.fixtures.map((entry) => entry.resource);
+  assert.equal(
+    new Set(resources).size,
+    resources.length,
+    "Fixture manifest must not contain duplicate resources.",
+  );
+
+  const actualApiResources = (await readdir(path.join(fixturesRoot, "api"), { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+    .map((entry) => `api/${entry.name}`);
+  const mappedApiResources = [...apiFixtureSchemas.keys()];
+  const manifestApiResources = resources.filter((resource) => resource.startsWith("api/"));
+  assertExactSet(
+    actualApiResources,
+    mappedApiResources,
+    "API fixture schema map must cover every contracts/fixtures/api/*.json file exactly.",
+  );
+  assertExactSet(
+    actualApiResources,
+    manifestApiResources,
+    "Fixture manifest must cover every contracts/fixtures/api/*.json file exactly.",
+  );
+
+  for (const resource of resources) {
+    assert.equal(typeof resource, "string", "Every fixture resource must be a string.");
+    const resourcePath = path.resolve(fixturesRoot, resource);
+    assert.ok(
+      resourcePath.startsWith(`${fixturesRoot}${path.sep}`),
+      `Fixture resource escapes contracts/fixtures: ${resource}`,
+    );
+    const resourceStat = await stat(resourcePath).catch(() => null);
+    assert.ok(resourceStat?.isFile(), `Fixture resource does not exist: ${resource}`);
+  }
+
+  const jsonFiles = await findJsonFiles(fixturesRoot);
+  await Promise.all(jsonFiles.map(readJson));
+  return manifest;
+}
+
+function isDate(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const [, yearText, monthText, dayText] = match;
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return month >= 1 && month <= 12 && day >= 1 && day <= daysInMonth[month - 1];
+}
+
+function isDateTime(value) {
+  const match = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(
+    value,
+  );
+  if (!match || !isDate(match[1])) return false;
+  const hour = Number(match[2]);
+  const minute = Number(match[3]);
+  const second = Number(match[4]);
+  const offsetHour = match[6] === undefined ? 0 : Number(match[6]);
+  const offsetMinute = match[7] === undefined ? 0 : Number(match[7]);
+  return (
+    hour <= 23 &&
+    minute <= 59 &&
+    second <= 60 &&
+    offsetHour <= 23 &&
+    offsetMinute <= 59
+  );
+}
+
+function createFixtureValidator(openApi) {
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  ajv.addFormat("uuid", /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+  ajv.addFormat("date", { type: "string", validate: isDate });
+  ajv.addFormat("date-time", { type: "string", validate: isDateTime });
+  ajv.addSchema(openApi, contractSchemaId);
+  return ajv;
+}
+
+function componentSchemaRef(componentName) {
+  return `${contractSchemaId}#/components/schemas/${componentName}`;
+}
+
+function validateFixture(ajv, componentName, fixture, fixtureLabel) {
+  const valid = ajv.validate(componentSchemaRef(componentName), fixture);
+  assert.ok(valid, `${fixtureLabel}: ${ajv.errorsText(ajv.errors, { separator: "\n" })}`);
+}
+
+function expectInvalid(ajv, componentName, fixture, expectedKeyword, assertionLabel) {
+  const valid = ajv.validate(componentSchemaRef(componentName), fixture);
+  assert.equal(valid, false, `${assertionLabel} unexpectedly passed validation.`);
+  assert.ok(
+    ajv.errors?.some((error) => error.keyword === expectedKeyword),
+    `${assertionLabel} did not fail with ${expectedKeyword}: ${ajv.errorsText(ajv.errors)}`,
+  );
+}
+
+async function validateApiFixtures(openApi) {
+  const ajv = createFixtureValidator(openApi);
+  const fixtures = new Map();
+
+  for (const [resource, componentName] of apiFixtureSchemas) {
+    const fixture = await readJson(path.join(fixturesRoot, resource));
+    validateFixture(ajv, componentName, fixture, resource);
+    fixtures.set(resource, fixture);
+  }
+
+  const extraProperty = structuredClone(fixtures.get("api/session.json"));
+  extraProperty.user.unexpected = true;
+  expectInvalid(
+    ajv,
+    "SessionResponse",
+    extraProperty,
+    "additionalProperties",
+    "SessionResponse additional-property assertion",
+  );
+
+  const missingRequired = structuredClone(fixtures.get("api/session.json"));
+  delete missingRequired.user.displayName;
+  expectInvalid(
+    ajv,
+    "SessionResponse",
+    missingRequired,
+    "required",
+    "SessionResponse required-field assertion",
+  );
+
+  const badDiscriminator = structuredClone(fixtures.get("api/barcode-found.json"));
+  badDiscriminator.status = "UNKNOWN";
+  expectInvalid(
+    ajv,
+    "BarcodeLookupResponse",
+    badDiscriminator,
+    "oneOf",
+    "BarcodeLookupResponse discriminator assertion",
+  );
+
+  const badUuid = structuredClone(fixtures.get("api/session.json"));
+  badUuid.user.id = "not-a-uuid";
+  expectInvalid(ajv, "SessionResponse", badUuid, "format", "SessionResponse UUID assertion");
+
+  const badCalendarDate = structuredClone(fixtures.get("api/kph-record.json"));
+  badCalendarDate.detectedDate = "2026-02-30";
+  expectInvalid(ajv, "KphRecord", badCalendarDate, "format", "KphRecord calendar-date assertion");
+
+  const badDateTime = structuredClone(fixtures.get("api/kph-record.json"));
+  badDateTime.createdAt = "2026-01-16T25:31:05+07:00";
+  expectInvalid(ajv, "KphRecord", badDateTime, "format", "KphRecord date-time assertion");
+
+  const badEnum = structuredClone(fixtures.get("api/kph-record.json"));
+  badEnum.type = "UNKNOWN";
+  expectInvalid(ajv, "KphRecord", badEnum, "enum", "KphRecord enum assertion");
+
+  const notFound = fixtures.get("api/barcode-not-found.json");
+  assert.equal(notFound.status, "NOT_FOUND", "Barcode not-found fixture must have status NOT_FOUND.");
+  assert.equal(
+    Object.hasOwn(notFound, "product"),
+    false,
+    "NOT_FOUND lookup must not infer a product; this does not prohibit direct manual KPH entry.",
+  );
+}
+
+function enumValues(openApi, schemaName) {
+  const values = openApi.components?.schemas?.[schemaName]?.enum;
+  assert.ok(Array.isArray(values), `OpenAPI component ${schemaName} must define an enum.`);
+  assert.equal(new Set(values).size, values.length, `${schemaName} enum contains duplicate values.`);
+  return values;
+}
+
+function assertSameValues(actual, expected, label) {
+  assert.deepEqual([...new Set(actual)].sort(), [...new Set(expected)].sort(), label);
+}
+
+function assertExactSet(actual, expected, label) {
+  assert.deepEqual([...actual].sort(), [...expected].sort(), label);
+}
+
+async function validateGoldenKphEnums(openApi) {
+  const cases = await readJson(path.join(fixturesRoot, "golden/kph/field-policy-cases.json"));
+  assert.ok(Array.isArray(cases) && cases.length > 0, "Golden KPH field-policy cases must not be empty.");
+
+  const fixtureTypes = cases.map((fixture) => fixture.type);
+  assert.equal(
+    new Set(fixtureTypes).size,
+    fixtureTypes.length,
+    "Golden KPH field-policy cases must define each KPH type exactly once.",
+  );
+  assertExactSet(
+    fixtureTypes,
+    Object.keys(acceptedKphPolicies),
+    "Golden KPH policies differ from the accepted TPCN/TPTS policy set.",
+  );
+
+  for (const fixture of cases) {
+    const acceptedPolicy = acceptedKphPolicies[fixture.type];
+    assert.ok(acceptedPolicy, `${fixture.id} uses unsupported KPH type ${fixture.type}.`);
+    assert.ok(fixture.conditions.includes(fixture.defaultCondition), `${fixture.id} has an invalid defaultCondition.`);
+    assert.ok(fixture.resolutions.includes(fixture.defaultResolution), `${fixture.id} has an invalid defaultResolution.`);
+    assert.equal(new Set(fixture.conditions).size, fixture.conditions.length, `${fixture.id} repeats a condition.`);
+    assert.equal(new Set(fixture.resolutions).size, fixture.resolutions.length, `${fixture.id} repeats a resolution.`);
+    assert.deepEqual(
+      fixture.conditions,
+      acceptedPolicy.conditions,
+      `${fixture.id} conditions differ from the accepted ${fixture.type} policy.`,
+    );
+    assert.equal(
+      fixture.defaultCondition,
+      acceptedPolicy.defaultCondition,
+      `${fixture.id} defaultCondition differs from the accepted ${fixture.type} policy.`,
+    );
+    assert.deepEqual(
+      fixture.resolutions,
+      acceptedPolicy.resolutions,
+      `${fixture.id} resolutions differ from the accepted ${fixture.type} policy.`,
+    );
+    assert.equal(
+      fixture.defaultResolution,
+      acceptedPolicy.defaultResolution,
+      `${fixture.id} defaultResolution differs from the accepted ${fixture.type} policy.`,
+    );
+  }
+
+  assertSameValues(
+    cases.map((fixture) => fixture.type),
+    enumValues(openApi, "KphType"),
+    "Golden KPH types differ from OpenAPI KphType.",
+  );
+  assertSameValues(
+    cases.flatMap((fixture) => fixture.conditions),
+    enumValues(openApi, "KphCondition"),
+    "Golden KPH conditions differ from OpenAPI KphCondition.",
+  );
+  assertSameValues(
+    cases.flatMap((fixture) => fixture.resolutions),
+    enumValues(openApi, "KphResolution"),
+    "Golden KPH resolutions differ from OpenAPI KphResolution.",
+  );
+  assertExactSet(
+    enumValues(openApi, "KphLookupStatus"),
+    acceptedKphLookupStatuses,
+    "OpenAPI KphLookupStatus differs from the locked public contract.",
+  );
+}
+
+async function main() {
+  await validateOpenApiStructure();
+  const manifest = await validateManifestAndJsonSyntax();
+  const openApi = yaml.load(await readFile(contractPath, "utf8"));
+  assert.equal(openApi.openapi, "3.1.0", "Contract Lock requires OpenAPI 3.1.0.");
+  await validateApiFixtures(openApi);
+  await validateGoldenKphEnums(openApi);
+  console.log(
+    `Contract Lock passed: ${manifest.fixtures.length} manifest resources, ${apiFixtureSchemas.size} API fixtures.`,
+  );
+}
+
+main().catch((error) => {
+  console.error(error instanceof Error ? error.stack : error);
+  process.exitCode = 1;
+});
