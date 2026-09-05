@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-04
+Cập nhật: 2026-09-05
 
 ## Giai đoạn
 
@@ -24,6 +24,11 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   image envelope/timestamp và cấu trúc Excel.
 - OpenAPI v1 tối thiểu cho health, session, store context, barcode lookup và
   KPH create/list. Frontend và backend dùng contract này là ranh giới cộng tác.
+- Contract Lock kiểm schema/examples và golden option matrix. Migration V2
+  đồng bộ đơn vị `kg`, đủ năm tình trạng mỗi loại như Pilot, và số lượng `EA`
+  nguyên/`kg` thập phân dương; không tự làm tròn số lượng trước validation.
+  `DAMAGED` trong dữ liệu database cũ chuyển sang `OTHER` kèm provenance;
+  không suy diễn thành Dập úng hay Thối mốc, không migrate IndexedDB Pilot.
 - Store PWA đã có component shell React giữ brand header, store/session context,
   hai entry TPCN/TPTS, lịch sử table/card responsive, form demo và tra hạn.
 - Pilot Store PWA cho cấu hình context cửa hàng/người dùng theo từng thiết bị,

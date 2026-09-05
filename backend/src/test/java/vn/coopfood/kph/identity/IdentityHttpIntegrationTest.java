@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -60,7 +61,7 @@ class IdentityHttpIntegrationTest {
     @BeforeEach
     void seedIdentity() {
         database.execute("TRUNCATE TABLE app_users, stores CASCADE");
-        Instant now = Instant.parse("2026-09-04T04:00:00Z");
+        Timestamp now = Timestamp.from(Instant.parse("2026-09-04T04:00:00Z"));
         database.execute(
                 "INSERT INTO app_users (id, username, password_hash, display_name, active, created_at, updated_at) "
                         + "VALUES (?, ?, ?, ?, TRUE, ?, ?)",
@@ -170,7 +171,7 @@ class IdentityHttpIntegrationTest {
         return HttpRequest.newBuilder(URI.create("http://localhost:" + port + path));
     }
 
-    private void insertStore(UUID storeId, String code, String name, boolean active, Instant now) {
+    private void insertStore(UUID storeId, String code, String name, boolean active, Timestamp now) {
         database.execute(
                 "INSERT INTO stores (id, store_code, store_name, active, created_at, updated_at) "
                         + "VALUES (?, ?, ?, ?, ?, ?)",
@@ -182,7 +183,7 @@ class IdentityHttpIntegrationTest {
                 now);
     }
 
-    private void insertMembership(UUID storeId, String role, boolean active, Instant now) {
+    private void insertMembership(UUID storeId, String role, boolean active, Timestamp now) {
         database.execute(
                 "INSERT INTO store_memberships (user_id, store_id, role, active, created_at, updated_at) "
                         + "VALUES (?, ?, ?, ?, ?, ?)",

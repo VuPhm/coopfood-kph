@@ -100,6 +100,9 @@ export interface paths {
          * Resolve a barcode to zero or one current active product
          * @description Reads only the published current catalog. `NOT_FOUND` never includes a
          *     guessed product and the response is never a collection.
+         *     Requires active membership in the requested store; global roles do not
+         *     bypass membership. Returns 503 when no current catalog exists or a
+         *     matching product has no explicitly designated primary supplier.
          */
         get: operations["lookupBarcode"];
         put?: never;
@@ -241,6 +244,8 @@ export interface components {
          *     OTHER; resolutions: CANCEL, EXCHANGE, RETURN, OTHER. TPTS conditions:
          *     BRUISED_WATERLOGGED, ROTTEN_MOLDY, NEAR_EXPIRY, EXPIRED, OTHER; it only
          *     allows CANCEL or OTHER.
+         *     EA quantity must be a positive whole number; kg accepts a positive
+         *     decimal quantity.
          *     OTHER detail is optional and normalizes to the Vietnamese legacy label
          *     when blank. At least one of barcode/manualSkuCode/manualProductName is
          *     required. Actor and store fields are deliberately absent.
@@ -270,7 +275,15 @@ export interface components {
              *     never an audit timestamp.
              */
             photoLastModified?: (string | null)[];
-        };
+        } & ({
+            /** @constant */
+            unit: "EA";
+            quantity: number;
+        } | {
+            /** @constant */
+            unit: "kg";
+            quantity: number;
+        });
         KphRecord: {
             /** Format: uuid */
             id: string;
@@ -538,7 +551,13 @@ export interface operations {
     };
     lookupBarcode: {
         parameters: {
-            query?: never;
+            query: {
+                /**
+                 * @description Requested store scope, revalidated against active membership.
+                 * @example 10000000-0000-4000-8000-000000000001
+                 */
+                storeId: string;
+            };
             header?: never;
             path: {
                 /** @description Exact string identifier; leading zeroes are significant. */
@@ -557,7 +576,9 @@ export interface operations {
                     "application/json": components["schemas"]["BarcodeLookupResponse"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             503: components["responses"]["ServiceUnavailable"];
         };
     };

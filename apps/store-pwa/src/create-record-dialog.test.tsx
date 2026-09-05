@@ -45,6 +45,10 @@ describe("Create KPH record", () => {
   it("uses the reviewed TPCN condition matrix", () => {
     renderDialog("TPCN");
     const condition = screen.getByRole("group", { name: "Tình trạng" });
+    expect(within(condition).getAllByRole("radio").map((radio) => radio.getAttribute("value"))).toEqual([
+      "NEAR_EXPIRY", "EXPIRED", "TORN_PACKAGING", "VACUUM_LEAK", "OTHER",
+    ]);
+    expect(within(condition).getByRole("radio", { name: "Cận date" })).toBeChecked();
     expect(within(condition).getByRole("radio", { name: "Rách bao bì" }).closest("label")?.querySelector(".lucide-package-open")).not.toBeNull();
     expect(within(condition).getByRole("radio", { name: "Xì chân không" }).closest("label")?.querySelector(".lucide-wind")).not.toBeNull();
   });
@@ -53,6 +57,9 @@ describe("Create KPH record", () => {
     renderDialog("TPTS");
     const condition = screen.getByRole("group", { name: "Tình trạng" });
     const resolution = screen.getByRole("group", { name: "Biện pháp xử lý" });
+    expect(within(condition).getAllByRole("radio").map((radio) => radio.getAttribute("value"))).toEqual([
+      "BRUISED_WATERLOGGED", "ROTTEN_MOLDY", "NEAR_EXPIRY", "EXPIRED", "OTHER",
+    ]);
     expect(within(condition).getByRole("radio", { name: "Dập úng" })).toBeChecked();
     expect(within(condition).getByRole("radio", { name: "Dập úng" }).closest("label")?.querySelector(".lucide-apple")).not.toBeNull();
     expect(within(condition).getByRole("radio", { name: "Thối mốc" }).closest("label")?.querySelector(".lucide-biohazard")).not.toBeNull();
@@ -136,7 +143,12 @@ describe("Create KPH record", () => {
     expect((treatmentDateInput as HTMLInputElement).value).toMatch(/^18\/\d{2}\/\d{4}$/);
   });
 
-  it("saves the entered values and stamped evidence instead of a placeholder", async () => {
+  it.each([
+    { kind: "TPCN" as const, condition: "Rách bao bì" },
+    { kind: "TPCN" as const, condition: "Xì chân không" },
+    { kind: "TPTS" as const, condition: "Dập úng" },
+    { kind: "TPTS" as const, condition: "Thối mốc" },
+  ])("saves the reviewed pilot tag $condition for $kind with entered values and stamped evidence", async ({ kind, condition }) => {
     Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:saved-photo") });
     Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
     const stampedBlob = new Blob(["stamped"], { type: "image/jpeg" });
@@ -146,7 +158,8 @@ describe("Create KPH record", () => {
       width: 1280,
       height: 720,
     });
-    const onSaved = renderDialog();
+    const onSaved = renderDialog(kind);
+    fireEvent.click(within(screen.getByRole("group", { name: "Tình trạng" })).getByRole("radio", { name: condition }));
     fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Sản phẩm kiểm thử" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Trần An" } });
@@ -157,7 +170,8 @@ describe("Create KPH record", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
 
     await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({
-        kind: "TPCN",
+        kind,
+        condition,
         barcode: "000123",
         productName: "Sản phẩm kiểm thử",
         detectedBy: "Trần An",

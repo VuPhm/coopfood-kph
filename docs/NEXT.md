@@ -38,6 +38,17 @@ song song bằng mock sinh từ cùng OpenAPI.
   1–3 ảnh và history table/card theo UI DNA.
 - Test role × store, business-date fixture và flow HTTP/browser quan trọng.
 
+### Tiến độ slice
+
+- Đã có session/store context và Contract Lock.
+- Migration coherence V2 giữ nguyên bộ tag Pilot accepted: TPCN có Cận date,
+  Hết HSD, Rách bao bì, Xì chân không, Khác; TPTS có Dập úng, Thối mốc,
+  Cận date, Hết HSD, Khác. Đây là tình trạng hàng, khác trạng thái duyệt.
+- Cần chạy test migration trên PostgreSQL 17 qua Testcontainers trước khi
+  công nhận database-clean acceptance; môi trường hiện chưa có Docker socket.
+- Bước triển khai tiếp theo: catalog lookup store-scoped `0 hoặc 1`, kèm test
+  cross-store và current published catalog; sau đó KPH create/list/private media.
+
 ### Ngoài phạm vi
 
 - Catalog import UI, provisioning UI, invalidate/export/approve, offline sync.

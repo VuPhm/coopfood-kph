@@ -19,6 +19,7 @@ const apiFixtureSchemas = new Map([
   ["api/barcode-found.json", "BarcodeLookupResponse"],
   ["api/barcode-not-found.json", "BarcodeLookupResponse"],
   ["api/kph-record.json", "KphRecord"],
+  ["api/kph-create.json", "KphCreateRequest"],
 ]);
 
 const acceptedKphPolicies = {
@@ -243,6 +244,55 @@ async function validateApiFixtures(openApi) {
     false,
     "NOT_FOUND lookup must not infer a product; this does not prohibit direct manual KPH entry.",
   );
+
+  const baseCreateRequest = fixtures.get("api/kph-create.json");
+  validateFixture(
+    ajv,
+    "KphCreateRequest",
+    baseCreateRequest,
+    "KphCreateRequest whole EA quantity assertion",
+  );
+
+  const fractionalEach = structuredClone(baseCreateRequest);
+  fractionalEach.quantity = 1.25;
+  expectInvalid(
+    ajv,
+    "KphCreateRequest",
+    fractionalEach,
+    "multipleOf",
+    "KphCreateRequest fractional EA quantity assertion",
+  );
+
+  const fractionalKg = structuredClone(baseCreateRequest);
+  fractionalKg.unit = "kg";
+  fractionalKg.quantity = 1.25;
+  validateFixture(
+    ajv,
+    "KphCreateRequest",
+    fractionalKg,
+    "KphCreateRequest fractional kg quantity assertion",
+  );
+
+  for (const [type, policy] of Object.entries(acceptedKphPolicies)) {
+    for (const condition of policy.conditions) {
+      validateFixture(ajv, "KphCreateRequest", {
+        ...baseCreateRequest, type, condition,
+      }, `${type}/${condition} pilot condition must remain accepted`);
+    }
+  }
+  for (const unit of ["EA", "kg"]) {
+    for (const quantity of [0, -1]) {
+      expectInvalid(ajv, "KphCreateRequest", {
+        ...baseCreateRequest, unit, quantity,
+      }, "exclusiveMinimum", `${unit} nonpositive quantity assertion`);
+    }
+  }
+  expectInvalid(ajv, "KphCreateRequest", {
+    ...baseCreateRequest, quantity: 1.0004,
+  }, "multipleOf", "EA fractional precision must not round to a whole unit");
+  validateFixture(ajv, "KphCreateRequest", {
+    ...baseCreateRequest, unit: "kg", quantity: 0.0001,
+  }, "Positive kg precision must not round to zero");
 }
 
 function enumValues(openApi, schemaName) {

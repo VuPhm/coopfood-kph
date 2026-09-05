@@ -512,6 +512,8 @@ components:
         OTHER; resolutions: CANCEL, EXCHANGE, RETURN, OTHER. TPTS conditions:
         BRUISED_WATERLOGGED, ROTTEN_MOLDY, NEAR_EXPIRY, EXPIRED, OTHER; it only
         allows CANCEL or OTHER.
+        EA quantity must be a positive whole number; kg accepts a positive
+        decimal quantity.
         OTHER detail is optional and normalizes to the Vietnamese legacy label
         when blank. At least one of barcode/manualSkuCode/manualProductName is
         required. Actor and store fields are deliberately absent.
@@ -564,6 +566,24 @@ components:
           items:
             type: [string, 'null']
             format: date-time
+      oneOf:
+        - type: object
+          required: [unit, quantity]
+          properties:
+            unit:
+              const: EA
+            quantity:
+              type: number
+              exclusiveMinimum: 0
+              multipleOf: 1
+        - type: object
+          required: [unit, quantity]
+          properties:
+            unit:
+              const: kg
+            quantity:
+              type: number
+              exclusiveMinimum: 0
 
     KphRecord:
       type: object
