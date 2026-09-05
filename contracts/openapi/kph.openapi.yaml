@@ -112,8 +112,19 @@ paths:
       description: |
         Reads only the published current catalog. `NOT_FOUND` never includes a
         guessed product and the response is never a collection.
+        Requires active membership in the requested store; global roles do not
+        bypass membership. Returns 503 when no current catalog exists or a
+        matching product has no explicitly designated primary supplier.
       parameters:
         - $ref: '#/components/parameters/BarcodePath'
+        - name: storeId
+          in: query
+          required: true
+          description: Requested store scope, revalidated against active membership.
+          schema:
+            type: string
+            format: uuid
+          example: 10000000-0000-4000-8000-000000000001
       responses:
         '200':
           description: Deterministic `FOUND` or `NOT_FOUND` result.
@@ -121,8 +132,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BarcodeLookupResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '503':
           $ref: '#/components/responses/ServiceUnavailable'
 

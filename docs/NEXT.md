@@ -44,10 +44,12 @@ song song bằng mock sinh từ cùng OpenAPI.
 - Migration coherence V2 giữ nguyên bộ tag Pilot accepted: TPCN có Cận date,
   Hết HSD, Rách bao bì, Xì chân không, Khác; TPTS có Dập úng, Thối mốc,
   Cận date, Hết HSD, Khác. Đây là tình trạng hàng, khác trạng thái duyệt.
-- Cần chạy test migration trên PostgreSQL 17 qua Testcontainers trước khi
-  công nhận database-clean acceptance; môi trường hiện chưa có Docker socket.
-- Bước triển khai tiếp theo: catalog lookup store-scoped `0 hoặc 1`, kèm test
-  cross-store và current published catalog; sau đó KPH create/list/private media.
+- Migration V2 đã pass trên PostgreSQL 17/Testcontainers từ database sạch và
+  đường nâng cấp mã cũ tổng hợp.
+- Catalog lookup đã trả `0 hoặc 1` từ catalog published/current với membership
+  store bắt buộc; dữ liệu inactive, non-current hoặc thiếu NCC chính không bị
+  suy diễn. `CHAIN_ADMIN` không bypass membership.
+- Bước triển khai tiếp theo: KPH create/list, catalog snapshot và private media.
 
 ### Ngoài phạm vi
 

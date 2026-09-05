@@ -8,9 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 
@@ -71,6 +74,13 @@ public class ProblemDetailAdvice {
     ResponseEntity<ProblemDetail> handleUnreadableBody() {
         ProblemDetail problem = problem(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST", "Request body is malformed.");
         return ResponseEntity.badRequest().body(problem);
+    }
+
+    @ExceptionHandler({MissingServletRequestParameterException.class,
+            MethodArgumentTypeMismatchException.class, HandlerMethodValidationException.class})
+    ResponseEntity<ProblemDetail> handleInvalidParameter() {
+        return ResponseEntity.badRequest().body(problem(
+                HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Request parameters are invalid."));
     }
 
     private ProblemDetail problem(HttpStatus status, String code, String detail) {
