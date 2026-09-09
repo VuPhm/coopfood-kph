@@ -1,6 +1,7 @@
 package vn.coopfood.kph.kph;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -10,11 +11,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -123,7 +127,8 @@ class KphHttpIntegrationTest {
         insertCatalog("001234");
         Login login = login();
         MockMultipartFile payload = payload("001234", "Sản phẩm client không được tin");
-        MockMultipartFile photo = new MockMultipartFile("photos", "evidence.png", "image/png", png(32, 16));
+        byte[] originalBytes = png(32, 16);
+        MockMultipartFile photo = new MockMultipartFile("photos", "evidence.png", "image/png", originalBytes);
 
         MvcResult created = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .file(payload)
@@ -145,11 +150,22 @@ class KphHttpIntegrationTest {
 
         String recordId = body.path("id").asText();
         String photoPath = body.path("photos").get(0).path("stampedContentPath").asText();
+        var persistedPhoto = database.fetchOne(
+                "SELECT original_storage_key, stamped_storage_key, original_sha256, stamped_sha256 "
+                        + "FROM kph_photos WHERE kph_record_id = ? AND ordinal = 1",
+                UUID.fromString(recordId));
+        assertThat(Files.readAllBytes(mediaRoot.resolve(persistedPhoto.get("original_storage_key", String.class))))
+                .containsExactly(originalBytes);
+        assertThat(persistedPhoto.get("original_sha256", String.class)).isEqualTo(sha256(originalBytes));
+        assertThat(persistedPhoto.get("stamped_sha256", String.class))
+                .isEqualTo(sha256(Files.readAllBytes(mediaRoot.resolve(
+                        persistedPhoto.get("stamped_storage_key", String.class)))));
         mockMvc.perform(get(photoPath).session(login.session()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", MediaType.IMAGE_JPEG_VALUE))
                 .andExpect(header().string("Cache-Control", containsString("private")))
                 .andExpect(header().string("Cache-Control", containsString("no-store")));
+        mockMvc.perform(get(photoPath)).andExpect(status().isUnauthorized());
 
         MvcResult list = mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID).session(login.session()))
                 .andExpect(status().isOk())
@@ -171,12 +187,23 @@ class KphHttpIntegrationTest {
                         .header("X-CSRF-TOKEN", login.csrfToken()).header("Idempotency-Key", "kph-replay-key-0001"))
                 .andExpect(status().isCreated()).andReturn();
         String firstId = objectMapper.readTree(first.getResponse().getContentAsByteArray()).path("id").asText();
+        Set<Path> mediaAfterFirst;
+        try (var files = Files.walk(mediaRoot)) {
+            mediaAfterFirst = files.filter(Files::isRegularFile).collect(java.util.stream.Collectors.toUnmodifiableSet());
+        }
 
         mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .file(payload(null, "Manual product")).file(new MockMultipartFile("photos", "evidence.jpg", "image/jpeg", jpeg(12, 12)))
                         .session(login.session()).header("X-CSRF-TOKEN", login.csrfToken())
                         .header("Idempotency-Key", "kph-replay-key-0001"))
                 .andExpect(status().isCreated());
+        assertThat(database.fetch("SELECT id FROM kph_records WHERE created_by = ?", USER_ID)).hasSize(1);
+        assertThat(database.fetch("SELECT id FROM kph_photos WHERE kph_record_id = ?", UUID.fromString(firstId)))
+                .hasSize(1);
+        try (var files = Files.walk(mediaRoot)) {
+            assertThat(files.filter(Files::isRegularFile).collect(java.util.stream.Collectors.toUnmodifiableSet()))
+                    .containsExactlyInAnyOrderElementsOf(mediaAfterFirst);
+        }
         MvcResult changed = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .file(payload(null, "Different product")).file(firstPhoto).session(login.session())
                         .header("X-CSRF-TOKEN", login.csrfToken())
@@ -221,6 +248,46 @@ class KphHttpIntegrationTest {
                         get("/api/v1/stores/{storeId}/kph", STORE_ID).session(login.session()))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray()).get(0);
         assertThat(reloaded).isEqualTo(body);
+    }
+
+    @Test
+    void cleansBothMediaFilesWhenTheDatabaseTransactionRollsBack() throws Exception {
+        Set<Path> filesBefore;
+        try (var files = Files.walk(mediaRoot)) {
+            filesBefore = files.filter(Files::isRegularFile).collect(java.util.stream.Collectors.toUnmodifiableSet());
+        }
+        database.execute("""
+                CREATE OR REPLACE FUNCTION fail_kph_photo_insert() RETURNS trigger
+                LANGUAGE plpgsql AS $$
+                BEGIN
+                    RAISE EXCEPTION 'synthetic KPH photo failure';
+                END;
+                $$
+                """);
+        database.execute("""
+                CREATE TRIGGER fail_kph_photo_insert_trigger
+                BEFORE INSERT ON kph_photos
+                FOR EACH ROW EXECUTE FUNCTION fail_kph_photo_insert()
+                """);
+        try {
+            Login login = login();
+            assertThatThrownBy(() -> mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
+                            .file(payload(null, "Rollback product"))
+                            .file(new MockMultipartFile("photos", "evidence.jpg", "image/jpeg", jpeg(32, 16)))
+                            .session(login.session())
+                            .header("X-CSRF-TOKEN", login.csrfToken())
+                            .header("Idempotency-Key", "kph-rollback-key-0001")))
+                    .isInstanceOf(jakarta.servlet.ServletException.class)
+                    .hasMessageContaining("synthetic KPH photo failure");
+        } finally {
+            database.execute("DROP TRIGGER IF EXISTS fail_kph_photo_insert_trigger ON kph_photos");
+            database.execute("DROP FUNCTION IF EXISTS fail_kph_photo_insert()");
+        }
+        try (var files = Files.walk(mediaRoot)) {
+            assertThat(files.filter(Files::isRegularFile).collect(java.util.stream.Collectors.toUnmodifiableSet()))
+                    .containsExactlyInAnyOrderElementsOf(filesBefore);
+        }
+        assertThat(database.fetch("SELECT id FROM kph_records")).isEmpty();
     }
 
     private Login login() throws Exception {
@@ -293,6 +360,10 @@ class KphHttpIntegrationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ImageIO.write(image, format, output);
         return output.toByteArray();
+    }
+
+    private static String sha256(byte[] bytes) throws Exception {
+        return java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
     }
 
     private record Login(MockHttpSession session, String csrfToken) {

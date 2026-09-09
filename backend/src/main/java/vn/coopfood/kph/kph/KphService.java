@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,18 +88,18 @@ class KphService {
 
         UUID recordId = UUID.randomUUID();
         Instant createdAt = Instant.now(clock);
-        List<String> storedKeys = new ArrayList<>();
+        MediaCleanup cleanup = registerMediaCleanup();
         try {
             List<StoredMedia> stored = new ArrayList<>();
             for (int index = 0; index < photos.size(); index++) {
-                Instant capturedAt = request.photoLastModified() != null && index < request.photoLastModified().size()
+                Instant fallbackCapturedAt = request.photoLastModified() != null && index < request.photoLastModified().size()
                         && request.photoLastModified().get(index) != null
                                 ? request.photoLastModified().get(index)
                                 : createdAt;
-                KphRepository.StoredPhoto storedPhoto = media.store(recordId, index + 1, photos.get(index), store, capturedAt);
-                stored.add(new StoredMedia(storedPhoto, capturedAt));
-                storedKeys.add(storedPhoto.originalStorageKey());
-                storedKeys.add(storedPhoto.stampedStorageKey());
+                LocalPrivateMediaStorage.StoredMedia storedPhoto = media.store(
+                        recordId, index + 1, photos.get(index), store, fallbackCapturedAt, createdAt);
+                stored.add(new StoredMedia(storedPhoto.photo(), storedPhoto.capturedAt()));
+                cleanup.track(storedPhoto.photo());
             }
 
             repository.insertRecord(recordId, storeId, actorId, request, barcode, lookupStatus, catalogValues, createdAt,
@@ -110,7 +112,7 @@ class KphService {
             repository.insertIdempotency(actorId, idempotencyKey, requestHash, recordId, createdAt);
             return repository.findOne(storeId, recordId).orElseThrow();
         } catch (RuntimeException exception) {
-            storedKeys.forEach(media::delete);
+            cleanup.deleteNow();
             throw exception;
         }
     }
@@ -175,7 +177,7 @@ class KphService {
             digest.update(objectMapper.writeValueAsBytes(request));
             if (photos != null) {
                 for (MultipartFile photo : photos) {
-                    byte[] bytes = photo.getBytes();
+                    byte[] bytes = media.readBounded(photo);
                     digest.update((byte) 0);
                     digest.update(Long.toString(bytes.length).getBytes(StandardCharsets.UTF_8));
                     digest.update((byte) 0);
@@ -183,7 +185,7 @@ class KphService {
                 }
             }
             return java.util.HexFormat.of().formatHex(digest.digest());
-        } catch (NoSuchAlgorithmException | java.io.IOException exception) {
+        } catch (NoSuchAlgorithmException exception) {
             throw new IllegalStateException("Could not fingerprint KPH request.", exception);
         }
     }
@@ -208,6 +210,39 @@ class KphService {
 
     private static ApiProblemException problem(HttpStatus status, String code, String detail) {
         return new ApiProblemException(status, code, detail);
+    }
+
+    private MediaCleanup registerMediaCleanup() {
+        MediaCleanup cleanup = new MediaCleanup(media);
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    if (status != TransactionSynchronization.STATUS_COMMITTED) {
+                        cleanup.deleteNow();
+                    }
+                }
+            });
+        }
+        return cleanup;
+    }
+
+    private static final class MediaCleanup {
+        private final LocalPrivateMediaStorage media;
+        private final List<String> storageKeys = new ArrayList<>();
+
+        private MediaCleanup(LocalPrivateMediaStorage media) {
+            this.media = media;
+        }
+
+        private void track(KphRepository.StoredPhoto photo) {
+            storageKeys.add(photo.originalStorageKey());
+            storageKeys.add(photo.stampedStorageKey());
+        }
+
+        private void deleteNow() {
+            storageKeys.forEach(media::delete);
+        }
     }
 
     private record StoredMedia(KphRepository.StoredPhoto photo, Instant capturedAt) {
