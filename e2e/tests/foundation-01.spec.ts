@@ -72,9 +72,9 @@ function syntheticPng(name: string, lastModified: number) {
 }
 
 function syntheticJpeg(name: string, lastModified: number) {
-  // A deterministic 1×1 JPEG exercises the other online-upload MIME path.
+  // A deterministic tiny JPEG exercises the other online-upload MIME path.
   const buffer = Buffer.from(
-    "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////2wBDAf//////////////////////////////////////////////////////////////////////////////////////wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9k=",
+    "/9j/4AAQSkZJRgABAgAAAQABAAD//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgEBAQEBAUFBQUFBQYGBgYGBgYGBgYGBgYHBwcICAgHBwcGBgcHCAgICAkJCQgICAgJCQoKCgwMCwsODg4RERT/xABLAAEBAAAAAAAAAAAAAAAAAAAABwEBAAAAAAAAAAAAAAAAAAAAABABAAAAAAAAAAAAAAAAAAAAABEBAAAAAAAAAAAAAAAAAAAAAP/AABEIAAgACAMBIgACEQADEQD/2gAMAwEAAhEDEQA/AL+AD//Z",
     "base64",
   );
   return { name, mimeType: "image/jpeg", buffer, lastModified };
@@ -336,7 +336,7 @@ test.describe("Foundation-01 browser acceptance", () => {
         skuCode: null,
         productName: marker,
         supplierCode: null,
-        supplierName: null,
+        supplierName: "NCC nhập tay E2E",
       },
       store: { id: STORES.primary.id },
     });
@@ -344,6 +344,7 @@ test.describe("Foundation-01 browser acceptance", () => {
 
     await page.reload();
     await waitForWorkspace(page);
+    await page.getByRole("tab", { name: /TP Tươi sống/i }).click();
     await expectVisible(page.getByText(marker, { exact: true }));
     await expect(page.locator(".desktop-history .record-photo-gallery").filter({ has: page.locator("img") }).last()).toHaveAttribute("aria-label", /3 ảnh minh chứng/);
   });
@@ -388,7 +389,7 @@ test.describe("Foundation-01 browser acceptance", () => {
         { code: "0002", role: "STORE_MANAGER" },
       ]);
       const employeeSession = await loginViaApi(employeeApi, USERS.employee);
-      expect(employeeSession.user.stores).toEqual([{ id: STORES.primary.id, code: "0001", role: "EMPLOYEE" }]);
+      expect(employeeSession.user.stores).toEqual([{ id: STORES.primary.id, code: "0001", name: STORES.primary.name, role: "EMPLOYEE" }]);
       const adminSession = await loginViaApi(adminApi, USERS.chainAdmin);
       expect(adminSession.user.stores).toEqual([]);
 

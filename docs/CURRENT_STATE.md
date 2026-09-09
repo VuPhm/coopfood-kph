@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-09
+Cập nhật: 2026-09-10
 
 ## Giai đoạn
 
@@ -64,16 +64,21 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
 - Device/browser matrix và workbook TPCN/TPTS đã được đóng theo acceptance tối
   thiểu của Pilot-00; acceptance ledger và runbook nằm trong `docs/pilot/`.
 
+- Kiểm tra bản tích hợp ngày 2026-09-10: frontend 133 tests và build pass;
+  backend 36 tests, không skip; jOOQ 3.20.17/PostgreSQL 17 tương thích. Build
+  online riêng tại `.local/online-dist`; log tại `.local/verification` (gitignored).
+
 ## Chưa hoàn tất
 
 - Đã rà local/remote branches ngày 2026-09-09 và lập
   [kế hoạch đóng Foundation-01](FOUNDATION_01_COMPLETION_PLAN.md). Các nhánh
   identity/contract/Pilot đã nằm trong HEAD; phần KPH online đã checkpoint tại `2c456ea`.
   Nhánh WIP planning chứa policy khác và không được merge nguyên nhánh.
-  Ba team Luna max đã giao commit từ ba worktree riêng; chờ root tích hợp và chạy acceptance.
-- Chưa có browser E2E chạy end-to-end trong repository mới; integration test
-  KPH đã pass với Docker/PostgreSQL local, và online mode hiện
-  nhận session đã đăng nhập từ backend thay vì tự dựng màn hình login.
+  Ba commit A/B/C đã tích hợp. Root đã bổ sung runtime/CI và sửa logout lỗi mạng
+  tại `acd585d`; đang chạy browser acceptance. Các worktree tạm không còn đã prune.
+- Đã có harness browser E2E với backend/PostgreSQL thật; chưa chốt acceptance.
+  Online đã có login/logout và chọn store theo membership. Bản preview dùng
+  database tổng hợp riêng, không phải môi trường vận hành.
 - Database migration V2 đã được kiểm chứng với PostgreSQL 17 qua Testcontainers,
   bao gồm clean database và nâng cấp dữ liệu mã cũ tổng hợp.
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,
