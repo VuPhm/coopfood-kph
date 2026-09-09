@@ -75,8 +75,9 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   identity/contract/Pilot đã nằm trong HEAD; phần KPH online đã checkpoint tại `2c456ea`.
   Nhánh WIP planning chứa policy khác và không được merge nguyên nhánh.
   Ba commit A/B/C đã tích hợp. Root đã bổ sung runtime/CI và sửa logout lỗi mạng
-  tại `acd585d`; đang chạy browser acceptance. Các worktree tạm không còn đã prune.
-- Đã có harness browser E2E với backend/PostgreSQL thật; chưa chốt acceptance.
+  tại `acd585d`; browser local 5 ca pass, 3 viewport-specific skips; chờ CI/owner acceptance. Các worktree tạm không còn đã prune.
+- Browser E2E đã chạy với backend/PostgreSQL thật; xem
+  [evidence tích hợp](evidence/foundation-01/integration-2026-09-10.md). Chưa chốt owner acceptance.
   Online đã có login/logout và chọn store theo membership. Bản preview dùng
   database tổng hợp riêng, không phải môi trường vận hành.
 - Database migration V2 đã được kiểm chứng với PostgreSQL 17 qua Testcontainers,

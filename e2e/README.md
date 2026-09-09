@@ -45,7 +45,7 @@ Install the E2E package dependencies without changing the root lockfile, then
 run both Chromium viewports:
 
 ```bash
-npm install --prefix e2e --ignore-scripts --package-lock=false
+npm ci --prefix e2e --ignore-scripts
 npx --prefix e2e playwright install chromium
 E2E_APP_URL=http://127.0.0.1:4173 E2E_BACKEND_URL=http://127.0.0.1:8080 npm --prefix e2e test
 ```
@@ -67,3 +67,24 @@ The fixed seed credentials are only for this local database:
 Re-run the seed script before a fresh acceptance run. It truncates the
 Foundation-01 tables only after the script's loopback E2E URL guard passes.
 Do not point it at a shared, staging or production database.
+
+If the host has no `psql`, use the client inside the disposable container after
+Flyway has created the schema:
+
+```bash
+docker exec -i coopfood-kph-foundation-01-postgres psql -U kph_e2e -d coopfood_kph_e2e -v ON_ERROR_STOP=1 < e2e/seed/foundation-01.sql
+```
+
+On machines with multiple JDKs, set `JAVA_HOME` to a Java 21 installation before
+running Maven. To keep a stable browser preview while `npm run verify` rebuilds
+its default output, build online into a separate directory and preview that output:
+
+```bash
+VITE_KPH_ONLINE=true npm --workspace @coopfood-kph/store-pwa run build -- --outDir "$PWD/.local/online-dist"
+npm --workspace @coopfood-kph/store-pwa exec -- vite preview --host 127.0.0.1 --port 4173 --strictPort --outDir "$PWD/.local/online-dist"
+```
+
+The default suite has five applicable cases: two desktop creation flows, one mobile card flow and
+one membership/session case repeated across both projects (five executions in total).
+Three project/case combinations are intentionally skipped by viewport. This is
+Chromium viewport coverage, not real-device iPhone acceptance.
