@@ -1,7 +1,7 @@
 import type { KphKind } from "@coopfood-kph/kph-rules";
 import { type DBSchema, openDB } from "idb";
 
-import type { DemoApprovalStatus, DemoRecord } from "./demo-records";
+import type { ApprovalStatus, RecordView } from "./record-view";
 
 const DATABASE_NAME = "coopfood-kph-pilot";
 const DATABASE_VERSION = 2;
@@ -29,7 +29,7 @@ export type PilotRecord = {
   condition: string;
   resolution: string;
   treatmentDate: string;
-  approvalStatus: DemoApprovalStatus;
+  approvalStatus: ApprovalStatus;
   photos: PilotPhoto[];
   note: string;
   trashState: "active" | "trash";
@@ -112,7 +112,7 @@ function database() {
   return databasePromise;
 }
 
-function persistablePhoto(recordId: string, photo: DemoRecord["photos"][number], index: number): PilotPhoto {
+function persistablePhoto(recordId: string, photo: RecordView["photos"][number], index: number): PilotPhoto {
   if (!photo.blob) throw new Error(`Ảnh ${index + 1} của phiếu ${recordId} chưa có dữ liệu để lưu`);
   return {
     id: photo.id,
@@ -124,7 +124,7 @@ function persistablePhoto(recordId: string, photo: DemoRecord["photos"][number],
   };
 }
 
-export function toPilotRecord(record: DemoRecord, trashState: "active" | "trash", previous?: PilotRecord): PilotRecord {
+export function toPilotRecord(record: RecordView, trashState: "active" | "trash", previous?: PilotRecord): PilotRecord {
   const now = new Date().toISOString();
   return {
     id: record.id,
@@ -157,7 +157,7 @@ export async function loadPilotRecords() {
   return records.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 }
 
-export async function savePilotRecord(record: DemoRecord, trashState: "active" | "trash" = "active") {
+export async function savePilotRecord(record: RecordView, trashState: "active" | "trash" = "active") {
   const db = await database();
   const previous = await db.get("records", record.id);
   const stored = toPilotRecord(record, trashState, previous);
@@ -190,7 +190,7 @@ export async function patchPilotRecords(
   }
 }
 
-export async function recordPilotExport(kind: KphKind, records: readonly DemoRecord[], fileName: string) {
+export async function recordPilotExport(kind: KphKind, records: readonly RecordView[], fileName: string) {
   const db = await database();
   const transaction = db.transaction(["export_runs", "records"], "readwrite");
   const createdAt = new Date().toISOString();

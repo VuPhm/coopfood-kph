@@ -30,7 +30,7 @@ class CatalogRepository {
     // One statement gives a consistent published version and product/supplier snapshot.
     // Empty result means no current catalog; null product means an exact lookup miss.
     Optional<LookupRow> lookupCurrent(String barcode) {
-        return database.select(PRODUCT_ID, SKU, PRODUCT_NAME, SUPPLIER_CODE, SUPPLIER_NAME)
+        return database.select(VERSION_ID, PRODUCT_ID, SKU, PRODUCT_NAME, SUPPLIER_CODE, SUPPLIER_NAME)
                 .from(table(name("catalog_versions")).as("v"))
                 .leftJoin(table(name("product_barcodes")).as("b"))
                 .on(field(name("b", "catalog_version_id"), UUID.class).eq(VERSION_ID)
@@ -50,9 +50,9 @@ class CatalogRepository {
                 .where(field(name("v", "status"), String.class).eq("PUBLISHED")
                         .and(field(name("v", "is_current"), Boolean.class).isTrue()))
                 .fetchOptional(row -> new LookupRow(
-                        row.get(PRODUCT_ID), row.get(SKU), row.get(PRODUCT_NAME),
+                        row.get(VERSION_ID), row.get(PRODUCT_ID), row.get(SKU), row.get(PRODUCT_NAME),
                         row.get(SUPPLIER_CODE), row.get(SUPPLIER_NAME)));
     }
 
-    record LookupRow(UUID productId, String skuCode, String name, String supplierCode, String supplierName) {}
+    record LookupRow(UUID versionId, UUID productId, String skuCode, String name, String supplierCode, String supplierName) {}
 }

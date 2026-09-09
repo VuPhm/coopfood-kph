@@ -32,6 +32,7 @@ import {
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
+import type { components } from "@coopfood-kph/api";
 
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
@@ -72,6 +73,7 @@ type FormData = z.infer<typeof schema>;
 type PhotoDraft = {
   id: string;
   fileName: string;
+  originalFile: File;
   stampedBlob: Blob;
   capturedAt: Date;
   url: string;
@@ -86,19 +88,26 @@ export type CreatedRecordDraft = {
   quantity: number;
   unit: "EA" | "kg";
   condition: string;
+  conditionValue: components["schemas"]["KphCondition"];
+  conditionDetail: string;
   resolution: string;
+  resolutionValue: components["schemas"]["KphResolution"];
+  resolutionDetail: string;
   treatmentDate: string;
   detectedBy: string;
   note: string;
-  photos: readonly { id: string; fileName: string; blob: Blob }[];
+  idempotencyKey?: string;
+  photos: readonly { id: string; fileName: string; blob: Blob; originalFile: File; capturedAt: Date }[];
 };
 
 type CreateRecordDialogProps = {
   kind: KphKind | null;
   open: boolean;
   profile?: StoreProfile;
+  actorReadOnly?: boolean;
   onOpenChange: (open: boolean) => void;
   onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
+  onBarcodeLookup?: ((barcode: string) => Promise<components["schemas"]["BarcodeLookupResponse"]>) | undefined;
 };
 
 const kindLabels: Record<KphKind, string> = {
@@ -125,7 +134,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile = DEFAULT_STORE_PROFILE }: CreateRecordDialogProps) {
+export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -135,9 +144,14 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const [savingRecord, setSavingRecord] = useState(false);
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [barcodeLookupMessage, setBarcodeLookupMessage] = useState("");
+  const lookupRequestId = useRef(0);
+  const autoFilledLookup = useRef({ barcode: "", productName: "", supplier: "" });
+  const idempotencyKeyRef = useRef<string | null>(null);
   const {
     formState: { errors },
     handleSubmit,
+    getValues,
     register,
     reset,
     setFocus,
@@ -152,6 +166,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const selectedResolution = watch("resolution");
   const detectedDate = watch("detectedDate");
   const treatmentDate = watch("treatmentDate");
+  const barcode = watch("barcode");
   const initialMonth = formatBusinessDate(new Date()).iso;
 
   function clearPhotos() {
@@ -168,6 +183,9 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     reset(defaultValues(kind, profile));
     clearPhotos();
     setPhotoError("");
+    setBarcodeLookupMessage("");
+    lookupRequestId.current += 1;
+    clearAutoFilledLookup();
   }, [kind, profile, reset]);
 
   useEffect(() => () => {
@@ -178,6 +196,46 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
 
   if (!kind) return null;
 
+  function clearAutoFilledLookup() {
+    const current = autoFilledLookup.current;
+    const values = getValues();
+    if (current.productName && values.productName === current.productName) {
+      setValue("productName", "", { shouldDirty: true });
+    }
+    if (current.supplier && values.supplier === current.supplier) {
+      setValue("supplier", "", { shouldDirty: true });
+    }
+    autoFilledLookup.current = { barcode: "", productName: "", supplier: "" };
+  }
+
+  async function lookupBarcode(value = barcode) {
+    const normalized = value.trim();
+    if (!onBarcodeLookup || !normalized) return;
+    const requestId = ++lookupRequestId.current;
+    clearAutoFilledLookup();
+    setBarcodeLookupMessage("Đang tra cứu barcode…");
+    try {
+      const result = await onBarcodeLookup(normalized);
+      if (requestId !== lookupRequestId.current || getValues("barcode").trim() !== normalized) return;
+      if (result.status === "FOUND") {
+        setValue("productName", result.product.name, { shouldDirty: true });
+        setValue("supplier", result.product.primarySupplier.name, { shouldDirty: true });
+        autoFilledLookup.current = {
+          barcode: normalized,
+          productName: result.product.name,
+          supplier: result.product.primarySupplier.name,
+        };
+        setBarcodeLookupMessage(`Đã tìm thấy ${result.product.skuCode}.`);
+      } else {
+        clearAutoFilledLookup();
+        setBarcodeLookupMessage("Không tìm thấy barcode. Có thể nhập tên hàng hóa và NCC thủ công; mã đã quét sẽ được giữ lại.");
+      }
+    } catch (error) {
+      if (requestId !== lookupRequestId.current || getValues("barcode").trim() !== normalized) return;
+      setBarcodeLookupMessage(error instanceof Error ? error.message : "Không thể tra cứu barcode lúc này.");
+    }
+  }
+
   const submit = handleSubmit(async (values) => {
     if (processingPhotos) {
       setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
@@ -187,11 +245,18 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
       setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
       return;
     }
+    const unsupportedPhoto = photos.find(({ originalFile }) => !["image/jpeg", "image/png"].includes(originalFile.type.toLowerCase()));
+    if (unsupportedPhoto) {
+      setPhotoError(`Ảnh “${unsupportedPhoto.fileName}” cần là JPEG hoặc PNG. Vui lòng chọn lại ảnh này.`);
+      return;
+    }
     const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
     const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
     setSavingRecord(true);
     setPhotoError("");
     try {
+      const idempotencyKey = idempotencyKeyRef.current ?? (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
+      idempotencyKeyRef.current = idempotencyKey;
       await onSaved({
         kind,
         detectedDate: values.detectedDate,
@@ -201,14 +266,26 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         quantity: Number(values.quantity),
         unit: values.unit,
         condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
+        conditionValue: conditionChoice.value as components["schemas"]["KphCondition"],
+        conditionDetail: values.conditionDetail.trim(),
         resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
+        resolutionValue: resolutionChoice.value as components["schemas"]["KphResolution"],
+        resolutionDetail: values.resolutionDetail.trim(),
         treatmentDate: values.treatmentDate.trim(),
-        detectedBy: values.detectedBy.trim(),
+        detectedBy: actorReadOnly ? profile.fullName : values.detectedBy.trim(),
         note: values.note.trim(),
-        photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
+        idempotencyKey,
+        photos: photos.map(({ id, fileName, originalFile, stampedBlob, capturedAt }) => ({
+          id,
+          fileName,
+          blob: stampedBlob,
+          originalFile,
+          capturedAt,
+        })),
       });
       reset(defaultValues(kind, profile));
       clearPhotos();
+      idempotencyKeyRef.current = null;
       onOpenChange(false);
     } catch (error) {
       setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
@@ -234,6 +311,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         additions.push({
           id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
           fileName: file.name,
+          originalFile: file,
           stampedBlob: processed.blob,
           capturedAt: processed.capturedAt,
           url: URL.createObjectURL(processed.blob),
@@ -278,11 +356,14 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
-                    <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode")} />
+                  <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", { onChange: (event) => {
+                    if (autoFilledLookup.current.barcode && event.target.value.trim() !== autoFilledLookup.current.barcode) clearAutoFilledLookup();
+                  }, onBlur: () => void lookupBarcode() })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
                       <ScanLine aria-hidden="true" size={18} />
                     </button>
                   </div>
+                  {barcodeLookupMessage ? <p className="mt-1 text-xs text-ink-muted" role="status">{barcodeLookupMessage}</p> : null}
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
                   <Input id="supplier" placeholder="Điền tên NCC" {...register("supplier")} />
@@ -322,7 +403,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
 
             <FormSection number="5" title="Người phát hiện & ảnh">
               <Field label="Tên người nhập" htmlFor="detected-by" required error={errors.detectedBy?.message}>
-                <Input id="detected-by" {...register("detectedBy")} />
+                <Input id="detected-by" readOnly={actorReadOnly} {...register("detectedBy")} />
               </Field>
               <div className="mt-3">
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
@@ -354,9 +435,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
       <BarcodeScannerDialog
         open={scannerOpen}
         onOpenChange={setScannerOpen}
-        onScan={(scannedBarcode) => {
-          setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
-          window.setTimeout(() => setFocus("barcode"), 0);
+          onScan={(scannedBarcode) => {
+            setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
+            void lookupBarcode(scannedBarcode);
+            window.setTimeout(() => setFocus("barcode"), 0);
         }}
       />
     </>

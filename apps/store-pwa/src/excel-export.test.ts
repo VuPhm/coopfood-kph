@@ -3,7 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import excelFixture from "../../../contracts/fixtures/golden/excel/expected-structure.json";
 
-import { DEMO_RECORDS, type DemoPhoto, type DemoRecord } from "./demo-records";
+import { DEMO_RECORDS } from "./demo-records";
+import type { EvidencePhotoView, RecordView } from "./record-view";
 import { buildKphWorkbook, escapeFormulaText } from "./excel-export";
 
 type EmbeddedImage = {
@@ -17,7 +18,7 @@ type EmbeddedImage = {
 
 type SyntheticBlob = Blob & { testDimensions: { width: number; height: number } };
 
-function photo(index: number, width: number, height: number): DemoPhoto {
+function photo(index: number, width: number, height: number): EvidencePhotoView {
   const bytes = new Uint8Array([0xff, 0xd8, index, 0xff, 0xd9]);
   const blob = {
     type: "image/jpeg",
@@ -27,7 +28,7 @@ function photo(index: number, width: number, height: number): DemoPhoto {
   return { id: `photo-${index}`, src: `ignored-${index}`, alt: `Ảnh ${index}`, blob };
 }
 
-function record(kind: "TPCN" | "TPTS", photos: readonly DemoPhoto[] = []): DemoRecord {
+function record(kind: "TPCN" | "TPTS", photos: readonly EvidencePhotoView[] = []): RecordView {
   const source = kind === "TPCN" ? DEMO_RECORDS[0]! : DEMO_RECORDS[1]!;
   return { ...source, kind, photos };
 }

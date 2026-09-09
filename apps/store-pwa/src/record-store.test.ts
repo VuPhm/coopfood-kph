@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { DemoRecord } from "./demo-records";
+import type { RecordView } from "./record-view";
 import {
   closePilotDatabaseForTests,
   getPilotExportRuns,
@@ -58,7 +58,7 @@ function inspectRecordsStore() {
   });
 }
 
-function record(): DemoRecord {
+function record(): RecordView {
   return {
     id: "KPH-260827-A1B2C3",
     kind: "TPCN",

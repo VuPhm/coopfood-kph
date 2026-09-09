@@ -1,6 +1,7 @@
 package vn.coopfood.kph.catalog;
 
 import java.util.UUID;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,7 @@ import vn.coopfood.kph.foundation.web.ApiProblemException;
 import vn.coopfood.kph.store.StoreAccessService;
 
 @Service
-class CatalogService {
+public class CatalogService {
 
     private final CatalogRepository repository;
     private final StoreAccessService storeAccess;
@@ -20,26 +21,54 @@ class CatalogService {
         this.storeAccess = storeAccess;
     }
 
-    BarcodeLookupResponse lookup(UUID storeId, String barcode, Authentication authentication) {
+    public BarcodeLookupResponse lookup(UUID storeId, String barcode, Authentication authentication) {
         storeAccess.requireMembership(storeId, authentication);
-        if (barcode == null || barcode.isEmpty() || barcode.length() > 128) {
-            throw new ApiProblemException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR",
-                    "Barcode must contain between 1 and 128 characters.");
+        var row = resolve(barcode);
+        if (row.isEmpty()) {
+            return new BarcodeLookupResponse.NotFound(barcode);
         }
+        var found = row.orElseThrow();
+        return new BarcodeLookupResponse.Found(barcode, new BarcodeLookupResponse.Product(
+                found.productId(), barcode, found.skuCode(), found.name(),
+                new BarcodeLookupResponse.Supplier(found.supplierCode(), found.supplierName())));
+    }
+
+    public Optional<CatalogSnapshot> resolveCurrent(String barcode) {
+        return resolve(barcode).map(row -> new CatalogSnapshot(
+                row.versionId(), row.productId(), row.skuCode(), row.name(),
+                row.supplierCode(), row.supplierName()));
+    }
+
+    private Optional<CatalogRepository.LookupRow> resolve(String barcode) {
+        validateBarcode(barcode);
         var row = repository.lookupCurrent(barcode).orElseThrow(CatalogService::catalogUnavailable);
         if (row.productId() == null) {
-            return new BarcodeLookupResponse.NotFound(barcode);
+            return Optional.empty();
         }
         if (row.supplierCode() == null || row.supplierName() == null) {
             throw catalogUnavailable();
         }
-        return new BarcodeLookupResponse.Found(barcode, new BarcodeLookupResponse.Product(
-                row.productId(), barcode, row.skuCode(), row.name(),
-                new BarcodeLookupResponse.Supplier(row.supplierCode(), row.supplierName())));
+        return Optional.of(row);
+    }
+
+    private static void validateBarcode(String barcode) {
+        if (barcode == null || barcode.isEmpty() || barcode.length() > 128) {
+            throw new ApiProblemException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR",
+                    "Barcode must contain between 1 and 128 characters.");
+        }
     }
 
     private static ApiProblemException catalogUnavailable() {
         return new ApiProblemException(HttpStatus.SERVICE_UNAVAILABLE, "CATALOG_UNAVAILABLE",
                 "The published catalog is not ready for lookup.");
+    }
+
+    public record CatalogSnapshot(
+            UUID catalogVersionId,
+            UUID productId,
+            String skuCode,
+            String productName,
+            String supplierCode,
+            String supplierName) {
     }
 }

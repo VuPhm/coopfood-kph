@@ -1,21 +1,24 @@
-import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
-import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronRight, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, Store, Trash2, UserRound } from "lucide-react";
+import type { KphKind } from "@coopfood-kph/kph-rules";
+import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
+import { AlertTriangle, ArrowDown, ArrowUp, ChevronDown, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Trash2 } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
 import { formatBusinessDate } from "./business-date";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
-import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord } from "./demo-records";
+import { DEMO_RECORDS } from "./demo-records";
+import { approvalLabels, type ApprovalStatus, type EvidencePhotoView, type RecordView } from "./record-view";
 import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
-import { EvidenceImageViewer } from "./image-viewer";
+import { RecordRow, RecordCard, type RecordActions } from "./history-records";
 import { PwaStatus } from "./pwa-status";
 import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord, type PilotRecord } from "./record-store";
 import { readStorageHealth, requestPersistentStorage, storageHealthWarning, storageUsageLabel, type StorageHealth } from "./storage-health";
 import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
+import { StoreContext } from "./store-context";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
+import { createOnlineGateway, onlineModeEnabled } from "./online-kph";
 
 export { formatBusinessDate } from "./business-date";
 
@@ -24,12 +27,7 @@ const kindCopy: Record<KphKind, { action: string; short: string }> = {
   TPTS: { action: "TP tươi sống", short: "TP Tươi sống" },
 };
 const kphKinds: KphKind[] = ["TPCN", "TPTS"];
-const approvalLabels: Record<DemoApprovalStatus, string> = {
-  PENDING: "Chờ duyệt",
-  APPROVED: "Đã duyệt",
-  REJECTED: "Không duyệt",
-};
-type ApprovalFilter = "ALL" | DemoApprovalStatus;
+type ApprovalFilter = "ALL" | ApprovalStatus;
 type RecordSortKey = "approval" | "condition" | "detectedDate" | "product" | "quantity" | "resolution" | "supplier";
 type RecordSort = { direction: "ascending" | "descending"; key: RecordSortKey };
 const approvalFilterOptions: readonly { label: string; value: ApprovalFilter }[] = [
@@ -48,17 +46,17 @@ const recordSortOptions: readonly { label: string; value: RecordSortKey }[] = [
   { label: "Trạng thái duyệt", value: "approval" },
 ];
 const recordCollator = new Intl.Collator("vi", { numeric: true, sensitivity: "base" });
-const pilotPersistenceEnabled = import.meta.env.MODE !== "test";
-const initialRecords = pilotPersistenceEnabled ? [] : DEMO_RECORDS;
-const initialApproval = Object.fromEntries(initialRecords.map(({ approvalStatus, id }) => [id, approvalStatus]));
+const onlinePersistenceEnabled = onlineModeEnabled();
+const pilotPersistenceEnabled = import.meta.env.MODE !== "test" && !onlinePersistenceEnabled;
+const initialRecords = pilotPersistenceEnabled || onlinePersistenceEnabled ? [] : DEMO_RECORDS;
 
-function hydrationPhotoUrl(photo: PilotRecord["photos"][number], ownedUrls: Set<string>): DemoPhoto {
+function hydrationPhotoUrl(photo: PilotRecord["photos"][number], ownedUrls: Set<string>): EvidencePhotoView {
   const src = URL.createObjectURL(photo.blob);
   ownedUrls.add(src);
   return { id: photo.id, src, alt: photo.alt, blob: photo.blob, fileName: photo.fileName };
 }
 
-function hydratePilotRecord(record: PilotRecord, ownedUrls: Set<string>): DemoRecord {
+function hydratePilotRecord(record: PilotRecord, ownedUrls: Set<string>): RecordView {
   return {
     id: record.id,
     kind: record.kind,
@@ -150,31 +148,25 @@ function detectedDateValue(value: string) {
   return `${year}${month}${day}`;
 }
 
-function quantityValue(value: string) {
-  const parsed = Number.parseFloat(value.replace(",", "."));
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function sortValue(record: DemoRecord, key: RecordSortKey, approvalStatus: DemoApprovalStatus) {
+function sortValue(record: RecordView, key: RecordSortKey, approvalStatus: ApprovalStatus) {
   switch (key) {
     case "approval": return approvalLabels[approvalStatus];
     case "condition": return record.condition;
     case "detectedDate": return detectedDateValue(record.detectedDate);
     case "product": return `${record.sku} ${record.productName}`;
-    case "quantity": return quantityValue(record.quantity);
+    case "quantity": return record.quantityValue;
     case "resolution": return record.resolution;
     case "supplier": return record.supplier;
   }
 }
 
 export function App() {
-  const [records, setRecords] = useState<readonly DemoRecord[]>(initialRecords);
+  const [records, setRecords] = useState<readonly RecordView[]>(initialRecords);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [createKind, setCreateKind] = useState<KphKind | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [expandedMobileRecords, setExpandedMobileRecords] = useState<ReadonlySet<string>>(new Set());
-  const [approvalByRecord, setApprovalByRecord] = useState<Record<string, DemoApprovalStatus>>(() => initialApproval);
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
   const [notice, setNotice] = useState("");
@@ -189,34 +181,35 @@ export function App() {
   const [storageHealth, setStorageHealth] = useState<StorageHealth>({ persistent: false, quota: null, usage: null });
   const [storageReady, setStorageReady] = useState(!pilotPersistenceEnabled);
   const [storageError, setStorageError] = useState("");
+  const [onlineStoreId, setOnlineStoreId] = useState<string | null>(null);
+  const [onlineLoading, setOnlineLoading] = useState(onlinePersistenceEnabled);
+  const [onlineGateway] = useState(() => onlinePersistenceEnabled ? createOnlineGateway() : null);
+  const [onlineReload, setOnlineReload] = useState(0);
   const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
     const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
-      const currentApproval = approvalByRecord[id] ?? approvalStatus;
       const hasExpectedDeletionState = trashMode ? deletedIds.has(id) : !deletedIds.has(id);
-      return kind === activeKind && hasExpectedDeletionState && (approvalFilter === "ALL" || currentApproval === approvalFilter);
+      return kind === activeKind && hasExpectedDeletionState && (approvalFilter === "ALL" || approvalStatus === approvalFilter);
     });
 
     if (!recordSort) return scopedRecords;
 
     return [...scopedRecords].sort((left, right) => {
-      const leftApproval = approvalByRecord[left.id] ?? left.approvalStatus;
-      const rightApproval = approvalByRecord[right.id] ?? right.approvalStatus;
-      const leftValue = sortValue(left, recordSort.key, leftApproval);
-      const rightValue = sortValue(right, recordSort.key, rightApproval);
+      const leftValue = sortValue(left, recordSort.key, left.approvalStatus);
+      const rightValue = sortValue(right, recordSort.key, right.approvalStatus);
       const comparison = typeof leftValue === "number" && typeof rightValue === "number"
         ? leftValue - rightValue
         : recordCollator.compare(String(leftValue), String(rightValue));
       return recordSort.direction === "ascending" ? comparison : -comparison;
     });
-  }, [activeKind, approvalByRecord, approvalFilter, deletedIds, recordSort, records, trashMode]);
+  }, [activeKind, approvalFilter, deletedIds, recordSort, records, trashMode]);
   const selectedRecords = useMemo(
     () => records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
     [activeKind, deletedIds, records, selected, trashMode],
   );
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
-  const storeConfigured = isStoreProfileConfigured(storeProfile);
+  const storeConfigured = onlinePersistenceEnabled ? onlineStoreId !== null : isStoreProfileConfigured(storeProfile);
   const storageWarning = storageReady ? storageHealthWarning(storageHealth) : null;
 
   useEffect(() => () => {
@@ -240,7 +233,6 @@ export function App() {
         if (cancelled) return;
         const hydrated = storedRecords.map((record) => hydratePilotRecord(record, ownedPhotoUrls.current));
         setRecords(hydrated);
-        setApprovalByRecord(Object.fromEntries(storedRecords.map(({ approvalStatus, id }) => [id, approvalStatus])));
         setDeletedIds(new Set(storedRecords.filter(({ trashState }) => trashState === "trash").map(({ id }) => id)));
         setStoreProfile(storedProfile);
         setStorageHealth(health);
@@ -264,10 +256,39 @@ export function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!onlinePersistenceEnabled || !onlineGateway) return;
+    let cancelled = false;
+    setOnlineLoading(true);
+    setStorageError("");
+    setOnlineStoreId(null);
+    setRecords([]);
+    setSelected(new Set());
+    void onlineGateway.loadWorkspace().then((workspace) => {
+      if (cancelled) return;
+      setRecords(workspace.records);
+      setOnlineStoreId(workspace.store.id);
+      setStoreProfile({
+        storeName: workspace.store.name,
+        storeCode: workspace.store.code,
+        role: workspace.store.role === "STORE_MANAGER" ? "STORE_MANAGER" : "STAFF",
+        fullName: workspace.session.user.displayName,
+        employeeCode: "",
+      });
+    }).catch((error: unknown) => {
+      if (!cancelled) setStorageError(error instanceof Error ? error.message : "Không thể tải workspace online");
+    }).finally(() => {
+      if (!cancelled) setOnlineLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [onlineGateway, onlineReload]);
+
   function openCreate(kind: KphKind) {
     if (!storeConfigured) {
-      setNotice("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
-      setStoreSettingsOpen(true);
+      setNotice(onlinePersistenceEnabled
+        ? "Không có cửa hàng hợp lệ trong phiên đăng nhập. Hãy đăng nhập lại hoặc liên hệ quản trị viên."
+        : "Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
+      if (!onlinePersistenceEnabled) setStoreSettingsOpen(true);
       return;
     }
     setCreateKind(kind);
@@ -275,6 +296,10 @@ export function App() {
   }
 
   function openExport() {
+    if (onlinePersistenceEnabled) {
+      setNotice("Xuất Excel online chưa nằm trong Foundation-01.");
+      return;
+    }
     if (!storeConfigured) {
       setNotice("Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
       setStoreSettingsOpen(true);
@@ -285,6 +310,7 @@ export function App() {
   }
 
   async function saveStoreSettings(profile: StoreProfile) {
+    if (onlinePersistenceEnabled) return;
     try {
       if (pilotPersistenceEnabled) {
         await savePilotStoreProfile(profile);
@@ -354,14 +380,17 @@ export function App() {
     });
   }
 
-  async function updateApproval(recordId: string, status: DemoApprovalStatus) {
+  async function updateApproval(recordId: string, status: ApprovalStatus) {
+    if (onlinePersistenceEnabled) {
+      setNotice("Luồng duyệt phiếu online chưa nằm trong Foundation-01.");
+      return;
+    }
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords([recordId], { approvalStatus: status });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Không thể lưu trạng thái duyệt trên thiết bị");
       return;
     }
-    setApprovalByRecord((current) => ({ ...current, [recordId]: status }));
     setSelected((current) => {
       const next = new Set(current);
       next.delete(recordId);
@@ -372,6 +401,10 @@ export function App() {
   }
 
   async function approveSelected() {
+    if (onlinePersistenceEnabled) {
+      setNotice("Luồng duyệt phiếu online chưa nằm trong Foundation-01.");
+      return;
+    }
     const recordIds = [...selected];
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords(recordIds, { approvalStatus: "APPROVED" });
@@ -379,17 +412,13 @@ export function App() {
       setNotice(error instanceof Error ? error.message : "Không thể lưu trạng thái duyệt trên thiết bị");
       return;
     }
-    setApprovalByRecord((current) => {
-      const next = { ...current };
-      selected.forEach((recordId) => { next[recordId] = "APPROVED"; });
-      return next;
-    });
     setRecords((current) => current.map((record) => recordIds.includes(record.id) ? { ...record, approvalStatus: "APPROVED" } : record));
     setNotice(`Đã duyệt ${recordIds.length} phiếu ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
     setSelected(new Set());
   }
 
   function toggleTrashMode() {
+    if (onlinePersistenceEnabled) return;
     setTrashMode((current) => !current);
     setSelected(new Set());
     setExpandedMobileRecords(new Set());
@@ -398,14 +427,23 @@ export function App() {
   }
 
   function requestDelete(recordId: string) {
+    if (onlinePersistenceEnabled) {
+      setNotice("Store PWA online không cho xóa hoặc vô hiệu hóa phiếu.");
+      return;
+    }
     setDeleteIds([recordId]);
   }
 
   function requestDeleteSelected() {
+    if (onlinePersistenceEnabled) {
+      setNotice("Store PWA online không cho xóa hoặc vô hiệu hóa phiếu.");
+      return;
+    }
     setDeleteIds(selectedRecords.map(({ id }) => id));
   }
 
   async function confirmDelete() {
+    if (onlinePersistenceEnabled) return;
     const targetIds = new Set(deleteIds);
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords([...targetIds], { trashState: "trash", deletedAt: new Date().toISOString() });
@@ -421,6 +459,7 @@ export function App() {
   }
 
   async function restoreRecord(recordId: string) {
+    if (onlinePersistenceEnabled) return;
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords([recordId], { trashState: "active", deletedAt: null });
     } catch (error) {
@@ -438,6 +477,7 @@ export function App() {
   }
 
   async function restoreSelected() {
+    if (onlinePersistenceEnabled) return;
     const targetIds = new Set(selectedRecords.map(({ id }) => id));
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords([...targetIds], { trashState: "active", deletedAt: null });
@@ -453,6 +493,15 @@ export function App() {
 
   async function saveCreatedRecord(draft: CreatedRecordDraft) {
     if (!storeConfigured) throw new Error("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
+    if (onlinePersistenceEnabled) {
+      if (!onlineGateway || !onlineStoreId) throw new Error("Không có phiên đăng nhập hợp lệ.");
+      const created = await onlineGateway.createRecord(onlineStoreId, draft);
+      setRecords((current) => [created, ...current]);
+      setActiveKind(draft.kind);
+      setSelected(new Set([created.id]));
+      setNotice(`Đã tạo phiếu ${created.id} và lưu trên máy chủ.`);
+      return;
+    }
     const dateDigits = draft.detectedDate.split("/").reverse().join("").slice(2);
     const uuid = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
     const id = `KPH-${dateDigits}-${uuid.replaceAll("-", "").slice(0, 6).toUpperCase()}`;
@@ -461,7 +510,7 @@ export function App() {
       ownedPhotoUrls.current.add(src);
       return { id: photoId, src, alt: `Ảnh minh chứng ${fileName} đã đóng tem`, blob, fileName };
     });
-    const record: DemoRecord = {
+    const record: RecordView = {
       id,
       kind: draft.kind,
       detectedDate: draft.detectedDate,
@@ -494,13 +543,13 @@ export function App() {
       throw error instanceof Error ? error : new Error("Không thể lưu phiếu trên thiết bị");
     }
     setRecords((current) => [record, ...current]);
-    setApprovalByRecord((current) => ({ ...current, [id]: "PENDING" }));
     setActiveKind(draft.kind);
     setSelected(new Set([id]));
     setNotice(`Đã tạo phiếu ${id} và lưu trên thiết bị này.`);
   }
 
   async function exportSelected() {
+    if (onlinePersistenceEnabled) return;
     if (!selectedRecords.length) return;
     if (!storeConfigured) {
       setExportOpen(false);
@@ -539,6 +588,14 @@ export function App() {
     document.getElementById(`history-tab-${nextKind.toLowerCase()}`)?.focus();
   }
 
+  const emptyHistoryMessage = onlinePersistenceEnabled
+    ? onlineLoading ? "Đang tải lịch sử từ máy chủ…" : storageError ? "Chưa tải được lịch sử phiếu." : "Chưa có phiếu nào trên máy chủ."
+    : storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…";
+
+  const recordActions: RecordActions | undefined = onlinePersistenceEnabled
+    ? undefined
+    : { approve: updateApproval, remove: requestDelete, restore: restoreRecord };
+
   return (
     <div className="min-h-dvh bg-canvas text-ink">
       <header className="app-header sticky top-0 z-30 bg-brand text-white shadow-md safe-top">
@@ -561,32 +618,26 @@ export function App() {
 
             <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
               {kphKinds.map((kind) => (
-                <button key={kind} type="button" disabled={!storageReady} className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
+                <button key={kind} type="button" disabled={!storageReady || onlineLoading || (onlinePersistenceEnabled && !storeConfigured)} className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
                   {kind === "TPCN" ? <PackagePlus aria-hidden="true" /> : <Salad aria-hidden="true" />}
                   <span><small>Tạo phiếu</small>{kindCopy[kind].action}</span>
                 </button>
               ))}
             </div>
 
-            <button
-              type="button"
-              className="store-context"
-              aria-label={`Thiết lập cửa hàng: ${storeIdentity(storeProfile)}`}
+            <StoreContext
+              storeLabel={onlinePersistenceEnabled && !storeConfigured ? "Chưa có cửa hàng" : storeIdentity(storeProfile)}
+              actorLabel={onlinePersistenceEnabled && !storeConfigured ? (onlineLoading ? "Đang tải phiên đăng nhập…" : "Chưa có phiên đăng nhập") : actorIdentity(storeProfile)}
+              storageLabel={onlinePersistenceEnabled ? "dữ liệu: máy chủ" : storageReady ? storageUsageLabel(storageHealth) : "dữ liệu: đang mở…"}
+              storageHint={onlinePersistenceEnabled ? "Phiếu được lưu trên máy chủ" : storageHealth.persistent ? "Dữ liệu pilot được trình duyệt cấp chế độ lưu bền" : "Dữ liệu pilot chỉ nằm trên thiết bị này và không đồng bộ"}
               disabled={!storageReady}
-              onClick={() => setStoreSettingsOpen(true)}
-            >
-              <Store className="store-context-icon" size={20} aria-hidden="true" />
-              <span className="store-context-copy">
-                <strong>{storeIdentity(storeProfile)}</strong>
-                <span>{actorIdentity(storeProfile)}</span>
-                <small title={storageHealth.persistent ? "Dữ liệu pilot được trình duyệt cấp chế độ lưu bền" : "Dữ liệu pilot chỉ nằm trên thiết bị này và không đồng bộ"}>
-                  {storageReady ? storageUsageLabel(storageHealth) : "dữ liệu: đang mở…"}
-                </small>
-              </span>
-              <ChevronRight className="store-context-disclosure" aria-hidden="true" />
-            </button>
+              onConfigure={onlinePersistenceEnabled ? undefined : () => setStoreSettingsOpen(true)}
+            />
           </div>
-          {storageError ? <p className="storage-error-banner" role="alert">{storageError}</p> : null}
+          {storageError ? <div className="storage-error-banner" role="alert">
+            <p>{storageError}</p>
+            {onlinePersistenceEnabled ? <Button variant="ghost" onClick={() => setOnlineReload((attempt) => attempt + 1)}>Thử tải lại</Button> : null}
+          </div> : null}
           <header className="history-header">
             <div className="history-title-row pr-3">
               <div className="history-title-group">
@@ -594,21 +645,23 @@ export function App() {
                   <span className="history-total-count" aria-label={`${visibleRecords.length} phiếu`}>{visibleRecords.length}</span>
                   {trashMode ? "Phiếu đã xoá" : "Phiếu đã khai báo"}
                 </h2>
-                <PilotDataNotice configured={storeConfigured} warning={storageWarning} onConfigure={() => setStoreSettingsOpen(true)} />
+                {onlinePersistenceEnabled
+                  ? <span className="text-xs font-semibold text-ink-muted">Dữ liệu: máy chủ</span>
+                  : <PilotDataNotice configured={storeConfigured} warning={storageWarning} onConfigure={() => setStoreSettingsOpen(true)} />}
               </div>
               <div className="history-title-actions">
                 <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
-                <button
-                  type="button"
-                  className="trash-mode-toggle"
-                  aria-label={trashMode ? "Quay lại phiếu đã khai báo" : `Mở thùng rác, có ${deletedIds.size} phiếu`}
-                  aria-pressed={trashMode}
-                  title={trashMode ? "Quay lại phiếu đã khai báo" : "Mở thùng rác"}
-                  onClick={toggleTrashMode}
-                >
-                  <History aria-hidden="true" />
-                  <span className="trash-mode-label">Phiếu đã xoá</span>
-                </button>
+                  {!onlinePersistenceEnabled ? <button
+                    type="button"
+                    className="trash-mode-toggle"
+                    aria-label={trashMode ? "Quay lại phiếu đã khai báo" : `Mở thùng rác, có ${deletedIds.size} phiếu`}
+                    aria-pressed={trashMode}
+                    title={trashMode ? "Quay lại phiếu đã khai báo" : "Mở thùng rác"}
+                    onClick={toggleTrashMode}
+                  >
+                    <History aria-hidden="true" />
+                    <span className="trash-mode-label">Phiếu đã xoá</span>
+                  </button> : null}
               </div>
             </div>
 
@@ -644,16 +697,16 @@ export function App() {
                 </div>
                 <div className="history-action-buttons">
                   <div className="history-selection-slot">
-                    {selected.size > 0
+                    {selected.size > 0 && !onlinePersistenceEnabled
                       ? trashMode
                         ? <button type="button" className="selection-count selection-approve selection-restore" onClick={restoreSelected}>Khôi phục <strong>{selected.size}</strong> phiếu</button>
                         : <button type="button" className="selection-count selection-approve" onClick={approveSelected}>Duyệt <strong>{selected.size}</strong> phiếu</button>
-                      : <span className="selection-count" aria-live="polite">Đã chọn <strong>0</strong></span>}
+                      : <span className="selection-count" aria-live="polite">Đã chọn <strong>{selected.size}</strong></span>}
                     <label className="select-all-history" aria-label="Chọn tất cả phiếu" title="Chọn tất cả">
                       <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
                     </label>
                   </div>
-                  {selected.size > 0 ? (
+                  {selected.size > 0 && !onlinePersistenceEnabled ? (
                     <div className="history-action-tools">
                       <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={openExport}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
                       <Button variant="ghost" className="history-delete" aria-label="Xóa phiếu đã chọn" title={trashMode ? "Không thể xoá vĩnh viễn" : "Chuyển sang trạng thái đã xoá"} disabled={trashMode} onClick={requestDeleteSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-delete-label">Xóa</span></Button>
@@ -681,16 +734,16 @@ export function App() {
                 </tr>
               </thead>
               <tbody>{visibleRecords.length > 0
-                ? visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)
-                : <tr><td className="empty-history-cell" colSpan={10}>{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</td></tr>}
+                ? visibleRecords.map((record) => <RecordRow key={record.id} actions={recordActions} record={record} selected={selected.has(record.id)} trashMode={trashMode} onToggle={toggleSelection} />)
+                : <tr><td className="empty-history-cell" colSpan={10}>{emptyHistoryMessage}</td></tr>}
               </tbody>
             </table>
           </div>
 
           <div className="grid gap-3 mobile-history">
             {visibleRecords.length > 0
-              ? visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
-              : <p className="empty-history-card">{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</p>}
+              ? visibleRecords.map((record) => <RecordCard key={record.id} actions={recordActions} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
+              : <p className="empty-history-card">{emptyHistoryMessage}</p>}
           </div>
         </section>
 
@@ -699,45 +752,57 @@ export function App() {
         </div>
       </main>
 
-      <CreateRecordDialog kind={createKind} open={dialogOpen} profile={storeProfile} onOpenChange={setDialogOpen} onSaved={saveCreatedRecord} />
-      <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} />
+      <CreateRecordDialog
+        kind={createKind}
+        open={dialogOpen}
+        profile={storeProfile}
+        actorReadOnly={onlinePersistenceEnabled}
+        onOpenChange={setDialogOpen}
+        onSaved={saveCreatedRecord}
+        onBarcodeLookup={onlinePersistenceEnabled && onlineGateway && onlineStoreId
+          ? (barcode) => onlineGateway.lookupBarcode(onlineStoreId, barcode)
+          : undefined}
+      />
+      {!onlinePersistenceEnabled ? <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} /> : null}
 
-      <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>
-        <DialogContent className="action-dialog" aria-describedby="delete-description">
-          <div className="action-dialog-icon is-danger"><AlertTriangle aria-hidden="true" /></div>
-          <DialogTitle>Chuyển {deleteIds.length} phiếu sang trạng thái đã xoá?</DialogTitle>
-          <DialogDescription id="delete-description">
-            Dữ liệu phiếu vẫn được giữ nguyên để phần thùng rác có thể khôi phục sau đó; không có thao tác xoá vĩnh viễn.
-          </DialogDescription>
-          <div className="action-dialog-actions">
-            <Button type="button" variant="ghost" onClick={() => setDeleteIds([])}>Hủy</Button>
-            <Button type="button" className="action-danger-button" onClick={confirmDelete}><Trash2 size={17} aria-hidden="true" />Xóa phiếu</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {!onlinePersistenceEnabled ? <>
+        <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>
+          <DialogContent className="action-dialog" aria-describedby="delete-description">
+            <div className="action-dialog-icon is-danger"><AlertTriangle aria-hidden="true" /></div>
+            <DialogTitle>Chuyển {deleteIds.length} phiếu sang trạng thái đã xoá?</DialogTitle>
+            <DialogDescription id="delete-description">
+              Dữ liệu phiếu vẫn được giữ nguyên để phần thùng rác có thể khôi phục sau đó; không có thao tác xoá vĩnh viễn.
+            </DialogDescription>
+            <div className="action-dialog-actions">
+              <Button type="button" variant="ghost" onClick={() => setDeleteIds([])}>Hủy</Button>
+              <Button type="button" className="action-danger-button" onClick={confirmDelete}><Trash2 size={17} aria-hidden="true" />Xóa phiếu</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
-      <Dialog open={exportOpen} onOpenChange={(open) => { if (!exporting) { setExportOpen(open); if (!open) setExportError(""); } }}>
-        <DialogContent className="action-dialog export-dialog" aria-describedby="export-description">
-          <div className="action-dialog-icon is-export"><FileSpreadsheet aria-hidden="true" /></div>
-          <DialogTitle>Xuất phiếu ra Excel</DialogTitle>
-          <DialogDescription id="export-description">
-            File BM-331.CF được dàn ngang, khóa định dạng và giữ tối đa ba ảnh minh chứng theo đúng thứ tự.
-          </DialogDescription>
-          <dl className="export-summary">
-            <div><dt>Loại phiếu</dt><dd>{kindCopy[activeKind].short}</dd></div>
-            <div><dt>Số phiếu</dt><dd>{selectedRecords.length}</dd></div>
-            <div><dt>Số ảnh</dt><dd>{selectedRecords.reduce((total, record) => total + record.photos.length, 0)}</dd></div>
-            <div><dt>Cửa hàng</dt><dd>{storeIdentity(storeProfile)}</dd></div>
-          </dl>
-          {exportError ? <p className="action-dialog-error" role="alert">{exportError}</p> : null}
-          <div className="action-dialog-actions">
-            <Button type="button" variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button>
-            <Button type="button" disabled={exporting || selectedRecords.length === 0 || !storeConfigured} onClick={exportSelected}>
-              {exporting ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xuất…</> : <><FileDown size={17} aria-hidden="true" />Xuất {selectedRecords.length} dòng</>}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        <Dialog open={exportOpen} onOpenChange={(open) => { if (!exporting) { setExportOpen(open); if (!open) setExportError(""); } }}>
+          <DialogContent className="action-dialog export-dialog" aria-describedby="export-description">
+            <div className="action-dialog-icon is-export"><FileSpreadsheet aria-hidden="true" /></div>
+            <DialogTitle>Xuất phiếu ra Excel</DialogTitle>
+            <DialogDescription id="export-description">
+              File BM-331.CF được dàn ngang, khóa định dạng và giữ tối đa ba ảnh minh chứng theo đúng thứ tự.
+            </DialogDescription>
+            <dl className="export-summary">
+              <div><dt>Loại phiếu</dt><dd>{kindCopy[activeKind].short}</dd></div>
+              <div><dt>Số phiếu</dt><dd>{selectedRecords.length}</dd></div>
+              <div><dt>Số ảnh</dt><dd>{selectedRecords.reduce((total, record) => total + record.photos.length, 0)}</dd></div>
+              <div><dt>Cửa hàng</dt><dd>{storeIdentity(storeProfile)}</dd></div>
+            </dl>
+            {exportError ? <p className="action-dialog-error" role="alert">{exportError}</p> : null}
+            <div className="action-dialog-actions">
+              <Button type="button" variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button>
+              <Button type="button" disabled={exporting || selectedRecords.length === 0 || !storeConfigured} onClick={exportSelected}>
+                {exporting ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xuất…</> : <><FileDown size={17} aria-hidden="true" />Xuất {selectedRecords.length} dòng</>}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </> : null}
       {notice ? <button type="button" className="notice-toast fixed bottom-20 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-xl" onClick={() => setNotice("")}>{notice}</button> : null}
       <PwaStatus />
     </div>
@@ -794,7 +859,7 @@ function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, so
 }
 
 function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSortReset, showSort = true, sort }: HistoryControlsContentProps) {
-  function toggleFilter(event: MouseEvent<HTMLButtonElement>, nextFilter: DemoApprovalStatus) {
+  function toggleFilter(event: MouseEvent<HTMLButtonElement>, nextFilter: ApprovalStatus) {
     const clearing = filter === nextFilter;
     onFilterChange(clearing ? "ALL" : nextFilter);
     if (clearing && document.documentElement.dataset.focusModality !== "keyboard") event.currentTarget.blur();
@@ -811,7 +876,7 @@ function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSo
           <div className="mobile-history-choice-grid mobile-history-filter-grid" role="group" aria-label="Lọc theo trạng thái duyệt">
             {approvalFilterOptions.slice(1).map(({ label, value }) => {
               const selected = filter === value;
-              return <button key={value} type="button" className={cn("mobile-history-choice mobile-history-filter-choice", `is-${value.toLowerCase()}`, selected && "is-selected")} aria-label={selected ? `Bỏ lọc ${label}` : `Lọc ${label}`} aria-pressed={selected} onClick={(event) => toggleFilter(event, value as DemoApprovalStatus)}>
+              return <button key={value} type="button" className={cn("mobile-history-choice mobile-history-filter-choice", `is-${value.toLowerCase()}`, selected && "is-selected")} aria-label={selected ? `Bỏ lọc ${label}` : `Lọc ${label}`} aria-pressed={selected} onClick={(event) => toggleFilter(event, value as ApprovalStatus)}>
                 <span>{label}</span>
               </button>;
             })}
@@ -851,136 +916,4 @@ function SortableHeader({ label, onSort, sort, sortKey }: { label: string; onSor
       <span>{label}</span>{active ? <SortIcon aria-hidden="true" /> : null}
     </button>
   </th>;
-}
-
-type RecordProps = {
-  approvalStatus: DemoApprovalStatus;
-  expanded?: boolean;
-  record: DemoRecord;
-  selected: boolean;
-  trashMode: boolean;
-  onApprovalChange: (id: string, status: DemoApprovalStatus) => void;
-  onDelete: (id: string) => void;
-  onExpansionChange?: (id: string, expanded: boolean) => void;
-  onRestore: (id: string) => void;
-  onToggle: (id: string) => void;
-};
-
-function RecordRow({ approvalStatus, onApprovalChange, onDelete, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
-  return <tr className={cn("record-row", selected && "is-selected")}>
-    <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
-    <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
-    <td className="p-3"><span className="font-mono text-xs font-bold text-brand">{record.sku}</span><br /><strong>{record.productName}</strong></td>
-    <td className="max-w-56 p-3 text-ink-muted">{record.supplier}</td>
-    <td className="p-3 font-bold">{record.quantity}</td>
-    <td className="p-3"><Tag className="status-badge" tone={getConditionTone(record.condition)}>{record.condition}</Tag></td>
-    <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
-    <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
-    <td className="p-3"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></td>
-    <td className="p-3 text-center"><RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} /></td>
-  </tr>;
-}
-
-function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDelete, onExpansionChange, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
-  function isInteractiveTarget(event: MouseEvent<HTMLElement>) {
-    return event.target instanceof HTMLElement && event.target.closest("button, input, select, label") !== null;
-  }
-
-  function expandFromCard(event: MouseEvent<HTMLElement>) {
-    if (!expanded && !isInteractiveTarget(event)) onExpansionChange?.(record.id, true);
-  }
-
-  function collapseFromHeader(event: MouseEvent<HTMLElement>) {
-    if (expanded && !isInteractiveTarget(event)) onExpansionChange?.(record.id, false);
-  }
-
-  return <article className={cn("record-card", !expanded && "is-compact", selected && "is-selected")} onClick={expandFromCard}>
-    <header className="record-card-header" onClick={collapseFromHeader}>
-      <div className="record-card-product"><p className="font-mono text-xs font-bold text-brand">{record.sku}</p><h3 className="font-black">{record.productName}</h3></div>
-      <div className="record-card-controls" onClick={(event) => event.stopPropagation()}>
-        <button type="button" className="record-card-expand" aria-expanded={expanded} aria-label={`${expanded ? "Thu gọn" : "Mở rộng"} phiếu ${record.id}`} title={expanded ? "Thu gọn phiếu" : "Mở rộng phiếu"} onClick={() => onExpansionChange?.(record.id, !expanded)}>
-          {expanded ? <ChevronUp size={18} aria-hidden="true" /> : <ChevronDown size={18} aria-hidden="true" />}
-        </button>
-        <label className="record-card-select-slot">
-          <input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} />
-        </label>
-      </div>
-    </header>
-
-    {expanded ? <>
-      <div className="record-card-meta" aria-label="Thông tin phiếu">
-        <span className="record-card-meta-item" aria-label={`Ngày phát hiện ${record.detectedDate}`} title="Ngày phát hiện"><CalendarDays aria-hidden="true" /><strong>{record.detectedDate}</strong></span>
-        <span className="record-card-meta-item" aria-label={`Người phát hiện ${record.detectedBy}`} title="Người phát hiện"><UserRound aria-hidden="true" /><span>{record.detectedBy}</span></span>
-        <span className="record-card-meta-item" aria-label={`Số lượng ${record.quantity}`} title="Số lượng"><Scale aria-hidden="true" /><strong>{record.quantity}</strong></span>
-        <span className="record-card-meta-item is-supplier" aria-label={`Nhà cung cấp ${record.supplier}`} title="Nhà cung cấp"><Building2 aria-hidden="true" /><span>{record.supplier}</span></span>
-      </div>
-      <div className="record-card-outcomes" aria-label="Tình trạng và biện pháp">
-        <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
-        <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
-      </div>
-      <RecordPhotoGallery photos={record.photos} recordId={record.id} variant="card" />
-      <div className="record-card-note" aria-label={`Ghi chú: ${record.note || "Không có ghi chú"}`}>
-        <span className="record-card-note-label">Ghi chú:</span>
-        <span className="record-card-note-content">{record.note || "—"}</span>
-      </div>
-    </> : null}
-    <footer className="record-card-footer">
-      {!expanded ? (
-        <RecordCardStatuses approvalStatus={approvalStatus} compact onApprovalChange={onApprovalChange} record={record} />
-      ) : (
-        <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
-      )}
-      <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} />
-    </footer>
-  </article>;
-}
-
-function RecordCardStatuses({ approvalStatus, compact = false, onApprovalChange, record }: { approvalStatus: DemoApprovalStatus; compact?: boolean; onApprovalChange: RecordProps["onApprovalChange"]; record: DemoRecord }) {
-  return <div className={cn("record-card-statuses", compact && "record-card-compact-outcomes")} aria-label="Tình trạng, biện pháp và duyệt">
-    <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
-    <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
-    <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
-  </div>;
-}
-
-function ApprovalControl({ onChange, recordId, status }: { onChange: (id: string, status: DemoApprovalStatus) => void; recordId: string; status: DemoApprovalStatus }) {
-  return <label className="approval-control">
-    <span className="sr-only">Duyệt</span>
-    <span className="approval-select-shell">
-      <select className={cn("approval-select", `is-${status.toLowerCase()}`)} aria-label={`Trạng thái duyệt phiếu ${recordId}`} value={status} onChange={(event) => onChange(recordId, event.target.value as DemoApprovalStatus)}>
-        {(Object.keys(approvalLabels) as DemoApprovalStatus[]).map((value) => <option key={value} value={value}>{approvalLabels[value]}</option>)}
-      </select>
-      <ChevronDown className="approval-select-icon" size={13} strokeWidth={2.5} aria-hidden="true" />
-    </span>
-  </label>;
-}
-
-function RecordHistoryActionButton({ onDelete, onRestore, recordId, trashMode }: { onDelete: RecordProps["onDelete"]; onRestore: RecordProps["onRestore"]; recordId: string; trashMode: boolean }) {
-  return <Button
-    variant="ghost"
-    size="icon"
-    className={cn("record-delete", trashMode && "is-restore")}
-    aria-label={`${trashMode ? "Khôi phục" : "Xóa"} phiếu ${recordId}`}
-    title={trashMode ? "Khôi phục phiếu" : "Chuyển sang trạng thái đã xoá"}
-    onClick={() => trashMode ? onRestore(recordId) : onDelete(recordId)}
-  >
-    {trashMode ? <RotateCcw size={17} aria-hidden="true" /> : <Trash2 size={17} aria-hidden="true" />}
-  </Button>;
-}
-
-function RecordPhotoGallery({ photos, recordId, variant }: { photos: readonly DemoPhoto[]; recordId: string; variant: "table" | "card" }) {
-  const [activePhoto, setActivePhoto] = useState<DemoPhoto | null>(null);
-  return (
-    <>
-      <div className={cn("record-photo-gallery", variant === "table" ? "is-table" : "is-card")} aria-label={`${photos.length} ảnh minh chứng của phiếu ${recordId}`}>
-        {photos.map((photo, index) => (
-          <button key={photo.id} type="button" className="record-photo-button" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1} của phiếu ${recordId}`}>
-            <img src={photo.src} alt="" />
-            {variant === "card" ? <span>{index + 1}</span> : null}
-          </button>
-        ))}
-      </div>
-      <EvidenceImageViewer image={activePhoto} open={activePhoto !== null} onOpenChange={(open) => { if (!open) setActivePhoto(null); }} />
-    </>
-  );
 }

@@ -1,39 +1,8 @@
-import type { KphKind } from "@coopfood-kph/kph-rules";
-
-export type DemoApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
-
-export type DemoRecord = {
-  id: string;
-  kind: KphKind;
-  detectedDate: string;
-  detectedBy: string;
-  sku: string;
-  productName: string;
-  supplier: string;
-  quantity: string;
-  quantityValue: number;
-  unit: "EA" | "kg";
-  condition: string;
-  resolution: string;
-  treatmentDate: string;
-  approvalStatus: DemoApprovalStatus;
-  photos: readonly DemoPhoto[];
-  note?: string;
-  createdAt?: string;
-  lastExportedAt?: string | null;
-};
-
-export type DemoPhoto = {
-  id: string;
-  src: string;
-  alt: string;
-  blob?: Blob;
-  fileName?: string;
-};
+import type { RecordView } from "./record-view";
 
 const DEMO_PHOTO_SRC = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'/%3E";
 
-export const DEMO_RECORDS: readonly DemoRecord[] = [
+export const DEMO_RECORDS: readonly RecordView[] = [
   {
     id: "KPH-260815-018",
     kind: "TPCN",

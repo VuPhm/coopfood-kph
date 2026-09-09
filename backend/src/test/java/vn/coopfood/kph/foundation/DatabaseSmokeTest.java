@@ -32,7 +32,7 @@ import org.testcontainers.utility.DockerImageName;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class DatabaseSmokeTest {
 
@@ -51,11 +51,14 @@ class DatabaseSmokeTest {
     @Autowired
     DSLContext database;
 
+    @Autowired
+    Flyway flyway;
+
     @Test
     void cleanPostgresAppliesBaselineAndExposesPublicHealth() throws Exception {
-        Integer migrations = database.fetchOne(
-                "SELECT count(*) AS total FROM flyway_schema_history WHERE success")
-                .get("total", Integer.class);
+        flyway.validate();
+        assertThat(flyway.info().pending()).isEmpty();
+        assertThat(flyway.info().applied()).isNotEmpty();
         Integer coreTables = database.fetchOne("""
                 SELECT count(*) AS total
                 FROM information_schema.tables
@@ -64,12 +67,12 @@ class DatabaseSmokeTest {
                     'app_users', 'user_roles', 'stores', 'store_memberships',
                     'catalog_import_batches', 'catalog_import_rows', 'catalog_versions',
                     'suppliers', 'products', 'product_suppliers', 'product_barcodes',
-                    'kph_records', 'kph_photos', 'kph_status_history', 'audit_events'
+                    'kph_records', 'kph_photos', 'kph_status_history', 'audit_events',
+                    'kph_idempotency_keys'
                   )
                 """).get("total", Integer.class);
 
-        assertThat(migrations).isEqualTo(2);
-        assertThat(coreTables).isEqualTo(15);
+        assertThat(coreTables).isEqualTo(16);
 
         HttpResponse<String> health = HttpClient.newHttpClient().send(
                 HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/actuator/health"))
@@ -217,14 +220,14 @@ class DatabaseSmokeTest {
                 DSLContext upgradeDatabase = DSL.using(connection);
                 TestScope scope = createScope(upgradeDatabase);
                 recordId = UUID.randomUUID();
-                assertThat(insertKph(
+                assertThat(insertLegacyKph(
                         upgradeDatabase,
                         scope,
                         recordId,
                         new KphPolicyCase("TPCN", "NEAR_EXPIRY", "CANCEL", "KG")))
                         .isEqualTo(1);
                 damagedRecordId = UUID.randomUUID();
-                assertThat(insertKph(
+                assertThat(insertLegacyKph(
                         upgradeDatabase,
                         scope,
                         damagedRecordId,
@@ -265,6 +268,21 @@ class DatabaseSmokeTest {
                         DSL.field(DSL.name("success"), Boolean.class).isTrue()
                                 .and(DSL.field(DSL.name("version"), String.class).in("1", "2"))))
                         .isEqualTo(2);
+                assertThat(upgradeDatabase.fetchOne("""
+                        SELECT r.snapshot_store_code, r.snapshot_store_name, r.snapshot_actor_display_name,
+                               s.store_code, s.store_name, u.display_name
+                        FROM kph_records r
+                        JOIN stores s ON s.id = r.store_id
+                        JOIN app_users u ON u.id = r.created_by
+                        WHERE r.id = ?
+                        """, damagedRecordId)).satisfies(record -> {
+                            assertThat(record.get("snapshot_store_code", String.class))
+                                    .isEqualTo(record.get("store_code", String.class));
+                            assertThat(record.get("snapshot_store_name", String.class))
+                                    .isEqualTo(record.get("store_name", String.class));
+                            assertThat(record.get("snapshot_actor_display_name", String.class))
+                                    .isEqualTo(record.get("display_name", String.class));
+                        });
             }
         } finally {
             database.dropSchemaIfExists(DSL.name(schemaName)).cascade().execute();
@@ -273,6 +291,21 @@ class DatabaseSmokeTest {
 
     private TestScope createScope() {
         return createScope(database);
+    }
+
+    // This fixture deliberately targets V1; current-schema inserts include V4 snapshots.
+    private int insertLegacyKph(DSLContext targetDatabase, TestScope scope, UUID recordId,
+            KphPolicyCase policyCase) {
+        return targetDatabase.execute("""
+                INSERT INTO kph_records (
+                    id, store_id, created_by, type, detected_date, quantity, unit,
+                    condition_code, resolution_code, scanned_barcode,
+                    catalog_lookup_status, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, DATE '2026-09-05', ?, ?, ?, ?, ?,
+                    'NOT_FOUND', now(), now())
+                """, recordId, scope.storeId(), scope.userId(), policyCase.type(),
+                policyCase.unit().equals("EA") ? new BigDecimal("1.000") : new BigDecimal("1.250"),
+                policyCase.unit(), policyCase.condition(), policyCase.resolution(), "schema-test-" + recordId);
     }
 
     private TestScope createScope(DSLContext targetDatabase) {
@@ -329,9 +362,10 @@ class DatabaseSmokeTest {
                 INSERT INTO kph_records (
                     id, store_id, created_by, type, detected_date, quantity, unit,
                     condition_code, resolution_code, scanned_barcode,
-                    catalog_lookup_status, created_at, updated_at
+                    catalog_lookup_status, snapshot_store_code, snapshot_store_name,
+                    snapshot_actor_display_name, created_at, updated_at
                 ) VALUES (?, ?, ?, ?, DATE '2026-09-05', ?, ?, ?, ?, ?,
-                    'NOT_FOUND', now(), now())
+                    'NOT_FOUND', ?, ?, ?, now(), now())
                 """,
                 recordId,
                 scope.storeId(),
@@ -341,7 +375,10 @@ class DatabaseSmokeTest {
                 policyCase.unit(),
                 policyCase.condition(),
                 policyCase.resolution(),
-                "schema-test-" + recordId);
+                "schema-test-" + recordId,
+                "schema-test-" + scope.userId(),
+                "Schema test store " + scope.userId(),
+                "Schema test " + scope.userId());
     }
 
     private void assertConstraintViolation(

@@ -49,7 +49,19 @@ song song bằng mock sinh từ cùng OpenAPI.
 - Catalog lookup đã trả `0 hoặc 1` từ catalog published/current với membership
   store bắt buộc; dữ liệu inactive, non-current hoặc thiếu NCC chính không bị
   suy diễn. `CHAIN_ADMIN` không bypass membership.
-- Bước triển khai tiếp theo: KPH create/list, catalog snapshot và private media.
+- Đã có implementation KPH create/list/photo, catalog snapshot, private media
+  và adapter Store PWA online trong working tree; slice chưa được acceptance.
+- Đợt khắc phục đầu tiên gom catalog resolver dùng chung cho lookup/snapshot,
+  tách seed nâng cấp V1 khỏi seed schema hiện tại, và thêm PR CI frontend/backend.
+- Đã làm rõ ranh giới hiển thị Pilot/online theo R02: callback thao tác chỉ được
+  truyền cho Pilot; online context/actor read-only và loading/error/empty có test.
+- Kế hoạch đóng milestone: [FOUNDATION_01_COMPLETION_PLAN.md](FOUNDATION_01_COMPLETION_PLAN.md).
+  Khóa checkpoint gồm cả file untracked trước khi chia ba team Luna max: online
+  flow, backend/media và E2E/review. Integration owner giữ vùng contract/config/
+  migration; mỗi team có worktree riêng. Chưa dispatch team trong lượt lập plan.
+- Dừng refactor tổng quát. Hoàn tất login/store, lookup/retry, media và browser
+  acceptance; tối đa hai vòng review có kế hoạch rồi đóng hoặc ghi blocker cụ thể.
+  Review kiến trúc là nguồn finding, không phải danh sách phải làm hết mới được đóng.
 
 ### Ngoài phạm vi
 

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ComponentProps } from "react";
 
 import { formatBusinessDate } from "./business-date";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
@@ -8,8 +9,8 @@ import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
 vi.mock("./image-processing", () => ({ processEvidencePhoto: vi.fn() }));
 
-function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: CreatedRecordDraft) => void>(), profile: StoreProfile = DEFAULT_STORE_PROFILE) {
-  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={onSaved} profile={profile} />);
+function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: CreatedRecordDraft) => void>(), profile: StoreProfile = DEFAULT_STORE_PROFILE, onBarcodeLookup?: ComponentProps<typeof CreateRecordDialog>["onBarcodeLookup"]) {
+  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={onSaved} profile={profile} onBarcodeLookup={onBarcodeLookup} />);
   return onSaved;
 }
 
@@ -121,6 +122,27 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("dialog", { name: "Quét mã SKU / UPC" })).toBeVisible();
   });
 
+  it("clears catalog autofill when a later barcode is not found", async () => {
+    const onBarcodeLookup = vi.fn()
+      .mockResolvedValueOnce({ status: "FOUND", barcode: "A", product: { id: "p", barcode: "A", skuCode: "SKU-A", name: "Sản phẩm A", primarySupplier: { code: "NCC-A", name: "NCC A" } } })
+      .mockResolvedValueOnce({ status: "NOT_FOUND", barcode: "B" });
+    renderDialog("TPCN", undefined, DEFAULT_STORE_PROFILE, onBarcodeLookup);
+    const barcode = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    const product = screen.getByRole("textbox", { name: "Tên hàng hóa" });
+    const supplier = screen.getByRole("textbox", { name: "Nhà cung cấp" });
+
+    fireEvent.change(barcode, { target: { value: "A" } });
+    fireEvent.blur(barcode);
+    await waitFor(() => expect(product).toHaveValue("Sản phẩm A"));
+    expect(supplier).toHaveValue("NCC A");
+    fireEvent.change(barcode, { target: { value: "B" } });
+    expect(product).toHaveValue("");
+    expect(supplier).toHaveValue("");
+    fireEvent.blur(barcode);
+    expect(await screen.findByText(/Không tìm thấy barcode/)).toBeVisible();
+    expect(onBarcodeLookup).toHaveBeenCalledTimes(2);
+  });
+
   it("locks the detected date, opens the treatment date calendar and allows date selection", () => {
     renderDialog();
     expect(screen.getByRole("textbox", { name: "Ngày phát hiện" })).toHaveValue(formatBusinessDate(new Date()).display);
@@ -180,6 +202,7 @@ describe("Create KPH record", () => {
         unit: "EA",
         photos: [expect.objectContaining({ fileName: "evidence.jpg", blob: stampedBlob })],
       })));
-    expect(onSaved.mock.calls[0]?.[0].photos[0]).not.toHaveProperty("originalFile");
+    expect(onSaved.mock.calls[0]?.[0].photos[0]).toHaveProperty("originalFile", expect.any(File));
+    expect(onSaved.mock.calls[0]?.[0].photos[0]).toHaveProperty("capturedAt", expect.any(Date));
   });
 });

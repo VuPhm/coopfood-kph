@@ -2,7 +2,7 @@ import type { KphKind } from "@coopfood-kph/kph-rules";
 import type ExcelJS from "exceljs";
 
 import { formatBusinessDate } from "./business-date";
-import type { DemoPhoto, DemoRecord } from "./demo-records";
+import type { EvidencePhotoView, RecordView } from "./record-view";
 import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
 const COMPANY = "CÔNG TY TNHH MTV THỰC PHẨM SAIGON CO.OP";
@@ -16,7 +16,7 @@ export function escapeFormulaText(value: string) {
   return ["=", "+", "-", "@"].includes(first) ? `'${value}` : value;
 }
 
-function treatmentMark(record: DemoRecord, resolution: string) {
+function treatmentMark(record: RecordView, resolution: string) {
   return record.resolution.trim().toUpperCase() === resolution ? "X" : "";
 }
 
@@ -33,7 +33,7 @@ function imageDimensions(source: string) {
   });
 }
 
-async function normalizePhoto(photo: DemoPhoto) {
+async function normalizePhoto(photo: EvidencePhotoView) {
   let sourceBlob: Blob;
   if (photo.blob) {
     sourceBlob = photo.blob;
@@ -74,7 +74,7 @@ function fitImage(width: number, height: number, maxWidth: number, maxHeight: nu
   return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
 }
 
-export async function buildKphWorkbook(kind: KphKind, records: readonly DemoRecord[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
+export async function buildKphWorkbook(kind: KphKind, records: readonly RecordView[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
   const module = await import("exceljs");
   const Excel = module.default;
   const workbook = new Excel.Workbook();
@@ -206,7 +206,7 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
   return workbook;
 }
 
-export async function downloadKphWorkbook(kind: KphKind, records: readonly DemoRecord[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
+export async function downloadKphWorkbook(kind: KphKind, records: readonly RecordView[], store: Pick<StoreProfile, "storeCode" | "storeName"> = DEFAULT_STORE_PROFILE) {
   const workbook = await buildKphWorkbook(kind, records, store);
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([new Uint8Array(buffer)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });

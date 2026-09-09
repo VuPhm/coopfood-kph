@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-05
+Cập nhật: 2026-09-09
 
 ## Giai đoạn
 
@@ -40,6 +40,25 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   sinh từ OpenAPI và transport dùng `openapi-fetch` với session/CSRF.
 - Backend Java 21/Spring Boot đã có baseline migration 15 bảng, security
   default-deny, ProblemDetail, business clock, ArchUnit và database smoke test.
+- Foundation-01 đã có KPH create/list/photo HTTP handlers với idempotency,
+  catalog/store/actor snapshot bất biến và local private original/stamped media;
+  Store PWA có adapter online dùng cùng OpenAPI cho session, history, lookup và
+  create multipart, bật bằng `VITE_KPH_ONLINE=true`.
+- Catalog lookup và snapshot creation dùng chung resolver published/current;
+  test KPH bao gồm barcode miss giữ nhập tay, fixed business clock và thư mục
+  media tạm. Seed nâng cấp V1 tách khỏi seed có snapshot V4.
+- Có workflow PR `Verify Foundation` cho frontend và backend. Full backend
+  verification yêu cầu Docker; integration không tự skip khi thiếu runtime.
+- Verification local ngày 2026-09-09: `npm run verify` pass 117 test và build;
+  backend `./mvnw -q verify` qua OrbStack/PostgreSQL 17 pass 30 test, không skip,
+  gồm database sạch và nâng cấp V1→V4. Workflow CI chưa được chạy trên GitHub.
+- Đợt tiếp theo làm rõ vùng dùng chung Pilot/online: model hiển thị `RecordView`
+  tách khỏi fixture demo; table/card nhận callback thao tác từ workspace; bỏ
+  state duyệt trùng. Online context/người nhập chỉ đọc từ session, có trạng thái
+  loading/error/empty và retry tải workspace; dialog Pilot không mount ở online.
+- Verification frontend sau đợt ranh giới: `npm run verify` pass 121 test và
+  build, gồm 4 ca online loading/retry và capability EMPLOYEE/STORE_MANAGER.
+  Đây là component tests với gateway mock, chưa thay thế browser E2E.
 - Pilot đã có IndexedDB cho phiếu/stamped image/trash/export history, scanner
   camera với fallback, image processing/viewer, service worker và Excel baseline.
 - Device/browser matrix và workbook TPCN/TPTS đã được đóng theo acceptance tối
@@ -47,9 +66,14 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
 
 ## Chưa hoàn tất
 
-- Chưa có vertical slice chạy end-to-end trong repository mới: UI hiện dùng dữ
-  liệu tổng hợp; backend đã có login/session/store context và barcode lookup,
-  nhưng chưa implement KPH create/list/media HTTP handlers.
+- Đã rà local/remote branches ngày 2026-09-09 và lập
+  [kế hoạch đóng Foundation-01](FOUNDATION_01_COMPLETION_PLAN.md). Các nhánh
+  identity/contract/Pilot đã nằm trong HEAD; phần KPH online mới còn chưa commit.
+  Nhánh WIP planning chứa policy khác và không được merge nguyên nhánh.
+  Chưa khởi chạy các team Luna max; cần checkpoint chung trước khi chia worktree.
+- Chưa có browser E2E chạy end-to-end trong repository mới; integration test
+  KPH đã pass với Docker/PostgreSQL local, và online mode hiện
+  nhận session đã đăng nhập từ backend thay vì tự dựng màn hình login.
 - Database migration V2 đã được kiểm chứng với PostgreSQL 17 qua Testcontainers,
   bao gồm clean database và nâng cấp dữ liệu mã cũ tổng hợp.
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,
