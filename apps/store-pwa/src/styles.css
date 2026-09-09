@@ -127,6 +127,18 @@ html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px
   white-space: nowrap;
 }
 .header-today-label { color: rgb(255 255 255 / .75); font-weight: 600; }
+.online-login-panel { width: min(90rem, calc(100% - var(--space-6))); margin: var(--space-6) auto 0; }
+.online-login-card { display: grid; width: min(32rem, 100%); gap: var(--space-3); border: 1px solid var(--color-border); border-radius: 24px; background: #fff; padding: var(--space-5); box-shadow: var(--shadow-panel); }
+.online-login-copy { margin: 0; color: var(--color-ink-muted); font-size: .875rem; line-height: 1.45; }
+.online-login-error { margin: 0; border-radius: 12px; background: var(--color-danger-soft); padding: var(--space-2) var(--space-3); color: var(--color-danger); font-size: .8125rem; font-weight: 750; }
+.online-login-form { display: grid; gap: var(--space-3); }
+.online-login-form label { display: grid; gap: var(--space-1-5); color: var(--color-ink); font-size: .75rem; font-weight: 800; }
+.online-login-form input { min-height: 2.75rem; border: 2px solid var(--color-surface-strong); border-radius: 12px; background: #fff; padding-inline: var(--space-3); color: var(--color-ink); }
+.online-login-form input:hover { border-color: rgb(0 102 51 / .25); background: var(--color-brand-soft); }
+.online-login-form input:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.online-login-form button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; gap: var(--space-2); border-radius: 12px; background: var(--color-brand); padding-inline: var(--space-4); color: #fff; font-size: .875rem; font-weight: 850; }
+.online-login-form button:hover { background: var(--color-brand-hover); }
+.online-login-form button:disabled { cursor: wait; opacity: .7; }
 .workspace-layout { --workspace-header-block-size: 10.875rem; display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: var(--space-4); }
 .workspace-side-stack { position: sticky; top: calc(4.75rem + env(safe-area-inset-top)); display: grid; min-width: 0; align-content: start; gap: var(--space-4); }
 .workspace-side-stack:not(:has(> :not(.expiry-workbench.is-collapsed))) { display: contents; }
@@ -198,6 +210,12 @@ button.store-context:disabled:hover { transform: none; border-color: var(--color
 .store-context-copy strong { color: var(--color-brand); font-size: .875rem; font-weight: 900; line-height: 1.1; }
 .store-context-copy span { color: var(--color-ink-muted); font-size: .75rem; line-height: 1.1; }
 .store-context-copy small { color: var(--color-ink-muted); font-size: .625rem; font-weight: 700; line-height: 1.1; }
+.store-context:has(.online-store-switcher) { grid-template-columns: auto minmax(0, 1fr) minmax(8rem, 12rem) auto; cursor: default; }
+.online-store-switcher select { width: 100%; min-height: 2.75rem; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); padding: 0 var(--space-2); color: var(--color-ink); font-size: .75rem; font-weight: 750; }
+.online-store-switcher select:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.online-logout-button { min-height: 2.75rem; border: 1px solid var(--color-border); border-radius: 12px; background: #fff; padding-inline: var(--space-3); color: var(--color-brand); font-size: .75rem; font-weight: 850; white-space: nowrap; }
+.online-logout-button:hover { border-color: var(--color-brand); background: var(--color-brand-soft); }
+.online-logout-button:disabled, .online-store-switcher select:disabled { cursor: wait; opacity: .65; }
 .store-context-disclosure { width: 1rem; height: 1rem; color: var(--color-ink-muted); stroke-width: 2.5; transition: transform var(--motion-fast) var(--motion-ease-out), color var(--motion-fast) ease; }
 button.store-context:hover .store-context-disclosure { transform: translateX(var(--space-1)); color: var(--color-brand); }
 .storage-error-banner { margin: 0 var(--panel-inset); border: 1px solid var(--color-danger); border-radius: 12px; background: var(--color-danger-soft); padding: var(--space-2) var(--space-3); color: var(--color-danger); font-size: .75rem; font-weight: 750; }
@@ -612,6 +630,11 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
   .app-brand-logo { height: 3.25rem; max-width: min(9rem, 57vw); }
   .header-today { margin-left: auto; background: transparent; padding: 0; font-size: .7rem; text-align: right; }
   .header-today-label { display: none; }
+  .online-login-panel { width: calc(100% - var(--space-4)); margin-top: var(--space-4); }
+  .online-login-card { padding: var(--space-4); }
+  .store-context:has(.online-store-switcher) { grid-template-columns: auto minmax(0, 1fr); height: auto; min-height: 4.5rem; }
+  .store-context:has(.online-store-switcher) .online-store-switcher { grid-column: 1 / -1; }
+  .store-context:has(.online-store-switcher) .online-logout-button { grid-column: 1 / -1; width: 100%; }
   .workspace-header { grid-template-areas: "title" "store" "actions"; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
   .workspace-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: var(--control-gap); }
   .workspace-create { width: 100%; height: 3.5rem; max-width: none; min-width: 0; gap: var(--space-1-5); padding-inline: var(--space-2); font-size: .7rem; text-align: center; }

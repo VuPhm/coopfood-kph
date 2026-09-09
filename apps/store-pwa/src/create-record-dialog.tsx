@@ -105,6 +105,7 @@ type CreateRecordDialogProps = {
   open: boolean;
   profile?: StoreProfile;
   actorReadOnly?: boolean;
+  onlineMode?: boolean;
   onOpenChange: (open: boolean) => void;
   onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
   onBarcodeLookup?: ((barcode: string) => Promise<components["schemas"]["BarcodeLookupResponse"]>) | undefined;
@@ -134,7 +135,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false }: CreateRecordDialogProps) {
+export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -145,9 +146,11 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [barcodeLookupMessage, setBarcodeLookupMessage] = useState("");
+  const [lookupRetryValue, setLookupRetryValue] = useState("");
   const lookupRequestId = useRef(0);
   const autoFilledLookup = useRef({ barcode: "", productName: "", supplier: "" });
   const idempotencyKeyRef = useRef<string | null>(null);
+  const savingRecordRef = useRef(false);
   const {
     formState: { errors },
     handleSubmit,
@@ -184,9 +187,30 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     clearPhotos();
     setPhotoError("");
     setBarcodeLookupMessage("");
+    setLookupRetryValue("");
     lookupRequestId.current += 1;
+    idempotencyKeyRef.current = null;
     clearAutoFilledLookup();
   }, [kind, profile, reset]);
+
+  useEffect(() => {
+    if (open || !kind) return;
+    reset(defaultValues(kind, profile));
+    clearPhotos();
+    setPhotoError("");
+    setBarcodeLookupMessage("");
+    setLookupRetryValue("");
+    lookupRequestId.current += 1;
+    idempotencyKeyRef.current = null;
+    clearAutoFilledLookup();
+  }, [open, kind, profile, reset]);
+
+  useEffect(() => {
+    const subscription = watch(() => {
+      if (!savingRecordRef.current) idempotencyKeyRef.current = null;
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   useEffect(() => () => {
     for (const photo of photoRef.current) {
@@ -210,10 +234,18 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
 
   async function lookupBarcode(value = barcode) {
     const normalized = value.trim();
-    if (!onBarcodeLookup || !normalized) return;
+    if (!normalized) {
+      lookupRequestId.current += 1;
+      clearAutoFilledLookup();
+      setBarcodeLookupMessage("");
+      setLookupRetryValue("");
+      return;
+    }
+    if (!onBarcodeLookup) return;
     const requestId = ++lookupRequestId.current;
     clearAutoFilledLookup();
     setBarcodeLookupMessage("Đang tra cứu barcode…");
+    setLookupRetryValue("");
     try {
       const result = await onBarcodeLookup(normalized);
       if (requestId !== lookupRequestId.current || getValues("barcode").trim() !== normalized) return;
@@ -233,6 +265,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     } catch (error) {
       if (requestId !== lookupRequestId.current || getValues("barcode").trim() !== normalized) return;
       setBarcodeLookupMessage(error instanceof Error ? error.message : "Không thể tra cứu barcode lúc này.");
+      setLookupRetryValue(normalized);
     }
   }
 
@@ -245,14 +278,15 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
       setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
       return;
     }
-    const unsupportedPhoto = photos.find(({ originalFile }) => !["image/jpeg", "image/png"].includes(originalFile.type.toLowerCase()));
+    const unsupportedPhoto = onlineMode && photos.find(({ originalFile }) => !isOnlinePhotoSupported(originalFile));
     if (unsupportedPhoto) {
-      setPhotoError(`Ảnh “${unsupportedPhoto.fileName}” cần là JPEG hoặc PNG. Vui lòng chọn lại ảnh này.`);
+      setPhotoError(onlinePhotoError(unsupportedPhoto.originalFile));
       return;
     }
     const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
     const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
     setSavingRecord(true);
+    savingRecordRef.current = true;
     setPhotoError("");
     try {
       const idempotencyKey = idempotencyKeyRef.current ?? (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
@@ -291,6 +325,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
       setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
     } finally {
       setSavingRecord(false);
+      savingRecordRef.current = false;
     }
   });
 
@@ -302,24 +337,44 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
       setPhotoError("Mỗi phiếu chỉ được tối đa 3 ảnh");
       return;
     }
+    if (onlineMode) {
+      const unsupportedFile = files.find((file) => !isOnlinePhotoSupported(file));
+      if (unsupportedFile) {
+        setPhotoError(onlinePhotoError(unsupportedFile));
+        return;
+      }
+    }
     setProcessingPhotos(true);
     setPhotoError("");
     const additions: PhotoDraft[] = [];
     try {
       for (const [index, file] of files.entries()) {
-        const processed = await processEvidencePhoto(file, { storeCode: profile.storeCode, storeName: profile.storeName });
-        additions.push({
-          id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
-          fileName: file.name,
-          originalFile: file,
-          stampedBlob: processed.blob,
-          capturedAt: processed.capturedAt,
-          url: URL.createObjectURL(processed.blob),
-        });
+        if (onlineMode) {
+          const capturedAt = file.lastModified > 0 ? new Date(file.lastModified) : new Date();
+          additions.push({
+            id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
+            fileName: file.name,
+            originalFile: file,
+            stampedBlob: file,
+            capturedAt,
+            url: createObjectUrl(file),
+          });
+        } else {
+          const processed = await processEvidencePhoto(file, { storeCode: profile.storeCode, storeName: profile.storeName });
+          additions.push({
+            id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
+            fileName: file.name,
+            originalFile: file,
+            stampedBlob: processed.blob,
+            capturedAt: processed.capturedAt,
+            url: createObjectUrl(processed.blob),
+          });
+        }
       }
       const next = [...photoRef.current, ...additions];
       photoRef.current = next;
       setPhotos(next);
+      idempotencyKeyRef.current = null;
     } catch (error) {
       additions.forEach((photo) => URL.revokeObjectURL(photo.url));
       setPhotoError(error instanceof Error ? error.message : "Không thể tối ưu và đóng tem ảnh minh chứng");
@@ -334,6 +389,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     const next = photos.filter((photo) => photo.id !== id);
     photoRef.current = next;
     setPhotos(next);
+    idempotencyKeyRef.current = null;
     if (activePhoto?.id === id) setActivePhoto(null);
   }
 
@@ -357,13 +413,16 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
                   <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", { onChange: (event) => {
+                    lookupRequestId.current += 1;
+                    setBarcodeLookupMessage("");
+                    setLookupRetryValue("");
                     if (autoFilledLookup.current.barcode && event.target.value.trim() !== autoFilledLookup.current.barcode) clearAutoFilledLookup();
                   }, onBlur: () => void lookupBarcode() })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
                       <ScanLine aria-hidden="true" size={18} />
                     </button>
                   </div>
-                  {barcodeLookupMessage ? <p className="mt-1 text-xs text-ink-muted" role="status">{barcodeLookupMessage}</p> : null}
+                  {barcodeLookupMessage ? <p className="mt-1 text-xs text-ink-muted" role="status">{barcodeLookupMessage}{lookupRetryValue ? <button type="button" className="ml-2 underline" onClick={() => void lookupBarcode(lookupRetryValue)}>Thử tra cứu lại</button> : null}</p> : null}
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
                   <Input id="supplier" placeholder="Điền tên NCC" {...register("supplier")} />
@@ -409,8 +468,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
                 <p className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                  <PhotoPicker disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
-                  <PhotoPicker disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
+                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
+                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
                 </div>
                 {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
                 <p className={cn("mt-2 text-xs font-semibold", photoError ? "text-danger" : "text-ink-muted")} role={photoError ? "alert" : "status"}>
@@ -436,6 +495,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
         open={scannerOpen}
         onOpenChange={setScannerOpen}
           onScan={(scannedBarcode) => {
+            lookupRequestId.current += 1;
             setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
             void lookupBarcode(scannedBarcode);
             window.setTimeout(() => setFocus("barcode"), 0);
@@ -486,6 +546,28 @@ function choiceIcon(value: string) {
   return <MoreHorizontal aria-hidden="true" />;
 }
 
-function PhotoPicker({ capture, disabled, icon, label, multiple, onChange }: { capture?: "environment"; disabled?: boolean; icon: ReactNode; label: string; multiple?: boolean; onChange: (event: ChangeEvent<HTMLInputElement>) => void }) {
-  return <label className={cn("photo-picker", disabled && "is-disabled")}><span>{icon}{label}</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/heic,image/heif,.heic,.heif" capture={capture} multiple={multiple} disabled={disabled} onChange={onChange} /></label>;
+const ONLINE_PHOTO_ACCEPT = "image/jpeg,image/png,.jpg,.jpeg,.png";
+const PILOT_PHOTO_ACCEPT = "image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif";
+
+function isOnlinePhotoSupported(file: File) {
+  const type = file.type.toLowerCase();
+  const name = file.name.toLowerCase();
+  if (type === "image/heic" || type === "image/heif" || /\.(heic|heif)$/.test(name)) return false;
+  if (type === "image/jpeg" || type === "image/png") return true;
+  return !type && /\.(jpe?g|png)$/.test(name);
+}
+
+function onlinePhotoError(file: File) {
+  const isHeic = file.type.toLowerCase().includes("heic") || file.type.toLowerCase().includes("heif") || /\.(heic|heif)$/i.test(file.name);
+  return isHeic
+    ? `Ảnh “${file.name}” là HEIC/HEIF và hiện chưa được hỗ trợ khi gửi online. Hãy chọn JPEG hoặc PNG; ảnh gốc không được thay bằng bản stamped.`
+    : `Ảnh “${file.name}” chưa được hỗ trợ khi gửi online. Hãy chọn JPEG hoặc PNG.`;
+}
+
+function createObjectUrl(blob: Blob) {
+  return typeof URL.createObjectURL === "function" ? URL.createObjectURL(blob) : "";
+}
+
+function PhotoPicker({ accept, capture, disabled, icon, label, multiple, onChange }: { accept: string; capture?: "environment"; disabled?: boolean; icon: ReactNode; label: string; multiple?: boolean; onChange: (event: ChangeEvent<HTMLInputElement>) => void }) {
+  return <label className={cn("photo-picker", disabled && "is-disabled")}><span>{icon}{label}</span><input className="sr-only" type="file" accept={accept} capture={capture} multiple={multiple} disabled={disabled} onChange={onChange} /></label>;
 }

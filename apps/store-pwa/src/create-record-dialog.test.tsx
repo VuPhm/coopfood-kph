@@ -9,8 +9,8 @@ import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
 vi.mock("./image-processing", () => ({ processEvidencePhoto: vi.fn() }));
 
-function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: CreatedRecordDraft) => void>(), profile: StoreProfile = DEFAULT_STORE_PROFILE, onBarcodeLookup?: ComponentProps<typeof CreateRecordDialog>["onBarcodeLookup"]) {
-  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={onSaved} profile={profile} onBarcodeLookup={onBarcodeLookup} />);
+function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: CreatedRecordDraft) => void>(), profile: StoreProfile = DEFAULT_STORE_PROFILE, onBarcodeLookup?: ComponentProps<typeof CreateRecordDialog>["onBarcodeLookup"], onlineMode = false) {
+  render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={onSaved} profile={profile} onBarcodeLookup={onBarcodeLookup} onlineMode={onlineMode} />);
   return onSaved;
 }
 
@@ -104,6 +104,92 @@ describe("Create KPH record", () => {
     expect(processEvidencePhoto).toHaveBeenCalledWith(file, { storeCode: "0123", storeName: "Cống Quỳnh" });
     fireEvent.click(screen.getByRole("button", { name: "Xem ảnh minh chứng 1" }));
     expect(screen.getByAltText("Ảnh minh chứng evidence.jpg đã đóng tem")).toHaveAttribute("src", "blob:stamped-photo");
+  });
+
+  it("keeps online JPEG bytes as the upload and leaves stamping to the backend", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:original-photo") });
+    const onSaved = renderDialog("TPCN", vi.fn(), { ...DEFAULT_STORE_PROFILE, storeName: "Cống Quỳnh", storeCode: "0123", fullName: "Nguyễn Văn Demo" }, undefined, true);
+    const file = new File(["original-online-bytes"], "evidence.jpg", { type: "image/jpeg" });
+    const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+
+    fireEvent.change(picker!, { target: { files: [file] } });
+    expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
+    expect(processEvidencePhoto).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Hàng online" } });
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({
+      photos: [expect.objectContaining({ originalFile: file, blob: file })],
+    })));
+  });
+
+  it("reports the online HEIC limit without replacing the original with a stamped JPEG", async () => {
+    const onSaved = renderDialog("TPCN", vi.fn(), DEFAULT_STORE_PROFILE, undefined, true);
+    const heic = new File(["heic-bytes"], "camera.heic", { type: "image/heic" });
+    const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+
+    fireEvent.change(picker!, { target: { files: [heic] } });
+    expect(await screen.findByRole("alert")).toHaveTextContent(/HEIC\/HEIF.*chưa được hỗ trợ.*online/i);
+    expect(processEvidencePhoto).not.toHaveBeenCalled();
+    expect(onSaved).not.toHaveBeenCalled();
+  });
+
+  it("continues to process Pilot HEIC files", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:pilot-heic") });
+    vi.mocked(processEvidencePhoto).mockResolvedValue({
+      blob: new Blob(["pilot-stamped"], { type: "image/jpeg" }),
+      capturedAt: new Date(),
+      width: 640,
+      height: 480,
+    });
+    const file = new File(["heic-bytes"], "camera.heic", { type: "image/heic" });
+    renderDialog();
+    const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+
+    fireEvent.change(picker!, { target: { files: [file] } });
+    expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
+    expect(processEvidencePhoto).toHaveBeenCalledWith(file, expect.anything());
+  });
+
+  it("starts a fresh idempotency key after the form is closed and reopened", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:pilot-photo") });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
+    vi.mocked(processEvidencePhoto).mockResolvedValue({
+      blob: new Blob(["pilot-stamped"], { type: "image/jpeg" }),
+      capturedAt: new Date(),
+      width: 640,
+      height: 480,
+    });
+    const onSaved = vi.fn<(draft: CreatedRecordDraft) => Promise<void>>()
+      .mockRejectedValueOnce(new Error("request timed out after commit"))
+      .mockResolvedValue(undefined);
+    const onOpenChange = vi.fn();
+    const props = { kind: "TPCN" as const, onOpenChange, onSaved, profile: DEFAULT_STORE_PROFILE };
+    const view = render(<CreateRecordDialog {...props} open />);
+
+    const addPhoto = async () => {
+      fireEvent.change(screen.getByText("Chọn ảnh").closest("label")?.querySelector("input")!, {
+        target: { files: [new File(["original"], "evidence.jpg", { type: "image/jpeg" })] },
+      });
+      await screen.findByText(/Đã xử lý 1\/3 ảnh/);
+    };
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Lần gửi đầu" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Trần An" } });
+    await addPhoto();
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+    const firstKey = onSaved.mock.calls[0]![0].idempotencyKey;
+
+    view.rerender(<CreateRecordDialog {...props} open={false} />);
+    view.rerender(<CreateRecordDialog {...props} open />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Lần gửi lại sau khi mở form" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Trần An" } });
+    await addPhoto();
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(2));
+
+    expect(onSaved.mock.calls[1]![0].idempotencyKey).not.toBe(firstKey);
   });
 
   it("keeps a manual-entry escape hatch when the camera is unavailable", () => {

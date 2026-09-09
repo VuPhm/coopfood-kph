@@ -1,4 +1,5 @@
 import type { KphKind } from "@coopfood-kph/kph-rules";
+import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
 import { AlertTriangle, ArrowDown, ArrowUp, ChevronDown, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Trash2 } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -18,7 +19,7 @@ import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPil
 import { StoreContext } from "./store-context";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
-import { createOnlineGateway, onlineModeEnabled } from "./online-kph";
+import { createOnlineGateway, onlineModeEnabled, type OnlineGateway, type OnlineSession, type OnlineWorkspace } from "./online-kph";
 
 export { formatBusinessDate } from "./business-date";
 
@@ -49,6 +50,7 @@ const recordCollator = new Intl.Collator("vi", { numeric: true, sensitivity: "ba
 const onlinePersistenceEnabled = onlineModeEnabled();
 const pilotPersistenceEnabled = import.meta.env.MODE !== "test" && !onlinePersistenceEnabled;
 const initialRecords = pilotPersistenceEnabled || onlinePersistenceEnabled ? [] : DEMO_RECORDS;
+const onlineSessionQueryKey = ["online", "session"] as const;
 
 function hydrationPhotoUrl(photo: PilotRecord["photos"][number], ownedUrls: Set<string>): EvidencePhotoView {
   const src = URL.createObjectURL(photo.blob);
@@ -160,7 +162,7 @@ function sortValue(record: RecordView, key: RecordSortKey, approvalStatus: Appro
   }
 }
 
-export function App() {
+function WorkspaceApp() {
   const [records, setRecords] = useState<readonly RecordView[]>(initialRecords);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [createKind, setCreateKind] = useState<KphKind | null>(null);
@@ -182,9 +184,65 @@ export function App() {
   const [storageReady, setStorageReady] = useState(!pilotPersistenceEnabled);
   const [storageError, setStorageError] = useState("");
   const [onlineStoreId, setOnlineStoreId] = useState<string | null>(null);
-  const [onlineLoading, setOnlineLoading] = useState(onlinePersistenceEnabled);
   const [onlineGateway] = useState(() => onlinePersistenceEnabled ? createOnlineGateway() : null);
   const [onlineReload, setOnlineReload] = useState(0);
+  const [onlineAuthRequired, setOnlineAuthRequired] = useState(false);
+  const queryClient = useQueryClient();
+  const onlineCapabilities = onlineGateway as unknown as Partial<OnlineGateway> | null;
+  const supportsIdentityApi = Boolean(onlineCapabilities?.getSession && onlineCapabilities?.loadHistory);
+  const legacyWorkspaceQuery = useQuery<OnlineWorkspace>({
+    queryKey: ["online", "workspace", onlineReload],
+    queryFn: ({ signal }) => onlineCapabilities?.loadWorkspace?.(signal) ?? Promise.reject(new Error("Gateway online chưa sẵn sàng.")),
+    enabled: onlinePersistenceEnabled && !supportsIdentityApi && !onlineAuthRequired,
+    retry: false,
+  });
+  const sessionQuery = useQuery<OnlineSession>({
+    queryKey: onlineSessionQueryKey,
+    queryFn: ({ signal }) => onlineCapabilities?.getSession?.(signal) ?? Promise.reject(new Error("Gateway phiên đăng nhập chưa sẵn sàng.")),
+    enabled: onlinePersistenceEnabled && supportsIdentityApi && !onlineAuthRequired,
+    retry: false,
+  });
+  const derivedOnlineSession = supportsIdentityApi ? sessionQuery.data : legacyWorkspaceQuery.data?.session;
+  const onlineSession = onlineAuthRequired ? undefined : derivedOnlineSession;
+  const onlineStores = onlineSession?.user.stores ?? [];
+  const onlineHistoryKey = ["online", "history", onlineSession?.user.id ?? "anonymous", onlineStoreId ?? "none"] as const;
+  const onlineHistoryQuery = useQuery<readonly RecordView[]>({
+    queryKey: onlineHistoryKey,
+    queryFn: ({ signal }) => onlineCapabilities?.loadHistory?.(onlineStoreId!, signal) ?? Promise.reject(new Error("Gateway lịch sử chưa sẵn sàng.")),
+    enabled: onlinePersistenceEnabled && supportsIdentityApi && !onlineAuthRequired && Boolean(onlineSession && onlineStoreId),
+    retry: false,
+  });
+  const onlineLoading = onlinePersistenceEnabled && !onlineAuthRequired && (supportsIdentityApi
+    ? sessionQuery.isPending || Boolean(onlineSession && onlineStoreId && onlineHistoryQuery.isPending)
+    : legacyWorkspaceQuery.isPending);
+  const onlineQueryError = supportsIdentityApi
+    ? sessionQuery.error ?? onlineHistoryQuery.error
+    : legacyWorkspaceQuery.error;
+  const loginMutation = useMutation({
+    mutationFn: ({ username, password }: { username: string; password: string }) => onlineCapabilities?.login?.(username, password) ?? Promise.reject(new Error("Gateway đăng nhập chưa sẵn sàng.")),
+    onSuccess: (session: OnlineSession) => {
+      setOnlineAuthRequired(false);
+      setStorageError("");
+      setRecords([]);
+      setSelected(new Set());
+      setOnlineStoreId(session.user.stores[0]?.id ?? null);
+      queryClient.setQueryData(onlineSessionQueryKey, session);
+      queryClient.removeQueries({ queryKey: ["online", "history"] });
+    },
+    onError: (error: unknown) => setStorageError(error instanceof Error ? error.message : "Không thể đăng nhập lúc này."),
+  });
+  const logoutMutation = useMutation({
+    mutationFn: () => onlineCapabilities?.logout?.() ?? Promise.reject(new Error("Gateway đăng xuất chưa sẵn sàng.")),
+    onSettled: () => {
+      setOnlineAuthRequired(true);
+      setOnlineStoreId(null);
+      setRecords([]);
+      setSelected(new Set());
+      setDialogOpen(false);
+      queryClient.removeQueries({ queryKey: ["online"] });
+      setStorageError("Bạn đã đăng xuất khỏi phiên hiện tại.");
+    },
+  });
   const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
     const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
@@ -223,6 +281,66 @@ export function App() {
     return () => window.clearTimeout(timeoutId);
   }, [notice]);
 
+  const onlineStoreSignature = onlineStores.map(({ id, role }) => `${id}:${role}`).join("|");
+
+  useEffect(() => {
+    if (!onlinePersistenceEnabled) return;
+    setOnlineStoreId((current) => current && onlineStores.some(({ id }) => id === current)
+      ? current
+      : onlineStores[0]?.id ?? null);
+  }, [onlineSession?.user.id, onlineStoreSignature]);
+
+  useEffect(() => {
+    if (!onlinePersistenceEnabled || !onlineSession || !onlineStoreId) return;
+    const store = onlineStores.find(({ id }) => id === onlineStoreId);
+    if (!store) return;
+    setStoreProfile({
+      storeName: store.name,
+      storeCode: store.code,
+      role: store.role === "STORE_MANAGER" ? "STORE_MANAGER" : "STAFF",
+      fullName: onlineSession.user.displayName,
+      employeeCode: "",
+    });
+  }, [onlineSession, onlineStoreId, onlineStoreSignature]);
+
+  const loadedOnlineRecords = supportsIdentityApi ? onlineHistoryQuery.data : legacyWorkspaceQuery.data?.records;
+
+  useEffect(() => {
+    if (!onlinePersistenceEnabled) return;
+    if (loadedOnlineRecords) {
+      setRecords(loadedOnlineRecords);
+      setStorageError("");
+      setOnlineAuthRequired(false);
+    } else if (onlineLoading || onlineAuthRequired) {
+      setRecords([]);
+    }
+  }, [loadedOnlineRecords, onlineLoading, onlineAuthRequired]);
+
+  useEffect(() => {
+    if (!onlinePersistenceEnabled || !onlineQueryError) return;
+    if (isAbortError(onlineQueryError)) return;
+    if (isSessionExpiryError(onlineQueryError)) {
+      expireOnlineSession(onlineQueryError);
+      return;
+    }
+    setStorageError(onlineQueryError instanceof Error ? onlineQueryError.message : "Không thể tải workspace online");
+  }, [onlineQueryError]);
+
+  useEffect(() => {
+    if (!onlinePersistenceEnabled || !onlineSession || onlineLoading || onlineStores.length > 0 || storageError) return;
+    setStorageError("Tài khoản chưa được gán cửa hàng hoạt động. Hãy liên hệ quản trị viên.");
+  }, [onlineLoading, onlineSession, onlineStores.length, storageError]);
+
+  function expireOnlineSession(error: unknown) {
+    setOnlineAuthRequired(true);
+    setOnlineStoreId(null);
+    setRecords([]);
+    setSelected(new Set());
+    setDialogOpen(false);
+    queryClient.removeQueries({ queryKey: ["online", "history"] });
+    setStorageError(sessionExpiryMessage(error));
+  }
+
   useEffect(() => {
     if (!pilotPersistenceEnabled) return;
     let cancelled = false;
@@ -256,33 +374,6 @@ export function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!onlinePersistenceEnabled || !onlineGateway) return;
-    let cancelled = false;
-    setOnlineLoading(true);
-    setStorageError("");
-    setOnlineStoreId(null);
-    setRecords([]);
-    setSelected(new Set());
-    void onlineGateway.loadWorkspace().then((workspace) => {
-      if (cancelled) return;
-      setRecords(workspace.records);
-      setOnlineStoreId(workspace.store.id);
-      setStoreProfile({
-        storeName: workspace.store.name,
-        storeCode: workspace.store.code,
-        role: workspace.store.role === "STORE_MANAGER" ? "STORE_MANAGER" : "STAFF",
-        fullName: workspace.session.user.displayName,
-        employeeCode: "",
-      });
-    }).catch((error: unknown) => {
-      if (!cancelled) setStorageError(error instanceof Error ? error.message : "Không thể tải workspace online");
-    }).finally(() => {
-      if (!cancelled) setOnlineLoading(false);
-    });
-    return () => { cancelled = true; };
-  }, [onlineGateway, onlineReload]);
-
   function openCreate(kind: KphKind) {
     if (!storeConfigured) {
       setNotice(onlinePersistenceEnabled
@@ -293,6 +384,28 @@ export function App() {
     }
     setCreateKind(kind);
     setDialogOpen(true);
+  }
+
+  function retryOnlineWorkspace() {
+    setOnlineAuthRequired(false);
+    setOnlineStoreId(null);
+    setRecords([]);
+    setSelected(new Set());
+    if (supportsIdentityApi) {
+      void queryClient.invalidateQueries({ queryKey: onlineSessionQueryKey });
+    } else {
+      setOnlineReload((attempt) => attempt + 1);
+    }
+  }
+
+  function changeOnlineStore(storeId: string) {
+    if (!onlineStores.some(({ id }) => id === storeId) || storeId === onlineStoreId) return;
+    setOnlineStoreId(storeId);
+    setRecords([]);
+    setSelected(new Set());
+    setExpandedMobileRecords(new Set());
+    setApprovalFilter("ALL");
+    setRecordSort(null);
   }
 
   function openExport() {
@@ -494,12 +607,18 @@ export function App() {
   async function saveCreatedRecord(draft: CreatedRecordDraft) {
     if (!storeConfigured) throw new Error("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
     if (onlinePersistenceEnabled) {
-      if (!onlineGateway || !onlineStoreId) throw new Error("Không có phiên đăng nhập hợp lệ.");
-      const created = await onlineGateway.createRecord(onlineStoreId, draft);
-      setRecords((current) => [created, ...current]);
-      setActiveKind(draft.kind);
-      setSelected(new Set([created.id]));
-      setNotice(`Đã tạo phiếu ${created.id} và lưu trên máy chủ.`);
+      if (!onlineCapabilities?.createRecord || !onlineStoreId) throw new Error("Không có phiên đăng nhập hợp lệ.");
+      try {
+        const created = await onlineCapabilities.createRecord(onlineStoreId, draft);
+        setRecords((current) => [created, ...current]);
+        queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => [created, ...(current ?? [])]);
+        setActiveKind(draft.kind);
+        setSelected(new Set([created.id]));
+        setNotice(`Đã tạo phiếu ${created.id} và lưu trên máy chủ.`);
+      } catch (error) {
+        if (isSessionExpiryError(error)) expireOnlineSession(error);
+        throw error;
+      }
       return;
     }
     const dateDigits = draft.detectedDate.split("/").reverse().join("").slice(2);
@@ -595,6 +714,7 @@ export function App() {
   const recordActions: RecordActions | undefined = onlinePersistenceEnabled
     ? undefined
     : { approve: updateApproval, remove: requestDelete, restore: restoreRecord };
+  const onlineLoginAvailable = onlinePersistenceEnabled && Boolean(onlineCapabilities?.login);
 
   return (
     <div className="min-h-dvh bg-canvas text-ink">
@@ -608,6 +728,12 @@ export function App() {
           <TodayDate />
         </div>
       </header>
+
+      {onlineLoginAvailable && !onlineSession && !onlineLoading ? <OnlineLoginPanel
+        busy={loginMutation.isPending}
+        error={storageError}
+        onSubmit={(username, password) => loginMutation.mutate({ username, password })}
+      /> : null}
 
       <main className="workspace-layout mx-auto max-w-[1440px] px-3 py-5 sm:px-6 sm:py-7">
         <section className={cn("history-board", trashMode && "is-trash-mode")} aria-labelledby="workspace-title">
@@ -627,16 +753,21 @@ export function App() {
 
             <StoreContext
               storeLabel={onlinePersistenceEnabled && !storeConfigured ? "Chưa có cửa hàng" : storeIdentity(storeProfile)}
-              actorLabel={onlinePersistenceEnabled && !storeConfigured ? (onlineLoading ? "Đang tải phiên đăng nhập…" : "Chưa có phiên đăng nhập") : actorIdentity(storeProfile)}
+              actorLabel={onlinePersistenceEnabled && !storeConfigured ? (onlineLoading ? "Đang tải phiên đăng nhập…" : onlineSession ? "Tài khoản chưa có cửa hàng" : "Chưa có phiên đăng nhập") : actorIdentity(storeProfile)}
               storageLabel={onlinePersistenceEnabled ? "dữ liệu: máy chủ" : storageReady ? storageUsageLabel(storageHealth) : "dữ liệu: đang mở…"}
               storageHint={onlinePersistenceEnabled ? "Phiếu được lưu trên máy chủ" : storageHealth.persistent ? "Dữ liệu pilot được trình duyệt cấp chế độ lưu bền" : "Dữ liệu pilot chỉ nằm trên thiết bị này và không đồng bộ"}
-              disabled={!storageReady}
+              disabled={!storageReady || (onlinePersistenceEnabled && !onlineSession)}
               onConfigure={onlinePersistenceEnabled ? undefined : () => setStoreSettingsOpen(true)}
+              storeOptions={onlinePersistenceEnabled ? onlineStores : undefined}
+              selectedStoreId={onlinePersistenceEnabled ? onlineStoreId : undefined}
+              onStoreChange={onlinePersistenceEnabled ? changeOnlineStore : undefined}
+              onLogout={onlinePersistenceEnabled && onlineSession ? () => logoutMutation.mutate() : undefined}
+              loggingOut={logoutMutation.isPending}
             />
           </div>
           {storageError ? <div className="storage-error-banner" role="alert">
             <p>{storageError}</p>
-            {onlinePersistenceEnabled ? <Button variant="ghost" onClick={() => setOnlineReload((attempt) => attempt + 1)}>Thử tải lại</Button> : null}
+            {onlinePersistenceEnabled ? <Button variant="ghost" disabled={loginMutation.isPending || logoutMutation.isPending} onClick={retryOnlineWorkspace}>Thử tải lại</Button> : null}
           </div> : null}
           <header className="history-header">
             <div className="history-title-row pr-3">
@@ -757,10 +888,14 @@ export function App() {
         open={dialogOpen}
         profile={storeProfile}
         actorReadOnly={onlinePersistenceEnabled}
+        onlineMode={onlinePersistenceEnabled}
         onOpenChange={setDialogOpen}
         onSaved={saveCreatedRecord}
-        onBarcodeLookup={onlinePersistenceEnabled && onlineGateway && onlineStoreId
-          ? (barcode) => onlineGateway.lookupBarcode(onlineStoreId, barcode)
+        onBarcodeLookup={onlinePersistenceEnabled && onlineCapabilities?.lookupBarcode && onlineStoreId
+          ? (barcode) => onlineCapabilities.lookupBarcode!(onlineStoreId, barcode).catch((error) => {
+            if (isSessionExpiryError(error)) expireOnlineSession(error);
+            throw error;
+          })
           : undefined}
       />
       {!onlinePersistenceEnabled ? <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} /> : null}
@@ -807,6 +942,70 @@ export function App() {
       <PwaStatus />
     </div>
   );
+}
+
+type OnlineLoginPanelProps = {
+  busy: boolean;
+  error: string;
+  onSubmit: (username: string, password: string) => void;
+};
+
+function OnlineLoginPanel({ busy, error, onSubmit }: OnlineLoginPanelProps) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  return <section className="online-login-panel" aria-labelledby="online-login-title">
+    <div className="online-login-card">
+      <div className="utility-panel-meta"><p id="online-login-title">Đăng nhập Store PWA</p></div>
+      <p className="online-login-copy">Đăng nhập để tải cửa hàng thuộc membership và lịch sử phiếu từ máy chủ.</p>
+      {error ? <p className="online-login-error" role="status">{error}</p> : null}
+      <form className="online-login-form" onSubmit={(event) => {
+        event.preventDefault();
+        if (!username.trim() || !password || busy) return;
+        onSubmit(username.trim(), password);
+      }}>
+        <label>
+          <span>Tên đăng nhập</span>
+          <input type="text" autoComplete="username" value={username} disabled={busy} onChange={(event) => setUsername(event.target.value)} />
+        </label>
+        <label>
+          <span>Mật khẩu</span>
+          <input type="password" autoComplete="current-password" value={password} disabled={busy} onChange={(event) => setPassword(event.target.value)} />
+        </label>
+        <Button type="submit" disabled={busy || !username.trim() || !password}>{busy ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang đăng nhập…</> : "Đăng nhập"}</Button>
+      </form>
+    </div>
+  </section>;
+}
+
+function isAbortError(error: unknown) {
+  return error instanceof DOMException && error.name === "AbortError"
+    || error instanceof Error && error.name === "AbortError";
+}
+
+function isSessionExpiryError(error: unknown) {
+  return hasUnauthorizedStatus(error)
+    || error instanceof Error && /phiên(?: đăng nhập)?[^.]*hết hạn|đăng nhập lại/i.test(error.message);
+}
+
+function sessionExpiryMessage(error: unknown) {
+  if (hasUnauthorizedStatus(error)) return "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tiếp tục.";
+  return error instanceof Error && error.message.trim()
+    ? error.message
+    : "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tiếp tục.";
+}
+
+function hasUnauthorizedStatus(error: unknown) {
+  return typeof error === "object" && error !== null && "status" in error && (error as { status?: unknown }).status === 401;
+}
+
+const appQueryClientDefaults = {
+  queries: { refetchOnWindowFocus: false, staleTime: 30_000, retry: false },
+};
+
+export function App() {
+  const [queryClient] = useState(() => new QueryClient({ defaultOptions: appQueryClientDefaults }));
+  return <QueryClientProvider client={queryClient}><WorkspaceApp /></QueryClientProvider>;
 }
 
 type HistoryControlsContentProps = {
