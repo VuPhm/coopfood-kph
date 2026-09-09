@@ -89,16 +89,13 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
   }
 
   async function logout() {
-    try {
-      const response = await client.POST("/api/v1/auth/logout", {
-        params: { header: { "X-CSRF-TOKEN": csrfToken } },
-      });
-      if (response.error) throw apiError(response, "Không thể đăng xuất khỏi phiên hiện tại.");
-    } finally {
-      csrfToken = "";
-      pendingCreates.clear();
-      keySignatures.clear();
-    }
+    const response = await client.POST("/api/v1/auth/logout", {
+      params: { header: { "X-CSRF-TOKEN": csrfToken } },
+    });
+    if (response.error) throw apiError(response, "Không thể đăng xuất khỏi phiên hiện tại.");
+    csrfToken = "";
+    pendingCreates.clear();
+    keySignatures.clear();
   }
 
   async function createRecord(storeId: string, draft: CreatedRecordDraft) {

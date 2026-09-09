@@ -54,3 +54,15 @@ this workflow does not deploy the Pilot.
 
 Do not introduce direct feature-to-feature cycles. Shared domain contracts should
 stay small and explicit rather than growing a generic platform layer.
+
+## Foundation-01 browser runtime
+
+Use Java 21 explicitly when the system default is older. jOOQ OSS 3.20.17 is
+pinned for PostgreSQL 17 (ADR-0003). The online media adapter uses
+metadata-extractor 2.19.0, accepts JPEG/PNG originals up to 10 MiB per part and a
+32 MiB multipart request, and rejects images exceeding 40 million decoded pixels
+or 20,000 pixels on either axis. Original bytes are retained; EXIF orientation is
+applied only to the stamped derivative. HEIC online is currently unsupported.
+
+See `e2e/README.md` for the disposable synthetic database and browser suite.
+Never use the E2E seed on a shared or operational database.

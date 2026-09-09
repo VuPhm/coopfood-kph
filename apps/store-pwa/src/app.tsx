@@ -233,7 +233,7 @@ function WorkspaceApp() {
   });
   const logoutMutation = useMutation({
     mutationFn: () => onlineCapabilities?.logout?.() ?? Promise.reject(new Error("Gateway đăng xuất chưa sẵn sàng.")),
-    onSettled: () => {
+    onSuccess: () => {
       setOnlineAuthRequired(true);
       setOnlineStoreId(null);
       setRecords([]);
@@ -241,6 +241,10 @@ function WorkspaceApp() {
       setDialogOpen(false);
       queryClient.removeQueries({ queryKey: ["online"] });
       setStorageError("Bạn đã đăng xuất khỏi phiên hiện tại.");
+    },
+    onError: (error: unknown) => {
+      if (isSessionExpiryError(error)) expireOnlineSession(error);
+      else setStorageError("Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại.");
     },
   });
   const ownedPhotoUrls = useRef(new Set<string>());

@@ -63,6 +63,20 @@ describe("online KPH gateway", () => {
     expect(logoutRequest.headers.get("X-CSRF-TOKEN")).toBe(sessionFixture.csrfToken);
   });
 
+  it("retains CSRF for logout retry after a network failure", async () => {
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify(sessionFixture), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockRejectedValueOnce(new Error("network error"))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const gateway = createOnlineGateway({ baseUrl: "http://localhost", fetch: fetcher });
+    await gateway.login("demo", "password");
+    await expect(gateway.logout()).rejects.toThrow("network error");
+    await gateway.logout();
+    for (const [request] of fetcher.mock.calls.slice(1)) {
+      expect((request as Request).headers.get("X-CSRF-TOKEN")).toBe(sessionFixture.csrfToken);
+    }
+  });
+
   it("keeps one idempotency key through a network failure and preserves original bytes", async () => {
     const fetcher = vi.fn<typeof fetch>()
       .mockRejectedValueOnce(new Error("request timed out after commit"))

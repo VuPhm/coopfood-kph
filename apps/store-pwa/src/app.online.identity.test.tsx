@@ -80,6 +80,17 @@ describe("online identity and scoped query state", () => {
     expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
   });
 
+  it("keeps logout retry available when the server response fails", async () => {
+    mocks.logout.mockRejectedValueOnce(new Error("network error"));
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "Đăng xuất" }));
+    expect(await screen.findByText("Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại.")).toBeVisible();
+    expect(screen.queryByText("Đăng nhập Store PWA")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
+    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(mocks.logout).toHaveBeenCalledTimes(2);
+  });
+
   it("keys history by user and store and clears the previous store records immediately", async () => {
     render(<App />);
     expect(await screen.findAllByText("Phiếu cửa hàng A")).toHaveLength(2);
