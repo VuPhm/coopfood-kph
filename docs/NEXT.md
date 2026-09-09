@@ -83,3 +83,11 @@ song song bằng mock sinh từ cùng OpenAPI.
 - Phiếu cần 1–3 ảnh; original và stamped đều private; danh sách reload
   từ backend giữ snapshot và thứ tự ảnh.
 - Test/docs của module đã chạm đều pass từ database sạch.
+
+### Điểm tiếp tục — 2026-09-10
+
+Local integration/frontend/backend/browser checks đã pass theo evidence
+`evidence/foundation-01/integration-2026-09-10.md`. Chờ xác nhận push nhánh lên
+origin public `VuPhm/coopfood-kph` để mở draft PR và chạy CI; automatic approval
+review đã từ chối lệnh trước khi thực thi. Sau CI, chốt owner acceptance của
+online preview. Không mở thêm team/refactor trong lúc chờ quyết định này.

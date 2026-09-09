@@ -62,3 +62,11 @@ khi filesystem lỗi; chưa có cơ chế phục hồi sau process crash ở pro
 Hoàn tất CI của draft PR trên SHA tích hợp, xử lý lỗi CI nếu có, nhận owner acceptance.
 Không mở thêm audit/refactor tổng quát. Các worktree team tạm đã prune; commit/branch
 team vẫn giữ provenance và mọi implementation đã cherry-pick vào branch chính của task.
+
+## Remote CI — cần xác nhận destination public
+
+Origin đã xác minh là `https://github.com/VuPhm/coopfood-kph`, repository public,
+quyền hiện tại ADMIN. Automatic approval review từ chối lệnh push/draft PR vì
+chưa đủ xác nhận chia sẻ mã nguồn lên đích public. Lệnh chưa chạy; PR chưa tạo,
+CI remote chưa chạy. Chờ owner cho phép push nhánh này và tạo draft PR, không
+merge/deploy. Local verification và preview đã hoàn tất, working tree được checkpoint.
