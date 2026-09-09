@@ -58,7 +58,7 @@ song song bằng mock sinh từ cùng OpenAPI.
 - Kế hoạch đóng milestone: [FOUNDATION_01_COMPLETION_PLAN.md](FOUNDATION_01_COMPLETION_PLAN.md).
   Khóa checkpoint gồm cả file untracked trước khi chia ba team Luna max: online
   flow, backend/media và E2E/review. Integration owner giữ vùng contract/config/
-  migration; mỗi team có worktree riêng. Chưa dispatch team trong lượt lập plan.
+  migration; mỗi team có worktree riêng. Đã dispatch A/B/C từ checkpoint `2c456ea`; xem bảng dispatch trong kế hoạch.
 - Dừng refactor tổng quát. Hoàn tất login/store, lookup/retry, media và browser
   acceptance; tối đa hai vòng review có kế hoạch rồi đóng hoặc ghi blocker cụ thể.
   Review kiến trúc là nguồn finding, không phải danh sách phải làm hết mới được đóng.

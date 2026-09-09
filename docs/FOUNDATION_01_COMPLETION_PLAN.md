@@ -1,6 +1,6 @@
 # Kế hoạch đóng Foundation-01
 
-Ngày đánh giá: 2026-09-09. Trạng thái: kế hoạch giao việc, chưa khởi chạy team.
+Ngày đánh giá: 2026-09-09. Trạng thái: đã dispatch ba team Luna max ngày 2026-09-09.
 Model thực hiện theo yêu cầu owner: `gpt-5.6-luna`, reasoning `max`.
 
 ## Đích và điểm dừng
@@ -191,3 +191,33 @@ hiện trong các vùng này vẫn phải được triage nếu tác động sli
 Giữ nguyên contract nghiệp vụ; gửi yêu cầu vùng chung cho integration owner.
 Không tự tạo subagent/task hoặc mở rộng scope. Chạy checks liên quan rồi dừng và
 bàn giao: file/diff, lệnh và kết quả, blocker còn lại. Không deploy.”
+
+## Dispatch thực tế — 2026-09-09
+
+Base chung: `2c456ea23f690a9c0cb353331e934b54906b4019`.
+Runtime: Java 21 / PostgreSQL 17 / jOOQ 3.20.17 theo ADR-0003; cần full verification
+sau override. Policy online JPEG/PNG original + stamped private, chưa hỗ trợ HEIC
+online; giữ hành vi HEIC Pilot. Không đổi multipart trong đợt dispatch.
+
+| Agent | Worktree | Branch |
+| --- | --- | --- |
+| `/root/team_a_online` | `/tmp/kph-foundation-team-a` | `codex/foundation-team-a` |
+| `/root/team_b_media` | `/tmp/kph-foundation-team-b` | `codex/foundation-team-b` |
+| `/root/team_c_acceptance` | `/tmp/kph-foundation-team-c` | `codex/foundation-team-c` |
+
+Root giữ integration và các vùng dùng chung. C chuẩn bị harness trước, chỉ chốt
+acceptance trên SHA tích hợp A/B. Không push/deploy khi dispatch.
+
+### Kết quả team đã nhận — chờ tích hợp
+
+- A: `b277082b4804c932b18c332151bcaccef85ee759`; báo typecheck, 102 frontend
+  tests và build pass trong worktree A.
+- B: `92aecc8`; báo compile, 5 media unit và 4 KPH integration pass; yêu cầu
+  integration owner thêm metadata-extractor 2.19.0 và multipart limits.
+- C: `a0638893cb4d8d653cc11717977801b3aea73275`; harness parse 8 cases,
+  chưa chạy acceptance thật; cần SHA tích hợp/runtime theo config-request.
+
+Đây là báo cáo team, chưa phải xác nhận root đã tích hợp hoặc nghiệm thu.
+Bước tiếp theo: review diff/ownership, áp dụng config request, tích hợp A/B/C,
+chạy gates rồi đưa owner thử bản online. Quy trình dùng lại cho các vòng tiếp theo
+nằm trong `DELIVERY_WORKFLOW.md`; không mở vòng planning Foundation mới.

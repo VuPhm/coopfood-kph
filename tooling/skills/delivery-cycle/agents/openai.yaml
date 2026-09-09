@@ -1,0 +1,4 @@
+interface:
+  display_name: "Delivery Cycle"
+  short_description: "Plan, delegate, verify and close bounded delivery cycles"
+  default_prompt: "Use $delivery-cycle to assess current work and run a bounded delivery cycle through acceptance."

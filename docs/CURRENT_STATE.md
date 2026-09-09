@@ -68,9 +68,9 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
 
 - Đã rà local/remote branches ngày 2026-09-09 và lập
   [kế hoạch đóng Foundation-01](FOUNDATION_01_COMPLETION_PLAN.md). Các nhánh
-  identity/contract/Pilot đã nằm trong HEAD; phần KPH online mới còn chưa commit.
+  identity/contract/Pilot đã nằm trong HEAD; phần KPH online đã checkpoint tại `2c456ea`.
   Nhánh WIP planning chứa policy khác và không được merge nguyên nhánh.
-  Chưa khởi chạy các team Luna max; cần checkpoint chung trước khi chia worktree.
+  Ba team Luna max đã giao commit từ ba worktree riêng; chờ root tích hợp và chạy acceptance.
 - Chưa có browser E2E chạy end-to-end trong repository mới; integration test
   KPH đã pass với Docker/PostgreSQL local, và online mode hiện
   nhận session đã đăng nhập từ backend thay vì tự dựng màn hình login.
