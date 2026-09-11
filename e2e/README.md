@@ -88,3 +88,13 @@ The default suite has five applicable cases: two desktop creation flows, one mob
 one membership/session case repeated across both projects (five executions in total).
 Three project/case combinations are intentionally skipped by viewport. This is
 Chromium viewport coverage, not real-device iPhone acceptance.
+
+## Visual review with fixtures
+
+For a UI-only review, start the online Vite server above, then run from the repo
+root: `node e2e/scripts/review-ui.cjs`. Override `UI_REVIEW_URL` for another local
+preview origin. This separate script mocks API responses from synthetic OpenAPI
+examples; it does not replace the real-backend suite or owner acceptance.
+It checks login isolation, keyboard entry, browser errors, page/dialog overflow
+and form dismissal, and saves six viewport screenshots plus form views under
+`.local/verification/ui-after-*.png` for visual inspection.

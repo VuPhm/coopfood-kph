@@ -221,6 +221,7 @@ function WorkspaceApp() {
   const loginMutation = useMutation({
     mutationFn: ({ username, password }: { username: string; password: string }) => onlineCapabilities?.login?.(username, password) ?? Promise.reject(new Error("Gateway đăng nhập chưa sẵn sàng.")),
     onSuccess: (session: OnlineSession) => {
+      logoutMutation.reset();
       setOnlineAuthRequired(false);
       setStorageError("");
       setRecords([]);
@@ -244,7 +245,7 @@ function WorkspaceApp() {
     },
     onError: (error: unknown) => {
       if (isSessionExpiryError(error)) expireOnlineSession(error);
-      else setStorageError("Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại.");
+
     },
   });
   const ownedPhotoUrls = useRef(new Set<string>());
@@ -718,6 +719,9 @@ function WorkspaceApp() {
   const recordActions: RecordActions | undefined = onlinePersistenceEnabled
     ? undefined
     : { approve: updateApproval, remove: requestDelete, restore: restoreRecord };
+  const workspaceError = logoutMutation.isError && !isSessionExpiryError(logoutMutation.error)
+    ? "Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại."
+    : storageError;
   const onlineLoginAvailable = onlinePersistenceEnabled && Boolean(onlineCapabilities?.login);
 
   return (
@@ -733,17 +737,24 @@ function WorkspaceApp() {
         </div>
       </header>
 
-      {onlineLoginAvailable && !onlineSession && !onlineLoading ? <OnlineLoginPanel
-        busy={loginMutation.isPending}
-        error={storageError}
-        onSubmit={(username, password) => loginMutation.mutate({ username, password })}
-      /> : null}
-
-      <main className="workspace-layout mx-auto max-w-[1440px] px-3 py-5 sm:px-6 sm:py-7">
+      {onlineLoginAvailable && !onlineSession ? (
+        onlineLoading ? (
+          <main className="online-login-panel" aria-busy="true">
+            <p className="online-login-copy" role="status">Đang mở cửa hàng của bạn…</p>
+          </main>
+        ) : (
+          <OnlineLoginPanel
+            busy={loginMutation.isPending}
+            error={storageError}
+            onSubmit={(username, password) => loginMutation.mutate({ username, password })}
+          />
+        )
+      ) : <main className="workspace-layout mx-auto max-w-[1440px] px-3 py-5 sm:px-6 sm:py-7">
         <section className={cn("history-board", trashMode && "is-trash-mode")} aria-labelledby="workspace-title">
           <div className="workspace-header">
-            <div className="utility-panel-meta workspace-header-meta">
-              <p id="workspace-title">Phiếu theo dõi hàng không phù hợp</p>
+            <div className="workspace-header-meta">
+              <h1 id="workspace-title">Theo dõi hàng không phù hợp</h1>
+              <p>Khai báo và tra cứu phiếu tại cửa hàng</p>
             </div>
 
             <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
@@ -769,8 +780,8 @@ function WorkspaceApp() {
               loggingOut={logoutMutation.isPending}
             />
           </div>
-          {storageError ? <div className="storage-error-banner" role="alert">
-            <p>{storageError}</p>
+          {workspaceError ? <div className="storage-error-banner" role="alert">
+            <p>{workspaceError}</p>
             {onlinePersistenceEnabled ? <Button variant="ghost" disabled={loginMutation.isPending || logoutMutation.isPending} onClick={retryOnlineWorkspace}>Thử tải lại</Button> : null}
           </div> : null}
           <header className="history-header">
@@ -885,7 +896,7 @@ function WorkspaceApp() {
         <div className="workspace-side-stack">
           <ExpiryWorkbench />
         </div>
-      </main>
+      </main>}
 
       <CreateRecordDialog
         kind={createKind}
@@ -958,10 +969,10 @@ function OnlineLoginPanel({ busy, error, onSubmit }: OnlineLoginPanelProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  return <section className="online-login-panel" aria-labelledby="online-login-title">
+  return <main className="online-login-panel" aria-labelledby="online-login-title">
     <div className="online-login-card">
-      <div className="utility-panel-meta"><p id="online-login-title">Đăng nhập Store PWA</p></div>
-      <p className="online-login-copy">Đăng nhập để tải cửa hàng thuộc membership và lịch sử phiếu từ máy chủ.</p>
+      <div className="online-login-heading"><span className="online-login-eyebrow">QUẢN LÝ PHIẾU KPH</span><h1 id="online-login-title">Đăng nhập Store PWA</h1></div>
+      <p className="online-login-copy">Sử dụng tài khoản được cấp để khai báo hàng không phù hợp và xem phiếu của cửa hàng.</p>
       {error ? <p className="online-login-error" role="status">{error}</p> : null}
       <form className="online-login-form" onSubmit={(event) => {
         event.preventDefault();
@@ -979,7 +990,7 @@ function OnlineLoginPanel({ busy, error, onSubmit }: OnlineLoginPanelProps) {
         <Button type="submit" disabled={busy || !username.trim() || !password}>{busy ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang đăng nhập…</> : "Đăng nhập"}</Button>
       </form>
     </div>
-  </section>;
+  </main>;
 }
 
 function isAbortError(error: unknown) {

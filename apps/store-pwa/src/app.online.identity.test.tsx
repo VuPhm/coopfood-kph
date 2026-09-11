@@ -68,6 +68,7 @@ describe("online identity and scoped query state", () => {
     render(<App />);
 
     expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(screen.queryByRole("button", { name: /Tạo phiếu.*TP khô/i })).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox", { name: "Tên đăng nhập" }), { target: { value: "demo" } });
     fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "password" } });
     fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
@@ -81,10 +82,15 @@ describe("online identity and scoped query state", () => {
   });
 
   it("keeps logout retry available when the server response fails", async () => {
+    let finishHistory!: (records: ReturnType<typeof record>[]) => void;
+    mocks.loadHistory.mockReturnValueOnce(new Promise(resolve => { finishHistory = resolve; }));
     mocks.logout.mockRejectedValueOnce(new Error("network error"));
     render(<App />);
     fireEvent.click(await screen.findByRole("button", { name: "Đăng xuất" }));
     expect(await screen.findByText("Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại.")).toBeVisible();
+    finishHistory([record(storeA.id, "Phiếu đến sau lỗi đăng xuất")]);
+    await screen.findAllByText("Phiếu đến sau lỗi đăng xuất");
+    expect(screen.getByText("Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại.")).toBeVisible();
     expect(screen.queryByText("Đăng nhập Store PWA")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
     expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();

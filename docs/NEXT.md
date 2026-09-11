@@ -104,3 +104,10 @@ chạy lại các tests backend của checkpoint trước.
 review từ chối riêng vì thiếu xác nhận PR công khai tại `VuPhm/coopfood-kph`.
 PR chưa tạo, remote Verify chưa chạy. Chờ owner xác nhận tạo draft PR public;
 không lặp lại push/integration đã hoàn tất và không mở vòng refactor mới.
+
+### UI feedback — 2026-09-12
+
+Theo yêu cầu mới, ưu tiên nghiệm thu phần Store PWA đã chuẩn hoá bằng skill
+`ui-ux-pro-max`; xem [UI evidence](evidence/foundation-01/ui-review-2026-09-12.md).
+Dùng ảnh desktop/mobile và preview có backend tổng hợp để chốt phản hồi UI.
+Không coi component tests hay screenshot fixture là owner acceptance.

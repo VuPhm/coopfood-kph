@@ -102,3 +102,11 @@ Scanner fix đã tích hợp tại `ca180af` và push lên origin; frontend hi�
 và build pass. Chỉ có worktree chính, report E2E cũ được ignore đúng ở Foundation.
 Draft PR public đang chờ xác nhận do automatic approval review; không coi remote
 CI hoặc owner acceptance là đã hoàn tất. Chi tiết điểm tiếp tục ở NEXT.
+
+## UI feedback reopened — 2026-09-12
+
+Owner chưa chấp nhận giao diện. Đã cài `ui-ux-pro-max` và chuẩn hoá Store PWA:
+login riêng, phân cấp workspace/cửa hàng, thao tác mobile và form; thêm script
+review UI dùng fixture. Xem [UI evidence](evidence/foundation-01/ui-review-2026-09-12.md).
+Đây là kiểm tra giao diện bằng Chromium/mock, chưa thay thế owner acceptance
+online. Không mở rộng Admin Web hoặc triển khai Pilot trong đợt này.
