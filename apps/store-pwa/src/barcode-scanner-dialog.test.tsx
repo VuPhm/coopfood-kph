@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -130,12 +130,17 @@ describe("BarcodeScannerDialog", () => {
     await waitFor(() => expect(mockTrack.stop).toHaveBeenCalled());
   });
 
-  it("returns a trimmed barcode from the native detector and closes after success", async () => {
+  it("uses the accepted formats and preserves a trimmed identifier with leading zeroes", async () => {
     const handleOpenChange = vi.fn();
     const handleScan = vi.fn();
+    const configuredFormats: string[][] = [];
     class TestBarcodeDetector {
-      static getSupportedFormats = vi.fn().mockResolvedValue(["ean_13"]);
-      detect = vi.fn().mockResolvedValue([{ rawValue: "  8938500000123  " }]);
+      static getSupportedFormats = vi.fn().mockResolvedValue(["qr_code", "code_39", "upc_a", "ean_13", "ean_8", "code_128"]);
+      detect = vi.fn().mockResolvedValue([{ rawValue: "  00012345  " }]);
+
+      constructor(options?: { formats?: string[] }) {
+        configuredFormats.push(options?.formats ?? []);
+      }
     }
     vi.stubGlobal("BarcodeDetector", TestBarcodeDetector);
     vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockReturnValue(HTMLMediaElement.HAVE_CURRENT_DATA);
@@ -145,9 +150,98 @@ describe("BarcodeScannerDialog", () => {
     render(<BarcodeScannerDialog open onOpenChange={handleOpenChange} onScan={handleScan} />);
 
     await waitFor(() => expect(screen.getByText("Đã nhận diện mã")).toBeVisible());
-    await waitFor(() => expect(handleScan).toHaveBeenCalledWith("8938500000123"), { timeout: 1_500 });
+    await waitFor(() => expect(handleScan).toHaveBeenCalledWith("00012345"), { timeout: 1_500 });
+    expect(configuredFormats).toEqual([["ean_8", "ean_13", "upc_a", "code_128", "code_39"]]);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
     expect(mockTrack.stop).toHaveBeenCalled();
+  });
+
+  it("does not publish a queued result after the scan dialog has closed", async () => {
+    const handleScan = vi.fn();
+    const frameCallbacks: FrameRequestCallback[] = [];
+    let queuedResult: (() => void) | undefined;
+    const originalSetTimeout = window.setTimeout.bind(window);
+    vi.spyOn(window, "setTimeout").mockImplementation(((handler: TimerHandler, timeout?: number) => {
+      if (timeout === 450 && typeof handler === "function") {
+        queuedResult = () => handler();
+        return 999;
+      }
+      return originalSetTimeout(handler, timeout);
+    }) as typeof window.setTimeout);
+    class TestBarcodeDetector {
+      static getSupportedFormats = vi.fn().mockResolvedValue(["ean_13"]);
+      detect = vi.fn().mockResolvedValue([{ rawValue: "OLD-0001" }]);
+    }
+    vi.stubGlobal("BarcodeDetector", TestBarcodeDetector);
+    vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockReturnValue(HTMLMediaElement.HAVE_CURRENT_DATA);
+    vi.stubGlobal("requestAnimationFrame", vi.fn((callback: FrameRequestCallback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    }));
+    vi.stubGlobal("cancelAnimationFrame", vi.fn());
+
+    const handleOpenChange = vi.fn();
+    const { rerender } = render(<BarcodeScannerDialog open onOpenChange={handleOpenChange} onScan={handleScan} />);
+    await waitFor(() => expect(frameCallbacks).toHaveLength(1));
+    await act(async () => {
+      await frameCallbacks.shift()?.(100);
+    });
+    expect(screen.getByText("OLD-0001")).toBeVisible();
+    expect(queuedResult).toBeTypeOf("function");
+
+    rerender(<BarcodeScannerDialog open={false} onOpenChange={handleOpenChange} onScan={handleScan} />);
+    act(() => queuedResult?.());
+
+    expect(handleScan).not.toHaveBeenCalled();
+  });
+
+  it("ignores a decoded value from an older scan session after reopening", async () => {
+    const handleOpenChange = vi.fn();
+    const handleScan = vi.fn();
+    const frameCallbacks: FrameRequestCallback[] = [];
+    let resolveOldDetection!: (value: Array<{ rawValue: string }>) => void;
+    const oldDetection = new Promise<Array<{ rawValue: string }>>((resolve) => {
+      resolveOldDetection = resolve;
+    });
+    let detectorIndex = 0;
+    class TestBarcodeDetector {
+      static getSupportedFormats = vi.fn().mockResolvedValue(["ean_13"]);
+      private readonly index = detectorIndex++;
+      detect = vi.fn(() => this.index === 0
+        ? oldDetection
+        : Promise.resolve([{ rawValue: "NEW-0002" }]));
+    }
+    vi.stubGlobal("BarcodeDetector", TestBarcodeDetector);
+    vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockReturnValue(HTMLMediaElement.HAVE_CURRENT_DATA);
+    vi.stubGlobal("requestAnimationFrame", vi.fn((callback: FrameRequestCallback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    }));
+    vi.stubGlobal("cancelAnimationFrame", vi.fn());
+
+    const scanner = <BarcodeScannerDialog open onOpenChange={handleOpenChange} onScan={handleScan} />;
+    const { rerender } = render(scanner);
+    await waitFor(() => expect(frameCallbacks).toHaveLength(1));
+    act(() => {
+      void frameCallbacks.shift()?.(100);
+    });
+
+    rerender(<BarcodeScannerDialog open={false} onOpenChange={handleOpenChange} onScan={handleScan} />);
+    rerender(scanner);
+    await waitFor(() => expect(frameCallbacks).toHaveLength(1));
+
+    await act(async () => {
+      resolveOldDetection([{ rawValue: "OLD-0001" }]);
+      await oldDetection;
+    });
+    expect(screen.queryByText("OLD-0001")).not.toBeInTheDocument();
+
+    await act(async () => {
+      await frameCallbacks.shift()?.(100);
+    });
+    expect(await screen.findByText("NEW-0002")).toBeVisible();
+    await waitFor(() => expect(handleScan).toHaveBeenCalledWith("NEW-0002"), { timeout: 1_500 });
+    expect(handleScan).toHaveBeenCalledTimes(1);
   });
 
   it("supports switching cameras and torch toggle when available", async () => {

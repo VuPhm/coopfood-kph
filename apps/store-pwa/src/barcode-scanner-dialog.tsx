@@ -40,6 +40,10 @@ interface BarcodeDetectorConstructor {
   getSupportedFormats: () => Promise<string[]>;
 }
 
+const NATIVE_BARCODE_FORMATS = ["ean_8", "ean_13", "upc_a", "code_128", "code_39"] as const;
+const SCAN_INTERVAL_MS = 100;
+const SUCCESS_FEEDBACK_MS = 450;
+
 export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScannerDialogProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -96,10 +100,9 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
     setTorchAvailable(false);
   }, []);
 
-  const handleScanSuccess = useCallback((code: string) => {
-    if (!isScanningRef.current) return;
+  const handleScanSuccess = useCallback((code: string, scanSession: number) => {
     const trimmed = code.trim();
-    if (!trimmed) return;
+    if (!trimmed || scanSession !== scanSessionRef.current || !isScanningRef.current) return;
     isScanningRef.current = false;
 
     setScannedCode(trimmed);
@@ -116,10 +119,11 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
     // Short delay to display success animation/flash before closing
     successTimeoutRef.current = window.setTimeout(() => {
       successTimeoutRef.current = null;
+      if (scanSession !== scanSessionRef.current) return;
       stopStream();
       onScan(trimmed);
       onOpenChange(false);
-    }, 450);
+    }, SUCCESS_FEEDBACK_MS);
   }, [onOpenChange, onScan, stopStream]);
 
   const startScanning = useCallback(async (deviceId?: string) => {
@@ -193,23 +197,21 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
           const detectorClass = (window as unknown as { BarcodeDetector: BarcodeDetectorConstructor }).BarcodeDetector;
           const supportedFormats = await detectorClass.getSupportedFormats();
           if (scanSession !== scanSessionRef.current) return;
-          const targetFormats = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "qr_code"].filter((f) => supportedFormats.includes(f));
-
-          const detector = targetFormats.length
-            ? new detectorClass({ formats: targetFormats })
-            : new detectorClass();
+          const targetFormats = NATIVE_BARCODE_FORMATS.filter((format) => supportedFormats.includes(format));
+          if (!targetFormats.length) throw new Error("Native barcode formats are unsupported");
+          const detector = new detectorClass({ formats: [...targetFormats] });
 
           let lastDetectTime = 0;
           const detectLoop = async (time: number) => {
-            if (!isScanningRef.current || !videoRef.current) return;
+            if (scanSession !== scanSessionRef.current || !isScanningRef.current || !videoRef.current) return;
 
-            // Scan at ~12-15 fps for performance balance
-            if (time - lastDetectTime >= 70 && videoRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            if (time - lastDetectTime >= SCAN_INTERVAL_MS && videoRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
               lastDetectTime = time;
               try {
                 const barcodes = await detector.detect(videoRef.current);
+                if (scanSession !== scanSessionRef.current) return;
                 if (barcodes && barcodes.length > 0 && barcodes[0]?.rawValue) {
-                  handleScanSuccess(barcodes[0].rawValue);
+                  handleScanSuccess(barcodes[0].rawValue, scanSession);
                   return;
                 }
               } catch {
@@ -217,7 +219,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
               }
             }
 
-            if (isScanningRef.current) {
+            if (scanSession === scanSessionRef.current && isScanningRef.current) {
               animationFrameIdRef.current = requestAnimationFrame(detectLoop);
             }
           };
@@ -228,6 +230,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
           // Fallback to ZXing if BarcodeDetector init fails
         }
       }
+      if (scanSession !== scanSessionRef.current) return;
 
       // ZXing fallback engine
       const {
@@ -241,15 +244,13 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
         BarcodeFormat.EAN_13,
         BarcodeFormat.EAN_8,
         BarcodeFormat.UPC_A,
-        BarcodeFormat.UPC_E,
         BarcodeFormat.CODE_128,
         BarcodeFormat.CODE_39,
-        BarcodeFormat.QR_CODE,
       ];
       hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
       hints.set(DecodeHintType.TRY_HARDER, true);
 
-      const zxingReader = new BrowserMultiFormatReaderConstructor(hints, 100);
+      const zxingReader = new BrowserMultiFormatReaderConstructor(hints, SCAN_INTERVAL_MS);
       zxingReaderRef.current = zxingReader;
 
       if (videoRef.current) {
@@ -257,7 +258,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
           videoRef.current,
           (result: Result | null | undefined, err: Exception | null | undefined) => {
             if (result && isScanningRef.current) {
-              handleScanSuccess(result.getText());
+              handleScanSuccess(result.getText(), scanSession);
             }
             if (err && !(err.name === "NotFoundException")) {
               // Non-fatal frame scan errors can be ignored
@@ -371,7 +372,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
 
           {/* Success state flash */}
           {status === "success" && (
-            <div className="absolute inset-0 bg-emerald-600/40 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20 animate-in fade-in zoom-in-95 duration-200">
+            <div className="absolute inset-0 bg-emerald-600/40 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20 animate-in fade-in zoom-in-95 duration-200" role="status" aria-live="polite">
               <div className="rounded-full bg-emerald-500 p-3 shadow-lg mb-2">
                 <ScanLine size={32} className="text-white" />
               </div>
@@ -392,7 +393,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
 
           {/* Error state */}
           {status === "error" && (
-            <div className="absolute inset-0 bg-neutral-950 p-6 flex flex-col items-center justify-center text-center text-white z-10">
+            <div className="absolute inset-0 bg-neutral-950 p-6 flex flex-col items-center justify-center text-center text-white z-10" role="alert">
               <div className="rounded-full bg-red-500/20 p-3 mb-3 text-red-400">
                 <TriangleAlert size={32} />
               </div>
