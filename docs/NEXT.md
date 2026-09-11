@@ -91,3 +91,16 @@ Local integration/frontend/backend/browser checks đã pass theo evidence
 origin public `VuPhm/coopfood-kph` để mở draft PR và chạy CI; automatic approval
 review đã từ chối lệnh trước khi thực thi. Sau CI, chốt owner acceptance của
 online preview. Không mở thêm team/refactor trong lúc chờ quyết định này.
+
+### Cập nhật 2026-09-11 — sau review nhánh
+
+Đã trở về Foundation và tích hợp scanner Pilot `edc81d2` thành `ca180af`, giải
+quyết xung đột với phần lifecycle đã có. Scanner 11 tests/typecheck pass;
+`npm run verify` pass 135 tests và build. Năm format baseline theo SCAN-02 được
+đối chiếu; chưa có bằng chứng thiết bị thật mới. Backend không đổi nên không
+chạy lại các tests backend của checkpoint trước.
+
+`ca180af` đã push thành công lên origin. Lệnh tạo draft PR bị automatic approval
+review từ chối riêng vì thiếu xác nhận PR công khai tại `VuPhm/coopfood-kph`.
+PR chưa tạo, remote Verify chưa chạy. Chờ owner xác nhận tạo draft PR public;
+không lặp lại push/integration đã hoàn tất và không mở vòng refactor mới.

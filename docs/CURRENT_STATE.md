@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-10
+Cập nhật: 2026-09-11
 
 ## Giai đoạn
 
@@ -95,3 +95,10 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
   hoặc EXIF parser tự viết từ implementation cũ.
 - Pilot đang chạy được freeze, chỉ nhận security/critical fix; dữ liệu Pilot
   không được migrate sang authority online.
+
+## Checkpoint sau review nhánh — 2026-09-11
+
+Scanner fix đã tích hợp tại `ca180af` và push lên origin; frontend hiện 135 tests
+và build pass. Chỉ có worktree chính, report E2E cũ được ignore đúng ở Foundation.
+Draft PR public đang chờ xác nhận do automatic approval review; không coi remote
+CI hoặc owner acceptance là đã hoàn tất. Chi tiết điểm tiếp tục ở NEXT.
