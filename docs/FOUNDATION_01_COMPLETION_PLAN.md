@@ -1,6 +1,7 @@
 # Kế hoạch đóng Foundation-01
 
-Ngày đánh giá: 2026-09-09. Trạng thái: đã dispatch ba team Luna max ngày 2026-09-09.
+Ngày đánh giá: 2026-09-09. Trạng thái: `CLOSED` ngày 2026-09-13 trên
+implementation candidate `92fb895b`; owner acceptance và CI remote đã đạt.
 Model thực hiện theo yêu cầu owner: `gpt-5.6-luna`, reasoning `max`.
 
 ## Đích và điểm dừng
@@ -159,16 +160,16 @@ cần thiết; không đánh dấu done, không tự mở vòng đánh bóng vô
 
 Gate đóng (tất cả bắt buộc):
 
-- [ ] Luồng browser thật Wave 1 đạt từ database sạch, cho cả hai loại phiếu.
-- [ ] Snapshot, ngày nghiệp vụ, membership, retry và private original/stamped có
+- [x] Luồng browser thật Wave 1 đạt từ database sạch, cho cả hai loại phiếu.
+- [x] Snapshot, ngày nghiệp vụ, membership, retry và private original/stamped có
   test; không regression các hành vi Pilot bị chạm.
-- [ ] `npm run verify` pass; build online pass; backend `./mvnw verify` có Docker,
+- [x] `npm run verify` pass; build online pass; backend `./mvnw verify` có Docker,
   migration sạch/nâng cấp pass và không skip integration; E2E pass.
-- [ ] PR Verify chạy xanh trên đúng SHA tích hợp sau khi có bước push/PR; nếu chưa
+- [x] PR Verify chạy xanh trên đúng SHA tích hợp sau khi có bước push/PR; nếu chưa
   thực hiện được thì ghi pending, không gọi local pass là CI pass.
-- [ ] Tất cả source mới đã nằm trong commit bàn giao; docs state/NEXT, hướng dẫn
+- [x] Tất cả source mới đã nằm trong commit bàn giao; docs state/NEXT, hướng dẫn
   run/seed/test và evidence đồng bộ. Không để phần implementation chỉ ở untracked.
-- [ ] Không còn blocker contract/security/data-loss/luồng chính. Ghi giới hạn
+- [x] Không còn blocker contract/security/data-loss/luồng chính. Ghi giới hạn
   device/format chưa kiểm đúng thực tế; không tuyên bố production-ready.
 
 Khi đạt gate: cập nhật Foundation-01 CLOSED, bàn giao SHA/evidence và dừng.

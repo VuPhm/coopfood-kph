@@ -18,10 +18,9 @@ evidence và runbook nằm trong `docs/pilot/`.
   tag mới theo owner waiver.
 - Sau release, nhánh deploy Pilot chỉ nhận security/critical fix.
 
-Chỉ có một milestone đang hoạt động. Không mang ngoại lệ local-only hoặc waiver
-release của Pilot sang topology online.
+Không mang ngoại lệ local-only hoặc waiver release của Pilot sang topology online.
 
-## Active — Foundation-01 — vertical slice tạo và xem phiếu KPH
+## Closed — Foundation-01 — vertical slice tạo và xem phiếu KPH
 
 ### Mục tiêu
 
@@ -50,7 +49,7 @@ song song bằng mock sinh từ cùng OpenAPI.
   store bắt buộc; dữ liệu inactive, non-current hoặc thiếu NCC chính không bị
   suy diễn. `CHAIN_ADMIN` không bypass membership.
 - Đã tích hợp implementation KPH create/list/photo, catalog snapshot, private
-  media và Store PWA online vào branch; slice chưa được owner acceptance.
+  media và Store PWA online; slice được owner acceptance ngày 2026-09-13.
 - Đợt khắc phục đầu tiên gom catalog resolver dùng chung cho lookup/snapshot,
   tách seed nâng cấp V1 khỏi seed schema hiện tại, và thêm PR CI frontend/backend.
 - Đã làm rõ ranh giới hiển thị Pilot/online theo R02: callback thao tác chỉ được
@@ -111,3 +110,21 @@ Theo yêu cầu mới, ưu tiên nghiệm thu phần Store PWA đã chuẩn hoá
 `ui-ux-pro-max`; xem [UI evidence](evidence/foundation-01/ui-review-2026-09-12.md).
 Dùng ảnh desktop/mobile và preview có backend tổng hợp để chốt phản hồi UI.
 Không coi component tests hay screenshot fixture là owner acceptance.
+
+### Closeout — 2026-09-13
+
+Candidate `92fb895` pass local frontend 135 tests/build, backend 36 tests không
+skip và browser E2E 5 pass/3 viewport-specific skip. PR #2 pass cả ba job remote
+`frontend`, `backend`, `browser`. Owner xác nhận đã thử một số phần, duyệt pass,
+cho phép public PR và yêu cầu chốt. Xem
+[closeout evidence](evidence/foundation-01/closeout-2026-09-13.md).
+
+Foundation-01 đã đóng. Không còn milestone active và không tự mở production
+rollout hay feature mới từ danh sách hoãn.
+
+## Chưa mở — milestone kế tiếp
+
+Owner cần chọn outcome riêng trước khi bắt đầu. Các candidate hiện có gồm
+approve/export online cho `STORE_MANAGER`; catalog/provisioning Admin Web; hoặc
+production readiness gồm hosting, PostgreSQL/object storage, retention và SSO/MFA.
+Không gộp các candidate này thành một milestone mặc định.

@@ -1,15 +1,15 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-11
+Cập nhật: 2026-09-13
 
 ## Giai đoạn
 
-`Foundation-01 — vertical slice tạo và xem phiếu KPH`
+`Foundation-01 — CLOSED; chưa mở milestone kế tiếp`
 
 Pilot local-only theo ADR-0002 đã được project owner đóng ngày 2026-09-04 bằng
 acceptance tối thiểu. Pilot đang chạy được giữ nguyên, không tạo tag/deploy mới
-hoặc rehearsal rollback; `REL-01`–`REL-03` được waive một lần. Foundation-01 là
-milestone active cho vertical slice online.
+hoặc rehearsal rollback; `REL-01`–`REL-03` được waive một lần. Foundation-01 đã
+được owner chấp nhận và đóng ngày 2026-09-13; hiện không có milestone active.
 
 Repository này là implementation mới. Hai repository tham chiếu
 `coopfood-kph-platform` và `tool-kph` chỉ được đọc để lấy provenance,
@@ -67,23 +67,18 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
 - Kiểm tra bản tích hợp ngày 2026-09-10: frontend 133 tests và build pass;
   backend 36 tests, không skip; jOOQ 3.20.17/PostgreSQL 17 tương thích. Build
   online riêng tại `.local/online-dist`; log tại `.local/verification` (gitignored).
+- Candidate cuối `92fb895` pass local frontend 135 tests/build, backend 36 tests
+  không skip và browser E2E 5 pass/3 viewport-specific skip. PR #2 pass đủ ba
+  job remote `frontend`, `backend`, `browser`; owner chấp nhận flow/UI và yêu cầu
+  chốt milestone ngày 2026-09-13.
 
-## Chưa hoàn tất
+## Ngoài phạm vi đã hoãn
 
-- Đã rà local/remote branches ngày 2026-09-09 và lập
-  [kế hoạch đóng Foundation-01](FOUNDATION_01_COMPLETION_PLAN.md). Các nhánh
-  identity/contract/Pilot đã nằm trong HEAD; phần KPH online đã checkpoint tại `2c456ea`.
-  Nhánh WIP planning chứa policy khác và không được merge nguyên nhánh.
-  Ba commit A/B/C đã tích hợp. Root đã bổ sung runtime/CI và sửa logout lỗi mạng
-  tại `acd585d`; browser local 5 ca pass, 3 viewport-specific skips; chờ CI/owner acceptance. Các worktree tạm không còn đã prune.
-- Browser E2E đã chạy với backend/PostgreSQL thật; xem
-  [evidence tích hợp](evidence/foundation-01/integration-2026-09-10.md). Chưa chốt owner acceptance.
-  Online đã có login/logout và chọn store theo membership. Bản preview dùng
-  database tổng hợp riêng, không phải môi trường vận hành.
-- Database migration V2 đã được kiểm chứng với PostgreSQL 17 qua Testcontainers,
-  bao gồm clean database và nâng cấp dữ liệu mã cũ tổng hợp.
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,
   primary supplier khi một product có nhiều NCC, và workflow approve/edit đầy đủ.
+- Online chỉ hỗ trợ JPEG/PNG; chưa có HEIC online, thiết bị iPhone thật, production
+  rollout, offline sync hoặc approve/export online. Các giới hạn này không thuộc
+  acceptance Foundation-01 và được giữ cho milestone sau.
 
 ## Ranh giới hiện tại
 
@@ -108,5 +103,12 @@ CI hoặc owner acceptance là đã hoàn tất. Chi tiết điểm tiếp tục
 Owner chưa chấp nhận giao diện. Đã cài `ui-ux-pro-max` và chuẩn hoá Store PWA:
 login riêng, phân cấp workspace/cửa hàng, thao tác mobile và form; thêm script
 review UI dùng fixture. Xem [UI evidence](evidence/foundation-01/ui-review-2026-09-12.md).
-Đây là kiểm tra giao diện bằng Chromium/mock, chưa thay thế owner acceptance
-online. Không mở rộng Admin Web hoặc triển khai Pilot trong đợt này.
+Owner đã kiểm tra một số phần, chấp nhận flow/UI và yêu cầu chốt ngày 2026-09-13.
+Không triển khai Pilot trong đợt này.
+
+## Foundation-01 closeout — 2026-09-13
+
+PR #2 đã có remote CI xanh trên candidate `92fb895`; bằng chứng local, CI, nguồn
+owner acceptance và giới hạn hoãn được ghi tại
+[closeout](evidence/foundation-01/closeout-2026-09-13.md). Foundation-01 đóng;
+không tự khởi động milestone hoặc production rollout tiếp theo.
