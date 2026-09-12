@@ -477,7 +477,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
                 </p>
               </div>
               <Field className="mt-3" label="Ghi chú" htmlFor="note" error={errors.note?.message}>
-                <textarea id="note" rows={3} className="w-full resize-y rounded-xl border-2 border-surface-strong bg-white px-3 py-3 text-base outline-none transition-[background-color,border-color] placeholder:text-ink-muted/70 hover:border-brand/25 hover:bg-brand-soft/40 focus-visible:outline-3 focus-visible:outline-focus focus-visible:outline-offset-2" placeholder="Nhập ghi chú..." {...register("note")} />
+                <textarea id="note" rows={3} className="w-full resize-y rounded-xl border-2 border-surface-strong bg-white px-3 py-3 text-base outline-none transition-[background-color,border-color] placeholder:text-ink-muted/70 hover:border-brand/25 hover:bg-brand-soft/40" placeholder="Nhập ghi chú..." {...register("note")} />
               </Field>
             </FormSection>
 
