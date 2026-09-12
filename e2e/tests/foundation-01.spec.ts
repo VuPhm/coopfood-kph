@@ -81,10 +81,17 @@ function syntheticJpeg(name: string, lastModified: number) {
 }
 
 async function firstVisible(...locators: Locator[]) {
-  for (const locator of locators) {
-    if (await locator.count() && await locator.first().isVisible()) return locator.first();
-  }
-  throw new Error("Could not find a visible locator for the requested control.");
+  let visibleLocator: Locator | undefined;
+  await expect.poll(async () => {
+    for (const locator of locators) {
+      if (await locator.count() && await locator.first().isVisible()) {
+        visibleLocator = locator.first();
+        return true;
+      }
+    }
+    return false;
+  }, { message: "Could not find a visible locator for the requested control." }).toBe(true);
+  return visibleLocator!;
 }
 
 async function expectVisible(locator: Locator) {
