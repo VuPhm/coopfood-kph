@@ -1,0 +1,107 @@
+name: Verify Foundation
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Select runner JDK 21
+        shell: bash
+        run: |
+          echo "JAVA_HOME=${JAVA_HOME_21_X64:?Runner must provide JDK 21}" >> "$GITHUB_ENV"
+          echo "${JAVA_HOME_21_X64}/bin" >> "$GITHUB_PATH"
+      - name: Require Docker for integration tests
+        run: docker info > /dev/null
+      - name: Verify with clean PostgreSQL Testcontainers databases
+        run: ./mvnw --batch-mode --no-transfer-progress verify
+
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: coopfood_kph_e2e
+          POSTGRES_USER: kph_e2e
+          POSTGRES_PASSWORD: local-e2e-only
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U kph_e2e -d coopfood_kph_e2e"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      KPH_DATABASE_URL: jdbc:postgresql://127.0.0.1:55432/coopfood_kph_e2e
+      KPH_DATABASE_USERNAME: kph_e2e
+      KPH_DATABASE_PASSWORD: local-e2e-only
+      KPH_MEDIA_ROOT: /tmp/kph-browser-media
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            e2e/package-lock.json
+      - name: Select runner JDK 21
+        run: |
+          echo "JAVA_HOME=${JAVA_HOME_21_X64:?Runner must provide JDK 21}" >> "$GITHUB_ENV"
+          echo "${JAVA_HOME_21_X64}/bin" >> "$GITHUB_PATH"
+      - run: npm ci
+      - run: npm ci --prefix e2e
+      - name: Install PostgreSQL client for synthetic seed
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - run: npm --prefix e2e exec -- playwright install --with-deps chromium
+      - name: Build online app and backend
+        run: |
+          VITE_KPH_ONLINE=true npm --workspace @coopfood-kph/store-pwa run build
+          # Backend job runs the full suite; this job packages the same SHA for browser tests.
+          ./backend/mvnw -f backend/pom.xml --batch-mode --no-transfer-progress -DskipTests package
+      - name: Run browser acceptance against real API
+        run: |
+          set -euo pipefail
+          java -jar backend/target/coopfood-kph-backend-0.1.0-SNAPSHOT.jar > /tmp/kph-browser-backend.log 2>&1 &
+          backend_pid=$!
+          npm --workspace @coopfood-kph/store-pwa exec -- vite preview --host 127.0.0.1 --port 4173 --strictPort > /tmp/kph-browser-app.log 2>&1 &
+          app_pid=$!
+          trap 'kill "$backend_pid" "$app_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/actuator/health > /dev/null && curl -fsS http://127.0.0.1:4173/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8080/actuator/health
+          ./e2e/scripts/seed-foundation-01.sh
+          npm --prefix e2e test
+      - name: Show server diagnostics on failure
+        if: failure()
+        run: |
+          tail -n 100 /tmp/kph-browser-backend.log 2>/dev/null || true
+          tail -n 30 /tmp/kph-browser-app.log 2>/dev/null || true

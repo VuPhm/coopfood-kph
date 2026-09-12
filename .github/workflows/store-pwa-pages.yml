@@ -2,25 +2,62 @@ name: Deploy Store PWA to GitHub Pages
 
 on:
   push:
-    branches:
-      - codex/github-pages-pwa
-  workflow_dispatch:
+    tags:
+      - "pilot-v*"
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: github-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      artifact_id: ${{ steps.pages_artifact.outputs.artifact_id }}
+      artifact_name: ${{ steps.release_artifact.outputs.artifact_name }}
+      artifact_sha256: ${{ steps.release_artifact.outputs.artifact_sha256 }}
+      release_sha: ${{ steps.release_ref.outputs.release_sha }}
+      release_tag: ${{ steps.release_ref.outputs.release_tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Verify annotated Pilot release tag
+        id: release_ref
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "Release workflow must run from a tag, got ${GITHUB_REF_TYPE}." >&2
+            exit 1
+          fi
+
+          if [[ ! "${GITHUB_REF_NAME}" =~ ^pilot-v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid Pilot release tag: ${GITHUB_REF_NAME}." >&2
+            exit 1
+          fi
+
+          if [[ "$(git cat-file -t "${GITHUB_REF}")" != "tag" ]]; then
+            echo "Pilot release tag must be annotated: ${GITHUB_REF_NAME}." >&2
+            exit 1
+          fi
+
+          release_sha="$(git rev-parse "${GITHUB_REF}^{commit}")"
+          checkout_sha="$(git rev-parse HEAD)"
+          if [[ "${release_sha}" != "${GITHUB_SHA}" || "${checkout_sha}" != "${release_sha}" ]]; then
+            echo "Tag, event and checkout SHA do not match." >&2
+            echo "tag=${release_sha} event=${GITHUB_SHA} checkout=${checkout_sha}" >&2
+            exit 1
+          fi
+
+          echo "release_sha=${release_sha}" >> "${GITHUB_OUTPUT}"
+          echo "release_tag=${GITHUB_REF_NAME}" >> "${GITHUB_OUTPUT}"
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -31,6 +68,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run Pilot verification
+        run: npm run verify
+
       - name: Configure GitHub Pages
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
@@ -39,11 +79,71 @@ jobs:
         run: npm --workspace @coopfood-kph/store-pwa run build -- --base "${{ steps.pages.outputs.base_path }}/"
 
       - name: Upload GitHub Pages artifact
+        id: pages_artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
+          name: github-pages-${{ steps.release_ref.outputs.release_sha }}
           path: apps/store-pwa/dist
+          retention-days: 90
+
+      - name: Record immutable release artifact
+        id: release_artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          artifact_path="${RUNNER_TEMP}/artifact.tar"
+          if [[ ! -f "${artifact_path}" ]]; then
+            echo "GitHub Pages artifact tar was not created." >&2
+            exit 1
+          fi
+
+          artifact_name="github-pages-${{ steps.release_ref.outputs.release_sha }}"
+          artifact_sha256="$(sha256sum "${artifact_path}" | awk '{print $1}')"
+          lockfile_sha256="$(sha256sum package-lock.json | awk '{print $1}')"
+          build_time="$(TZ=Asia/Ho_Chi_Minh date '+%Y-%m-%dT%H:%M:%S%z')"
+
+          printf '%s  artifact.tar\n' "${artifact_sha256}" > "${RUNNER_TEMP}/artifact.tar.sha256"
+          {
+            echo "release_tag=${{ steps.release_ref.outputs.release_tag }}"
+            echo "release_sha=${{ steps.release_ref.outputs.release_sha }}"
+            echo "build_time_asia_ho_chi_minh=${build_time}"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+            echo "lockfile_sha256=${lockfile_sha256}"
+            echo "pages_artifact_id=${{ steps.pages_artifact.outputs.artifact_id }}"
+            echo "pages_artifact_name=${artifact_name}"
+            echo "pages_artifact_sha256=${artifact_sha256}"
+            echo "workflow_run=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } > "${RUNNER_TEMP}/pilot-pages-release-metadata.txt"
+
+          echo "artifact_name=${artifact_name}" >> "${GITHUB_OUTPUT}"
+          echo "artifact_sha256=${artifact_sha256}" >> "${GITHUB_OUTPUT}"
+          {
+            echo "### Pilot Pages release artifact"
+            echo
+            echo "- Tag: \`${{ steps.release_ref.outputs.release_tag }}\`"
+            echo "- Commit: \`${{ steps.release_ref.outputs.release_sha }}\`"
+            echo "- Artifact ID: \`${{ steps.pages_artifact.outputs.artifact_id }}\`"
+            echo "- Artifact: \`${artifact_name}\`"
+            echo "- SHA-256: \`${artifact_sha256}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload release metadata
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: pilot-pages-metadata-${{ steps.release_ref.outputs.release_sha }}
+          path: |
+            ${{ runner.temp }}/artifact.tar.sha256
+            ${{ runner.temp }}/pilot-pages-release-metadata.txt
+          if-no-files-found: error
+          retention-days: 90
 
   deploy:
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -53,3 +153,19 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        with:
+          artifact_name: ${{ needs.build.outputs.artifact_name }}
+
+      - name: Record deployment metadata
+        shell: bash
+        run: |
+          {
+            echo "### Pilot Pages deployment"
+            echo
+            echo "- Tag: \`${{ needs.build.outputs.release_tag }}\`"
+            echo "- Commit: \`${{ needs.build.outputs.release_sha }}\`"
+            echo "- Artifact ID: \`${{ needs.build.outputs.artifact_id }}\`"
+            echo "- Artifact: \`${{ needs.build.outputs.artifact_name }}\`"
+            echo "- SHA-256: \`${{ needs.build.outputs.artifact_sha256 }}\`"
+            echo "- Pages URL: ${{ steps.deployment.outputs.page_url }}"
+          } >> "${GITHUB_STEP_SUMMARY}"

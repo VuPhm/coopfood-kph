@@ -10,3 +10,5 @@ Thứ tự đọc bắt buộc cho mọi thay đổi:
 
 `SOURCE_MANIFEST.md` ghi provenance của tài liệu, fixture và khung giao diện
 được mang từ hai repository tham chiếu. Hai repository đó là read-only.
+
+Quy trình kế hoạch → điều chỉnh → triển khai → nghiệm thu: [DELIVERY_WORKFLOW.md](DELIVERY_WORKFLOW.md).

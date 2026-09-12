@@ -1,6 +1,7 @@
 export const EVIDENCE_MAX_WIDTH = 1280;
 export const EVIDENCE_MAX_HEIGHT = 720;
-export const EVIDENCE_TARGET_BYTES = 420 * 1024;
+export const EVIDENCE_TARGET_BYTES = 550 * 1024;
+export const EVIDENCE_QUALITY_FLOOR = 0.54;
 
 export type StoreStamp = { storeCode: string; storeName: string };
 
@@ -28,7 +29,7 @@ export function evidenceDimensions(width: number, height: number) {
   };
 }
 
-async function captureDate(file: File, controlledNow: Date) {
+export async function resolveEvidenceCaptureDate(file: File, controlledNow: Date) {
   try {
     const { parse: parseExif } = await import("exifr/dist/lite.esm.mjs");
     const metadata = await parseExif(file, ["DateTimeOriginal", "DateTimeDigitized", "DateTime"]);
@@ -73,7 +74,7 @@ async function loadDrawable(file: File): Promise<DrawableImage> {
 }
 
 function roundedRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
-  const safeRadius = Math.min(radius, width / 2, height / 2);
+  const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
   context.beginPath();
   context.moveTo(x + safeRadius, y);
   context.arcTo(x + width, y, x + width, y + height, safeRadius);
@@ -99,9 +100,9 @@ function canvasBlob(canvas: HTMLCanvasElement, quality: number) {
 
 async function compress(canvas: HTMLCanvasElement) {
   let workingCanvas = canvas;
-  let blob = await canvasBlob(workingCanvas, 0.8);
+  let blob = await canvasBlob(workingCanvas, 0.78);
   for (let pass = 0; pass < 4; pass += 1) {
-    for (const quality of [0.72, 0.64, 0.56]) {
+    for (const quality of [0.7, 0.62, EVIDENCE_QUALITY_FLOOR]) {
       if (blob.size <= EVIDENCE_TARGET_BYTES) return { blob, canvas: workingCanvas };
       blob = await canvasBlob(workingCanvas, quality);
     }
@@ -109,9 +110,11 @@ async function compress(canvas: HTMLCanvasElement) {
     const resized = document.createElement("canvas");
     resized.width = Math.max(1, Math.round(workingCanvas.width * 0.8));
     resized.height = Math.max(1, Math.round(workingCanvas.height * 0.8));
-    resized.getContext("2d")?.drawImage(workingCanvas, 0, 0, resized.width, resized.height);
+    const resizedContext = resized.getContext("2d");
+    if (!resizedContext) return { blob, canvas: workingCanvas };
+    resizedContext.drawImage(workingCanvas, 0, 0, resized.width, resized.height);
     workingCanvas = resized;
-    blob = await canvasBlob(workingCanvas, 0.8);
+    blob = await canvasBlob(workingCanvas, 0.78);
   }
   return { blob, canvas: workingCanvas };
 }
@@ -139,12 +142,14 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
   const { date, time, weekday } = dateParts(capturedAt);
   const storeIdentity = [store.storeCode, store.storeName].filter(Boolean).join(" - ");
   const shortEdge = Math.min(width, height);
-  const unit = Math.min(22, Math.max(13, Math.round(shortEdge * 0.028)));
+  const smallImageScale = Math.min(1, shortEdge / 160);
+  const unit = Math.max(2, Math.round(Math.min(22, Math.max(13, shortEdge * 0.028)) * smallImageScale));
   const padding = Math.round(unit * 0.44);
   const timeSize = Math.round(unit * 1.72);
   const textSize = Math.round(unit * 0.88);
-  const storeTextSize = Math.max(10, Math.round(textSize * 0.78));
-  const margin = Math.min(42, Math.max(12, Math.round(shortEdge * 0.035)));
+  const storeTextSize = Math.max(2, Math.round(textSize * 0.78));
+  const desiredMargin = Math.min(42, Math.max(12, Math.round(shortEdge * 0.035)));
+  const margin = Math.min(desiredMargin, Math.max(0, Math.floor((shortEdge - 1) / 4)));
 
   context.font = `700 ${timeSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
   const timeWidth = context.measureText(time).width;
@@ -154,11 +159,11 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
   const dateWidth = context.measureText(date).width;
   const columnGap = Math.round(unit * 0.55);
   const contentWidth = timeWidth + columnGap + Math.max(weekdayWidth, dateWidth);
-  const baseCardWidth = Math.min(310, Math.max(170, Math.round(contentWidth + padding * 2)));
-  const cardWidth = Math.min(width - margin * 2, Math.round(baseCardWidth * 1.25));
+  const baseCardWidth = Math.min(Math.round(310 * smallImageScale), Math.max(Math.round(170 * smallImageScale), Math.round(contentWidth + padding * 2)));
+  const cardWidth = Math.max(1, Math.min(width - margin * 2, Math.round(baseCardWidth * 1.25)));
   const infoHeight = Math.round(timeSize * 1.24);
   const storeHeight = storeIdentity ? Math.round(unit * 1.08) : 0;
-  const cardHeight = padding * 2 + infoHeight + storeHeight;
+  const cardHeight = Math.max(1, Math.min(height - margin * 2, padding * 2 + infoHeight + storeHeight));
   const x = margin;
   const y = Math.max(margin, height - margin - cardHeight);
 
@@ -194,13 +199,13 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
     context.fillRect(contentX, storeY, Math.max(3, Math.round(unit * 0.18)), Math.round(unit * 0.88));
     context.fillStyle = "#fff";
     context.font = `600 ${storeTextSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-    context.fillText(ellipsis(context, storeIdentity, cardWidth - padding * 2 - Math.round(unit * 0.7)), contentX + Math.round(unit * 0.58), storeY + Math.round(unit * 0.7));
+    context.fillText(ellipsis(context, storeIdentity, Math.max(1, cardWidth - padding * 2 - Math.round(unit * 0.7))), contentX + Math.round(unit * 0.58), storeY + Math.round(unit * 0.7));
   }
   context.restore();
 }
 
 export async function processEvidencePhoto(file: File, store: StoreStamp, controlledNow = new Date()): Promise<ProcessedEvidencePhoto> {
-  const [drawable, capturedAt] = await Promise.all([loadDrawable(file), captureDate(file, controlledNow)]);
+  const [drawable, capturedAt] = await Promise.all([loadDrawable(file), resolveEvidenceCaptureDate(file, controlledNow)]);
   try {
     if (!drawable.width || !drawable.height) throw new Error("Ảnh minh chứng không có kích thước hợp lệ.");
     const dimensions = evidenceDimensions(drawable.width, drawable.height);

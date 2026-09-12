@@ -58,5 +58,10 @@ và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
 
 ## Bàn giao
 
+Với milestone nhiều bước hoặc yêu cầu điều phối team, dùng
+`tooling/skills/delivery-cycle/SKILL.md` và `docs/DELIVERY_WORKFLOW.md`.
+Giữ kế hoạch hiện có khi resume; việc nhỏ không cần tạo hồ sơ đầy đủ. Phân biệt
+kiểm tra kỹ thuật đạt và nghiệm thu thực của owner; đóng vòng rồi dừng.
+
 Nêu file đã đổi, lệnh kiểm tra và kết quả, quyết định/giả định, rủi ro còn lại và
 một bước nhỏ tiếp theo.

@@ -1,10 +1,10 @@
 import type { KphKind } from "@coopfood-kph/kph-rules";
 import { type DBSchema, openDB } from "idb";
 
-import type { DemoApprovalStatus, DemoRecord } from "./demo-records";
+import type { ApprovalStatus, RecordView } from "./record-view";
 
 const DATABASE_NAME = "coopfood-kph-pilot";
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 
 export type PilotPhoto = {
   id: string;
@@ -29,7 +29,7 @@ export type PilotRecord = {
   condition: string;
   resolution: string;
   treatmentDate: string;
-  approvalStatus: DemoApprovalStatus;
+  approvalStatus: ApprovalStatus;
   photos: PilotPhoto[];
   note: string;
   trashState: "active" | "trash";
@@ -62,6 +62,7 @@ interface PilotDatabase extends DBSchema {
       "by-detected-date": string;
       "by-kind": KphKind;
       "by-trash-state": "active" | "trash";
+      "by-updated-at": string;
     };
   };
   export_runs: {
@@ -79,15 +80,21 @@ let databasePromise: ReturnType<typeof openDB<PilotDatabase>> | undefined;
 
 function database() {
   databasePromise ??= openDB<PilotDatabase>(DATABASE_NAME, DATABASE_VERSION, {
-    upgrade(db) {
-      const records = db.createObjectStore("records", { keyPath: "id" });
-      records.createIndex("by-kind", "kind");
-      records.createIndex("by-trash-state", "trashState");
-      records.createIndex("by-detected-date", "detectedDate");
+    upgrade(db, oldVersion, _newVersion, transaction) {
+      if (oldVersion < 1) {
+        const records = db.createObjectStore("records", { keyPath: "id" });
+        records.createIndex("by-kind", "kind");
+        records.createIndex("by-trash-state", "trashState");
+        records.createIndex("by-detected-date", "detectedDate");
 
-      const exportRuns = db.createObjectStore("export_runs", { keyPath: "id" });
-      exportRuns.createIndex("by-created-at", "createdAt");
-      db.createObjectStore("settings", { keyPath: "key" });
+        const exportRuns = db.createObjectStore("export_runs", { keyPath: "id" });
+        exportRuns.createIndex("by-created-at", "createdAt");
+        db.createObjectStore("settings", { keyPath: "key" });
+      }
+
+      if (oldVersion < 2) {
+        transaction.objectStore("records").createIndex("by-updated-at", "updatedAt");
+      }
     },
     blocked() {
       window.dispatchEvent(new CustomEvent("kph-storage-blocked"));
@@ -105,7 +112,7 @@ function database() {
   return databasePromise;
 }
 
-function persistablePhoto(recordId: string, photo: DemoRecord["photos"][number], index: number): PilotPhoto {
+function persistablePhoto(recordId: string, photo: RecordView["photos"][number], index: number): PilotPhoto {
   if (!photo.blob) throw new Error(`Ảnh ${index + 1} của phiếu ${recordId} chưa có dữ liệu để lưu`);
   return {
     id: photo.id,
@@ -117,7 +124,7 @@ function persistablePhoto(recordId: string, photo: DemoRecord["photos"][number],
   };
 }
 
-export function toPilotRecord(record: DemoRecord, trashState: "active" | "trash", previous?: PilotRecord): PilotRecord {
+export function toPilotRecord(record: RecordView, trashState: "active" | "trash", previous?: PilotRecord): PilotRecord {
   const now = new Date().toISOString();
   return {
     id: record.id,
@@ -150,7 +157,7 @@ export async function loadPilotRecords() {
   return records.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 }
 
-export async function savePilotRecord(record: DemoRecord, trashState: "active" | "trash" = "active") {
+export async function savePilotRecord(record: RecordView, trashState: "active" | "trash" = "active") {
   const db = await database();
   const previous = await db.get("records", record.id);
   const stored = toPilotRecord(record, trashState, previous);
@@ -165,15 +172,25 @@ export async function patchPilotRecords(
   const db = await database();
   const transaction = db.transaction("records", "readwrite");
   const now = new Date().toISOString();
-  for (const recordId of recordIds) {
-    const current = await transaction.store.get(recordId);
-    if (!current) continue;
-    await transaction.store.put({ ...current, ...patch, updatedAt: now });
+  try {
+    for (const recordId of recordIds) {
+      const current = await transaction.store.get(recordId);
+      if (!current) continue;
+      await transaction.store.put({ ...current, ...patch, updatedAt: now });
+    }
+    await transaction.done;
+  } catch (error) {
+    try {
+      transaction.abort();
+    } catch {
+      // IndexedDB may already have aborted after a failed request.
+    }
+    await transaction.done.catch(() => undefined);
+    throw error;
   }
-  await transaction.done;
 }
 
-export async function recordPilotExport(kind: KphKind, records: readonly DemoRecord[], fileName: string) {
+export async function recordPilotExport(kind: KphKind, records: readonly RecordView[], fileName: string) {
   const db = await database();
   const transaction = db.transaction(["export_runs", "records"], "readwrite");
   const createdAt = new Date().toISOString();
@@ -185,12 +202,22 @@ export async function recordPilotExport(kind: KphKind, records: readonly DemoRec
     createdAt,
     templateVersion: "BM-331.CF-01",
   };
-  await transaction.objectStore("export_runs").put(run);
-  for (const record of records) {
-    const current = await transaction.objectStore("records").get(record.id);
-    if (current) await transaction.objectStore("records").put({ ...current, lastExportedAt: createdAt, updatedAt: createdAt });
+  try {
+    await transaction.objectStore("export_runs").put(run);
+    for (const record of records) {
+      const current = await transaction.objectStore("records").get(record.id);
+      if (current) await transaction.objectStore("records").put({ ...current, lastExportedAt: createdAt, updatedAt: createdAt });
+    }
+    await transaction.done;
+  } catch (error) {
+    try {
+      transaction.abort();
+    } catch {
+      // IndexedDB may already have aborted after a failed request.
+    }
+    await transaction.done.catch(() => undefined);
+    throw error;
   }
-  await transaction.done;
   return run;
 }
 
@@ -210,13 +237,25 @@ export async function getPilotSetting<T>(key: string): Promise<T | undefined> {
 }
 
 export async function resetPilotDatabaseForTests() {
-  const db = await database();
-  db.close();
+  const openDatabase = databasePromise;
   databasePromise = undefined;
+  if (openDatabase) {
+    try {
+      (await openDatabase).close();
+    } catch {
+      // A failed open has no connection to close before deleting the test DB.
+    }
+  }
   await new Promise<void>((resolve, reject) => {
     const request = indexedDB.deleteDatabase(DATABASE_NAME);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
     request.onblocked = () => reject(new Error("Không thể reset IndexedDB test"));
   });
+}
+
+export async function closePilotDatabaseForTests() {
+  const openDatabase = databasePromise;
+  databasePromise = undefined;
+  if (openDatabase) (await openDatabase).close();
 }

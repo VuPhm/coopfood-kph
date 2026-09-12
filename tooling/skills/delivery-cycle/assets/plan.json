@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "",
+  "revision": 1,
+  "status": "PLANNING",
+  "objective": "",
+  "inScope": [],
+  "outOfScope": [],
+  "baseSha": "",
+  "candidateSha": "",
+  "integrationOwner": "",
+  "sharedPaths": [],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Define scope, acceptance gates and ownership before dispatch."
+}
