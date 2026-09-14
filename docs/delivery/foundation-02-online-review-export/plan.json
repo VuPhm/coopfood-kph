@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "foundation-02-online-review-export",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "EXECUTING",
   "objective": "Cho phép STORE_MANAGER đúng active store membership lọc lịch sử phiếu theo khoảng ngày phát hiện, duyệt phiếu và xuất Excel online với kiểm tra server-side và audit; EMPLOYEE vẫn chỉ xem/tạo và CHAIN_ADMIN không bypass store scope.",
   "inScope": [
     "OpenAPI, examples và generated client cho bộ lọc ngày, duyệt và export online",
@@ -18,7 +18,7 @@
     "Approval time window chưa có business rule"
   ],
   "baseSha": "405f6810e52ed1288f95b3484f20918e435614b9",
-  "candidateSha": "40a6b17c6cbc5ab8f2991caad065a30922bc1e57",
+  "candidateSha": "",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -28,17 +28,17 @@
     "pnpm-lock.yaml"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "40a6b17c6cbc5ab8f2991caad065a30922bc1e57",
-      "evidence": "docs/delivery/foundation-02-online-review-export/technical-evidence.md"
+      "status": "pending",
+      "revision": null,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "owner-acceptance",
@@ -50,7 +50,15 @@
       "evidence": ""
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Làm bộ lọc ngày compact; ở màn hình nhỏ tích hợp vào hộp thoại lọc hiện có.",
+      "source": "Phản hồi trực tiếp của project owner trong Codex ngày 2026-09-15.",
+      "impact": "Thay đổi bố cục và interaction của bộ lọc ngày trên Store PWA, cần cập nhật component/E2E/screenshot và vô hiệu hóa evidence UI revision 1; contract/backend không đổi.",
+      "decision": "Desktop dùng cụm ngày một hàng compact; mobile đặt cùng state/control vào hộp thoại lọc và sắp xếp hiện có, giữ label, lỗi inline, inclusive range và xóa selection khi áp dụng/xóa lọc."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Bàn giao candidate 40a6b17 cho owner kiểm tra các kịch bản trong acceptance-handoff.md và ghi quyết định nghiệm thu thực."
+  "nextAction": "Triển khai UI compact responsive revision 2, cập nhật test và tạo candidate/evidence mới trước khi bàn giao lại owner."
 }
