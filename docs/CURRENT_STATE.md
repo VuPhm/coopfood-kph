@@ -1,15 +1,17 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-13
+Cập nhật: 2026-09-15
 
 ## Giai đoạn
 
-`Foundation-01 — CLOSED; chưa mở milestone kế tiếp`
+`Foundation-02 — EXECUTING: duyệt, xuất Excel online và lọc lịch sử theo ngày`
 
 Pilot local-only theo ADR-0002 đã được project owner đóng ngày 2026-09-04 bằng
 acceptance tối thiểu. Pilot đang chạy được giữ nguyên, không tạo tag/deploy mới
 hoặc rehearsal rollback; `REL-01`–`REL-03` được waive một lần. Foundation-01 đã
-được owner chấp nhận và đóng ngày 2026-09-13; hiện không có milestone active.
+được owner chấp nhận và đóng ngày 2026-09-13. Owner mở Foundation-02 ngày
+2026-09-15 cho đúng một outcome: `STORE_MANAGER` duyệt/xuất online và người dùng
+lọc lịch sử theo khoảng ngày phát hiện.
 
 Repository này là implementation mới. Hai repository tham chiếu
 `coopfood-kph-platform` và `tool-kph` chỉ được đọc để lấy provenance,
@@ -75,9 +77,9 @@ business behavior và UI DNA; không tiếp tục phát triển sản phẩm tro
 ## Ngoài phạm vi đã hoãn
 
 - Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,
-  primary supplier khi một product có nhiều NCC, và workflow approve/edit đầy đủ.
+  primary supplier khi một product có nhiều NCC, edit workflow hoặc cửa sổ duyệt.
 - Online chỉ hỗ trợ JPEG/PNG; chưa có HEIC online, thiết bị iPhone thật, production
-  rollout, offline sync hoặc approve/export online. Các giới hạn này không thuộc
+  rollout hoặc offline sync. Các giới hạn này không thuộc
   acceptance Foundation-01 và được giữ cho milestone sau.
 
 ## Ranh giới hiện tại
@@ -112,3 +114,13 @@ PR #2 đã có remote CI xanh trên candidate `92fb895`; bằng chứng local, C
 owner acceptance và giới hạn hoãn được ghi tại
 [closeout](evidence/foundation-01/closeout-2026-09-13.md). Foundation-01 đóng;
 không tự khởi động milestone hoặc production rollout tiếp theo.
+
+## Foundation-02 đang thực hiện — 2026-09-15
+
+Cycle record: [foundation-02-online-review-export](delivery/foundation-02-online-review-export/plan.json).
+Revision 1 khóa khoảng ngày `detectedFrom`/`detectedTo` inclusive trên
+`detected_date`; approval `PENDING/APPROVED/REJECTED` có history/audit; export
+chỉ nhận record `SUBMITTED + APPROVED` cùng store/type và lấy reviewer snapshot
+cho cột R. Chỉ `STORE_MANAGER` đúng active membership được mutation;
+`EMPLOYEE` chỉ xem/tạo và `CHAIN_ADMIN` không bypass. Chưa có owner acceptance
+cho hành vi mới; cần hoàn tất integrated/browser evidence trước khi bàn giao.

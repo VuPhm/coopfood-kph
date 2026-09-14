@@ -6,7 +6,10 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -118,9 +121,73 @@ class KphService {
     }
 
     @Transactional(readOnly = true)
-    List<KphRecordResponse> list(UUID storeId, KphType type, Authentication authentication) {
+    List<KphRecordResponse> list(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
+            Authentication authentication) {
         storeAccess.requireMembership(storeId, authentication);
-        return repository.findAll(storeId, type);
+        if (detectedFrom != null && detectedTo != null && detectedFrom.isAfter(detectedTo)) {
+            throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "DATE_RANGE_INVALID",
+                    "detectedFrom must be on or before detectedTo.");
+        }
+        return repository.findAll(storeId, type, detectedFrom, detectedTo);
+    }
+
+    @Transactional
+    KphRecordResponse review(UUID storeId, UUID recordId, KphApprovalRequest request,
+            Authentication authentication) {
+        StoreContext store = storeAccess.requireStoreManager(storeId, authentication);
+        var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
+        var current = repository.lockReviewState(storeId, recordId)
+                .orElseThrow(() -> problem(HttpStatus.NOT_FOUND, "KPH_RECORD_NOT_FOUND",
+                        "The KPH record does not exist in this store."));
+        if (!"SUBMITTED".equals(current.lifecycleState())) {
+            throw problem(HttpStatus.CONFLICT, "KPH_RECORD_NOT_SUBMITTED",
+                    "Only a submitted KPH record can be reviewed.");
+        }
+        if (current.approvalStatus() == request.status()) {
+            return repository.findOne(store.id(), recordId).orElseThrow();
+        }
+        Instant reviewedAt = Instant.now(clock);
+        repository.updateReview(recordId, request.status(), principal.userId(), principal.user().displayName(), reviewedAt);
+        repository.insertApprovalHistory(recordId, current.approvalStatus(), request.status(), principal.userId(),
+                principal.user().displayName(), reviewedAt);
+        repository.insertApprovalAudit(principal.userId(), recordId, storeId, current.approvalStatus(),
+                request.status(), reviewedAt);
+        return repository.findOne(store.id(), recordId).orElseThrow();
+    }
+
+    @Transactional
+    KphExportResponse prepareExport(UUID storeId, KphExportRequest request, Authentication authentication) {
+        StoreContext store = storeAccess.requireStoreManager(storeId, authentication);
+        var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
+        if (new HashSet<>(request.recordIds()).size() != request.recordIds().size()) {
+            throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "EXPORT_SELECTION_DUPLICATE",
+                    "recordIds must not contain duplicates.");
+        }
+
+        List<KphRecordResponse> found = repository.findAllByIds(storeId, request.type(), request.recordIds());
+        if (found.size() != request.recordIds().size()) {
+            throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "EXPORT_SELECTION_INVALID",
+                    "Every selected record must belong to this store and requested type.");
+        }
+        Map<UUID, KphRecordResponse> recordsById = new HashMap<>();
+        for (KphRecordResponse record : found) {
+            if (!"SUBMITTED".equals(record.lifecycleState())
+                    || record.approvalStatus() != KphApprovalStatus.APPROVED) {
+                throw problem(HttpStatus.CONFLICT, "EXPORT_RECORD_NOT_APPROVED",
+                        "Every selected record must be submitted and approved before export.");
+            }
+            recordsById.put(record.id(), record);
+        }
+        List<KphRecordResponse> ordered = request.recordIds().stream().map(recordsById::get).toList();
+        UUID exportId = UUID.randomUUID();
+        Instant exportedAt = Instant.now(clock);
+        String metadata = objectMapper.writeValueAsString(Map.of(
+                "type", request.type().name(),
+                "recordCount", ordered.size(),
+                "recordIds", request.recordIds()));
+        repository.insertExportAudit(principal.userId(), exportId, storeId, metadata, exportedAt);
+        return new KphExportResponse(exportId, exportedAt,
+                new KphRecordResponse.StoreSnapshot(store.id(), store.code(), store.name()), ordered);
     }
 
     @Transactional(readOnly = true)

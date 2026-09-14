@@ -154,6 +154,20 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/KphType'
+        - name: detectedFrom
+          in: query
+          required: false
+          description: Inclusive lower bound of the KPH detected date.
+          schema:
+            type: string
+            format: date
+        - name: detectedTo
+          in: query
+          required: false
+          description: Inclusive upper bound of the KPH detected date. Must not precede detectedFrom.
+          schema:
+            type: string
+            format: date
       responses:
         '200':
           description: Store-scoped history, newest first.
@@ -163,12 +177,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KphRecord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
     post:
       tags: [KPH]
       operationId: createKphRecord
@@ -209,6 +225,87 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KphRecord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/stores/{storeId}/kph/{recordId}/approval:
+    put:
+      tags: [KPH]
+      operationId: reviewKphRecord
+      summary: Set the approval decision for one KPH record
+      description: |
+        Only a STORE_MANAGER with an active membership in this exact store may
+        review a record. Global CHAIN_ADMIN does not bypass store membership or
+        the STORE_MANAGER role. Every state change is appended to review history
+        and the audit trail; repeating the same decision is idempotent.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - name: recordId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KphApprovalRequest'
+      responses:
+        '200':
+          description: Current record including the persisted review decision.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KphRecord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/stores/{storeId}/kph/exports:
+    post:
+      tags: [KPH]
+      operationId: prepareKphExport
+      summary: Authorize and snapshot one online KPH Excel export
+      description: |
+        Only a STORE_MANAGER with active membership may export. All requested
+        records must belong to this store, share the requested type, remain
+        SUBMITTED and already be APPROVED. The response is the authoritative
+        ordered snapshot used by the Store PWA to build the workbook; the backend
+        records one audit event for the export selection.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KphExportRequest'
+      responses:
+        '200':
+          description: Authorized export snapshot in the same order as recordIds.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KphExportBundle'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -512,6 +609,54 @@ components:
       type: string
       enum: [SUBMITTED, INVALIDATED]
 
+    KphApprovalStatus:
+      type: string
+      enum: [PENDING, APPROVED, REJECTED]
+
+    KphApprovalRequest:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/KphApprovalStatus'
+
+    KphExportRequest:
+      type: object
+      additionalProperties: false
+      required: [type, recordIds]
+      properties:
+        type:
+          $ref: '#/components/schemas/KphType'
+        recordIds:
+          type: array
+          minItems: 1
+          maxItems: 500
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+
+    KphExportBundle:
+      type: object
+      additionalProperties: false
+      required: [exportId, exportedAt, store, records]
+      properties:
+        exportId:
+          type: string
+          format: uuid
+        exportedAt:
+          type: string
+          format: date-time
+        store:
+          $ref: '#/components/schemas/KphStoreSnapshot'
+        records:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/KphRecord'
+
     KphCreateRequest:
       type: object
       additionalProperties: false
@@ -614,6 +759,9 @@ components:
         - lookupStatus
         - catalogSnapshot
         - lifecycleState
+        - approvalStatus
+        - reviewedBy
+        - reviewedAt
         - store
         - detectedBy
         - photos
@@ -650,6 +798,15 @@ components:
           $ref: '#/components/schemas/KphCatalogSnapshot'
         lifecycleState:
           $ref: '#/components/schemas/KphLifecycleState'
+        approvalStatus:
+          $ref: '#/components/schemas/KphApprovalStatus'
+        reviewedBy:
+          oneOf:
+            - $ref: '#/components/schemas/ActorSnapshot'
+            - type: 'null'
+        reviewedAt:
+          type: [string, 'null']
+          format: date-time
         note:
           type: [string, 'null']
         store:

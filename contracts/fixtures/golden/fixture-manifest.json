@@ -17,6 +17,8 @@
     {"resource":"api/barcode-found.json","tracePrefix":"SCAN-"},
     {"resource":"api/barcode-not-found.json","tracePrefix":"SCAN-"},
     {"resource":"api/kph-record.json","tracePrefix":"KPH-"},
-    {"resource":"api/kph-create.json","tracePrefix":"KPH-"}
+    {"resource":"api/kph-create.json","tracePrefix":"KPH-"},
+    {"resource":"api/kph-approval.json","tracePrefix":"ID-"},
+    {"resource":"api/kph-export.json","tracePrefix":"XLSX-"}
   ]
 }

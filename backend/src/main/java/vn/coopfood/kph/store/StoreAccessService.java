@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import vn.coopfood.kph.foundation.web.ApiProblemException;
 import vn.coopfood.kph.identity.SessionPrincipal;
 import vn.coopfood.kph.identity.StoreContext;
+import vn.coopfood.kph.identity.StoreRole;
 
 @Service
 public class StoreAccessService {
@@ -27,5 +28,16 @@ public class StoreAccessService {
                         HttpStatus.FORBIDDEN,
                         "STORE_ACCESS_DENIED",
                         "The current user is not an active member of this store."));
+    }
+
+    public StoreContext requireStoreManager(UUID storeId, Authentication authentication) {
+        StoreContext store = requireMembership(storeId, authentication);
+        if (store.role() != StoreRole.STORE_MANAGER) {
+            throw new ApiProblemException(
+                    HttpStatus.FORBIDDEN,
+                    "STORE_MANAGER_REQUIRED",
+                    "An active STORE_MANAGER membership is required for this store.");
+        }
+        return store;
     }
 }

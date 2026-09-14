@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -248,6 +249,104 @@ class KphHttpIntegrationTest {
                         get("/api/v1/stores/{storeId}/kph", STORE_ID).session(login.session()))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray()).get(0);
         assertThat(reloaded).isEqualTo(body);
+    }
+
+    @Test
+    void filtersDetectedDateInclusivelyAndRejectsAnInvertedRange() throws Exception {
+        Login login = login();
+        MvcResult created = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .file(payload(null, "Dated product"))
+                        .file(new MockMultipartFile("photos", "evidence.jpg", "image/jpeg", jpeg(12, 12)))
+                        .session(login.session()).header("X-CSRF-TOKEN", login.csrfToken())
+                        .header("Idempotency-Key", "kph-date-filter-0001"))
+                .andExpect(status().isCreated()).andReturn();
+        UUID recordId = UUID.fromString(objectMapper.readTree(created.getResponse().getContentAsByteArray()).path("id").asText());
+        database.execute("UPDATE kph_records SET detected_date = DATE '2026-09-01' WHERE id = ?", recordId);
+
+        JsonNode included = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("detectedFrom", "2026-09-01")
+                        .queryParam("detectedTo", "2026-09-01")
+                        .session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+        assertThat(included).hasSize(1);
+        assertThat(included.get(0).path("id").asText()).isEqualTo(recordId.toString());
+
+        JsonNode excluded = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("detectedFrom", "2026-09-02")
+                        .session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+        assertThat(excluded).isEmpty();
+
+        MvcResult inverted = mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("detectedFrom", "2026-09-03")
+                        .queryParam("detectedTo", "2026-09-02")
+                        .session(login.session()))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+        assertThat(objectMapper.readTree(inverted.getResponse().getContentAsByteArray()).path("code").asText())
+                .isEqualTo("DATE_RANGE_INVALID");
+    }
+
+    @Test
+    void managerReviewsAndExportsApprovedRecordsWithAuditWhileEmployeeCannot() throws Exception {
+        Login employee = login();
+        MvcResult created = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .file(payload(null, "Review product"))
+                        .file(new MockMultipartFile("photos", "evidence.jpg", "image/jpeg", jpeg(12, 12)))
+                        .session(employee.session()).header("X-CSRF-TOKEN", employee.csrfToken())
+                        .header("Idempotency-Key", "kph-online-review-0001"))
+                .andExpect(status().isCreated()).andReturn();
+        String recordId = objectMapper.readTree(created.getResponse().getContentAsByteArray()).path("id").asText();
+        String approvalBody = "{\"status\":\"APPROVED\"}";
+        String exportBody = "{\"type\":\"TPCN\",\"recordIds\":[\"" + recordId + "\"]}";
+
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
+                        .contentType(MediaType.APPLICATION_JSON).content(approvalBody)
+                        .session(employee.session()).header("X-CSRF-TOKEN", employee.csrfToken()))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportBody)
+                        .session(employee.session()).header("X-CSRF-TOKEN", employee.csrfToken()))
+                .andExpect(status().isForbidden());
+
+        database.execute("UPDATE store_memberships SET role = 'STORE_MANAGER' WHERE user_id = ? AND store_id = ?",
+                USER_ID, STORE_ID);
+        Login manager = login();
+        MvcResult pendingExport = mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isConflict()).andReturn();
+        assertThat(objectMapper.readTree(pendingExport.getResponse().getContentAsByteArray()).path("code").asText())
+                .isEqualTo("EXPORT_RECORD_NOT_APPROVED");
+        MvcResult reviewed = mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
+                        .contentType(MediaType.APPLICATION_JSON).content(approvalBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andReturn();
+        assertThat(reviewed.getResponse().getStatus())
+                .withFailMessage(reviewed.getResponse().getContentAsString())
+                .isEqualTo(200);
+        JsonNode reviewedBody = objectMapper.readTree(reviewed.getResponse().getContentAsByteArray());
+        assertThat(reviewedBody.path("approvalStatus").asText()).isEqualTo("APPROVED");
+        assertThat(reviewedBody.path("reviewedBy").path("displayName").asText()).isEqualTo("KPH Demo");
+        assertThat(Instant.parse(reviewedBody.path("reviewedAt").asText())).isEqualTo(NOW);
+
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
+                        .contentType(MediaType.APPLICATION_JSON).content(approvalBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isOk());
+        assertThat(database.fetchOne("SELECT count(*) AS total FROM kph_approval_history").get("total", Integer.class))
+                .isEqualTo(1);
+        assertThat(database.fetch("SELECT id FROM audit_events WHERE action = 'KPH_REVIEWED'")).hasSize(1);
+
+        MvcResult exported = mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isOk()).andReturn();
+        JsonNode export = objectMapper.readTree(exported.getResponse().getContentAsByteArray());
+        assertThat(export.path("store").path("id").asText()).isEqualTo(STORE_ID.toString());
+        assertThat(export.path("records")).hasSize(1);
+        assertThat(export.path("records").get(0).path("id").asText()).isEqualTo(recordId);
+        assertThat(Instant.parse(export.path("exportedAt").asText())).isEqualTo(NOW);
+        assertThat(database.fetch("SELECT metadata FROM audit_events WHERE action = 'KPH_EXPORTED'")).hasSize(1);
     }
 
     @Test

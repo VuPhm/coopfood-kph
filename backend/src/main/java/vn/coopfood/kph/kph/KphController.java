@@ -1,5 +1,6 @@
 package vn.coopfood.kph.kph;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,12 +14,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.Valid;
 
@@ -35,8 +39,10 @@ class KphController {
 
     @GetMapping
     List<KphRecordResponse> list(@PathVariable UUID storeId, @RequestParam(required = false) KphType type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate detectedFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate detectedTo,
             Authentication authentication) {
-        return service.list(storeId, type, authentication);
+        return service.list(storeId, type, detectedFrom, detectedTo, authentication);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -47,6 +53,18 @@ class KphController {
             Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.create(storeId, payload, photos, idempotencyKey, authentication));
+    }
+
+    @PutMapping("/{recordId}/approval")
+    KphRecordResponse review(@PathVariable UUID storeId, @PathVariable UUID recordId,
+            @Valid @RequestBody KphApprovalRequest request, Authentication authentication) {
+        return service.review(storeId, recordId, request, authentication);
+    }
+
+    @PostMapping("/exports")
+    KphExportResponse prepareExport(@PathVariable UUID storeId,
+            @Valid @RequestBody KphExportRequest request, Authentication authentication) {
+        return service.prepareExport(storeId, request, authentication);
     }
 
     @GetMapping("/{recordId}/photos/{ordinal}")

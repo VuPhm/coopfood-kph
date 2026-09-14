@@ -255,6 +255,16 @@ html[data-focus-modality="keyboard"] .trash-mode-toggle:focus { outline: 2px sol
 .trash-mode-toggle:active svg { transform: rotate(-12deg); }
 .history-board.is-trash-mode .history-title { color: var(--color-danger); }
 .history-board.is-trash-mode .history-total-count { background: var(--color-danger); }
+.history-date-filter { display: grid; grid-template-columns: minmax(10.5rem, 13rem) minmax(10.5rem, 13rem) auto; align-items: end; gap: var(--space-2); border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-surface-muted); padding: var(--space-2-5); }
+.history-date-field { display: grid; min-width: 0; gap: var(--space-1); color: var(--color-ink-muted); font-size: .6875rem; font-weight: 850; }
+.history-date-field input { min-height: 2.75rem; background: #fff; font-size: .8125rem; }
+.history-date-actions { display: flex; min-height: 2.75rem; align-items: center; gap: var(--space-2); }
+.history-date-actions > button { min-height: 2.75rem; white-space: nowrap; }
+.history-date-clear { border: 0; border-radius: 9px; background: transparent; padding-inline: var(--space-2); color: var(--color-brand); font-size: .75rem; font-weight: 850; }
+.history-date-clear:hover:not(:disabled) { background: var(--color-brand-soft); }
+.history-date-clear:disabled { color: var(--color-ink-muted); opacity: .45; }
+html[data-focus-modality="keyboard"] .history-date-clear:focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.history-date-error { grid-column: 1 / -1; margin: 0; color: var(--color-danger); font-size: .75rem; font-weight: 750; }
 .history-controls-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; }
 .history-controls-trigger { position: relative; display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 1px solid var(--color-border); border-radius: 10px; background: #fff; color: var(--color-ink-muted); transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease; }
 .history-controls-mobile { display: none; }
@@ -329,12 +339,14 @@ html[data-focus-modality="keyboard"] .history-tab:focus { outline: 2px solid var
 .history-action-buttons { display: flex; align-items: center; gap: var(--space-1-5); }
 .history-selection-slot { display: flex; align-items: center; }
 .history-action-tools { display: flex; align-items: center; gap: var(--space-1-5); }
+.history-action-tools.is-online { grid-template-columns: minmax(0, 1fr); }
 .selection-count { display: inline-flex; min-height: 2.75rem; min-width: 8.75rem; align-items: center; justify-content: center; gap: var(--space-1); border: 1px solid var(--color-border); border-radius: 12px; background: #fff; padding: 0 var(--space-3); color: var(--color-ink-muted); font-size: .75rem; font-weight: 700; white-space: nowrap; animation: fade-enter var(--motion-ui) ease both; transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease, color var(--motion-fast) ease, box-shadow var(--motion-fast) ease; }
 .selection-count strong { color: var(--color-brand); }
 .selection-approve { border: 0; background: var(--color-orange); color: #fff; font-weight: 850; cursor: pointer; box-shadow: 0 3px 10px rgb(242 146 0 / .28); transition: background-color 150ms ease, transform 150ms ease, box-shadow 150ms ease; }
 .selection-approve strong { color: #fff; }
 .selection-approve:hover { background: #dc8400; box-shadow: 0 6px 16px rgb(242 146 0 / .35); }
 .selection-approve:active { transform: translateY(1px); background: #c57600; }
+.selection-approve:disabled, .selection-approve:disabled:hover, .selection-approve:disabled:active { transform: none; background: var(--color-orange); cursor: wait; opacity: .65; box-shadow: none; }
 html[data-focus-modality="keyboard"] .selection-approve:focus { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .history-list-controls { display: none; }
 .select-all-history { display: none; }
@@ -653,6 +665,9 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
   .workspace-create small { font-size: .6875rem; }
   .workspace-create svg { width: 1rem; height: 1rem; }
   .history-board { --panel-inset: var(--space-4); gap: var(--space-5); padding: var(--panel-inset); border-radius: 20px; padding-bottom: 6rem; }
+  .history-date-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
+  .history-date-actions { grid-column: 1 / -1; }
+  .history-date-actions > button:first-child { flex: 1 1 auto; }
   .history-controls-row { display: flex; flex-direction: column; width: 100%; align-items: stretch; gap: var(--space-2); }
   .history-controls-mobile { display: inline-grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 0; border-radius: 0; background: transparent; padding: 0; color: var(--color-ink-muted); }
   .history-controls-mobile:hover, .history-controls-mobile.is-active { border: 0; background: transparent; color: var(--color-brand); }
@@ -666,6 +681,7 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
   html[data-focus-modality="keyboard"] .expand-all-mobile:focus { outline: 3px solid var(--color-focus); outline-offset: 2px; }
   .history-action-buttons { display: grid; width: 100%; gap: var(--space-1-5); padding-inline: var(--space-3); }
   .history-action-tools { display: grid; width: 100%; grid-template-columns: minmax(0, 1fr) 2.25rem; gap: var(--space-1-5); align-items: center; }
+  .history-action-tools.is-online { grid-template-columns: minmax(0, 1fr); }
   .history-export { width: 100%; min-height: 2.25rem; height: 2.25rem; border-radius: 10px; padding-inline: .75rem; justify-content: center; white-space: nowrap; font-size: .75rem; }
   .history-delete { width: 2.25rem; min-width: 2.25rem; min-height: 2.25rem; height: 2.25rem; justify-content: center; padding: 0; }
   .history-delete-label { display: none; }
@@ -833,6 +849,8 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
 }
 
 @media (max-width: 480px) {
+  .history-date-filter { grid-template-columns: minmax(0, 1fr); }
+  .history-date-actions { grid-column: 1; }
   .expiry-calendar { width: min(20rem, calc(100vw - 2rem)); max-width: calc(100vw - 2rem); }
   .expiry-result-summary { padding: var(--space-3); gap: var(--space-2-5); }
   .expiry-result-icon { width: 3.25rem; height: 3.25rem; }

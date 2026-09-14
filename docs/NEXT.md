@@ -122,9 +122,20 @@ cho phép public PR và yêu cầu chốt. Xem
 Foundation-01 đã đóng. Không còn milestone active và không tự mở production
 rollout hay feature mới từ danh sách hoãn.
 
-## Chưa mở — milestone kế tiếp
+## Active — Foundation-02 — duyệt, xuất online và lọc ngày
 
-Owner cần chọn outcome riêng trước khi bắt đầu. Các candidate hiện có gồm
-approve/export online cho `STORE_MANAGER`; catalog/provisioning Admin Web; hoặc
-production readiness gồm hosting, PostgreSQL/object storage, retention và SSO/MFA.
-Không gộp các candidate này thành một milestone mặc định.
+Owner xác nhận mở cycle ngày 2026-09-15 và yêu cầu bổ sung lọc theo ngày khi xem
+phiếu. Phạm vi/gate nằm tại
+[plan](delivery/foundation-02-online-review-export/plan.json).
+
+- Khóa OpenAPI/examples/generated client cho query ngày, approval và export.
+- Migration V5 giữ approval state/reviewer snapshot/history; backend revalidate
+  manager membership, ghi audit và khóa snapshot export trong transaction.
+- Store PWA dùng `dd/mm/yyyy`, báo lỗi khoảng ngược cạnh field; EMPLOYEE không
+  thấy action duyệt/xuất, manager chỉ xuất selection đã duyệt.
+- Chạy Contract Lock, frontend tests/build, backend full Testcontainers từ
+  database sạch và browser E2E desktop/mobile; sau đó bàn giao owner test.
+
+Ngoài cycle: production infra, offline sync, Admin catalog/provisioning, edit,
+xóa/invalidate và approval time window. Sau khi owner chấp nhận Foundation-02
+mới đóng record; không tự mở candidate tiếp theo.

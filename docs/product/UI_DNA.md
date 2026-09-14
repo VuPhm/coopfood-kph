@@ -160,6 +160,10 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   heading vùng và choice-card được compact, choice chưa chọn không tô nền.
 - Filter chạy trước sort, count tổng phản ánh tập đang hiển thị và thay filter
   phải xóa selection để không giữ thao tác trên dòng đã bị ẩn.
+- Khoảng ngày phát hiện đặt ngay trên tab/danh sách, dùng hai field có label rõ
+  “Từ ngày”/“Đến ngày”, nhập và hiển thị `dd/mm/yyyy`. Chỉ áp dụng khi bấm
+  “Lọc ngày”; một đầu có thể để trống, hai đầu tính inclusive, khoảng ngược báo
+  lỗi tại cụm filter. “Xóa lọc” đưa danh sách về toàn bộ scope hiện tại.
 - Mobile: card có checkbox/ngày/SKU ở header; tên/số lượng, ảnh, tình trạng và
   biện pháp nằm kế nhau; footer chỉ giữ trạng thái duyệt.
 - Mobile mặc định dùng card compact giữ nguyên header sản phẩm và footer tình
@@ -183,9 +187,11 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   accessible name nhưng ẩn nhãn hiển thị. Các toolbar không bọc thêm panel nhiều
   lớp, dùng nhịp dọc tối thiểu và không phóng lớn theo card.
 - Trạng thái duyệt có ba giá trị “Chờ duyệt”, “Đã duyệt”, “Không duyệt”. UI demo
-  cho phép thao tác; backend sau này chỉ cho `STORE_MANAGER` đúng membership.
+  cho phép thao tác; online chỉ cho `STORE_MANAGER` đúng membership, còn
+  `EMPLOYEE` chỉ xem/tạo và `CHAIN_ADMIN` không bypass.
 - Export chỉ bật khi có selection; “chọn tất cả” áp dụng trong loại phiếu hiện
-  hành, không xuyên tab. Store PWA không hiển thị xóa/vô hiệu hóa cho CHT.
+  hành, không xuyên tab. Online chỉ bật export khi toàn bộ selection đã duyệt;
+  Store PWA không hiển thị xóa/vô hiệu hóa cho CHT.
 - Empty state nói rõ dữ liệu “trong phiên”. Hệ thống mới phải đổi copy/state cho
   dữ liệu server/offline nhưng giữ khả năng hiểu ngay phạm vi danh sách.
 

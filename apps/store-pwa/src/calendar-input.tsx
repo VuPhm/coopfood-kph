@@ -24,6 +24,7 @@ function firstDayOfMonth(value: LocalDate): LocalDate {
 }
 
 type CalendarInputProps = {
+  ariaDescribedBy?: string;
   id: string;
   initialMonth: LocalDate;
   label: string;
@@ -34,7 +35,7 @@ type CalendarInputProps = {
 
 type CalendarPosition = Pick<CSSProperties, "left" | "top">;
 
-export function CalendarInput({ id, initialMonth, label, onValueChange, readOnly, value }: CalendarInputProps) {
+export function CalendarInput({ ariaDescribedBy, id, initialMonth, label, onValueChange, readOnly, value }: CalendarInputProps) {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<LocalDate>(firstDayOfMonth(initialMonth));
   const [position, setPosition] = useState<CalendarPosition | null>(null);
@@ -120,6 +121,7 @@ export function CalendarInput({ id, initialMonth, label, onValueChange, readOnly
         placeholder="dd/mm/yyyy"
         readOnly={readOnly}
         aria-readonly={readOnly}
+        aria-describedby={ariaDescribedBy}
         className={cn("pr-12 tabular-nums", readOnly && "text-ink-muted")}
       />
       <button

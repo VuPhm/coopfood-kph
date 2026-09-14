@@ -1,4 +1,4 @@
-import type { KphKind } from "@coopfood-kph/kph-rules";
+import { parseDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
 import { AlertTriangle, ArrowDown, ArrowUp, ChevronDown, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Trash2 } from "lucide-react";
@@ -6,6 +6,7 @@ import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useSta
 
 import { assetUrl } from "./asset-url";
 import { formatBusinessDate } from "./business-date";
+import { CalendarInput } from "./calendar-input";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
 import { DEMO_RECORDS } from "./demo-records";
 import { approvalLabels, type ApprovalStatus, type EvidencePhotoView, type RecordView } from "./record-view";
@@ -171,6 +172,11 @@ function WorkspaceApp() {
   const [expandedMobileRecords, setExpandedMobileRecords] = useState<ReadonlySet<string>>(new Set());
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
+  const [reviewingIds, setReviewingIds] = useState<ReadonlySet<string>>(new Set());
+  const [dateFromInput, setDateFromInput] = useState("");
+  const [dateToInput, setDateToInput] = useState("");
+  const [dateFilter, setDateFilter] = useState<{ detectedFrom?: LocalDate; detectedTo?: LocalDate }>({});
+  const [dateFilterError, setDateFilterError] = useState("");
   const [notice, setNotice] = useState("");
   const [deletedIds, setDeletedIds] = useState<ReadonlySet<string>>(new Set());
   const [deleteIds, setDeleteIds] = useState<readonly string[]>([]);
@@ -205,10 +211,10 @@ function WorkspaceApp() {
   const derivedOnlineSession = supportsIdentityApi ? sessionQuery.data : legacyWorkspaceQuery.data?.session;
   const onlineSession = onlineAuthRequired ? undefined : derivedOnlineSession;
   const onlineStores = onlineSession?.user.stores ?? [];
-  const onlineHistoryKey = ["online", "history", onlineSession?.user.id ?? "anonymous", onlineStoreId ?? "none"] as const;
+  const onlineHistoryKey = ["online", "history", onlineSession?.user.id ?? "anonymous", onlineStoreId ?? "none", dateFilter.detectedFrom ?? "", dateFilter.detectedTo ?? ""] as const;
   const onlineHistoryQuery = useQuery<readonly RecordView[]>({
     queryKey: onlineHistoryKey,
-    queryFn: ({ signal }) => onlineCapabilities?.loadHistory?.(onlineStoreId!, signal) ?? Promise.reject(new Error("Gateway lịch sử chưa sẵn sàng.")),
+    queryFn: ({ signal }) => onlineCapabilities?.loadHistory?.(onlineStoreId!, dateFilter, signal) ?? Promise.reject(new Error("Gateway lịch sử chưa sẵn sàng.")),
     enabled: onlinePersistenceEnabled && supportsIdentityApi && !onlineAuthRequired && Boolean(onlineSession && onlineStoreId),
     retry: false,
   });
@@ -250,9 +256,13 @@ function WorkspaceApp() {
   });
   const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
-    const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
+    const scopedRecords = records.filter(({ kind, id, approvalStatus, detectedDate }) => {
       const hasExpectedDeletionState = trashMode ? deletedIds.has(id) : !deletedIds.has(id);
-      return kind === activeKind && hasExpectedDeletionState && (approvalFilter === "ALL" || approvalStatus === approvalFilter);
+      const detected = detectedDateValue(detectedDate);
+      const afterStart = !dateFilter.detectedFrom || detected >= dateFilter.detectedFrom.replaceAll("-", "");
+      const beforeEnd = !dateFilter.detectedTo || detected <= dateFilter.detectedTo.replaceAll("-", "");
+      return kind === activeKind && hasExpectedDeletionState && afterStart && beforeEnd
+        && (approvalFilter === "ALL" || approvalStatus === approvalFilter);
     });
 
     if (!recordSort) return scopedRecords;
@@ -265,7 +275,7 @@ function WorkspaceApp() {
         : recordCollator.compare(String(leftValue), String(rightValue));
       return recordSort.direction === "ascending" ? comparison : -comparison;
     });
-  }, [activeKind, approvalFilter, deletedIds, recordSort, records, trashMode]);
+  }, [activeKind, approvalFilter, dateFilter, deletedIds, recordSort, records, trashMode]);
   const selectedRecords = useMemo(
     () => records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
     [activeKind, deletedIds, records, selected, trashMode],
@@ -273,6 +283,11 @@ function WorkspaceApp() {
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
   const storeConfigured = onlinePersistenceEnabled ? onlineStoreId !== null : isStoreProfileConfigured(storeProfile);
+  const selectedOnlineStore = onlineStores.find(({ id }) => id === onlineStoreId);
+  const canManageOnline = selectedOnlineStore?.role === "STORE_MANAGER";
+  const selectedRecordsAreExportable = selectedRecords.length > 0
+    && selectedRecords.every(({ approvalStatus }) => approvalStatus === "APPROVED");
+  const filterInitialMonth = formatBusinessDate(new Date()).iso as LocalDate;
   const storageWarning = storageReady ? storageHealthWarning(storageHealth) : null;
 
   useEffect(() => () => {
@@ -408,19 +423,16 @@ function WorkspaceApp() {
     setOnlineStoreId(storeId);
     setRecords([]);
     setSelected(new Set());
+    setReviewingIds(new Set());
     setExpandedMobileRecords(new Set());
     setApprovalFilter("ALL");
     setRecordSort(null);
   }
 
   function openExport() {
-    if (onlinePersistenceEnabled) {
-      setNotice("Xuất Excel online chưa nằm trong Foundation-01.");
-      return;
-    }
     if (!storeConfigured) {
-      setNotice("Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
-      setStoreSettingsOpen(true);
+      setNotice(onlinePersistenceEnabled ? "Không có cửa hàng hợp lệ để xuất Excel." : "Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
+      if (!onlinePersistenceEnabled) setStoreSettingsOpen(true);
       return;
     }
     setExportError("");
@@ -484,6 +496,33 @@ function WorkspaceApp() {
     setSelected(new Set());
   }
 
+  function applyDateFilter() {
+    try {
+      const detectedFrom = dateFromInput.trim() ? parseDisplayDate(dateFromInput) : undefined;
+      const detectedTo = dateToInput.trim() ? parseDisplayDate(dateToInput) : undefined;
+      if (detectedFrom && detectedTo && detectedFrom > detectedTo) {
+        setDateFilterError("Từ ngày không được sau đến ngày.");
+        return;
+      }
+      setDateFilter({
+        ...(detectedFrom ? { detectedFrom } : {}),
+        ...(detectedTo ? { detectedTo } : {}),
+      });
+      setDateFilterError("");
+      setSelected(new Set());
+    } catch {
+      setDateFilterError("Nhập ngày hợp lệ theo định dạng dd/mm/yyyy.");
+    }
+  }
+
+  function clearDateFilter() {
+    setDateFromInput("");
+    setDateToInput("");
+    setDateFilter({});
+    setDateFilterError("");
+    setSelected(new Set());
+  }
+
   function toggleRecordSort(key: RecordSortKey) {
     setRecordSort((current) => current?.key === key
       ? { key, direction: current.direction === "ascending" ? "descending" : "ascending" }
@@ -500,14 +539,30 @@ function WorkspaceApp() {
 
   async function updateApproval(recordId: string, status: ApprovalStatus) {
     if (onlinePersistenceEnabled) {
-      setNotice("Luồng duyệt phiếu online chưa nằm trong Foundation-01.");
+      if (!canManageOnline || !onlineStoreId || !onlineCapabilities?.reviewRecord) return;
+      setReviewingIds((current) => new Set([...current, recordId]));
+      try {
+        const reviewed = await onlineCapabilities.reviewRecord(onlineStoreId, recordId, status);
+        setRecords((current) => current.map((record) => record.id === recordId ? reviewed : record));
+        queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => current?.map((record) => record.id === recordId ? reviewed : record));
+        setSelected((current) => new Set([...current].filter((id) => id !== recordId)));
+        setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” trên máy chủ.`);
+      } catch (error) {
+        if (isSessionExpiryError(error)) expireOnlineSession(error);
+        else setNotice(error instanceof Error ? error.message : "Không thể cập nhật trạng thái duyệt trên máy chủ");
+      } finally {
+        setReviewingIds((current) => new Set([...current].filter((id) => id !== recordId)));
+      }
       return;
     }
+    setReviewingIds((current) => new Set([...current, recordId]));
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords([recordId], { approvalStatus: status });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Không thể lưu trạng thái duyệt trên thiết bị");
       return;
+    } finally {
+      setReviewingIds((current) => new Set([...current].filter((id) => id !== recordId)));
     }
     setSelected((current) => {
       const next = new Set(current);
@@ -520,15 +575,34 @@ function WorkspaceApp() {
 
   async function approveSelected() {
     if (onlinePersistenceEnabled) {
-      setNotice("Luồng duyệt phiếu online chưa nằm trong Foundation-01.");
+      if (!canManageOnline || !onlineStoreId || !onlineCapabilities?.reviewRecord) return;
+      const recordIds = [...selected];
+      setReviewingIds(new Set(recordIds));
+      try {
+        const reviewedRecords = await Promise.all(recordIds.map((recordId) => onlineCapabilities.reviewRecord!(onlineStoreId, recordId, "APPROVED")));
+        const byId = new Map(reviewedRecords.map((record) => [record.id, record]));
+        setRecords((current) => current.map((record) => byId.get(record.id) ?? record));
+        queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => current?.map((record) => byId.get(record.id) ?? record));
+        setNotice(`Đã duyệt ${recordIds.length} phiếu trên máy chủ.`);
+        setSelected(new Set());
+      } catch (error) {
+        void queryClient.invalidateQueries({ queryKey: ["online", "history"] });
+        if (isSessionExpiryError(error)) expireOnlineSession(error);
+        else setNotice(error instanceof Error ? error.message : "Không thể duyệt các phiếu đã chọn");
+      } finally {
+        setReviewingIds(new Set());
+      }
       return;
     }
     const recordIds = [...selected];
+    setReviewingIds(new Set(recordIds));
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords(recordIds, { approvalStatus: "APPROVED" });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Không thể lưu trạng thái duyệt trên thiết bị");
       return;
+    } finally {
+      setReviewingIds(new Set());
     }
     setRecords((current) => current.map((record) => recordIds.includes(record.id) ? { ...record, approvalStatus: "APPROVED" } : record));
     setNotice(`Đã duyệt ${recordIds.length} phiếu ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
@@ -673,7 +747,6 @@ function WorkspaceApp() {
   }
 
   async function exportSelected() {
-    if (onlinePersistenceEnabled) return;
     if (!selectedRecords.length) return;
     if (!storeConfigured) {
       setExportOpen(false);
@@ -684,11 +757,23 @@ function WorkspaceApp() {
     setExporting(true);
     setExportError("");
     try {
-      const fileName = await downloadKphWorkbook(activeKind, selectedRecords, storeProfile);
+      let exportRecords = selectedRecords;
+      if (onlinePersistenceEnabled) {
+        if (!onlineStoreId || !onlineCapabilities?.prepareExport) {
+          throw new Error("Gateway xuất Excel online chưa sẵn sàng.");
+        }
+        exportRecords = (await onlineCapabilities.prepareExport(
+          onlineStoreId,
+          activeKind,
+          selectedRecords.map(({ id }) => id),
+        )).records;
+      }
+      const fileName = await downloadKphWorkbook(activeKind, exportRecords, storeProfile);
       if (pilotPersistenceEnabled) await recordPilotExport(activeKind, selectedRecords, fileName);
       setExportOpen(false);
-      setNotice(`Đã tạo file Excel gồm ${selectedRecords.length} phiếu ${kindCopy[activeKind].short}; hãy gửi file này cho CHT.`);
+      setNotice(`Đã tạo file Excel gồm ${exportRecords.length} phiếu ${kindCopy[activeKind].short}; hãy gửi file này cho CHT.`);
     } catch (error) {
+      if (isSessionExpiryError(error)) expireOnlineSession(error);
       setExportError(error instanceof Error ? error.message : "Không thể xuất file Excel");
     } finally {
       setExporting(false);
@@ -717,8 +802,8 @@ function WorkspaceApp() {
     : storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…";
 
   const recordActions: RecordActions | undefined = onlinePersistenceEnabled
-    ? undefined
-    : { approve: updateApproval, remove: requestDelete, restore: restoreRecord };
+    ? canManageOnline ? { approve: updateApproval, busyIds: reviewingIds } : undefined
+    : { approve: updateApproval, busyIds: reviewingIds, remove: requestDelete, restore: restoreRecord };
   const workspaceError = logoutMutation.isError && !isSessionExpiryError(logoutMutation.error)
     ? "Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại."
     : storageError;
@@ -811,6 +896,22 @@ function WorkspaceApp() {
               </div>
             </div>
 
+            <form className="history-date-filter" aria-label="Lọc phiếu theo ngày phát hiện" onSubmit={(event) => { event.preventDefault(); applyDateFilter(); }}>
+              <label className="history-date-field" htmlFor="history-date-from">
+                <span>Từ ngày</span>
+                <CalendarInput {...(dateFilterError ? { ariaDescribedBy: "history-date-error" } : {})} id="history-date-from" initialMonth={filterInitialMonth} label="Từ ngày phát hiện" value={dateFromInput} onValueChange={setDateFromInput} />
+              </label>
+              <label className="history-date-field" htmlFor="history-date-to">
+                <span>Đến ngày</span>
+                <CalendarInput {...(dateFilterError ? { ariaDescribedBy: "history-date-error" } : {})} id="history-date-to" initialMonth={filterInitialMonth} label="Đến ngày phát hiện" value={dateToInput} onValueChange={setDateToInput} />
+              </label>
+              <div className="history-date-actions">
+                <Button type="submit" variant="ghost">Lọc ngày</Button>
+                <button type="button" className="history-date-clear" disabled={!dateFromInput && !dateToInput && !dateFilter.detectedFrom && !dateFilter.detectedTo} onClick={clearDateFilter}>Xóa lọc</button>
+              </div>
+              {dateFilterError ? <p id="history-date-error" className="history-date-error" role="alert">{dateFilterError}</p> : null}
+            </form>
+
             <div className="history-controls-row">
               <div className="history-tabs" role="tablist" aria-label="Loại phiếu">
                 {kphKinds.map((kind) => {
@@ -843,19 +944,19 @@ function WorkspaceApp() {
                 </div>
                 <div className="history-action-buttons">
                   <div className="history-selection-slot">
-                    {selected.size > 0 && !onlinePersistenceEnabled
+                    {selected.size > 0 && (!onlinePersistenceEnabled || canManageOnline)
                       ? trashMode
                         ? <button type="button" className="selection-count selection-approve selection-restore" onClick={restoreSelected}>Khôi phục <strong>{selected.size}</strong> phiếu</button>
-                        : <button type="button" className="selection-count selection-approve" onClick={approveSelected}>Duyệt <strong>{selected.size}</strong> phiếu</button>
+                        : <button type="button" className="selection-count selection-approve" disabled={reviewingIds.size > 0} onClick={approveSelected}>{reviewingIds.size > 0 ? "Đang duyệt…" : <>Duyệt <strong>{selected.size}</strong> phiếu</>}</button>
                       : <span className="selection-count" aria-live="polite">Đã chọn <strong>{selected.size}</strong></span>}
                     <label className="select-all-history" aria-label="Chọn tất cả phiếu" title="Chọn tất cả">
                       <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
                     </label>
                   </div>
-                  {selected.size > 0 && !onlinePersistenceEnabled ? (
-                    <div className="history-action-tools">
-                      <Button variant="primary" className="history-export" aria-label="Xuất Excel" onClick={openExport}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
-                      <Button variant="ghost" className="history-delete" aria-label="Xóa phiếu đã chọn" title={trashMode ? "Không thể xoá vĩnh viễn" : "Chuyển sang trạng thái đã xoá"} disabled={trashMode} onClick={requestDeleteSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-delete-label">Xóa</span></Button>
+                  {selected.size > 0 && (!onlinePersistenceEnabled || canManageOnline) ? (
+                    <div className={cn("history-action-tools", onlinePersistenceEnabled && "is-online")}>
+                      <Button variant="primary" className="history-export" aria-label="Xuất Excel" title={onlinePersistenceEnabled && !selectedRecordsAreExportable ? "Chỉ xuất các phiếu đã duyệt" : "Xuất Excel"} disabled={onlinePersistenceEnabled && !selectedRecordsAreExportable} onClick={openExport}><FileDown size={17} aria-hidden="true" /><span className="history-export-label">Xuất Excel</span></Button>
+                      {!onlinePersistenceEnabled ? <Button variant="ghost" className="history-delete" aria-label="Xóa phiếu đã chọn" title={trashMode ? "Không thể xoá vĩnh viễn" : "Chuyển sang trạng thái đã xoá"} disabled={trashMode} onClick={requestDeleteSelected}><Trash2 size={17} aria-hidden="true" /><span className="history-delete-label">Xóa</span></Button> : null}
                     </div>
                   ) : null}
                 </div>
@@ -915,7 +1016,7 @@ function WorkspaceApp() {
       />
       {!onlinePersistenceEnabled ? <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} /> : null}
 
-      {!onlinePersistenceEnabled ? <>
+      {!onlinePersistenceEnabled ?
         <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>
           <DialogContent className="action-dialog" aria-describedby="delete-description">
             <div className="action-dialog-icon is-danger"><AlertTriangle aria-hidden="true" /></div>
@@ -929,7 +1030,8 @@ function WorkspaceApp() {
             </div>
           </DialogContent>
         </Dialog>
-
+      : null}
+      {!onlinePersistenceEnabled || canManageOnline ?
         <Dialog open={exportOpen} onOpenChange={(open) => { if (!exporting) { setExportOpen(open); if (!open) setExportError(""); } }}>
           <DialogContent className="action-dialog export-dialog" aria-describedby="export-description">
             <div className="action-dialog-icon is-export"><FileSpreadsheet aria-hidden="true" /></div>
@@ -946,13 +1048,13 @@ function WorkspaceApp() {
             {exportError ? <p className="action-dialog-error" role="alert">{exportError}</p> : null}
             <div className="action-dialog-actions">
               <Button type="button" variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button>
-              <Button type="button" disabled={exporting || selectedRecords.length === 0 || !storeConfigured} onClick={exportSelected}>
+              <Button type="button" disabled={exporting || selectedRecords.length === 0 || !storeConfigured || (onlinePersistenceEnabled && !selectedRecordsAreExportable)} onClick={exportSelected}>
                 {exporting ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang xuất…</> : <><FileDown size={17} aria-hidden="true" />Xuất {selectedRecords.length} dòng</>}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
-      </> : null}
+      : null}
       {notice ? <button type="button" className="notice-toast fixed bottom-20 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-xl" onClick={() => setNotice("")}>{notice}</button> : null}
       <PwaStatus />
     </div>

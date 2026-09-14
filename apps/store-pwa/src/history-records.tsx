@@ -7,9 +7,10 @@ import { EvidenceImageViewer } from "./image-viewer";
 import { approvalLabels, type ApprovalStatus, type EvidencePhotoView, type RecordView } from "./record-view";
 
 export type RecordActions = {
-  approve: (id: string, status: ApprovalStatus) => void;
-  remove: (id: string) => void;
-  restore: (id: string) => void;
+  approve?: (id: string, status: ApprovalStatus) => void | Promise<void>;
+  busyIds?: ReadonlySet<string>;
+  remove?: (id: string) => void;
+  restore?: (id: string) => void;
 };
 
 type RecordProps = {
@@ -32,8 +33,8 @@ export function RecordRow({ actions, onToggle, record, selected, trashMode }: Re
     <td className="p-3"><Tag className="status-badge" tone={getConditionTone(record.condition)}>{record.condition}</Tag></td>
     <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
     <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
-    <td className="p-3"><ApprovalControl recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></td>
-    <td className="p-3 text-center">{actions ? <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={actions.remove} onRestore={actions.restore} /> : null}</td>
+    <td className="p-3"><ApprovalControl busy={actions?.busyIds?.has(record.id)} recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></td>
+    <td className="p-3 text-center">{actions?.remove && actions.restore ? <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={actions.remove!} onRestore={actions.restore!} /> : null}</td>
   </tr>;
 }
 
@@ -84,9 +85,9 @@ export function RecordCard({ actions, expanded = false, onExpansionChange, onTog
       {!expanded ? (
         <RecordCardStatuses compact actions={actions} record={record} />
       ) : (
-        <div className="record-card-approval"><ApprovalControl recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></div>
+        <div className="record-card-approval"><ApprovalControl busy={actions?.busyIds?.has(record.id)} recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></div>
       )}
-      {actions ? <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={actions.remove} onRestore={actions.restore} /> : null}
+      {actions?.remove && actions.restore ? <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={actions.remove!} onRestore={actions.restore!} /> : null}
     </footer>
   </article>;
 }
@@ -95,16 +96,16 @@ function RecordCardStatuses({ compact = false, actions, record }: { compact?: bo
   return <div className={cn("record-card-statuses", compact && "record-card-compact-outcomes")} aria-label="Tình trạng, biện pháp và duyệt">
     <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
     <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
-    <div className="record-card-approval"><ApprovalControl recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></div>
+    <div className="record-card-approval"><ApprovalControl busy={actions?.busyIds?.has(record.id)} recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></div>
   </div>;
 }
 
-function ApprovalControl({ onChange, recordId, status }: { onChange?: ((id: string, status: ApprovalStatus) => void) | undefined; recordId: string; status: ApprovalStatus }) {
+function ApprovalControl({ busy = false, onChange, recordId, status }: { busy?: boolean | undefined; onChange?: ((id: string, status: ApprovalStatus) => void | Promise<void>) | undefined; recordId: string; status: ApprovalStatus }) {
   if (!onChange) return <span>{approvalLabels[status]}</span>;
   return <label className="approval-control">
     <span className="sr-only">Duyệt</span>
     <span className="approval-select-shell">
-      <select className={cn("approval-select", `is-${status.toLowerCase()}`)} aria-label={`Trạng thái duyệt phiếu ${recordId}`} value={status} onChange={(event) => onChange(recordId, event.target.value as ApprovalStatus)}>
+      <select className={cn("approval-select", `is-${status.toLowerCase()}`)} aria-label={`Trạng thái duyệt phiếu ${recordId}`} aria-busy={busy} disabled={busy} value={status} onChange={(event) => void onChange(recordId, event.target.value as ApprovalStatus)}>
         {(Object.keys(approvalLabels) as ApprovalStatus[]).map((value) => <option key={value} value={value}>{approvalLabels[value]}</option>)}
       </select>
       <ChevronDown className="approval-select-icon" size={13} strokeWidth={2.5} aria-hidden="true" />
@@ -112,7 +113,7 @@ function ApprovalControl({ onChange, recordId, status }: { onChange?: ((id: stri
   </label>;
 }
 
-function RecordHistoryActionButton({ onDelete, onRestore, recordId, trashMode }: { onDelete: RecordActions["remove"]; onRestore: RecordActions["restore"]; recordId: string; trashMode: boolean }) {
+function RecordHistoryActionButton({ onDelete, onRestore, recordId, trashMode }: { onDelete: NonNullable<RecordActions["remove"]>; onRestore: NonNullable<RecordActions["restore"]>; recordId: string; trashMode: boolean }) {
   return <Button
     variant="ghost"
     size="icon"

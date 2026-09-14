@@ -100,22 +100,52 @@ class KphRepository {
                 """, UUID.randomUUID(), actorId, recordId, storeId, toTimestamp(occurredAt));
     }
 
-    List<KphRecordResponse> findAll(UUID storeId, KphType type) {
+    List<KphRecordResponse> findAll(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo) {
         String sql = """
                 SELECT r.*, r.snapshot_store_code AS store_code, r.snapshot_store_name AS store_name,
                        r.snapshot_actor_display_name AS display_name,
+                       r.snapshot_reviewer_display_name AS reviewer_display_name,
                        p.ordinal AS photo_ordinal, p.stamped_storage_key, p.captured_at
                 FROM kph_records r
                 JOIN stores s ON s.id = r.store_id
                 JOIN app_users u ON u.id = r.created_by
                 JOIN kph_photos p ON p.kph_record_id = r.id
                 WHERE r.store_id = ?
-                """ + (type == null ? "" : " AND r.type = ? ") + " ORDER BY r.created_at DESC, r.id, p.ordinal";
+                """ + (type == null ? "" : " AND r.type = ? ")
+                + (detectedFrom == null ? "" : " AND r.detected_date >= ? ")
+                + (detectedTo == null ? "" : " AND r.detected_date <= ? ")
+                + " ORDER BY r.created_at DESC, r.id, p.ordinal";
         List<Object> params = new ArrayList<>();
         params.add(storeId);
         if (type != null) {
             params.add(type.name());
         }
+        if (detectedFrom != null) {
+            params.add(detectedFrom);
+        }
+        if (detectedTo != null) {
+            params.add(detectedTo);
+        }
+        return mapRows(database.fetch(sql, params.toArray()));
+    }
+
+    List<KphRecordResponse> findAllByIds(UUID storeId, KphType type, List<UUID> recordIds) {
+        String placeholders = String.join(", ", java.util.Collections.nCopies(recordIds.size(), "?"));
+        String sql = """
+                SELECT r.*, r.snapshot_store_code AS store_code, r.snapshot_store_name AS store_name,
+                       r.snapshot_actor_display_name AS display_name,
+                       r.snapshot_reviewer_display_name AS reviewer_display_name,
+                       p.ordinal AS photo_ordinal, p.stamped_storage_key, p.captured_at
+                FROM kph_records r
+                JOIN stores s ON s.id = r.store_id
+                JOIN app_users u ON u.id = r.created_by
+                JOIN kph_photos p ON p.kph_record_id = r.id
+                WHERE r.store_id = ? AND r.type = ? AND r.id IN (
+                """ + placeholders + ") ORDER BY r.created_at DESC, r.id, p.ordinal FOR SHARE OF r";
+        List<Object> params = new ArrayList<>();
+        params.add(storeId);
+        params.add(type.name());
+        params.addAll(recordIds);
         return mapRows(database.fetch(sql, params.toArray()));
     }
 
@@ -123,6 +153,7 @@ class KphRepository {
         String sql = """
                 SELECT r.*, r.snapshot_store_code AS store_code, r.snapshot_store_name AS store_name,
                        r.snapshot_actor_display_name AS display_name,
+                       r.snapshot_reviewer_display_name AS reviewer_display_name,
                        p.ordinal AS photo_ordinal, p.stamped_storage_key, p.captured_at
                 FROM kph_records r
                 JOIN stores s ON s.id = r.store_id
@@ -133,6 +164,65 @@ class KphRepository {
                 """;
         List<KphRecordResponse> records = mapRows(database.fetch(sql, storeId, recordId));
         return records.stream().findFirst();
+    }
+
+    Optional<ReviewState> lockReviewState(UUID storeId, UUID recordId) {
+        return database.fetchOptional("""
+                SELECT approval_status, lifecycle_state
+                FROM kph_records
+                WHERE store_id = ? AND id = ?
+                FOR UPDATE
+                """, storeId, recordId).map(row -> new ReviewState(
+                        KphApprovalStatus.valueOf(row.get("approval_status", String.class)),
+                        row.get("lifecycle_state", String.class)));
+    }
+
+    void updateReview(UUID recordId, KphApprovalStatus status, UUID actorId, String actorDisplayName, Instant reviewedAt) {
+        if (status == KphApprovalStatus.PENDING) {
+            database.execute("""
+                    UPDATE kph_records
+                    SET approval_status = 'PENDING', reviewed_by = NULL, reviewed_at = NULL,
+                        snapshot_reviewer_display_name = NULL, updated_at = ?
+                    WHERE id = ?
+                    """, toTimestamp(reviewedAt), recordId);
+            return;
+        }
+        database.execute("""
+                UPDATE kph_records
+                SET approval_status = ?, reviewed_by = ?, reviewed_at = ?,
+                    snapshot_reviewer_display_name = ?, updated_at = ?
+                WHERE id = ?
+                """, status.name(), actorId, toTimestamp(reviewedAt), actorDisplayName,
+                toTimestamp(reviewedAt), recordId);
+    }
+
+    void insertApprovalHistory(UUID recordId, KphApprovalStatus from, KphApprovalStatus to,
+            UUID actorId, String actorDisplayName, Instant changedAt) {
+        database.execute("""
+                INSERT INTO kph_approval_history
+                    (id, kph_record_id, from_status, to_status, changed_by,
+                     snapshot_reviewer_display_name, changed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, UUID.randomUUID(), recordId, from.name(), to.name(), actorId,
+                actorDisplayName, toTimestamp(changedAt));
+    }
+
+    void insertApprovalAudit(UUID actorId, UUID recordId, UUID storeId,
+            KphApprovalStatus from, KphApprovalStatus to, Instant occurredAt) {
+        database.execute("""
+                INSERT INTO audit_events
+                    (id, actor_user_id, action, target_type, target_id, store_id, metadata, occurred_at)
+                VALUES (?, ?, 'KPH_REVIEWED', 'KPH_RECORD', ?, ?,
+                    jsonb_build_object('fromStatus', ?, 'toStatus', ?), ?)
+                """, UUID.randomUUID(), actorId, recordId, storeId, from.name(), to.name(), toTimestamp(occurredAt));
+    }
+
+    void insertExportAudit(UUID actorId, UUID exportId, UUID storeId, String metadataJson, Instant occurredAt) {
+        database.execute("""
+                INSERT INTO audit_events
+                    (id, actor_user_id, action, target_type, target_id, store_id, metadata, occurred_at)
+                VALUES (?, ?, 'KPH_EXPORTED', 'KPH_EXPORT', ?, ?, ?::jsonb, ?)
+                """, UUID.randomUUID(), actorId, exportId, storeId, metadataJson, toTimestamp(occurredAt));
     }
 
     Optional<PhotoStorageKey> findPhoto(UUID storeId, UUID recordId, int ordinal) {
@@ -175,6 +265,11 @@ class KphRepository {
                                 row.get("snapshot_supplier_code", String.class),
                                 row.get("snapshot_supplier_name", String.class)),
                         row.get("lifecycle_state", String.class),
+                        KphApprovalStatus.valueOf(row.get("approval_status", String.class)),
+                        row.get("reviewed_by", UUID.class) == null ? null : new KphRecordResponse.ActorSnapshot(
+                                row.get("reviewed_by", UUID.class),
+                                row.get("reviewer_display_name", String.class)),
+                        row.get("reviewed_at") == null ? null : toInstant(row.get("reviewed_at")),
                         row.get("note", String.class),
                         new KphRecordResponse.StoreSnapshot(
                                 row.get("store_id", UUID.class),
@@ -234,5 +329,8 @@ class KphRepository {
     }
 
     record PhotoStorageKey(String value) {
+    }
+
+    record ReviewState(KphApprovalStatus approvalStatus, String lifecycleState) {
     }
 }

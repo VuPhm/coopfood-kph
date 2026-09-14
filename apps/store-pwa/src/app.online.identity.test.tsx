@@ -103,7 +103,7 @@ describe("online identity and scoped query state", () => {
     const context = screen.getByRole("group", { name: /Cửa hàng hiện tại/ });
     const switcher = within(context).getByRole("combobox", { name: "Chọn cửa hàng" });
     fireEvent.change(switcher, { target: { value: storeB.id } });
-    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledWith(storeB.id, expect.anything()));
+    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledWith(storeB.id, {}, expect.anything()));
     expect(await screen.findAllByText("Phiếu cửa hàng B")).toHaveLength(2);
     expect(screen.queryByText("Phiếu cửa hàng A")).not.toBeInTheDocument();
   });

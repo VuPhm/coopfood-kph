@@ -129,4 +129,41 @@ describe("online KPH gateway", () => {
     expect((error as OnlineApiError).status).toBe(401);
     expect((error as Error).message).toContain("Phiên đăng nhập");
   });
+
+  it("sends date bounds and manager review/export mutations with CSRF", async () => {
+    const approvedRecord = {
+      ...recordFixture,
+      approvalStatus: "APPROVED" as const,
+      reviewedBy: { id: sessionFixture.user.id, displayName: sessionFixture.user.displayName },
+      reviewedAt: "2026-09-15T08:00:00Z",
+    };
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify(sessionFixture), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify([recordFixture]), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(approvedRecord), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        exportId: "50000000-0000-4000-8000-000000000001",
+        exportedAt: "2026-09-15T08:01:00Z",
+        store: recordFixture.store,
+        records: [approvedRecord],
+      }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    const gateway = createOnlineGateway({ baseUrl: "http://localhost", fetch: fetcher });
+
+    await gateway.login("demo", "password");
+    await gateway.loadHistory(recordFixture.store.id, { detectedFrom: "2026-09-01", detectedTo: "2026-09-15" });
+    const reviewed = await gateway.reviewRecord(recordFixture.store.id, recordFixture.id, "APPROVED");
+    const exported = await gateway.prepareExport(recordFixture.store.id, "TPCN", [recordFixture.id]);
+
+    const requests = fetcher.mock.calls.map(([request]) => request as Request);
+    expect(requests[1]!.url).toContain("detectedFrom=2026-09-01");
+    expect(requests[1]!.url).toContain("detectedTo=2026-09-15");
+    expect(requests[2]!.method).toBe("PUT");
+    expect(requests[2]!.headers.get("X-CSRF-TOKEN")).toBe(sessionFixture.csrfToken);
+    expect(await requests[2]!.json()).toEqual({ status: "APPROVED" });
+    expect(requests[3]!.method).toBe("POST");
+    expect(requests[3]!.headers.get("X-CSRF-TOKEN")).toBe(sessionFixture.csrfToken);
+    expect(await requests[3]!.json()).toEqual({ type: "TPCN", recordIds: [recordFixture.id] });
+    expect(reviewed.approvalStatus).toBe("APPROVED");
+    expect(exported.records[0]?.reviewedBy).toBe(sessionFixture.user.displayName);
+  });
 });

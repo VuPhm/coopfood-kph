@@ -76,7 +76,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/session", "/api/v1/stores").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/catalog/barcodes/*").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/*/photos/*").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/kph").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/exports").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/stores/*/kph/*/approval").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                         .anyRequest().denyAll())
                 .exceptionHandling(exceptions -> exceptions

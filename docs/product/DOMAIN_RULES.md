@@ -74,4 +74,10 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
   structural/render test với dữ liệu tổng hợp. Baseline generated legacy đã
   được chọn cho delivery: chỉ xuất record `SUBMITTED` cùng store/type do
   `STORE_MANAGER` đúng membership thực hiện, ghi audit, để trống approver R
-  và không chèn logo. Full approval workflow vẫn chưa được mở.
+  và không chèn logo.
+- Foundation-02 mở approval online theo xác nhận của owner ngày 15/09/2026:
+  trạng thái gồm `PENDING`, `APPROVED`, `REJECTED`; chỉ `STORE_MANAGER` đúng
+  active membership được đổi trạng thái và mọi thay đổi phải ghi history/audit.
+  Export online chỉ nhận các record `SUBMITTED` và `APPROVED` cùng store/type,
+  ghi tên người duyệt vào cột R; không đặt cửa sổ thời gian duyệt khi nghiệp vụ
+  chưa chốt. Export Pilot local-only tiếp tục giữ hành vi baseline riêng.

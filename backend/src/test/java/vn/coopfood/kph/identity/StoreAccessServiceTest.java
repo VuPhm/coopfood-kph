@@ -50,6 +50,28 @@ class StoreAccessServiceTest {
                 });
     }
 
+    @Test
+    void requiresTheStoreManagerMembershipAndDoesNotTreatChainAdminAsABypass() {
+        StoreContext manager = new StoreContext(ALLOWED_STORE, "0001", "Nguyễn Kiệm", StoreRole.STORE_MANAGER);
+        assertThat(service.requireStoreManager(ALLOWED_STORE, authenticationWith(List.of(manager))))
+                .isEqualTo(manager);
+
+        SessionUser chainAdminEmployee = new SessionUser(
+                UUID.fromString("10000000-0000-4000-8000-000000000001"),
+                "admin.demo",
+                "Admin Demo",
+                Set.of(GlobalRole.CHAIN_ADMIN),
+                List.of(new StoreContext(ALLOWED_STORE, "0001", "Nguyễn Kiệm", StoreRole.EMPLOYEE)));
+        SessionPrincipal principal = new SessionPrincipal(chainAdminEmployee);
+        var authentication = UsernamePasswordAuthenticationToken.authenticated(principal, null, principal.authorities());
+
+        assertThatThrownBy(() -> service.requireStoreManager(ALLOWED_STORE, authentication))
+                .isInstanceOfSatisfying(ApiProblemException.class, problem -> {
+                    assertThat(problem.status()).isEqualTo(HttpStatus.FORBIDDEN);
+                    assertThat(problem.code()).isEqualTo("STORE_MANAGER_REQUIRED");
+                });
+    }
+
     private UsernamePasswordAuthenticationToken authenticationWith(List<StoreContext> stores) {
         SessionUser user = new SessionUser(
                 UUID.fromString("10000000-0000-4000-8000-000000000001"),

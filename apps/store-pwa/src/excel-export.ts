@@ -145,7 +145,7 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly RecordVi
       treatmentMark(record, "XUẤT TRẢ"),
       ["HỦY", "ĐỔI", "XUẤT TRẢ"].includes(record.resolution.trim().toUpperCase()) ? "" : safeText(record.resolution),
       safeText(record.treatmentDate),
-      "", "", "", "",
+      "", "", "", record.approvalStatus === "APPROVED" ? safeText(record.reviewedBy ?? "") : "",
     ];
 
     for (let column = 1; column <= 18; column += 1) {
