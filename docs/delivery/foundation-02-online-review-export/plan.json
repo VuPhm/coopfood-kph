@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "foundation-02-online-review-export",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Cho phép STORE_MANAGER đúng active store membership lọc lịch sử phiếu theo khoảng ngày phát hiện, duyệt phiếu và xuất Excel online với kiểm tra server-side và audit; EMPLOYEE vẫn chỉ xem/tạo và CHAIN_ADMIN không bypass store scope.",
   "inScope": [
     "OpenAPI, examples và generated client cho bộ lọc ngày, duyệt và export online",
@@ -18,7 +18,7 @@
     "Approval time window chưa có business rule"
   ],
   "baseSha": "405f6810e52ed1288f95b3484f20918e435614b9",
-  "candidateSha": "",
+  "candidateSha": "40a6b17c6cbc5ab8f2991caad065a30922bc1e57",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -35,10 +35,10 @@
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": null,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 1,
+      "sha": "40a6b17c6cbc5ab8f2991caad065a30922bc1e57",
+      "evidence": "docs/delivery/foundation-02-online-review-export/technical-evidence.md"
     },
     {
       "id": "owner-acceptance",
@@ -52,5 +52,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Khóa contract/fixture revision 1, triển khai migration/backend/Store PWA rồi tạo candidate SHA để kiểm tra tích hợp."
+  "nextAction": "Bàn giao candidate 40a6b17 cho owner kiểm tra các kịch bản trong acceptance-handoff.md và ghi quyết định nghiệm thu thực."
 }
