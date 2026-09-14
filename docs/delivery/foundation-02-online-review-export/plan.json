@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "foundation-02-online-review-export",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Cho phép STORE_MANAGER đúng active store membership lọc lịch sử phiếu theo khoảng ngày phát hiện, duyệt phiếu và xuất Excel online với kiểm tra server-side và audit; EMPLOYEE vẫn chỉ xem/tạo và CHAIN_ADMIN không bypass store scope.",
+  "inScope": [
+    "OpenAPI, examples và generated client cho bộ lọc ngày, duyệt và export online",
+    "PostgreSQL migration cho approval state/history và backend authorization/audit",
+    "Store PWA lọc ngày phát hiện inclusive, duyệt theo quyền và xuất các phiếu đã duyệt",
+    "Kiểm thử contract, backend integration, frontend unit/component và E2E liên quan"
+  ],
+  "outOfScope": [
+    "Production infrastructure hoặc deployment",
+    "Offline synchronization và conflict resolution",
+    "Admin catalog import/publish",
+    "Xóa hoặc vô hiệu hóa phiếu từ Store PWA",
+    "Approval time window chưa có business rule"
+  ],
+  "baseSha": "405f6810e52ed1288f95b3484f20918e435614b9",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/**",
+    "contracts/fixtures/**",
+    "backend/src/main/resources/db/migration/**",
+    "packages/api/**",
+    "pnpm-lock.yaml"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-integrated",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": null,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": null,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Khóa contract/fixture revision 1, triển khai migration/backend/Store PWA rồi tạo candidate SHA để kiểm tra tích hợp."
+}
