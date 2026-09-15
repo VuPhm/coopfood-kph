@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "online-stability-s01-s02",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Ổn định Store PWA online khi request chậm hoặc duyệt lô lỗi một phần: response tạo phiếu từ store/session cũ không làm bẩn UI hiện tại, và duyệt lô phải đợi mọi request hoàn tất rồi báo đúng kết quả thành công/thất bại.",
+  "inScope": [
+    "Tích hợp commit S01 b0c404a và kiểm tra response tạo phiếu bị trì hoãn qua đổi store hoặc logout/login",
+    "S02 thay Promise.all bằng xử lý settled có giới hạn concurrency hợp lý, giữ busy đến khi toàn bộ request kết thúc và refetch sau cùng",
+    "Store PWA component regression, frontend verify và browser gate online phù hợp trên candidate tích hợp"
+  ],
+  "outOfScope": [
+    "S03 store snapshot cho Excel hoặc giới hạn selection 500",
+    "S04 refactor online Query cache thành nguồn history duy nhất",
+    "Thay đổi OpenAPI, generated client, backend, database migration, Pilot persistence hoặc Admin Web",
+    "Merge main, push, deploy hoặc production rollout"
+  ],
+  "baseSha": "880edf44b45322f4630f10640103c59c6d1cf4b4",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "apps/store-pwa/src/app.tsx",
+    "apps/store-pwa/src/app.online.identity.test.tsx",
+    "apps/store-pwa/src/app.online.test.tsx",
+    "apps/store-pwa/e2e/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-integrated",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Checkpoint kế hoạch, tích hợp S01 vào nhánh integration, thực hiện S02 tuần tự rồi chạy gate trên candidate mới."
+}
