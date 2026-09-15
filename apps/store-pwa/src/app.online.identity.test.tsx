@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import sessionFixture from "../../../contracts/fixtures/api/session.json";
+import type { RecordView } from "./record-view";
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -10,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   login: vi.fn(),
   logout: vi.fn(),
   createRecord: vi.fn(),
+  reviewRecord: vi.fn(),
   lookupBarcode: vi.fn(),
 }));
 
@@ -22,6 +24,7 @@ vi.mock("./online-kph", () => ({
     login: mocks.login,
     logout: mocks.logout,
     createRecord: mocks.createRecord,
+    reviewRecord: mocks.reviewRecord,
     lookupBarcode: mocks.lookupBarcode,
   }),
 }));
@@ -32,7 +35,7 @@ const storeA = { ...sessionFixture.user.stores[0]!, id: "20000000-0000-4000-8000
 const storeB = { ...sessionFixture.user.stores[0]!, id: "20000000-0000-4000-8000-000000000002", code: "CF-DEMO-002", name: "Lý Thường Kiệt" };
 const session = { ...sessionFixture, user: { ...sessionFixture.user, stores: [storeA, storeB] } };
 
-function record(id: string, productName: string) {
+function record(id: string, productName: string): RecordView {
   return {
     id,
     kind: "TPCN" as const,
@@ -186,5 +189,67 @@ describe("online identity and scoped query state", () => {
     expect(await screen.findAllByText("Phiếu đúng scope")).toHaveLength(2);
     expectSelectedCount(1);
     expect(screen.getByText(/Đã tạo phiếu created-in-current-scope/)).toBeVisible();
+  });
+
+  it("waits for the whole review batch, reports partial failure, and retries only failed records", async () => {
+    const failedRecord = record("review-fails", "Phiếu duyệt lỗi");
+    const successfulRecord = record("review-succeeds", "Phiếu duyệt thành công");
+    const reviewedRecord = { ...successfulRecord, approvalStatus: "APPROVED" as const };
+    let history = [failedRecord, successfulRecord];
+    const slowSuccess = deferred<ReturnType<typeof record>>();
+    mocks.loadHistory.mockImplementation(() => Promise.resolve(history));
+    mocks.reviewRecord.mockImplementation((_storeId: string, recordId: string) => recordId === failedRecord.id
+      ? Promise.reject(new Error("review failed"))
+      : slowSuccess.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu duyệt lỗi");
+
+    fireEvent.click(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${failedRecord.id}` })[0]!);
+    fireEvent.click(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${successfulRecord.id}` })[0]!);
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 2 phiếu" }));
+    await waitFor(() => expect(mocks.reviewRecord).toHaveBeenCalledTimes(2));
+    expect(await screen.findByRole("button", { name: "Đang duyệt…" })).toBeDisabled();
+
+    history = [failedRecord, reviewedRecord];
+    await act(async () => slowSuccess.resolve(reviewedRecord));
+    expect(await screen.findByText("Đã duyệt 1 phiếu; 1 phiếu chưa duyệt được và vẫn được chọn để thử lại.")).toBeVisible();
+    expect(mocks.loadHistory).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole("button", { name: "Duyệt 1 phiếu" })).toBeEnabled();
+    expect(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${failedRecord.id}` })[0]).toBeChecked();
+    expect(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${successfulRecord.id}` })[0]).not.toBeChecked();
+
+    const retriedRecord = { ...failedRecord, approvalStatus: "APPROVED" as const };
+    history = [retriedRecord, reviewedRecord];
+    mocks.reviewRecord.mockResolvedValueOnce(retriedRecord);
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 1 phiếu" }));
+    expect(await screen.findByText("Đã duyệt 1 phiếu trên máy chủ.")).toBeVisible();
+    expect(mocks.reviewRecord).toHaveBeenLastCalledWith(storeA.id, failedRecord.id, "APPROVED");
+    expectSelectedCount(0);
+  });
+
+  it("limits an online review batch to four concurrent requests", async () => {
+    const batch = Array.from({ length: 5 }, (_, index) => record(`review-${index + 1}`, `Phiếu ${index + 1}`));
+    const pending = new Map(batch.map((item) => [item.id, deferred<ReturnType<typeof record>>()] as const));
+    mocks.loadHistory.mockResolvedValue(batch);
+    mocks.reviewRecord.mockImplementation((_storeId: string, recordId: string) => pending.get(recordId)!.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu 1");
+
+    for (const item of batch) {
+      fireEvent.click(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${item.id}` })[0]!);
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 5 phiếu" }));
+    await waitFor(() => expect(mocks.reviewRecord).toHaveBeenCalledTimes(4));
+    expect(mocks.reviewRecord).toHaveBeenCalledTimes(4);
+
+    const first = batch[0]!;
+    await act(async () => pending.get(first.id)!.resolve({ ...first, approvalStatus: "APPROVED" as const }));
+    await waitFor(() => expect(mocks.reviewRecord).toHaveBeenCalledTimes(5));
+    await act(async () => {
+      for (const item of batch.slice(1)) {
+        pending.get(item.id)!.resolve({ ...item, approvalStatus: "APPROVED" as const });
+      }
+    });
+    expect(await screen.findByText("Đã duyệt 5 phiếu trên máy chủ.")).toBeVisible();
   });
 });

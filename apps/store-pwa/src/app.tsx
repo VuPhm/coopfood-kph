@@ -53,6 +53,28 @@ const onlinePersistenceEnabled = onlineModeEnabled();
 const pilotPersistenceEnabled = import.meta.env.MODE !== "test" && !onlinePersistenceEnabled;
 const initialRecords = pilotPersistenceEnabled || onlinePersistenceEnabled ? [] : DEMO_RECORDS;
 const onlineSessionQueryKey = ["online", "session"] as const;
+const onlineApprovalConcurrency = 4;
+
+async function settleWithConcurrency<T, R>(items: readonly T[], limit: number, task: (item: T) => Promise<R>) {
+  const results = new Array<PromiseSettledResult<R>>(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      try {
+        results[index] = { status: "fulfilled", value: await task(items[index]!) };
+      } catch (reason) {
+        results[index] = { status: "rejected", reason };
+      }
+    }
+  }
+
+  const workerCount = Math.min(Math.max(1, limit), items.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+  return results;
+}
 
 function hydrationPhotoUrl(photo: PilotRecord["photos"][number], ownedUrls: Set<string>): EvidencePhotoView {
   const src = URL.createObjectURL(photo.blob);
@@ -232,6 +254,7 @@ function WorkspaceApp() {
       ...onlineMutationScopeRef.current,
       generation: onlineMutationScopeRef.current.generation + 1,
     };
+    setReviewingIds(new Set());
   }
 
   function isOnlineMutationScopeCurrent(scope: OnlineMutationScope) {
@@ -590,18 +613,27 @@ function WorkspaceApp() {
   async function updateApproval(recordId: string, status: ApprovalStatus) {
     if (onlinePersistenceEnabled) {
       if (!canManageOnline || !onlineStoreId || !onlineCapabilities?.reviewRecord) return;
+      const mutationScope: OnlineMutationScope = {
+        generation: onlineMutationScopeRef.current.generation,
+        storeId: onlineStoreId,
+        userId: onlineSession?.user.id ?? null,
+      };
       setReviewingIds((current) => new Set([...current, recordId]));
       try {
         const reviewed = await onlineCapabilities.reviewRecord(onlineStoreId, recordId, status);
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
         setRecords((current) => current.map((record) => record.id === recordId ? reviewed : record));
         queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => current?.map((record) => record.id === recordId ? reviewed : record));
         setSelected((current) => new Set([...current].filter((id) => id !== recordId)));
         setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” trên máy chủ.`);
       } catch (error) {
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
         if (isSessionExpiryError(error)) expireOnlineSession(error);
         else setNotice(error instanceof Error ? error.message : "Không thể cập nhật trạng thái duyệt trên máy chủ");
       } finally {
-        setReviewingIds((current) => new Set([...current].filter((id) => id !== recordId)));
+        if (isOnlineMutationScopeCurrent(mutationScope)) {
+          setReviewingIds((current) => new Set([...current].filter((id) => id !== recordId)));
+        }
       }
       return;
     }
@@ -627,20 +659,42 @@ function WorkspaceApp() {
     if (onlinePersistenceEnabled) {
       if (!canManageOnline || !onlineStoreId || !onlineCapabilities?.reviewRecord) return;
       const recordIds = [...selected];
+      const storeId = onlineStoreId;
+      const reviewRecord = onlineCapabilities.reviewRecord;
+      const mutationScope: OnlineMutationScope = {
+        generation: onlineMutationScopeRef.current.generation,
+        storeId,
+        userId: onlineSession?.user.id ?? null,
+      };
+      const historyScopeKey = ["online", "history", mutationScope.userId ?? "anonymous", storeId] as const;
       setReviewingIds(new Set(recordIds));
       try {
-        const reviewedRecords = await Promise.all(recordIds.map((recordId) => onlineCapabilities.reviewRecord!(onlineStoreId, recordId, "APPROVED")));
+        const results = await settleWithConcurrency(
+          recordIds,
+          onlineApprovalConcurrency,
+          (recordId) => reviewRecord(storeId, recordId, "APPROVED"),
+        );
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
+        const sessionFailure = results.find((result) => result.status === "rejected" && isSessionExpiryError(result.reason));
+        if (sessionFailure?.status === "rejected") {
+          expireOnlineSession(sessionFailure.reason);
+          return;
+        }
+        const reviewedRecords = results
+          .filter((result): result is PromiseFulfilledResult<RecordView> => result.status === "fulfilled")
+          .map(({ value }) => value);
+        const failedIds = results.flatMap((result, index) => result.status === "rejected" ? [recordIds[index]!] : []);
         const byId = new Map(reviewedRecords.map((record) => [record.id, record]));
         setRecords((current) => current.map((record) => byId.get(record.id) ?? record));
         queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => current?.map((record) => byId.get(record.id) ?? record));
-        setNotice(`Đã duyệt ${recordIds.length} phiếu trên máy chủ.`);
-        setSelected(new Set());
-      } catch (error) {
-        void queryClient.invalidateQueries({ queryKey: ["online", "history"] });
-        if (isSessionExpiryError(error)) expireOnlineSession(error);
-        else setNotice(error instanceof Error ? error.message : "Không thể duyệt các phiếu đã chọn");
+        await queryClient.invalidateQueries({ queryKey: historyScopeKey });
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
+        setSelected(new Set(failedIds));
+        setNotice(failedIds.length === 0
+          ? `Đã duyệt ${reviewedRecords.length} phiếu trên máy chủ.`
+          : `Đã duyệt ${reviewedRecords.length} phiếu; ${failedIds.length} phiếu chưa duyệt được và vẫn được chọn để thử lại.`);
       } finally {
-        setReviewingIds(new Set());
+        if (isOnlineMutationScopeCurrent(mutationScope)) setReviewingIds(new Set());
       }
       return;
     }
