@@ -144,3 +144,18 @@ phiếu. Phạm vi/gate nằm tại
 Ngoài cycle: production infra, offline sync, Admin catalog/provisioning, edit,
 xóa/invalidate và approval time window. Hiện không có milestone active; yêu cầu
 kế tiếp phải chỉ định outcome mới, không tự mở candidate, deploy hoặc rollout.
+
+## Đề xuất tiếp tục sau review — 2026-09-16
+
+Owner yêu cầu review code/kiến trúc và lên kế hoạch để tự chia việc thực hiện dần.
+Xem [review và roadmap](REVIEW_AND_ROADMAP_2026-09-16.md): findings có vị trí code,
+giới hạn kiểm chứng và 12 gói việc có dependency/acceptance riêng.
+
+Ưu tiên đề xuất: S01 chặn mutation trả muộn sau đổi store/session; S02 xử lý duyệt
+lô thất bại một phần; S03 dùng store snapshot cho Excel và báo giới hạn selection.
+Sau đó chuẩn bị Admin provisioning/catalog, paging và vận hành theo nhu cầu.
+Đây là backlog đề xuất, **chưa mở milestone hoặc triển khai implementation**.
+
+Git/workspace được chuẩn bị riêng trước khi giao việc:
+[workspace setup](WORKSPACE_SETUP_2026-09-16.md). Nhánh tích hợp giữ checkpoint;
+worktree S01 chờ owner giao, S02/S03 lấy nền sau tích hợp vì cùng sửa `app.tsx`.
