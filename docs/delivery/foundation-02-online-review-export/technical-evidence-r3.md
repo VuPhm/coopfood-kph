@@ -1,6 +1,7 @@
 # Technical evidence — Foundation-02 revision 3
 
-- Candidate: `d2fb72ebb6cba65018bacaef993c21163dfcce7c`
+- Candidate: `f179b380690fd12ab4acc3f53c5fb5f5b84c0a29`
+- Runtime/UI commit: `d2fb72ebb6cba65018bacaef993c21163dfcce7c`
 - Plan revision: `3`
 - Verified: `2026-09-15`, timezone `Asia/Ho_Chi_Minh`
 
@@ -12,6 +13,7 @@
    - 138 frontend/package tests passed: Admin Web 1, Store PWA 109, generated
      API 2, KPH rules 19 and UI 7.
    - Admin Web and Store PWA production builds passed.
+   - The command ran on the runtime/UI tree committed as `d2fb72e`.
 2. `env E2E_APP_URL=http://127.0.0.1:4174 E2E_BACKEND_URL=http://127.0.0.1:8080 npm --prefix e2e test`
    against a clean Vite process, the real Spring Boot API and disposable
    PostgreSQL 17 — **PASS**
@@ -30,6 +32,11 @@
      320px so complete dates remain operable.
 
 ## Reused unaffected evidence
+
+The final candidate `f179b38` advances `d2fb72e` only with cycle/current-state
+documentation and the corrected E2E README execution count. `npm run check:docs`
+passed on the exact final candidate content; runtime and test sources are
+byte-identical to the E2E-verified runtime/UI commit.
 
 Revision 3 changes Store PWA interaction/layout, frontend/browser tests and
 product/cycle documentation only. OpenAPI, generated API, backend code and V5

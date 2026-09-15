@@ -1,6 +1,7 @@
 # Integrated acceptance handoff
 
-- Candidate SHA / plan revision: `d2fb72ebb6cba65018bacaef993c21163dfcce7c` / `3`
+- Candidate SHA / plan revision: `f179b380690fd12ab4acc3f53c5fb5f5b84c0a29` / `3`
+- Runtime/UI commit: `d2fb72ebb6cba65018bacaef993c21163dfcce7c`
 - Preview mode: online Store PWA backed by the real Spring Boot API and a
   disposable PostgreSQL 17 database populated only with synthetic E2E data.
 - Technical evidence: [technical-evidence-r3.md](technical-evidence-r3.md)
@@ -33,7 +34,7 @@
   one.
 
 Owner decision: **accepted** on `2026-09-16` for candidate
-`d2fb72ebb6cba65018bacaef993c21163dfcce7c`, plan revision `3`.
+`f179b380690fd12ab4acc3f53c5fb5f5b84c0a29`, plan revision `3`.
 
 Decision source: direct project-owner message in this Codex thread:
 “cho pass, làm tiếp”.

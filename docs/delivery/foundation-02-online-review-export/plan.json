@@ -18,7 +18,7 @@
     "Approval time window chưa có business rule"
   ],
   "baseSha": "405f6810e52ed1288f95b3484f20918e435614b9",
-  "candidateSha": "d2fb72ebb6cba65018bacaef993c21163dfcce7c",
+  "candidateSha": "f179b380690fd12ab4acc3f53c5fb5f5b84c0a29",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -37,7 +37,7 @@
       "required": true,
       "status": "pass",
       "revision": 3,
-      "sha": "d2fb72ebb6cba65018bacaef993c21163dfcce7c",
+      "sha": "f179b380690fd12ab4acc3f53c5fb5f5b84c0a29",
       "evidence": "docs/delivery/foundation-02-online-review-export/technical-evidence-r3.md"
     },
     {
@@ -46,7 +46,7 @@
       "required": true,
       "status": "pass",
       "revision": 3,
-      "sha": "d2fb72ebb6cba65018bacaef993c21163dfcce7c",
+      "sha": "f179b380690fd12ab4acc3f53c5fb5f5b84c0a29",
       "evidence": "docs/delivery/foundation-02-online-review-export/acceptance-handoff.md",
       "acceptedBy": "project owner",
       "decisionRef": "Direct Codex thread message on 2026-09-16: cho pass, làm tiếp"
@@ -69,5 +69,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Cycle đã đóng; chờ project owner chỉ định outcome cụ thể cho cycle tiếp theo."
+  "nextAction": "Cycle đã đóng tại candidate f179b38; chờ project owner chỉ định outcome cụ thể cho cycle tiếp theo."
 }
