@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "foundation-02-online-review-export",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Cho phép STORE_MANAGER đúng active store membership lọc lịch sử phiếu theo khoảng ngày phát hiện, duyệt phiếu và xuất Excel online với kiểm tra server-side và audit; EMPLOYEE vẫn chỉ xem/tạo và CHAIN_ADMIN không bypass store scope.",
   "inScope": [
     "OpenAPI, examples và generated client cho bộ lọc ngày, duyệt và export online",
@@ -18,7 +18,7 @@
     "Approval time window chưa có business rule"
   ],
   "baseSha": "405f6810e52ed1288f95b3484f20918e435614b9",
-  "candidateSha": "",
+  "candidateSha": "ba95608ae468bd85c98f3ea94cc9411912308e4c",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -35,10 +35,10 @@
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": null,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 2,
+      "sha": "ba95608ae468bd85c98f3ea94cc9411912308e4c",
+      "evidence": "docs/delivery/foundation-02-online-review-export/technical-evidence-r2.md"
     },
     {
       "id": "owner-acceptance",
@@ -60,5 +60,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Triển khai UI compact responsive revision 2, cập nhật test và tạo candidate/evidence mới trước khi bàn giao lại owner."
+  "nextAction": "Bàn giao candidate ba95608 cho owner kiểm tra bố cục compact desktop và date filter trong dialog mobile, rồi ghi quyết định nghiệm thu thực."
 }
