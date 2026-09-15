@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "foundation-02-online-review-export",
   "revision": 3,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Cho phép STORE_MANAGER đúng active store membership lọc lịch sử phiếu theo khoảng ngày phát hiện, duyệt phiếu và xuất Excel online với kiểm tra server-side và audit; EMPLOYEE vẫn chỉ xem/tạo và CHAIN_ADMIN không bypass store scope.",
   "inScope": [
     "OpenAPI, examples và generated client cho bộ lọc ngày, duyệt và export online",
@@ -44,10 +44,12 @@
       "id": "owner-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending",
-      "revision": null,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 3,
+      "sha": "d2fb72ebb6cba65018bacaef993c21163dfcce7c",
+      "evidence": "docs/delivery/foundation-02-online-review-export/acceptance-handoff.md",
+      "acceptedBy": "project owner",
+      "decisionRef": "Direct Codex thread message on 2026-09-16: cho pass, làm tiếp"
     }
   ],
   "changes": [
@@ -67,5 +69,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Bàn giao candidate d2fb72e cho owner kiểm tra auto-filter, khoảng một đầu và bố cục desktop/mobile, rồi ghi quyết định nghiệm thu thực."
+  "nextAction": "Cycle đã đóng; chờ project owner chỉ định outcome cụ thể cho cycle tiếp theo."
 }

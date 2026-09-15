@@ -32,7 +32,18 @@
 - No approval time window is enforced because no accepted business rule defines
   one.
 
-Owner decision: **pending** as of `2026-09-15`.
+Owner decision: **accepted** on `2026-09-16` for candidate
+`d2fb72ebb6cba65018bacaef993c21163dfcce7c`, plan revision `3`.
 
-Next action: owner runs or reviews the scenarios above and explicitly accepts or
-requests a bounded correction. The cycle remains `AWAITING_ACCEPTANCE` until then.
+Decision source: direct project-owner message in this Codex thread:
+“cho pass, làm tiếp”.
+
+## Closeout
+
+- Technical gate: passed with [revision 3 evidence](technical-evidence-r3.md).
+- Owner gate: passed by the decision above.
+- Remaining limitations stay deferred: physical-iPhone coverage, production
+  deployment, offline synchronization, Admin catalog/provisioning, record
+  edit/invalidation and an approval time window without a business rule.
+- Foundation-02 is closed. No deployment, merge, push or next milestone is
+  implied by this acceptance.
