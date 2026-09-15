@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-15
+Cập nhật: 2026-09-16
 
 ## Giai đoạn
 
-`Foundation-02 — AWAITING_ACCEPTANCE: duyệt, xuất Excel online và lọc lịch sử theo ngày`
+`Foundation-02 — CLOSED: duyệt, xuất Excel online và lọc lịch sử theo ngày`
 
 Pilot local-only theo ADR-0002 đã được project owner đóng ngày 2026-09-04 bằng
 acceptance tối thiểu. Pilot đang chạy được giữ nguyên, không tạo tag/deploy mới
@@ -115,7 +115,7 @@ owner acceptance và giới hạn hoãn được ghi tại
 [closeout](evidence/foundation-01/closeout-2026-09-13.md). Foundation-01 đóng;
 không tự khởi động milestone hoặc production rollout tiếp theo.
 
-## Foundation-02 đang thực hiện — 2026-09-15
+## Foundation-02 closeout — 2026-09-16
 
 Cycle record: [foundation-02-online-review-export](delivery/foundation-02-online-review-export/plan.json).
 Revision 3 giữ khoảng ngày `detectedFrom`/`detectedTo` inclusive trên
@@ -126,4 +126,5 @@ cho cột R. Chỉ `STORE_MANAGER` đúng active membership được mutation;
 date filter chỉ còn hai ô, mũi tên và nút xóa; ngày hoàn chỉnh hợp lệ tự áp dụng,
 lọc một đầu được hỗ trợ. Desktop giữ một hàng compact, mobile đưa ngày vào hộp
 “Lọc & sắp xếp” hiện có. Integrated/browser/visual evidence revision 3 đã đạt;
-cycle đang chờ owner nghiệm thu hành vi và bố cục mới.
+project owner chấp nhận candidate `f179b38` ngày 2026-09-16 và cycle đã đóng.
+Không có deploy, merge hoặc milestone kế tiếp được mở ngầm từ quyết định này.

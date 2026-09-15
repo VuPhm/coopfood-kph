@@ -122,7 +122,7 @@ cho phép public PR và yêu cầu chốt. Xem
 Foundation-01 đã đóng. Không còn milestone active và không tự mở production
 rollout hay feature mới từ danh sách hoãn.
 
-## Active — Foundation-02 — duyệt, xuất online và lọc ngày
+## Closed — Foundation-02 — duyệt, xuất online và lọc ngày
 
 Owner xác nhận mở cycle ngày 2026-09-15 và yêu cầu bổ sung lọc theo ngày khi xem
 phiếu. Phạm vi/gate nằm tại
@@ -138,8 +138,9 @@ phiếu. Phạm vi/gate nằm tại
   manager chỉ xuất selection đã duyệt.
 - Candidate revision 3 đã pass Contract Lock, frontend tests/build, backend
   evidence không bị ảnh hưởng, browser E2E desktop/mobile và visual QA tới
-  `320px`/landscape. Bước còn lại là owner nghiệm thu bố cục và luồng thực tế.
+  `320px`/landscape. Project owner cho pass candidate `f179b38` ngày
+  2026-09-16; gate acceptance/close đều pass và cycle đã đóng.
 
 Ngoài cycle: production infra, offline sync, Admin catalog/provisioning, edit,
-xóa/invalidate và approval time window. Sau khi owner chấp nhận Foundation-02
-mới đóng record; không tự mở candidate tiếp theo.
+xóa/invalidate và approval time window. Hiện không có milestone active; yêu cầu
+kế tiếp phải chỉ định outcome mới, không tự mở candidate, deploy hoặc rollout.
