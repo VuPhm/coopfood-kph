@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "online-stability-s01-s02",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Ổn định Store PWA online khi request chậm hoặc duyệt lô lỗi một phần: response tạo phiếu từ store/session cũ không làm bẩn UI hiện tại, và duyệt lô phải đợi mọi request hoàn tất rồi báo đúng kết quả thành công/thất bại.",
   "inScope": [
     "Tích hợp commit S01 b0c404a và kiểm tra response tạo phiếu bị trì hoãn qua đổi store hoặc logout/login",
@@ -16,7 +16,7 @@
     "Merge main, push, deploy hoặc production rollout"
   ],
   "baseSha": "880edf44b45322f4630f10640103c59c6d1cf4b4",
-  "candidateSha": "",
+  "candidateSha": "ac90677da6c92f0511ae3f6133cb90cd6e347c33",
   "integrationOwner": "/root",
   "sharedPaths": [
     "apps/store-pwa/src/app.tsx",
@@ -32,7 +32,10 @@
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "ac90677da6c92f0511ae3f6133cb90cd6e347c33",
+      "evidence": "docs/delivery/online-stability-s01-s02/technical-evidence.md"
     },
     {
       "id": "owner-acceptance",
@@ -43,5 +46,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Checkpoint kế hoạch, tích hợp S01 vào nhánh integration, thực hiện S02 tuần tự rồi chạy gate trên candidate mới."
+  "nextAction": "Chờ project owner nghiệm thu candidate ac90677 theo acceptance-handoff; chưa mở S03 hoặc merge/push/deploy."
 }
