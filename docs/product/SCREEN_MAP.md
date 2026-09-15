@@ -38,7 +38,7 @@ login hay admin catalog.
 |---|---|---|---|---|
 | Workspace KPH | Mở app | Brand, ngày, store identity, hai nút tạo, lịch sử, FAB tra hạn | Desktop bảng; mobile card | Store PWA authenticated shell; KPH-01, ID-01–05, UI-01 |
 | Empty history | Chưa tạo record | Copy “Chưa có dữ liệu khai báo trong phiên” | Giống layout list | Empty server/offline state, copy theo scope thật; KPH-13 |
-| TPCN history | Tab Khô & khác | Count, khoảng ngày phát hiện, selection, duyệt/export, row/card | Table `>700px`; cards `<=700px` | Store PWA list filtered by type/date; không có xóa/vô hiệu hóa cho CHT; UI-01–03,08 |
+| TPCN history | Tab Khô & khác | Count, khoảng ngày phát hiện, selection, duyệt/export, row/card | Table và date filter compact `>700px`; cards `<=700px`, date filter nằm trong hộp “Lọc & sắp xếp” | Store PWA list filtered by type/date; không có xóa/vô hiệu hóa cho CHT; UI-01–03,08 |
 | TPTS history | Tab Tươi sống | Như TPCN, options/data riêng | Như trên | Store PWA list filtered by type |
 | Create TPCN | Nút tạo TPCN | Form sectioned; 5 condition, ngày phát hiện khóa theo ngày hiện tại; image; save/cancel | Modal body scroll trên mobile | Store PWA create flow; KPH-02,04,06–12 |
 | Create TPTS | Nút tạo TPTS | Cùng form với 5 condition, chỉ HỦY/KHÁC, không còn Hư hỏng | Modal body scroll | Store PWA create flow; KPH-03,05–12 |

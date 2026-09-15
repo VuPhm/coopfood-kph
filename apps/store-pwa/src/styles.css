@@ -255,11 +255,18 @@ html[data-focus-modality="keyboard"] .trash-mode-toggle:focus { outline: 2px sol
 .trash-mode-toggle:active svg { transform: rotate(-12deg); }
 .history-board.is-trash-mode .history-title { color: var(--color-danger); }
 .history-board.is-trash-mode .history-total-count { background: var(--color-danger); }
-.history-date-filter { display: grid; grid-template-columns: minmax(10.5rem, 13rem) minmax(10.5rem, 13rem) auto; align-items: end; gap: var(--space-2); border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-surface-muted); padding: var(--space-2-5); }
+.history-date-filter { display: grid; min-width: 0; align-items: center; gap: var(--space-2); }
+.history-date-filter-desktop { grid-template-columns: auto minmax(9rem, 11.5rem) minmax(9rem, 11.5rem) auto; width: fit-content; max-width: 100%; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); padding: var(--space-1-5) var(--space-2); }
+.history-date-caption { color: var(--color-ink); font-size: .6875rem; font-weight: 900; white-space: nowrap; }
 .history-date-field { display: grid; min-width: 0; gap: var(--space-1); color: var(--color-ink-muted); font-size: .6875rem; font-weight: 850; }
+.history-date-filter-desktop .history-date-field { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
+.history-date-filter-desktop .history-date-field > span { white-space: nowrap; }
 .history-date-field input { min-height: 2.75rem; background: #fff; font-size: .8125rem; }
 .history-date-actions { display: flex; min-height: 2.75rem; align-items: center; gap: var(--space-2); }
 .history-date-actions > button { min-height: 2.75rem; white-space: nowrap; }
+.history-date-filter-mobile { grid-template-columns: repeat(2, minmax(0, 1fr)); border: 0; background: transparent; padding: 0; }
+.history-date-filter-mobile .history-date-actions { grid-column: 1 / -1; }
+.history-date-filter-mobile .history-date-actions > button { width: 100%; }
 .history-date-clear { border: 0; border-radius: 9px; background: transparent; padding-inline: var(--space-2); color: var(--color-brand); font-size: .75rem; font-weight: 850; }
 .history-date-clear:hover:not(:disabled) { background: var(--color-brand-soft); }
 .history-date-clear:disabled { color: var(--color-ink-muted); opacity: .45; }
@@ -273,14 +280,14 @@ html[data-focus-modality="keyboard"] .history-controls-trigger:focus { outline: 
 .history-controls-icon { position: relative; display: grid; width: 1.125rem; height: 1.125rem; place-items: center; }
 .history-controls-icon > svg { width: 1.125rem; height: 1.125rem; stroke-width: 2.25; }
 .history-controls-indicator { position: absolute; top: -.1875rem; right: -.25rem; width: .375rem; height: .375rem; border: 1px solid #fff; border-radius: 999px; background: var(--color-brand); box-shadow: 0 0 0 1px rgb(0 102 51 / .12); animation: content-enter var(--motion-ui) var(--motion-ease-out) both; }
-.mobile-history-dialog { width: min(24rem, calc(100% - var(--space-6))); gap: 0; overflow: hidden; border-radius: 22px; padding: 0; }
+.mobile-history-dialog { width: min(24rem, calc(100% - var(--space-6))); max-height: calc(100dvh - var(--space-6) - env(safe-area-inset-top) - env(safe-area-inset-bottom)); grid-template-rows: auto minmax(0, 1fr); gap: 0; overflow: hidden; border-radius: 22px; padding: 0; }
 .mobile-history-dialog > [data-slot="dialog-close"] { top: .625rem; right: .625rem; }
 .mobile-history-dialog-header { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); align-items: center; gap: var(--space-2-5); border-bottom: 1px solid var(--color-border); background: linear-gradient(135deg, #fff 0%, var(--color-brand-soft) 145%); padding: var(--space-3) 3.5rem var(--space-3) var(--space-4); }
 .mobile-history-dialog-icon { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border-radius: 12px; background: var(--color-brand); color: #fff; box-shadow: 0 4px 12px rgb(0 66 33 / .18); }
 .mobile-history-dialog-icon svg { width: 1.125rem; height: 1.125rem; stroke-width: 2.5; }
 .mobile-history-dialog-title { color: var(--color-ink); font-size: 1rem; line-height: 1.2; }
 .mobile-history-dialog-description { margin-top: .125rem; font-size: .6875rem; font-weight: 700; line-height: 1.35; }
-.mobile-history-dialog-body { display: grid; gap: var(--space-2-5); padding: var(--space-3); }
+.mobile-history-dialog-body { display: grid; gap: var(--space-2-5); overflow-y: auto; overscroll-behavior: contain; padding: var(--space-3); }
 .mobile-history-section { display: grid; gap: var(--space-2); border: 1px solid var(--color-border); border-radius: 15px; background: #fff; padding: var(--space-3); }
 .mobile-history-section-header { display: flex; min-height: 1.5rem; align-items: center; justify-content: space-between; gap: var(--space-2); }
 .mobile-history-section-header h3 { margin: 0; color: var(--color-ink); font-size: .6875rem; font-weight: 900; letter-spacing: .045em; text-transform: uppercase; }
@@ -665,9 +672,7 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
   .workspace-create small { font-size: .6875rem; }
   .workspace-create svg { width: 1rem; height: 1rem; }
   .history-board { --panel-inset: var(--space-4); gap: var(--space-5); padding: var(--panel-inset); border-radius: 20px; padding-bottom: 6rem; }
-  .history-date-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
-  .history-date-actions { grid-column: 1 / -1; }
-  .history-date-actions > button:first-child { flex: 1 1 auto; }
+  .history-date-filter-desktop { display: none; }
   .history-controls-row { display: flex; flex-direction: column; width: 100%; align-items: stretch; gap: var(--space-2); }
   .history-controls-mobile { display: inline-grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 0; border-radius: 0; background: transparent; padding: 0; color: var(--color-ink-muted); }
   .history-controls-mobile:hover, .history-controls-mobile.is-active { border: 0; background: transparent; color: var(--color-brand); }
@@ -849,8 +854,6 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
 }
 
 @media (max-width: 480px) {
-  .history-date-filter { grid-template-columns: minmax(0, 1fr); }
-  .history-date-actions { grid-column: 1; }
   .expiry-calendar { width: min(20rem, calc(100vw - 2rem)); max-width: calc(100vw - 2rem); }
   .expiry-result-summary { padding: var(--space-3); gap: var(--space-2-5); }
   .expiry-result-icon { width: 3.25rem; height: 3.25rem; }
@@ -865,6 +868,8 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
   .workspace-create { gap: var(--space-1-5); padding-inline: var(--space-1-5); font-size: .65rem; }
   .workspace-create svg { width: 1rem; height: 1rem; }
   .history-tab { gap: var(--space-1); font-size: .68rem; }
+  .history-date-filter-mobile { grid-template-columns: minmax(0, 1fr); }
+  .history-date-filter-mobile .history-date-actions { grid-column: 1; }
   .mobile-history-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mobile-history-filter-grid .mobile-history-choice:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .history-action-tools { grid-template-columns: minmax(0, 1fr); }

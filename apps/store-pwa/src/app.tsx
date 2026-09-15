@@ -287,6 +287,7 @@ function WorkspaceApp() {
   const canManageOnline = selectedOnlineStore?.role === "STORE_MANAGER";
   const selectedRecordsAreExportable = selectedRecords.length > 0
     && selectedRecords.every(({ approvalStatus }) => approvalStatus === "APPROVED");
+  const dateFilterActive = Boolean(dateFilter.detectedFrom || dateFilter.detectedTo);
   const filterInitialMonth = formatBusinessDate(new Date()).iso as LocalDate;
   const storageWarning = storageReady ? storageHealthWarning(storageHealth) : null;
 
@@ -502,7 +503,7 @@ function WorkspaceApp() {
       const detectedTo = dateToInput.trim() ? parseDisplayDate(dateToInput) : undefined;
       if (detectedFrom && detectedTo && detectedFrom > detectedTo) {
         setDateFilterError("Từ ngày không được sau đến ngày.");
-        return;
+        return false;
       }
       setDateFilter({
         ...(detectedFrom ? { detectedFrom } : {}),
@@ -510,8 +511,10 @@ function WorkspaceApp() {
       });
       setDateFilterError("");
       setSelected(new Set());
+      return true;
     } catch {
       setDateFilterError("Nhập ngày hợp lệ theo định dạng dd/mm/yyyy.");
+      return false;
     }
   }
 
@@ -881,7 +884,22 @@ function WorkspaceApp() {
                   : <PilotDataNotice configured={storeConfigured} warning={storageWarning} onConfigure={() => setStoreSettingsOpen(true)} />}
               </div>
               <div className="history-title-actions">
-                <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
+                <MobileHistoryControls
+                  dateFilterActive={dateFilterActive}
+                  dateFilterError={dateFilterError}
+                  dateFromInput={dateFromInput}
+                  dateToInput={dateToInput}
+                  filter={approvalFilter}
+                  filterInitialMonth={filterInitialMonth}
+                  onDateFilterApply={applyDateFilter}
+                  onDateFilterClear={clearDateFilter}
+                  onDateFromChange={setDateFromInput}
+                  onDateToChange={setDateToInput}
+                  onFilterChange={changeApprovalFilter}
+                  onSort={cycleMobileRecordSort}
+                  onSortReset={() => setRecordSort(null)}
+                  sort={recordSort}
+                />
                   {!onlinePersistenceEnabled ? <button
                     type="button"
                     className="trash-mode-toggle"
@@ -896,21 +914,20 @@ function WorkspaceApp() {
               </div>
             </div>
 
-            <form className="history-date-filter" aria-label="Lọc phiếu theo ngày phát hiện" onSubmit={(event) => { event.preventDefault(); applyDateFilter(); }}>
-              <label className="history-date-field" htmlFor="history-date-from">
-                <span>Từ ngày</span>
-                <CalendarInput {...(dateFilterError ? { ariaDescribedBy: "history-date-error" } : {})} id="history-date-from" initialMonth={filterInitialMonth} label="Từ ngày phát hiện" value={dateFromInput} onValueChange={setDateFromInput} />
-              </label>
-              <label className="history-date-field" htmlFor="history-date-to">
-                <span>Đến ngày</span>
-                <CalendarInput {...(dateFilterError ? { ariaDescribedBy: "history-date-error" } : {})} id="history-date-to" initialMonth={filterInitialMonth} label="Đến ngày phát hiện" value={dateToInput} onValueChange={setDateToInput} />
-              </label>
-              <div className="history-date-actions">
-                <Button type="submit" variant="ghost">Lọc ngày</Button>
-                <button type="button" className="history-date-clear" disabled={!dateFromInput && !dateToInput && !dateFilter.detectedFrom && !dateFilter.detectedTo} onClick={clearDateFilter}>Xóa lọc</button>
-              </div>
-              {dateFilterError ? <p id="history-date-error" className="history-date-error" role="alert">{dateFilterError}</p> : null}
-            </form>
+            <HistoryDateFilter
+              active={dateFilterActive}
+              className="history-date-filter-desktop"
+              error={dateFilterError}
+              fromValue={dateFromInput}
+              idPrefix="history-date"
+              initialMonth={filterInitialMonth}
+              onApply={applyDateFilter}
+              onClear={clearDateFilter}
+              onFromValueChange={setDateFromInput}
+              onToValueChange={setDateToInput}
+              showCaption
+              toValue={dateToInput}
+            />
 
             <div className="history-controls-row">
               <div className="history-tabs" role="tablist" aria-label="Loại phiếu">
@@ -1135,6 +1152,54 @@ type HistoryControlsContentProps = {
   sort: RecordSort | null;
 };
 
+type HistoryDateFilterProps = {
+  active: boolean;
+  className?: string;
+  error: string;
+  fromValue: string;
+  idPrefix: string;
+  initialMonth: LocalDate;
+  onApplied?: () => void;
+  onApply: () => boolean;
+  onClear: () => void;
+  onFromValueChange: (value: string) => void;
+  onToValueChange: (value: string) => void;
+  showCaption?: boolean;
+  showClear?: boolean;
+  toValue: string;
+};
+
+function HistoryDateFilter({ active, className, error, fromValue, idPrefix, initialMonth, onApplied, onApply, onClear, onFromValueChange, onToValueChange, showCaption = false, showClear = true, toValue }: HistoryDateFilterProps) {
+  const errorId = `${idPrefix}-error`;
+  const fromId = `${idPrefix}-from`;
+  const toId = `${idPrefix}-to`;
+  const clearDisabled = !fromValue && !toValue && !active;
+
+  return <form
+    className={cn("history-date-filter", className)}
+    aria-label="Lọc phiếu theo ngày phát hiện"
+    onSubmit={(event) => {
+      event.preventDefault();
+      if (onApply()) onApplied?.();
+    }}
+  >
+    {showCaption ? <span className="history-date-caption">Ngày phát hiện</span> : null}
+    <label className="history-date-field" htmlFor={fromId}>
+      <span>Từ ngày</span>
+      <CalendarInput {...(error ? { ariaDescribedBy: errorId } : {})} id={fromId} initialMonth={initialMonth} label="Từ ngày phát hiện" value={fromValue} onValueChange={onFromValueChange} />
+    </label>
+    <label className="history-date-field" htmlFor={toId}>
+      <span>Đến ngày</span>
+      <CalendarInput {...(error ? { ariaDescribedBy: errorId } : {})} id={toId} initialMonth={initialMonth} label="Đến ngày phát hiện" value={toValue} onValueChange={onToValueChange} />
+    </label>
+    <div className="history-date-actions">
+      <Button type="submit" variant="secondary" aria-label="Lọc ngày">Lọc</Button>
+      {showClear ? <button type="button" className="history-date-clear" disabled={clearDisabled} onClick={onClear}>Xóa lọc</button> : null}
+    </div>
+    {error ? <p id={errorId} className="history-date-error" role="alert">{error}</p> : null}
+  </form>;
+}
+
 function HistoryControlsTrigger({ active, className, controls, expanded, label, onClick }: { active: boolean; className?: string; controls?: string; expanded?: boolean; label: string; onClick?: () => void }) {
   return <button
     type="button"
@@ -1152,9 +1217,22 @@ function HistoryControlsTrigger({ active, className, controls, expanded, label, 
   </button>;
 }
 
-function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, sort }: Omit<HistoryControlsContentProps, "idPrefix">) {
+type MobileHistoryControlsProps = Omit<HistoryControlsContentProps, "idPrefix"> & {
+  dateFilterActive: boolean;
+  dateFilterError: string;
+  dateFromInput: string;
+  dateToInput: string;
+  filterInitialMonth: LocalDate;
+  onDateFilterApply: () => boolean;
+  onDateFilterClear: () => void;
+  onDateFromChange: (value: string) => void;
+  onDateToChange: (value: string) => void;
+};
+
+function MobileHistoryControls({ dateFilterActive, dateFilterError, dateFromInput, dateToInput, filter, filterInitialMonth, onDateFilterApply, onDateFilterClear, onDateFromChange, onDateToChange, onFilterChange, onSort, onSortReset, sort }: MobileHistoryControlsProps) {
   const [open, setOpen] = useState(false);
-  const active = filter !== "ALL" || sort !== null;
+  const active = dateFilterActive || filter !== "ALL" || sort !== null;
+  const dateClearDisabled = !dateFromInput && !dateToInput && !dateFilterActive;
 
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogTrigger asChild>
@@ -1165,11 +1243,36 @@ function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, so
         <span className="mobile-history-dialog-icon" aria-hidden="true"><ListFilter /></span>
         <div>
           <DialogTitle className="mobile-history-dialog-title">Lọc &amp; sắp xếp</DialogTitle>
-          <DialogDescription id="mobile-history-dialog-description" className="mobile-history-dialog-description">Thay đổi được áp dụng ngay</DialogDescription>
+          <DialogDescription id="mobile-history-dialog-description" className="mobile-history-dialog-description">Ngày áp dụng khi bấm Lọc; lựa chọn khác áp dụng ngay</DialogDescription>
         </div>
       </header>
 
-      <HistoryControlsContent filter={filter} idPrefix="mobile" onFilterChange={onFilterChange} onSort={onSort} onSortReset={onSortReset} sort={sort} />
+      <div className="mobile-history-dialog-body">
+        <section className="mobile-history-section" aria-labelledby="mobile-date-filter-title">
+          <header className="mobile-history-section-header">
+            <h3 id="mobile-date-filter-title">Ngày phát hiện</h3>
+            <button type="button" className="mobile-history-section-reset" aria-label="Xóa lọc ngày" disabled={dateClearDisabled} onClick={onDateFilterClear}>
+              <RotateCcw aria-hidden="true" /><span>Xóa ngày</span>
+            </button>
+          </header>
+          <HistoryDateFilter
+            active={dateFilterActive}
+            className="history-date-filter-mobile"
+            error={dateFilterError}
+            fromValue={dateFromInput}
+            idPrefix="mobile-history-date"
+            initialMonth={filterInitialMonth}
+            onApplied={() => setOpen(false)}
+            onApply={onDateFilterApply}
+            onClear={onDateFilterClear}
+            onFromValueChange={onDateFromChange}
+            onToValueChange={onDateToChange}
+            showClear={false}
+            toValue={dateToInput}
+          />
+        </section>
+        <HistoryControlsContent filter={filter} idPrefix="mobile" onFilterChange={onFilterChange} onSort={onSort} onSortReset={onSortReset} sort={sort} />
+      </div>
     </DialogContent>
   </Dialog>;
 }
@@ -1181,7 +1284,7 @@ function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSo
     if (clearing && document.documentElement.dataset.focusModality !== "keyboard") event.currentTarget.blur();
   }
 
-  return <div className="mobile-history-dialog-body">
+  return <>
         <section className="mobile-history-section" aria-labelledby={`${idPrefix}-filter-title`}>
           <header className="mobile-history-section-header">
             <h3 id={`${idPrefix}-filter-title`}>Trạng thái duyệt</h3>
@@ -1219,7 +1322,7 @@ function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSo
             })}
           </div>
         </section> : null}
-      </div>;
+      </>;
 }
 
 function SortableHeader({ label, onSort, sort, sortKey }: { label: string; onSort: (key: RecordSortKey) => void; sort: RecordSort | null; sortKey: RecordSortKey }) {

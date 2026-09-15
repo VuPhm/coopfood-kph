@@ -118,9 +118,11 @@ không tự khởi động milestone hoặc production rollout tiếp theo.
 ## Foundation-02 đang thực hiện — 2026-09-15
 
 Cycle record: [foundation-02-online-review-export](delivery/foundation-02-online-review-export/plan.json).
-Revision 1 khóa khoảng ngày `detectedFrom`/`detectedTo` inclusive trên
+Revision 2 giữ khoảng ngày `detectedFrom`/`detectedTo` inclusive trên
 `detected_date`; approval `PENDING/APPROVED/REJECTED` có history/audit; export
 chỉ nhận record `SUBMITTED + APPROVED` cùng store/type và lấy reviewer snapshot
 cho cột R. Chỉ `STORE_MANAGER` đúng active membership được mutation;
-`EMPLOYEE` chỉ xem/tạo và `CHAIN_ADMIN` không bypass. Chưa có owner acceptance
-cho hành vi mới; cần hoàn tất integrated/browser evidence trước khi bàn giao.
+`EMPLOYEE` chỉ xem/tạo và `CHAIN_ADMIN` không bypass. Theo phản hồi owner,
+desktop chuyển date filter thành một hàng compact, mobile đưa ngày vào hộp
+“Lọc & sắp xếp” hiện có. Evidence revision 1 đã bị vô hiệu hóa; cần hoàn tất
+integrated/browser evidence revision 2 trước khi bàn giao lại.
