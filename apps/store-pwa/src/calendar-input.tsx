@@ -27,15 +27,17 @@ type CalendarInputProps = {
   ariaDescribedBy?: string;
   id: string;
   initialMonth: LocalDate;
+  invalid?: boolean;
   label: string;
   onValueChange: (value: string) => void;
+  placeholder?: string;
   readOnly?: boolean;
   value: string;
 };
 
 type CalendarPosition = Pick<CSSProperties, "left" | "top">;
 
-export function CalendarInput({ ariaDescribedBy, id, initialMonth, label, onValueChange, readOnly, value }: CalendarInputProps) {
+export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, label, onValueChange, placeholder = "dd/mm/yyyy", readOnly, value }: CalendarInputProps) {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<LocalDate>(firstDayOfMonth(initialMonth));
   const [position, setPosition] = useState<CalendarPosition | null>(null);
@@ -118,9 +120,10 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, label, onValu
         onChange={(event) => onValueChange(formatDateEntry(event.target.value))}
         inputMode="numeric"
         maxLength={10}
-        placeholder="dd/mm/yyyy"
+        placeholder={placeholder}
         readOnly={readOnly}
         aria-readonly={readOnly}
+        aria-invalid={invalid || undefined}
         aria-describedby={ariaDescribedBy}
         className={cn("pr-12 tabular-nums", readOnly && "text-ink-muted")}
       />

@@ -160,12 +160,15 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   heading vùng và choice-card được compact, choice chưa chọn không tô nền.
 - Filter chạy trước sort, count tổng phản ánh tập đang hiển thị và thay filter
   phải xóa selection để không giữ thao tác trên dòng đã bị ẩn.
-- Khoảng ngày phát hiện dùng hai field có label rõ “Từ ngày”/“Đến ngày”, nhập và
-  hiển thị `dd/mm/yyyy`. Trên desktop, cụm ngày là một hàng compact phía trên
-  tab/danh sách; trên mobile (`<=700px`) không render thành khối riêng mà nằm
-  trong cùng hộp thoại “Lọc & sắp xếp” hiện có. Chỉ áp dụng khi bấm “Lọc ngày”;
-  một đầu có thể để trống, hai đầu tính inclusive, khoảng ngược báo lỗi tại cụm
-  filter. “Xóa lọc” đưa danh sách về toàn bộ scope hiện tại.
+- Khoảng ngày phát hiện chỉ giữ hai field “Từ”/“Đến”, mũi tên chỉ hướng ở giữa
+  và nút xóa lọc; accessible name đầy đủ vẫn là “Từ ngày phát hiện”/“Đến ngày
+  phát hiện”. Giá trị nhập và hiển thị theo `dd/mm/yyyy`. Trên desktop, cụm ngày
+  là một hàng compact phía trên tab/danh sách; trên mobile (`<=700px`) không
+  render thành khối riêng mà nằm trong cùng hộp thoại “Lọc & sắp xếp” hiện có.
+  Khi một giá trị ngày hoàn chỉnh, hợp lệ được nhập/chọn/đổi hoặc bị xóa, filter
+  áp dụng ngay; không gửi request trong lúc người dùng mới gõ dở. Một đầu trống
+  nghĩa là không giới hạn đầu đó, hai đầu tính inclusive, khoảng ngược báo lỗi
+  tại cụm filter. “Xóa lọc” đưa danh sách về toàn bộ scope hiện tại.
 - Mobile: card có checkbox/ngày/SKU ở header; tên/số lượng, ảnh, tình trạng và
   biện pháp nằm kế nhau; footer chỉ giữ trạng thái duyệt.
 - Mobile mặc định dùng card compact giữ nguyên header sản phẩm và footer tình

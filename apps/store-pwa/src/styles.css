@@ -256,18 +256,14 @@ html[data-focus-modality="keyboard"] .trash-mode-toggle:focus { outline: 2px sol
 .history-board.is-trash-mode .history-title { color: var(--color-danger); }
 .history-board.is-trash-mode .history-total-count { background: var(--color-danger); }
 .history-date-filter { display: grid; min-width: 0; align-items: center; gap: var(--space-2); }
-.history-date-filter-desktop { grid-template-columns: auto minmax(9rem, 11.5rem) minmax(9rem, 11.5rem) auto; width: fit-content; max-width: 100%; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); padding: var(--space-1-5) var(--space-2); }
-.history-date-caption { color: var(--color-ink); font-size: .6875rem; font-weight: 900; white-space: nowrap; }
-.history-date-field { display: grid; min-width: 0; gap: var(--space-1); color: var(--color-ink-muted); font-size: .6875rem; font-weight: 850; }
-.history-date-filter-desktop .history-date-field { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
-.history-date-filter-desktop .history-date-field > span { white-space: nowrap; }
+.history-date-filter-desktop { grid-template-columns: minmax(9rem, 11.5rem) auto minmax(9rem, 11.5rem) auto; width: fit-content; max-width: 100%; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); padding: var(--space-1-5) var(--space-2); }
+.history-date-field { display: block; min-width: 0; color: var(--color-ink-muted); font-size: .6875rem; font-weight: 850; }
 .history-date-field input { min-height: 2.75rem; background: #fff; font-size: .8125rem; }
-.history-date-actions { display: flex; min-height: 2.75rem; align-items: center; gap: var(--space-2); }
-.history-date-actions > button { min-height: 2.75rem; white-space: nowrap; }
-.history-date-filter-mobile { grid-template-columns: repeat(2, minmax(0, 1fr)); border: 0; background: transparent; padding: 0; }
-.history-date-filter-mobile .history-date-actions { grid-column: 1 / -1; }
-.history-date-filter-mobile .history-date-actions > button { width: 100%; }
-.history-date-clear { border: 0; border-radius: 9px; background: transparent; padding-inline: var(--space-2); color: var(--color-brand); font-size: .75rem; font-weight: 850; }
+.history-date-arrow { width: 1rem; height: 1rem; color: var(--color-ink-muted); stroke-width: 2.5; }
+.history-date-filter-mobile { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); border: 0; background: transparent; padding: 0; }
+.history-date-filter-mobile .history-date-field input { padding-inline: var(--space-2) 2.75rem; font-size: 1rem; font-weight: 650; letter-spacing: -.015em; }
+.history-date-clear { display: inline-flex; min-width: 2.75rem; min-height: 2.75rem; align-items: center; justify-content: center; gap: var(--space-1); border: 0; border-radius: 9px; background: transparent; padding-inline: var(--space-2); color: var(--color-brand); font-size: .75rem; font-weight: 850; white-space: nowrap; }
+.history-date-clear svg { width: 1rem; height: 1rem; flex: 0 0 auto; }
 .history-date-clear:hover:not(:disabled) { background: var(--color-brand-soft); }
 .history-date-clear:disabled { color: var(--color-ink-muted); opacity: .45; }
 html[data-focus-modality="keyboard"] .history-date-clear:focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
@@ -869,7 +865,7 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
   .workspace-create svg { width: 1rem; height: 1rem; }
   .history-tab { gap: var(--space-1); font-size: .68rem; }
   .history-date-filter-mobile { grid-template-columns: minmax(0, 1fr); }
-  .history-date-filter-mobile .history-date-actions { grid-column: 1; }
+  .history-date-filter-mobile .history-date-arrow { justify-self: center; margin-block: calc(-1 * var(--space-1)); transform: rotate(90deg); }
   .mobile-history-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mobile-history-filter-grid .mobile-history-choice:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .history-action-tools { grid-template-columns: minmax(0, 1fr); }

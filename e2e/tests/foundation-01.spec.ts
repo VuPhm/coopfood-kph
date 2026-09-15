@@ -390,12 +390,11 @@ test.describe("Store PWA browser acceptance", () => {
     const filterDialog = page.getByRole("dialog", { name: "Lọc & sắp xếp" });
     await expect(filterDialog.getByRole("heading", { name: "Ngày phát hiện" })).toBeVisible();
     const today = businessDateDisplay();
+    const filteredResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && response.url().includes("detectedTo="));
     await filterDialog.locator("#mobile-history-date-from").fill(today);
     await filterDialog.locator("#mobile-history-date-to").fill(today);
-    const filteredResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && response.url().includes("detectedTo="));
-    await filterDialog.getByRole("button", { name: "Lọc ngày", exact: true }).click();
     expect((await filteredResponse).status()).toBe(200);
-    await expect(filterDialog).toBeHidden();
+    await filterDialog.getByRole("button", { name: "Đóng" }).click();
     await expect(filterTrigger).toHaveClass(/is-active/);
     await expect(card).toBeVisible();
     await card.getByRole("button", { name: /mở rộng phiếu/i }).click();
@@ -422,16 +421,16 @@ test.describe("Store PWA browser acceptance", () => {
     await expect(row).toBeVisible();
 
     const today = businessDateDisplay();
+    const filteredResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && response.url().includes("detectedTo="));
     await page.locator("#history-date-from").fill(today);
     await page.locator("#history-date-to").fill(today);
-    const filteredResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && response.url().includes("detectedTo="));
-    await page.getByRole("button", { name: "Lọc ngày" }).click();
     expect((await filteredResponse).status()).toBe(200);
     await expect(row).toBeVisible();
 
+    const fromOnlyResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && !response.url().includes("detectedTo="));
     await page.locator("#history-date-from").fill(businessDateDisplay(1));
     await page.locator("#history-date-to").fill("");
-    await page.getByRole("button", { name: "Lọc ngày" }).click();
+    expect((await fromOnlyResponse).status()).toBe(200);
     await expect(row).toBeHidden();
     await page.getByRole("button", { name: "Xóa lọc" }).click();
     await expect(row).toBeVisible();

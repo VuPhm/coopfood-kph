@@ -130,7 +130,7 @@ describe("Online workspace boundary", () => {
     expect(screen.queryByRole("button", { name: /Xóa phiếu/ })).not.toBeInTheDocument();
   });
 
-  it("filters visible history by an inclusive detected-date range and reports an inverted range", async () => {
+  it("auto-filters inclusive detected dates with either bound and reports an inverted range", async () => {
     const base = workspace();
     mocks.loadWorkspace.mockResolvedValue({
       ...base,
@@ -143,13 +143,18 @@ describe("Online workspace boundary", () => {
     await screen.findAllByText("Trong khoảng");
 
     fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "10/09/2026" } });
-    fireEvent.change(screen.getByLabelText("Đến ngày"), { target: { value: "10/09/2026" } });
-    fireEvent.click(screen.getByRole("button", { name: "Lọc ngày" }));
     expect(screen.getAllByText("Trong khoảng")).toHaveLength(2);
     expect(screen.queryByText("Ngoài khoảng")).not.toBeInTheDocument();
 
+    fireEvent.click(screen.getByRole("button", { name: "Xóa lọc ngày" }));
+    expect(screen.getAllByText("Trong khoảng")).toHaveLength(2);
+    expect(screen.getAllByText("Ngoài khoảng")).toHaveLength(2);
+
+    fireEvent.change(screen.getByLabelText("Đến ngày"), { target: { value: "09/09/2026" } });
+    expect(screen.queryByText("Trong khoảng")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Ngoài khoảng")).toHaveLength(2);
+
     fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "11/09/2026" } });
-    fireEvent.click(screen.getByRole("button", { name: "Lọc ngày" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Từ ngày không được sau đến ngày");
   });
 });

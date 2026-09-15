@@ -173,22 +173,22 @@ describe("Store workspace", () => {
     expect(within(dialog).getByRole("heading", { name: "Trạng thái duyệt" })).toBeVisible();
     expect(within(dialog).getByRole("heading", { name: "Sắp xếp theo" })).toBeVisible();
     expect(within(dialog).queryByText("Cột sắp xếp")).not.toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Lọc ngày" })).not.toBeInTheDocument();
+    expect(dialog.querySelector(".history-date-arrow")).not.toBeNull();
 
     fireEvent.change(dialog.querySelector("#mobile-history-date-from")!, { target: { value: "16/08/2026" } });
+    expect(filterTrigger).toHaveClass("is-active");
     fireEvent.change(dialog.querySelector("#mobile-history-date-to")!, { target: { value: "15/08/2026" } });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Lọc ngày" }));
     expect(within(dialog).getByRole("alert")).toHaveTextContent("Từ ngày không được sau đến ngày");
-    expect(filterTrigger).not.toHaveClass("is-active");
 
     fireEvent.change(dialog.querySelector("#mobile-history-date-from")!, { target: { value: "15/08/2026" } });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Lọc ngày" }));
-    expect(screen.queryByRole("dialog", { name: "Lọc & sắp xếp" })).not.toBeInTheDocument();
+    expect(within(dialog).queryByRole("alert")).not.toBeInTheDocument();
+    expect(dialog).toBeVisible();
     expect(filterTrigger).toHaveClass("is-active");
 
-    fireEvent.click(filterTrigger);
-    const reopenedDialog = screen.getByRole("dialog", { name: "Lọc & sắp xếp" });
-    fireEvent.click(within(reopenedDialog).getByRole("button", { name: "Xóa lọc ngày" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Xóa lọc ngày" }));
     expect(filterTrigger).not.toHaveClass("is-active");
+    const reopenedDialog = dialog;
     const reopenedApprovedFilter = within(reopenedDialog).getByRole("button", { name: "Lọc Đã duyệt" });
     fireEvent.click(reopenedApprovedFilter);
 
