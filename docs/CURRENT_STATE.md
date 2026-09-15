@@ -4,7 +4,7 @@ Cập nhật: 2026-09-15
 
 ## Giai đoạn
 
-`Foundation-02 — EXECUTING: duyệt, xuất Excel online và lọc lịch sử theo ngày`
+`Foundation-02 — AWAITING_ACCEPTANCE: duyệt, xuất Excel online và lọc lịch sử theo ngày`
 
 Pilot local-only theo ADR-0002 đã được project owner đóng ngày 2026-09-04 bằng
 acceptance tối thiểu. Pilot đang chạy được giữ nguyên, không tạo tag/deploy mới
@@ -124,5 +124,5 @@ chỉ nhận record `SUBMITTED + APPROVED` cùng store/type và lấy reviewer s
 cho cột R. Chỉ `STORE_MANAGER` đúng active membership được mutation;
 `EMPLOYEE` chỉ xem/tạo và `CHAIN_ADMIN` không bypass. Theo phản hồi owner,
 desktop chuyển date filter thành một hàng compact, mobile đưa ngày vào hộp
-“Lọc & sắp xếp” hiện có. Evidence revision 1 đã bị vô hiệu hóa; cần hoàn tất
-integrated/browser evidence revision 2 trước khi bàn giao lại.
+“Lọc & sắp xếp” hiện có. Integrated/browser/visual evidence revision 2 đã đạt;
+cycle đang chờ owner nghiệm thu hành vi và bố cục mới.

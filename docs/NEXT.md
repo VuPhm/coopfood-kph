@@ -134,8 +134,9 @@ phiếu. Phạm vi/gate nằm tại
 - Store PWA dùng `dd/mm/yyyy`, báo lỗi khoảng ngược cạnh field; desktop hiển thị
   bộ lọc ngày một hàng compact, mobile đặt cùng hộp “Lọc & sắp xếp”; EMPLOYEE
   không thấy action duyệt/xuất, manager chỉ xuất selection đã duyệt.
-- Chạy Contract Lock, frontend tests/build, backend full Testcontainers từ
-  database sạch và browser E2E desktop/mobile; sau đó bàn giao owner test.
+- Candidate revision 2 đã pass Contract Lock, frontend tests/build, backend
+  evidence không bị ảnh hưởng, browser E2E desktop/mobile và visual QA tới
+  `320px`/landscape. Bước còn lại là owner nghiệm thu bố cục và luồng thực tế.
 
 Ngoài cycle: production infra, offline sync, Admin catalog/provisioning, edit,
 xóa/invalidate và approval time window. Sau khi owner chấp nhận Foundation-02
