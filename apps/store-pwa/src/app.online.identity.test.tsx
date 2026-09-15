@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import sessionFixture from "../../../contracts/fixtures/api/session.json";
@@ -51,6 +51,33 @@ function record(id: string, productName: string) {
     photos: [],
     note: "",
   };
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+  return { promise, resolve };
+}
+
+async function submitOnlineRecord(productName: string) {
+  fireEvent.click(await screen.findByRole("button", { name: /Tạo phiếu TP khô/i }));
+  fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: productName } });
+  const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+  fireEvent.change(picker!, { target: { files: [new File(["evidence"], "evidence.jpg", { type: "image/jpeg" })] } });
+  expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+  await waitFor(() => expect(mocks.createRecord).toHaveBeenCalledOnce());
+}
+
+function expectSelectedCount(count: number) {
+  if (count === 0) {
+    expect(screen.getByText((_, element) => element?.classList.contains("selection-count") === true))
+      .toHaveTextContent("Đã chọn 0");
+    return;
+  }
+  expect(screen.getByRole("button", { name: `Duyệt ${count} phiếu` })).toBeVisible();
 }
 
 beforeEach(() => {
@@ -106,5 +133,58 @@ describe("online identity and scoped query state", () => {
     await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledWith(storeB.id, {}, expect.anything()));
     expect(await screen.findAllByText("Phiếu cửa hàng B")).toHaveLength(2);
     expect(screen.queryByText("Phiếu cửa hàng A")).not.toBeInTheDocument();
+  });
+
+  it("ignores a create response after the user switches stores", async () => {
+    const pendingCreate = deferred<ReturnType<typeof record>>();
+    mocks.createRecord.mockReturnValueOnce(pendingCreate.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu cửa hàng A");
+    await submitOnlineRecord("Phiếu tạo muộn ở A");
+
+    fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
+    const switcher = within(screen.getByRole("group", { name: /Cửa hàng hiện tại/ }))
+      .getByRole("combobox", { name: "Chọn cửa hàng" });
+    fireEvent.change(switcher, { target: { value: storeB.id } });
+    expect(await screen.findAllByText("Phiếu cửa hàng B")).toHaveLength(2);
+
+    await act(async () => pendingCreate.resolve(record("created-at-a", "Phiếu tạo muộn ở A")));
+    expect(screen.queryByText("Phiếu tạo muộn ở A")).not.toBeInTheDocument();
+    expectSelectedCount(0);
+    expect(screen.queryByText(/Đã tạo phiếu created-at-a/)).not.toBeInTheDocument();
+  });
+
+  it("ignores a create response from an earlier login generation", async () => {
+    const pendingCreate = deferred<ReturnType<typeof record>>();
+    mocks.createRecord.mockReturnValueOnce(pendingCreate.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu cửa hàng A");
+    await submitOnlineRecord("Phiếu từ phiên cũ");
+
+    fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
+    fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
+    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên đăng nhập" }), { target: { value: "demo" } });
+    fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
+    await screen.findAllByText("Phiếu cửa hàng A");
+
+    await act(async () => pendingCreate.resolve(record("created-before-logout", "Phiếu từ phiên cũ")));
+    expect(screen.queryByText("Phiếu từ phiên cũ")).not.toBeInTheDocument();
+    expectSelectedCount(0);
+    expect(screen.queryByText(/Đã tạo phiếu created-before-logout/)).not.toBeInTheDocument();
+  });
+
+  it("applies a create response while the original session and store are still current", async () => {
+    const pendingCreate = deferred<ReturnType<typeof record>>();
+    mocks.createRecord.mockReturnValueOnce(pendingCreate.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu cửa hàng A");
+    await submitOnlineRecord("Phiếu đúng scope");
+
+    await act(async () => pendingCreate.resolve(record("created-in-current-scope", "Phiếu đúng scope")));
+    expect(await screen.findAllByText("Phiếu đúng scope")).toHaveLength(2);
+    expectSelectedCount(1);
+    expect(screen.getByText(/Đã tạo phiếu created-in-current-scope/)).toBeVisible();
   });
 });

@@ -32,6 +32,7 @@ const kphKinds: KphKind[] = ["TPCN", "TPTS"];
 type ApprovalFilter = "ALL" | ApprovalStatus;
 type RecordSortKey = "approval" | "condition" | "detectedDate" | "product" | "quantity" | "resolution" | "supplier";
 type RecordSort = { direction: "ascending" | "descending"; key: RecordSortKey };
+type OnlineMutationScope = { generation: number; storeId: string | null; userId: string | null };
 const approvalFilterOptions: readonly { label: string; value: ApprovalFilter }[] = [
   { label: "Tất cả trạng thái", value: "ALL" },
   { label: approvalLabels.PENDING, value: "PENDING" },
@@ -193,6 +194,7 @@ function WorkspaceApp() {
   const [onlineGateway] = useState(() => onlinePersistenceEnabled ? createOnlineGateway() : null);
   const [onlineReload, setOnlineReload] = useState(0);
   const [onlineAuthRequired, setOnlineAuthRequired] = useState(false);
+  const onlineMutationScopeRef = useRef<OnlineMutationScope>({ generation: 0, storeId: null, userId: null });
   const queryClient = useQueryClient();
   const onlineCapabilities = onlineGateway as unknown as Partial<OnlineGateway> | null;
   const supportsIdentityApi = Boolean(onlineCapabilities?.getSession && onlineCapabilities?.loadHistory);
@@ -224,9 +226,25 @@ function WorkspaceApp() {
   const onlineQueryError = supportsIdentityApi
     ? sessionQuery.error ?? onlineHistoryQuery.error
     : legacyWorkspaceQuery.error;
+
+  function invalidateOnlineMutationScope() {
+    onlineMutationScopeRef.current = {
+      ...onlineMutationScopeRef.current,
+      generation: onlineMutationScopeRef.current.generation + 1,
+    };
+  }
+
+  function isOnlineMutationScopeCurrent(scope: OnlineMutationScope) {
+    const current = onlineMutationScopeRef.current;
+    return current.generation === scope.generation
+      && current.userId === scope.userId
+      && current.storeId === scope.storeId;
+  }
+
   const loginMutation = useMutation({
     mutationFn: ({ username, password }: { username: string; password: string }) => onlineCapabilities?.login?.(username, password) ?? Promise.reject(new Error("Gateway đăng nhập chưa sẵn sàng.")),
     onSuccess: (session: OnlineSession) => {
+      invalidateOnlineMutationScope();
       logoutMutation.reset();
       setOnlineAuthRequired(false);
       setStorageError("");
@@ -241,6 +259,7 @@ function WorkspaceApp() {
   const logoutMutation = useMutation({
     mutationFn: () => onlineCapabilities?.logout?.() ?? Promise.reject(new Error("Gateway đăng xuất chưa sẵn sàng.")),
     onSuccess: () => {
+      invalidateOnlineMutationScope();
       setOnlineAuthRequired(true);
       setOnlineStoreId(null);
       setRecords([]);
@@ -305,6 +324,17 @@ function WorkspaceApp() {
   const onlineStoreSignature = onlineStores.map(({ id, role }) => `${id}:${role}`).join("|");
 
   useEffect(() => {
+    const userId = onlineSession?.user.id ?? null;
+    const current = onlineMutationScopeRef.current;
+    if (current.userId === userId && current.storeId === onlineStoreId) return;
+    onlineMutationScopeRef.current = {
+      generation: current.generation + 1,
+      storeId: onlineStoreId,
+      userId,
+    };
+  }, [onlineSession?.user.id, onlineStoreId]);
+
+  useEffect(() => {
     if (!onlinePersistenceEnabled) return;
     setOnlineStoreId((current) => current && onlineStores.some(({ id }) => id === current)
       ? current
@@ -353,6 +383,7 @@ function WorkspaceApp() {
   }, [onlineLoading, onlineSession, onlineStores.length, storageError]);
 
   function expireOnlineSession(error: unknown) {
+    invalidateOnlineMutationScope();
     setOnlineAuthRequired(true);
     setOnlineStoreId(null);
     setRecords([]);
@@ -408,6 +439,7 @@ function WorkspaceApp() {
   }
 
   function retryOnlineWorkspace() {
+    invalidateOnlineMutationScope();
     setOnlineAuthRequired(false);
     setOnlineStoreId(null);
     setRecords([]);
@@ -421,6 +453,7 @@ function WorkspaceApp() {
 
   function changeOnlineStore(storeId: string) {
     if (!onlineStores.some(({ id }) => id === storeId) || storeId === onlineStoreId) return;
+    invalidateOnlineMutationScope();
     setOnlineStoreId(storeId);
     setRecords([]);
     setSelected(new Set());
@@ -704,14 +737,21 @@ function WorkspaceApp() {
     if (!storeConfigured) throw new Error("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
     if (onlinePersistenceEnabled) {
       if (!onlineCapabilities?.createRecord || !onlineStoreId) throw new Error("Không có phiên đăng nhập hợp lệ.");
+      const mutationScope: OnlineMutationScope = {
+        generation: onlineMutationScopeRef.current.generation,
+        storeId: onlineStoreId,
+        userId: onlineSession?.user.id ?? null,
+      };
       try {
         const created = await onlineCapabilities.createRecord(onlineStoreId, draft);
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
         setRecords((current) => [created, ...current]);
         queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => [created, ...(current ?? [])]);
         setActiveKind(draft.kind);
         setSelected(new Set([created.id]));
         setNotice(`Đã tạo phiếu ${created.id} và lưu trên máy chủ.`);
       } catch (error) {
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
         if (isSessionExpiryError(error)) expireOnlineSession(error);
         throw error;
       }
