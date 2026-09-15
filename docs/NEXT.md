@@ -131,10 +131,12 @@ phiếu. Phạm vi/gate nằm tại
 - Khóa OpenAPI/examples/generated client cho query ngày, approval và export.
 - Migration V5 giữ approval state/reviewer snapshot/history; backend revalidate
   manager membership, ghi audit và khóa snapshot export trong transaction.
-- Store PWA dùng `dd/mm/yyyy`, báo lỗi khoảng ngược cạnh field; desktop hiển thị
-  bộ lọc ngày một hàng compact, mobile đặt cùng hộp “Lọc & sắp xếp”; EMPLOYEE
-  không thấy action duyệt/xuất, manager chỉ xuất selection đã duyệt.
-- Candidate revision 2 đã pass Contract Lock, frontend tests/build, backend
+- Store PWA dùng `dd/mm/yyyy`, báo lỗi khoảng ngược cạnh field; cụm lọc chỉ giữ
+  hai ô ngày, mũi tên, nút xóa và tự áp dụng khi ngày hoàn chỉnh hợp lệ thay đổi.
+  Một đầu trống là khoảng không giới hạn; desktop hiển thị một hàng compact,
+  mobile đặt cùng hộp “Lọc & sắp xếp”. EMPLOYEE không thấy action duyệt/xuất,
+  manager chỉ xuất selection đã duyệt.
+- Candidate revision 3 đã pass Contract Lock, frontend tests/build, backend
   evidence không bị ảnh hưởng, browser E2E desktop/mobile và visual QA tới
   `320px`/landscape. Bước còn lại là owner nghiệm thu bố cục và luồng thực tế.
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "foundation-02-online-review-export",
-  "revision": 2,
+  "revision": 3,
   "status": "AWAITING_ACCEPTANCE",
   "objective": "Cho phép STORE_MANAGER đúng active store membership lọc lịch sử phiếu theo khoảng ngày phát hiện, duyệt phiếu và xuất Excel online với kiểm tra server-side và audit; EMPLOYEE vẫn chỉ xem/tạo và CHAIN_ADMIN không bypass store scope.",
   "inScope": [
@@ -18,7 +18,7 @@
     "Approval time window chưa có business rule"
   ],
   "baseSha": "405f6810e52ed1288f95b3484f20918e435614b9",
-  "candidateSha": "ba95608ae468bd85c98f3ea94cc9411912308e4c",
+  "candidateSha": "d2fb72ebb6cba65018bacaef993c21163dfcce7c",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -36,9 +36,9 @@
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 2,
-      "sha": "ba95608ae468bd85c98f3ea94cc9411912308e4c",
-      "evidence": "docs/delivery/foundation-02-online-review-export/technical-evidence-r2.md"
+      "revision": 3,
+      "sha": "d2fb72ebb6cba65018bacaef993c21163dfcce7c",
+      "evidence": "docs/delivery/foundation-02-online-review-export/technical-evidence-r3.md"
     },
     {
       "id": "owner-acceptance",
@@ -57,8 +57,15 @@
       "source": "Phản hồi trực tiếp của project owner trong Codex ngày 2026-09-15.",
       "impact": "Thay đổi bố cục và interaction của bộ lọc ngày trên Store PWA, cần cập nhật component/E2E/screenshot và vô hiệu hóa evidence UI revision 1; contract/backend không đổi.",
       "decision": "Desktop dùng cụm ngày một hàng compact; mobile đặt cùng state/control vào hộp thoại lọc và sắp xếp hiện có, giữ label, lỗi inline, inclusive range và xóa selection khi áp dụng/xóa lọc."
+    },
+    {
+      "revision": 3,
+      "request": "Tinh gọn vùng lọc chỉ còn hai ô ngày, mũi tên và nút xóa; tự lọc khi nhập/chọn/đổi ngày và hỗ trợ lọc chỉ từ hoặc chỉ đến ngày.",
+      "source": "Phản hồi trực tiếp của project owner trong Codex ngày 2026-09-15.",
+      "impact": "Thay interaction của date filter Store PWA và E2E/UI evidence; OpenAPI/backend không đổi vì hai query bound đã optional độc lập.",
+      "decision": "Ngày hoàn chỉnh hợp lệ hoặc thao tác xóa áp dụng ngay; input đang gõ dở không phát request. Một bound trống được bỏ khỏi query; range ngược giữ filter hợp lệ gần nhất và báo lỗi inline."
     }
   ],
   "blockers": [],
-  "nextAction": "Bàn giao candidate ba95608 cho owner kiểm tra bố cục compact desktop và date filter trong dialog mobile, rồi ghi quyết định nghiệm thu thực."
+  "nextAction": "Bàn giao candidate d2fb72e cho owner kiểm tra auto-filter, khoảng một đầu và bố cục desktop/mobile, rồi ghi quyết định nghiệm thu thực."
 }

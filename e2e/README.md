@@ -84,9 +84,10 @@ VITE_KPH_ONLINE=true npm --workspace @coopfood-kph/store-pwa run build -- --outD
 npm --workspace @coopfood-kph/store-pwa exec -- vite preview --host 127.0.0.1 --port 4173 --strictPort --outDir "$PWD/.local/online-dist"
 ```
 
-The default suite has five applicable cases: two desktop creation flows, one mobile card flow and
-one membership/session case repeated across both projects (five executions in total).
-Three project/case combinations are intentionally skipped by viewport. This is
+The default suite has five scenarios: two desktop creation flows, one desktop
+review/export/date-filter flow, one mobile card/date-filter flow and one
+membership/session flow repeated across both projects (six executions in total).
+Four project/case combinations are intentionally skipped by viewport. This is
 Chromium viewport coverage, not real-device iPhone acceptance.
 
 ## Visual review with fixtures
