@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
   "id": "p01-provisioning-policy",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Chốt đề xuất contract provisioning tối thiểu cho user, store, global role, store membership, bootstrap/recovery và credential reset để P02 có role matrix cùng fixture allow/deny được owner chấp nhận mà không suy diễn quyền hoặc triển khai feature sớm.",
+  "revision": 2,
+  "status": "EXECUTING",
+  "objective": "Chốt contract provisioning tối thiểu cho user, region, store, role/membership, bootstrap/recovery và credential reset để P02 có hierarchy CHAIN_ADMIN > REGION_MANAGER > STORE_MANAGER cùng fixture allow/deny được owner chấp nhận mà không suy diễn quyền hoặc triển khai feature sớm.",
   "inScope": [
-    "Tài liệu product policy với actor matrix, lifecycle, bootstrap/recovery, session effect, audit và guardrail last-admin/self-lockout",
-    "Fixture tổng hợp ngôn ngữ độc lập cho allow/deny provisioning và nguyên tắc CHAIN_ADMIN không bypass KPH store scope",
+    "Tài liệu product policy với actor matrix, region/store lifecycle, bootstrap/recovery, session effect, audit và guardrail last-admin/self-lockout",
+    "Fixture tổng hợp ngôn ngữ độc lập cho allow/deny provisioning và hierarchy CHAIN_ADMIN toàn chuỗi, REGION_MANAGER đúng vùng, STORE_MANAGER đúng store",
+    "ADR và business contract ghi rõ quyền KPH kế thừa theo hierarchy, gồm test deny ngoài vùng/cross-store",
     "Contract Lock validation cho fixture và dẫn chiếu nguồn security NIST/OWASP hiện hành",
     "Acceptance handoff nêu rõ các policy owner cần chấp nhận hoặc sửa trước P02"
   ],
@@ -15,14 +16,20 @@
     "Email/SMS reset, SSO/MFA, production bootstrap tooling, hosting và secret delivery",
     "Catalog staging/publish, paging history, backup/restore hoặc production rollout"
   ],
-  "baseSha": "c803561f5938a9fe58d2119b2a913fa3a59863dc",
-  "candidateSha": "88b12e457237b32518e067d86bd20831625ff545",
+  "baseSha": "a42dbf3392de928b4a75869b4d30665f71da70e2",
+  "candidateSha": "",
   "integrationOwner": "/root",
   "sharedPaths": [
     "docs/product/PROVISIONING_POLICY.md",
     "contracts/fixtures/golden/identity/provisioning-policy-cases.json",
     "contracts/fixtures/golden/fixture-manifest.json",
     "scripts/check-contracts.mjs",
+    "AGENTS.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/DOMAIN_RULES.md",
+    "docs/adr/0004-scoped-management-hierarchy.md",
+    "docs/adr/README.md",
     "docs/delivery/p01-provisioning-policy/**"
   ],
   "reviewLimit": 2,
@@ -33,22 +40,30 @@
       "id": "technical-contract",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "88b12e457237b32518e067d86bd20831625ff545",
-      "evidence": "docs/delivery/p01-provisioning-policy/technical-evidence.md"
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "owner-policy-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 1,
+      "revision": 2,
       "sha": "",
       "evidence": ""
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Thêm một cấp quản lý vùng gồm nhiều store, bắt buộc đúng phạm vi vùng và được đi xuống store; cấp admin tổng phía trên được đi xuống mọi store. Các quyết định còn lại duyệt/theo tiêu chuẩn an toàn.",
+      "source": "Codex user message 2026-09-17 beginning '1. có 1 cấp quản lý vùng gồm nhiều store'",
+      "impact": "Thay đổi authorization contract P01, làm evidence/candidate revision 1 hết hiệu lực; cần bổ sung region entity/membership, explicit inherited KPH access, cross-region denial, ADR và cập nhật business contract.",
+      "decision": "Sửa P01 thành hierarchy CHAIN_ADMIN toàn chuỗi > REGION_MANAGER đúng region > STORE_MANAGER đúng store; giữ password/bootstrap/lifecycle theo security baseline đã duyệt. Không triển khai P02 trong cycle này."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Project owner reviews the five policy decisions in acceptance-handoff.md and explicitly accepts P01 or supplies concrete corrections; do not start P02 meanwhile."
+  "nextAction": "Revise the P01 policy, business contract, ADR and fixtures for the accepted scoped management hierarchy, then rerun technical verification and close only if revision 2 exactly reflects the owner decision."
 }
