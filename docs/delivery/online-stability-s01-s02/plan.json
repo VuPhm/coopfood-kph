@@ -16,7 +16,7 @@
     "Merge main, push, deploy hoặc production rollout"
   ],
   "baseSha": "880edf44b45322f4630f10640103c59c6d1cf4b4",
-  "candidateSha": "ac90677da6c92f0511ae3f6133cb90cd6e347c33",
+  "candidateSha": "ac906776fd8876e1c89b686fc882f7b8b0cc640b",
   "integrationOwner": "/root",
   "sharedPaths": [
     "apps/store-pwa/src/app.tsx",
@@ -34,7 +34,7 @@
       "required": true,
       "status": "pass",
       "revision": 1,
-      "sha": "ac90677da6c92f0511ae3f6133cb90cd6e347c33",
+      "sha": "ac906776fd8876e1c89b686fc882f7b8b0cc640b",
       "evidence": "docs/delivery/online-stability-s01-s02/technical-evidence.md"
     },
     {
