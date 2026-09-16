@@ -6,6 +6,18 @@ import type { EvidencePhotoView, RecordView } from "./record-view";
 
 type Session = components["schemas"]["SessionResponse"];
 type KphRecord = components["schemas"]["KphRecord"];
+type KphApprovalStatus = components["schemas"]["KphApprovalStatus"];
+
+export type OnlineHistoryFilter = {
+  detectedFrom?: string;
+  detectedTo?: string;
+};
+
+export type OnlineExportBundle = {
+  exportId: string;
+  exportedAt: string;
+  records: RecordView[];
+};
 
 export type OnlineSession = Session;
 
@@ -30,11 +42,13 @@ export type OnlineWorkspace = {
 export type OnlineGateway = {
   getSession: (signal?: AbortSignal) => Promise<Session>;
   listStores: (signal?: AbortSignal) => Promise<components["schemas"]["StoreContext"][]>;
-  loadHistory: (storeId: string, signal?: AbortSignal) => Promise<RecordView[]>;
+  loadHistory: (storeId: string, filter?: OnlineHistoryFilter, signal?: AbortSignal) => Promise<RecordView[]>;
   loadWorkspace: (signal?: AbortSignal) => Promise<OnlineWorkspace>;
   login: (username: string, password: string, signal?: AbortSignal) => Promise<Session>;
   logout: () => Promise<void>;
   createRecord: (storeId: string, draft: CreatedRecordDraft) => Promise<RecordView>;
+  reviewRecord: (storeId: string, recordId: string, status: KphApprovalStatus) => Promise<RecordView>;
+  prepareExport: (storeId: string, type: components["schemas"]["KphType"], recordIds: string[]) => Promise<OnlineExportBundle>;
   lookupBarcode: (storeId: string, barcode: string, signal?: AbortSignal) => Promise<components["schemas"]["BarcodeLookupResponse"]>;
 };
 
@@ -61,9 +75,9 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     return response.data;
   }
 
-  async function loadHistory(storeId: string, signal?: AbortSignal) {
+  async function loadHistory(storeId: string, filter: OnlineHistoryFilter = {}, signal?: AbortSignal) {
     const response = await client.GET("/api/v1/stores/{storeId}/kph", {
-      params: { path: { storeId } },
+      params: { path: { storeId }, query: filter },
       ...(signal ? { signal } : {}),
     });
     if (response.error || !response.data) throw apiError(response, "Không thể tải lịch sử phiếu KPH.");
@@ -74,7 +88,7 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     const session = await getSession(signal);
     const store = session.user.stores[0];
     if (!store) throw new Error("Tài khoản chưa được gán cửa hàng hoạt động.");
-    return { session, store, records: await loadHistory(store.id, signal) };
+    return { session, store, records: await loadHistory(store.id, {}, signal) };
   }
 
   async function login(username: string, password: string, signal?: AbortSignal): Promise<Session> {
@@ -154,6 +168,34 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     return toRecordView(response.data);
   }
 
+  async function reviewRecord(storeId: string, recordId: string, status: KphApprovalStatus) {
+    const response = await client.PUT("/api/v1/stores/{storeId}/kph/{recordId}/approval", {
+      params: {
+        path: { storeId, recordId },
+        header: { "X-CSRF-TOKEN": csrfToken },
+      },
+      body: { status },
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể cập nhật trạng thái duyệt phiếu KPH.");
+    return toRecordView(response.data);
+  }
+
+  async function prepareExport(storeId: string, type: components["schemas"]["KphType"], recordIds: string[]) {
+    const response = await client.POST("/api/v1/stores/{storeId}/kph/exports", {
+      params: {
+        path: { storeId },
+        header: { "X-CSRF-TOKEN": csrfToken },
+      },
+      body: { type, recordIds },
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể chuẩn bị dữ liệu xuất Excel.");
+    return {
+      exportId: response.data.exportId,
+      exportedAt: response.data.exportedAt,
+      records: response.data.records.map(toRecordView),
+    };
+  }
+
   async function lookupBarcode(storeId: string, barcode: string, signal?: AbortSignal) {
     const response = await client.GET("/api/v1/catalog/barcodes/{barcode}", {
       params: { path: { barcode }, query: { storeId } },
@@ -163,7 +205,7 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     return response.data as components["schemas"]["BarcodeLookupResponse"];
   }
 
-  return { getSession, listStores, loadHistory, loadWorkspace, login, logout, createRecord, lookupBarcode };
+  return { getSession, listStores, loadHistory, loadWorkspace, login, logout, createRecord, reviewRecord, prepareExport, lookupBarcode };
 }
 
 function apiError(response: { error?: unknown; response?: Response }, fallback: string) {
@@ -260,7 +302,8 @@ function toRecordView(record: KphRecord): RecordView {
     condition: condition ? resolveChoiceLabel(condition, record.conditionDetail ?? "") : record.condition,
     resolution: resolution ? resolveChoiceLabel(resolution, record.resolutionDetail ?? "") : record.resolution,
     treatmentDate: record.processedDate ? isoToDisplayDate(record.processedDate) : "",
-    approvalStatus: "PENDING",
+    approvalStatus: record.approvalStatus,
+    ...(record.reviewedBy ? { reviewedBy: record.reviewedBy.displayName } : {}),
     photos,
     note: record.note ?? "",
     createdAt: record.createdAt,

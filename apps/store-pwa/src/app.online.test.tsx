@@ -8,6 +8,8 @@ import type { OnlineWorkspace } from "./online-kph";
 const mocks = vi.hoisted(() => ({
   loadWorkspace: vi.fn(),
   createRecord: vi.fn(),
+  reviewRecord: vi.fn(),
+  prepareExport: vi.fn(),
   lookupBarcode: vi.fn(),
   loadPilotRecords: vi.fn(),
   patchPilotRecords: vi.fn(),
@@ -21,6 +23,8 @@ vi.mock("./online-kph", () => ({
   createOnlineGateway: () => ({
     loadWorkspace: mocks.loadWorkspace,
     createRecord: mocks.createRecord,
+    reviewRecord: mocks.reviewRecord,
+    prepareExport: mocks.prepareExport,
     lookupBarcode: mocks.lookupBarcode,
   }),
 }));
@@ -75,8 +79,8 @@ describe("Online workspace boundary", () => {
     expect(mocks.loadWorkspace).toHaveBeenCalledTimes(2);
   });
 
-  it.each(["EMPLOYEE", "STORE_MANAGER"] as const)("keeps Pilot actions unavailable for online %s in table and cards", async (role) => {
-    mocks.loadWorkspace.mockResolvedValue(workspace(role));
+  it("keeps review, export and Pilot delete unavailable for online EMPLOYEE", async () => {
+    mocks.loadWorkspace.mockResolvedValue(workspace("EMPLOYEE"));
     render(<App />);
     await screen.findAllByText("Sản phẩm từ máy chủ");
 
@@ -100,5 +104,57 @@ describe("Online workspace boundary", () => {
     expect(mocks.recordPilotExport).not.toHaveBeenCalled();
     expect(mocks.savePilotRecord).not.toHaveBeenCalled();
     expect(mocks.downloadKphWorkbook).not.toHaveBeenCalled();
+  });
+
+  it("lets an online STORE_MANAGER review and export an approved server snapshot without delete", async () => {
+    const managerWorkspace = workspace("STORE_MANAGER");
+    const approved = { ...managerWorkspace.records[0]!, approvalStatus: "APPROVED" as const, reviewedBy: managerWorkspace.session.user.displayName };
+    mocks.loadWorkspace.mockResolvedValue(managerWorkspace);
+    mocks.reviewRecord.mockResolvedValue(approved);
+    mocks.prepareExport.mockResolvedValue({ exportId: "export-1", exportedAt: "2026-09-15T08:00:00Z", records: [approved] });
+    mocks.downloadKphWorkbook.mockResolvedValue("KPH.xlsx");
+    render(<App />);
+    await screen.findAllByText("Sản phẩm từ máy chủ");
+
+    const reviewSelect = screen.getAllByRole("combobox", { name: /Trạng thái duyệt phiếu online-record-1/ })[0]!;
+    fireEvent.change(reviewSelect, { target: { value: "APPROVED" } });
+    await waitFor(() => expect(mocks.reviewRecord).toHaveBeenCalledWith(managerWorkspace.store.id, "online-record-1", "APPROVED"));
+
+    fireEvent.click(screen.getAllByRole("checkbox", { name: "Chọn phiếu online-record-1" })[0]!);
+    const exportButton = screen.getByRole("button", { name: "Xuất Excel" });
+    expect(exportButton).toBeEnabled();
+    fireEvent.click(exportButton);
+    fireEvent.click(screen.getByRole("button", { name: "Xuất 1 dòng" }));
+    await waitFor(() => expect(mocks.prepareExport).toHaveBeenCalledWith(managerWorkspace.store.id, "TPCN", ["online-record-1"]));
+    expect(mocks.downloadKphWorkbook).toHaveBeenCalledWith("TPCN", [approved], expect.objectContaining({ storeCode: managerWorkspace.store.code }));
+    expect(screen.queryByRole("button", { name: /Xóa phiếu/ })).not.toBeInTheDocument();
+  });
+
+  it("auto-filters inclusive detected dates with either bound and reports an inverted range", async () => {
+    const base = workspace();
+    mocks.loadWorkspace.mockResolvedValue({
+      ...base,
+      records: [
+        { ...base.records[0]!, id: "in-range", detectedDate: "10/09/2026", productName: "Trong khoảng" },
+        { ...base.records[0]!, id: "out-range", detectedDate: "09/09/2026", productName: "Ngoài khoảng" },
+      ],
+    });
+    render(<App />);
+    await screen.findAllByText("Trong khoảng");
+
+    fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "10/09/2026" } });
+    expect(screen.getAllByText("Trong khoảng")).toHaveLength(2);
+    expect(screen.queryByText("Ngoài khoảng")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Xóa lọc ngày" }));
+    expect(screen.getAllByText("Trong khoảng")).toHaveLength(2);
+    expect(screen.getAllByText("Ngoài khoảng")).toHaveLength(2);
+
+    fireEvent.change(screen.getByLabelText("Đến ngày"), { target: { value: "09/09/2026" } });
+    expect(screen.queryByText("Trong khoảng")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Ngoài khoảng")).toHaveLength(2);
+
+    fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "11/09/2026" } });
+    expect(screen.getByRole("alert")).toHaveTextContent("Từ ngày không được sau đến ngày");
   });
 });

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "online-stability-s01-s02",
+  "revision": 3,
+  "status": "CLOSED",
+  "objective": "Ổn định Store PWA online khi request chậm hoặc duyệt lô lỗi một phần: response tạo phiếu từ store/session cũ không làm bẩn UI hiện tại, và duyệt lô phải đợi mọi request hoàn tất rồi báo đúng kết quả thành công/thất bại.",
+  "inScope": [
+    "Tích hợp commit S01 b0c404a và kiểm tra response tạo phiếu bị trì hoãn qua đổi store hoặc logout/login",
+    "S02 thay Promise.all bằng xử lý settled có giới hạn concurrency hợp lý, giữ busy đến khi toàn bộ request kết thúc và refetch sau cùng",
+    "Store PWA component regression, frontend verify và browser gate online phù hợp trên candidate tích hợp",
+    "Push nhánh integration và mở draft PR vào main để review tập trung; theo dõi remote CI trước owner acceptance",
+    "Hai script start/stop một lệnh cho môi trường nghiệm thu online bằng PostgreSQL/media/fixture tổng hợp riêng"
+  ],
+  "outOfScope": [
+    "S03 store snapshot cho Excel hoặc giới hạn selection 500",
+    "S04 refactor online Query cache thành nguồn history duy nhất",
+    "Thay đổi OpenAPI, generated client, backend, database migration, Pilot persistence hoặc Admin Web",
+    "Merge main, deploy hoặc production rollout"
+  ],
+  "baseSha": "880edf44b45322f4630f10640103c59c6d1cf4b4",
+  "candidateSha": "6836bc51cdf693626e7c608e23d3132f7d40c775",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "apps/store-pwa/src/app.tsx",
+    "apps/store-pwa/src/app.online.identity.test.tsx",
+    "apps/store-pwa/src/app.online.test.tsx",
+    "apps/store-pwa/e2e/**",
+    "e2e/scripts/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-integrated",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 3,
+      "sha": "6836bc51cdf693626e7c608e23d3132f7d40c775",
+      "evidence": "docs/delivery/online-stability-s01-s02/technical-evidence.md"
+    },
+    {
+      "id": "owner-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 3,
+      "sha": "6836bc51cdf693626e7c608e23d3132f7d40c775",
+      "evidence": "docs/delivery/online-stability-s01-s02/acceptance-handoff.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "Codex user message 2026-09-16: pass, làm tiếp"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Tiếp tục việc dang dở và cân nhắc mở PR nếu đã đến lúc.",
+      "source": "Yêu cầu trực tiếp của project owner trong Codex ngày 2026-09-16.",
+      "impact": "Mở rộng delivery từ local candidate sang push nhánh và draft PR để review/CI; code S01–S02 và acceptance behavior không đổi.",
+      "decision": "Mở draft PR vì origin/main là ancestor, không có PR trùng hoặc commit riêng trên main; PR bao gồm Foundation-02 đã accepted cùng S01–S02. Không merge trước owner acceptance. Technical evidence revision 1 được carry forward vì revision 2 chỉ đổi hồ sơ delivery/PR coordination."
+    },
+    {
+      "revision": 3,
+      "request": "Cung cấp script chạy/dừng nhanh để project owner nghiệm thu.",
+      "source": "Yêu cầu trực tiếp của project owner trong Codex ngày 2026-09-16.",
+      "impact": "Thêm tooling cục bộ dưới e2e/scripts và hướng dẫn nghiệm thu; runtime product, contract, backend schema và acceptance behavior S01–S02 không đổi. Technical gate revision 2 phải kiểm thêm bash syntax và start/stop lifecycle thật.",
+      "decision": "Cung cấp hai script start/stop dành cho macOS, dùng production online build, backend jar, PostgreSQL 17 disposable, seed tổng hợp, launchctl service có label cố định và container marker an toàn; không dùng dữ liệu vận hành hoặc tự mở browser. Runtime/log đặt dưới /tmp để tránh macOS TCC chặn launchd ghi vào Documents. Evidence product revision 2 được carry forward, evidence tooling được bổ sung trên candidate revision 3."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Cycle đã đóng theo owner acceptance. Chuyển PR #3 sang ready-for-review rồi dừng; merge main, deploy hoặc mở S03 cần yêu cầu riêng."
+}

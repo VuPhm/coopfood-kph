@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "foundation-02-online-review-export",
+  "revision": 3,
+  "status": "CLOSED",
+  "objective": "Cho phép STORE_MANAGER đúng active store membership lọc lịch sử phiếu theo khoảng ngày phát hiện, duyệt phiếu và xuất Excel online với kiểm tra server-side và audit; EMPLOYEE vẫn chỉ xem/tạo và CHAIN_ADMIN không bypass store scope.",
+  "inScope": [
+    "OpenAPI, examples và generated client cho bộ lọc ngày, duyệt và export online",
+    "PostgreSQL migration cho approval state/history và backend authorization/audit",
+    "Store PWA lọc ngày phát hiện inclusive, duyệt theo quyền và xuất các phiếu đã duyệt",
+    "Kiểm thử contract, backend integration, frontend unit/component và E2E liên quan"
+  ],
+  "outOfScope": [
+    "Production infrastructure hoặc deployment",
+    "Offline synchronization và conflict resolution",
+    "Admin catalog import/publish",
+    "Xóa hoặc vô hiệu hóa phiếu từ Store PWA",
+    "Approval time window chưa có business rule"
+  ],
+  "baseSha": "405f6810e52ed1288f95b3484f20918e435614b9",
+  "candidateSha": "f179b380690fd12ab4acc3f53c5fb5f5b84c0a29",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/**",
+    "contracts/fixtures/**",
+    "backend/src/main/resources/db/migration/**",
+    "packages/api/**",
+    "pnpm-lock.yaml"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-integrated",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 3,
+      "sha": "f179b380690fd12ab4acc3f53c5fb5f5b84c0a29",
+      "evidence": "docs/delivery/foundation-02-online-review-export/technical-evidence-r3.md"
+    },
+    {
+      "id": "owner-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 3,
+      "sha": "f179b380690fd12ab4acc3f53c5fb5f5b84c0a29",
+      "evidence": "docs/delivery/foundation-02-online-review-export/acceptance-handoff.md",
+      "acceptedBy": "project owner",
+      "decisionRef": "Direct Codex thread message on 2026-09-16: cho pass, làm tiếp"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Làm bộ lọc ngày compact; ở màn hình nhỏ tích hợp vào hộp thoại lọc hiện có.",
+      "source": "Phản hồi trực tiếp của project owner trong Codex ngày 2026-09-15.",
+      "impact": "Thay đổi bố cục và interaction của bộ lọc ngày trên Store PWA, cần cập nhật component/E2E/screenshot và vô hiệu hóa evidence UI revision 1; contract/backend không đổi.",
+      "decision": "Desktop dùng cụm ngày một hàng compact; mobile đặt cùng state/control vào hộp thoại lọc và sắp xếp hiện có, giữ label, lỗi inline, inclusive range và xóa selection khi áp dụng/xóa lọc."
+    },
+    {
+      "revision": 3,
+      "request": "Tinh gọn vùng lọc chỉ còn hai ô ngày, mũi tên và nút xóa; tự lọc khi nhập/chọn/đổi ngày và hỗ trợ lọc chỉ từ hoặc chỉ đến ngày.",
+      "source": "Phản hồi trực tiếp của project owner trong Codex ngày 2026-09-15.",
+      "impact": "Thay interaction của date filter Store PWA và E2E/UI evidence; OpenAPI/backend không đổi vì hai query bound đã optional độc lập.",
+      "decision": "Ngày hoàn chỉnh hợp lệ hoặc thao tác xóa áp dụng ngay; input đang gõ dở không phát request. Một bound trống được bỏ khỏi query; range ngược giữ filter hợp lệ gần nhất và báo lỗi inline."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Cycle đã đóng tại candidate f179b38; chờ project owner chỉ định outcome cụ thể cho cycle tiếp theo."
+}

@@ -56,10 +56,24 @@ type KphRecord = {
   };
   photos: Array<{ ordinal: number; stampedContentPath: string; capturedAt: string }>;
   store: { id: string; code: string; name: string };
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+  reviewedBy: { id: string; displayName: string } | null;
 };
 
 function apiUrl(path: string) {
   return new URL(path, BACKEND_URL).toString();
+}
+
+function businessDateDisplay(dayOffset = 0) {
+  const value = new Date(Date.now() + dayOffset * 24 * 60 * 60 * 1_000);
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).formatToParts(value);
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)!.value;
+  return `${part("day")}/${part("month")}/${part("year")}`;
 }
 
 function syntheticPng(name: string, lastModified: number) {
@@ -250,7 +264,7 @@ async function directApiContext() {
   return await playwrightRequest.newContext({ baseURL: BACKEND_URL });
 }
 
-test.describe("Foundation-01 browser acceptance", () => {
+test.describe("Store PWA browser acceptance", () => {
   test("STORE_MANAGER creates FOUND TPCN with one photo, reloads it, and cannot see it in another store", async ({ page, context }, testInfo) => {
     test.skip(testInfo.project.name.includes("mobile"), "Desktop test covers table layout and store switch.");
     await loginViaUi(page, USERS.manager);
@@ -370,11 +384,68 @@ test.describe("Foundation-01 browser acceptance", () => {
     await expect(page.locator(".desktop-history")).toBeHidden();
     const card = page.locator(".mobile-history .record-card").filter({ hasText: marker }).first();
     await expect(card).toBeVisible();
+    await expect(page.locator(".history-date-filter-desktop")).toBeHidden();
+    const filterTrigger = page.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" });
+    await filterTrigger.click();
+    const filterDialog = page.getByRole("dialog", { name: "Lọc & sắp xếp" });
+    await expect(filterDialog.getByRole("heading", { name: "Ngày phát hiện" })).toBeVisible();
+    const today = businessDateDisplay();
+    const filteredResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && response.url().includes("detectedTo="));
+    await filterDialog.locator("#mobile-history-date-from").fill(today);
+    await filterDialog.locator("#mobile-history-date-to").fill(today);
+    expect((await filteredResponse).status()).toBe(200);
+    await filterDialog.getByRole("button", { name: "Đóng" }).click();
+    await expect(filterTrigger).toHaveClass(/is-active/);
+    await expect(card).toBeVisible();
     await card.getByRole("button", { name: /mở rộng phiếu/i }).click();
     await expect(card.getByLabel(/1 ảnh minh chứng/)).toBeVisible();
     await page.reload();
     await waitForWorkspace(page);
     await expectVisible(page.locator(".mobile-history .record-card").filter({ hasText: marker }));
+  });
+
+  test("STORE_MANAGER filters by detected date, reviews a record and downloads the authorized Excel", async ({ page, context }, testInfo) => {
+    test.skip(testInfo.project.name.includes("mobile"), "Desktop project verifies the online review and workbook download flow.");
+    await loginViaUi(page, USERS.manager);
+    const dialog = await openCreateDialog(page, "TPCN");
+    await lookupBarcode(dialog, NOT_FOUND_BARCODE, "NOT_FOUND");
+    const marker = `Sản phẩm E2E REVIEW ${Date.now()}`;
+    await (await firstVisible(dialog.getByLabel(/tên hàng hóa|product name/i))).fill(marker);
+    await addPhotos(dialog, 1, `foundation-review-${testInfo.workerIndex}`);
+    await saveDialog(dialog);
+
+    const records = await listRecords(context, STORES.primary.id);
+    const created = records.find((record) => record.catalogSnapshot.productName === marker)!;
+    expect(created.approvalStatus).toBe("PENDING");
+    const row = page.locator(".desktop-history .record-row").filter({ hasText: marker });
+    await expect(row).toBeVisible();
+
+    const today = businessDateDisplay();
+    const filteredResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && response.url().includes("detectedTo="));
+    await page.locator("#history-date-from").fill(today);
+    await page.locator("#history-date-to").fill(today);
+    expect((await filteredResponse).status()).toBe(200);
+    await expect(row).toBeVisible();
+
+    const fromOnlyResponse = page.waitForResponse((response) => response.url().includes("detectedFrom=") && !response.url().includes("detectedTo="));
+    await page.locator("#history-date-from").fill(businessDateDisplay(1));
+    await page.locator("#history-date-to").fill("");
+    expect((await fromOnlyResponse).status()).toBe(200);
+    await expect(row).toBeHidden();
+    await page.getByRole("button", { name: "Xóa lọc" }).click();
+    await expect(row).toBeVisible();
+
+    const reviewResponse = page.waitForResponse((response) => response.request().method() === "PUT" && response.url().endsWith(`/kph/${created.id}/approval`));
+    await row.getByRole("combobox", { name: new RegExp(`Trạng thái duyệt phiếu ${created.id}`) }).selectOption("APPROVED");
+    expect((await reviewResponse).status()).toBe(200);
+    await row.getByRole("checkbox", { name: `Chọn phiếu ${created.id}` }).check();
+    await expect(page.getByRole("button", { name: "Xuất Excel" })).toBeEnabled();
+    await page.getByRole("button", { name: "Xuất Excel" }).click();
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Xuất 1 dòng" }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/^Phieu_Theo_Doi_Hang_KPH_.*\.xlsx$/);
+    expect(await download.failure()).toBeNull();
   });
 
   test("session expiry and EMPLOYEE/STORE_MANAGER membership isolation return contract errors", async ({ page, context }) => {
@@ -400,12 +471,25 @@ test.describe("Foundation-01 browser acceptance", () => {
       const adminSession = await loginViaApi(adminApi, USERS.chainAdmin);
       expect(adminSession.user.stores).toEqual([]);
 
-      expect((await employeeApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(200);
+      const employeeRecordsResponse = await employeeApi.get(`/api/v1/stores/${STORES.primary.id}/kph`);
+      expect(employeeRecordsResponse.status()).toBe(200);
       expect((await employeeApi.get(`/api/v1/stores/${STORES.secondary.id}/kph`)).status()).toBe(403);
       expect((await managerApi.get(`/api/v1/stores/${STORES.outsideMembership.id}/kph`)).status()).toBe(403);
       expect((await adminApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(403);
       expect((await adminApi.get(`/api/v1/catalog/barcodes/${FOUND_BARCODE}?storeId=${STORES.primary.id}`)).status()).toBe(403);
       expect((await anonymousApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(401);
+
+      const record = (await employeeRecordsResponse.json() as KphRecord[])[0];
+      if (record) {
+        expect((await employeeApi.put(`/api/v1/stores/${STORES.primary.id}/kph/${record.id}/approval`, {
+          headers: { "X-CSRF-TOKEN": employeeSession.csrfToken },
+          data: { status: "APPROVED" },
+        })).status()).toBe(403);
+        expect((await adminApi.post(`/api/v1/stores/${STORES.primary.id}/kph/exports`, {
+          headers: { "X-CSRF-TOKEN": adminSession.csrfToken },
+          data: { type: record.type, recordIds: [record.id] },
+        })).status()).toBe(403);
+      }
 
       const logout = await managerApi.post("/api/v1/auth/logout", {
         headers: { "X-CSRF-TOKEN": managerSession.csrfToken },

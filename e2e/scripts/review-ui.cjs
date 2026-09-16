@@ -8,6 +8,7 @@ const scenarios = [
   ['login', 1440, 1000, false], ['login-mobile', 375, 812, false],
   ['desktop', 1440, 1000, true], ['tablet', 768, 1024, true],
   ['mobile', 390, 844, true], ['small', 320, 740, true],
+  ['mobile-landscape', 667, 375, true],
 ];
 (async () => {
   mkdirSync(output, { recursive: true });
@@ -38,6 +39,18 @@ const scenarios = [
         assert.equal(await page.getByRole('textbox', { name: 'Tên đăng nhập' }).evaluate(el => el === document.activeElement), true);
       }
       await page.screenshot({ path: `${output}/ui-after-${name}.png`, fullPage: true });
+      if (signedIn && (name === 'mobile' || name === 'small' || name === 'mobile-landscape')) {
+        assert.equal(await page.locator('.history-date-filter-desktop').isVisible(), false, `${name}: standalone date filter must be hidden`);
+        await page.getByRole('button', { name: 'Mở lọc và sắp xếp trên mobile' }).click();
+        const filterDialog = page.getByRole('dialog', { name: 'Lọc & sắp xếp' });
+        await filterDialog.waitFor();
+        assert.equal(await filterDialog.locator('#mobile-history-date-from').isVisible(), true, `${name}: from date must be visible in filter dialog`);
+        assert.equal(await filterDialog.locator('#mobile-history-date-to').isVisible(), true, `${name}: to date must be visible in filter dialog`);
+        assert.ok(await filterDialog.evaluate(el => el.scrollWidth <= el.clientWidth), `${name}: filter dialog overflow`);
+        await page.screenshot({ path: `${output}/ui-after-filter-${name}.png` });
+        await page.keyboard.press('Escape');
+        await filterDialog.waitFor({ state: 'hidden' });
+      }
       if (signedIn && (name === 'mobile' || name === 'desktop')) {
         await page.getByRole('button', { name: /Tạo phiếu.*TP khô/i }).click();
         const dialog = page.getByRole('dialog');

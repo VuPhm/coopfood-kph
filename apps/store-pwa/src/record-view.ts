@@ -17,6 +17,7 @@ export type RecordView = {
   resolution: string;
   treatmentDate: string;
   approvalStatus: ApprovalStatus;
+  reviewedBy?: string;
   photos: readonly EvidencePhotoView[];
   note?: string;
   createdAt?: string;

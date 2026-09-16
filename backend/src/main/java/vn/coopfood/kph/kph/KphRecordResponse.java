@@ -22,6 +22,9 @@ public record KphRecordResponse(
         String lookupStatus,
         CatalogSnapshot catalogSnapshot,
         String lifecycleState,
+        KphApprovalStatus approvalStatus,
+        ActorSnapshot reviewedBy,
+        Instant reviewedAt,
         String note,
         StoreSnapshot store,
         ActorSnapshot detectedBy,
@@ -59,6 +62,9 @@ public record KphRecordResponse(
         private final String lookupStatus;
         private final CatalogSnapshot catalogSnapshot;
         private final String lifecycleState;
+        private final KphApprovalStatus approvalStatus;
+        private final ActorSnapshot reviewedBy;
+        private final Instant reviewedAt;
         private final String note;
         private final StoreSnapshot store;
         private final ActorSnapshot detectedBy;
@@ -68,7 +74,8 @@ public record KphRecordResponse(
         Builder(UUID id, KphType type, LocalDate detectedDate, LocalDate processedDate, BigDecimal quantity,
                 KphUnit unit, KphCondition condition, String conditionDetail, KphResolution resolution,
                 String resolutionDetail, String barcode, String lookupStatus, CatalogSnapshot catalogSnapshot,
-                String lifecycleState, String note, StoreSnapshot store, ActorSnapshot detectedBy, Instant createdAt) {
+                String lifecycleState, KphApprovalStatus approvalStatus, ActorSnapshot reviewedBy, Instant reviewedAt,
+                String note, StoreSnapshot store, ActorSnapshot detectedBy, Instant createdAt) {
             this.id = id;
             this.type = type;
             this.detectedDate = detectedDate;
@@ -83,6 +90,9 @@ public record KphRecordResponse(
             this.lookupStatus = lookupStatus;
             this.catalogSnapshot = catalogSnapshot;
             this.lifecycleState = lifecycleState;
+            this.approvalStatus = approvalStatus;
+            this.reviewedBy = reviewedBy;
+            this.reviewedAt = reviewedAt;
             this.note = note;
             this.store = store;
             this.detectedBy = detectedBy;
@@ -96,7 +106,8 @@ public record KphRecordResponse(
         KphRecordResponse build() {
             return new KphRecordResponse(id, type, detectedDate, processedDate, quantity, unit, condition,
                     conditionDetail, resolution, resolutionDetail, barcode, lookupStatus, catalogSnapshot,
-                    lifecycleState, note, store, detectedBy, List.copyOf(photos), createdAt);
+                    lifecycleState, approvalStatus, reviewedBy, reviewedAt, note, store, detectedBy,
+                    List.copyOf(photos), createdAt);
         }
     }
 }

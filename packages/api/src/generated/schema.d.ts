@@ -140,6 +140,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/stores/{storeId}/kph/{recordId}/approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set the approval decision for one KPH record
+         * @description Only a STORE_MANAGER with an active membership in this exact store may
+         *     review a record. Global CHAIN_ADMIN does not bypass store membership or
+         *     the STORE_MANAGER role. Every state change is appended to review history
+         *     and the audit trail; repeating the same decision is idempotent.
+         */
+        put: operations["reviewKphRecord"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/kph/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Authorize and snapshot one online KPH Excel export
+         * @description Only a STORE_MANAGER with active membership may export. All requested
+         *     records must belong to this store, share the requested type, remain
+         *     SUBMITTED and already be APPROVED. The response is the authoritative
+         *     ordered snapshot used by the Store PWA to build the workbook; the backend
+         *     records one audit event for the export selection.
+         */
+        post: operations["prepareKphExport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stores/{storeId}/kph/{recordId}/photos/{ordinal}": {
         parameters: {
             query?: never;
@@ -239,6 +286,23 @@ export interface components {
         KphLookupStatus: "FOUND" | "NOT_FOUND" | "MANUAL";
         /** @enum {string} */
         KphLifecycleState: "SUBMITTED" | "INVALIDATED";
+        /** @enum {string} */
+        KphApprovalStatus: "PENDING" | "APPROVED" | "REJECTED";
+        KphApprovalRequest: {
+            status: components["schemas"]["KphApprovalStatus"];
+        };
+        KphExportRequest: {
+            type: components["schemas"]["KphType"];
+            recordIds: string[];
+        };
+        KphExportBundle: {
+            /** Format: uuid */
+            exportId: string;
+            /** Format: date-time */
+            exportedAt: string;
+            store: components["schemas"]["KphStoreSnapshot"];
+            records: components["schemas"]["KphRecord"][];
+        };
         /**
          * @description TPCN conditions: NEAR_EXPIRY, EXPIRED, TORN_PACKAGING, VACUUM_LEAK,
          *     OTHER; resolutions: CANCEL, EXCHANGE, RETURN, OTHER. TPTS conditions:
@@ -302,6 +366,10 @@ export interface components {
             lookupStatus: components["schemas"]["KphLookupStatus"];
             catalogSnapshot: components["schemas"]["KphCatalogSnapshot"];
             lifecycleState: components["schemas"]["KphLifecycleState"];
+            approvalStatus: components["schemas"]["KphApprovalStatus"];
+            reviewedBy: components["schemas"]["ActorSnapshot"] | null;
+            /** Format: date-time */
+            reviewedAt: string | null;
             note?: string | null;
             store: components["schemas"]["KphStoreSnapshot"];
             detectedBy: components["schemas"]["ActorSnapshot"];
@@ -586,6 +654,10 @@ export interface operations {
         parameters: {
             query?: {
                 type?: components["schemas"]["KphType"];
+                /** @description Inclusive lower bound of the KPH detected date. */
+                detectedFrom?: string;
+                /** @description Inclusive upper bound of the KPH detected date. Must not precede detectedFrom. */
+                detectedTo?: string;
             };
             header?: never;
             path: {
@@ -605,9 +677,10 @@ export interface operations {
                     "application/json": components["schemas"]["KphRecord"][];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
+            422: components["responses"]["UnprocessableEntity"];
         };
     };
     createKphRecord: {
@@ -640,6 +713,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["KphRecord"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
+        };
+    };
+    reviewKphRecord: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Requested scope; membership remains authoritative on the server. */
+                storeId: components["parameters"]["StoreIdPath"];
+                recordId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KphApprovalRequest"];
+            };
+        };
+        responses: {
+            /** @description Current record including the persisted review decision. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KphRecord"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    prepareKphExport: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Requested scope; membership remains authoritative on the server. */
+                storeId: components["parameters"]["StoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KphExportRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized export snapshot in the same order as recordIds. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KphExportBundle"];
                 };
             };
             400: components["responses"]["BadRequest"];

@@ -18,6 +18,9 @@
     "supplierName": "NCC Demo"
   },
   "lifecycleState": "SUBMITTED",
+  "approvalStatus": "PENDING",
+  "reviewedBy": null,
+  "reviewedAt": null,
   "note": null,
   "store": {
     "id": "20000000-0000-4000-8000-000000000001",

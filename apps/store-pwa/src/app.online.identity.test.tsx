@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import sessionFixture from "../../../contracts/fixtures/api/session.json";
+import type { RecordView } from "./record-view";
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -10,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   login: vi.fn(),
   logout: vi.fn(),
   createRecord: vi.fn(),
+  reviewRecord: vi.fn(),
   lookupBarcode: vi.fn(),
 }));
 
@@ -22,6 +24,7 @@ vi.mock("./online-kph", () => ({
     login: mocks.login,
     logout: mocks.logout,
     createRecord: mocks.createRecord,
+    reviewRecord: mocks.reviewRecord,
     lookupBarcode: mocks.lookupBarcode,
   }),
 }));
@@ -32,7 +35,7 @@ const storeA = { ...sessionFixture.user.stores[0]!, id: "20000000-0000-4000-8000
 const storeB = { ...sessionFixture.user.stores[0]!, id: "20000000-0000-4000-8000-000000000002", code: "CF-DEMO-002", name: "Lý Thường Kiệt" };
 const session = { ...sessionFixture, user: { ...sessionFixture.user, stores: [storeA, storeB] } };
 
-function record(id: string, productName: string) {
+function record(id: string, productName: string): RecordView {
   return {
     id,
     kind: "TPCN" as const,
@@ -51,6 +54,33 @@ function record(id: string, productName: string) {
     photos: [],
     note: "",
   };
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+  return { promise, resolve };
+}
+
+async function submitOnlineRecord(productName: string) {
+  fireEvent.click(await screen.findByRole("button", { name: /Tạo phiếu TP khô/i }));
+  fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: productName } });
+  const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+  fireEvent.change(picker!, { target: { files: [new File(["evidence"], "evidence.jpg", { type: "image/jpeg" })] } });
+  expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+  await waitFor(() => expect(mocks.createRecord).toHaveBeenCalledOnce());
+}
+
+function expectSelectedCount(count: number) {
+  if (count === 0) {
+    expect(screen.getByText((_, element) => element?.classList.contains("selection-count") === true))
+      .toHaveTextContent("Đã chọn 0");
+    return;
+  }
+  expect(screen.getByRole("button", { name: `Duyệt ${count} phiếu` })).toBeVisible();
 }
 
 beforeEach(() => {
@@ -103,8 +133,123 @@ describe("online identity and scoped query state", () => {
     const context = screen.getByRole("group", { name: /Cửa hàng hiện tại/ });
     const switcher = within(context).getByRole("combobox", { name: "Chọn cửa hàng" });
     fireEvent.change(switcher, { target: { value: storeB.id } });
-    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledWith(storeB.id, expect.anything()));
+    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledWith(storeB.id, {}, expect.anything()));
     expect(await screen.findAllByText("Phiếu cửa hàng B")).toHaveLength(2);
     expect(screen.queryByText("Phiếu cửa hàng A")).not.toBeInTheDocument();
+  });
+
+  it("ignores a create response after the user switches stores", async () => {
+    const pendingCreate = deferred<ReturnType<typeof record>>();
+    mocks.createRecord.mockReturnValueOnce(pendingCreate.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu cửa hàng A");
+    await submitOnlineRecord("Phiếu tạo muộn ở A");
+
+    fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
+    const switcher = within(screen.getByRole("group", { name: /Cửa hàng hiện tại/ }))
+      .getByRole("combobox", { name: "Chọn cửa hàng" });
+    fireEvent.change(switcher, { target: { value: storeB.id } });
+    expect(await screen.findAllByText("Phiếu cửa hàng B")).toHaveLength(2);
+
+    await act(async () => pendingCreate.resolve(record("created-at-a", "Phiếu tạo muộn ở A")));
+    expect(screen.queryByText("Phiếu tạo muộn ở A")).not.toBeInTheDocument();
+    expectSelectedCount(0);
+    expect(screen.queryByText(/Đã tạo phiếu created-at-a/)).not.toBeInTheDocument();
+  });
+
+  it("ignores a create response from an earlier login generation", async () => {
+    const pendingCreate = deferred<ReturnType<typeof record>>();
+    mocks.createRecord.mockReturnValueOnce(pendingCreate.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu cửa hàng A");
+    await submitOnlineRecord("Phiếu từ phiên cũ");
+
+    fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
+    fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
+    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên đăng nhập" }), { target: { value: "demo" } });
+    fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
+    await screen.findAllByText("Phiếu cửa hàng A");
+
+    await act(async () => pendingCreate.resolve(record("created-before-logout", "Phiếu từ phiên cũ")));
+    expect(screen.queryByText("Phiếu từ phiên cũ")).not.toBeInTheDocument();
+    expectSelectedCount(0);
+    expect(screen.queryByText(/Đã tạo phiếu created-before-logout/)).not.toBeInTheDocument();
+  });
+
+  it("applies a create response while the original session and store are still current", async () => {
+    const pendingCreate = deferred<ReturnType<typeof record>>();
+    mocks.createRecord.mockReturnValueOnce(pendingCreate.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu cửa hàng A");
+    await submitOnlineRecord("Phiếu đúng scope");
+
+    await act(async () => pendingCreate.resolve(record("created-in-current-scope", "Phiếu đúng scope")));
+    expect(await screen.findAllByText("Phiếu đúng scope")).toHaveLength(2);
+    expectSelectedCount(1);
+    expect(screen.getByText(/Đã tạo phiếu created-in-current-scope/)).toBeVisible();
+  });
+
+  it("waits for the whole review batch, reports partial failure, and retries only failed records", async () => {
+    const failedRecord = record("review-fails", "Phiếu duyệt lỗi");
+    const successfulRecord = record("review-succeeds", "Phiếu duyệt thành công");
+    const reviewedRecord = { ...successfulRecord, approvalStatus: "APPROVED" as const };
+    let history = [failedRecord, successfulRecord];
+    const slowSuccess = deferred<ReturnType<typeof record>>();
+    mocks.loadHistory.mockImplementation(() => Promise.resolve(history));
+    mocks.reviewRecord.mockImplementation((_storeId: string, recordId: string) => recordId === failedRecord.id
+      ? Promise.reject(new Error("review failed"))
+      : slowSuccess.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu duyệt lỗi");
+
+    fireEvent.click(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${failedRecord.id}` })[0]!);
+    fireEvent.click(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${successfulRecord.id}` })[0]!);
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 2 phiếu" }));
+    await waitFor(() => expect(mocks.reviewRecord).toHaveBeenCalledTimes(2));
+    expect(await screen.findByRole("button", { name: "Đang duyệt…" })).toBeDisabled();
+
+    history = [failedRecord, reviewedRecord];
+    await act(async () => slowSuccess.resolve(reviewedRecord));
+    expect(await screen.findByText("Đã duyệt 1 phiếu; 1 phiếu chưa duyệt được và vẫn được chọn để thử lại.")).toBeVisible();
+    expect(mocks.loadHistory).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole("button", { name: "Duyệt 1 phiếu" })).toBeEnabled();
+    expect(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${failedRecord.id}` })[0]).toBeChecked();
+    expect(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${successfulRecord.id}` })[0]).not.toBeChecked();
+
+    const retriedRecord = { ...failedRecord, approvalStatus: "APPROVED" as const };
+    history = [retriedRecord, reviewedRecord];
+    mocks.reviewRecord.mockResolvedValueOnce(retriedRecord);
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 1 phiếu" }));
+    expect(await screen.findByText("Đã duyệt 1 phiếu trên máy chủ.")).toBeVisible();
+    expect(mocks.reviewRecord).toHaveBeenLastCalledWith(storeA.id, failedRecord.id, "APPROVED");
+    expectSelectedCount(0);
+  });
+
+  it("limits an online review batch to four concurrent requests", async () => {
+    const batch = Array.from({ length: 5 }, (_, index) => record(`review-${index + 1}`, `Phiếu ${index + 1}`));
+    const pending = new Map(batch.map((item) => [item.id, deferred<ReturnType<typeof record>>()] as const));
+    mocks.loadHistory.mockResolvedValue(batch);
+    mocks.reviewRecord.mockImplementation((_storeId: string, recordId: string) => pending.get(recordId)!.promise);
+    render(<App />);
+    await screen.findAllByText("Phiếu 1");
+
+    for (const item of batch) {
+      fireEvent.click(screen.getAllByRole("checkbox", { name: `Chọn phiếu ${item.id}` })[0]!);
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Duyệt 5 phiếu" }));
+    await waitFor(() => expect(mocks.reviewRecord).toHaveBeenCalledTimes(4));
+    expect(mocks.reviewRecord).toHaveBeenCalledTimes(4);
+
+    const first = batch[0]!;
+    await act(async () => pending.get(first.id)!.resolve({ ...first, approvalStatus: "APPROVED" as const }));
+    await waitFor(() => expect(mocks.reviewRecord).toHaveBeenCalledTimes(5));
+    await act(async () => {
+      for (const item of batch.slice(1)) {
+        pending.get(item.id)!.resolve({ ...item, approvalStatus: "APPROVED" as const });
+      }
+    });
+    expect(await screen.findByText("Đã duyệt 5 phiếu trên máy chủ.")).toBeVisible();
   });
 });

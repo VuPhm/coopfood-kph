@@ -67,12 +67,12 @@ class DatabaseSmokeTest {
                     'app_users', 'user_roles', 'stores', 'store_memberships',
                     'catalog_import_batches', 'catalog_import_rows', 'catalog_versions',
                     'suppliers', 'products', 'product_suppliers', 'product_barcodes',
-                    'kph_records', 'kph_photos', 'kph_status_history', 'audit_events',
+                    'kph_records', 'kph_photos', 'kph_status_history', 'kph_approval_history', 'audit_events',
                     'kph_idempotency_keys'
                   )
                 """).get("total", Integer.class);
 
-        assertThat(coreTables).isEqualTo(16);
+        assertThat(coreTables).isEqualTo(17);
 
         HttpResponse<String> health = HttpClient.newHttpClient().send(
                 HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/actuator/health"))

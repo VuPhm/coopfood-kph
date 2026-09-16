@@ -109,6 +109,7 @@ sau khi validation xác nhận `HSD > NSX`; `HSD == NSX` phải trả lỗi.
 | UI-05 | Escape đóng picker/image/scanner/settings/export/delete/lookup theo ưu tiên | Giữ nguyên tắc; chuẩn hóa cho mọi modal |
 | UI-06 | Focus đôi lúc được đưa vào close/field và trả trigger; không có focus trap nhất quán, KPH modal không đóng bằng Escape chung | Loại bỏ nợ kỹ thuật; thêm focus trap/restore focus có test |
 | UI-07 | Reduced-motion bỏ FAB animation và transition đáng kể | Giữ |
+| UI-08 | Lịch sử lọc theo khoảng ngày phát hiện | Foundation-02: hai đầu mút inclusive; một đầu có thể để trống; `from > to` báo lỗi cạnh control; backend lọc theo `detected_date`, không theo `created_at`; áp dụng/xóa lọc phải xóa selection. Desktop dùng một hàng compact; mobile tích hợp vào hộp “Lọc & sắp xếp” hiện có |
 
 ## Excel compatibility
 
@@ -123,6 +124,7 @@ sau khi validation xác nhận `HSD > NSX`; `HSD == NSX` phải trả lỗi.
 | XLSX-07 | Cell string bắt đầu sau trim-left bằng `=`, `+`, `-`, `@` được prefix apostrophe | Giữ security golden chống formula injection |
 | XLSX-08 | Filename chứa loại phiếu và ngày local `dd-mm-yyyy` | Giữ trừ khi có acceptance criteria mới |
 | XLSX-09 | Raw XLSX không deterministic vì password/hash và package metadata | Cải tiến test: canonical structural assertions thay vì byte-for-byte |
+| XLSX-10 | Approval online chưa có trong baseline | Foundation-02: chỉ `STORE_MANAGER` đúng membership được export record `SUBMITTED + APPROVED`; backend trả snapshot có thứ tự, ghi audit và cột R lấy reviewer snapshot |
 
 ## PWA và offline
 

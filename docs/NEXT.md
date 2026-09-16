@@ -122,9 +122,50 @@ cho phép public PR và yêu cầu chốt. Xem
 Foundation-01 đã đóng. Không còn milestone active và không tự mở production
 rollout hay feature mới từ danh sách hoãn.
 
-## Chưa mở — milestone kế tiếp
+## Closed — Foundation-02 — duyệt, xuất online và lọc ngày
 
-Owner cần chọn outcome riêng trước khi bắt đầu. Các candidate hiện có gồm
-approve/export online cho `STORE_MANAGER`; catalog/provisioning Admin Web; hoặc
-production readiness gồm hosting, PostgreSQL/object storage, retention và SSO/MFA.
-Không gộp các candidate này thành một milestone mặc định.
+Owner xác nhận mở cycle ngày 2026-09-15 và yêu cầu bổ sung lọc theo ngày khi xem
+phiếu. Phạm vi/gate nằm tại
+[plan](delivery/foundation-02-online-review-export/plan.json).
+
+- Khóa OpenAPI/examples/generated client cho query ngày, approval và export.
+- Migration V5 giữ approval state/reviewer snapshot/history; backend revalidate
+  manager membership, ghi audit và khóa snapshot export trong transaction.
+- Store PWA dùng `dd/mm/yyyy`, báo lỗi khoảng ngược cạnh field; cụm lọc chỉ giữ
+  hai ô ngày, mũi tên, nút xóa và tự áp dụng khi ngày hoàn chỉnh hợp lệ thay đổi.
+  Một đầu trống là khoảng không giới hạn; desktop hiển thị một hàng compact,
+  mobile đặt cùng hộp “Lọc & sắp xếp”. EMPLOYEE không thấy action duyệt/xuất,
+  manager chỉ xuất selection đã duyệt.
+- Candidate revision 3 đã pass Contract Lock, frontend tests/build, backend
+  evidence không bị ảnh hưởng, browser E2E desktop/mobile và visual QA tới
+  `320px`/landscape. Project owner cho pass candidate `f179b38` ngày
+  2026-09-16; gate acceptance/close đều pass và cycle đã đóng.
+
+Ngoài cycle: production infra, offline sync, Admin catalog/provisioning, edit,
+xóa/invalidate và approval time window. Hiện không có milestone active; yêu cầu
+kế tiếp phải chỉ định outcome mới, không tự mở candidate, deploy hoặc rollout.
+
+## Đề xuất tiếp tục sau review — 2026-09-16
+
+Owner yêu cầu review code/kiến trúc và lên kế hoạch để tự chia việc thực hiện dần.
+Xem [review và roadmap](REVIEW_AND_ROADMAP_2026-09-16.md): findings có vị trí code,
+giới hạn kiểm chứng và 12 gói việc có dependency/acceptance riêng.
+
+Ưu tiên đề xuất: S01 chặn mutation trả muộn sau đổi store/session; S02 xử lý duyệt
+lô thất bại một phần; S03 dùng store snapshot cho Excel và báo giới hạn selection.
+Sau đó chuẩn bị Admin provisioning/catalog, paging và vận hành theo nhu cầu.
+Đây là backlog đề xuất, **chưa mở milestone hoặc triển khai implementation**.
+
+Git/workspace được chuẩn bị riêng trước khi giao việc:
+[workspace setup](WORKSPACE_SETUP_2026-09-16.md). Nhánh tích hợp giữ checkpoint;
+worktree S01 chờ owner giao, S02/S03 lấy nền sau tích hợp vì cùng sửa `app.tsx`.
+
+## Closed — Online stability S01–S02
+
+Owner chấp nhận candidate `6836bc5` ngày 2026-09-16. Cycle revision 3 đã pass
+technical/owner gate và đóng; quick runtime start/stop được bàn giao. PR #3 đã
+pass đủ `frontend`, `backend`, `browser` và ở trạng thái ready-for-review.
+
+Hiện không có cycle implementation active. Chưa merge `main`, deploy hoặc mở
+S03. Yêu cầu tiếp theo cần nêu rõ một outcome: merge PR #3 hoặc mở cycle S03;
+không tự làm cả hai từ owner acceptance của S01–S02.

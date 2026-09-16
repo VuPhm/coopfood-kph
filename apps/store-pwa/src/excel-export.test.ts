@@ -160,4 +160,16 @@ describe("KPH Excel export", () => {
       photos.map((_, index) => [0xff, 0xd8, index + 1, 0xff, 0xd9]),
     );
   });
+
+  it("writes the approved reviewer to column R with formula-injection protection", async () => {
+    const approved = {
+      ...record("TPCN"),
+      approvalStatus: "APPROVED" as const,
+      reviewedBy: "=Nguyễn Quản lý",
+    };
+    const workbook = await buildKphWorkbook("TPCN", [approved], { storeCode: "0123", storeName: "Cống Quỳnh" });
+    const readBack = await serializeAndRead(workbook);
+
+    expect(readBack.getWorksheet("Thực phẩm khô & khác")!.getCell("R9").value).toBe("'=Nguyễn Quản lý");
+  });
 });

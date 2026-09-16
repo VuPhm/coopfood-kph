@@ -20,6 +20,8 @@ const apiFixtureSchemas = new Map([
   ["api/barcode-not-found.json", "BarcodeLookupResponse"],
   ["api/kph-record.json", "KphRecord"],
   ["api/kph-create.json", "KphCreateRequest"],
+  ["api/kph-approval.json", "KphApprovalRequest"],
+  ["api/kph-export.json", "KphExportRequest"],
 ]);
 
 const acceptedKphPolicies = {

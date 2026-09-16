@@ -12,3 +12,5 @@ Thứ tự đọc bắt buộc cho mọi thay đổi:
 được mang từ hai repository tham chiếu. Hai repository đó là read-only.
 
 Quy trình kế hoạch → điều chỉnh → triển khai → nghiệm thu: [DELIVERY_WORKFLOW.md](DELIVERY_WORKFLOW.md).
+
+Review hiện hành và backlog chia việc: [REVIEW_AND_ROADMAP_2026-09-16.md](REVIEW_AND_ROADMAP_2026-09-16.md).
