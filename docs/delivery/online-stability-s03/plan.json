@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "online-stability-s03",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Bảo đảm Store PWA online tạo workbook từ store snapshot authoritative của response export và báo rõ giới hạn 500 phiếu trước khi gửi request export.",
   "inScope": [
     "Giữ store snapshot trong OnlineExportBundle và chuyển nó thành StoreProfile dùng cho header workbook online",
@@ -16,7 +16,7 @@
     "Thay đổi layout workbook, Pilot persistence, Admin Web, deploy hoặc production rollout"
   ],
   "baseSha": "5358ad6ef3e7f6b57f10b1e9192a904ea7e65942",
-  "candidateSha": "",
+  "candidateSha": "05b462b4ee6632e14dbe4c147b6c341eb6a5d420",
   "integrationOwner": "/root",
   "sharedPaths": [
     "apps/store-pwa/src/app.tsx",
@@ -33,10 +33,10 @@
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
-      "sha": "",
-      "evidence": ""
+      "sha": "05b462b4ee6632e14dbe4c147b6c341eb6a5d420",
+      "evidence": "docs/delivery/online-stability-s03/technical-evidence.md"
     },
     {
       "id": "owner-acceptance",
@@ -44,11 +44,11 @@
       "required": true,
       "status": "pending",
       "revision": 1,
-      "sha": "",
-      "evidence": ""
+      "sha": "05b462b4ee6632e14dbe4c147b6c341eb6a5d420",
+      "evidence": "docs/delivery/online-stability-s03/acceptance-handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Implement the two S03 regressions on the reviewed origin/main merge checkpoint, then run targeted tests and full frontend verification."
+  "nextAction": "Project owner reviews the S03 handoff and accepts the candidate or gives one bounded correction list."
 }
