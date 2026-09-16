@@ -20,7 +20,7 @@ import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPil
 import { StoreContext } from "./store-context";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
-import { createOnlineGateway, onlineModeEnabled, type OnlineGateway, type OnlineSession, type OnlineWorkspace } from "./online-kph";
+import { createOnlineGateway, onlineExportSelectionError, onlineModeEnabled, type OnlineGateway, type OnlineSession, type OnlineWorkspace } from "./online-kph";
 
 export { formatBusinessDate } from "./business-date";
 
@@ -492,6 +492,13 @@ function WorkspaceApp() {
       if (!onlinePersistenceEnabled) setStoreSettingsOpen(true);
       return;
     }
+    if (onlinePersistenceEnabled) {
+      const selectionError = onlineExportSelectionError(selectedRecords.length);
+      if (selectionError) {
+        setNotice(selectionError);
+        return;
+      }
+    }
     setExportError("");
     setExportOpen(true);
   }
@@ -869,17 +876,23 @@ function WorkspaceApp() {
     setExportError("");
     try {
       let exportRecords = selectedRecords;
+      let exportStore = { storeCode: storeProfile.storeCode, storeName: storeProfile.storeName };
       if (onlinePersistenceEnabled) {
         if (!onlineStoreId || !onlineCapabilities?.prepareExport) {
           throw new Error("Gateway xuất Excel online chưa sẵn sàng.");
         }
-        exportRecords = (await onlineCapabilities.prepareExport(
+        const exportBundle = await onlineCapabilities.prepareExport(
           onlineStoreId,
           activeKind,
           selectedRecords.map(({ id }) => id),
-        )).records;
+        );
+        exportRecords = exportBundle.records;
+        exportStore = {
+          storeCode: exportBundle.store.code,
+          storeName: exportBundle.store.name,
+        };
       }
-      const fileName = await downloadKphWorkbook(activeKind, exportRecords, storeProfile);
+      const fileName = await downloadKphWorkbook(activeKind, exportRecords, exportStore);
       if (pilotPersistenceEnabled) await recordPilotExport(activeKind, selectedRecords, fileName);
       setExportOpen(false);
       setNotice(`Đã tạo file Excel gồm ${exportRecords.length} phiếu ${kindCopy[activeKind].short}; hãy gửi file này cho CHT.`);

@@ -16,10 +16,12 @@ const mocks = vi.hoisted(() => ({
   recordPilotExport: vi.fn(),
   savePilotRecord: vi.fn(),
   downloadKphWorkbook: vi.fn(),
+  onlineExportSelectionError: vi.fn<(recordCount: number) => string | null>(),
 }));
 
 vi.mock("./online-kph", () => ({
   onlineModeEnabled: () => true,
+  onlineExportSelectionError: mocks.onlineExportSelectionError,
   createOnlineGateway: () => ({
     loadWorkspace: mocks.loadWorkspace,
     createRecord: mocks.createRecord,
@@ -47,7 +49,12 @@ function workspace(role: "EMPLOYEE" | "STORE_MANAGER" = "EMPLOYEE"): OnlineWorks
   };
 }
 
-beforeEach(() => vi.resetAllMocks());
+beforeEach(() => {
+  vi.resetAllMocks();
+  mocks.onlineExportSelectionError.mockImplementation((recordCount) => recordCount > 500
+    ? "Chỉ có thể xuất tối đa 500 phiếu mỗi lần. Hãy giảm số phiếu đã chọn rồi thử lại."
+    : null);
+});
 
 describe("Online workspace boundary", () => {
   it("shows loading without demo records or a premature empty state", () => {
@@ -109,9 +116,10 @@ describe("Online workspace boundary", () => {
   it("lets an online STORE_MANAGER review and export an approved server snapshot without delete", async () => {
     const managerWorkspace = workspace("STORE_MANAGER");
     const approved = { ...managerWorkspace.records[0]!, approvalStatus: "APPROVED" as const, reviewedBy: managerWorkspace.session.user.displayName };
+    const exportStore = { ...managerWorkspace.store, code: "0456", name: "Snapshot từ máy chủ" };
     mocks.loadWorkspace.mockResolvedValue(managerWorkspace);
     mocks.reviewRecord.mockResolvedValue(approved);
-    mocks.prepareExport.mockResolvedValue({ exportId: "export-1", exportedAt: "2026-09-15T08:00:00Z", records: [approved] });
+    mocks.prepareExport.mockResolvedValue({ exportId: "export-1", exportedAt: "2026-09-15T08:00:00Z", store: exportStore, records: [approved] });
     mocks.downloadKphWorkbook.mockResolvedValue("KPH.xlsx");
     render(<App />);
     await screen.findAllByText("Sản phẩm từ máy chủ");
@@ -126,8 +134,31 @@ describe("Online workspace boundary", () => {
     fireEvent.click(exportButton);
     fireEvent.click(screen.getByRole("button", { name: "Xuất 1 dòng" }));
     await waitFor(() => expect(mocks.prepareExport).toHaveBeenCalledWith(managerWorkspace.store.id, "TPCN", ["online-record-1"]));
-    expect(mocks.downloadKphWorkbook).toHaveBeenCalledWith("TPCN", [approved], expect.objectContaining({ storeCode: managerWorkspace.store.code }));
+    expect(mocks.downloadKphWorkbook).toHaveBeenCalledWith("TPCN", [approved], {
+      storeCode: exportStore.code,
+      storeName: exportStore.name,
+    });
     expect(screen.queryByRole("button", { name: /Xóa phiếu/ })).not.toBeInTheDocument();
+  });
+
+  it("surfaces the online export selection limit before sending a request", async () => {
+    const managerWorkspace = workspace("STORE_MANAGER");
+    const approved = { ...managerWorkspace.records[0]!, approvalStatus: "APPROVED" as const };
+    mocks.loadWorkspace.mockResolvedValue({
+      ...managerWorkspace,
+      records: [approved],
+    });
+    mocks.onlineExportSelectionError.mockReturnValueOnce("Chỉ có thể xuất tối đa 500 phiếu mỗi lần. Hãy giảm số phiếu đã chọn rồi thử lại.");
+    render(<App />);
+    await screen.findAllByText("Sản phẩm từ máy chủ");
+
+    fireEvent.click(screen.getAllByRole("checkbox", { name: "Chọn phiếu online-record-1" })[0]!);
+    fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
+
+    expect(screen.getByText("Chỉ có thể xuất tối đa 500 phiếu mỗi lần. Hãy giảm số phiếu đã chọn rồi thử lại.")).toBeInTheDocument();
+    expect(mocks.onlineExportSelectionError).toHaveBeenCalledWith(1);
+    expect(screen.queryByRole("button", { name: "Xuất 1 dòng" })).not.toBeInTheDocument();
+    expect(mocks.prepareExport).not.toHaveBeenCalled();
   });
 
   it("auto-filters inclusive detected dates with either bound and reports an inverted range", async () => {
