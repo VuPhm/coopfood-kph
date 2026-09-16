@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "online-stability-s04",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Tách online history authority khỏi Pilot/local state để TanStack Query là nguồn online duy nhất, với invalidation đúng user, store và date filter trong khi giữ nguyên hành vi login/create/review/export đã accepted.",
   "inScope": [
     "Online render và derived count/selection đọc từ Query data/cache thay vì effect sao chép history sang Pilot records state",
@@ -17,7 +17,7 @@
     "Refactor toàn bộ app.tsx, đổi UI đã accepted, đổi Pilot persistence hoặc thêm global state manager"
   ],
   "baseSha": "39f95814fcd2233142fc78238243972cc61d3f1f",
-  "candidateSha": "",
+  "candidateSha": "ebc9cdc84cc29bdde8f226ef71054a9eca5e4c32",
   "integrationOwner": "/root",
   "sharedPaths": [
     "apps/store-pwa/src/app.tsx",
@@ -34,10 +34,10 @@
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
-      "sha": "",
-      "evidence": ""
+      "sha": "ebc9cdc84cc29bdde8f226ef71054a9eca5e4c32",
+      "evidence": "docs/delivery/online-stability-s04/technical-evidence.md"
     },
     {
       "id": "owner-acceptance",
@@ -45,11 +45,11 @@
       "required": true,
       "status": "pending",
       "revision": 1,
-      "sha": "",
-      "evidence": ""
+      "sha": "ebc9cdc84cc29bdde8f226ef71054a9eca5e4c32",
+      "evidence": "docs/delivery/online-stability-s04/acceptance-handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Commit plan checkpoint, run dispatch check, then implement the bounded Store PWA authority split without changing public contracts or UI behavior."
+  "nextAction": "Project owner reviews the S04 scenarios and accepts candidate ebc9cdc or returns one bounded correction list."
 }
