@@ -1,7 +1,11 @@
 # Technical evidence — online stability S01–S02
 
-Ngày: 16/09/2026. Revision: 1. Candidate:
+Ngày: 16/09/2026. Revision: 2. Candidate:
 `ac906776fd8876e1c89b686fc882f7b8b0cc640b`.
+
+Revision 2 chỉ mở rộng bước phối hợp sang push/draft PR; không đổi runtime code,
+contract hay acceptance behavior. Toàn bộ evidence revision 1 trên candidate này
+được carry forward; các commit mới hơn candidate chỉ nằm trong thư mục hồ sơ cycle.
 
 ## Phạm vi đã kiểm
 
