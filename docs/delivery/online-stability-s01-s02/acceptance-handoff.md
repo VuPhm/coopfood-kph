@@ -1,6 +1,26 @@
 # Acceptance handoff — online stability S01–S02
 
-Candidate: `ac906776fd8876e1c89b686fc882f7b8b0cc640b`. Mode: Store PWA online.
+Candidate: `6836bc51cdf693626e7c608e23d3132f7d40c775`. Mode: Store PWA online.
+Draft PR: <https://github.com/VuPhm/coopfood-kph/pull/3>.
+
+## Chạy/dừng nhanh trên macOS
+
+Từ repository root, bảo đảm OrbStack/Docker Desktop đang chạy:
+
+```bash
+./e2e/scripts/start-online-acceptance.sh
+```
+
+Mở `http://127.0.0.1:4173`, dùng một trong hai tài khoản fixture:
+
+- CHT: `manager.e2e` / `manager-e2e-password`
+- Nhân viên: `employee.e2e` / `employee-e2e-password`
+
+Dừng và thu hồi database/media tổng hợp:
+
+```bash
+./e2e/scripts/stop-online-acceptance.sh
+```
 
 ## Kịch bản nghiệm thu
 
@@ -14,9 +34,9 @@ Candidate: `ac906776fd8876e1c89b686fc882f7b8b0cc640b`. Mode: Store PWA online.
    còn được chọn. Bấm duyệt lại chỉ gửi các phiếu lỗi.
 5. Lô từ năm phiếu trở lên không có quá bốn request approval chạy đồng thời.
 
-Online preview kỹ thuật đã chạy tại `http://127.0.0.1:4173` với database/media
-tổng hợp và được dừng sau browser gate. Có thể khởi động lại cùng runbook E2E nếu
-owner muốn thao tác trực tiếp; không dùng dữ liệu thật.
+Quick runtime đã được kiểm start, đăng nhập same-origin, start lặp và stop lặp với
+database/media tổng hợp; không dùng dữ liệu thật. Log/build được giữ dưới
+`/tmp/coopfood-kph-online-acceptance` để hỗ trợ chẩn đoán.
 
 Trạng thái quyết định: **pending owner acceptance**. Việc test kỹ thuật đạt không
 tự suy diễn thành merge, push, deploy hoặc quyền mở S03.

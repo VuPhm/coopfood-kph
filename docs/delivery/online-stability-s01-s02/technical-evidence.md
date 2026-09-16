@@ -1,11 +1,11 @@
 # Technical evidence — online stability S01–S02
 
-Ngày: 16/09/2026. Revision: 2. Candidate:
-`ac906776fd8876e1c89b686fc882f7b8b0cc640b`.
+Ngày: 16/09/2026. Revision: 3. Candidate:
+`6836bc51cdf693626e7c608e23d3132f7d40c775`.
 
-Revision 2 chỉ mở rộng bước phối hợp sang push/draft PR; không đổi runtime code,
-contract hay acceptance behavior. Toàn bộ evidence revision 1 trên candidate này
-được carry forward; các commit mới hơn candidate chỉ nằm trong thư mục hồ sơ cycle.
+Revision 3 thêm tooling start/stop dành cho owner acceptance; không đổi runtime
+product, contract hay acceptance behavior S01–S02. Toàn bộ evidence product
+revision 2 được carry forward và tooling mới được kiểm thật trên candidate này.
 
 ## Phạm vi đã kiểm
 
@@ -26,12 +26,22 @@ contract hay acceptance behavior. Toàn bộ evidence revision 1 trên candidate
 | `npm run verify` | PASS docs, Contract Lock 14 resources/7 API fixtures, generated API drift, typecheck, 143 tests và build Admin Web/Store PWA |
 | `VITE_KPH_ONLINE=true npm --workspace @coopfood-kph/store-pwa run build -- --outDir .../.local/online-dist --emptyOutDir` | PASS online production build; PWA precache 13 entries |
 | `E2E_APP_URL=http://127.0.0.1:4173 E2E_BACKEND_URL=http://127.0.0.1:8080 npm --prefix e2e test` | PASS 6, skip 4 theo viewport; desktop/mobile Chromium |
+| `bash -n e2e/scripts/start-online-acceptance.sh e2e/scripts/stop-online-acceptance.sh` | PASS |
+| `./e2e/scripts/start-online-acceptance.sh` | PASS: build, migrate V1→V5, seed tổng hợp, backend health UP và Store PWA trả HTML; hai launchctl service và PostgreSQL container còn chạy sau khi shell kết thúc |
+| `POST /api/v1/auth/login` và `GET /api/v1/auth/session` qua `http://127.0.0.1:4173/api/...` | PASS: session của `manager.e2e`, hai membership `STORE_MANAGER`; same-origin proxy hoạt động |
+| Chạy start lần hai khi runtime khỏe | PASS: trả thông tin truy cập ngay, không rebuild hoặc reseed |
+| Chạy stop hai lần rồi kiểm port/service/container | PASS: lần đầu dừng hai service và container có marker; lần hai no-op; không còn listener 55432/8080/4173, launchctl service hoặc container |
+| GitHub Actions PR #3, run `35047059150` | PASS: frontend 44s, backend 59s, browser 1m48s trên candidate `6836bc5` |
 
 Browser gate dùng Docker 29.4.0, PostgreSQL 17.10 disposable trên port 55432,
 schema sạch migrate V1→V5, fixture tổng hợp, media riêng dưới `/tmp`, backend
 Spring Boot cục bộ và online preview port 4173. Các process, container `--rm` và
 media tạm do lượt này tạo đã được dừng/xóa; ba port 55432/8080/4173 không còn
 listener sau kiểm tra.
+
+Quick runtime dùng `launchctl` thay process nền thường để vẫn sống sau khi đóng
+terminal. State/log/build tổng hợp ở `/tmp/coopfood-kph-online-acceptance` vì
+macOS TCC không cho user service ghi log trực tiếp dưới `Documents`.
 
 ## Giới hạn
 

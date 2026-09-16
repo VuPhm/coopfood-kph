@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "online-stability-s01-s02",
   "revision": 3,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Ổn định Store PWA online khi request chậm hoặc duyệt lô lỗi một phần: response tạo phiếu từ store/session cũ không làm bẩn UI hiện tại, và duyệt lô phải đợi mọi request hoàn tất rồi báo đúng kết quả thành công/thất bại.",
   "inScope": [
     "Tích hợp commit S01 b0c404a và kiểm tra response tạo phiếu bị trì hoãn qua đổi store hoặc logout/login",
@@ -18,7 +18,7 @@
     "Merge main, deploy hoặc production rollout"
   ],
   "baseSha": "880edf44b45322f4630f10640103c59c6d1cf4b4",
-  "candidateSha": "ac906776fd8876e1c89b686fc882f7b8b0cc640b",
+  "candidateSha": "6836bc51cdf693626e7c608e23d3132f7d40c775",
   "integrationOwner": "/root",
   "sharedPaths": [
     "apps/store-pwa/src/app.tsx",
@@ -35,7 +35,7 @@
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "passed"
     },
     {
       "id": "owner-acceptance",
@@ -57,9 +57,9 @@
       "request": "Cung cấp script chạy/dừng nhanh để project owner nghiệm thu.",
       "source": "Yêu cầu trực tiếp của project owner trong Codex ngày 2026-09-16.",
       "impact": "Thêm tooling cục bộ dưới e2e/scripts và hướng dẫn nghiệm thu; runtime product, contract, backend schema và acceptance behavior S01–S02 không đổi. Technical gate revision 2 phải kiểm thêm bash syntax và start/stop lifecycle thật.",
-      "decision": "Cung cấp hai script start/stop dùng production online build, backend jar, PostgreSQL 17 disposable, seed tổng hợp và PID/container marker an toàn; không dùng dữ liệu vận hành hoặc tự mở browser. Evidence product revision 2 được carry forward, evidence tooling được bổ sung trên candidate revision 3."
+      "decision": "Cung cấp hai script start/stop dành cho macOS, dùng production online build, backend jar, PostgreSQL 17 disposable, seed tổng hợp, launchctl service có label cố định và container marker an toàn; không dùng dữ liệu vận hành hoặc tự mở browser. Runtime/log đặt dưới /tmp để tránh macOS TCC chặn launchd ghi vào Documents. Evidence product revision 2 được carry forward, evidence tooling được bổ sung trên candidate revision 3."
     }
   ],
   "blockers": [],
-  "nextAction": "Implement và chạy thật start/stop scripts, cập nhật PR #3 và remote CI, rồi bàn giao URL/credential để project owner nghiệm thu. Chưa mở S03 hoặc merge/deploy."
+  "nextAction": "Project owner nghiệm thu candidate 6836bc5 tại local quick runtime hoặc review draft PR #3; ghi nhận sign-off hay issue cụ thể. Chưa mở S03 hoặc merge/deploy."
 }
