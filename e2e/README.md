@@ -12,6 +12,37 @@ bootstrap path.
 
 ## Run
 
+### Chạy nhanh để owner nghiệm thu
+
+Từ repository root, khi Docker/OrbStack đang chạy và dependencies đã được cài:
+
+```bash
+./e2e/scripts/start-online-acceptance.sh
+```
+
+Script dành cho macOS, tự động build, migrate và seed fixture tổng hợp. PostgreSQL
+chạy trong container disposable; backend và online preview chạy bằng user service
+`launchctl` để vẫn hoạt động sau khi đóng terminal. Tất cả port chỉ bind vào
+loopback. Khi sẵn sàng, mở
+`http://127.0.0.1:4173` và đăng nhập bằng một trong hai tài khoản:
+
+- CHT: `manager.e2e` / `manager-e2e-password`
+- Nhân viên: `employee.e2e` / `employee-e2e-password`
+
+Dừng toàn bộ runtime do script quản lý bằng:
+
+```bash
+./e2e/scripts/stop-online-acceptance.sh
+```
+
+Script stop chỉ dừng hai user service có label acceptance cố định và database
+container có tên/label acceptance khớp; không tự dừng process khác đang giữ port.
+Log/build được giữ trong
+`/tmp/coopfood-kph-online-acceptance`, còn database container `--rm` và media
+tổng hợp được thu hồi khi dừng.
+
+### Chạy thủ công / CI
+
 Use three terminals from the repository root. The commands below intentionally
 use a separate database name, port and Docker container so an existing local
 database is not selected by accident.
