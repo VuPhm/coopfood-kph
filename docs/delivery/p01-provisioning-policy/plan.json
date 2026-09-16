@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p01-provisioning-policy",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "CLOSED",
   "objective": "Chốt contract provisioning tối thiểu cho user, region, store, role/membership, bootstrap/recovery và credential reset để P02 có hierarchy CHAIN_ADMIN > REGION_MANAGER > STORE_MANAGER cùng fixture allow/deny được owner chấp nhận mà không suy diễn quyền hoặc triển khai feature sớm.",
   "inScope": [
     "Tài liệu product policy với actor matrix, region/store lifecycle, bootstrap/recovery, session effect, audit và guardrail last-admin/self-lockout",
@@ -17,7 +17,7 @@
     "Catalog staging/publish, paging history, backup/restore hoặc production rollout"
   ],
   "baseSha": "a42dbf3392de928b4a75869b4d30665f71da70e2",
-  "candidateSha": "",
+  "candidateSha": "bc86d4c81c43102028c4f519d101de02aa3f580c",
   "integrationOwner": "/root",
   "sharedPaths": [
     "docs/product/PROVISIONING_POLICY.md",
@@ -35,26 +35,28 @@
     "docs/delivery/p01-provisioning-policy/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "technical-contract",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "bc86d4c81c43102028c4f519d101de02aa3f580c",
+      "evidence": "docs/delivery/p01-provisioning-policy/technical-evidence.md"
     },
     {
       "id": "owner-policy-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "bc86d4c81c43102028c4f519d101de02aa3f580c",
+      "evidence": "docs/delivery/p01-provisioning-policy/acceptance-handoff.md",
+      "acceptedBy": "project owner",
+      "decisionRef": "Codex user message 2026-09-17 beginning '1. có 1 cấp quản lý vùng gồm nhiều store'"
     }
   ],
   "changes": [
@@ -67,5 +69,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Revise the P01 policy, business contract, ADR and fixtures for the accepted scoped management hierarchy, then rerun technical verification and close only if revision 2 exactly reflects the owner decision."
+  "nextAction": "P01 is closed. Stop; open a separate P02 delivery cycle only on a new owner request."
 }

@@ -1,30 +1,39 @@
 # Acceptance handoff — P01 provisioning policy
 
-Candidate: `88b12e457237b32518e067d86bd20831625ff545`.
-Mode: product/security policy và fixture synthetic; chưa triển khai P02.
+Candidate: `bc86d4c81c43102028c4f519d101de02aa3f580c`.
+Mode: product/security policy, ADR và fixture synthetic; chưa triển khai P02.
 
-## Quyết định cần owner chấp nhận hoặc sửa
+## Quyết định owner đã chấp nhận
 
-1. Chỉ `CHAIN_ADMIN` quản trị user/store/role/membership/credential; role này
-   không tự có quyền KPH hoặc catalog. KPH vẫn bắt buộc membership đúng store.
-2. User, store và membership không hard delete. Hệ thống chặn self-lockout,
-   admin active cuối cùng và manager active cuối của cửa hàng đang hoạt động.
-3. Store mới inactive và chỉ activate khi có active `STORE_MANAGER`.
-4. Password-only baseline là tối thiểu 15 Unicode code point, hỗ trợ ít nhất 64,
-   không composition/rotation định kỳ; reset buộc đổi và vô hiệu access cũ.
-5. Không seed/default admin. Bootstrap local chỉ chạy khi chưa từng có admin;
-   recovery local là luồng riêng khi active admin bằng 0 và luôn audit.
+1. Có ba scope quản lý: `STORE_MANAGER` đúng store, `REGION_MANAGER` đúng vùng
+   gồm nhiều store và `CHAIN_ADMIN` toàn chuỗi. Cả quản lý vùng và admin tổng
+   được đi xuống store trong scope tương ứng.
+2. User/region/store/assignment/membership dùng lifecycle an toàn, audit và guard
+   chống self-lockout/last-admin/last-manager; không hard delete.
+3. Store mới inactive; chỉ activate khi region active và có active
+   `STORE_MANAGER` trong store.
+4. Password/reset/session theo NIST/OWASP baseline đã ghi trong policy.
+5. Không seed/default admin; bootstrap/recovery local, điều kiện chặt và audit.
+
+## Ranh giới least privilege đã áp dụng
+
+- `REGION_MANAGER` thao tác KPH và quản lý store profile/membership trong vùng,
+  nhưng không cấp global/region role, tạo/khóa global user hoặc reset credential.
+- `CHAIN_ADMIN` quản trị identity/region/store toàn chuỗi và thao tác KPH tại mọi
+  active store; không tự có quyền catalog.
+- Store → region luôn do backend resolve. Fixture có allow đúng vùng và deny với
+  store hợp lệ nhưng ngoài vùng.
 
 ## Cách kiểm
 
-- Đọc policy tại `docs/product/PROVISIONING_POLICY.md`.
-- Đọc 25 allow/deny cases tại
+- Policy: `docs/product/PROVISIONING_POLICY.md`.
+- ADR: `docs/adr/0004-scoped-management-hierarchy.md`.
+- 36 allow/deny cases:
   `contracts/fixtures/golden/identity/provisioning-policy-cases.json`.
-- Chạy `npm run check:contracts`; thay outcome/role guard quan trọng mà không cập
-  nhật validator có chủ đích sẽ làm Contract Lock fail.
+- Chạy `npm run check:contracts` hoặc toàn bộ `npm run verify`.
 
 ## Trạng thái quyết định
 
-Technical gate revision 1 đã pass. Owner gate đang chờ; câu “tạm cho pass, tiếp”
-ngày 17/09/2026 đã được dùng để đóng S04 và cho phép bắt đầu P01, không được suy
-diễn là đã chấp nhận nội dung policy P01 được tạo sau đó.
+Owner message ngày 17/09/2026 bắt đầu bằng “1. có 1 cấp quản lý vùng gồm nhiều
+store” đã sửa điểm 1 và duyệt/căn theo tiêu chuẩn an toàn các điểm 2–5. Revision
+2 triển khai đúng quyết định đó; technical gate đã pass trên candidate nêu trên.
