@@ -11,6 +11,7 @@
     {"resource":"golden/dates/return-date-cases.json","tracePrefix":"DATE-"},
     {"resource":"golden/dates/invalid-date-cases.json","tracePrefix":"DATE-"},
     {"resource":"golden/kph/field-policy-cases.json","tracePrefix":"KPH-"},
+    {"resource":"golden/identity/provisioning-policy-cases.json","tracePrefix":"ID-P01-"},
     {"resource":"golden/images/expected-manifest.json","tracePrefix":"IMG-"},
     {"resource":"golden/excel/expected-structure.json","tracePrefix":"XLSX-"},
     {"resource":"api/session.json","tracePrefix":"ID-"},
