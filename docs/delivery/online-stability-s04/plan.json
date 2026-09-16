@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "online-stability-s04",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Tách online history authority khỏi Pilot/local state để TanStack Query là nguồn online duy nhất, với invalidation đúng user, store và date filter trong khi giữ nguyên hành vi login/create/review/export đã accepted.",
   "inScope": [
     "Online render và derived count/selection đọc từ Query data/cache thay vì effect sao chép history sang Pilot records state",
@@ -43,13 +43,15 @@
       "id": "owner-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
       "sha": "ebc9cdc84cc29bdde8f226ef71054a9eca5e4c32",
-      "evidence": "docs/delivery/online-stability-s04/acceptance-handoff.md"
+      "evidence": "docs/delivery/online-stability-s04/acceptance-handoff.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "Codex user message 2026-09-17: tạm cho pass, tiếp"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Project owner reviews the S04 scenarios and accepts candidate ebc9cdc or returns one bounded correction list."
+  "nextAction": "Cycle đã đóng theo owner acceptance có điều kiện. Real-backend E2E được giữ là giới hạn hoãn; mở P01 contract/policy provisioning theo yêu cầu tiếp tục riêng."
 }

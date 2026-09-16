@@ -21,4 +21,6 @@ Mode: Store PWA online; UI/contract không đổi.
 ## Trạng thái quyết định
 
 Technical gate revision 1 đã pass với giới hạn real-backend E2E nêu trong
-`technical-evidence.md`. Chưa ghi nhận owner acceptance cho candidate S04 này.
+`technical-evidence.md`. Ngày 17/09/2026, project owner xác nhận “tạm cho pass,
+tiếp”. Quyết định này chấp nhận candidate S04 để tiếp tục roadmap, đồng thời giữ
+real-backend E2E chưa rerun là giới hạn được hoãn chứ không coi là đã pass.
