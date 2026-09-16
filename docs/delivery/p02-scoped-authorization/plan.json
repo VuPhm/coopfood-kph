@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "p02-scoped-authorization",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Triển khai vertical slice P02 đầu tiên cho hierarchy KPH đã khóa: database lưu region/store mapping và active user-region assignment; backend resolve scope từ database mỗi request để CHAIN_ADMIN toàn chuỗi, REGION_MANAGER đúng vùng và STORE_MANAGER/EMPLOYEE đúng membership có quyền KPH tương ứng, với deny test cross-store/cross-region.",
+  "inScope": [
+    "Một Flyway migration thêm regions, store.region_id và user_region_assignments với relational constraints/index cần thiết",
+    "Authorization policy tập trung resolve active store -> active region từ database; không tin region từ client",
+    "Quyền xem/tạo KPH cho active membership, active REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN; duyệt/xuất chỉ cho STORE_MANAGER đúng store, REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN",
+    "Session/store selector hiển thị các active store effective cho region/chain scope để online flow có thể điều hướng mà không dùng UI làm security boundary",
+    "Unit/integration tests bao phủ membership, same-region, cross-region, inactive assignment/region/store và chain-wide scope",
+    "Technical evidence và acceptance handoff riêng; owner test sau không bị ghi nhận nhầm là acceptance"
+  ],
+  "outOfScope": [
+    "Public provisioning OpenAPI, generated client và Admin Web CRUD cho user/region/store/role/membership",
+    "Credential encoder migration, reset/change, bootstrap/recovery tooling và session-version invalidation",
+    "Store/region lifecycle mutation, last-admin/last-manager guards và audit cho các mutation provisioning",
+    "Catalog staging/publish, paging, production infrastructure hoặc deployment"
+  ],
+  "baseSha": "fd4790d76693500089f23497a502c8a667218018",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "backend/src/main/resources/db/migration/V3__scoped_management_hierarchy.sql",
+    "backend/src/main/java/vn/coopfood/kph/identity/IdentityRepository.java",
+    "backend/src/main/java/vn/coopfood/kph/identity/RegionContext.java",
+    "backend/src/main/java/vn/coopfood/kph/identity/SessionUser.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreAccessRepository.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreAccessService.java",
+    "backend/src/test/java/vn/coopfood/kph/identity/IdentityHttpIntegrationTest.java",
+    "backend/src/test/java/vn/coopfood/kph/identity/IdentityServiceTest.java",
+    "backend/src/test/java/vn/coopfood/kph/identity/StoreAccessServiceTest.java",
+    "backend/src/test/java/vn/coopfood/kph/kph/KphHttpIntegrationTest.java",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/p02-scoped-authorization/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-scoped-authorization",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": null,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-slice-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": null,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "Tiếp, có thể làm trước, tôi test sau cũng được.",
+      "source": "Codex user message 2026-09-17",
+      "impact": "Mở cycle P02 và cho phép triển khai kỹ thuật trước khi owner nghiệm thu; acceptance gate vẫn pending.",
+      "decision": "Bắt đầu từ slice schema + scoped KPH authorization như NEXT đề xuất; giữ provisioning API/Admin UI và credential thành slice sau."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Checkpoint plan, validate dispatch record, then implement the solo integration slice and run focused plus integrated backend checks."
+}
