@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p01-provisioning-policy",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Chốt đề xuất contract provisioning tối thiểu cho user, store, global role, store membership, bootstrap/recovery và credential reset để P02 có role matrix cùng fixture allow/deny được owner chấp nhận mà không suy diễn quyền hoặc triển khai feature sớm.",
   "inScope": [
     "Tài liệu product policy với actor matrix, lifecycle, bootstrap/recovery, session effect, audit và guardrail last-admin/self-lockout",
@@ -16,7 +16,7 @@
     "Catalog staging/publish, paging history, backup/restore hoặc production rollout"
   ],
   "baseSha": "c803561f5938a9fe58d2119b2a913fa3a59863dc",
-  "candidateSha": "",
+  "candidateSha": "88b12e457237b32518e067d86bd20831625ff545",
   "integrationOwner": "/root",
   "sharedPaths": [
     "docs/product/PROVISIONING_POLICY.md",
@@ -26,17 +26,17 @@
     "docs/delivery/p01-provisioning-policy/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical-contract",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
-      "sha": "",
-      "evidence": ""
+      "sha": "88b12e457237b32518e067d86bd20831625ff545",
+      "evidence": "docs/delivery/p01-provisioning-policy/technical-evidence.md"
     },
     {
       "id": "owner-policy-acceptance",
@@ -50,5 +50,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Commit the P01 plan, run dispatch validation, then produce the proposed policy, fixture and validation without implementing P02."
+  "nextAction": "Project owner reviews the five policy decisions in acceptance-handoff.md and explicitly accepts P01 or supplies concrete corrections; do not start P02 meanwhile."
 }
