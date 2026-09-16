@@ -159,3 +159,13 @@ Sau đó chuẩn bị Admin provisioning/catalog, paging và vận hành theo nh
 Git/workspace được chuẩn bị riêng trước khi giao việc:
 [workspace setup](WORKSPACE_SETUP_2026-09-16.md). Nhánh tích hợp giữ checkpoint;
 worktree S01 chờ owner giao, S02/S03 lấy nền sau tích hợp vì cùng sửa `app.tsx`.
+
+## Closed — Online stability S01–S02
+
+Owner chấp nhận candidate `6836bc5` ngày 2026-09-16. Cycle revision 3 đã pass
+technical/owner gate và đóng; quick runtime start/stop được bàn giao. PR #3 đã
+pass đủ `frontend`, `backend`, `browser` và ở trạng thái ready-for-review.
+
+Hiện không có cycle implementation active. Chưa merge `main`, deploy hoặc mở
+S03. Yêu cầu tiếp theo cần nêu rõ một outcome: merge PR #3 hoặc mở cycle S03;
+không tự làm cả hai từ owner acceptance của S01–S02.

@@ -4,7 +4,7 @@ Cập nhật: 2026-09-16
 
 ## Giai đoạn
 
-`Foundation-02 — CLOSED: duyệt, xuất Excel online và lọc lịch sử theo ngày`
+`Online stability S01–S02 — CLOSED; PR #3 ready-for-review`
 
 Pilot local-only theo ADR-0002 đã được project owner đóng ngày 2026-09-04 bằng
 acceptance tối thiểu. Pilot đang chạy được giữ nguyên, không tạo tag/deploy mới
@@ -128,3 +128,15 @@ lọc một đầu được hỗ trợ. Desktop giữ một hàng compact, mobil
 “Lọc & sắp xếp” hiện có. Integrated/browser/visual evidence revision 3 đã đạt;
 project owner chấp nhận candidate `f179b38` ngày 2026-09-16 và cycle đã đóng.
 Không có deploy, merge hoặc milestone kế tiếp được mở ngầm từ quyết định này.
+
+## Online stability S01–S02 closeout — 2026-09-16
+
+Cycle [online-stability-s01-s02](delivery/online-stability-s01-s02/plan.json)
+đã đóng ở revision 3 sau khi project owner xác nhận “pass, làm tiếp”. Candidate
+`6836bc5` chặn response tạo phiếu từ store/session cũ và xử lý duyệt lô theo
+settled result với giới hạn bốn request đồng thời. Quick runtime macOS có script
+start/stop, PostgreSQL/media/fixture tổng hợp riêng và đã pass lifecycle thực.
+
+PR #3 pass remote CI `frontend`, `backend`, `browser`, hiện đã chuyển từ draft
+sang ready-for-review. Chưa merge `main`, deploy hoặc mở S03; các bước đó cần
+yêu cầu riêng để không mở rộng scope ngầm.
