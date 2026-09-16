@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "online-stability-s04",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Tách online history authority khỏi Pilot/local state để TanStack Query là nguồn online duy nhất, với invalidation đúng user, store và date filter trong khi giữ nguyên hành vi login/create/review/export đã accepted.",
+  "inScope": [
+    "Online render và derived count/selection đọc từ Query data/cache thay vì effect sao chép history sang Pilot records state",
+    "Create/update/invalidation chỉ tác động cache đúng user/store/filter và không chèn record không thỏa date filter",
+    "Review single/batch refetch hoặc update nhất quán sau khi mọi request settle; giữ scope guards S01 và settled concurrency S02",
+    "Giữ Pilot IndexedDB/local records state riêng và thêm regression tests cho online refetch/filter/scope cùng Pilot baseline",
+    "Chạy Store PWA targeted tests/check, root npm run verify và browser gate nếu thay đổi observable runtime cần bằng chứng"
+  ],
+  "outOfScope": [
+    "Thay đổi OpenAPI, backend, database migration, packages/ui hoặc root dependencies",
+    "Paging, server-side selection/filter/sort, Admin provisioning/catalog hoặc production infrastructure",
+    "Refactor toàn bộ app.tsx, đổi UI đã accepted, đổi Pilot persistence hoặc thêm global state manager"
+  ],
+  "baseSha": "39f95814fcd2233142fc78238243972cc61d3f1f",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "apps/store-pwa/src/app.tsx",
+    "apps/store-pwa/src/app.test.tsx",
+    "apps/store-pwa/src/app.online.test.tsx",
+    "apps/store-pwa/src/app.online.identity.test.tsx",
+    "docs/delivery/online-stability-s04/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-integrated",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Commit plan checkpoint, run dispatch check, then implement the bounded Store PWA authority split without changing public contracts or UI behavior."
+}
