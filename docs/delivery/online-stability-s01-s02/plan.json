@@ -35,7 +35,10 @@
       "id": "technical-integrated",
       "kind": "technical",
       "required": true,
-      "status": "passed"
+      "status": "pass",
+      "revision": 3,
+      "sha": "6836bc51cdf693626e7c608e23d3132f7d40c775",
+      "evidence": "docs/delivery/online-stability-s01-s02/technical-evidence.md"
     },
     {
       "id": "owner-acceptance",
