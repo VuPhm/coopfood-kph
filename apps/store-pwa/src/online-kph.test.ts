@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import sessionFixture from "../../../contracts/fixtures/api/session.json";
 import recordFixture from "../../../contracts/fixtures/api/kph-record.json";
 
-import { createOnlineGateway, OnlineApiError } from "./online-kph";
+import { createOnlineGateway, onlineExportSelectionError, OnlineApiError } from "./online-kph";
 
 function draft(file: File, idempotencyKey = "client-key-00000001") {
   return {
@@ -44,6 +44,27 @@ function createdResponse() {
 }
 
 describe("online KPH gateway", () => {
+  it("accepts 500 export rows and reports a clear limit at 501", () => {
+    expect(onlineExportSelectionError(500)).toBeNull();
+    expect(onlineExportSelectionError(501)).toBe("Chỉ có thể xuất tối đa 500 phiếu mỗi lần. Hãy giảm số phiếu đã chọn rồi thử lại.");
+  });
+
+  it("sends all 500 selected record IDs to the export endpoint", async () => {
+    const recordIds = Array.from({ length: 500 }, (_, index) => `50000000-0000-4000-8000-${String(index).padStart(12, "0")}`);
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({
+      exportId: "50000000-0000-4000-8000-000000000999",
+      exportedAt: "2026-09-16T08:00:00Z",
+      store: recordFixture.store,
+      records: [],
+    }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    const gateway = createOnlineGateway({ baseUrl: "http://localhost", fetch: fetcher });
+
+    await gateway.prepareExport(recordFixture.store.id, "TPCN", recordIds);
+
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(await (fetcher.mock.calls[0]![0] as Request).json()).toEqual({ type: "TPCN", recordIds });
+  });
+
   it("logs in, stores CSRF, and logs out with the authenticated session", async () => {
     const fetcher = vi.fn<typeof fetch>()
       .mockResolvedValueOnce(new Response(JSON.stringify(sessionFixture), { status: 200, headers: { "Content-Type": "application/json" } }))
@@ -164,6 +185,7 @@ describe("online KPH gateway", () => {
     expect(requests[3]!.headers.get("X-CSRF-TOKEN")).toBe(sessionFixture.csrfToken);
     expect(await requests[3]!.json()).toEqual({ type: "TPCN", recordIds: [recordFixture.id] });
     expect(reviewed.approvalStatus).toBe("APPROVED");
+    expect(exported.store).toEqual(recordFixture.store);
     expect(exported.records[0]?.reviewedBy).toBe(sessionFixture.user.displayName);
   });
 });

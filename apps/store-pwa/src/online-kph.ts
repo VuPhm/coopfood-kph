@@ -16,8 +16,17 @@ export type OnlineHistoryFilter = {
 export type OnlineExportBundle = {
   exportId: string;
   exportedAt: string;
+  store: components["schemas"]["KphStoreSnapshot"];
   records: RecordView[];
 };
+
+export const ONLINE_EXPORT_MAX_RECORDS = 500;
+
+export function onlineExportSelectionError(recordCount: number) {
+  return recordCount > ONLINE_EXPORT_MAX_RECORDS
+    ? `Chỉ có thể xuất tối đa ${ONLINE_EXPORT_MAX_RECORDS} phiếu mỗi lần. Hãy giảm số phiếu đã chọn rồi thử lại.`
+    : null;
+}
 
 export type OnlineSession = Session;
 
@@ -192,6 +201,7 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     return {
       exportId: response.data.exportId,
       exportedAt: response.data.exportedAt,
+      store: response.data.store,
       records: response.data.records.map(toRecordView),
     };
   }

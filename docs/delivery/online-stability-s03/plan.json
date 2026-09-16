@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "online-stability-s03",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Bảo đảm Store PWA online tạo workbook từ store snapshot authoritative của response export và báo rõ giới hạn 500 phiếu trước khi gửi request export.",
+  "inScope": [
+    "Giữ store snapshot trong OnlineExportBundle và chuyển nó thành StoreProfile dùng cho header workbook online",
+    "Giữ export Pilot local-only dùng store profile trên thiết bị như hiện tại",
+    "Cho phép selection 500 phiếu gửi tới prepareExport nhưng chặn selection từ 501 phiếu tại UI trước request với thông báo rõ ràng",
+    "Regression tests cho adapter response, workbook header snapshot và giới hạn selection; chạy frontend verification trên candidate tích hợp"
+  ],
+  "outOfScope": [
+    "Thay đổi OpenAPI, backend, database migration hoặc giới hạn API 500 đã có",
+    "Phân trang history, server-side selection/filter/sort hoặc S04 refactor online state",
+    "Thay đổi layout workbook, Pilot persistence, Admin Web, deploy hoặc production rollout"
+  ],
+  "baseSha": "5358ad6ef3e7f6b57f10b1e9192a904ea7e65942",
+  "candidateSha": "05b462b4ee6632e14dbe4c147b6c341eb6a5d420",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "apps/store-pwa/src/app.tsx",
+    "apps/store-pwa/src/app.online.test.tsx",
+    "apps/store-pwa/src/online-kph.ts",
+    "apps/store-pwa/src/online-kph.test.ts",
+    "docs/delivery/online-stability-s03/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-integrated",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "05b462b4ee6632e14dbe4c147b6c341eb6a5d420",
+      "evidence": "docs/delivery/online-stability-s03/technical-evidence.md"
+    },
+    {
+      "id": "owner-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "05b462b4ee6632e14dbe4c147b6c341eb6a5d420",
+      "evidence": "docs/delivery/online-stability-s03/acceptance-handoff.md"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Project owner reviews the S03 handoff and accepts the candidate or gives one bounded correction list."
+}
