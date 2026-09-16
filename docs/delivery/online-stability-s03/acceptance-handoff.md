@@ -17,4 +17,7 @@ Mode: Store PWA online.
 
 ## Trạng thái quyết định
 
-Technical gate đã pass. Chưa ghi nhận owner acceptance cho candidate S03 này.
+Technical gate đã pass. Ngày 17/09/2026, project owner yêu cầu tự xác minh, xác
+nhận “tôi cho pass” và cho phép tiếp tục lộ trình. S03 được chấp nhận trên
+candidate `05b462b4ee6632e14dbe4c147b6c341eb6a5d420`; quyết định này không bao gồm
+deploy, production rollout hoặc tự mở rộng ngoài S04 đã nêu trong roadmap.
