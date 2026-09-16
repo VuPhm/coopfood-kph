@@ -4,7 +4,7 @@ Cập nhật: 2026-09-17
 
 ## Giai đoạn
 
-`Online stability S03 — CLOSED; S04 là bước kế tiếp đã được owner cho phép`
+`Online stability S04 — CLOSED có điều kiện; P01 provisioning policy là bước kế tiếp`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -25,6 +25,11 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   `05b462b`: workbook online dùng store snapshot từ response export; 500 phiếu
   được gửi đủ, 501 bị chặn rõ ràng trước request. Cycle closeout ở
   [plan](delivery/online-stability-s03/plan.json).
+- Online stability S04 được owner “tạm cho pass” ngày 2026-09-17 trên candidate
+  `ebc9cdc`: online history dùng TanStack Query làm authority duy nhất, cache
+  tách theo user/store/date filter và Pilot giữ local state riêng. Real-backend
+  E2E chưa rerun do Docker không sẵn sàng và vẫn là giới hạn hoãn, xem
+  [S04 plan](delivery/online-stability-s04/plan.json).
 
 ## Hệ thống hiện có
 
@@ -41,11 +46,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 ## Kiểm chứng gần nhất
 
 - PR #3 đã merge vào `main` và từng pass remote CI `frontend`, `backend`, `browser`.
-- Ngày 2026-09-17, S03 chạy lại `npm run verify`: PASS docs/Contract Lock,
-  generated API drift, TypeScript, 146 tests và build Admin Web/Store PWA.
-- S03 không đổi backend/OpenAPI; backend suite không được dùng làm bằng chứng mới
-  cho candidate này. Warning chunk lớn của Store PWA vẫn là baseline chưa có số
-  đo thiết bị để kết luận cần đổi thư viện.
+- Ngày 2026-09-17, S04 `npm run verify` PASS docs/Contract Lock, generated API
+  drift, TypeScript, 147 tests và build; browser fixture review pass 7 viewport.
+- S04 không đổi backend/OpenAPI. Real-backend browser suite chưa rerun vì Docker
+  không hoạt động; warning chunk lớn vẫn là baseline chưa có số đo thiết bị.
 
 ## Ranh giới và phần hoãn
 
@@ -59,8 +63,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-Owner đã cho phép tiếp tục sau khi pass S03. Bước duy nhất đang mở kế tiếp là
-S04: tách online history authority khỏi Pilot/local state, dùng Query cache làm
-nguồn online duy nhất và giữ nguyên behavior UI đã accepted. Phạm vi/acceptance
-hiện hành được ghi ở [NEXT](NEXT.md); review đầy đủ và backlog sau đó nằm tại
+Owner đã cho phép tiếp tục sau S04. Bước đang mở kế tiếp là P01: chốt policy và
+fixture provisioning tối thiểu cho tài khoản, cửa hàng, membership và reset
+credential; chưa triển khai Admin/API/backend P02. Phạm vi hiện hành ở
+[NEXT](NEXT.md); backlog đầy đủ ở
 [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).
