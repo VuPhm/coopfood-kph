@@ -33,10 +33,13 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
 - Không xóa cứng phiếu đã đồng bộ; vô hiệu hóa phải có lý do và audit.
 - Ngoại lệ pilot local-only theo ADR-0002: phiếu chưa đồng bộ được chuyển vào
   thùng rác và khôi phục trên cùng thiết bị; Store PWA không có xóa vĩnh viễn.
-- Ngoài ngoại lệ pilot, `STORE_MANAGER` (CHT) có membership đúng cửa hàng chỉ
-  thao tác duyệt trong UI lịch sử; không được xóa hoặc vô hiệu hóa phiếu. Quyền
-  vô hiệu hóa cho cấp quản trị tương lai chưa chốt và không được suy diễn cho
-  `CHAIN_ADMIN`.
+- Ngoài ngoại lệ pilot, quyền KPH online kế thừa theo scope đã chốt tại P01:
+  `STORE_MANAGER` (CHT) có active membership đúng cửa hàng;
+  `REGION_MANAGER` có active assignment tới region đang chứa cửa hàng; và
+  `CHAIN_ADMIN` có scope toàn chuỗi. Ba cấp được xem/tạo/duyệt/xuất trong scope
+  tương ứng nhưng không được xóa hoặc vô hiệu hóa phiếu. Backend phải xác định
+  store → region từ database ở mỗi request và có test deny cross-store/
+  cross-region; UI visibility không thay authorization.
 - Cửa sổ thời gian sửa/duyệt chưa chốt; implementation không được tự đặt giới hạn.
 - Ảnh gốc upload và bản stamped dẫn xuất đều private, giữ theo vòng đời phiếu;
   stamped không thay thế evidence gốc. Ngoại lệ pilot local-only theo ADR-0002
@@ -76,8 +79,10 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
   `STORE_MANAGER` đúng membership thực hiện, ghi audit, để trống approver R
   và không chèn logo.
 - Foundation-02 mở approval online theo xác nhận của owner ngày 15/09/2026:
-  trạng thái gồm `PENDING`, `APPROVED`, `REJECTED`; chỉ `STORE_MANAGER` đúng
-  active membership được đổi trạng thái và mọi thay đổi phải ghi history/audit.
-  Export online chỉ nhận các record `SUBMITTED` và `APPROVED` cùng store/type,
-  ghi tên người duyệt vào cột R; không đặt cửa sổ thời gian duyệt khi nghiệp vụ
-  chưa chốt. Export Pilot local-only tiếp tục giữ hành vi baseline riêng.
+  trạng thái gồm `PENDING`, `APPROVED`, `REJECTED`; Foundation-02 ban đầu chỉ có
+  `STORE_MANAGER` đúng active membership. P01 ngày 17/09/2026 mở rộng explicit
+  cho `REGION_MANAGER` đúng region và `CHAIN_ADMIN` toàn chuỗi; mọi thay đổi phải
+  ghi history/audit. Export online chỉ nhận các record `SUBMITTED` và `APPROVED`
+  cùng store/type, ghi tên người duyệt vào cột R; không đặt cửa sổ thời gian
+  duyệt khi nghiệp vụ chưa chốt. Export Pilot local-only tiếp tục giữ hành vi
+  baseline riêng.

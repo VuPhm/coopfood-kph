@@ -42,8 +42,10 @@ và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
 - Not-found cho phép scan lại hoặc nhập tay với trạng thái `NOT_FOUND`, không
   suy diễn sản phẩm.
 - KPH giữ catalog snapshot, 1-3 ảnh theo thứ tự, original và stamped đều private.
-- Chỉ `STORE_MANAGER` đúng membership được duyệt/xuất phiếu trong scope hiện
-  tại; Store PWA không cho xóa/vô hiệu hóa và `CHAIN_ADMIN` không bypass ngầm.
+- Quyền KPH kế thừa phải explicit: `STORE_MANAGER` đúng store,
+  `REGION_MANAGER` có active assignment tới region chứa store, và `CHAIN_ADMIN`
+  trên toàn chuỗi được duyệt/xuất trong scope tương ứng; luôn test cross-store/
+  cross-region. Store PWA không cho xóa/vô hiệu hóa.
 - UI giữ UI DNA và interaction đã accepted; cải tiến accessibility không được
   đổi nghiệp vụ.
 

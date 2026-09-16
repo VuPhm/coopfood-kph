@@ -28,6 +28,8 @@
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "docs/product/DOMAIN_RULES.md",
+    "docs/product/BEHAVIOR_INVENTORY.md",
+    "docs/product/UI_DNA.md",
     "docs/adr/0004-scoped-management-hierarchy.md",
     "docs/adr/README.md",
     "docs/delivery/p01-provisioning-policy/**"

@@ -46,7 +46,7 @@ phải API identifier.
 | ID-03 | Tối đa 5 tên người phát hiện gần nhất lưu localStorage, de-duplicate không phân biệt hoa/thường; tên mới nhất làm default | Cải tiến; mặc định actor từ account, lịch sử/ghi thay chỉ khi role cho phép |
 | ID-04 | Legacy không login, role, session hoặc tenant check | Cải tiến bắt buộc; backend kiểm membership cho mọi request store-scoped |
 | ID-05 | Store identity được đóng trực tiếp vào ảnh và đưa vào tóm tắt/Excel | Giữ snapshot presentation; nguồn store phải là session-authorized context |
-| ID-06 | Policy nhân viên/manager sửa, duyệt, vô hiệu hóa phiếu chưa tồn tại | Cải tiến bắt buộc: `STORE_MANAGER` (CHT) đúng membership chỉ được duyệt trong UI lịch sử; không được xóa/vô hiệu hóa. Quyền quản trị tương lai chưa chốt; `CHAIN_ADMIN` không bypass ngầm |
+| ID-06 | Policy nhân viên/manager sửa, duyệt, vô hiệu hóa phiếu chưa tồn tại | Cải tiến đã chốt: `STORE_MANAGER` đúng store, `REGION_MANAGER` đúng region và `CHAIN_ADMIN` toàn chuỗi được xem/tạo/duyệt/xuất theo scope explicit; không được xóa/vô hiệu hóa. Backend test cross-store/cross-region |
 
 Login mới không được thêm bước chọn store/người phát hiện lặp lại trên mỗi phiếu.
 Sau login, cửa hàng hợp lệ và actor mặc định phải sẵn ngay trong workspace; chỉ
@@ -124,7 +124,7 @@ sau khi validation xác nhận `HSD > NSX`; `HSD == NSX` phải trả lỗi.
 | XLSX-07 | Cell string bắt đầu sau trim-left bằng `=`, `+`, `-`, `@` được prefix apostrophe | Giữ security golden chống formula injection |
 | XLSX-08 | Filename chứa loại phiếu và ngày local `dd-mm-yyyy` | Giữ trừ khi có acceptance criteria mới |
 | XLSX-09 | Raw XLSX không deterministic vì password/hash và package metadata | Cải tiến test: canonical structural assertions thay vì byte-for-byte |
-| XLSX-10 | Approval online chưa có trong baseline | Foundation-02: chỉ `STORE_MANAGER` đúng membership được export record `SUBMITTED + APPROVED`; backend trả snapshot có thứ tự, ghi audit và cột R lấy reviewer snapshot |
+| XLSX-10 | Approval online chưa có trong baseline | Foundation-02 mở cho `STORE_MANAGER` đúng store; P01 mở rộng explicit cho `REGION_MANAGER` đúng region và `CHAIN_ADMIN` toàn chuỗi. Export vẫn chỉ nhận `SUBMITTED + APPROVED`, trả snapshot có thứ tự, ghi audit và cột R lấy reviewer snapshot |
 
 ## PWA và offline
 

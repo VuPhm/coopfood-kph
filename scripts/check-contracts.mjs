@@ -410,8 +410,18 @@ function assertNoSensitiveFixtureKeys(value, location = "fixture") {
 async function validateProvisioningPolicyCases() {
   const fixture = await readJson(provisioningPolicyFixturePath);
   assert.equal(fixture.provenance, "synthetic", "Provisioning fixture must remain synthetic.");
-  assert.equal(fixture.approvalStatus, "proposed", "P01 fixture must remain proposed until owner acceptance.");
-  assert.equal(fixture.policyVersion, 1, "Unexpected provisioning policy fixture version.");
+  assert.equal(fixture.approvalStatus, "accepted", "P01 fixture must reflect owner acceptance.");
+  assert.equal(fixture.policyVersion, 2, "Unexpected provisioning policy fixture version.");
+  assert.equal(
+    fixture.conventions?.listedGrantsAreActive,
+    true,
+    "Listed fixture grants must explicitly represent active grants.",
+  );
+  assert.equal(
+    fixture.conventions?.storeRegionSource,
+    "SERVER_AUTHORITY",
+    "Store-to-region scope must be resolved by the server.",
+  );
   assert.ok(Array.isArray(fixture.cases) && fixture.cases.length > 0, "Provisioning cases must not be empty.");
   assertNoSensitiveFixtureKeys(fixture);
 
@@ -429,8 +439,8 @@ async function validateProvisioningPolicyCases() {
   assertProvisioningCase(casesById, "ID-P01-001", "ALLOW", "CHAIN_ADMIN_PROVISIONS_IDENTITY");
   assertProvisioningCase(casesById, "ID-P01-002", "DENY", "IDENTITY_ADMIN_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-003", "DENY", "IDENTITY_ADMIN_REQUIRED");
-  assertProvisioningCase(casesById, "ID-P01-004", "DENY", "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED");
-  assertProvisioningCase(casesById, "ID-P01-005", "ALLOW", "STORE_SCOPED_MANAGER");
+  assertProvisioningCase(casesById, "ID-P01-004", "ALLOW", "CHAIN_WIDE_ADMIN");
+  assertProvisioningCase(casesById, "ID-P01-005", "ALLOW", "REGION_SCOPED_MANAGER");
   assertProvisioningCase(casesById, "ID-P01-006", "DENY", "SELF_LOCKOUT_FORBIDDEN");
   assertProvisioningCase(casesById, "ID-P01-007", "DENY", "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-009", "DENY", "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED");
@@ -448,16 +458,42 @@ async function validateProvisioningPolicyCases() {
   assertProvisioningCase(casesById, "ID-P01-023", "DENY", "SOFT_LIFECYCLE_ONLY");
   assertProvisioningCase(casesById, "ID-P01-024", "DENY", "LAST_ACTIVE_STORE_MANAGER_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-025", "DENY", "LAST_ACTIVE_STORE_MANAGER_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-026", "DENY", "ACTIVE_REGION_ASSIGNMENT_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-027", "ALLOW", "STORE_SCOPED_MANAGER");
+  assertProvisioningCase(casesById, "ID-P01-028", "DENY", "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-029", "ALLOW", "REGION_SCOPED_MEMBERSHIP_ADMIN");
+  assertProvisioningCase(casesById, "ID-P01-030", "DENY", "ACTIVE_REGION_ASSIGNMENT_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-031", "DENY", "CHAIN_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-032", "ALLOW", "CHAIN_ADMIN_MANAGES_REGION_SCOPE");
+  assertProvisioningCase(casesById, "ID-P01-033", "DENY", "IDENTITY_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-034", "DENY", "CHAIN_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-035", "DENY", "ACTIVE_REGION_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-036", "ALLOW", "CHAIN_WIDE_ADMIN");
 
   assert.deepEqual(
     casesById.get("ID-P01-004").actor.globalRoles,
     ["CHAIN_ADMIN"],
-    "KPH no-bypass denial must explicitly exercise CHAIN_ADMIN.",
+    "Chain-wide KPH access must explicitly exercise CHAIN_ADMIN.",
   );
   assert.deepEqual(
-    casesById.get("ID-P01-005").actor.memberships,
+    casesById.get("ID-P01-005").actor.regionAssignments,
+    ["REGION-SOUTH"],
+    "Regional KPH approval must require an explicit region assignment.",
+  );
+  assert.equal(
+    casesById.get("ID-P01-005").context.storeRegion,
+    "REGION-SOUTH",
+    "Regional allow case must resolve a store inside the assigned region.",
+  );
+  assert.equal(
+    casesById.get("ID-P01-026").context.storeRegion,
+    "REGION-NORTH",
+    "Regional deny case must exercise a valid store outside the assigned region.",
+  );
+  assert.deepEqual(
+    casesById.get("ID-P01-027").actor.memberships,
     [{ store: "STORE-001", role: "STORE_MANAGER" }],
-    "KPH approval must require an explicit store-scoped manager membership.",
+    "Store-scoped KPH export must require an explicit store manager membership.",
   );
   assert.ok(
     casesById.get("ID-P01-013").expected.effects.includes("INVALIDATE_EXISTING_ACCESS"),
