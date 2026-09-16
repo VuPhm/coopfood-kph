@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "p01-provisioning-policy",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Chốt đề xuất contract provisioning tối thiểu cho user, store, global role, store membership, bootstrap/recovery và credential reset để P02 có role matrix cùng fixture allow/deny được owner chấp nhận mà không suy diễn quyền hoặc triển khai feature sớm.",
+  "inScope": [
+    "Tài liệu product policy với actor matrix, lifecycle, bootstrap/recovery, session effect, audit và guardrail last-admin/self-lockout",
+    "Fixture tổng hợp ngôn ngữ độc lập cho allow/deny provisioning và nguyên tắc CHAIN_ADMIN không bypass KPH store scope",
+    "Contract Lock validation cho fixture và dẫn chiếu nguồn security NIST/OWASP hiện hành",
+    "Acceptance handoff nêu rõ các policy owner cần chấp nhận hoặc sửa trước P02"
+  ],
+  "outOfScope": [
+    "OpenAPI endpoint, generated client, backend/Admin implementation, database migration hoặc credential thật",
+    "Email/SMS reset, SSO/MFA, production bootstrap tooling, hosting và secret delivery",
+    "Catalog staging/publish, paging history, backup/restore hoặc production rollout"
+  ],
+  "baseSha": "c803561f5938a9fe58d2119b2a913fa3a59863dc",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "docs/product/PROVISIONING_POLICY.md",
+    "contracts/fixtures/golden/identity/provisioning-policy-cases.json",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "scripts/check-contracts.mjs",
+    "docs/delivery/p01-provisioning-policy/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-contract",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-policy-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Commit the P01 plan, run dispatch validation, then produce the proposed policy, fixture and validation without implementing P02."
+}
