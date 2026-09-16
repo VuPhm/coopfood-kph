@@ -38,5 +38,10 @@ Quick runtime đã được kiểm start, đăng nhập same-origin, start lặp
 database/media tổng hợp; không dùng dữ liệu thật. Log/build được giữ dưới
 `/tmp/coopfood-kph-online-acceptance` để hỗ trợ chẩn đoán.
 
-Trạng thái quyết định: **pending owner acceptance**. Việc test kỹ thuật đạt không
-tự suy diễn thành merge, push, deploy hoặc quyền mở S03.
+## Quyết định owner
+
+Project owner xác nhận **“pass, làm tiếp”** trong Codex ngày 16/09/2026 cho
+candidate `6836bc5`. Owner acceptance đạt; cycle S01–S02 được đóng ở revision 3.
+
+Quyết định này không tự mở rộng sang merge `main`, deploy hoặc S03. PR #3 có thể
+chuyển từ draft sang ready-for-review; hành động tiếp theo cần yêu cầu riêng.

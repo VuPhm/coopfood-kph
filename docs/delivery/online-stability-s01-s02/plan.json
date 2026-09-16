@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "online-stability-s01-s02",
   "revision": 3,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Ổn định Store PWA online khi request chậm hoặc duyệt lô lỗi một phần: response tạo phiếu từ store/session cũ không làm bẩn UI hiện tại, và duyệt lô phải đợi mọi request hoàn tất rồi báo đúng kết quả thành công/thất bại.",
   "inScope": [
     "Tích hợp commit S01 b0c404a và kiểm tra response tạo phiếu bị trì hoãn qua đổi store hoặc logout/login",
@@ -44,7 +44,12 @@
       "id": "owner-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "6836bc51cdf693626e7c608e23d3132f7d40c775",
+      "evidence": "docs/delivery/online-stability-s01-s02/acceptance-handoff.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "Codex user message 2026-09-16: pass, làm tiếp"
     }
   ],
   "changes": [
@@ -64,5 +69,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Project owner nghiệm thu candidate 6836bc5 tại local quick runtime hoặc review draft PR #3; ghi nhận sign-off hay issue cụ thể. Chưa mở S03 hoặc merge/deploy."
+  "nextAction": "Cycle đã đóng theo owner acceptance. Chuyển PR #3 sang ready-for-review rồi dừng; merge main, deploy hoặc mở S03 cần yêu cầu riêng."
 }
