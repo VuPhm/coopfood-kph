@@ -44,6 +44,17 @@ const NATIVE_BARCODE_FORMATS = ["ean_8", "ean_13", "upc_a", "code_128", "code_39
 const SCAN_INTERVAL_MS = 100;
 const SUCCESS_FEEDBACK_MS = 450;
 
+function prepareVideoForInlinePlayback(video: HTMLVideoElement) {
+  video.autoplay = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.setAttribute("autoplay", "true");
+  video.setAttribute("muted", "true");
+  video.setAttribute("playsinline", "true");
+  // Older iOS WebViews still inspect the prefixed attribute.
+  video.setAttribute("webkit-playsinline", "true");
+}
+
 export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScannerDialogProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -181,6 +192,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       }
 
       if (videoRef.current) {
+        prepareVideoForInlinePlayback(videoRef.current);
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
@@ -254,7 +266,10 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       zxingReaderRef.current = zxingReader;
 
       if (videoRef.current) {
-        void zxingReader.decodeFromVideoElementContinuously(
+        // The preview is already attached and playing. Calling
+        // decodeFromVideoElementContinuously here re-initializes the video and
+        // waits for another `playing` event, which WebKit may not emit.
+        zxingReader.decodeContinuously(
           videoRef.current,
           (result: Result | null | undefined, err: Exception | null | undefined) => {
             if (result && isScanningRef.current) {

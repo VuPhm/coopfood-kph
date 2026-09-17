@@ -33,6 +33,8 @@ describe("BarcodeScannerDialog", () => {
 
     // Mock HTMLMediaElement.prototype.play
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => Promise.resolve());
+    vi.spyOn(BrowserMultiFormatReader.prototype, "decodeContinuously")
+      .mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -160,16 +162,32 @@ describe("BarcodeScannerDialog", () => {
   it("decodes with the ZXing fallback when native BarcodeDetector is unavailable", async () => {
     const handleOpenChange = vi.fn();
     const handleScan = vi.fn();
-    const decode = vi.spyOn(BrowserMultiFormatReader.prototype, "decodeFromVideoElementContinuously")
-      .mockImplementation(async (_source, callback) => {
-        callback({ getText: () => "0009876543210" } as Result, undefined);
-      });
+    const decodeContinuously = vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously);
+    decodeContinuously.mockImplementation((_source, callback) => {
+      callback({ getText: () => "0009876543210" } as Result, undefined);
+    });
 
     render(<BarcodeScannerDialog open onOpenChange={handleOpenChange} onScan={handleScan} />);
 
-    await waitFor(() => expect(decode).toHaveBeenCalled());
+    await waitFor(() => expect(decodeContinuously).toHaveBeenCalled());
     await waitFor(() => expect(handleScan).toHaveBeenCalledWith("0009876543210"), { timeout: 1_500 });
     expect(handleOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("starts the Safari fallback on the existing inline video without reinitializing playback", async () => {
+    const decodeContinuously = vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously);
+    const reinitializeVideo = vi.spyOn(BrowserMultiFormatReader.prototype, "decodeFromVideoElementContinuously");
+
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+
+    await waitFor(() => expect(decodeContinuously).toHaveBeenCalled());
+    const video = screen.getByLabelText("Camera preview") as HTMLVideoElement;
+    expect(decodeContinuously).toHaveBeenCalledWith(video, expect.any(Function));
+    expect(reinitializeVideo).not.toHaveBeenCalled();
+    expect(video.srcObject).toBe(mockStream);
+    expect(video.playsInline).toBe(true);
+    expect(video.muted).toBe(true);
+    expect(video.getAttribute("webkit-playsinline")).toBe("true");
   });
 
   it("does not publish a queued result after the scan dialog has closed", async () => {
