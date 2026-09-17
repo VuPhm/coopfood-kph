@@ -495,7 +495,7 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 .pwa-status-copy { display: grid; min-width: 0; gap: 2px; }
 .pwa-status-copy strong { font-size: .8125rem; }
 .pwa-status-copy small { color: var(--color-ink-muted); font-size: .6875rem; line-height: 1.35; }
-.pwa-status-dismiss { display: grid; width: 2rem; height: 2rem; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--color-ink-muted); }
+.pwa-status-dismiss { display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--color-ink-muted); }
 .pwa-status-dismiss:hover { background: var(--color-surface-muted); color: var(--color-ink); }
 .pwa-status-dismiss svg { width: 1rem; height: 1rem; }
 

@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { BrowserMultiFormatReader, type Result } from "@zxing/library";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -154,6 +155,21 @@ describe("BarcodeScannerDialog", () => {
     expect(configuredFormats).toEqual([["ean_8", "ean_13", "upc_a", "code_128", "code_39"]]);
     expect(handleOpenChange).toHaveBeenCalledWith(false);
     expect(mockTrack.stop).toHaveBeenCalled();
+  });
+
+  it("decodes with the ZXing fallback when native BarcodeDetector is unavailable", async () => {
+    const handleOpenChange = vi.fn();
+    const handleScan = vi.fn();
+    const decode = vi.spyOn(BrowserMultiFormatReader.prototype, "decodeFromVideoElementContinuously")
+      .mockImplementation(async (_source, callback) => {
+        callback({ getText: () => "0009876543210" } as Result, undefined);
+      });
+
+    render(<BarcodeScannerDialog open onOpenChange={handleOpenChange} onScan={handleScan} />);
+
+    await waitFor(() => expect(decode).toHaveBeenCalled());
+    await waitFor(() => expect(handleScan).toHaveBeenCalledWith("0009876543210"), { timeout: 1_500 });
+    expect(handleOpenChange).toHaveBeenCalledWith(false);
   });
 
   it("does not publish a queued result after the scan dialog has closed", async () => {
