@@ -14,23 +14,26 @@ export function PwaStatus({ serviceWorkerEnabled = import.meta.env.MODE !== "tes
   const applyingUpdate = useRef(false);
 
   useEffect(() => {
+    const serviceWorker = "serviceWorker" in navigator ? navigator.serviceWorker : null;
+    const hasWaitingUpdate = () => Boolean(serviceWorker?.controller && registrationRef.current?.waiting);
     const checkForUpdate = () => {
+      if (hasWaitingUpdate()) setNotice("update");
       if (!navigator.onLine) return;
       void registrationRef.current?.update().catch(() => {
         // A failed background check must not interrupt the local-only app.
       });
     };
     const handleOnline = () => {
-      setNotice((current) => current === "offline" ? null : current);
+      setNotice((current) => current === "update" || hasWaitingUpdate() ? "update" : current === "offline" ? null : current);
       checkForUpdate();
     };
-    const handleOffline = () => setNotice("offline");
+    const handleOffline = () => setNotice((current) => current === "update" || hasWaitingUpdate() ? "update" : "offline");
     const handleFocus = () => checkForUpdate();
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
     window.addEventListener("focus", handleFocus);
 
-    if (!("serviceWorker" in navigator) || !serviceWorkerEnabled) {
+    if (!serviceWorker || !serviceWorkerEnabled) {
       return () => {
         window.removeEventListener("online", handleOnline);
         window.removeEventListener("offline", handleOffline);
@@ -38,7 +41,6 @@ export function PwaStatus({ serviceWorkerEnabled = import.meta.env.MODE !== "tes
       };
     }
 
-    const serviceWorker = navigator.serviceWorker;
     let cancelled = false;
     const handleControllerChange = () => {
       if (applyingUpdate.current) window.location.reload();

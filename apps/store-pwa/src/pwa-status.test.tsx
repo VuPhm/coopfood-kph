@@ -35,11 +35,22 @@ describe("PwaStatus", () => {
   });
 
   it("keeps a waiting update visible and explains that the scanner needs it", async () => {
-    render(<PwaStatus serviceWorkerEnabled />);
+    const { unmount } = render(<PwaStatus serviceWorkerEnabled />);
 
     expect(await screen.findByText("Có phiên bản mới")).toBeVisible();
     expect(screen.getByText(/cập nhật để dùng máy quét mã vạch/i)).toBeVisible();
     expect(screen.queryByRole("button", { name: "Đóng thông báo PWA" })).not.toBeInTheDocument();
+
+    fireEvent(window, new Event("offline"));
+    expect(screen.getByText("Có phiên bản mới")).toBeVisible();
+    expect(screen.queryByText("Đang ngoại tuyến")).not.toBeInTheDocument();
+
+    fireEvent(window, new Event("online"));
+    expect(screen.getByText("Có phiên bản mới")).toBeVisible();
+
+    unmount();
+    render(<PwaStatus serviceWorkerEnabled />);
+    expect(await screen.findByText("Có phiên bản mới")).toBeVisible();
 
     fireEvent.click(screen.getByRole("button", { name: "Cập nhật" }));
     expect(waitingWorker.postMessage).toHaveBeenCalledWith({ type: "SKIP_WAITING" });
@@ -53,7 +64,7 @@ describe("PwaStatus", () => {
       updateViaCache: "none",
     }));
 
-    window.dispatchEvent(new Event("focus"));
+    fireEvent(window, new Event("focus"));
     await waitFor(() => expect(registration.update).toHaveBeenCalled());
   });
 });
