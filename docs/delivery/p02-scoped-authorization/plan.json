@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p02-scoped-authorization",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Triển khai vertical slice P02 đầu tiên cho hierarchy KPH đã khóa: database lưu region/store mapping và active user-region assignment; backend resolve scope từ database mỗi request để CHAIN_ADMIN toàn chuỗi, REGION_MANAGER đúng vùng và STORE_MANAGER/EMPLOYEE đúng membership có quyền KPH tương ứng, với deny test cross-store/cross-region.",
   "inScope": [
     "Một Flyway migration thêm regions, store.region_id và user_region_assignments với relational constraints/index cần thiết",
@@ -19,7 +19,7 @@
     "Catalog staging/publish, paging, production infrastructure hoặc deployment"
   ],
   "baseSha": "fd4790d76693500089f23497a502c8a667218018",
-  "candidateSha": "",
+  "candidateSha": "17da6cac4bca735916dd210a70ea2812fb9d742c",
   "integrationOwner": "/root",
   "sharedPaths": [
     "backend/src/main/resources/db/migration/V6__scoped_management_hierarchy.sql",
@@ -39,17 +39,17 @@
     "docs/delivery/p02-scoped-authorization/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical-scoped-authorization",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": null,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 1,
+      "sha": "17da6cac4bca735916dd210a70ea2812fb9d742c",
+      "evidence": "docs/delivery/p02-scoped-authorization/technical-evidence.md"
     },
     {
       "id": "owner-slice-acceptance",
@@ -58,10 +58,10 @@
       "status": "pending",
       "revision": null,
       "sha": "",
-      "evidence": ""
+      "evidence": "docs/delivery/p02-scoped-authorization/acceptance-handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Checkpoint plan, validate dispatch record, then implement the solo integration slice and run focused plus integrated backend checks."
+  "nextAction": "Owner tests the synthetic scoped-authorization scenarios and accepts or reports a concrete defect; do not open the provisioning API/Admin UI slice before this acceptance decision."
 }

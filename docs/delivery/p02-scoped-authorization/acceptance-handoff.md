@@ -1,7 +1,8 @@
 # Acceptance handoff — P02 scoped authorization
 
-Trạng thái: **AWAITING_ACCEPTANCE**  
-Candidate: sẽ ghi sau khi checkpoint code
+Trạng thái: **AWAITING_ACCEPTANCE**
+
+Candidate: `17da6cac4bca735916dd210a70ea2812fb9d742c`
 
 ## Outcome cần xác nhận
 
