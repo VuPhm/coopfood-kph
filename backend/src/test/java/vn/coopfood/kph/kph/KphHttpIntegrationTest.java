@@ -61,6 +61,8 @@ class KphHttpIntegrationTest {
     private static final UUID USER_ID = UUID.fromString("10000000-0000-4000-8000-000000000001");
     private static final UUID STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000001");
     private static final UUID OTHER_STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000002");
+    private static final UUID REGION_ID = UUID.fromString("30000000-0000-4000-8000-000000000001");
+    private static final UUID OTHER_REGION_ID = UUID.fromString("30000000-0000-4000-8000-000000000002");
     // UTC and business dates differ, so the test also exercises the business zone.
     private static final Instant NOW = Instant.parse("2026-09-05T18:00:00Z");
 
@@ -109,14 +111,16 @@ class KphHttpIntegrationTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext)
                 .apply(springSecurity())
                 .build();
-        database.execute("TRUNCATE TABLE app_users, stores, catalog_import_batches CASCADE");
+        database.execute("TRUNCATE TABLE app_users, regions, stores, catalog_import_batches CASCADE");
         Timestamp now = Timestamp.from(Instant.parse("2026-09-05T04:00:00Z"));
         database.execute("""
                 INSERT INTO app_users (id, username, password_hash, display_name, active, created_at, updated_at)
                 VALUES (?, 'kph.demo', ?, 'KPH Demo', TRUE, ?, ?)
                 """, USER_ID, passwordEncoder.encode("correct-password"), now, now);
-        insertStore(STORE_ID, "0001", "Nguyễn Kiệm", now);
-        insertStore(OTHER_STORE_ID, "0002", "Store Other", now);
+        insertRegion(REGION_ID, "R-01", now);
+        insertRegion(OTHER_REGION_ID, "R-02", now);
+        insertStore(STORE_ID, REGION_ID, "0001", "Nguyễn Kiệm", now);
+        insertStore(OTHER_STORE_ID, OTHER_REGION_ID, "0002", "Store Other", now);
         database.execute("""
                 INSERT INTO store_memberships (user_id, store_id, role, active, created_at, updated_at)
                 VALUES (?, ?, 'EMPLOYEE', TRUE, ?, ?)
@@ -287,7 +291,7 @@ class KphHttpIntegrationTest {
     }
 
     @Test
-    void managerReviewsAndExportsApprovedRecordsWithAuditWhileEmployeeCannot() throws Exception {
+    void scopedManagersReviewAndExportWithNextRequestEffectWhileEmployeeCannot() throws Exception {
         Login employee = login();
         MvcResult created = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .file(payload(null, "Review product"))
@@ -308,9 +312,14 @@ class KphHttpIntegrationTest {
                         .session(employee.session()).header("X-CSRF-TOKEN", employee.csrfToken()))
                 .andExpect(status().isForbidden());
 
-        database.execute("UPDATE store_memberships SET role = 'STORE_MANAGER' WHERE user_id = ? AND store_id = ?",
-                USER_ID, STORE_ID);
+        Timestamp now = Timestamp.from(NOW);
+        database.execute("""
+                INSERT INTO user_region_assignments (user_id, region_id, active, created_at, updated_at)
+                VALUES (?, ?, TRUE, ?, ?)
+                """, USER_ID, REGION_ID, now, now);
         Login manager = login();
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
+                .andExpect(status().isForbidden());
         MvcResult pendingExport = mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
                         .contentType(MediaType.APPLICATION_JSON).content(exportBody)
                         .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
@@ -347,6 +356,24 @@ class KphHttpIntegrationTest {
         assertThat(export.path("records").get(0).path("id").asText()).isEqualTo(recordId);
         assertThat(Instant.parse(export.path("exportedAt").asText())).isEqualTo(NOW);
         assertThat(database.fetch("SELECT metadata FROM audit_events WHERE action = 'KPH_EXPORTED'")).hasSize(1);
+
+        database.execute("""
+                UPDATE user_region_assignments
+                SET active = FALSE, updated_at = ?
+                WHERE user_id = ? AND region_id = ?
+                """, now, USER_ID, REGION_ID);
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"REJECTED\"}")
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isForbidden());
+
+        database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"REJECTED\"}")
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -407,11 +434,18 @@ class KphHttpIntegrationTest {
                         + ",\"manualProductName\":" + objectMapper.writeValueAsString(productName) + "}").getBytes());
     }
 
-    private void insertStore(UUID id, String code, String name, Timestamp now) {
+    private void insertRegion(UUID id, String code, Timestamp now) {
         database.execute("""
-                INSERT INTO stores (id, store_code, store_name, active, created_at, updated_at)
+                INSERT INTO regions (id, region_code, region_name, active, created_at, updated_at)
                 VALUES (?, ?, ?, TRUE, ?, ?)
-                """, id, code, name, now, now);
+                """, id, code, "Region " + code, now, now);
+    }
+
+    private void insertStore(UUID id, UUID regionId, String code, String name, Timestamp now) {
+        database.execute("""
+                INSERT INTO stores (id, region_id, store_code, store_name, active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, TRUE, ?, ?)
+                """, id, regionId, code, name, now, now);
     }
 
     private void insertCatalog(String barcode) {

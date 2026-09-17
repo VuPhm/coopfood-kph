@@ -2,39 +2,82 @@ package vn.coopfood.kph.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import vn.coopfood.kph.foundation.web.ApiProblemException;
+import vn.coopfood.kph.store.StoreAccessRepository;
+import vn.coopfood.kph.store.StoreAccessRepository.AccessSnapshot;
 import vn.coopfood.kph.store.StoreAccessService;
 
 class StoreAccessServiceTest {
 
-    private static final UUID ALLOWED_STORE = UUID.fromString("20000000-0000-4000-8000-000000000001");
-    private static final UUID OTHER_STORE = UUID.fromString("20000000-0000-4000-8000-000000000002");
+    private static final UUID USER_ID = UUID.fromString("10000000-0000-4000-8000-000000000001");
+    private static final UUID STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000001");
 
-    private final StoreAccessService service = new StoreAccessService();
+    private FakeStoreAccessRepository repository;
+    private StoreAccessService service;
+    private UsernamePasswordAuthenticationToken authentication;
 
-    @Test
-    void acceptsOnlyMembershipPresentInTheRefreshedPrincipal() {
-        StoreContext expected = new StoreContext(ALLOWED_STORE, "0001", "Nguyễn Kiệm", StoreRole.EMPLOYEE);
-        var authentication = authenticationWith(List.of(expected));
-
-        assertThat(service.requireMembership(ALLOWED_STORE, authentication)).isEqualTo(expected);
+    @BeforeEach
+    void setUp() {
+        repository = new FakeStoreAccessRepository();
+        service = new StoreAccessService(repository);
+        SessionPrincipal principal = new SessionPrincipal(new SessionUser(
+                USER_ID, "manager.demo", "Manager Demo", Set.of(), List.of()));
+        authentication = UsernamePasswordAuthenticationToken.authenticated(
+                principal, null, principal.authorities());
     }
 
     @Test
-    void rejectsCrossStoreAccess() {
-        var authentication = authenticationWith(List.of(
-                new StoreContext(ALLOWED_STORE, "0001", "Nguyễn Kiệm", StoreRole.EMPLOYEE)));
+    void permitsMembershipRegionAndChainScopesForStoreWork() {
+        for (AccessSnapshot access : List.of(
+                access(StoreRole.EMPLOYEE, false, false),
+                access(null, true, false),
+                access(null, false, true))) {
+            repository.answers.add(Optional.of(access));
 
-        assertThatThrownBy(() -> service.requireMembership(OTHER_STORE, authentication))
+            assertThat(service.requireMembership(STORE_ID, authentication))
+                    .isEqualTo(new StoreAccessService.AuthorizedStore(STORE_ID, "0001", "Nguyễn Kiệm"));
+        }
+    }
+
+    @Test
+    void managerActionsAcceptOnlyStoreRegionOrChainManagerScope() {
+        repository.answers.add(Optional.of(access(StoreRole.STORE_MANAGER, false, false)));
+        repository.answers.add(Optional.of(access(null, true, false)));
+        repository.answers.add(Optional.of(access(null, false, true)));
+        repository.answers.add(Optional.of(access(StoreRole.EMPLOYEE, false, false)));
+
+        service.requireStoreManager(STORE_ID, authentication);
+        service.requireStoreManager(STORE_ID, authentication);
+        service.requireStoreManager(STORE_ID, authentication);
+        assertThatThrownBy(() -> service.requireStoreManager(STORE_ID, authentication))
+                .isInstanceOfSatisfying(ApiProblemException.class, problem -> {
+                    assertThat(problem.status()).isEqualTo(HttpStatus.FORBIDDEN);
+                    assertThat(problem.code()).isEqualTo("STORE_MANAGER_REQUIRED");
+                });
+    }
+
+    @Test
+    void deniesValidButOutOfScopeOrInactiveStore() {
+        repository.answers.add(Optional.of(access(null, false, false)));
+        repository.answers.add(Optional.empty());
+
+        assertThatThrownBy(() -> service.requireMembership(STORE_ID, authentication))
+                .isInstanceOfSatisfying(ApiProblemException.class, problem -> {
+                    assertThat(problem.status()).isEqualTo(HttpStatus.FORBIDDEN);
+                    assertThat(problem.code()).isEqualTo("STORE_ACCESS_DENIED");
+                });
+        assertThatThrownBy(() -> service.requireMembership(STORE_ID, authentication))
                 .isInstanceOfSatisfying(ApiProblemException.class, problem -> {
                     assertThat(problem.status()).isEqualTo(HttpStatus.FORBIDDEN);
                     assertThat(problem.code()).isEqualTo("STORE_ACCESS_DENIED");
@@ -42,44 +85,30 @@ class StoreAccessServiceTest {
     }
 
     @Test
-    void rejectsMissingAuthentication() {
-        assertThatThrownBy(() -> service.requireMembership(ALLOWED_STORE, null))
+    void rejectsMissingAuthenticationBeforeQueryingScope() {
+        assertThatThrownBy(() -> service.requireMembership(STORE_ID, null))
                 .isInstanceOfSatisfying(ApiProblemException.class, problem -> {
                     assertThat(problem.status()).isEqualTo(HttpStatus.UNAUTHORIZED);
                     assertThat(problem.code()).isEqualTo("AUTHENTICATION_REQUIRED");
                 });
     }
 
-    @Test
-    void requiresTheStoreManagerMembershipAndDoesNotTreatChainAdminAsABypass() {
-        StoreContext manager = new StoreContext(ALLOWED_STORE, "0001", "Nguyễn Kiệm", StoreRole.STORE_MANAGER);
-        assertThat(service.requireStoreManager(ALLOWED_STORE, authenticationWith(List.of(manager))))
-                .isEqualTo(manager);
-
-        SessionUser chainAdminEmployee = new SessionUser(
-                UUID.fromString("10000000-0000-4000-8000-000000000001"),
-                "admin.demo",
-                "Admin Demo",
-                Set.of(GlobalRole.CHAIN_ADMIN),
-                List.of(new StoreContext(ALLOWED_STORE, "0001", "Nguyễn Kiệm", StoreRole.EMPLOYEE)));
-        SessionPrincipal principal = new SessionPrincipal(chainAdminEmployee);
-        var authentication = UsernamePasswordAuthenticationToken.authenticated(principal, null, principal.authorities());
-
-        assertThatThrownBy(() -> service.requireStoreManager(ALLOWED_STORE, authentication))
-                .isInstanceOfSatisfying(ApiProblemException.class, problem -> {
-                    assertThat(problem.status()).isEqualTo(HttpStatus.FORBIDDEN);
-                    assertThat(problem.code()).isEqualTo("STORE_MANAGER_REQUIRED");
-                });
+    private AccessSnapshot access(StoreRole membership, boolean regionManager, boolean chainAdmin) {
+        return new AccessSnapshot(
+                STORE_ID, "0001", "Nguyễn Kiệm", membership, regionManager, chainAdmin);
     }
 
-    private UsernamePasswordAuthenticationToken authenticationWith(List<StoreContext> stores) {
-        SessionUser user = new SessionUser(
-                UUID.fromString("10000000-0000-4000-8000-000000000001"),
-                "employee.demo",
-                "Nhân viên Demo",
-                Set.of(),
-                stores);
-        SessionPrincipal principal = new SessionPrincipal(user);
-        return UsernamePasswordAuthenticationToken.authenticated(principal, null, principal.authorities());
+    private static final class FakeStoreAccessRepository extends StoreAccessRepository {
+        private final List<Optional<AccessSnapshot>> answers = new ArrayList<>();
+        private int index;
+
+        private FakeStoreAccessRepository() {
+            super(null);
+        }
+
+        @Override
+        public Optional<AccessSnapshot> findActiveAccess(UUID userId, UUID storeId) {
+            return answers.get(index++);
+        }
     }
 }

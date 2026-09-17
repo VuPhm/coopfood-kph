@@ -35,6 +35,8 @@ class CatalogLookupHttpIntegrationTest {
     private static final UUID USER_ID = UUID.fromString("10000000-0000-4000-8000-000000000001");
     private static final UUID STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000001");
     private static final UUID OTHER_STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000002");
+    private static final UUID REGION_ID = UUID.fromString("30000000-0000-4000-8000-000000000001");
+    private static final UUID OTHER_REGION_ID = UUID.fromString("30000000-0000-4000-8000-000000000002");
 
     @Container
     @ServiceConnection
@@ -59,14 +61,16 @@ class CatalogLookupHttpIntegrationTest {
 
     @BeforeEach
     void seedActorAndStore() {
-        database.execute("TRUNCATE TABLE app_users, stores, catalog_import_batches CASCADE");
+        database.execute("TRUNCATE TABLE app_users, regions, stores, catalog_import_batches CASCADE");
         Timestamp now = Timestamp.from(Instant.parse("2026-09-05T04:00:00Z"));
         database.execute("""
                 INSERT INTO app_users (id, username, password_hash, display_name, active, created_at, updated_at)
                 VALUES (?, 'catalog.demo', ?, 'Catalog Demo', TRUE, ?, ?)
                 """, USER_ID, passwordEncoder.encode("correct-password"), now, now);
-        insertStore(STORE_ID, "0001", true, now);
-        insertStore(OTHER_STORE_ID, "0002", true, now);
+        insertRegion(REGION_ID, "R-01", now);
+        insertRegion(OTHER_REGION_ID, "R-02", now);
+        insertStore(STORE_ID, REGION_ID, "0001", true, now);
+        insertStore(OTHER_STORE_ID, OTHER_REGION_ID, "0002", true, now);
         database.execute("""
                 INSERT INTO store_memberships (user_id, store_id, role, active, created_at, updated_at)
                 VALUES (?, ?, 'EMPLOYEE', TRUE, ?, ?)
@@ -125,7 +129,7 @@ class CatalogLookupHttpIntegrationTest {
         HttpClient client = login();
         assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(403);
         database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
-        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(403);
+        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(200);
 
         HttpResponse<String> absentStore = request(client, "/api/v1/catalog/barcodes/001234");
         assertThat(absentStore.statusCode()).isEqualTo(400);
@@ -134,6 +138,7 @@ class CatalogLookupHttpIntegrationTest {
         assertThat(malformedStore.statusCode()).isEqualTo(400);
         assertThat(objectMapper.readTree(malformedStore.body()).path("code").asText()).isEqualTo("VALIDATION_ERROR");
 
+        database.execute("DELETE FROM user_roles WHERE user_id = ? AND role = 'CHAIN_ADMIN'", USER_ID);
         database.execute("UPDATE store_memberships SET active = FALSE WHERE user_id = ? AND store_id = ?", USER_ID, STORE_ID);
         assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(403);
     }
@@ -167,11 +172,18 @@ class CatalogLookupHttpIntegrationTest {
                 HttpResponse.BodyHandlers.ofString());
     }
 
-    private void insertStore(UUID id, String code, boolean active, Timestamp now) {
+    private void insertRegion(UUID id, String code, Timestamp now) {
         database.execute("""
-                INSERT INTO stores (id, store_code, store_name, active, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """, id, code, "Store " + code, active, now, now);
+                INSERT INTO regions (id, region_code, region_name, active, created_at, updated_at)
+                VALUES (?, ?, ?, TRUE, ?, ?)
+                """, id, code, "Region " + code, now, now);
+    }
+
+    private void insertStore(UUID id, UUID regionId, String code, boolean active, Timestamp now) {
+        database.execute("""
+                INSERT INTO stores (id, region_id, store_code, store_name, active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, id, regionId, code, "Store " + code, active, now, now);
     }
 
     private Catalog insertCatalog(String barcode, boolean current, boolean productActive, boolean primary, boolean barcodeActive) {

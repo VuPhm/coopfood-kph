@@ -4,7 +4,7 @@ Cập nhật: 2026-09-17
 
 ## Giai đoạn
 
-`P01 provisioning policy — ACCEPTED; P02 implementation là bước kế tiếp chưa mở`
+`P02 scoped authorization slice — technical PASS, AWAITING_ACCEPTANCE`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -34,6 +34,11 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   `CHAIN_ADMIN` toàn chuỗi → `REGION_MANAGER` đúng vùng → `STORE_MANAGER` đúng
   store; credential/bootstrap/lifecycle theo security baseline. P01 chỉ khóa
   contract/fixture, chưa triển khai schema/API/Admin UI.
+- P02 slice đầu đã triển khai candidate trên branch
+  `codex/p02-scoped-authorization`: migration V6 thêm region/store mapping và
+  user-region assignment; backend cho phép KPH theo membership đúng store,
+  `REGION_MANAGER` đúng vùng hoặc `CHAIN_ADMIN` toàn chuỗi. Technical
+  suite đã pass; owner chưa test/nghiệm thu.
 
 ## Hệ thống hiện có
 
@@ -52,6 +57,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - PR #3 đã merge vào `main` và từng pass remote CI `frontend`, `backend`, `browser`.
 - Ngày 2026-09-17, P01 Contract Lock bao phủ role hierarchy, cross-store/
   cross-region denial, last-admin/last-manager và credential/bootstrap guard.
+- P02 scoped authorization: full backend test PASS trên PostgreSQL 17 qua
+  Testcontainers, gồm clean migration, upgrade V1→V6, cross-region denial,
+  region grant/revoke request kế tiếp và chain-wide access; `npm run verify`
+  PASS. Owner acceptance vẫn pending theo yêu cầu test sau.
 - Ngày 2026-09-17, S04 `npm run verify` PASS docs/Contract Lock, generated API
   drift, TypeScript, 147 tests và build; browser fixture review pass 7 viewport.
 - S04 không đổi backend/OpenAPI. Real-backend browser suite chưa rerun vì Docker
@@ -69,8 +78,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-P01 đã khóa policy và fixture. Bước nhỏ kế tiếp khi được mở là P02: thiết kế
-vertical slice implementation cho region/store authorization và provisioning;
-chưa có schema/API/Admin implementation nào được suy diễn từ việc P01 được duyệt.
-Phạm vi đề xuất ở [NEXT](NEXT.md); backlog đầy đủ ở
-[roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).
+P02 scoped authorization đang chờ owner test. Không tự mở public
+provisioning API/Admin UI hoặc credential/bootstrap slice trước khi đóng
+vòng này. Kịch bản thử và giới hạn nằm trong
+[P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
+đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).

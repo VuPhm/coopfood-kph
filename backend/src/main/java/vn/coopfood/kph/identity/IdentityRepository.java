@@ -60,9 +60,12 @@ class IdentityRepository {
                 .from(table(name("store_memberships")).as("sm"))
                 .join(table(name("stores")).as("s"))
                 .on(field(name("s", "id"), UUID.class).eq(field(name("sm", "store_id"), UUID.class)))
+                .join(table(name("regions")).as("r"))
+                .on(field(name("r", "id"), UUID.class).eq(field(name("s", "region_id"), UUID.class)))
                 .where(field(name("sm", "user_id"), UUID.class).eq(userId)
                         .and(field(name("sm", "active"), Boolean.class).isTrue())
-                        .and(field(name("s", "active"), Boolean.class).isTrue()))
+                        .and(field(name("s", "active"), Boolean.class).isTrue())
+                        .and(field(name("r", "active"), Boolean.class).isTrue()))
                 .orderBy(field(name("s", "store_code"), String.class), field(name("s", "id"), UUID.class))
                 .fetch(record -> new StoreContext(
                         record.value1(),

@@ -8,7 +8,7 @@
     "Một Flyway migration thêm regions, store.region_id và user_region_assignments với relational constraints/index cần thiết",
     "Authorization policy tập trung resolve active store -> active region từ database; không tin region từ client",
     "Quyền xem/tạo KPH cho active membership, active REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN; duyệt/xuất chỉ cho STORE_MANAGER đúng store, REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN",
-    "Session/store selector hiển thị các active store effective cho region/chain scope để online flow có thể điều hướng mà không dùng UI làm security boundary",
+    "Session refresh giữ global role/membership thật; authorization query đọc active region assignment trực tiếp từ database mỗi request, không giả inherited scope thành store membership",
     "Unit/integration tests bao phủ membership, same-region, cross-region, inactive assignment/region/store và chain-wide scope",
     "Technical evidence và acceptance handoff riêng; owner test sau không bị ghi nhận nhầm là acceptance"
   ],
@@ -24,10 +24,12 @@
   "sharedPaths": [
     "backend/src/main/resources/db/migration/V6__scoped_management_hierarchy.sql",
     "backend/src/main/java/vn/coopfood/kph/identity/IdentityRepository.java",
-    "backend/src/main/java/vn/coopfood/kph/identity/RegionContext.java",
-    "backend/src/main/java/vn/coopfood/kph/identity/SessionUser.java",
     "backend/src/main/java/vn/coopfood/kph/store/StoreAccessRepository.java",
     "backend/src/main/java/vn/coopfood/kph/store/StoreAccessService.java",
+    "backend/src/main/java/vn/coopfood/kph/kph/KphService.java",
+    "backend/src/main/java/vn/coopfood/kph/kph/LocalPrivateMediaStorage.java",
+    "backend/src/test/java/vn/coopfood/kph/catalog/CatalogLookupHttpIntegrationTest.java",
+    "backend/src/test/java/vn/coopfood/kph/foundation/DatabaseSmokeTest.java",
     "backend/src/test/java/vn/coopfood/kph/identity/IdentityHttpIntegrationTest.java",
     "backend/src/test/java/vn/coopfood/kph/identity/IdentityServiceTest.java",
     "backend/src/test/java/vn/coopfood/kph/identity/StoreAccessServiceTest.java",

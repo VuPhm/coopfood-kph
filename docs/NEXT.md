@@ -2,12 +2,28 @@
 
 Cập nhật: 2026-09-17
 
-## Next when requested — P02 provisioning implementation
+## Current acceptance — P02 scoped authorization slice
+
+Candidate P02 đầu tiên đã triển khai schema region/store mapping,
+user-region assignment và KPH authorization kế thừa. Technical gate đã
+pass; owner sẽ test sau nên cycle ở `AWAITING_ACCEPTANCE`, không tự ghi
+nhận đã nghiệm thu.
+
+Khi owner test, xác nhận ba outcome:
+
+1. `REGION_MANAGER` thao tác KPH trong đúng region và bị deny ở region khác.
+2. Grant/revoke region assignment có hiệu lực ở request kế tiếp.
+3. `CHAIN_ADMIN` truy cập active store toàn chuỗi mà không cần synthetic
+   store membership.
+
+Handoff chi tiết: [p02-scoped-authorization](delivery/p02-scoped-authorization/acceptance-handoff.md).
+
+## Sau khi P02 slice đầu được chấp nhận — provisioning API/Admin UI
 
 P01 đã được owner duyệt ngày 17/09/2026 với hierarchy explicit:
 `CHAIN_ADMIN` toàn chuỗi, `REGION_MANAGER` đúng vùng và `STORE_MANAGER` đúng
-store. P02 chưa mở; việc duyệt P01 không tự cho phép migration, endpoint hoặc
-Admin UI nếu chưa tạo cycle implementation riêng.
+store. Schema/authorization slice đã mở và chờ acceptance; endpoint và
+Admin UI vẫn chưa mở trong cycle implementation riêng.
 
 ### Outcome
 

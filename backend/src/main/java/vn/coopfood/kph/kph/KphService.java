@@ -26,7 +26,6 @@ import tools.jackson.databind.ObjectMapper;
 import vn.coopfood.kph.catalog.CatalogService;
 import vn.coopfood.kph.foundation.time.TimeConfiguration;
 import vn.coopfood.kph.foundation.web.ApiProblemException;
-import vn.coopfood.kph.identity.StoreContext;
 import vn.coopfood.kph.store.StoreAccessService;
 
 @Service
@@ -52,7 +51,7 @@ class KphService {
     @Transactional
     KphRecordResponse create(UUID storeId, KphCreateRequest request, List<MultipartFile> photos,
             String idempotencyKey, Authentication authentication) {
-        StoreContext store = storeAccess.requireMembership(storeId, authentication);
+        StoreAccessService.AuthorizedStore store = storeAccess.requireMembership(storeId, authentication);
         UUID actorId = ((vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal()).userId();
         validateIdempotencyKey(idempotencyKey);
         String requestHash = fingerprint(request, photos);
@@ -134,7 +133,7 @@ class KphService {
     @Transactional
     KphRecordResponse review(UUID storeId, UUID recordId, KphApprovalRequest request,
             Authentication authentication) {
-        StoreContext store = storeAccess.requireStoreManager(storeId, authentication);
+        StoreAccessService.AuthorizedStore store = storeAccess.requireStoreManager(storeId, authentication);
         var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
         var current = repository.lockReviewState(storeId, recordId)
                 .orElseThrow(() -> problem(HttpStatus.NOT_FOUND, "KPH_RECORD_NOT_FOUND",
@@ -157,7 +156,7 @@ class KphService {
 
     @Transactional
     KphExportResponse prepareExport(UUID storeId, KphExportRequest request, Authentication authentication) {
-        StoreContext store = storeAccess.requireStoreManager(storeId, authentication);
+        StoreAccessService.AuthorizedStore store = storeAccess.requireStoreManager(storeId, authentication);
         var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
         if (new HashSet<>(request.recordIds()).size() != request.recordIds().size()) {
             throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "EXPORT_SELECTION_DUPLICATE",
