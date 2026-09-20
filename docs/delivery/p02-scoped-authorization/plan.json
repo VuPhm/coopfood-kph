@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p02-scoped-authorization",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Triển khai vertical slice P02 đầu tiên cho hierarchy KPH đã khóa: database lưu region/store mapping và active user-region assignment; backend resolve scope từ database mỗi request để CHAIN_ADMIN toàn chuỗi, REGION_MANAGER đúng vùng và STORE_MANAGER/EMPLOYEE đúng membership có quyền KPH tương ứng, với deny test cross-store/cross-region.",
   "inScope": [
     "Một Flyway migration thêm regions, store.region_id và user_region_assignments với relational constraints/index cần thiết",
@@ -22,7 +22,7 @@
     "Catalog staging/publish, paging, production infrastructure hoặc deployment"
   ],
   "baseSha": "4543cce6cd95fa71c8acb6badd437a7fd693748e",
-  "candidateSha": "",
+  "candidateSha": "4fe070d417194a9d39a0316fda5ca093047539e8",
   "integrationOwner": "/root",
   "sharedPaths": [
     "backend/src/main/resources/db/migration/V6__scoped_management_hierarchy.sql",
@@ -48,16 +48,16 @@
     "docs/delivery/p02-scoped-authorization/**"
   ],
   "reviewLimit": 3,
-  "reviewRound": 2,
+  "reviewRound": 3,
   "teams": [],
   "gates": [
     {
       "id": "technical-scoped-authorization",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": null,
-      "sha": "",
+      "status": "pass",
+      "revision": 2,
+      "sha": "4fe070d417194a9d39a0316fda5ca093047539e8",
       "evidence": "docs/delivery/p02-scoped-authorization/technical-evidence.md"
     },
     {
@@ -82,22 +82,22 @@
   "blockers": [
     {
       "id": "inactive-scope-integration-coverage",
-      "status": "open",
+      "status": "resolved",
       "owner": "/root",
-      "nextAction": "Add PostgreSQL-backed denial coverage for inactive assignment, store and region with inherited scope."
+      "nextAction": "Covered by KphHttpIntegrationTest plus existing assignment revoke coverage at candidate SHA."
     },
     {
       "id": "kph-policy-layer-boundary",
-      "status": "open",
+      "status": "resolved",
       "owner": "/root",
-      "nextAction": "Separate active store scope resolution from KPH capability decisions and remove service-owned DTO leakage."
+      "nextAction": "Implemented StoreAccessResolver, KphStoreAccessPolicy and neutral StoreRef at candidate SHA."
     },
     {
       "id": "active-store-region-concurrency",
-      "status": "open",
+      "status": "resolved",
       "owner": "/root",
-      "nextAction": "Replace V6 cross-table check triggers with a concurrency-safe relational constraint and verify lifecycle transitions."
+      "nextAction": "Implemented generated conditional key plus composite foreign key and verified lifecycle transitions on PostgreSQL 17."
     }
   ],
-  "nextAction": "Implement the bounded revision 2 repair, run targeted PostgreSQL tests and integrated gates, then record a new candidate for owner acceptance."
+  "nextAction": "Owner runs the revised acceptance scenarios and accepts candidate 4fe070d or reports one concrete defect; do not open provisioning API/Admin UI before that decision."
 }

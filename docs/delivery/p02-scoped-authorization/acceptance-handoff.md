@@ -2,7 +2,7 @@
 
 Trạng thái: **AWAITING_ACCEPTANCE**
 
-Candidate: `17da6cac4bca735916dd210a70ea2812fb9d742c`
+Candidate: `4fe070d417194a9d39a0316fda5ca093047539e8`
 
 ## Outcome cần xác nhận
 
@@ -14,6 +14,8 @@ Candidate: `17da6cac4bca735916dd210a70ea2812fb9d742c`
   cần synthetic store membership.
 - Grant/revoke assignment hoặc global role có hiệu lực ở request kế
   tiếp; backend tự resolve store → region từ PostgreSQL.
+- Store hoặc region inactive bị deny kể cả khi actor còn active region
+  assignment hoặc `CHAIN_ADMIN`.
 
 ## Cách test sau
 
@@ -29,7 +31,7 @@ env DOCKER_HOST=unix:///Users/vup/.orbstack/run/docker.sock \
 Kết quả mong đợi: lệnh exit 0. Test KPH chứng minh employee bị deny
 manager action, region manager đúng vùng được duyệt/xuất,
 cross-region bị deny, revoke có hiệu lực ngay request sau và chain admin
-tiếp tục có scope toàn chuỗi.
+tiếp tục có scope toàn chuỗi; inactive store/region luôn bị deny.
 
 ## Giới hạn cố ý
 
