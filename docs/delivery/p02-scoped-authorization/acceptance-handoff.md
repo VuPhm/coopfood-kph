@@ -1,8 +1,14 @@
 # Acceptance handoff — P02 scoped authorization
 
-Trạng thái: **AWAITING_ACCEPTANCE**
+Trạng thái: **ACCEPTED — 2026-09-21**
 
-Candidate: `4fe070d417194a9d39a0316fda5ca093047539e8`
+Candidate: `f091016e3a0caae4e4e87198b2741c8c958a1f0f`
+
+Implementation commit: `4fe070d417194a9d39a0316fda5ca093047539e8`
+
+Accepted by: Owner
+
+Decision reference: owner message 2026-09-21, “còn lại cho pass”.
 
 ## Outcome cần xác nhận
 
@@ -42,3 +48,13 @@ tiếp tục có scope toàn chuỗi; inactive store/region luôn bị deny.
   guard hoặc credential/bootstrap implementation.
 - Migration upgrade tạo một vùng chuyển tiếp riêng cho mỗi store cũ,
   giữ scope hẹp thay vì tự gom các store vào một vùng rộng.
+
+## Yêu cầu chuyển sang cycle kế tiếp
+
+Owner yêu cầu deactivate store/region và các thao tác xóa quan trọng phải đặt
+lịch với thời hạn tùy chọn nhưng tối thiểu 30 ngày. Yêu cầu này không thay đổi
+authorization candidate vì P02 chưa có lifecycle mutation API.
+
+Contract hiện hiểu “xóa” là deactivate/revoke có audit, không hard delete. Trước
+khi triển khai provisioning/lifecycle cần khóa danh sách thao tác quan trọng khác
+và quy tắc emergency suspend/revoke cho sự cố bảo mật.

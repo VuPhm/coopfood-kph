@@ -2,7 +2,9 @@
 
 Revision: 2
 
-Candidate: `4fe070d417194a9d39a0316fda5ca093047539e8`
+Candidate: `f091016e3a0caae4e4e87198b2741c8c958a1f0f`
+
+Verified implementation: `4fe070d417194a9d39a0316fda5ca093047539e8`
 
 Date: 2026-09-21
 
@@ -32,6 +34,7 @@ Date: 2026-09-21
 | `npm run verify` | Node 24 | PASS; docs, contracts, generated API drift, TypeScript, frontend/package tests and production builds |
 | `node --test tooling/skills/delivery-cycle/scripts/cycle.test.mjs` | Node 24 | PASS; 9/9 delivery-cycle tests |
 | `git diff --check` and `python3 -m json.tool docs/delivery/p02-scoped-authorization/plan.json` | Git / Python 3 | PASS |
+| `npm run check:docs && npm run check:contracts` | Node 24 | PASS on the docs-only lifecycle addendum; 15 manifest resources, 7 API fixtures |
 
 `npm run verify` giữ warning chunk Store PWA trên 500 kB đã có trong
 baseline; slice này không đổi frontend bundle.
@@ -45,4 +48,9 @@ baseline; slice này không đổi frontend bundle.
 - UI selector cho region/chain manager, provisioning CRUD, privileged mutation
   audit/guards và credential/bootstrap là các slice sau, không phải blocker
   của outcome authorization backend này.
-- Owner acceptance chưa có; technical PASS không được coi là nghiệm thu.
+- Owner đã acceptance riêng ngày 2026-09-21; technical PASS tự nó không được coi
+  là nghiệm thu.
+- Backend/full-workspace evidence was produced at implementation commit `4fe070d`.
+  Candidate `f091016` only adds accepted policy/current-state documentation, so
+  that evidence is carried forward; docs and Contract Lock were rerun on the
+  exact content committed as `f091016`.
