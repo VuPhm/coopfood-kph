@@ -4,7 +4,7 @@ Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`P02 scoped authorization slice — CLOSED, owner accepted`
+`P02 — CLOSED; P03 scheduled lifecycle — VERIFYING, chưa owner accepted`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -50,6 +50,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - Store PWA online hỗ trợ login → chọn cửa hàng → lookup barcode/manual fallback
   → tạo phiếu → history/filter → duyệt → xuất Excel. Pilot tiếp tục có persistence,
   trash, scanner, stamped image và export local riêng.
+- P03 bổ sung lịch ngừng hoạt động vùng/cửa hàng (tối thiểu 30 ngày), đổi/hủy/
+  thực thi thủ công khi đến hạn, audit và Admin Web cùng contract. Lịch không tự
+  chạy; owner cần nghiệm thu lựa chọn tối thiểu này. Preview local dùng dữ liệu
+  tổng hợp riêng, không dùng dữ liệu vận hành thật.
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
@@ -80,10 +84,12 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-P02 scoped authorization đã đóng. Mặc định lifecycle kế tiếp: deactivate
-store/region đặt lịch tối thiểu 30 ngày; thu hồi quyền, khóa user, reset credential
-và vô hiệu session vẫn có hiệu lực ngay vì an toàn; không hard delete và không
-xây generic scheduler khi chưa có nhu cầu.
+P02 scoped authorization đã đóng. P03 đã mở theo yêu cầu “tiếp nếu đã đóng P02”,
+đang hoàn tất kiểm chứng và chuẩn bị nghiệm thu tại
+[P03 plan](delivery/p03-scheduled-lifecycle/plan.json).
+Không đóng P03 hoặc mở cycle mới trước khi có quyết định owner. Thu hồi quyền,
+khóa user, reset credential và vô hiệu session vẫn thuộc slice khác; không hard
+delete và không xây generic scheduler khi chưa có nhu cầu.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).

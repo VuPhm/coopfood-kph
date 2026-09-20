@@ -36,13 +36,18 @@
     "backend/src/test/java/vn/coopfood/kph/foundation/DatabaseSmokeTest.java",
     "backend/src/test/java/vn/coopfood/kph/lifecycle/**",
     "apps/admin-web/src/**",
+    "apps/admin-web/vite.config.ts",
     "e2e/scripts/review-admin-lifecycle.cjs",
+    "e2e/scripts/start-p03-acceptance.sh",
+    "e2e/scripts/stop-p03-acceptance.sh",
+    "e2e/scripts/verify-p03-lifecycle.cjs",
+    "e2e/seed/p03-lifecycle.sql",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "docs/delivery/p03-scheduled-lifecycle/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {

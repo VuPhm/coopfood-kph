@@ -18,10 +18,11 @@ const scenarios = [
   const session = JSON.parse(readFileSync("contracts/fixtures/api/session.json"));
   session.user.globalRoles = ["CHAIN_ADMIN"];
   const targets = JSON.parse(readFileSync("contracts/fixtures/api/lifecycle-targets.json"));
-  const schedules = JSON.parse(readFileSync("contracts/fixtures/api/lifecycle-schedules.json"));
+  const scheduleFixture = JSON.parse(readFileSync("contracts/fixtures/api/lifecycle-schedules.json"));
   const browser = await chromium.launch();
   try {
     for (const [name, width, height, signedIn] of scenarios) {
+      let schedules = structuredClone(scheduleFixture);
       const page = await browser.newPage({ viewport: { width, height }, reducedMotion: "reduce" });
       const errors = [];
       page.on("pageerror", (error) => errors.push(error.message));
@@ -39,7 +40,10 @@ const scenarios = [
         if (path.endsWith("/lifecycle/targets")) return route.fulfill({ json: targets });
         if (path.endsWith("/lifecycle/schedules") && request.method() === "GET") return route.fulfill({ json: schedules });
         if (path.endsWith("/lifecycle/schedules") && request.method() === "POST") return route.fulfill({ status: 201, json: schedules[0] });
-        if (path.endsWith("/cancel")) return route.fulfill({ json: { ...schedules[0], status: "CANCELLED" } });
+        if (path.endsWith("/cancel")) {
+          schedules = [{ ...schedules[0], status: "CANCELLED" }];
+          return route.fulfill({ json: schedules[0] });
+        }
         return route.fulfill({ json: schedules[0] });
       });
       await page.goto(process.env.ADMIN_UI_REVIEW_URL || "http://127.0.0.1:4174");
@@ -51,8 +55,6 @@ const scenarios = [
       assert.equal(await page.getByRole("main").count(), 1);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${name}: page overflow`);
       if (!signedIn) {
-        await page.keyboard.press("Tab");
-        assert.equal(await page.getByRole("link", { name: "Bỏ qua đến nội dung chính" }).evaluate((element) => element === document.activeElement), true);
         await page.keyboard.press("Tab");
         assert.equal(await page.getByRole("textbox", { name: /Tên đăng nhập/ }).evaluate((element) => element === document.activeElement), true);
       } else {
@@ -66,8 +68,8 @@ const scenarios = [
         if (name === "desktop") {
           await page.getByRole("combobox", { name: /Vùng hoặc cửa hàng/ }).selectOption(`STORE:${targets[1].id}`);
           await page.getByRole("textbox", { name: /^Lý do/ }).fill("Kiểm tra lịch tổng hợp");
-          await page.getByRole("button", { name: "Tạo lịch deactivate" }).click();
-          await page.getByText(/Đã đặt lịch deactivate CF-0012/).waitFor();
+          await page.getByRole("button", { name: "Tạo lịch ngừng hoạt động" }).click();
+          await page.getByText(/Đã đặt lịch ngừng hoạt động CF-0012/).waitFor();
           await page.getByRole("button", { name: "Hủy lịch" }).click();
           const dialog = page.getByRole("dialog");
           await dialog.getByRole("textbox", { name: /Lý do/ }).fill("Thay đổi kế hoạch");

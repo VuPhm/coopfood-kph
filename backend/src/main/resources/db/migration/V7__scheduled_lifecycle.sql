@@ -6,6 +6,10 @@ CREATE TABLE lifecycle_deactivation_schedules (
     target_type VARCHAR(16) NOT NULL
         CHECK (target_type IN ('REGION', 'STORE')),
     target_id UUID NOT NULL,
+    region_target_id UUID GENERATED ALWAYS AS
+        (CASE WHEN target_type = 'REGION' THEN target_id END) STORED REFERENCES regions (id),
+    store_target_id UUID GENERATED ALWAYS AS
+        (CASE WHEN target_type = 'STORE' THEN target_id END) STORED REFERENCES stores (id),
     effective_date DATE NOT NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'SCHEDULED'
         CHECK (status IN ('SCHEDULED', 'CANCELLED', 'EXECUTED')),

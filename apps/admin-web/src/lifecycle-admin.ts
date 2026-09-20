@@ -124,5 +124,22 @@ function apiError(
   fallback: string,
 ) {
   const problem = response.error as { code?: string; detail?: string } | undefined;
-  return new AdminApiError(problem?.detail ?? fallback, response.response?.status, problem?.code);
+  const messages: Record<string, string> = {
+    AUTHENTICATION_REQUIRED: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    INVALID_CREDENTIALS: "Tên đăng nhập hoặc mật khẩu không đúng.",
+    LIFECYCLE_ADMIN_REQUIRED: "Bạn chưa có quyền quản trị chuỗi hoặc vùng đang hoạt động.",
+    LIFECYCLE_TARGET_SCOPE_DENIED: "Vùng hoặc cửa hàng này nằm ngoài phạm vi của bạn.",
+    LIFECYCLE_TARGET_NOT_FOUND: "Không tìm thấy vùng hoặc cửa hàng này.",
+    LIFECYCLE_TARGET_INACTIVE: "Vùng hoặc cửa hàng này đã ngừng hoạt động.",
+    LIFECYCLE_SCHEDULE_EXISTS: "Vùng hoặc cửa hàng này đã có lịch đang chờ. Hãy đổi hoặc hủy lịch đó.",
+    LIFECYCLE_SCHEDULE_NOT_FOUND: "Không tìm thấy lịch này. Hãy tải lại danh sách.",
+    LIFECYCLE_SCHEDULE_FINAL: "Lịch đã hủy hoặc đã thực thi không thể thay đổi.",
+    LIFECYCLE_SCHEDULE_NOT_DUE: "Chưa đến ngày hiệu lực của lịch này.",
+    EFFECTIVE_DATE_TOO_SOON: "Ngày hiệu lực phải cách ngày hiện tại ít nhất 30 ngày.",
+    LIFECYCLE_REASON_INVALID: "Hãy nhập lý do từ 1 đến 500 ký tự.",
+    REGION_HAS_ACTIVE_STORES: "Vùng vẫn còn cửa hàng hoạt động. Hãy ngừng hoạt động các cửa hàng trước.",
+    STORE_REGION_INACTIVE: "Vùng của cửa hàng không còn hoạt động. Vui lòng kiểm tra lại.",
+    ACTIVE_STORE_MANAGER_REQUIRED: "Cửa hàng phải còn ít nhất một quản lý đang hoạt động trước khi thực thi.",
+  };
+  return new AdminApiError((problem?.code && messages[problem.code]) || fallback, response.response?.status, problem?.code);
 }

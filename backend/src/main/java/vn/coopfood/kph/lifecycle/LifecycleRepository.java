@@ -212,15 +212,15 @@ class LifecycleRepository {
     }
 
     int countActiveStoreManagers(UUID storeId) {
-        Integer count = database.fetchOne("""
-                SELECT count(*)
+        return database.fetch("""
+                SELECT sm.user_id
                 FROM store_memberships sm
                 JOIN app_users u ON u.id = sm.user_id AND u.active
                 WHERE sm.store_id = ?
                   AND sm.active
                   AND sm.role = 'STORE_MANAGER'
-                """, storeId).get(0, Integer.class);
-        return count == null ? 0 : count;
+                FOR SHARE OF sm, u
+                """, storeId).size();
     }
 
     void insertAudit(UUID actorId, String action, LifecycleTargetType targetType,

@@ -430,7 +430,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/LifecycleValidation'
 
   /api/v1/admin/lifecycle/schedules/{scheduleId}:
     put:
@@ -464,7 +464,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '422':
-          $ref: '#/components/responses/UnprocessableEntity'
+          $ref: '#/components/responses/LifecycleValidation'
 
   /api/v1/admin/lifecycle/schedules/{scheduleId}/cancel:
     post:
@@ -497,6 +497,9 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/LifecycleValidation'
 
   /api/v1/admin/lifecycle/schedules/{scheduleId}/execute:
     post:
@@ -532,6 +535,9 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/LifecycleValidation'
 
 components:
   securitySchemes:
@@ -619,6 +625,12 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
+    LifecycleValidation:
+      description: Invalid lifecycle date or reason; code identifies the failed rule.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     ServiceUnavailable:
       description: Required infrastructure is unavailable.
       content:

@@ -70,8 +70,8 @@ class LifecycleService {
         SessionPrincipal actor = requireLifecycleActor(authentication);
         String reason = normalizeReason(request.reason());
         validateEffectiveDate(request.effectiveDate());
-        LifecycleScheduleResponse schedule = requirePendingSchedule(scheduleId);
-        requireAuthorizedTarget(actor.userId(), schedule.target().type(), schedule.target().id());
+        LifecycleScheduleResponse schedule = requirePendingSchedule(scheduleId, actor.userId());
+        requireActiveTarget(requireAuthorizedTarget(actor.userId(), schedule.target().type(), schedule.target().id()));
         Instant now = clock.instant();
         repository.reschedule(scheduleId, request.effectiveDate(), reason, actor.userId(), now);
         repository.insertAudit(actor.userId(), action(schedule.target().type(), "RESCHEDULED"),
@@ -85,8 +85,7 @@ class LifecycleService {
             Authentication authentication) {
         SessionPrincipal actor = requireLifecycleActor(authentication);
         String reason = normalizeReason(request.reason());
-        LifecycleScheduleResponse schedule = requirePendingSchedule(scheduleId);
-        requireAuthorizedTarget(actor.userId(), schedule.target().type(), schedule.target().id());
+        LifecycleScheduleResponse schedule = requirePendingSchedule(scheduleId, actor.userId());
         Instant now = clock.instant();
         repository.cancel(scheduleId, reason, actor.userId(), now);
         repository.insertAudit(actor.userId(), action(schedule.target().type(), "CANCELLED"),
@@ -100,7 +99,7 @@ class LifecycleService {
             Authentication authentication) {
         SessionPrincipal actor = requireLifecycleActor(authentication);
         String reason = normalizeReason(request.reason());
-        LifecycleScheduleResponse schedule = requirePendingSchedule(scheduleId);
+        LifecycleScheduleResponse schedule = requirePendingSchedule(scheduleId, actor.userId());
         LifecycleRepository.TargetRecord target = requireAuthorizedTarget(
                 actor.userId(), schedule.target().type(), schedule.target().id());
         requireActiveTarget(target);
@@ -159,10 +158,12 @@ class LifecycleService {
         });
     }
 
-    private LifecycleScheduleResponse requirePendingSchedule(UUID scheduleId) {
+    private LifecycleScheduleResponse requirePendingSchedule(UUID scheduleId, UUID actorId) {
         LifecycleScheduleResponse schedule = repository.lockSchedule(scheduleId)
                 .orElseThrow(() -> problem(HttpStatus.NOT_FOUND, "LIFECYCLE_SCHEDULE_NOT_FOUND",
                         "The lifecycle schedule does not exist."));
+        // Scope must be checked before disclosing whether a schedule is terminal.
+        requireAuthorizedTarget(actorId, schedule.target().type(), schedule.target().id());
         if (schedule.status() != LifecycleScheduleStatus.SCHEDULED) {
             throw problem(HttpStatus.CONFLICT, "LIFECYCLE_SCHEDULE_FINAL",
                     "A cancelled or executed lifecycle schedule cannot be changed.");

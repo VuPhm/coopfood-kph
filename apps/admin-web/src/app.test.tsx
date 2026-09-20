@@ -13,7 +13,8 @@ const session = {
   user: { ...sessionFixture.user, globalRoles: ["CHAIN_ADMIN" as const] },
 };
 const targets = targetsFixture as Awaited<ReturnType<LifecycleAdminGateway["listTargets"]>>;
-const schedules = schedulesFixture as Awaited<ReturnType<LifecycleAdminGateway["listSchedules"]>>;
+const futureDate = new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10);
+const schedules = schedulesFixture.map((schedule) => ({ ...schedule, effectiveDate: futureDate })) as Awaited<ReturnType<LifecycleAdminGateway["listSchedules"]>>;
 
 function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdminGateway {
   return {
@@ -36,6 +37,51 @@ function renderApp(api: LifecycleAdminGateway) {
 }
 
 describe("Admin lifecycle workspace", () => {
+  it("logs out and removes the previous account's data before another login", async () => {
+    const api = gateway();
+    renderApp(api);
+    await screen.findByText("CF-0012 · Nguyễn Kiệm");
+    fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
+    await screen.findByRole("heading", { name: "Đăng nhập quản trị" });
+    expect(screen.queryByText("CF-0012 · Nguyễn Kiệm")).not.toBeInTheDocument();
+    vi.mocked(api.listTargets).mockResolvedValue([]);
+    vi.mocked(api.listSchedules).mockResolvedValue([]);
+    fireEvent.change(screen.getByLabelText(/Tên đăng nhập/), { target: { value: "another.admin" } });
+    fireEvent.change(screen.getByLabelText(/Mật khẩu/), { target: { value: "synthetic-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
+    await screen.findByText("Chưa có lịch ngừng hoạt động");
+    expect(screen.queryByText("CF-0012 · Nguyễn Kiệm")).not.toBeInTheDocument();
+  });
+
+  it("returns to login when a lifecycle request reports an expired session", async () => {
+    const api = gateway();
+    renderApp(api);
+    await screen.findByText("CF-0012 · Nguyễn Kiệm");
+    vi.mocked(api.listSchedules).mockRejectedValue(Object.assign(new Error("Hết phiên"), { status: 401 }));
+    fireEvent.click(screen.getByRole("button", { name: "Tải lại lịch ngừng hoạt động" }));
+    await screen.findByRole("heading", { name: "Đăng nhập quản trị" });
+    expect(screen.queryByText("CF-0012 · Nguyễn Kiệm")).not.toBeInTheDocument();
+  });
+
+  it("resets a dismissed action draft and allows clearing an invalid date", async () => {
+    const api = gateway();
+    renderApp(api);
+    await screen.findByText("CF-0012 · Nguyễn Kiệm");
+    fireEvent.click(screen.getByRole("button", { name: "Đổi lịch" }));
+    let dialog = screen.getByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText(/Lý do/), { target: { value: "Nháp không lưu" } });
+    fireEvent.change(within(dialog).getByLabelText(/Ngày hiệu lực mới/), { target: { value: "" } });
+    expect(within(dialog).getByLabelText(/Ngày hiệu lực mới/)).toHaveValue("");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Lưu ngày mới" }));
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("dd/mm/yyyy");
+    expect(api.reschedule).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Quay lại" }));
+    fireEvent.click(screen.getByRole("button", { name: "Hủy lịch" }));
+    dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByLabelText(/Lý do/)).toHaveValue("");
+    expect(within(dialog).queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("recovers an expired session through the accessible login form", async () => {
     const expired = Object.assign(new Error("Phiên đăng nhập đã hết hạn."), { status: 401 });
     const api = gateway({ getSession: vi.fn().mockRejectedValue(expired) });
@@ -47,7 +93,7 @@ describe("Admin lifecycle workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
 
     await waitFor(() => expect(api.login).toHaveBeenCalledWith("chain.admin", "correct-password"));
-    expect(await screen.findByRole("heading", { name: "Đặt lịch deactivate" })).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Đặt lịch ngừng hoạt động" })).toBeVisible();
   });
 
   it("creates a schedule with display date converted to the ISO contract", async () => {
@@ -62,7 +108,7 @@ describe("Admin lifecycle workspace", () => {
     const [day, month, year] = dateInput.value.split("/");
     const expectedIso = `${year}-${month}-${day}`;
     fireEvent.change(screen.getByRole("textbox", { name: /^Lý do/ }), { target: { value: "Kết thúc địa điểm thuê" } });
-    fireEvent.click(screen.getByRole("button", { name: "Tạo lịch deactivate" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tạo lịch ngừng hoạt động" }));
 
     await waitFor(() => expect(api.createSchedule).toHaveBeenCalledWith({
       targetType: "STORE",
@@ -70,7 +116,7 @@ describe("Admin lifecycle workspace", () => {
       effectiveDate: expectedIso,
       reason: "Kết thúc địa điểm thuê",
     }));
-    expect(await screen.findByText(/Đã đặt lịch deactivate CF-0012/)).toBeVisible();
+    expect(await screen.findByText(/Đã đặt lịch ngừng hoạt động CF-0012/)).toBeVisible();
   });
 
   it("confirms cancellation with a required reason and keeps execution disabled before due date", async () => {
@@ -81,7 +127,7 @@ describe("Admin lifecycle workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Hủy lịch" }));
 
     const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByRole("heading", { name: "Hủy lịch deactivate" })).toBeVisible();
+    expect(within(dialog).getByRole("heading", { name: "Hủy lịch ngừng hoạt động" })).toBeVisible();
     fireEvent.change(within(dialog).getByRole("textbox", { name: /Lý do/ }), { target: { value: "Kế hoạch thay đổi" } });
     fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận hủy lịch" }));
 

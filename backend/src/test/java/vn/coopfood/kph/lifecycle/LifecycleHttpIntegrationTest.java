@@ -1,6 +1,7 @@
 package vn.coopfood.kph.lifecycle;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -86,6 +87,41 @@ class LifecycleHttpIntegrationTest {
                 INSERT INTO store_memberships (user_id, store_id, role, active, created_at, updated_at)
                 VALUES (?, ?, 'STORE_MANAGER', TRUE, ?, ?), (?, ?, 'STORE_MANAGER', TRUE, ?, ?)
                 """, MANAGER_ID, STORE_A, now, now, MANAGER_ID, STORE_B, now, now);
+    }
+
+    @Test
+    void scopePrecedesTerminalStatusAndInvalidTargetsCannotBePersisted() throws Exception {
+        AuthenticatedClient chain = login("chain.admin");
+        AuthenticatedClient regional = login("region.manager");
+        UUID scheduleId = createDueSchedule(chain, "STORE", STORE_B);
+        body(post(chain, "/api/v1/admin/lifecycle/schedules/" + scheduleId + "/cancel",
+                "{\"reason\":\"Hủy lịch mẫu\"}"), 200);
+        assertThat(post(regional, "/api/v1/admin/lifecycle/schedules/" + scheduleId + "/cancel",
+                "{\"reason\":\"Ngoài vùng\"}").statusCode()).isEqualTo(403);
+        assertThatThrownBy(() -> database.execute(
+                "UPDATE lifecycle_deactivation_schedules SET target_id = ? WHERE id = ?",
+                UUID.randomUUID(), scheduleId)).isInstanceOf(RuntimeException.class);
+        assertThat(database.fetchValue("SELECT target_id FROM lifecycle_deactivation_schedules WHERE id = ?", scheduleId))
+                .isEqualTo(STORE_B);
+    }
+
+    @Test
+    void rejectsMissingCsrfUnknownFieldsAndBlankReasonsWithoutAudit() throws Exception {
+        AuthenticatedClient chain = login("chain.admin");
+        String payload = """
+                {"targetType":"STORE","targetId":"%s","effectiveDate":"%s","reason":"Kế hoạch"}
+                """.formatted(STORE_A, LocalDate.now(clock).plusDays(30));
+        assertThat(chain.client().send(request("/api/v1/admin/lifecycle/schedules")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(payload)).build(),
+                HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(403);
+        assertThat(post(chain, "/api/v1/admin/lifecycle/schedules",
+                payload.replace("\"Kế hoạch\"", "\"   \"")).statusCode()).isEqualTo(422);
+        assertThat(post(chain, "/api/v1/admin/lifecycle/schedules",
+                payload.replace("\"reason\":", "\"regionId\":\"forged\",\"reason\":")).statusCode()).isEqualTo(400);
+        assertThat(database.fetchValue("SELECT count(*) FROM lifecycle_deactivation_schedules")).isEqualTo(0L);
+        assertThat(database.fetchValue("SELECT count(*) FROM audit_events WHERE action = 'STORE_DEACTIVATION_SCHEDULED'"))
+                .isEqualTo(0L);
     }
 
     @Test

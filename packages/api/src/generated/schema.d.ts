@@ -628,6 +628,15 @@ export interface components {
                 "application/problem+json": components["schemas"]["ValidationProblem"];
             };
         };
+        /** @description Invalid lifecycle date or reason; code identifies the failed rule. */
+        LifecycleValidation: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description Required infrastructure is unavailable. */
         ServiceUnavailable: {
             headers: {
@@ -1040,7 +1049,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
-            422: components["responses"]["UnprocessableEntity"];
+            422: components["responses"]["LifecycleValidation"];
         };
     };
     rescheduleLifecycleDeactivation: {
@@ -1074,7 +1083,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
-            422: components["responses"]["UnprocessableEntity"];
+            422: components["responses"]["LifecycleValidation"];
         };
     };
     cancelLifecycleSchedule: {
@@ -1108,6 +1117,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            422: components["responses"]["LifecycleValidation"];
         };
     };
     executeLifecycleSchedule: {
@@ -1141,6 +1151,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            422: components["responses"]["LifecycleValidation"];
         };
     };
 }

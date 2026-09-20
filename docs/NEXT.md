@@ -20,7 +20,18 @@ Các outcome đã được chấp nhận:
 
 Handoff chi tiết: [p02-scoped-authorization](delivery/p02-scoped-authorization/acceptance-handoff.md).
 
-## Mặc định cho slice lifecycle/provisioning kế tiếp
+## P03 scheduled lifecycle — đang kiểm chứng/nghiệm thu
+
+Đã tiếp tục P03 trên `codex/p03-scheduled-lifecycle` sau khi P02 đóng. Backend,
+OpenAPI, fixtures, generated client và Admin Web đã có create/reschedule/cancel/
+manual execute cho store/region; lịch tối thiểu 30 ngày và recheck guard/scope.
+Thực thi là thao tác thủ công khi đến hạn, không có tiến trình tự chạy.
+
+Hoàn tất technical evidence và nghiệm thu owner theo
+[P03 plan](delivery/p03-scheduled-lifecycle/plan.json). Không coi “tiếp” là
+nghiệm thu P03 và không tự mở thêm cycle sau điểm bàn giao này.
+
+## Policy lifecycle đã khóa
 
 Owner đã yêu cầu deactivate store/region phải đặt lịch với ngày hiệu lực tùy
 chọn nhưng cách thời điểm tạo lịch tối thiểu 30 ngày. Trước ngày hiệu lực entity
@@ -32,15 +43,15 @@ lại lúc thực thi.
 user, thu hồi global role/region assignment/store membership, reset credential
 và invalid session có hiệu lực ngay ở request kế tiếp, kèm lý do, audit và guard
 last-admin/last-manager. Không xây generic scheduler hoặc mở rộng thêm target khi
-chưa có requirement vận hành cụ thể. Đây là default để dùng khi cycle tương ứng
-được owner mở, chưa phải yêu cầu triển khai ngay.
+chưa có requirement vận hành cụ thể. P03 chỉ triển khai phần lịch deactivate
+store/region; các lifecycle identity/credential khác chưa triển khai trong slice này.
 
 ## Sau khi P02 slice đầu được chấp nhận — provisioning API/Admin UI
 
 P01 đã được owner duyệt ngày 17/09/2026 với hierarchy explicit:
 `CHAIN_ADMIN` toàn chuỗi, `REGION_MANAGER` đúng vùng và `STORE_MANAGER` đúng
-store. Schema/authorization slice đã đóng; endpoint và Admin UI vẫn chưa mở
-trong cycle implementation riêng.
+store. Schema/authorization slice đã đóng; P03 mở endpoint/Admin UI cho lịch
+deactivate, các capability provisioning còn lại chờ cycle riêng.
 
 ### Outcome
 
