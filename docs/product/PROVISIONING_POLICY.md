@@ -94,10 +94,14 @@ synthetic membership. `CATALOG_ADMIN` không được provision identity và
 - Tạo lịch, đổi lịch, hủy lịch và thực thi lịch đều phải audit. Guard active
   store → active region và last-manager phải được kiểm lại trong transaction tại
   thời điểm thực thi, không chỉ lúc tạo lịch.
-- “Xóa” trong yêu cầu này được hiểu là deactivate/revoke có thể phục hồi; policy
-  không mở hard delete. Danh sách các thao tác phá hủy quan trọng khác ngoài
-  store/region và ngoại lệ xử lý sự cố bảo mật phải được khóa trước khi mở API
-  lifecycle tương ứng.
+- Mặc định tối thiểu, lịch 30 ngày chỉ áp dụng cho deactivate store và region.
+  User deactivation, global-role revoke, region-assignment revoke,
+  store-membership revoke, credential reset và session invalidation có hiệu lực
+  ngay ở request kế tiếp để không kéo dài quyền truy cập khi có rủi ro bảo mật;
+  vẫn phải có lý do, audit và guard last-admin/last-manager tương ứng.
+- “Xóa” được hiểu là deactivate/revoke có thể phục hồi; policy không mở hard
+  delete. Chỉ mở rộng lịch 30 ngày sang loại target khác khi có requirement vận
+  hành cụ thể, không xây generic scheduler trước.
 
 ## Credential policy
 

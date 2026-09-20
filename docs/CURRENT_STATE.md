@@ -80,9 +80,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-P02 scoped authorization đã đóng. Trước khi mở public provisioning API/Admin UI,
-cycle kế tiếp phải khóa danh sách “thao tác phá hủy quan trọng” áp dụng lịch tối
-thiểu 30 ngày và quyết định ngoại lệ xử lý sự cố bảo mật; không hard delete.
+P02 scoped authorization đã đóng. Mặc định lifecycle kế tiếp: deactivate
+store/region đặt lịch tối thiểu 30 ngày; thu hồi quyền, khóa user, reset credential
+và vô hiệu session vẫn có hiệu lực ngay vì an toàn; không hard delete và không
+xây generic scheduler khi chưa có nhu cầu.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).

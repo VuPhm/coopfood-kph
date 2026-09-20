@@ -20,7 +20,7 @@ Các outcome đã được chấp nhận:
 
 Handoff chi tiết: [p02-scoped-authorization](delivery/p02-scoped-authorization/acceptance-handoff.md).
 
-## Quyết định trước slice lifecycle/provisioning kế tiếp
+## Mặc định cho slice lifecycle/provisioning kế tiếp
 
 Owner đã yêu cầu deactivate store/region phải đặt lịch với ngày hiệu lực tùy
 chọn nhưng cách thời điểm tạo lịch tối thiểu 30 ngày. Trước ngày hiệu lực entity
@@ -28,12 +28,12 @@ vẫn active; sau khi thực thi, authorization deny từ request kế tiếp. K
 delete; schedule/reschedule/cancel/execute đều phải audit và guard phải được kiểm
 lại lúc thực thi.
 
-Trước implementation chỉ còn phải khóa:
-
-1. Danh sách cụ thể các thao tác deactivate/revoke khác được xếp là “xóa quan
-   trọng” và cũng chịu thời hạn tối thiểu 30 ngày.
-2. Có cho phép emergency suspend/revoke ngay khi xảy ra sự cố bảo mật hay không,
-   và ai có quyền thực hiện ngoại lệ đó.
+Để giữ scope nhỏ, lịch 30 ngày trước mắt chỉ áp dụng cho store và region. Khóa
+user, thu hồi global role/region assignment/store membership, reset credential
+và invalid session có hiệu lực ngay ở request kế tiếp, kèm lý do, audit và guard
+last-admin/last-manager. Không xây generic scheduler hoặc mở rộng thêm target khi
+chưa có requirement vận hành cụ thể. Đây là default để dùng khi cycle tương ứng
+được owner mở, chưa phải yêu cầu triển khai ngay.
 
 ## Sau khi P02 slice đầu được chấp nhận — provisioning API/Admin UI
 
