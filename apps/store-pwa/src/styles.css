@@ -832,6 +832,10 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 
 /* Barcode Scanner */
 .barcode-scanner-dialog-content {
+  max-height: calc(100dvh - 1rem);
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
   background: #0d1117;
@@ -858,6 +862,111 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
   background: linear-gradient(90deg, transparent 0%, #10b981 30%, #34d399 50%, #10b981 70%, transparent 100%);
   box-shadow: 0 0 10px 2px rgba(52, 211, 153, 0.65);
   animation: barcode-laser-scan 2s ease-in-out infinite alternate;
+}
+
+.barcode-scanner-preferences {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: rgb(38 38 38);
+  border-top: 1px solid rgb(38 38 38);
+}
+
+.barcode-scanner-preference {
+  display: grid;
+  min-height: 4.75rem;
+  grid-template-columns: 2rem minmax(0, 1fr) 2.25rem;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  background: rgb(23 23 23);
+  color: rgb(255 255 255 / 0.82);
+  text-align: left;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.barcode-scanner-preference:hover,
+.barcode-scanner-preference:focus-visible {
+  background: rgb(38 38 38);
+  color: #fff;
+}
+
+.barcode-scanner-preference:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid #34d399;
+  outline-offset: -3px;
+}
+
+.barcode-scanner-preference-icon {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.625rem;
+  background: rgb(16 185 129 / 0.14);
+  color: #6ee7b7;
+}
+
+.barcode-scanner-preference-copy {
+  min-width: 0;
+}
+
+.barcode-scanner-preference-copy strong,
+.barcode-scanner-preference-copy span {
+  display: block;
+}
+
+.barcode-scanner-preference-copy strong {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.barcode-scanner-preference-copy span {
+  margin-top: 0.125rem;
+  color: rgb(255 255 255 / 0.58);
+  font-size: 0.6875rem;
+  line-height: 0.925rem;
+}
+
+.barcode-scanner-switch-track {
+  position: relative;
+  display: inline-flex;
+  width: 2.25rem;
+  height: 1.25rem;
+  align-items: center;
+  border-radius: 999px;
+  background: rgb(82 82 82);
+  transition: background-color 150ms ease;
+}
+
+.barcode-scanner-switch-track > span {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-left: 0.1875rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+  transition: transform 150ms ease;
+}
+
+.barcode-scanner-preference[aria-checked="true"] .barcode-scanner-switch-track {
+  background: #059669;
+}
+
+.barcode-scanner-preference[aria-checked="true"] .barcode-scanner-switch-track > span {
+  transform: translateX(1rem);
+}
+
+@media (max-width: 480px) {
+  .barcode-scanner-preferences {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .barcode-scanner-preference {
+    min-height: 4rem;
+  }
 }
 
 @keyframes barcode-laser-scan {

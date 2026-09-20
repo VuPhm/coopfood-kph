@@ -9,14 +9,20 @@ import {
 import type { BrowserMultiFormatReader, Exception, Result } from "@zxing/library";
 import {
   Camera,
+  CameraOff,
   Flashlight,
   FlashlightOff,
   RefreshCw,
   ScanLine,
   SwitchCamera,
   TriangleAlert,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+
+import { getPilotSetting, setPilotSetting } from "./record-store";
+import { playScanSuccessSound } from "./scanner-sound";
 
 export type BarcodeScannerDialogProps = {
   open: boolean;
@@ -43,6 +49,17 @@ interface BarcodeDetectorConstructor {
 const NATIVE_BARCODE_FORMATS = ["ean_8", "ean_13", "upc_a", "code_128", "code_39"] as const;
 const SCAN_INTERVAL_MS = 100;
 const SUCCESS_FEEDBACK_MS = 450;
+const SCANNER_PREFERENCES_KEY = "scanner-preferences";
+
+type ScannerPreferences = {
+  keepCameraReady: boolean;
+  soundEnabled: boolean;
+};
+
+const DEFAULT_SCANNER_PREFERENCES: ScannerPreferences = {
+  keepCameraReady: false,
+  soundEnabled: true,
+};
 
 function prepareVideoForInlinePlayback(video: HTMLVideoElement) {
   video.autoplay = true;
@@ -63,6 +80,10 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
   const successTimeoutRef = useRef<number | null>(null);
   const scanSessionRef = useRef(0);
   const isScanningRef = useRef(false);
+  const keepCameraReadyRef = useRef(DEFAULT_SCANNER_PREFERENCES.keepCameraReady);
+  const soundEnabledRef = useRef(DEFAULT_SCANNER_PREFERENCES.soundEnabled);
+  const preferencesTouchedRef = useRef(false);
+  const currentDeviceIdRef = useRef("");
 
   const [status, setStatus] = useState<ScannerStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -71,11 +92,12 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
   const [torchAvailable, setTorchAvailable] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState(DEFAULT_SCANNER_PREFERENCES);
 
   const titleId = useId();
   const descId = useId();
 
-  const stopStream = useCallback(() => {
+  const stopDetection = useCallback(() => {
     scanSessionRef.current += 1;
     isScanningRef.current = false;
     if (successTimeoutRef.current !== null) {
@@ -94,6 +116,10 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       }
       zxingReaderRef.current = null;
     }
+  }, []);
+
+  const stopStream = useCallback(() => {
+    stopDetection();
     if (streamRef.current) {
       for (const track of streamRef.current.getTracks()) {
         try {
@@ -104,11 +130,59 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       }
       streamRef.current = null;
     }
+    currentDeviceIdRef.current = "";
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
     setTorchOn(false);
     setTorchAvailable(false);
+  }, [stopDetection]);
+
+  const parkStream = useCallback(() => {
+    stopDetection();
+    const stream = streamRef.current;
+    if (stream) {
+      for (const track of stream.getVideoTracks()) {
+        try {
+          track.enabled = false;
+        } catch {
+          // A browser may expose a read-only shim; the stream is still detached below.
+        }
+      }
+    }
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setTorchOn(false);
+  }, [stopDetection]);
+
+  useEffect(() => {
+    let active = true;
+    void getPilotSetting<Partial<ScannerPreferences>>(SCANNER_PREFERENCES_KEY)
+      .then((stored) => {
+        if (!active || !stored || preferencesTouchedRef.current) return;
+        const next = {
+          keepCameraReady: typeof stored.keepCameraReady === "boolean"
+            ? stored.keepCameraReady
+            : DEFAULT_SCANNER_PREFERENCES.keepCameraReady,
+          soundEnabled: typeof stored.soundEnabled === "boolean"
+            ? stored.soundEnabled
+            : DEFAULT_SCANNER_PREFERENCES.soundEnabled,
+        };
+        keepCameraReadyRef.current = next.keepCameraReady;
+        soundEnabledRef.current = next.soundEnabled;
+        setPreferences(next);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const updatePreferences = useCallback((next: ScannerPreferences) => {
+    preferencesTouchedRef.current = true;
+    keepCameraReadyRef.current = next.keepCameraReady;
+    soundEnabledRef.current = next.soundEnabled;
+    setPreferences(next);
+    void setPilotSetting(SCANNER_PREFERENCES_KEY, next).catch(() => undefined);
   }, []);
 
   const handleScanSuccess = useCallback((code: string, scanSession: number) => {
@@ -118,6 +192,8 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
 
     setScannedCode(trimmed);
     setStatus("success");
+
+    if (soundEnabledRef.current) void playScanSuccessSound();
 
     try {
       if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
@@ -131,14 +207,34 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
     successTimeoutRef.current = window.setTimeout(() => {
       successTimeoutRef.current = null;
       if (scanSession !== scanSessionRef.current) return;
-      stopStream();
+      if (keepCameraReadyRef.current) parkStream();
+      else stopStream();
       onScan(trimmed);
       onOpenChange(false);
     }, SUCCESS_FEEDBACK_MS);
-  }, [onOpenChange, onScan, stopStream]);
+  }, [onOpenChange, onScan, parkStream, stopStream]);
 
   const startScanning = useCallback(async (deviceId?: string) => {
-    stopStream();
+    const currentStream = streamRef.current;
+    const currentTrack = currentStream?.getVideoTracks()[0];
+    const canReuseStream = Boolean(
+      keepCameraReadyRef.current
+      && currentStream
+      && currentTrack
+      && currentTrack.readyState !== "ended"
+      && (!deviceId || !currentDeviceIdRef.current || currentDeviceIdRef.current === deviceId),
+    );
+
+    if (canReuseStream) {
+      stopDetection();
+      try {
+        currentTrack!.enabled = true;
+      } catch {
+        // Continue; attaching the retained stream remains safe to try.
+      }
+    } else {
+      stopStream();
+    }
     const scanSession = scanSessionRef.current;
     setStatus("requesting");
     setErrorMessage("");
@@ -162,9 +258,11 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
             },
       };
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const stream = canReuseStream
+        ? currentStream!
+        : await navigator.mediaDevices.getUserMedia(constraints);
       if (scanSession !== scanSessionRef.current) {
-        for (const track of stream.getTracks()) track.stop();
+        if (!canReuseStream) for (const track of stream.getTracks()) track.stop();
         return;
       }
       streamRef.current = stream;
@@ -186,6 +284,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
 
       // Check torch capability
       const videoTrack = stream.getVideoTracks()[0];
+      currentDeviceIdRef.current = videoTrack?.getSettings?.().deviceId || deviceId || currentDeviceIdRef.current;
       if (videoTrack && typeof videoTrack.getCapabilities === "function") {
         const capabilities = videoTrack.getCapabilities() as { torch?: boolean };
         setTorchAvailable(Boolean(capabilities.torch));
@@ -297,23 +396,23 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
         setErrorMessage("Không thể khởi động máy ảnh. Vui lòng thử lại hoặc nhập mã thủ công.");
       }
     }
-  }, [handleScanSuccess, stopStream]);
+  }, [handleScanSuccess, stopDetection, stopStream]);
 
   // Start scanning when dialog opens
   useEffect(() => {
     if (open) {
       void startScanning(selectedDeviceId || undefined);
     } else {
-      stopStream();
+      if (keepCameraReadyRef.current && streamRef.current) parkStream();
+      else stopStream();
       setStatus("idle");
       setErrorMessage("");
       setScannedCode(null);
     }
 
-    return () => {
-      stopStream();
-    };
-  }, [open, selectedDeviceId, startScanning, stopStream]);
+  }, [open, parkStream, selectedDeviceId, startScanning, stopStream]);
+
+  useEffect(() => () => stopStream(), [stopStream]);
 
   const toggleTorch = useCallback(async () => {
     if (!streamRef.current) return;
@@ -337,9 +436,10 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
     const nextIndex = (currentIndex + 1) % cameras.length;
     const nextDevice = cameras[nextIndex];
     if (nextDevice) {
+      stopStream();
       setSelectedDeviceId(nextDevice.deviceId);
     }
-  }, [cameras, selectedDeviceId]);
+  }, [cameras, selectedDeviceId, stopStream]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -431,6 +531,46 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
               </div>
             </div>
           )}
+        </div>
+
+        <div className="barcode-scanner-preferences" aria-label="Tùy chọn trình quét">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={preferences.keepCameraReady}
+            className="barcode-scanner-preference"
+            onClick={() => updatePreferences({ ...preferences, keepCameraReady: !preferences.keepCameraReady })}
+          >
+            <span className="barcode-scanner-preference-icon" aria-hidden="true">
+              {preferences.keepCameraReady ? <Camera size={18} /> : <CameraOff size={18} />}
+            </span>
+            <span className="barcode-scanner-preference-copy">
+              <strong>Giữ camera trong phiên</strong>
+              <span>Giảm hỏi lại khi quét tiếp; quyền lâu dài do trình duyệt quản lý.</span>
+            </span>
+            <span className="barcode-scanner-switch-track" aria-hidden="true">
+              <span />
+            </span>
+          </button>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={preferences.soundEnabled}
+            className="barcode-scanner-preference"
+            onClick={() => updatePreferences({ ...preferences, soundEnabled: !preferences.soundEnabled })}
+          >
+            <span className="barcode-scanner-preference-icon" aria-hidden="true">
+              {preferences.soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+            </span>
+            <span className="barcode-scanner-preference-copy">
+              <strong>Âm báo khi quét thành công</strong>
+              <span>Âm xác nhận ngắn, không ảnh hưởng kết quả quét.</span>
+            </span>
+            <span className="barcode-scanner-switch-track" aria-hidden="true">
+              <span />
+            </span>
+          </button>
         </div>
 
         {/* Action Controls Bar */}

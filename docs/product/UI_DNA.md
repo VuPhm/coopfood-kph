@@ -234,6 +234,13 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   tiên camera sau, cho đổi camera và thử lại.
 - Thành công đóng modal và điền mã; lỗi quyền/không có camera vẫn chỉ dẫn nhập
   tay hoặc dùng máy quét cầm tay dạng bàn phím.
+- Scanner có tùy chọn giữ camera sẵn sàng trong phiên để tái dùng stream đã được
+  cấp quyền giữa các lần quét. Khi đóng scanner phải tạm ngưng track; khi rời
+  component phải giải phóng camera. App không được tuyên bố có thể ghi đè lựa
+  chọn quyền lâu dài của trình duyệt/OS.
+- Quét thành công có âm xác nhận ngắn, mặc định bật; người dùng có thể bật/tắt
+  ngay trong scanner và lựa chọn được ghi nhớ trên thiết bị. Visual success và
+  fallback nhập tay vẫn hoạt động nếu Web Audio không khả dụng.
 - Hệ thống mới giữ affordance và fallback này, sau đó lookup catalog đúng
   cardinality `0 hoặc 1` để tự điền SKU/tên sản phẩm/NCC. Not-found hiện rõ lựa
   chọn quét lại hoặc nhập tay; manual fallback phải giữ cờ `NOT_FOUND`, không mở

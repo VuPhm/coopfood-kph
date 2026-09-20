@@ -83,6 +83,8 @@ sau khi validation xác nhận `HSD > NSX`; `HSD == NSX` phải trả lỗi.
 | SCAN-05 | Legacy không lookup catalog và không tự điền tên/NCC; field scanner đang gọi chung “SKU/UPC” | Cải tiến F2/F4; scan barcode lookup trả `0 hoặc 1`, tự điền SKU/tên/NCC |
 | SCAN-06 | Một barcode active → một product active; một SKU → nhiều barcode | Hợp đồng mới đã accepted ở ADR-0003 |
 | SCAN-07 | Policy barcode không tìm thấy (chặn hay manual có cờ) | Cải tiến có chủ đích: cho quét lại; nếu người dùng chọn nhập tay thì giữ barcode đã quét (nếu có) và trạng thái `NOT_FOUND`, không hiển thị danh sách product |
+| SCAN-08 | Trình duyệt có thể hỏi lại quyền camera khi mỗi lần quét đều tạo stream mới | Cho phép người dùng giữ camera sẵn sàng trong phiên; tái dùng stream đã cấp, tạm ngưng track khi đóng scanner và luôn giải phóng khi rời component. Quyền lâu dài vẫn do trình duyệt/OS quyết định |
+| SCAN-09 | Legacy không có âm báo thành công | Phát âm xác nhận ngắn khi nhận mã; có công tắc bật/tắt ngay trong scanner và ghi nhớ lựa chọn trên thiết bị |
 
 ## Ảnh
 

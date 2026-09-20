@@ -38,6 +38,7 @@ import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
+import { primeScanSuccessSound } from "./scanner-sound";
 import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
 
 function isDisplayDate(value: string) {
@@ -281,7 +282,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
                     <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode")} />
-                    <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
+                    <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => {
+                      primeScanSuccessSound();
+                      setScannerOpen(true);
+                    }}>
                       <ScanLine aria-hidden="true" size={18} />
                     </button>
                   </div>

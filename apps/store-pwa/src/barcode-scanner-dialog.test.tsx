@@ -1,18 +1,42 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { BrowserMultiFormatReader, type Result } from "@zxing/library";
+import { useState } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
+import { getPilotSetting, setPilotSetting } from "./record-store";
+import { playScanSuccessSound } from "./scanner-sound";
+
+vi.mock("./record-store", () => ({
+  getPilotSetting: vi.fn(),
+  setPilotSetting: vi.fn(),
+}));
+
+vi.mock("./scanner-sound", () => ({
+  playScanSuccessSound: vi.fn(),
+}));
+
+function ScannerHarness() {
+  const [open, setOpen] = useState(true);
+  return <>
+    <button type="button" onClick={() => setOpen(true)}>Mở lại máy quét</button>
+    <BarcodeScannerDialog open={open} onOpenChange={setOpen} onScan={vi.fn()} />
+  </>;
+}
 
 describe("BarcodeScannerDialog", () => {
   const originalMediaDevices = navigator.mediaDevices;
-  let mockTrack: { stop: ReturnType<typeof vi.fn>; getCapabilities: ReturnType<typeof vi.fn>; applyConstraints: ReturnType<typeof vi.fn> };
+  let mockTrack: { enabled: boolean; readyState: MediaStreamTrackState; stop: ReturnType<typeof vi.fn>; getCapabilities: ReturnType<typeof vi.fn>; getSettings: ReturnType<typeof vi.fn>; applyConstraints: ReturnType<typeof vi.fn> };
   let mockStream: { getTracks: () => unknown[]; getVideoTracks: () => unknown[] };
 
   beforeEach(() => {
+    vi.clearAllMocks();
     mockTrack = {
+      enabled: true,
+      readyState: "live",
       stop: vi.fn(),
       getCapabilities: vi.fn(() => ({ torch: true })),
+      getSettings: vi.fn(() => ({ deviceId: "cam-1" })),
       applyConstraints: vi.fn().mockResolvedValue(undefined),
     };
     mockStream = {
@@ -35,6 +59,9 @@ describe("BarcodeScannerDialog", () => {
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => Promise.resolve());
     vi.spyOn(BrowserMultiFormatReader.prototype, "decodeContinuously")
       .mockImplementation(() => undefined);
+    vi.mocked(getPilotSetting).mockResolvedValue(undefined);
+    vi.mocked(setPilotSetting).mockResolvedValue(undefined);
+    vi.mocked(playScanSuccessSound).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -308,5 +335,65 @@ describe("BarcodeScannerDialog", () => {
     await waitFor(() => {
       expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(2);
     });
+  });
+
+  it("reuses one granted camera stream across scans when the user opts in", async () => {
+    let decodeCallback: Parameters<BrowserMultiFormatReader["decodeContinuously"]>[1] | undefined;
+    vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously).mockImplementation((_source, callback) => {
+      decodeCallback = callback;
+    });
+
+    const view = render(<ScannerHarness />);
+    await waitFor(() => expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1));
+
+    const keepCamera = screen.getByRole("switch", { name: /Giữ camera trong phiên/i });
+    expect(keepCamera).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(keepCamera);
+    expect(keepCamera).toHaveAttribute("aria-checked", "true");
+    expect(setPilotSetting).toHaveBeenCalledWith("scanner-preferences", expect.objectContaining({ keepCameraReady: true }));
+
+    act(() => decodeCallback?.({ getText: () => "0001112223334" } as Result, undefined));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument(), { timeout: 1_500 });
+    expect(mockTrack.enabled).toBe(false);
+    expect(mockTrack.stop).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Mở lại máy quét" }));
+    await waitFor(() => expect(screen.getByRole("dialog")).toBeVisible());
+    await waitFor(() => expect(mockTrack.enabled).toBe(true));
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+
+    view.unmount();
+    expect(mockTrack.stop).toHaveBeenCalledTimes(1);
+  });
+
+  it("plays a short success sound only while the scanner sound switch is enabled", async () => {
+    let decodeCallback: Parameters<BrowserMultiFormatReader["decodeContinuously"]>[1] | undefined;
+    vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously).mockImplementation((_source, callback) => {
+      decodeCallback = callback;
+    });
+
+    const { unmount } = render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    await waitFor(() => expect(decodeCallback).toBeTypeOf("function"));
+    act(() => decodeCallback?.({ getText: () => "SOUND-ON" } as Result, undefined));
+    expect(playScanSuccessSound).toHaveBeenCalledTimes(1);
+    unmount();
+
+    vi.clearAllMocks();
+    vi.mocked(getPilotSetting).mockResolvedValue({ keepCameraReady: false, soundEnabled: true });
+    vi.mocked(setPilotSetting).mockResolvedValue(undefined);
+    vi.mocked(playScanSuccessSound).mockResolvedValue(undefined);
+    decodeCallback = undefined;
+    vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously).mockImplementation((_source, callback) => {
+      decodeCallback = callback;
+    });
+
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    const soundToggle = await screen.findByRole("switch", { name: /Âm báo khi quét thành công/i });
+    fireEvent.click(soundToggle);
+    expect(soundToggle).toHaveAttribute("aria-checked", "false");
+    await waitFor(() => expect(decodeCallback).toBeTypeOf("function"));
+    act(() => decodeCallback?.({ getText: () => "SOUND-OFF" } as Result, undefined));
+    expect(playScanSuccessSound).not.toHaveBeenCalled();
+    expect(setPilotSetting).toHaveBeenCalledWith("scanner-preferences", expect.objectContaining({ soundEnabled: false }));
   });
 });
