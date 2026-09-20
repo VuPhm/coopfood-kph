@@ -65,7 +65,7 @@ class DatabaseSmokeTest {
                 WHERE table_schema = 'public'
                   AND table_name IN (
                     'app_users', 'user_roles', 'regions', 'stores', 'store_memberships',
-                    'user_region_assignments',
+                    'user_region_assignments', 'lifecycle_deactivation_schedules',
                     'catalog_import_batches', 'catalog_import_rows', 'catalog_versions',
                     'suppliers', 'products', 'product_suppliers', 'product_barcodes',
                     'kph_records', 'kph_photos', 'kph_status_history', 'kph_approval_history', 'audit_events',
@@ -73,7 +73,7 @@ class DatabaseSmokeTest {
                   )
                 """).get("total", Integer.class);
 
-        assertThat(coreTables).isEqualTo(19);
+        assertThat(coreTables).isEqualTo(20);
 
         HttpResponse<String> health = HttpClient.newHttpClient().send(
                 HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/actuator/health"))

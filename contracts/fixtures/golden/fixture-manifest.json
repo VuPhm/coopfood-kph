@@ -20,6 +20,8 @@
     {"resource":"api/kph-record.json","tracePrefix":"KPH-"},
     {"resource":"api/kph-create.json","tracePrefix":"KPH-"},
     {"resource":"api/kph-approval.json","tracePrefix":"ID-"},
-    {"resource":"api/kph-export.json","tracePrefix":"XLSX-"}
+    {"resource":"api/kph-export.json","tracePrefix":"XLSX-"},
+    {"resource":"api/lifecycle-targets.json","tracePrefix":"ID-LIFECYCLE-"},
+    {"resource":"api/lifecycle-schedules.json","tracePrefix":"ID-LIFECYCLE-"}
   ]
 }

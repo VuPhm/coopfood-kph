@@ -26,6 +26,8 @@ const apiFixtureSchemas = new Map([
   ["api/kph-create.json", "KphCreateRequest"],
   ["api/kph-approval.json", "KphApprovalRequest"],
   ["api/kph-export.json", "KphExportRequest"],
+  ["api/lifecycle-targets.json", "LifecycleTarget"],
+  ["api/lifecycle-schedules.json", "LifecycleSchedule"],
 ]);
 
 const acceptedKphPolicies = {
@@ -193,7 +195,11 @@ async function validateApiFixtures(openApi) {
 
   for (const [resource, componentName] of apiFixtureSchemas) {
     const fixture = await readJson(path.join(fixturesRoot, resource));
-    validateFixture(ajv, componentName, fixture, resource);
+    if (Array.isArray(fixture)) {
+      fixture.forEach((item, index) => validateFixture(ajv, componentName, item, `${resource}[${index}]`));
+    } else {
+      validateFixture(ajv, componentName, fixture, resource);
+    }
     fixtures.set(resource, fixture);
   }
 

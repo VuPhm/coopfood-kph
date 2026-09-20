@@ -16,6 +16,7 @@ tags:
   - name: Stores
   - name: Catalog
   - name: KPH
+  - name: Admin lifecycle
 security:
   - sessionCookie: []
 paths:
@@ -358,6 +359,180 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/admin/lifecycle/targets:
+    get:
+      tags: [Admin lifecycle]
+      operationId: listLifecycleTargets
+      summary: List active region/store targets the actor may schedule
+      description: |
+        CHAIN_ADMIN sees active regions and stores chain-wide. REGION_MANAGER
+        sees active stores only in active assigned regions. The backend derives
+        every effective region from PostgreSQL.
+      responses:
+        '200':
+          description: Authorized active lifecycle targets.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LifecycleTarget'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/lifecycle/schedules:
+    get:
+      tags: [Admin lifecycle]
+      operationId: listLifecycleSchedules
+      summary: List lifecycle schedules visible to the actor
+      responses:
+        '200':
+          description: Schedules newest first, constrained to current actor scope.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LifecycleSchedule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Admin lifecycle]
+      operationId: createLifecycleSchedule
+      summary: Schedule a store or region deactivation at least 30 days ahead
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleScheduleCreateRequest'
+      responses:
+        '201':
+          description: Deactivation schedule created; the target remains active.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/admin/lifecycle/schedules/{scheduleId}:
+    put:
+      tags: [Admin lifecycle]
+      operationId: rescheduleLifecycleDeactivation
+      summary: Move a pending lifecycle schedule to another valid effective date
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleRescheduleRequest'
+      responses:
+        '200':
+          description: Pending schedule updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/admin/lifecycle/schedules/{scheduleId}/cancel:
+    post:
+      tags: [Admin lifecycle]
+      operationId: cancelLifecycleSchedule
+      summary: Cancel a pending lifecycle schedule without deleting its history
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleReasonRequest'
+      responses:
+        '200':
+          description: Schedule marked cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/admin/lifecycle/schedules/{scheduleId}/execute:
+    post:
+      tags: [Admin lifecycle]
+      operationId: executeLifecycleSchedule
+      summary: Manually execute a due lifecycle schedule
+      description: |
+        The backend locks and revalidates schedule state, effective date,
+        target state, actor scope and lifecycle guards in the same transaction.
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleReasonRequest'
+      responses:
+        '200':
+          description: Target deactivated and schedule marked executed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
 components:
   securitySchemes:
     sessionCookie:
@@ -399,6 +574,13 @@ components:
         type: string
         minLength: 16
         maxLength: 128
+    ScheduleIdPath:
+      name: scheduleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
 
   responses:
     BadRequest:
@@ -523,6 +705,125 @@ components:
           type: string
         role:
           $ref: '#/components/schemas/StoreRole'
+
+    LifecycleTargetType:
+      type: string
+      enum: [REGION, STORE]
+
+    LifecycleScheduleStatus:
+      type: string
+      enum: [SCHEDULED, CANCELLED, EXECUTED]
+
+    LifecycleTarget:
+      type: object
+      additionalProperties: false
+      required: [type, id, code, name, regionId, regionCode, regionName]
+      properties:
+        type:
+          $ref: '#/components/schemas/LifecycleTargetType'
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: String identifier; leading zeroes are significant.
+        name:
+          type: string
+        regionId:
+          type: [string, 'null']
+          format: uuid
+        regionCode:
+          type: [string, 'null']
+        regionName:
+          type: [string, 'null']
+
+    LifecycleSchedule:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - target
+        - effectiveDate
+        - status
+        - reason
+        - createdBy
+        - createdAt
+        - updatedBy
+        - updatedAt
+        - cancelledAt
+        - executedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        target:
+          $ref: '#/components/schemas/LifecycleTarget'
+        effectiveDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/LifecycleScheduleStatus'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+        createdBy:
+          $ref: '#/components/schemas/ActorSnapshot'
+        createdAt:
+          type: string
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/ActorSnapshot'
+        updatedAt:
+          type: string
+          format: date-time
+        cancelledAt:
+          type: [string, 'null']
+          format: date-time
+        executedAt:
+          type: [string, 'null']
+          format: date-time
+
+    LifecycleScheduleCreateRequest:
+      type: object
+      additionalProperties: false
+      required: [targetType, targetId, effectiveDate, reason]
+      properties:
+        targetType:
+          $ref: '#/components/schemas/LifecycleTargetType'
+        targetId:
+          type: string
+          format: uuid
+        effectiveDate:
+          type: string
+          format: date
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    LifecycleRescheduleRequest:
+      type: object
+      additionalProperties: false
+      required: [effectiveDate, reason]
+      properties:
+        effectiveDate:
+          type: string
+          format: date
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    LifecycleReasonRequest:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
 
     BarcodeLookupResponse:
       oneOf:

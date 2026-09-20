@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p03-scheduled-lifecycle",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "VERIFYING",
   "objective": "Triển khai vertical slice lifecycle kế tiếp: CHAIN_ADMIN đặt lịch deactivate active region/store và REGION_MANAGER đặt lịch deactivate active store đúng vùng, với ngày hiệu lực tối thiểu 30 ngày lịch; reschedule/cancel/manual execute được audit, guard và quyền được kiểm lại trong transaction tại lúc thao tác; Admin Web cho phép owner dùng thử toàn bộ flow qua OpenAPI chung.",
   "inScope": [
     "Một Flyway migration V7 chuyên biệt cho lịch deactivate REGION/STORE, unique active schedule theo target và trạng thái SCHEDULED/CANCELLED/EXECUTED",
@@ -27,6 +27,8 @@
     "contracts/openapi/kph.openapi.yaml",
     "contracts/fixtures/api/lifecycle-targets.json",
     "contracts/fixtures/api/lifecycle-schedules.json",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "scripts/check-contracts.mjs",
     "packages/api/src/generated/schema.d.ts",
     "backend/src/main/resources/db/migration/V7__scheduled_lifecycle.sql",
     "backend/src/main/java/vn/coopfood/kph/foundation/security/SecurityConfiguration.java",
@@ -34,12 +36,13 @@
     "backend/src/test/java/vn/coopfood/kph/foundation/DatabaseSmokeTest.java",
     "backend/src/test/java/vn/coopfood/kph/lifecycle/**",
     "apps/admin-web/src/**",
+    "e2e/scripts/review-admin-lifecycle.cjs",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "docs/delivery/p03-scheduled-lifecycle/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
@@ -63,5 +66,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Checkpoint the bounded plan, pass dispatch validation, implement the solo vertical slice, then verify the integrated candidate before owner acceptance."
+  "nextAction": "Commit the reviewed integrated candidate, rerun technical gates at that SHA, record evidence, then hand off the Admin Web scenarios for explicit owner acceptance."
 }

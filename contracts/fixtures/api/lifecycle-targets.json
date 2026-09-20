@@ -1,0 +1,20 @@
+[
+  {
+    "type": "REGION",
+    "id": "30000000-0000-4000-8000-000000000001",
+    "code": "MN-01",
+    "name": "Miền Nam 1",
+    "regionId": null,
+    "regionCode": null,
+    "regionName": null
+  },
+  {
+    "type": "STORE",
+    "id": "10000000-0000-4000-8000-000000000001",
+    "code": "CF-0012",
+    "name": "Nguyễn Kiệm",
+    "regionId": "30000000-0000-4000-8000-000000000001",
+    "regionCode": "MN-01",
+    "regionName": "Miền Nam 1"
+  }
+]

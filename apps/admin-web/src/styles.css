@@ -27,6 +27,8 @@
   body { margin: 0; min-width: 320px; }
   * { box-sizing: border-box; }
   button { border: 0; }
+  :where(button, select, input, textarea):not(:disabled) { cursor: pointer; touch-action: manipulation; }
+  :where(input, textarea):not(:disabled) { cursor: text; }
   :where(button, input:not(.sr-only), select, textarea):focus { outline: none; }
   .sr-only:focus { outline: none; }
   svg { stroke-width: 2.35; }
