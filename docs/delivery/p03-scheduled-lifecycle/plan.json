@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "p03-scheduled-lifecycle",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Triển khai vertical slice lifecycle kế tiếp: CHAIN_ADMIN đặt lịch deactivate active region/store và REGION_MANAGER đặt lịch deactivate active store đúng vùng, với ngày hiệu lực tối thiểu 30 ngày lịch; reschedule/cancel/manual execute được audit, guard và quyền được kiểm lại trong transaction tại lúc thao tác; Admin Web cho phép owner dùng thử toàn bộ flow qua OpenAPI chung.",
+  "inScope": [
+    "Một Flyway migration V7 chuyên biệt cho lịch deactivate REGION/STORE, unique active schedule theo target và trạng thái SCHEDULED/CANCELLED/EXECUTED",
+    "Public OpenAPI, examples và generated TypeScript client cho list target, list schedule, create, reschedule, cancel và manual execute",
+    "Backend authorization từ database: CHAIN_ADMIN toàn chuỗi; REGION_MANAGER chỉ store thuộc active region assignment; không tin region từ client",
+    "Ngày hiệu lực theo Asia/Ho_Chi_Minh và tối thiểu LocalDate server + 30 ngày; trước ngày hiệu lực target vẫn active",
+    "Execute khóa/kiểm lại schedule, target, effective date, actor scope, active store -> active region và active STORE_MANAGER trước khi deactivate; region có active store phải bị conflict",
+    "Audit append-only cho schedule/reschedule/cancel/execute, reason bắt buộc và không ghi secret/session/full request body",
+    "Admin Web login/session, target selector, lịch hiện có và thao tác reschedule/cancel/execute có feedback, accessible labels và responsive layout theo UI DNA",
+    "Unit/component và PostgreSQL integration tests bao phủ 30-day boundary, before-due denial, cross-region denial, revoke-before-execute denial, guard conflict, audit và request-next authorization effect"
+  ],
+  "outOfScope": [
+    "Generic scheduler/background queue hoặc tự động execute theo cron",
+    "Lifecycle user, global role, region assignment, store membership, credential/reset/session API",
+    "Create/update/reactivate/move region hoặc store và hard delete bất kỳ target nào",
+    "Catalog, paging, production deployment, SSO/MFA và notification email/SMS"
+  ],
+  "baseSha": "57b20f8f28b2e597afd8d99c54a66c5301bf5b47",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/kph.openapi.yaml",
+    "contracts/fixtures/api/lifecycle-targets.json",
+    "contracts/fixtures/api/lifecycle-schedules.json",
+    "packages/api/src/generated/schema.d.ts",
+    "backend/src/main/resources/db/migration/V7__scheduled_lifecycle.sql",
+    "backend/src/main/java/vn/coopfood/kph/foundation/security/SecurityConfiguration.java",
+    "backend/src/main/java/vn/coopfood/kph/lifecycle/**",
+    "backend/src/test/java/vn/coopfood/kph/foundation/DatabaseSmokeTest.java",
+    "backend/src/test/java/vn/coopfood/kph/lifecycle/**",
+    "apps/admin-web/src/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/p03-scheduled-lifecycle/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-scheduled-lifecycle",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": null,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-lifecycle-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": null,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Checkpoint the bounded plan, pass dispatch validation, implement the solo vertical slice, then verify the integrated candidate before owner acceptance."
+}
