@@ -2,16 +2,15 @@
 
 Cập nhật: 2026-09-21
 
-## Current acceptance — P02 scoped authorization slice
+## P02 scoped authorization — đã đóng
 
 Candidate P02 sau repair round 2 đã triển khai schema region/store mapping,
 user-region assignment và KPH authorization kế thừa. Scope resolver và KPH
 capability policy đã tách lớp; invariant active store → active region được giữ
-bằng relational constraint an toàn khi concurrent. Technical gate đã pass;
-owner sẽ test sau nên cycle ở `AWAITING_ACCEPTANCE`, không tự ghi nhận đã
-nghiệm thu.
+bằng relational constraint an toàn khi concurrent. Technical gate đã pass và
+owner chấp nhận ngày 2026-09-21.
 
-Khi owner test, xác nhận ba outcome:
+Các outcome đã được chấp nhận:
 
 1. `REGION_MANAGER` thao tác KPH trong đúng region và bị deny ở region khác.
 2. Grant/revoke region assignment có hiệu lực ở request kế tiếp.
@@ -21,12 +20,27 @@ Khi owner test, xác nhận ba outcome:
 
 Handoff chi tiết: [p02-scoped-authorization](delivery/p02-scoped-authorization/acceptance-handoff.md).
 
+## Quyết định trước slice lifecycle/provisioning kế tiếp
+
+Owner đã yêu cầu deactivate store/region phải đặt lịch với ngày hiệu lực tùy
+chọn nhưng cách thời điểm tạo lịch tối thiểu 30 ngày. Trước ngày hiệu lực entity
+vẫn active; sau khi thực thi, authorization deny từ request kế tiếp. Không hard
+delete; schedule/reschedule/cancel/execute đều phải audit và guard phải được kiểm
+lại lúc thực thi.
+
+Trước implementation chỉ còn phải khóa:
+
+1. Danh sách cụ thể các thao tác deactivate/revoke khác được xếp là “xóa quan
+   trọng” và cũng chịu thời hạn tối thiểu 30 ngày.
+2. Có cho phép emergency suspend/revoke ngay khi xảy ra sự cố bảo mật hay không,
+   và ai có quyền thực hiện ngoại lệ đó.
+
 ## Sau khi P02 slice đầu được chấp nhận — provisioning API/Admin UI
 
 P01 đã được owner duyệt ngày 17/09/2026 với hierarchy explicit:
 `CHAIN_ADMIN` toàn chuỗi, `REGION_MANAGER` đúng vùng và `STORE_MANAGER` đúng
-store. Schema/authorization slice đã mở và chờ acceptance; endpoint và
-Admin UI vẫn chưa mở trong cycle implementation riêng.
+store. Schema/authorization slice đã đóng; endpoint và Admin UI vẫn chưa mở
+trong cycle implementation riêng.
 
 ### Outcome
 

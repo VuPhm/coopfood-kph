@@ -1,7 +1,7 @@
 # Provisioning policy
 
-Trạng thái: **Accepted — P01 owner decision 2026-09-17**
-Cập nhật: 2026-09-17
+Trạng thái: **Accepted — P01 owner decision 2026-09-17; lifecycle addendum 2026-09-21**
+Cập nhật: 2026-09-21
 
 ## Mục tiêu và ranh giới
 
@@ -82,6 +82,22 @@ synthetic membership. `CATALOG_ADMIN` không được provision identity và
 - Không được revoke/downgrade/deactivate user cuối cùng đang là active
   `STORE_MANAGER` của một active store. Có thể chuẩn bị thay thế trong cùng một
   transaction rồi mới thu hồi manager cũ.
+
+### Đặt lịch thao tác lifecycle quan trọng
+
+- Deactivate store hoặc region không có hiệu lực ngay. Người thao tác chọn ngày
+  hiệu lực cách thời điểm server tiếp nhận ít nhất 30 ngày lịch; có thể chọn lâu
+  hơn 30 ngày.
+- Trước ngày hiệu lực, store/region vẫn active. Khi lịch được thực thi thành
+  công, trạng thái mới có hiệu lực ở request kế tiếp và mọi inherited scope,
+  kể cả `CHAIN_ADMIN`, bị deny theo policy authorization hiện hành.
+- Tạo lịch, đổi lịch, hủy lịch và thực thi lịch đều phải audit. Guard active
+  store → active region và last-manager phải được kiểm lại trong transaction tại
+  thời điểm thực thi, không chỉ lúc tạo lịch.
+- “Xóa” trong yêu cầu này được hiểu là deactivate/revoke có thể phục hồi; policy
+  không mở hard delete. Danh sách các thao tác phá hủy quan trọng khác ngoài
+  store/region và ngoại lệ xử lý sự cố bảo mật phải được khóa trước khi mở API
+  lifecycle tương ứng.
 
 ## Credential policy
 
