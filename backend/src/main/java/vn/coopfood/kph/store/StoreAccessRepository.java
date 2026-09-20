@@ -9,15 +9,15 @@ import org.springframework.stereotype.Repository;
 import vn.coopfood.kph.identity.StoreRole;
 
 @Repository
-public class StoreAccessRepository {
+class StoreAccessRepository {
 
     private final DSLContext database;
 
-    public StoreAccessRepository(DSLContext database) {
+    StoreAccessRepository(DSLContext database) {
         this.database = database;
     }
 
-    public Optional<AccessSnapshot> findActiveAccess(UUID userId, UUID storeId) {
+    Optional<AccessSnapshot> findActiveAccess(UUID userId, UUID storeId) {
         return database.fetchOptional("""
                 SELECT s.id, s.store_code, s.store_name, sm.role,
                        EXISTS (
@@ -53,7 +53,7 @@ public class StoreAccessRepository {
                         Boolean.TRUE.equals(row.get("chain_admin", Boolean.class))));
     }
 
-    public record AccessSnapshot(
+    record AccessSnapshot(
             UUID storeId,
             String storeCode,
             String storeName,

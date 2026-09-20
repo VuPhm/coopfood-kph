@@ -86,6 +86,39 @@ class DatabaseSmokeTest {
     }
 
     @Test
+    void activeStoreRequiresActiveRegionAcrossLifecycleTransitions() {
+        UUID regionId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        String suffix = storeId.toString();
+        database.execute("""
+                INSERT INTO regions (id, region_code, region_name, active, created_at, updated_at)
+                VALUES (?, ?, ?, FALSE, now(), now())
+                """, regionId, "lifecycle-" + suffix.substring(0, 8), "Lifecycle region " + suffix);
+        database.execute("""
+                INSERT INTO stores (id, region_id, store_code, store_name, active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, FALSE, now(), now())
+                """, storeId, regionId, "lifecycle-" + suffix, "Lifecycle store " + suffix);
+
+        assertThatThrownBy(() -> database.execute(
+                "UPDATE stores SET active = TRUE, updated_at = now() WHERE id = ?", storeId))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("stores_active_region_required");
+
+        database.execute("UPDATE regions SET active = TRUE, updated_at = now() WHERE id = ?", regionId);
+        assertThat(database.execute(
+                "UPDATE stores SET active = TRUE, updated_at = now() WHERE id = ?", storeId)).isEqualTo(1);
+
+        assertThatThrownBy(() -> database.execute(
+                "UPDATE regions SET active = FALSE, updated_at = now() WHERE id = ?", regionId))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("stores_active_region_required");
+
+        database.execute("UPDATE stores SET active = FALSE, updated_at = now() WHERE id = ?", storeId);
+        assertThat(database.execute(
+                "UPDATE regions SET active = FALSE, updated_at = now() WHERE id = ?", regionId)).isEqualTo(1);
+    }
+
+    @Test
     void kphPolicyAcceptsEveryContractConditionAndResolutionForItsType() throws Exception {
         TestScope scope = createScope();
         JsonNode policies = readKphPolicies();

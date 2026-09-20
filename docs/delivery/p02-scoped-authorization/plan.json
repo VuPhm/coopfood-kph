@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "p02-scoped-authorization",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "EXECUTING",
   "objective": "Triển khai vertical slice P02 đầu tiên cho hierarchy KPH đã khóa: database lưu region/store mapping và active user-region assignment; backend resolve scope từ database mỗi request để CHAIN_ADMIN toàn chuỗi, REGION_MANAGER đúng vùng và STORE_MANAGER/EMPLOYEE đúng membership có quyền KPH tương ứng, với deny test cross-store/cross-region.",
   "inScope": [
     "Một Flyway migration thêm regions, store.region_id và user_region_assignments với relational constraints/index cần thiết",
@@ -10,7 +10,10 @@
     "Quyền xem/tạo KPH cho active membership, active REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN; duyệt/xuất chỉ cho STORE_MANAGER đúng store, REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN",
     "Session refresh giữ global role/membership thật; authorization query đọc active region assignment trực tiếp từ database mỗi request, không giả inherited scope thành store membership",
     "Unit/integration tests bao phủ membership, same-region, cross-region, inactive assignment/region/store và chain-wide scope",
-    "Technical evidence và acceptance handoff riêng; owner test sau không bị ghi nhận nhầm là acceptance"
+    "Technical evidence và acceptance handoff riêng; owner test sau không bị ghi nhận nhầm là acceptance",
+    "Repair review round 2: tách store scope resolver khỏi KPH capability policy và dùng DTO StoreRef trung lập",
+    "Database giữ invariant active store -> active region bằng constraint an toàn khi concurrent thay cho trigger check-then-act",
+    "PostgreSQL integration tests chứng minh inactive assignment/store/region bị deny cho inherited scope"
   ],
   "outOfScope": [
     "Public provisioning OpenAPI, generated client và Admin Web CRUD cho user/region/store/role/membership",
@@ -18,14 +21,18 @@
     "Store/region lifecycle mutation, last-admin/last-manager guards và audit cho các mutation provisioning",
     "Catalog staging/publish, paging, production infrastructure hoặc deployment"
   ],
-  "baseSha": "fd4790d76693500089f23497a502c8a667218018",
-  "candidateSha": "17da6cac4bca735916dd210a70ea2812fb9d742c",
+  "baseSha": "4543cce6cd95fa71c8acb6badd437a7fd693748e",
+  "candidateSha": "",
   "integrationOwner": "/root",
   "sharedPaths": [
     "backend/src/main/resources/db/migration/V6__scoped_management_hierarchy.sql",
     "backend/src/main/java/vn/coopfood/kph/identity/IdentityRepository.java",
+    "backend/src/main/java/vn/coopfood/kph/catalog/CatalogService.java",
     "backend/src/main/java/vn/coopfood/kph/store/StoreAccessRepository.java",
     "backend/src/main/java/vn/coopfood/kph/store/StoreAccessService.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreAccessResolver.java",
+    "backend/src/main/java/vn/coopfood/kph/store/KphStoreAccessPolicy.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreRef.java",
     "backend/src/main/java/vn/coopfood/kph/kph/KphService.java",
     "backend/src/main/java/vn/coopfood/kph/kph/LocalPrivateMediaStorage.java",
     "backend/src/test/java/vn/coopfood/kph/catalog/CatalogLookupHttpIntegrationTest.java",
@@ -33,22 +40,24 @@
     "backend/src/test/java/vn/coopfood/kph/identity/IdentityHttpIntegrationTest.java",
     "backend/src/test/java/vn/coopfood/kph/identity/IdentityServiceTest.java",
     "backend/src/test/java/vn/coopfood/kph/identity/StoreAccessServiceTest.java",
+    "backend/src/test/java/vn/coopfood/kph/store/KphStoreAccessPolicyTest.java",
     "backend/src/test/java/vn/coopfood/kph/kph/KphHttpIntegrationTest.java",
+    "backend/src/test/java/vn/coopfood/kph/kph/LocalPrivateMediaStorageTest.java",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "docs/delivery/p02-scoped-authorization/**"
   ],
-  "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewLimit": 3,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "technical-scoped-authorization",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "17da6cac4bca735916dd210a70ea2812fb9d742c",
+      "status": "pending",
+      "revision": null,
+      "sha": "",
       "evidence": "docs/delivery/p02-scoped-authorization/technical-evidence.md"
     },
     {
@@ -61,7 +70,34 @@
       "evidence": "docs/delivery/p02-scoped-authorization/acceptance-handoff.md"
     }
   ],
-  "changes": [],
-  "blockers": [],
-  "nextAction": "Owner tests the synthetic scoped-authorization scenarios and accepts or reports a concrete defect; do not open the provisioning API/Admin UI slice before this acceptance decision."
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Thực hiện repair sau review round 2 theo cấu trúc/layer backend tối thiểu đã đề xuất.",
+      "source": "Owner message 2026-09-21: thực hiện",
+      "impact": "Invalidates revision 1 technical evidence; changes authorization structure, V6 integrity enforcement and required integration coverage.",
+      "decision": "Bound repair to P02 backend/schema/tests only; extend review limit to one final integrated review and keep provisioning API/Admin UI out of scope."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "inactive-scope-integration-coverage",
+      "status": "open",
+      "owner": "/root",
+      "nextAction": "Add PostgreSQL-backed denial coverage for inactive assignment, store and region with inherited scope."
+    },
+    {
+      "id": "kph-policy-layer-boundary",
+      "status": "open",
+      "owner": "/root",
+      "nextAction": "Separate active store scope resolution from KPH capability decisions and remove service-owned DTO leakage."
+    },
+    {
+      "id": "active-store-region-concurrency",
+      "status": "open",
+      "owner": "/root",
+      "nextAction": "Replace V6 cross-table check triggers with a concurrency-safe relational constraint and verify lifecycle transitions."
+    }
+  ],
+  "nextAction": "Implement the bounded revision 2 repair, run targeted PostgreSQL tests and integrated gates, then record a new candidate for owner acceptance."
 }

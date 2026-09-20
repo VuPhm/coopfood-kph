@@ -63,46 +63,15 @@ CREATE TABLE user_region_assignments (
 CREATE INDEX user_region_assignments_region_idx
     ON user_region_assignments (region_id, active);
 
-CREATE FUNCTION require_active_region_for_active_store()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF NEW.active AND NOT EXISTS (
-        SELECT 1
-        FROM regions r
-        WHERE r.id = NEW.region_id
-          AND r.active
-    ) THEN
-        RAISE EXCEPTION 'active store requires an active region'
-            USING ERRCODE = '23514', CONSTRAINT = 'stores_active_region_required';
-    END IF;
-    RETURN NEW;
-END $$;
+-- A generated nullable key expresses the conditional invariant without a
+-- check-then-act trigger. PostgreSQL foreign-key locking serializes store
+-- activation against region deactivation across concurrent transactions.
+ALTER TABLE regions
+    ADD CONSTRAINT regions_id_active_key UNIQUE (id, active);
 
-CREATE TRIGGER stores_require_active_region
-BEFORE INSERT OR UPDATE OF active, region_id ON stores
-FOR EACH ROW
-EXECUTE FUNCTION require_active_region_for_active_store();
-
-CREATE FUNCTION prevent_region_deactivation_with_active_stores()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF OLD.active AND NOT NEW.active AND EXISTS (
-        SELECT 1
-        FROM stores s
-        WHERE s.region_id = NEW.id
-          AND s.active
-    ) THEN
-        RAISE EXCEPTION 'region with active stores cannot be deactivated'
-            USING ERRCODE = '23514', CONSTRAINT = 'regions_active_stores_guard';
-    END IF;
-    RETURN NEW;
-END $$;
-
-CREATE TRIGGER regions_guard_active_stores
-BEFORE UPDATE OF active ON regions
-FOR EACH ROW
-EXECUTE FUNCTION prevent_region_deactivation_with_active_stores();
+ALTER TABLE stores
+    ADD COLUMN required_region_active BOOLEAN
+        GENERATED ALWAYS AS (CASE WHEN active THEN TRUE ELSE NULL END) STORED,
+    ADD CONSTRAINT stores_active_region_required
+        FOREIGN KEY (region_id, required_region_active)
+        REFERENCES regions (id, active);

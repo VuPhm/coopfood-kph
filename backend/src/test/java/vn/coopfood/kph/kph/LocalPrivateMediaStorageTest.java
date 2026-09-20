@@ -19,16 +19,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
 
-import vn.coopfood.kph.identity.StoreContext;
-import vn.coopfood.kph.identity.StoreRole;
-
 class LocalPrivateMediaStorageTest {
 
-    private static final StoreContext STORE = new StoreContext(
-            UUID.fromString("20000000-0000-4000-8000-000000000001"),
-            "0001",
-            "Nguyễn Kiệm",
-            StoreRole.EMPLOYEE);
+    private static final String STORE_CODE = "0001";
+    private static final String STORE_NAME = "Nguyễn Kiệm";
     private static final Instant SERVER_NOW = Instant.parse("2026-01-04T03:04:05Z");
 
     @TempDir
@@ -44,7 +38,8 @@ class LocalPrivateMediaStorageTest {
                 UUID.randomUUID(),
                 1,
                 new MockMultipartFile("photos", "evidence.jpg", "image/jpeg", original),
-                STORE,
+                STORE_CODE,
+                STORE_NAME,
                 lastModified,
                 SERVER_NOW);
 
@@ -68,7 +63,8 @@ class LocalPrivateMediaStorageTest {
                 UUID.randomUUID(),
                 1,
                 new MockMultipartFile("photos", "evidence.png", "image/png", image(600, 400, "png")),
-                STORE,
+                STORE_CODE,
+                STORE_NAME,
                 null,
                 SERVER_NOW);
 
@@ -87,7 +83,8 @@ class LocalPrivateMediaStorageTest {
                 UUID.randomUUID(),
                 1,
                 new MockMultipartFile("photos", "evidence.jpg", "image/jpeg", original),
-                STORE,
+                STORE_CODE,
+                STORE_NAME,
                 Instant.parse("2026-01-03T03:04:05Z"),
                 SERVER_NOW);
 
@@ -101,7 +98,8 @@ class LocalPrivateMediaStorageTest {
                 UUID.randomUUID(),
                 1,
                 new MockMultipartFile("photos", "evidence.jpg", "image/jpeg", "not-an-image".getBytes()),
-                STORE,
+                STORE_CODE,
+                STORE_NAME,
                 null,
                 SERVER_NOW))
                 .isInstanceOf(vn.coopfood.kph.foundation.web.ApiProblemException.class)

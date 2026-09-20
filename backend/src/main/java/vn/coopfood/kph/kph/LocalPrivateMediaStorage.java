@@ -52,8 +52,6 @@ import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 
 import vn.coopfood.kph.foundation.web.ApiProblemException;
-import vn.coopfood.kph.identity.StoreContext;
-import vn.coopfood.kph.store.StoreAccessService;
 
 /**
  * Local private storage for the online Foundation-01 evidence slice.
@@ -109,16 +107,6 @@ class LocalPrivateMediaStorage {
      * @param serverNow controlled server clock used as the final timestamp
      */
     StoredMedia store(UUID recordId, int ordinal, MultipartFile upload,
-            StoreContext store, Instant fallbackCapturedAt, Instant serverNow) {
-        return store(recordId, ordinal, upload, store.code(), store.name(), fallbackCapturedAt, serverNow);
-    }
-
-    StoredMedia store(UUID recordId, int ordinal, MultipartFile upload,
-            StoreAccessService.AuthorizedStore store, Instant fallbackCapturedAt, Instant serverNow) {
-        return store(recordId, ordinal, upload, store.code(), store.name(), fallbackCapturedAt, serverNow);
-    }
-
-    private StoredMedia store(UUID recordId, int ordinal, MultipartFile upload,
             String storeCode, String storeName, Instant fallbackCapturedAt, Instant serverNow) {
         byte[] original = readBounded(upload);
         try {
@@ -158,8 +146,8 @@ class LocalPrivateMediaStorage {
      * fallback and server clock.
      */
     KphRepository.StoredPhoto store(UUID recordId, int ordinal, MultipartFile upload,
-            StoreContext store, Instant capturedAt) {
-        return store(recordId, ordinal, upload, store, capturedAt, capturedAt).photo();
+            String storeCode, String storeName, Instant capturedAt) {
+        return store(recordId, ordinal, upload, storeCode, storeName, capturedAt, capturedAt).photo();
     }
 
     /**

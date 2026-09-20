@@ -377,6 +377,30 @@ class KphHttpIntegrationTest {
     }
 
     @Test
+    void inheritedScopeCannotAccessInactiveStoreOrRegion() throws Exception {
+        Timestamp now = Timestamp.from(NOW);
+        database.execute("""
+                INSERT INTO user_region_assignments (user_id, region_id, active, created_at, updated_at)
+                VALUES (?, ?, TRUE, ?, ?)
+                """, USER_ID, OTHER_REGION_ID, now, now);
+        Login manager = login();
+
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
+                .andExpect(status().isOk());
+
+        database.execute(
+                "UPDATE stores SET active = FALSE, updated_at = ? WHERE id = ?", now, OTHER_STORE_ID);
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
+                .andExpect(status().isForbidden());
+
+        database.execute(
+                "UPDATE regions SET active = FALSE, updated_at = ? WHERE id = ?", now, OTHER_REGION_ID);
+        database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void cleansBothMediaFilesWhenTheDatabaseTransactionRollsBack() throws Exception {
         Set<Path> filesBefore;
         try (var files = Files.walk(mediaRoot)) {

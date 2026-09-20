@@ -1,13 +1,15 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-09-17
+Cập nhật: 2026-09-21
 
 ## Current acceptance — P02 scoped authorization slice
 
-Candidate P02 đầu tiên đã triển khai schema region/store mapping,
-user-region assignment và KPH authorization kế thừa. Technical gate đã
-pass; owner sẽ test sau nên cycle ở `AWAITING_ACCEPTANCE`, không tự ghi
-nhận đã nghiệm thu.
+Candidate P02 sau repair round 2 đã triển khai schema region/store mapping,
+user-region assignment và KPH authorization kế thừa. Scope resolver và KPH
+capability policy đã tách lớp; invariant active store → active region được giữ
+bằng relational constraint an toàn khi concurrent. Technical gate đã pass;
+owner sẽ test sau nên cycle ở `AWAITING_ACCEPTANCE`, không tự ghi nhận đã
+nghiệm thu.
 
 Khi owner test, xác nhận ba outcome:
 
@@ -15,6 +17,7 @@ Khi owner test, xác nhận ba outcome:
 2. Grant/revoke region assignment có hiệu lực ở request kế tiếp.
 3. `CHAIN_ADMIN` truy cập active store toàn chuỗi mà không cần synthetic
    store membership.
+4. Store hoặc region inactive bị deny kể cả khi user còn region/chain scope.
 
 Handoff chi tiết: [p02-scoped-authorization](delivery/p02-scoped-authorization/acceptance-handoff.md).
 

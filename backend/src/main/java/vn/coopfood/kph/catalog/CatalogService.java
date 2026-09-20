@@ -8,21 +8,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import vn.coopfood.kph.foundation.web.ApiProblemException;
-import vn.coopfood.kph.store.StoreAccessService;
+import vn.coopfood.kph.store.KphStoreAccessPolicy;
 
 @Service
 public class CatalogService {
 
     private final CatalogRepository repository;
-    private final StoreAccessService storeAccess;
+    private final KphStoreAccessPolicy accessPolicy;
 
-    CatalogService(CatalogRepository repository, StoreAccessService storeAccess) {
+    CatalogService(CatalogRepository repository, KphStoreAccessPolicy accessPolicy) {
         this.repository = repository;
-        this.storeAccess = storeAccess;
+        this.accessPolicy = accessPolicy;
     }
 
     public BarcodeLookupResponse lookup(UUID storeId, String barcode, Authentication authentication) {
-        storeAccess.requireMembership(storeId, authentication);
+        accessPolicy.requireViewCreate(storeId, authentication);
         var row = resolve(barcode);
         if (row.isEmpty()) {
             return new BarcodeLookupResponse.NotFound(barcode);

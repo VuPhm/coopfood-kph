@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-17
+Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
@@ -34,11 +34,11 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   `CHAIN_ADMIN` toàn chuỗi → `REGION_MANAGER` đúng vùng → `STORE_MANAGER` đúng
   store; credential/bootstrap/lifecycle theo security baseline. P01 chỉ khóa
   contract/fixture, chưa triển khai schema/API/Admin UI.
-- P02 slice đầu đã triển khai candidate trên branch
-  `codex/p02-scoped-authorization`: migration V6 thêm region/store mapping và
-  user-region assignment; backend cho phép KPH theo membership đúng store,
-  `REGION_MANAGER` đúng vùng hoặc `CHAIN_ADMIN` toàn chuỗi. Technical
-  suite đã pass; owner chưa test/nghiệm thu.
+- P02 scoped authorization đã qua repair/review round 2 trên branch
+  `codex/p02-scoped-authorization`: resolver scope store được tách khỏi policy
+  capability KPH; migration V6 dùng relational constraint chống race cho invariant
+  active store → active region; backend deny inherited scope khi store/region
+  inactive. Technical suite đã pass; owner chưa test/nghiệm thu.
 
 ## Hệ thống hiện có
 
@@ -57,8 +57,9 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - PR #3 đã merge vào `main` và từng pass remote CI `frontend`, `backend`, `browser`.
 - Ngày 2026-09-17, P01 Contract Lock bao phủ role hierarchy, cross-store/
   cross-region denial, last-admin/last-manager và credential/bootstrap guard.
-- P02 scoped authorization: full backend test PASS trên PostgreSQL 17 qua
-  Testcontainers, gồm clean migration, upgrade V1→V6, cross-region denial,
+- Ngày 2026-09-21, P02 scoped authorization full backend test PASS trên
+  PostgreSQL 17 qua Testcontainers, gồm clean/upgrade V1→V6, lifecycle
+  active store/region, inactive store/region denial, cross-region denial,
   region grant/revoke request kế tiếp và chain-wide access; `npm run verify`
   PASS. Owner acceptance vẫn pending theo yêu cầu test sau.
 - Ngày 2026-09-17, S04 `npm run verify` PASS docs/Contract Lock, generated API
@@ -78,7 +79,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-P02 scoped authorization đang chờ owner test. Không tự mở public
+P02 scoped authorization đã đạt technical gate sau repair round 2 và đang chờ
+owner test. Không tự mở public
 provisioning API/Admin UI hoặc credential/bootstrap slice trước khi đóng
 vòng này. Kịch bản thử và giới hạn nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
