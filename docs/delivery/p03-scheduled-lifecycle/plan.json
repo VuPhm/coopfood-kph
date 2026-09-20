@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p03-scheduled-lifecycle",
   "revision": 1,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Triển khai vertical slice lifecycle kế tiếp: CHAIN_ADMIN đặt lịch deactivate active region/store và REGION_MANAGER đặt lịch deactivate active store đúng vùng, với ngày hiệu lực tối thiểu 30 ngày lịch; reschedule/cancel/manual execute được audit, guard và quyền được kiểm lại trong transaction tại lúc thao tác; Admin Web cho phép owner dùng thử toàn bộ flow qua OpenAPI chung.",
   "inScope": [
     "Một Flyway migration V7 chuyên biệt cho lịch deactivate REGION/STORE, unique active schedule theo target và trạng thái SCHEDULED/CANCELLED/EXECUTED",
@@ -21,7 +21,7 @@
     "Catalog, paging, production deployment, SSO/MFA và notification email/SMS"
   ],
   "baseSha": "57b20f8f28b2e597afd8d99c54a66c5301bf5b47",
-  "candidateSha": "",
+  "candidateSha": "b9e909daeb2aaa92ccd51dadc08d1162d0481e7c",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -54,10 +54,10 @@
       "id": "technical-scheduled-lifecycle",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": null,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 1,
+      "sha": "b9e909daeb2aaa92ccd51dadc08d1162d0481e7c",
+      "evidence": "docs/delivery/p03-scheduled-lifecycle/technical-evidence.md"
     },
     {
       "id": "owner-lifecycle-acceptance",
@@ -71,5 +71,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Commit the reviewed integrated candidate, rerun technical gates at that SHA, record evidence, then hand off the Admin Web scenarios for explicit owner acceptance."
+  "nextAction": "Owner thử preview P03 tại http://127.0.0.1:4174 theo acceptance-handoff.md và quyết định explicit, bao gồm manual execute khi đến hạn. Chỉ đóng P03 sau user gate; không tự mở cycle tiếp theo."
 }
