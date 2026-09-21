@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p04-user-deactivation",
   "revision": 2,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Triển khai vertical slice vô hiệu hóa user: chỉ active CHAIN_ADMIN được xem directory toàn chuỗi và deactivate một user khác với lý do bắt buộc; mutation có audit, chặn self-deactivate, last active CHAIN_ADMIN và last active STORE_MANAGER của mọi active store trong cùng transaction, làm mọi session của target mất quyền ở request kế tiếp; Admin Web cho phép owner xác nhận và dùng thử flow qua OpenAPI chung.",
   "inScope": [
     "Public OpenAPI, example fixture và generated TypeScript client cho list admin users và deactivate user với reason bắt buộc",
@@ -45,10 +45,10 @@
       "id": "technical-user-deactivation",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "4f7c2cb166ade696f327c31188a2cee0c92f3483",
+      "evidence": "docs/delivery/p04-user-deactivation/technical-evidence.md"
     },
     {
       "id": "owner-user-deactivation-acceptance",
@@ -57,7 +57,7 @@
       "status": "pending",
       "revision": 2,
       "sha": "",
-      "evidence": ""
+      "evidence": "docs/delivery/p04-user-deactivation/acceptance-handoff.md"
     }
   ],
   "changes": [
@@ -70,5 +70,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Chạy full technical gates trên candidate 4f7c2cb, ghi evidence revision 2 rồi chuẩn bị preview cho owner nghiệm thu."
+  "nextAction": "Owner chạy kịch bản trên preview local và xác nhận acceptance hoặc nêu thay đổi cụ thể; không merge/đóng cycle trước quyết định đó."
 }
