@@ -21,7 +21,7 @@
     "Provision CATALOG_ADMIN, quản trị identity/credential, notification và production rollout",
     "Sửa Store PWA, lookup semantics published hiện có hoặc migration dữ liệu thật"
   ],
-  "baseSha": "b382c3bb93fb8e7eea3c5291f759b8a641d3b89b",
+  "baseSha": "b382c3b07bc6cd8544f4159b071ee53d420b5068",
   "candidateSha": "",
   "integrationOwner": "/root",
   "sharedPaths": [
