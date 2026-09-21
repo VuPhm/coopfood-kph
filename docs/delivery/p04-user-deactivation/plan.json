@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "id": "p04-user-deactivation",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Triển khai vertical slice vô hiệu hóa user: chỉ active CHAIN_ADMIN được xem directory toàn chuỗi và deactivate một user khác với lý do bắt buộc; mutation có audit, chặn self-deactivate và last active CHAIN_ADMIN trong cùng transaction, làm mọi session của target mất quyền ở request kế tiếp; Admin Web cho phép owner xác nhận và dùng thử flow qua OpenAPI chung.",
+  "inScope": [
+    "Public OpenAPI, example fixture và generated TypeScript client cho list admin users và deactivate user với reason bắt buộc",
+    "Backend CHAIN_ADMIN-only resolve actor từ session; list trả identity/status/global roles tối thiểu, không trả credential hoặc membership ngoài nhu cầu của flow",
+    "Deactivate khóa và kiểm target cùng tập active CHAIN_ADMIN trong transaction; chặn target không tồn tại, đã inactive, self-deactivate và last active CHAIN_ADMIN",
+    "Deactivate đặt app_users.active=false, giữ role/assignment/membership để có thể reactivate explicit về sau và ghi audit USER_DEACTIVATED không chứa PII đầy đủ/secret/session",
+    "Principal refresh hiện có phải làm session target nhận 401 ở request kế tiếp; login mới của target bị từ chối",
+    "Admin Web có workspace tài khoản cho CHAIN_ADMIN, dialog xác nhận, reason 1-500 ký tự, loading/success/error rõ, keyboard/accessibility và responsive layout theo UI DNA",
+    "Contract, frontend component và PostgreSQL integration tests bao phủ quyền, self/last-admin/concurrency guard, audit, login/session invalidation và UI feedback"
+  ],
+  "outOfScope": [
+    "Create/update/reactivate user, hard delete, grant/revoke global role, region assignment hoặc store membership",
+    "Credential create/reset/change, encoder migration, bootstrap/recovery và temporary-password delivery",
+    "Lifecycle store/region, catalog publish, paging, backup/restore, production deployment, SSO/MFA và notification",
+    "Delegated identity administration cho REGION_MANAGER hoặc CATALOG_ADMIN"
+  ],
+  "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/kph.openapi.yaml",
+    "contracts/fixtures/api/admin-users.json",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "packages/api/src/generated/schema.d.ts",
+    "backend/src/main/java/vn/coopfood/kph/foundation/security/SecurityConfiguration.java",
+    "backend/src/main/java/vn/coopfood/kph/identity/**",
+    "backend/src/test/java/vn/coopfood/kph/identity/**",
+    "apps/admin-web/src/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/p04-user-deactivation/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-user-deactivation",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-user-deactivation-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Triển khai contract-first trên base f308e0e, kiểm scope rồi tích hợp backend/Admin Web và chuẩn bị preview cho owner nghiệm thu."
+}
