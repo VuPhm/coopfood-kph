@@ -2,8 +2,8 @@
 
 Candidate: `b9e909daeb2aaa92ccd51dadc08d1162d0481e7c`, branch
 `codex/p03-scheduled-lifecycle`, revision 1. P02 đã CLOSED và không mở lại.
-P03 chờ owner nghiệm thu, chưa CLOSED. “Tiếp” là yêu cầu tiếp tục làm, không
-phải quyết định nghiệm thu kết quả P03.
+P03 được owner chấp nhận ngày 21/09/2026 và đã CLOSED. Quyết định giữ mô hình
+thực thi thủ công khi lịch đến hạn cùng các giới hạn đã liệt kê bên dưới.
 
 ## Mở bản chạy thử
 
@@ -69,7 +69,6 @@ Log local: `/tmp/coopfood-kph-p03-acceptance/`; revision ghi tại `revision`.
   năng thiết bị thật. Kiểm tra mobile là Chromium viewport, không phải iPhone thật.
 - Không push/merge/PR hoặc remote CI trong vòng này.
 
-Owner hãy xác nhận “P03 pass” nếu các thao tác và cách thực thi thủ công đáp ứng
-nhu cầu, hoặc nêu kịch bản/lỗi cần sửa. Chỉ sau quyết định explicit mới ghi user
-gate và chạy close check. Theo delivery-cycle: technical pass không thay thế
-user acceptance; không tự mở cycle tiếp theo.
+Owner xác nhận “cho pass p03, tiếp” trong Codex task hiện tại ngày 21/09/2026.
+Quyết định được ghi chi tiết tại [acceptance decision](acceptance-decision.md);
+technical pass và owner acceptance là hai gate riêng biệt.
