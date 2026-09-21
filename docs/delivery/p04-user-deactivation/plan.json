@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p04-user-deactivation",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "VERIFYING",
   "objective": "Triển khai vertical slice vô hiệu hóa user: chỉ active CHAIN_ADMIN được xem directory toàn chuỗi và deactivate một user khác với lý do bắt buộc; mutation có audit, chặn self-deactivate, last active CHAIN_ADMIN và last active STORE_MANAGER của mọi active store trong cùng transaction, làm mọi session của target mất quyền ở request kế tiếp; Admin Web cho phép owner xác nhận và dùng thử flow qua OpenAPI chung.",
   "inScope": [
     "Public OpenAPI, example fixture và generated TypeScript client cho list admin users và deactivate user với reason bắt buộc",
@@ -20,7 +20,7 @@
     "Delegated identity administration cho REGION_MANAGER hoặc CATALOG_ADMIN"
   ],
   "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
-  "candidateSha": "",
+  "candidateSha": "4f7c2cb166ade696f327c31188a2cee0c92f3483",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -38,7 +38,7 @@
     "docs/delivery/p04-user-deactivation/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
@@ -70,5 +70,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Triển khai contract-first trên base f308e0e, kiểm scope rồi tích hợp backend/Admin Web và chuẩn bị preview cho owner nghiệm thu."
+  "nextAction": "Chạy full technical gates trên candidate 4f7c2cb, ghi evidence revision 2 rồi chuẩn bị preview cho owner nghiệm thu."
 }
