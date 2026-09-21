@@ -37,3 +37,18 @@ Ngày: 17/09/2026. Revision: 1. Candidate:
 - Build vẫn có warning chunk lớn baseline (main khoảng 527 kB, ExcelJS khoảng
   930 kB); S04 không đổi dependency/bundle strategy.
 - Không kiểm thiết bị thật; HEIC và rollout vẫn ngoài phạm vi.
+
+## Theo dõi tích hợp — PR #5, 21/09/2026
+
+Phần này không thay đổi candidate hoặc gate lịch sử ở trên. Trên nhánh tích hợp
+PR #5, môi trường container đã sẵn sàng và giới hạn real-backend E2E của candidate
+đã được kiểm lại:
+
+| Lệnh / gate | Kết quả |
+| --- | --- |
+| `./e2e/scripts/start-online-acceptance.sh` | PASS PostgreSQL 17, backend thật, Store PWA online và migrations V1–V8 |
+| `npm --prefix e2e test` | PASS 6, skip 4 theo viewport |
+
+Fixture Foundation được cập nhật `region_id` theo hierarchy V6. Browser
+expectation cho `CHAIN_ADMIN` cũng được đồng bộ với policy P02 đã chấp nhận:
+chain admin có KPH/catalog scope trên toàn chuỗi. Không dùng dữ liệu vận hành thật.

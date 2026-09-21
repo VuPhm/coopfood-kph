@@ -42,12 +42,12 @@ Contract accepted: [CATALOG_STAGING_CONTRACT](product/CATALOG_STAGING_CONTRACT.m
 Plan: [c01-catalog-staging](delivery/c01-catalog-staging/plan.json). C02 publish,
 primary supplier và mọi dữ liệu vận hành thật vẫn ngoài scope.
 
-## Điểm tích hợp kế tiếp — mở PR
+## Điểm tích hợp hiện tại — PR #5
 
-`origin/main` đã chứa S03 qua PR #4. Nhánh hiện tại nối tiếp đúng tree đó và gồm
-các cycle đã đóng S04, P01, P02, P03, C01. Nên mở integration PR tại đây thay vì
-gom thêm candidate: diff đã lớn, còn C02 bị chặn bởi quyết định primary supplier,
-trong khi D01/O01/O02 là outcome độc lập nên nên bắt đầu từ main sau tích hợp.
+`origin/main` đã chứa S03 qua PR #4. PR #5 nối tiếp đúng tree đó và gồm các cycle
+đã đóng S04, P01, P02, P03, C01. Không gom thêm candidate: diff đã lớn, còn C02
+bị chặn bởi quyết định primary supplier, trong khi D01/O01/O02 là outcome độc lập
+nên nên bắt đầu từ main sau tích hợp.
 
 Trước khi merge cần để remote CI chạy đầy đủ và review riêng các vùng rủi ro:
 migration V6–V8, authorization cross-store/cross-region, lifecycle execute guard,
@@ -116,7 +116,9 @@ deactivate, các capability provisioning còn lại chờ cycle riêng.
 
 - Pilot-00, Foundation-01, Foundation-02 và S01–S03: xem evidence/cycle tương ứng.
 - S04: [online-stability-s04](delivery/online-stability-s04/plan.json), owner
-  chấp nhận có điều kiện ngày 2026-09-17; real-backend E2E vẫn hoãn.
+  chấp nhận có điều kiện ngày 2026-09-17; giới hạn real-backend E2E của candidate
+  đã được khép lại trong preflight PR #5 ngày 2026-09-21 (PASS 6, skip 4 theo
+  viewport trên PostgreSQL 17/backend thật).
 - P01: [p01-provisioning-policy](delivery/p01-provisioning-policy/plan.json),
   owner chấp nhận hierarchy và security policy ngày 2026-09-17.
 

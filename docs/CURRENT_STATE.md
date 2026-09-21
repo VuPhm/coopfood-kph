@@ -4,7 +4,7 @@ Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`C01 catalog staging — CLOSED; integration PR checkpoint — READY`
+`C01 catalog staging — CLOSED; integration PR #5 — OPEN`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -28,9 +28,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   [plan](delivery/online-stability-s03/plan.json).
 - Online stability S04 được owner “tạm cho pass” ngày 2026-09-17 trên candidate
   `ebc9cdc`: online history dùng TanStack Query làm authority duy nhất, cache
-  tách theo user/store/date filter và Pilot giữ local state riêng. Real-backend
-  E2E chưa rerun do Docker không sẵn sàng và vẫn là giới hạn hoãn, xem
-  [S04 plan](delivery/online-stability-s04/plan.json).
+  tách theo user/store/date filter và Pilot giữ local state riêng. Candidate chưa
+  rerun được real-backend E2E do Docker không sẵn sàng; giới hạn lịch sử này đã
+  được khép lại trong preflight PR #5 ngày 2026-09-21, xem
+  [S04 evidence](delivery/online-stability-s04/technical-evidence.md).
 - P01 provisioning policy được owner chấp nhận ngày 2026-09-17: hierarchy
   `CHAIN_ADMIN` toàn chuỗi → `REGION_MANAGER` đúng vùng → `STORE_MANAGER` đúng
   store; credential/bootstrap/lifecycle theo security baseline. P01 chỉ khóa
@@ -77,8 +78,11 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   upload/replay/reject và lookup isolation. Owner đã cho pass cùng ngày.
 - Ngày 2026-09-17, S04 `npm run verify` PASS docs/Contract Lock, generated API
   drift, TypeScript, 147 tests và build; browser fixture review pass 7 viewport.
-- S04 không đổi backend/OpenAPI. Real-backend browser suite chưa rerun vì Docker
-  không hoạt động; warning chunk lớn vẫn là baseline chưa có số đo thiết bị.
+- Ngày 2026-09-21, preflight PR #5 đã chạy lại Foundation real-backend browser
+  suite trên PostgreSQL 17/backend thật sau migrations V1–V8: PASS 6, skip 4
+  theo viewport. Seed đã được đồng bộ với hierarchy V6 và expectation
+  `CHAIN_ADMIN` với policy P02. Warning chunk lớn vẫn là baseline chưa có số đo
+  thiết bị.
 
 ## Ranh giới và phần hoãn
 
@@ -94,10 +98,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
-[C01 plan](delivery/c01-catalog-staging/plan.json). Điểm dừng phù hợp kế tiếp là
-integration PR cho chuỗi accepted S04 → P01 → P02 → P03 → C01. C02 chưa nên mở
-trước khi chốt primary supplier; primary supplier và lookup current vẫn là quyết
-định nghiệp vụ riêng.
+[C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
+accepted S04 → P01 → P02 → P03 → C01 đã mở và đang chờ remote CI/review. C02
+chưa nên mở trước khi chốt primary supplier; primary supplier và lookup current
+vẫn là quyết định nghiệp vụ riêng.
 Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
