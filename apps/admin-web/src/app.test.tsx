@@ -8,6 +8,7 @@ import catalogImportsFixture from "../../../contracts/fixtures/api/catalog-impor
 import catalogDetailFixture from "../../../contracts/fixtures/api/catalog-import-detail.json";
 import catalogUploadFixture from "../../../contracts/fixtures/api/catalog-import-upload.json";
 import sessionFixture from "../../../contracts/fixtures/api/session.json";
+import adminUsersFixture from "../../../contracts/fixtures/api/admin-users.json";
 import { App } from "./app";
 import type { LifecycleAdminGateway } from "./lifecycle-admin";
 
@@ -22,6 +23,7 @@ const catalogSession = {
 const targets = targetsFixture as Awaited<ReturnType<LifecycleAdminGateway["listTargets"]>>;
 const futureDate = new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10);
 const schedules = schedulesFixture.map((schedule) => ({ ...schedule, effectiveDate: futureDate })) as Awaited<ReturnType<LifecycleAdminGateway["listSchedules"]>>;
+const adminUsers = adminUsersFixture as Awaited<ReturnType<LifecycleAdminGateway["listUsers"]>>;
 
 function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdminGateway {
   return {
@@ -37,6 +39,8 @@ function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdmin
     listCatalogImports: vi.fn().mockResolvedValue([]),
     getCatalogImport: vi.fn().mockRejectedValue(new Error("Không có batch catalog")),
     uploadCatalogImport: vi.fn().mockRejectedValue(new Error("Chưa cấu hình catalog")),
+    listUsers: vi.fn().mockResolvedValue(adminUsers),
+    deactivateUser: vi.fn().mockImplementation(async (id: string) => ({ ...adminUsers.find((user) => user.id === id)!, active: false })),
     ...overrides,
   };
 }
@@ -201,5 +205,44 @@ describe("Admin catalog staging workspace", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Header catalog không hợp lệ.");
     expect(alert).toHaveFocus();
+  });
+});
+
+describe("Admin identity workspace", () => {
+  it("requires a reason, confirms deactivation and announces request-next session effect", async () => {
+    const api = gateway();
+    renderApp(api);
+    await screen.findByText("CF-0012 · Nguyễn Kiệm");
+    fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
+
+    expect(await screen.findByRole("heading", { name: "Tài khoản người dùng" })).toBeVisible();
+    expect(await screen.findByText("Quản lý cửa hàng Demo")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Vô hiệu hóa" }));
+
+    const dialog = screen.getByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận vô hiệu hóa" }));
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("Hãy nhập lý do");
+    fireEvent.change(within(dialog).getByLabelText(/Lý do/), { target: { value: "Nhân sự đã nghỉ việc" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận vô hiệu hóa" }));
+
+    await waitFor(() => expect(api.deactivateUser).toHaveBeenCalledWith(adminUsers[1]!.id, "Nhân sự đã nghỉ việc"));
+    expect(await screen.findByRole("status")).toHaveTextContent(/request kế tiếp/);
+  });
+
+  it("does not offer self-deactivation and surfaces backend guard failures", async () => {
+    const api = gateway({
+      deactivateUser: vi.fn().mockRejectedValue(new Error("Không thể vô hiệu hóa quản trị chuỗi cuối cùng đang hoạt động.")),
+    });
+    renderApp(api);
+    await screen.findByText("CF-0012 · Nguyễn Kiệm");
+    fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
+    await screen.findByRole("heading", { name: "Tài khoản người dùng" });
+
+    expect(await screen.findByText("Tài khoản đang đăng nhập")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Vô hiệu hóa" }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText(/Lý do/), { target: { value: "Kiểm tra guard" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận vô hiệu hóa" }));
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("quản trị chuỗi cuối cùng");
   });
 });

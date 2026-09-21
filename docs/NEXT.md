@@ -2,6 +2,18 @@
 
 Cập nhật: 2026-09-21
 
+## P04 user deactivation — đang thực hiện
+
+Cycle revision 2 triển khai directory toàn chuỗi và deactivate user cho active
+`CHAIN_ADMIN`. Mutation phải có reason/audit, giữ role/assignment/membership để
+reactivate explicit về sau và làm session target mất quyền ở request kế tiếp.
+Trong cùng transaction phải chặn self-deactivate, không để mất active
+`CHAIN_ADMIN` cuối cùng và không để active store mất `STORE_MANAGER` cuối cùng.
+
+Ngoài scope P04: create/update/reactivate user, grant/revoke role/assignment/
+membership, reset/change credential, bootstrap/recovery và production delivery.
+Plan: [p04-user-deactivation](delivery/p04-user-deactivation/plan.json).
+
 ## P02 scoped authorization — đã đóng
 
 Candidate P02 sau repair round 2 đã triển khai schema region/store mapping,

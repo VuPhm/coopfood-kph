@@ -17,11 +17,19 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 
+import vn.coopfood.kph.identity.IdentityAdminException;
+
 @RestControllerAdvice
 public class ProblemDetailAdvice {
 
     @ExceptionHandler(ApiProblemException.class)
     ResponseEntity<ProblemDetail> handleApiProblem(ApiProblemException exception) {
+        ProblemDetail problem = problem(exception.status(), exception.code(), exception.getMessage());
+        return ResponseEntity.status(exception.status()).body(problem);
+    }
+
+    @ExceptionHandler(IdentityAdminException.class)
+    ResponseEntity<ProblemDetail> handleIdentityAdminProblem(IdentityAdminException exception) {
         ProblemDetail problem = problem(exception.status(), exception.code(), exception.getMessage());
         return ResponseEntity.status(exception.status()).body(problem);
     }

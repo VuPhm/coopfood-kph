@@ -4,7 +4,7 @@ Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`C01 catalog staging — CLOSED; integration PR #5 — MERGED`
+`P04 user deactivation — EXECUTING on revision 2`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -59,6 +59,11 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - C01 bổ sung catalog staging/validation CSV cho `CATALOG_ADMIN`: giữ identifier
   dạng string, trả lỗi theo dòng, replay idempotent theo checksum và không tạo
   catalog published. Owner đã chấp nhận ngày 2026-09-21.
+- P04 đang triển khai lát cắt identity lifecycle đầu tiên: `CHAIN_ADMIN` xem
+  directory và vô hiệu hóa user khác với reason/audit; session target mất quyền
+  ở request kế tiếp. Guard transaction chặn self-deactivate, last active
+  `CHAIN_ADMIN` và last active `STORE_MANAGER` của active store. Reset credential,
+  role/assignment/membership revoke và reactivate vẫn ngoài slice.
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
@@ -103,7 +108,13 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
 tích hợp của chuỗi này. Chưa mở cycle mới. C02 chỉ nên mở sau khi chốt primary
 supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ riêng.
-Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
+Thu hồi role/assignment/membership, reset credential và session-version invalidation
+vẫn thuộc slice khác; P04 chỉ vô hiệu hóa toàn bộ user và dựa vào principal refresh.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).
+
+P04 đã mở từ `main` tại `f308e0e`; kế hoạch revision 2 nằm ở
+[p04-user-deactivation](delivery/p04-user-deactivation/plan.json). Tiếp tục từ
+technical verification và owner acceptance của đúng slice này; không mở thêm
+credential/reset hoặc C02 trong cùng cycle.

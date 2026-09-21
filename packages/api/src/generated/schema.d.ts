@@ -207,6 +207,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the chain-wide user directory
+         * @description Requires an active CHAIN_ADMIN. Credential data is never returned.
+         */
+        get: operations["listAdminUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Immediately deactivate another user
+         * @description Requires an active CHAIN_ADMIN. The backend locks and revalidates the
+         *     target and active CHAIN_ADMIN set in one transaction. Self-deactivation
+         *     and deactivating the last active CHAIN_ADMIN or the last active
+         *     STORE_MANAGER of an active store are forbidden. Existing sessions of
+         *     the target lose authority on their next request.
+         */
+        post: operations["deactivateAdminUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/lifecycle/targets": {
         parameters: {
             query?: never;
@@ -381,6 +425,17 @@ export interface components {
             code: string;
             name: string;
             role: components["schemas"]["StoreRole"];
+        };
+        AdminUser: {
+            /** Format: uuid */
+            id: string;
+            username: string;
+            displayName: string;
+            active: boolean;
+            globalRoles: components["schemas"]["GlobalRole"][];
+        };
+        UserDeactivateRequest: {
+            reason: string;
         };
         /** @enum {string} */
         LifecycleTargetType: "REGION" | "STORE";
@@ -768,6 +823,7 @@ export interface components {
         IdempotencyKey: string;
         ScheduleIdPath: string;
         CatalogBatchIdPath: string;
+        UserIdPath: string;
     };
     requestBodies: never;
     headers: never;
@@ -1086,6 +1142,62 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    listAdminUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Users ordered by canonical username. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUser"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    deactivateAdminUser: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                userId: components["parameters"]["UserIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserDeactivateRequest"];
+            };
+        };
+        responses: {
+            /** @description User deactivated; roles and assignments remain stored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUser"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
         };
     };
     listLifecycleTargets: {

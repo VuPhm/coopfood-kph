@@ -7,6 +7,7 @@ export type LifecycleTargetType = components["schemas"]["LifecycleTargetType"];
 export type CatalogImportBatch = components["schemas"]["CatalogImportBatch"];
 export type CatalogImportDetail = components["schemas"]["CatalogImportDetail"];
 export type CatalogImportUploadResponse = components["schemas"]["CatalogImportUploadResponse"];
+export type AdminUser = components["schemas"]["AdminUser"];
 
 export class AdminApiError extends Error {
   readonly status: number | undefined;
@@ -38,6 +39,8 @@ export type LifecycleAdminGateway = {
   listCatalogImports(signal?: AbortSignal): Promise<CatalogImportBatch[]>;
   getCatalogImport(id: string, offset?: number, signal?: AbortSignal): Promise<CatalogImportDetail>;
   uploadCatalogImport(file: File): Promise<CatalogImportUploadResponse>;
+  listUsers(signal?: AbortSignal): Promise<AdminUser[]>;
+  deactivateUser(id: string, reason: string): Promise<AdminUser>;
 };
 
 export function createLifecycleAdminGateway(
@@ -149,10 +152,26 @@ export function createLifecycleAdminGateway(
     return response.data;
   }
 
+  async function listUsers(signal?: AbortSignal) {
+    const response = await client.GET("/api/v1/admin/users", signal ? { signal } : {});
+    if (response.error || !response.data) throw apiError(response, "Không thể tải danh sách tài khoản.");
+    return response.data;
+  }
+
+  async function deactivateUser(id: string, reason: string) {
+    const response = await client.POST("/api/v1/admin/users/{userId}/deactivate", {
+      params: { path: { userId: id }, header: { "X-CSRF-TOKEN": csrfToken } },
+      body: { reason },
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể vô hiệu hóa tài khoản.");
+    return response.data;
+  }
+
   return {
     getSession, login, logout,
     listTargets, listSchedules, createSchedule, reschedule, cancel, execute,
     listCatalogImports, getCatalogImport, uploadCatalogImport,
+    listUsers, deactivateUser,
   };
 }
 
@@ -186,6 +205,14 @@ function apiError(
     CATALOG_HEADER_INVALID: "Header phải đúng thứ tự: NCC, Tên NCC, UPC, SKU, Tên sản phẩm.",
     CATALOG_CSV_MALFORMED: "Cấu trúc CSV không hợp lệ. Hãy kiểm tra dấu phẩy và dấu ngoặc kép.",
     CATALOG_ROW_LIMIT_EXCEEDED: "File catalog không được vượt quá 50.000 dòng dữ liệu.",
+    CHAIN_ADMIN_REQUIRED: "Bạn cần quyền quản trị chuỗi đang hoạt động.",
+    ADMIN_USER_NOT_FOUND: "Không tìm thấy tài khoản này. Hãy tải lại danh sách.",
+    ADMIN_USER_ALREADY_INACTIVE: "Tài khoản này đã bị vô hiệu hóa.",
+    USER_SELF_DEACTIVATION_FORBIDDEN: "Bạn không thể tự vô hiệu hóa tài khoản đang đăng nhập.",
+    LAST_CHAIN_ADMIN_REQUIRED: "Không thể vô hiệu hóa quản trị chuỗi cuối cùng đang hoạt động.",
+    LAST_STORE_MANAGER_REQUIRED: "Không thể vô hiệu hóa quản lý cuối cùng của một cửa hàng đang hoạt động.",
+    ADMIN_USER_STATE_CHANGED: "Trạng thái tài khoản vừa thay đổi. Hãy tải lại danh sách.",
+    USER_DEACTIVATION_REASON_INVALID: "Hãy nhập lý do từ 1 đến 500 ký tự.",
   };
   return new AdminApiError((problem?.code && messages[problem.code]) || fallback, response.response?.status, problem?.code);
 }

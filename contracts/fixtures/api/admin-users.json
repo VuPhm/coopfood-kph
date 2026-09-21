@@ -1,0 +1,16 @@
+[
+  {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "username": "manager.demo",
+    "displayName": "Nguyễn Văn Demo",
+    "active": true,
+    "globalRoles": ["CHAIN_ADMIN"]
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000002",
+    "username": "store.manager",
+    "displayName": "Quản lý cửa hàng Demo",
+    "active": true,
+    "globalRoles": []
+  }
+]
