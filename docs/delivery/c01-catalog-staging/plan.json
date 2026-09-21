@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "c01-catalog-staging",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Triển khai C01 catalog staging/validation từ CSV tổng hợp qua OpenAPI chung: CATALOG_ADMIN upload, xem batch và lỗi theo dòng; identifier được giữ dạng string, duplicate barcode bị reject, upload cùng checksum idempotent và dữ liệu staging tuyệt đối không xuất hiện trong lookup trước C02 publish.",
   "inScope": [
     "Khóa contract C01 cho UTF-8 CSV 5 cột NCC/Tên NCC/UPC/SKU/Tên sản phẩm, quoted field chuẩn CSV, identifier trim nhưng không ép số và giữ leading zero",
@@ -22,7 +22,7 @@
     "Sửa Store PWA, lookup semantics published hiện có hoặc migration dữ liệu thật"
   ],
   "baseSha": "b382c3b07bc6cd8544f4159b071ee53d420b5068",
-  "candidateSha": "",
+  "candidateSha": "7c73a13dabbc8bd63439b0705b249aa724551d88",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -48,29 +48,29 @@
     "docs/delivery/c01-catalog-staging/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical-catalog-staging",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": null,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 1,
+      "sha": "7c73a13dabbc8bd63439b0705b249aa724551d88",
+      "evidence": "docs/delivery/c01-catalog-staging/technical-evidence.md"
     },
     {
       "id": "owner-catalog-staging-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": null,
-      "sha": "",
-      "evidence": ""
+      "revision": 1,
+      "sha": "7c73a13dabbc8bd63439b0705b249aa724551d88",
+      "evidence": "docs/delivery/c01-catalog-staging/acceptance-handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Checkpoint plan/contract, pass dispatch check, then implement the solo vertical slice without opening C02 publish."
+  "nextAction": "Owner dùng preview tổng hợp và xác nhận pass/reject C01; không mở C02 publish trước quyết định rõ ràng."
 }

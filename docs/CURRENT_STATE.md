@@ -4,7 +4,7 @@ Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`P03 scheduled lifecycle — CLOSED; C01 catalog staging — EXECUTING`
+`P03 scheduled lifecycle — CLOSED; C01 catalog staging — AWAITING_ACCEPTANCE`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -54,6 +54,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   thực thi thủ công khi đến hạn, audit và Admin Web cùng contract. Lịch không tự
   chạy; owner đã chấp nhận lựa chọn tối thiểu này ngày 2026-09-21. Preview local
   dùng dữ liệu tổng hợp riêng, không dùng dữ liệu vận hành thật.
+- C01 candidate `7c73a13` nhận CSV catalog vào staging immutable, giữ identifier
+  dạng string, báo lỗi theo dòng và idempotent theo checksum. Backend/API/Admin
+  Web và real-backend browser flow đã pass; không có catalog version published
+  nên lookup cửa hàng vẫn bị cô lập. C01 đang chờ owner nghiệm thu.
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
@@ -87,8 +91,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 P03 đã đóng theo quyết định owner “cho pass p03, tiếp” trên candidate `b9e909d`;
 close record ở [P03 plan](delivery/p03-scheduled-lifecycle/plan.json). C01 catalog
 staging/validation đã mở theo thứ tự roadmap tại
-[C01 plan](delivery/c01-catalog-staging/plan.json). C01 không publish catalog;
-primary supplier và lookup current vẫn chờ C02 cùng quyết định nghiệp vụ riêng.
+[C01 plan](delivery/c01-catalog-staging/plan.json). Candidate đã technical pass
+và có [handoff nghiệm thu](delivery/c01-catalog-staging/acceptance-handoff.md),
+nhưng chưa CLOSED. C01 không publish catalog; primary supplier và lookup current
+vẫn chờ C02 cùng quyết định nghiệp vụ riêng.
 Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog

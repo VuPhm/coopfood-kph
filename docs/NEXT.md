@@ -31,12 +31,18 @@ Thực thi là thao tác thủ công khi đến hạn, không có tiến trình 
 Technical evidence, owner decision và close gate nằm tại
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json).
 
-## C01 catalog staging/validation — đang triển khai
+## C01 catalog staging/validation — chờ owner nghiệm thu
 
 C01 mở theo yêu cầu “tiếp” sau khi P03 đóng. Slice nhận UTF-8 CSV tổng hợp,
 giữ identifier dạng string/leading zero, trả lỗi theo dòng và chặn duplicate
 barcode. Chỉ `CATALOG_ADMIN` có quyền; upload cùng checksum idempotent. Batch
 staging không được tạo published catalog hoặc xuất hiện trong lookup.
+
+Candidate `7c73a13` đã technical pass: Contract Lock và generated client đồng
+bộ, 155 frontend tests + build pass, 53 backend tests pass trên PostgreSQL, và
+browser E2E backend thật pass upload/replay/reject/lookup isolation. Preview sạch
+và kịch bản owner nằm tại
+[C01 acceptance handoff](delivery/c01-catalog-staging/acceptance-handoff.md).
 
 Contract candidate: [CATALOG_STAGING_CONTRACT](product/CATALOG_STAGING_CONTRACT.md).
 Plan: [c01-catalog-staging](delivery/c01-catalog-staging/plan.json). C02 publish,
