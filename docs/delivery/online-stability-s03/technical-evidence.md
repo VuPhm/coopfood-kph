@@ -23,6 +23,11 @@ Ngày: 16/09/2026. Revision: 1. Candidate:
 | `npm run verify` | PASS docs, Contract Lock 14 resources/7 API fixtures, generated API drift, typecheck, 146 tests và build Admin Web/Store PWA |
 | `git diff --check` trước candidate | PASS |
 
+Ngày 17/09/2026, ngay trước khi ghi nhận owner acceptance, `npm run verify` được
+chạy lại trên branch handoff sạch chứa đúng candidate và chỉ các commit hồ sơ
+cycle theo sau. Kết quả tiếp tục PASS Contract Lock, generated API drift,
+TypeScript, 146 tests và build hai frontend; warning chunk baseline không đổi.
+
 ## Giới hạn
 
 - Backend/OpenAPI không đổi; giới hạn `maxItems: 500` và validation backend đã

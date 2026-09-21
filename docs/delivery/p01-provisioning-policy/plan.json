@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "p01-provisioning-policy",
+  "revision": 2,
+  "status": "CLOSED",
+  "objective": "Chốt contract provisioning tối thiểu cho user, region, store, role/membership, bootstrap/recovery và credential reset để P02 có hierarchy CHAIN_ADMIN > REGION_MANAGER > STORE_MANAGER cùng fixture allow/deny được owner chấp nhận mà không suy diễn quyền hoặc triển khai feature sớm.",
+  "inScope": [
+    "Tài liệu product policy với actor matrix, region/store lifecycle, bootstrap/recovery, session effect, audit và guardrail last-admin/self-lockout",
+    "Fixture tổng hợp ngôn ngữ độc lập cho allow/deny provisioning và hierarchy CHAIN_ADMIN toàn chuỗi, REGION_MANAGER đúng vùng, STORE_MANAGER đúng store",
+    "ADR và business contract ghi rõ quyền KPH kế thừa theo hierarchy, gồm test deny ngoài vùng/cross-store",
+    "Contract Lock validation cho fixture và dẫn chiếu nguồn security NIST/OWASP hiện hành",
+    "Acceptance handoff nêu rõ các policy owner cần chấp nhận hoặc sửa trước P02"
+  ],
+  "outOfScope": [
+    "OpenAPI endpoint, generated client, backend/Admin implementation, database migration hoặc credential thật",
+    "Email/SMS reset, SSO/MFA, production bootstrap tooling, hosting và secret delivery",
+    "Catalog staging/publish, paging history, backup/restore hoặc production rollout"
+  ],
+  "baseSha": "a42dbf3392de928b4a75869b4d30665f71da70e2",
+  "candidateSha": "bc86d4c81c43102028c4f519d101de02aa3f580c",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "docs/product/PROVISIONING_POLICY.md",
+    "contracts/fixtures/golden/identity/provisioning-policy-cases.json",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "scripts/check-contracts.mjs",
+    "AGENTS.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/DOMAIN_RULES.md",
+    "docs/product/BEHAVIOR_INVENTORY.md",
+    "docs/product/UI_DNA.md",
+    "docs/adr/0004-scoped-management-hierarchy.md",
+    "docs/adr/README.md",
+    "docs/delivery/p01-provisioning-policy/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 2,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-contract",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "bc86d4c81c43102028c4f519d101de02aa3f580c",
+      "evidence": "docs/delivery/p01-provisioning-policy/technical-evidence.md"
+    },
+    {
+      "id": "owner-policy-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "bc86d4c81c43102028c4f519d101de02aa3f580c",
+      "evidence": "docs/delivery/p01-provisioning-policy/acceptance-handoff.md",
+      "acceptedBy": "project owner",
+      "decisionRef": "Codex user message 2026-09-17 beginning '1. có 1 cấp quản lý vùng gồm nhiều store'"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Thêm một cấp quản lý vùng gồm nhiều store, bắt buộc đúng phạm vi vùng và được đi xuống store; cấp admin tổng phía trên được đi xuống mọi store. Các quyết định còn lại duyệt/theo tiêu chuẩn an toàn.",
+      "source": "Codex user message 2026-09-17 beginning '1. có 1 cấp quản lý vùng gồm nhiều store'",
+      "impact": "Thay đổi authorization contract P01, làm evidence/candidate revision 1 hết hiệu lực; cần bổ sung region entity/membership, explicit inherited KPH access, cross-region denial, ADR và cập nhật business contract.",
+      "decision": "Sửa P01 thành hierarchy CHAIN_ADMIN toàn chuỗi > REGION_MANAGER đúng region > STORE_MANAGER đúng store; giữ password/bootstrap/lifecycle theo security baseline đã duyệt. Không triển khai P02 trong cycle này."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "P01 is closed. Stop; open a separate P02 delivery cycle only on a new owner request."
+}

@@ -20,7 +20,7 @@ import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPil
 import { StoreContext } from "./store-context";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
-import { createOnlineGateway, onlineExportSelectionError, onlineModeEnabled, type OnlineGateway, type OnlineSession, type OnlineWorkspace } from "./online-kph";
+import { createOnlineGateway, onlineExportSelectionError, onlineModeEnabled, type OnlineSession } from "./online-kph";
 
 export { formatBusinessDate } from "./business-date";
 
@@ -187,7 +187,7 @@ function sortValue(record: RecordView, key: RecordSortKey, approvalStatus: Appro
 }
 
 function WorkspaceApp() {
-  const [records, setRecords] = useState<readonly RecordView[]>(initialRecords);
+  const [localRecords, setLocalRecords] = useState<readonly RecordView[]>(initialRecords);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [createKind, setCreateKind] = useState<KphKind | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -214,40 +214,31 @@ function WorkspaceApp() {
   const [storageError, setStorageError] = useState("");
   const [onlineStoreId, setOnlineStoreId] = useState<string | null>(null);
   const [onlineGateway] = useState(() => onlinePersistenceEnabled ? createOnlineGateway() : null);
-  const [onlineReload, setOnlineReload] = useState(0);
   const [onlineAuthRequired, setOnlineAuthRequired] = useState(false);
   const onlineMutationScopeRef = useRef<OnlineMutationScope>({ generation: 0, storeId: null, userId: null });
   const queryClient = useQueryClient();
-  const onlineCapabilities = onlineGateway as unknown as Partial<OnlineGateway> | null;
-  const supportsIdentityApi = Boolean(onlineCapabilities?.getSession && onlineCapabilities?.loadHistory);
-  const legacyWorkspaceQuery = useQuery<OnlineWorkspace>({
-    queryKey: ["online", "workspace", onlineReload],
-    queryFn: ({ signal }) => onlineCapabilities?.loadWorkspace?.(signal) ?? Promise.reject(new Error("Gateway online chưa sẵn sàng.")),
-    enabled: onlinePersistenceEnabled && !supportsIdentityApi && !onlineAuthRequired,
-    retry: false,
-  });
   const sessionQuery = useQuery<OnlineSession>({
     queryKey: onlineSessionQueryKey,
-    queryFn: ({ signal }) => onlineCapabilities?.getSession?.(signal) ?? Promise.reject(new Error("Gateway phiên đăng nhập chưa sẵn sàng.")),
-    enabled: onlinePersistenceEnabled && supportsIdentityApi && !onlineAuthRequired,
+    queryFn: ({ signal }) => onlineGateway?.getSession(signal) ?? Promise.reject(new Error("Gateway phiên đăng nhập chưa sẵn sàng.")),
+    enabled: onlinePersistenceEnabled && !onlineAuthRequired,
     retry: false,
   });
-  const derivedOnlineSession = supportsIdentityApi ? sessionQuery.data : legacyWorkspaceQuery.data?.session;
-  const onlineSession = onlineAuthRequired ? undefined : derivedOnlineSession;
+  const onlineSession = onlineAuthRequired ? undefined : sessionQuery.data;
   const onlineStores = onlineSession?.user.stores ?? [];
-  const onlineHistoryKey = ["online", "history", onlineSession?.user.id ?? "anonymous", onlineStoreId ?? "none", dateFilter.detectedFrom ?? "", dateFilter.detectedTo ?? ""] as const;
+  const onlineHistoryScopeKey = ["online", "history", onlineSession?.user.id ?? "anonymous", onlineStoreId ?? "none"] as const;
+  const onlineHistoryKey = [...onlineHistoryScopeKey, dateFilter.detectedFrom ?? "", dateFilter.detectedTo ?? ""] as const;
+  const onlineHistoryKeyRef = useRef(onlineHistoryKey);
+  onlineHistoryKeyRef.current = onlineHistoryKey;
   const onlineHistoryQuery = useQuery<readonly RecordView[]>({
     queryKey: onlineHistoryKey,
-    queryFn: ({ signal }) => onlineCapabilities?.loadHistory?.(onlineStoreId!, dateFilter, signal) ?? Promise.reject(new Error("Gateway lịch sử chưa sẵn sàng.")),
-    enabled: onlinePersistenceEnabled && supportsIdentityApi && !onlineAuthRequired && Boolean(onlineSession && onlineStoreId),
+    queryFn: ({ signal }) => onlineGateway?.loadHistory(onlineStoreId!, dateFilter, signal) ?? Promise.reject(new Error("Gateway lịch sử chưa sẵn sàng.")),
+    enabled: onlinePersistenceEnabled && !onlineAuthRequired && Boolean(onlineSession && onlineStoreId),
     retry: false,
   });
-  const onlineLoading = onlinePersistenceEnabled && !onlineAuthRequired && (supportsIdentityApi
-    ? sessionQuery.isPending || Boolean(onlineSession && onlineStoreId && onlineHistoryQuery.isPending)
-    : legacyWorkspaceQuery.isPending);
-  const onlineQueryError = supportsIdentityApi
-    ? sessionQuery.error ?? onlineHistoryQuery.error
-    : legacyWorkspaceQuery.error;
+  const records = onlinePersistenceEnabled ? (onlineHistoryQuery.data ?? []) : localRecords;
+  const onlineLoading = onlinePersistenceEnabled && !onlineAuthRequired
+    && (sessionQuery.isPending || Boolean(onlineSession && onlineStoreId && onlineHistoryQuery.isPending));
+  const onlineQueryError = sessionQuery.error ?? onlineHistoryQuery.error;
 
   function invalidateOnlineMutationScope() {
     onlineMutationScopeRef.current = {
@@ -265,13 +256,12 @@ function WorkspaceApp() {
   }
 
   const loginMutation = useMutation({
-    mutationFn: ({ username, password }: { username: string; password: string }) => onlineCapabilities?.login?.(username, password) ?? Promise.reject(new Error("Gateway đăng nhập chưa sẵn sàng.")),
+    mutationFn: ({ username, password }: { username: string; password: string }) => onlineGateway?.login(username, password) ?? Promise.reject(new Error("Gateway đăng nhập chưa sẵn sàng.")),
     onSuccess: (session: OnlineSession) => {
       invalidateOnlineMutationScope();
       logoutMutation.reset();
       setOnlineAuthRequired(false);
       setStorageError("");
-      setRecords([]);
       setSelected(new Set());
       setOnlineStoreId(session.user.stores[0]?.id ?? null);
       queryClient.setQueryData(onlineSessionQueryKey, session);
@@ -280,12 +270,11 @@ function WorkspaceApp() {
     onError: (error: unknown) => setStorageError(error instanceof Error ? error.message : "Không thể đăng nhập lúc này."),
   });
   const logoutMutation = useMutation({
-    mutationFn: () => onlineCapabilities?.logout?.() ?? Promise.reject(new Error("Gateway đăng xuất chưa sẵn sàng.")),
+    mutationFn: () => onlineGateway?.logout() ?? Promise.reject(new Error("Gateway đăng xuất chưa sẵn sàng.")),
     onSuccess: () => {
       invalidateOnlineMutationScope();
       setOnlineAuthRequired(true);
       setOnlineStoreId(null);
-      setRecords([]);
       setSelected(new Set());
       setDialogOpen(false);
       queryClient.removeQueries({ queryKey: ["online"] });
@@ -377,18 +366,13 @@ function WorkspaceApp() {
     });
   }, [onlineSession, onlineStoreId, onlineStoreSignature]);
 
-  const loadedOnlineRecords = supportsIdentityApi ? onlineHistoryQuery.data : legacyWorkspaceQuery.data?.records;
-
   useEffect(() => {
     if (!onlinePersistenceEnabled) return;
-    if (loadedOnlineRecords) {
-      setRecords(loadedOnlineRecords);
+    if (sessionQuery.isSuccess && (!onlineStoreId || onlineHistoryQuery.isSuccess)) {
       setStorageError("");
       setOnlineAuthRequired(false);
-    } else if (onlineLoading || onlineAuthRequired) {
-      setRecords([]);
     }
-  }, [loadedOnlineRecords, onlineLoading, onlineAuthRequired]);
+  }, [onlineHistoryQuery.isSuccess, onlineStoreId, sessionQuery.isSuccess]);
 
   useEffect(() => {
     if (!onlinePersistenceEnabled || !onlineQueryError) return;
@@ -409,7 +393,6 @@ function WorkspaceApp() {
     invalidateOnlineMutationScope();
     setOnlineAuthRequired(true);
     setOnlineStoreId(null);
-    setRecords([]);
     setSelected(new Set());
     setDialogOpen(false);
     queryClient.removeQueries({ queryKey: ["online", "history"] });
@@ -425,7 +408,7 @@ function WorkspaceApp() {
         const [storedRecords, health, storedProfile] = await Promise.all([loadPilotRecords(), readStorageHealth(), loadPilotStoreProfile()]);
         if (cancelled) return;
         const hydrated = storedRecords.map((record) => hydratePilotRecord(record, ownedPhotoUrls.current));
-        setRecords(hydrated);
+        setLocalRecords(hydrated);
         setDeletedIds(new Set(storedRecords.filter(({ trashState }) => trashState === "trash").map(({ id }) => id)));
         setStoreProfile(storedProfile);
         setStorageHealth(health);
@@ -465,20 +448,14 @@ function WorkspaceApp() {
     invalidateOnlineMutationScope();
     setOnlineAuthRequired(false);
     setOnlineStoreId(null);
-    setRecords([]);
     setSelected(new Set());
-    if (supportsIdentityApi) {
-      void queryClient.invalidateQueries({ queryKey: onlineSessionQueryKey });
-    } else {
-      setOnlineReload((attempt) => attempt + 1);
-    }
+    void queryClient.invalidateQueries({ queryKey: onlineSessionQueryKey });
   }
 
   function changeOnlineStore(storeId: string) {
     if (!onlineStores.some(({ id }) => id === storeId) || storeId === onlineStoreId) return;
     invalidateOnlineMutationScope();
     setOnlineStoreId(storeId);
-    setRecords([]);
     setSelected(new Set());
     setReviewingIds(new Set());
     setExpandedMobileRecords(new Set());
@@ -619,18 +596,18 @@ function WorkspaceApp() {
 
   async function updateApproval(recordId: string, status: ApprovalStatus) {
     if (onlinePersistenceEnabled) {
-      if (!canManageOnline || !onlineStoreId || !onlineCapabilities?.reviewRecord) return;
+      if (!canManageOnline || !onlineStoreId || !onlineGateway) return;
       const mutationScope: OnlineMutationScope = {
         generation: onlineMutationScopeRef.current.generation,
         storeId: onlineStoreId,
         userId: onlineSession?.user.id ?? null,
       };
+      const historyScopeKey = ["online", "history", mutationScope.userId ?? "anonymous", mutationScope.storeId] as const;
       setReviewingIds((current) => new Set([...current, recordId]));
       try {
-        const reviewed = await onlineCapabilities.reviewRecord(onlineStoreId, recordId, status);
+        const reviewed = await onlineGateway.reviewRecord(onlineStoreId, recordId, status);
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
-        setRecords((current) => current.map((record) => record.id === recordId ? reviewed : record));
-        queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => current?.map((record) => record.id === recordId ? reviewed : record));
+        queryClient.setQueriesData<readonly RecordView[]>({ queryKey: historyScopeKey }, (current) => current?.map((record) => record.id === recordId ? reviewed : record));
         setSelected((current) => new Set([...current].filter((id) => id !== recordId)));
         setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” trên máy chủ.`);
       } catch (error) {
@@ -658,16 +635,16 @@ function WorkspaceApp() {
       next.delete(recordId);
       return next;
     });
-    setRecords((current) => current.map((record) => record.id === recordId ? { ...record, approvalStatus: status } : record));
+    setLocalRecords((current) => current.map((record) => record.id === recordId ? { ...record, approvalStatus: status } : record));
     setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
   }
 
   async function approveSelected() {
     if (onlinePersistenceEnabled) {
-      if (!canManageOnline || !onlineStoreId || !onlineCapabilities?.reviewRecord) return;
+      if (!canManageOnline || !onlineStoreId || !onlineGateway) return;
       const recordIds = [...selected];
       const storeId = onlineStoreId;
-      const reviewRecord = onlineCapabilities.reviewRecord;
+      const reviewRecord = onlineGateway.reviewRecord;
       const mutationScope: OnlineMutationScope = {
         generation: onlineMutationScopeRef.current.generation,
         storeId,
@@ -692,8 +669,7 @@ function WorkspaceApp() {
           .map(({ value }) => value);
         const failedIds = results.flatMap((result, index) => result.status === "rejected" ? [recordIds[index]!] : []);
         const byId = new Map(reviewedRecords.map((record) => [record.id, record]));
-        setRecords((current) => current.map((record) => byId.get(record.id) ?? record));
-        queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => current?.map((record) => byId.get(record.id) ?? record));
+        queryClient.setQueriesData<readonly RecordView[]>({ queryKey: historyScopeKey }, (current) => current?.map((record) => byId.get(record.id) ?? record));
         await queryClient.invalidateQueries({ queryKey: historyScopeKey });
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
         setSelected(new Set(failedIds));
@@ -715,7 +691,7 @@ function WorkspaceApp() {
     } finally {
       setReviewingIds(new Set());
     }
-    setRecords((current) => current.map((record) => recordIds.includes(record.id) ? { ...record, approvalStatus: "APPROVED" } : record));
+    setLocalRecords((current) => current.map((record) => recordIds.includes(record.id) ? { ...record, approvalStatus: "APPROVED" } : record));
     setNotice(`Đã duyệt ${recordIds.length} phiếu ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
     setSelected(new Set());
   }
@@ -797,19 +773,22 @@ function WorkspaceApp() {
   async function saveCreatedRecord(draft: CreatedRecordDraft) {
     if (!storeConfigured) throw new Error("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.");
     if (onlinePersistenceEnabled) {
-      if (!onlineCapabilities?.createRecord || !onlineStoreId) throw new Error("Không có phiên đăng nhập hợp lệ.");
+      if (!onlineGateway || !onlineStoreId) throw new Error("Không có phiên đăng nhập hợp lệ.");
       const mutationScope: OnlineMutationScope = {
         generation: onlineMutationScopeRef.current.generation,
         storeId: onlineStoreId,
         userId: onlineSession?.user.id ?? null,
       };
+      const historyScopeKey = ["online", "history", mutationScope.userId ?? "anonymous", mutationScope.storeId] as const;
       try {
-        const created = await onlineCapabilities.createRecord(onlineStoreId, draft);
+        const created = await onlineGateway.createRecord(onlineStoreId, draft);
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
-        setRecords((current) => [created, ...current]);
-        queryClient.setQueryData<readonly RecordView[]>(onlineHistoryKey, (current) => [created, ...(current ?? [])]);
-        setActiveKind(draft.kind);
-        setSelected(new Set([created.id]));
+        await queryClient.invalidateQueries({ queryKey: historyScopeKey });
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
+        const currentHistory = queryClient.getQueryData<readonly RecordView[]>(onlineHistoryKeyRef.current);
+        const createdIsVisible = currentHistory?.some(({ id }) => id === created.id) ?? false;
+        if (createdIsVisible) setActiveKind(draft.kind);
+        setSelected(createdIsVisible ? new Set([created.id]) : new Set());
         setNotice(`Đã tạo phiếu ${created.id} và lưu trên máy chủ.`);
       } catch (error) {
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
@@ -858,7 +837,7 @@ function WorkspaceApp() {
       });
       throw error instanceof Error ? error : new Error("Không thể lưu phiếu trên thiết bị");
     }
-    setRecords((current) => [record, ...current]);
+    setLocalRecords((current) => [record, ...current]);
     setActiveKind(draft.kind);
     setSelected(new Set([id]));
     setNotice(`Đã tạo phiếu ${id} và lưu trên thiết bị này.`);
@@ -878,10 +857,10 @@ function WorkspaceApp() {
       let exportRecords = selectedRecords;
       let exportStore = { storeCode: storeProfile.storeCode, storeName: storeProfile.storeName };
       if (onlinePersistenceEnabled) {
-        if (!onlineStoreId || !onlineCapabilities?.prepareExport) {
+        if (!onlineStoreId || !onlineGateway) {
           throw new Error("Gateway xuất Excel online chưa sẵn sàng.");
         }
-        const exportBundle = await onlineCapabilities.prepareExport(
+        const exportBundle = await onlineGateway.prepareExport(
           onlineStoreId,
           activeKind,
           selectedRecords.map(({ id }) => id),
@@ -931,7 +910,7 @@ function WorkspaceApp() {
   const workspaceError = logoutMutation.isError && !isSessionExpiryError(logoutMutation.error)
     ? "Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại."
     : storageError;
-  const onlineLoginAvailable = onlinePersistenceEnabled && Boolean(onlineCapabilities?.login);
+  const onlineLoginAvailable = onlinePersistenceEnabled && Boolean(onlineGateway);
 
   return (
     <div className="min-h-dvh bg-canvas text-ink">
@@ -1142,8 +1121,8 @@ function WorkspaceApp() {
         onlineMode={onlinePersistenceEnabled}
         onOpenChange={setDialogOpen}
         onSaved={saveCreatedRecord}
-        onBarcodeLookup={onlinePersistenceEnabled && onlineCapabilities?.lookupBarcode && onlineStoreId
-          ? (barcode) => onlineCapabilities.lookupBarcode!(onlineStoreId, barcode).catch((error) => {
+        onBarcodeLookup={onlinePersistenceEnabled && onlineGateway && onlineStoreId
+          ? (barcode) => onlineGateway.lookupBarcode(onlineStoreId, barcode).catch((error) => {
             if (isSessionExpiryError(error)) expireOnlineSession(error);
             throw error;
           })

@@ -7,7 +7,7 @@
 
 BEGIN;
 
-TRUNCATE TABLE app_users, stores, catalog_import_batches CASCADE;
+TRUNCATE TABLE app_users, regions, stores, catalog_import_batches CASCADE;
 
 INSERT INTO app_users (
     id, username, password_hash, display_name, active, created_at, updated_at
@@ -43,11 +43,32 @@ INSERT INTO app_users (
 INSERT INTO user_roles (user_id, role)
 VALUES ('10000000-0000-4000-8000-000000000003', 'CHAIN_ADMIN');
 
+INSERT INTO regions (
+    id, region_code, region_name, active, created_at, updated_at
+) VALUES
+    (
+        '21000000-0000-4000-8000-000000000001',
+        'E2E-A',
+        'Vùng A E2E',
+        TRUE,
+        '2026-09-09 00:00:00+07',
+        '2026-09-09 00:00:00+07'
+    ),
+    (
+        '21000000-0000-4000-8000-000000000002',
+        'E2E-B',
+        'Vùng B E2E',
+        TRUE,
+        '2026-09-09 00:00:00+07',
+        '2026-09-09 00:00:00+07'
+    );
+
 INSERT INTO stores (
-    id, store_code, store_name, active, created_at, updated_at
+    id, region_id, store_code, store_name, active, created_at, updated_at
 ) VALUES
     (
         '20000000-0000-4000-8000-000000000001',
+        '21000000-0000-4000-8000-000000000001',
         '0001',
         'Nguyễn Kiệm E2E',
         TRUE,
@@ -56,6 +77,7 @@ INSERT INTO stores (
     ),
     (
         '20000000-0000-4000-8000-000000000002',
+        '21000000-0000-4000-8000-000000000001',
         '0002',
         'Store Hai E2E',
         TRUE,
@@ -64,6 +86,7 @@ INSERT INTO stores (
     ),
     (
         '20000000-0000-4000-8000-000000000003',
+        '21000000-0000-4000-8000-000000000002',
         '0003',
         'Store Ngoài Scope E2E',
         TRUE,

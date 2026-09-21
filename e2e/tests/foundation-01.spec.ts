@@ -475,8 +475,8 @@ test.describe("Store PWA browser acceptance", () => {
       expect(employeeRecordsResponse.status()).toBe(200);
       expect((await employeeApi.get(`/api/v1/stores/${STORES.secondary.id}/kph`)).status()).toBe(403);
       expect((await managerApi.get(`/api/v1/stores/${STORES.outsideMembership.id}/kph`)).status()).toBe(403);
-      expect((await adminApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(403);
-      expect((await adminApi.get(`/api/v1/catalog/barcodes/${FOUND_BARCODE}?storeId=${STORES.primary.id}`)).status()).toBe(403);
+      expect((await adminApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(200);
+      expect((await adminApi.get(`/api/v1/catalog/barcodes/${FOUND_BARCODE}?storeId=${STORES.primary.id}`)).status()).toBe(200);
       expect((await anonymousApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(401);
 
       const record = (await employeeRecordsResponse.json() as KphRecord[])[0];
@@ -484,10 +484,6 @@ test.describe("Store PWA browser acceptance", () => {
         expect((await employeeApi.put(`/api/v1/stores/${STORES.primary.id}/kph/${record.id}/approval`, {
           headers: { "X-CSRF-TOKEN": employeeSession.csrfToken },
           data: { status: "APPROVED" },
-        })).status()).toBe(403);
-        expect((await adminApi.post(`/api/v1/stores/${STORES.primary.id}/kph/exports`, {
-          headers: { "X-CSRF-TOKEN": adminSession.csrfToken },
-          data: { type: record.type, recordIds: [record.id] },
         })).status()).toBe(403);
       }
 

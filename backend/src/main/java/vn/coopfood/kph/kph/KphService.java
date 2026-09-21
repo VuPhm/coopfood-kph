@@ -26,24 +26,24 @@ import tools.jackson.databind.ObjectMapper;
 import vn.coopfood.kph.catalog.CatalogService;
 import vn.coopfood.kph.foundation.time.TimeConfiguration;
 import vn.coopfood.kph.foundation.web.ApiProblemException;
-import vn.coopfood.kph.identity.StoreContext;
-import vn.coopfood.kph.store.StoreAccessService;
+import vn.coopfood.kph.store.KphStoreAccessPolicy;
+import vn.coopfood.kph.store.StoreRef;
 
 @Service
 class KphService {
 
     private final KphRepository repository;
     private final CatalogService catalog;
-    private final StoreAccessService storeAccess;
+    private final KphStoreAccessPolicy accessPolicy;
     private final LocalPrivateMediaStorage media;
     private final Clock clock;
     private final ObjectMapper objectMapper;
 
-    KphService(KphRepository repository, CatalogService catalog, StoreAccessService storeAccess,
+    KphService(KphRepository repository, CatalogService catalog, KphStoreAccessPolicy accessPolicy,
             LocalPrivateMediaStorage media, Clock clock, ObjectMapper objectMapper) {
         this.repository = repository;
         this.catalog = catalog;
-        this.storeAccess = storeAccess;
+        this.accessPolicy = accessPolicy;
         this.media = media;
         this.clock = clock;
         this.objectMapper = objectMapper;
@@ -52,7 +52,7 @@ class KphService {
     @Transactional
     KphRecordResponse create(UUID storeId, KphCreateRequest request, List<MultipartFile> photos,
             String idempotencyKey, Authentication authentication) {
-        StoreContext store = storeAccess.requireMembership(storeId, authentication);
+        StoreRef store = accessPolicy.requireViewCreate(storeId, authentication);
         UUID actorId = ((vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal()).userId();
         validateIdempotencyKey(idempotencyKey);
         String requestHash = fingerprint(request, photos);
@@ -100,7 +100,8 @@ class KphService {
                                 ? request.photoLastModified().get(index)
                                 : createdAt;
                 LocalPrivateMediaStorage.StoredMedia storedPhoto = media.store(
-                        recordId, index + 1, photos.get(index), store, fallbackCapturedAt, createdAt);
+                        recordId, index + 1, photos.get(index), store.code(), store.name(),
+                        fallbackCapturedAt, createdAt);
                 stored.add(new StoredMedia(storedPhoto.photo(), storedPhoto.capturedAt()));
                 cleanup.track(storedPhoto.photo());
             }
@@ -123,7 +124,7 @@ class KphService {
     @Transactional(readOnly = true)
     List<KphRecordResponse> list(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
             Authentication authentication) {
-        storeAccess.requireMembership(storeId, authentication);
+        accessPolicy.requireViewCreate(storeId, authentication);
         if (detectedFrom != null && detectedTo != null && detectedFrom.isAfter(detectedTo)) {
             throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "DATE_RANGE_INVALID",
                     "detectedFrom must be on or before detectedTo.");
@@ -134,7 +135,7 @@ class KphService {
     @Transactional
     KphRecordResponse review(UUID storeId, UUID recordId, KphApprovalRequest request,
             Authentication authentication) {
-        StoreContext store = storeAccess.requireStoreManager(storeId, authentication);
+        StoreRef store = accessPolicy.requireReviewExport(storeId, authentication);
         var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
         var current = repository.lockReviewState(storeId, recordId)
                 .orElseThrow(() -> problem(HttpStatus.NOT_FOUND, "KPH_RECORD_NOT_FOUND",
@@ -157,7 +158,7 @@ class KphService {
 
     @Transactional
     KphExportResponse prepareExport(UUID storeId, KphExportRequest request, Authentication authentication) {
-        StoreContext store = storeAccess.requireStoreManager(storeId, authentication);
+        StoreRef store = accessPolicy.requireReviewExport(storeId, authentication);
         var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
         if (new HashSet<>(request.recordIds()).size() != request.recordIds().size()) {
             throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "EXPORT_SELECTION_DUPLICATE",
@@ -192,7 +193,7 @@ class KphService {
 
     @Transactional(readOnly = true)
     byte[] stampedPhoto(UUID storeId, UUID recordId, int ordinal, Authentication authentication) {
-        storeAccess.requireMembership(storeId, authentication);
+        accessPolicy.requireViewCreate(storeId, authentication);
         if (ordinal < 1 || ordinal > 3) {
             throw problem(HttpStatus.NOT_FOUND, "PHOTO_NOT_FOUND", "The evidence photo does not exist.");
         }

@@ -64,7 +64,8 @@ class DatabaseSmokeTest {
                 FROM information_schema.tables
                 WHERE table_schema = 'public'
                   AND table_name IN (
-                    'app_users', 'user_roles', 'stores', 'store_memberships',
+                    'app_users', 'user_roles', 'regions', 'stores', 'store_memberships',
+                    'user_region_assignments', 'lifecycle_deactivation_schedules',
                     'catalog_import_batches', 'catalog_import_rows', 'catalog_versions',
                     'suppliers', 'products', 'product_suppliers', 'product_barcodes',
                     'kph_records', 'kph_photos', 'kph_status_history', 'kph_approval_history', 'audit_events',
@@ -72,7 +73,7 @@ class DatabaseSmokeTest {
                   )
                 """).get("total", Integer.class);
 
-        assertThat(coreTables).isEqualTo(17);
+        assertThat(coreTables).isEqualTo(20);
 
         HttpResponse<String> health = HttpClient.newHttpClient().send(
                 HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/actuator/health"))
@@ -82,6 +83,39 @@ class DatabaseSmokeTest {
 
         assertThat(health.statusCode()).isEqualTo(200);
         assertThat(health.body()).contains("UP");
+    }
+
+    @Test
+    void activeStoreRequiresActiveRegionAcrossLifecycleTransitions() {
+        UUID regionId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        String suffix = storeId.toString();
+        database.execute("""
+                INSERT INTO regions (id, region_code, region_name, active, created_at, updated_at)
+                VALUES (?, ?, ?, FALSE, now(), now())
+                """, regionId, "lifecycle-" + suffix.substring(0, 8), "Lifecycle region " + suffix);
+        database.execute("""
+                INSERT INTO stores (id, region_id, store_code, store_name, active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, FALSE, now(), now())
+                """, storeId, regionId, "lifecycle-" + suffix, "Lifecycle store " + suffix);
+
+        assertThatThrownBy(() -> database.execute(
+                "UPDATE stores SET active = TRUE, updated_at = now() WHERE id = ?", storeId))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("stores_active_region_required");
+
+        database.execute("UPDATE regions SET active = TRUE, updated_at = now() WHERE id = ?", regionId);
+        assertThat(database.execute(
+                "UPDATE stores SET active = TRUE, updated_at = now() WHERE id = ?", storeId)).isEqualTo(1);
+
+        assertThatThrownBy(() -> database.execute(
+                "UPDATE regions SET active = FALSE, updated_at = now() WHERE id = ?", regionId))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("stores_active_region_required");
+
+        database.execute("UPDATE stores SET active = FALSE, updated_at = now() WHERE id = ?", storeId);
+        assertThat(database.execute(
+                "UPDATE regions SET active = FALSE, updated_at = now() WHERE id = ?", regionId)).isEqualTo(1);
     }
 
     @Test
@@ -311,6 +345,7 @@ class DatabaseSmokeTest {
     private TestScope createScope(DSLContext targetDatabase) {
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
+        UUID regionId = UUID.randomUUID();
         String suffix = userId.toString();
 
         targetDatabase.execute(
@@ -323,15 +358,30 @@ class DatabaseSmokeTest {
                 "schema-test-" + suffix,
                 "not-a-real-password-hash",
                 "Schema test " + suffix);
-        targetDatabase.execute(
-                """
-                INSERT INTO stores (
-                    id, store_code, store_name, created_at, updated_at
-                ) VALUES (?, ?, ?, now(), now())
-                """,
-                storeId,
-                "schema-test-" + suffix,
-                "Schema test store " + suffix);
+        Integer regionTables = targetDatabase.fetchOne("""
+                SELECT count(*) AS total
+                FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name = 'regions'
+                """).get("total", Integer.class);
+        if (regionTables == 1) {
+            targetDatabase.execute("""
+                    INSERT INTO regions (
+                        id, region_code, region_name, active, created_at, updated_at
+                    ) VALUES (?, ?, ?, TRUE, now(), now())
+                    """, regionId, "schema-" + suffix.substring(0, 8), "Schema test region " + suffix);
+            targetDatabase.execute("""
+                    INSERT INTO stores (
+                        id, region_id, store_code, store_name, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, now(), now())
+                    """, storeId, regionId, "schema-test-" + suffix, "Schema test store " + suffix);
+        } else {
+            targetDatabase.execute("""
+                    INSERT INTO stores (
+                        id, store_code, store_name, created_at, updated_at
+                    ) VALUES (?, ?, ?, now(), now())
+                    """, storeId, "schema-test-" + suffix, "Schema test store " + suffix);
+        }
 
         return new TestScope(userId, storeId);
     }

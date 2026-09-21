@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "id": "p02-scoped-authorization",
+  "revision": 2,
+  "status": "CLOSED",
+  "objective": "Triển khai vertical slice P02 đầu tiên cho hierarchy KPH đã khóa: database lưu region/store mapping và active user-region assignment; backend resolve scope từ database mỗi request để CHAIN_ADMIN toàn chuỗi, REGION_MANAGER đúng vùng và STORE_MANAGER/EMPLOYEE đúng membership có quyền KPH tương ứng, với deny test cross-store/cross-region.",
+  "inScope": [
+    "Một Flyway migration thêm regions, store.region_id và user_region_assignments với relational constraints/index cần thiết",
+    "Authorization policy tập trung resolve active store -> active region từ database; không tin region từ client",
+    "Quyền xem/tạo KPH cho active membership, active REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN; duyệt/xuất chỉ cho STORE_MANAGER đúng store, REGION_MANAGER đúng vùng hoặc CHAIN_ADMIN",
+    "Session refresh giữ global role/membership thật; authorization query đọc active region assignment trực tiếp từ database mỗi request, không giả inherited scope thành store membership",
+    "Unit/integration tests bao phủ membership, same-region, cross-region, inactive assignment/region/store và chain-wide scope",
+    "Technical evidence và acceptance handoff riêng; owner test sau không bị ghi nhận nhầm là acceptance",
+    "Repair review round 2: tách store scope resolver khỏi KPH capability policy và dùng DTO StoreRef trung lập",
+    "Database giữ invariant active store -> active region bằng constraint an toàn khi concurrent thay cho trigger check-then-act",
+    "PostgreSQL integration tests chứng minh inactive assignment/store/region bị deny cho inherited scope"
+  ],
+  "outOfScope": [
+    "Public provisioning OpenAPI, generated client và Admin Web CRUD cho user/region/store/role/membership",
+    "Credential encoder migration, reset/change, bootstrap/recovery tooling và session-version invalidation",
+    "Store/region lifecycle mutation, last-admin/last-manager guards và audit cho các mutation provisioning",
+    "Catalog staging/publish, paging, production infrastructure hoặc deployment"
+  ],
+  "baseSha": "4543cce6cd95fa71c8acb6badd437a7fd693748e",
+  "candidateSha": "f091016e3a0caae4e4e87198b2741c8c958a1f0f",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "backend/src/main/resources/db/migration/V6__scoped_management_hierarchy.sql",
+    "backend/src/main/java/vn/coopfood/kph/identity/IdentityRepository.java",
+    "backend/src/main/java/vn/coopfood/kph/catalog/CatalogService.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreAccessRepository.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreAccessService.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreAccessResolver.java",
+    "backend/src/main/java/vn/coopfood/kph/store/KphStoreAccessPolicy.java",
+    "backend/src/main/java/vn/coopfood/kph/store/StoreRef.java",
+    "backend/src/main/java/vn/coopfood/kph/kph/KphService.java",
+    "backend/src/main/java/vn/coopfood/kph/kph/LocalPrivateMediaStorage.java",
+    "backend/src/test/java/vn/coopfood/kph/catalog/CatalogLookupHttpIntegrationTest.java",
+    "backend/src/test/java/vn/coopfood/kph/foundation/DatabaseSmokeTest.java",
+    "backend/src/test/java/vn/coopfood/kph/identity/IdentityHttpIntegrationTest.java",
+    "backend/src/test/java/vn/coopfood/kph/identity/IdentityServiceTest.java",
+    "backend/src/test/java/vn/coopfood/kph/identity/StoreAccessServiceTest.java",
+    "backend/src/test/java/vn/coopfood/kph/store/KphStoreAccessPolicyTest.java",
+    "backend/src/test/java/vn/coopfood/kph/kph/KphHttpIntegrationTest.java",
+    "backend/src/test/java/vn/coopfood/kph/kph/LocalPrivateMediaStorageTest.java",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/p02-scoped-authorization/**"
+  ],
+  "reviewLimit": 3,
+  "reviewRound": 3,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-scoped-authorization",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "f091016e3a0caae4e4e87198b2741c8c958a1f0f",
+      "evidence": "docs/delivery/p02-scoped-authorization/technical-evidence.md"
+    },
+    {
+      "id": "owner-slice-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "f091016e3a0caae4e4e87198b2741c8c958a1f0f",
+      "evidence": "docs/delivery/p02-scoped-authorization/acceptance-handoff.md",
+      "acceptedBy": "Owner",
+      "decisionRef": "Owner message 2026-09-21: còn lại cho pass"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Thực hiện repair sau review round 2 theo cấu trúc/layer backend tối thiểu đã đề xuất.",
+      "source": "Owner message 2026-09-21: thực hiện",
+      "impact": "Invalidates revision 1 technical evidence; changes authorization structure, V6 integrity enforcement and required integration coverage.",
+      "decision": "Bound repair to P02 backend/schema/tests only; extend review limit to one final integrated review and keep provisioning API/Admin UI out of scope."
+    },
+    {
+      "revision": 2,
+      "request": "Cho pass P02 và yêu cầu thao tác deactivate store/region hoặc xóa quan trọng phải đặt lịch trước tối thiểu 30 ngày.",
+      "source": "Owner message 2026-09-21: Store hoặc region inactive... còn lại cho pass",
+      "impact": "Accepts the P02 behavior unchanged; adds a docs-only lifecycle requirement for a future provisioning slice.",
+      "decision": "Close P02. Interpret delete as auditable deactivate/revoke rather than hard delete; defer the exact list of other critical operations and security-emergency exceptions for the next lifecycle contract lock."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "inactive-scope-integration-coverage",
+      "status": "resolved",
+      "owner": "/root",
+      "nextAction": "Covered by KphHttpIntegrationTest plus existing assignment revoke coverage at candidate SHA."
+    },
+    {
+      "id": "kph-policy-layer-boundary",
+      "status": "resolved",
+      "owner": "/root",
+      "nextAction": "Implemented StoreAccessResolver, KphStoreAccessPolicy and neutral StoreRef at candidate SHA."
+    },
+    {
+      "id": "active-store-region-concurrency",
+      "status": "resolved",
+      "owner": "/root",
+      "nextAction": "Implemented generated conditional key plus composite foreign key and verified lifecycle transitions on PostgreSQL 17."
+    }
+  ],
+  "nextAction": "Cycle closed. Do not auto-start implementation; the next lifecycle/provisioning cycle must first lock critical-operation scope and emergency security exceptions for the 30-day schedule rule."
+}

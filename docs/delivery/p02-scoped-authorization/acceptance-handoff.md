@@ -1,0 +1,60 @@
+# Acceptance handoff — P02 scoped authorization
+
+Trạng thái: **ACCEPTED — 2026-09-21**
+
+Candidate: `f091016e3a0caae4e4e87198b2741c8c958a1f0f`
+
+Implementation commit: `4fe070d417194a9d39a0316fda5ca093047539e8`
+
+Accepted by: Owner
+
+Decision reference: owner message 2026-09-21, “còn lại cho pass”.
+
+## Outcome cần xác nhận
+
+- Active `STORE_MANAGER` đúng membership vẫn duyệt/xuất được.
+- Active `REGION_MANAGER` được xem/tạo/duyệt/xuất KPH tại store
+  thuộc active region assignment, nhưng bị deny với store có ID hợp lệ
+  ở region khác.
+- `CHAIN_ADMIN` được thao tác KPH tại mọi active store mà không
+  cần synthetic store membership.
+- Grant/revoke assignment hoặc global role có hiệu lực ở request kế
+  tiếp; backend tự resolve store → region từ PostgreSQL.
+- Store hoặc region inactive bị deny kể cả khi actor còn active region
+  assignment hoặc `CHAIN_ADMIN`.
+
+## Cách test sau
+
+Slice này chưa có provisioning UI/API, nên acceptance tạm dùng fixture
+tổng hợp trong integration test:
+
+```sh
+cd backend
+env DOCKER_HOST=unix:///Users/vup/.orbstack/run/docker.sock \
+  ./mvnw -q -Dtest=KphHttpIntegrationTest,CatalogLookupHttpIntegrationTest test
+```
+
+Kết quả mong đợi: lệnh exit 0. Test KPH chứng minh employee bị deny
+manager action, region manager đúng vùng được duyệt/xuất,
+cross-region bị deny, revoke có hiệu lực ngay request sau và chain admin
+tiếp tục có scope toàn chuỗi; inactive store/region luôn bị deny.
+
+## Giới hạn cố ý
+
+- `/api/v1/auth/session` và `/api/v1/stores` vẫn chỉ trả store membership
+  thật; không giả inherited scope thành `STORE_MANAGER`. Store selector cho
+  region/chain manager sẽ đi cùng OpenAPI/frontend slice sau.
+- Chưa có CRUD provisioning, lifecycle mutation/audit, last-admin/last-manager
+  guard hoặc credential/bootstrap implementation.
+- Migration upgrade tạo một vùng chuyển tiếp riêng cho mỗi store cũ,
+  giữ scope hẹp thay vì tự gom các store vào một vùng rộng.
+
+## Yêu cầu chuyển sang cycle kế tiếp
+
+Owner yêu cầu deactivate store/region và các thao tác xóa quan trọng phải đặt
+lịch với thời hạn tùy chọn nhưng tối thiểu 30 ngày. Yêu cầu này không thay đổi
+authorization candidate vì P02 chưa có lifecycle mutation API.
+
+Contract hiện hiểu “xóa” là deactivate/revoke có audit, không hard delete. Trước
+khi triển khai provisioning/lifecycle cần khóa danh sách thao tác quan trọng khác
+và quy tắc emergency suspend/revoke cho sự cố bảo mật.

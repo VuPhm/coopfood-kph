@@ -1,0 +1,264 @@
+{
+  "id": "P01-PROVISIONING-POLICY-01",
+  "provenance": "synthetic",
+  "approvalStatus": "accepted",
+  "policyVersion": 2,
+  "conventions": {
+    "listedGrantsAreActive": true,
+    "storeRegionSource": "SERVER_AUTHORITY"
+  },
+  "cases": [
+    {
+      "caseId": "ID-P01-001",
+      "action": "USER_CREATE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": {},
+      "expected": { "decision": "ALLOW", "reason": "CHAIN_ADMIN_PROVISIONS_IDENTITY", "effects": ["AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-002",
+      "action": "USER_CREATE",
+      "actor": { "globalRoles": ["CATALOG_ADMIN"], "memberships": [] },
+      "context": {},
+      "expected": { "decision": "DENY", "reason": "IDENTITY_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-003",
+      "action": "USER_CREATE",
+      "actor": { "globalRoles": [], "memberships": [{ "store": "STORE-001", "role": "STORE_MANAGER" }] },
+      "context": {},
+      "expected": { "decision": "DENY", "reason": "IDENTITY_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-004",
+      "action": "KPH_APPROVE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "store": "STORE-001" },
+      "expected": { "decision": "ALLOW", "reason": "CHAIN_WIDE_ADMIN", "effects": ["AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-005",
+      "action": "KPH_APPROVE",
+      "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
+      "context": { "store": "STORE-001", "storeRegion": "REGION-SOUTH" },
+      "expected": { "decision": "ALLOW", "reason": "REGION_SCOPED_MANAGER", "effects": ["AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-006",
+      "action": "GLOBAL_ROLE_REVOKE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "role": "CHAIN_ADMIN", "selfTarget": true, "resultActiveChainAdminCount": 1 },
+      "expected": { "decision": "DENY", "reason": "SELF_LOCKOUT_FORBIDDEN", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-007",
+      "action": "GLOBAL_ROLE_REVOKE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "role": "CHAIN_ADMIN", "selfTarget": false, "resultActiveChainAdminCount": 0 },
+      "expected": { "decision": "DENY", "reason": "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-008",
+      "action": "GLOBAL_ROLE_REVOKE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "role": "CHAIN_ADMIN", "selfTarget": false, "resultActiveChainAdminCount": 1 },
+      "expected": { "decision": "ALLOW", "reason": "ANOTHER_ACTIVE_CHAIN_ADMIN_REMAINS", "effects": ["AUDIT", "EFFECTIVE_NEXT_REQUEST"] }
+    },
+    {
+      "caseId": "ID-P01-009",
+      "action": "USER_DEACTIVATE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "selfTarget": false, "resultActiveChainAdminCount": 0 },
+      "expected": { "decision": "DENY", "reason": "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-010",
+      "action": "MEMBERSHIP_REVOKE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "store": "STORE-001", "storeActive": true, "role": "STORE_MANAGER", "resultActiveStoreManagerCount": 0 },
+      "expected": { "decision": "DENY", "reason": "LAST_ACTIVE_STORE_MANAGER_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-011",
+      "action": "STORE_ACTIVATE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "store": "STORE-001", "regionActive": true, "activeStoreManagerCount": 1 },
+      "expected": { "decision": "ALLOW", "reason": "ACTIVE_STORE_MANAGER_PRESENT", "effects": ["AUDIT", "EFFECTIVE_NEXT_REQUEST"] }
+    },
+    {
+      "caseId": "ID-P01-012",
+      "action": "STORE_ACTIVATE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "store": "STORE-001", "regionActive": true, "activeStoreManagerCount": 0 },
+      "expected": { "decision": "DENY", "reason": "ACTIVE_STORE_MANAGER_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-013",
+      "action": "CREDENTIAL_RESET",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "selfTarget": false },
+      "expected": { "decision": "ALLOW", "reason": "ADMIN_RESETS_OTHER_USER", "effects": ["RESET_REQUIRED", "INVALIDATE_EXISTING_ACCESS", "AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-014",
+      "action": "CREDENTIAL_RESET",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "selfTarget": true },
+      "expected": { "decision": "DENY", "reason": "USE_SELF_CHANGE", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-015",
+      "action": "CREDENTIAL_CHANGE",
+      "actor": { "globalRoles": [], "memberships": [] },
+      "context": { "selfTarget": true, "currentCredentialVerified": true },
+      "expected": { "decision": "ALLOW", "reason": "SELF_CHANGE_VERIFIED", "effects": ["CLEAR_RESET_REQUIRED", "INVALIDATE_EXISTING_ACCESS", "AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-016",
+      "action": "ADMIN_BOOTSTRAP",
+      "actor": { "kind": "OPERATOR", "globalRoles": [], "memberships": [] },
+      "context": { "chainAdminEverExisted": false },
+      "expected": { "decision": "ALLOW", "reason": "FIRST_ADMIN_ONLY", "effects": ["RESET_REQUIRED", "AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-017",
+      "action": "ADMIN_BOOTSTRAP",
+      "actor": { "kind": "OPERATOR", "globalRoles": [], "memberships": [] },
+      "context": { "chainAdminEverExisted": true },
+      "expected": { "decision": "DENY", "reason": "BOOTSTRAP_ALREADY_CONSUMED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-018",
+      "action": "ADMIN_RECOVERY",
+      "actor": { "kind": "OPERATOR", "globalRoles": [], "memberships": [] },
+      "context": { "activeChainAdminCount": 0 },
+      "expected": { "decision": "ALLOW", "reason": "NO_ACTIVE_ADMIN", "effects": ["RESET_REQUIRED", "INVALIDATE_EXISTING_ACCESS", "AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-019",
+      "action": "ADMIN_RECOVERY",
+      "actor": { "kind": "OPERATOR", "globalRoles": [], "memberships": [] },
+      "context": { "activeChainAdminCount": 1 },
+      "expected": { "decision": "DENY", "reason": "ACTIVE_ADMIN_EXISTS", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-020",
+      "action": "HARD_DELETE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "targetType": "USER" },
+      "expected": { "decision": "DENY", "reason": "SOFT_LIFECYCLE_ONLY", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-021",
+      "action": "USER_CREATE",
+      "actor": { "globalRoles": [], "memberships": [{ "store": "STORE-001", "role": "EMPLOYEE" }] },
+      "context": {},
+      "expected": { "decision": "DENY", "reason": "IDENTITY_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-022",
+      "action": "HARD_DELETE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "targetType": "STORE" },
+      "expected": { "decision": "DENY", "reason": "SOFT_LIFECYCLE_ONLY", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-023",
+      "action": "HARD_DELETE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "targetType": "MEMBERSHIP" },
+      "expected": { "decision": "DENY", "reason": "SOFT_LIFECYCLE_ONLY", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-024",
+      "action": "USER_DEACTIVATE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "selfTarget": false, "activeStore": "STORE-001", "resultActiveStoreManagerCount": 0 },
+      "expected": { "decision": "DENY", "reason": "LAST_ACTIVE_STORE_MANAGER_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-025",
+      "action": "MEMBERSHIP_DOWNGRADE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "store": "STORE-001", "storeActive": true, "fromRole": "STORE_MANAGER", "toRole": "EMPLOYEE", "resultActiveStoreManagerCount": 0 },
+      "expected": { "decision": "DENY", "reason": "LAST_ACTIVE_STORE_MANAGER_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-026",
+      "action": "KPH_APPROVE",
+      "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
+      "context": { "store": "STORE-901", "storeRegion": "REGION-NORTH" },
+      "expected": { "decision": "DENY", "reason": "ACTIVE_REGION_ASSIGNMENT_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-027",
+      "action": "KPH_EXPORT",
+      "actor": { "globalRoles": [], "memberships": [{ "store": "STORE-001", "role": "STORE_MANAGER" }] },
+      "context": { "store": "STORE-001", "storeRegion": "REGION-SOUTH" },
+      "expected": { "decision": "ALLOW", "reason": "STORE_SCOPED_MANAGER", "effects": ["AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-028",
+      "action": "KPH_EXPORT",
+      "actor": { "globalRoles": [], "memberships": [{ "store": "STORE-001", "role": "STORE_MANAGER" }] },
+      "context": { "store": "STORE-002", "storeRegion": "REGION-SOUTH" },
+      "expected": { "decision": "DENY", "reason": "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-029",
+      "action": "MEMBERSHIP_UPSERT",
+      "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
+      "context": { "store": "STORE-001", "storeRegion": "REGION-SOUTH", "targetRole": "EMPLOYEE" },
+      "expected": { "decision": "ALLOW", "reason": "REGION_SCOPED_MEMBERSHIP_ADMIN", "effects": ["AUDIT", "EFFECTIVE_NEXT_REQUEST"] }
+    },
+    {
+      "caseId": "ID-P01-030",
+      "action": "MEMBERSHIP_UPSERT",
+      "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
+      "context": { "store": "STORE-901", "storeRegion": "REGION-NORTH", "targetRole": "EMPLOYEE" },
+      "expected": { "decision": "DENY", "reason": "ACTIVE_REGION_ASSIGNMENT_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-031",
+      "action": "GLOBAL_ROLE_GRANT",
+      "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
+      "context": { "role": "CATALOG_ADMIN" },
+      "expected": { "decision": "DENY", "reason": "CHAIN_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-032",
+      "action": "REGION_MANAGER_GRANT",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "region": "REGION-SOUTH" },
+      "expected": { "decision": "ALLOW", "reason": "CHAIN_ADMIN_MANAGES_REGION_SCOPE", "effects": ["AUDIT", "EFFECTIVE_NEXT_REQUEST"] }
+    },
+    {
+      "caseId": "ID-P01-033",
+      "action": "USER_CREATE",
+      "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
+      "context": {},
+      "expected": { "decision": "DENY", "reason": "IDENTITY_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-034",
+      "action": "CREDENTIAL_RESET",
+      "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
+      "context": { "selfTarget": false },
+      "expected": { "decision": "DENY", "reason": "CHAIN_ADMIN_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-035",
+      "action": "STORE_ACTIVATE",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "store": "STORE-001", "regionActive": false, "activeStoreManagerCount": 1 },
+      "expected": { "decision": "DENY", "reason": "ACTIVE_REGION_REQUIRED", "effects": [] }
+    },
+    {
+      "caseId": "ID-P01-036",
+      "action": "KPH_EXPORT",
+      "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
+      "context": { "store": "STORE-901", "storeRegion": "REGION-NORTH" },
+      "expected": { "decision": "ALLOW", "reason": "CHAIN_WIDE_ADMIN", "effects": ["AUDIT"] }
+    }
+  ]
+}

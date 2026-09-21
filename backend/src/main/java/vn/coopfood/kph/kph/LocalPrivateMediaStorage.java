@@ -52,7 +52,6 @@ import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 
 import vn.coopfood.kph.foundation.web.ApiProblemException;
-import vn.coopfood.kph.identity.StoreContext;
 
 /**
  * Local private storage for the online Foundation-01 evidence slice.
@@ -108,7 +107,7 @@ class LocalPrivateMediaStorage {
      * @param serverNow controlled server clock used as the final timestamp
      */
     StoredMedia store(UUID recordId, int ordinal, MultipartFile upload,
-            StoreContext store, Instant fallbackCapturedAt, Instant serverNow) {
+            String storeCode, String storeName, Instant fallbackCapturedAt, Instant serverNow) {
         byte[] original = readBounded(upload);
         try {
             Metadata metadata = readMetadata(original);
@@ -116,7 +115,7 @@ class LocalPrivateMediaStorage {
             Instant capturedAt = captureInstant(metadata)
                     .or(() -> Optional.ofNullable(fallbackCapturedAt))
                     .orElse(serverNow);
-            BufferedImage stamped = stamp(image.image(), store, capturedAt);
+            BufferedImage stamped = stamp(image.image(), storeCode, storeName, capturedAt);
             byte[] stampedBytes = encodeJpeg(stamped);
             String extension = "image/png".equals(image.contentType()) ? ".png" : ".jpg";
             String base = "records/" + recordId + "/" + ordinal + "-" + UUID.randomUUID();
@@ -147,8 +146,8 @@ class LocalPrivateMediaStorage {
      * fallback and server clock.
      */
     KphRepository.StoredPhoto store(UUID recordId, int ordinal, MultipartFile upload,
-            StoreContext store, Instant capturedAt) {
-        return store(recordId, ordinal, upload, store, capturedAt, capturedAt).photo();
+            String storeCode, String storeName, Instant capturedAt) {
+        return store(recordId, ordinal, upload, storeCode, storeName, capturedAt, capturedAt).photo();
     }
 
     /**
@@ -383,7 +382,8 @@ class LocalPrivateMediaStorage {
         return Optional.empty();
     }
 
-    private static BufferedImage stamp(BufferedImage source, StoreContext store, Instant capturedAt) {
+    private static BufferedImage stamp(
+            BufferedImage source, String storeCode, String storeName, Instant capturedAt) {
         double scale = Math.min(1d, Math.min((double) MAX_WIDTH / source.getWidth(),
                 (double) MAX_HEIGHT / source.getHeight()));
         int width = Math.max(1, (int) Math.round(source.getWidth() * scale));
@@ -394,7 +394,7 @@ class LocalPrivateMediaStorage {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             graphics.drawImage(source, 0, 0, width, height, null);
             String firstLine = STAMP_TIME.format(capturedAt);
-            String secondLine = store.code() + " " + store.name();
+            String secondLine = storeCode + " " + storeName;
             int fontSize = Math.max(1, Math.min(28, Math.max(1, Math.min(width, height) / 36)));
             graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD, fontSize));
             int padding = Math.max(1, Math.min(8, fontSize / 2));

@@ -207,6 +207,144 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/lifecycle/targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List active region/store targets the actor may schedule
+         * @description CHAIN_ADMIN sees active regions and stores chain-wide. REGION_MANAGER
+         *     sees active stores only in active assigned regions. The backend derives
+         *     every effective region from PostgreSQL.
+         */
+        get: operations["listLifecycleTargets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/lifecycle/schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List lifecycle schedules visible to the actor */
+        get: operations["listLifecycleSchedules"];
+        put?: never;
+        /** Schedule a store or region deactivation at least 30 days ahead */
+        post: operations["createLifecycleSchedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/lifecycle/schedules/{scheduleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Move a pending lifecycle schedule to another valid effective date */
+        put: operations["rescheduleLifecycleDeactivation"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/lifecycle/schedules/{scheduleId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a pending lifecycle schedule without deleting its history */
+        post: operations["cancelLifecycleSchedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/lifecycle/schedules/{scheduleId}/execute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Manually execute a due lifecycle schedule
+         * @description The backend locks and revalidates schedule state, effective date,
+         *     target state, actor scope and lifecycle guards in the same transaction.
+         */
+        post: operations["executeLifecycleSchedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the latest immutable catalog staging batches
+         * @description Requires active CATALOG_ADMIN; CHAIN_ADMIN is not an implicit catalog role.
+         */
+        get: operations["listCatalogImports"];
+        put?: never;
+        /**
+         * Validate and persist one UTF-8 catalog CSV as an immutable staging batch
+         * @description The exact required header is `NCC,Tên NCC,UPC,SKU,Tên sản phẩm`.
+         *     Identifier fields remain strings. Replaying the exact file bytes returns
+         *     the existing batch with `replayed=true`; this endpoint never publishes.
+         */
+        post: operations["uploadCatalogImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/imports/{batchId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read one staging batch and all row-level validation results */
+        get: operations["getCatalogImport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -243,6 +381,107 @@ export interface components {
             code: string;
             name: string;
             role: components["schemas"]["StoreRole"];
+        };
+        /** @enum {string} */
+        LifecycleTargetType: "REGION" | "STORE";
+        /** @enum {string} */
+        LifecycleScheduleStatus: "SCHEDULED" | "CANCELLED" | "EXECUTED";
+        LifecycleTarget: {
+            type: components["schemas"]["LifecycleTargetType"];
+            /** Format: uuid */
+            id: string;
+            /** @description String identifier; leading zeroes are significant. */
+            code: string;
+            name: string;
+            /** Format: uuid */
+            regionId: string | null;
+            regionCode: string | null;
+            regionName: string | null;
+        };
+        LifecycleSchedule: {
+            /** Format: uuid */
+            id: string;
+            target: components["schemas"]["LifecycleTarget"];
+            /** Format: date */
+            effectiveDate: string;
+            status: components["schemas"]["LifecycleScheduleStatus"];
+            reason: string;
+            createdBy: components["schemas"]["ActorSnapshot"];
+            /** Format: date-time */
+            createdAt: string;
+            updatedBy: components["schemas"]["ActorSnapshot"];
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: date-time */
+            cancelledAt: string | null;
+            /** Format: date-time */
+            executedAt: string | null;
+        };
+        LifecycleScheduleCreateRequest: {
+            targetType: components["schemas"]["LifecycleTargetType"];
+            /** Format: uuid */
+            targetId: string;
+            /** Format: date */
+            effectiveDate: string;
+            reason: string;
+        };
+        LifecycleRescheduleRequest: {
+            /** Format: date */
+            effectiveDate: string;
+            reason: string;
+        };
+        LifecycleReasonRequest: {
+            reason: string;
+        };
+        /** @enum {string} */
+        CatalogImportStatus: "STAGED" | "VALIDATED" | "PUBLISHED" | "REJECTED";
+        /** @enum {string} */
+        CatalogImportRowStatus: "VALID" | "WARNING" | "ERROR";
+        CatalogImportBatch: {
+            /** Format: uuid */
+            id: string;
+            checksumSha256: string;
+            originalFilename: string;
+            /** Format: int64 */
+            fileSizeBytes: number;
+            status: components["schemas"]["CatalogImportStatus"];
+            rowCount: number;
+            validRowCount: number;
+            errorRowCount: number;
+            /** @description Null only for legacy batches created before C01 actor provenance. */
+            createdBy: components["schemas"]["ActorSnapshot"] | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CatalogImportUploadResponse: {
+            batch: components["schemas"]["CatalogImportBatch"];
+            replayed: boolean;
+        };
+        CatalogImportDetail: {
+            batch: components["schemas"]["CatalogImportBatch"];
+            rows: components["schemas"]["CatalogImportRow"][];
+            rowTotal: number;
+            rowOffset: number;
+            rowLimit: number;
+        };
+        CatalogImportRow: {
+            rowNumber: number;
+            status: components["schemas"]["CatalogImportRowStatus"];
+            raw: components["schemas"]["CatalogRowValues"];
+            normalized: components["schemas"]["CatalogRowValues"];
+            validationMessages: components["schemas"]["CatalogValidationMessage"][];
+        };
+        CatalogRowValues: {
+            supplierCode: string;
+            supplierName: string;
+            barcode: string;
+            skuCode: string;
+            productName: string;
+        };
+        CatalogValidationMessage: {
+            code: string;
+            field: string;
+            message: string;
         };
         BarcodeLookupResponse: components["schemas"]["BarcodeFound"] | components["schemas"]["BarcodeNotFound"];
         BarcodeFound: {
@@ -482,6 +721,33 @@ export interface components {
                 "application/problem+json": components["schemas"]["ValidationProblem"];
             };
         };
+        /** @description Invalid lifecycle date or reason; code identifies the failed rule. */
+        LifecycleValidation: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description File encoding, header, CSV structure or row limit is invalid. */
+        CatalogImportValidation: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description Uploaded file exceeds the endpoint limit. */
+        PayloadTooLarge: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description Required infrastructure is unavailable. */
         ServiceUnavailable: {
             headers: {
@@ -500,6 +766,8 @@ export interface components {
         CsrfHeader: string;
         /** @description Client-generated opaque key scoped to the authenticated actor. */
         IdempotencyKey: string;
+        ScheduleIdPath: string;
+        CatalogBatchIdPath: string;
     };
     requestBodies: never;
     headers: never;
@@ -813,6 +1081,277 @@ export interface operations {
                 };
                 content: {
                     "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listLifecycleTargets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized active lifecycle targets. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LifecycleTarget"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listLifecycleSchedules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Schedules newest first, constrained to current actor scope. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LifecycleSchedule"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    createLifecycleSchedule: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LifecycleScheduleCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Deactivation schedule created; the target remains active. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LifecycleSchedule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["LifecycleValidation"];
+        };
+    };
+    rescheduleLifecycleDeactivation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                scheduleId: components["parameters"]["ScheduleIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LifecycleRescheduleRequest"];
+            };
+        };
+        responses: {
+            /** @description Pending schedule updated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LifecycleSchedule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["LifecycleValidation"];
+        };
+    };
+    cancelLifecycleSchedule: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                scheduleId: components["parameters"]["ScheduleIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LifecycleReasonRequest"];
+            };
+        };
+        responses: {
+            /** @description Schedule marked cancelled. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LifecycleSchedule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["LifecycleValidation"];
+        };
+    };
+    executeLifecycleSchedule: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                scheduleId: components["parameters"]["ScheduleIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LifecycleReasonRequest"];
+            };
+        };
+        responses: {
+            /** @description Target deactivated and schedule marked executed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LifecycleSchedule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["LifecycleValidation"];
+        };
+    };
+    listCatalogImports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description At most 50 batches, newest first. Staging never affects store lookup. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportBatch"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    uploadCatalogImport: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Exact bytes were already staged; existing immutable batch returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportUploadResponse"];
+                };
+            };
+            /** @description New batch validated and persisted as VALIDATED or REJECTED. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportUploadResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            413: components["responses"]["PayloadTooLarge"];
+            422: components["responses"]["CatalogImportValidation"];
+        };
+    };
+    getCatalogImport: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                batchId: components["parameters"]["CatalogBatchIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Immutable batch detail ordered by source row number. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportDetail"];
                 };
             };
             401: components["responses"]["Unauthorized"];

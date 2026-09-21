@@ -6,7 +6,12 @@ import { DEMO_RECORDS } from "./demo-records";
 import type { OnlineWorkspace } from "./online-kph";
 
 const mocks = vi.hoisted(() => ({
+  getSession: vi.fn(),
+  listStores: vi.fn(),
+  loadHistory: vi.fn(),
   loadWorkspace: vi.fn(),
+  login: vi.fn(),
+  logout: vi.fn(),
   createRecord: vi.fn(),
   reviewRecord: vi.fn(),
   prepareExport: vi.fn(),
@@ -23,7 +28,12 @@ vi.mock("./online-kph", () => ({
   onlineModeEnabled: () => true,
   onlineExportSelectionError: mocks.onlineExportSelectionError,
   createOnlineGateway: () => ({
+    getSession: mocks.getSession,
+    listStores: mocks.listStores,
+    loadHistory: mocks.loadHistory,
     loadWorkspace: mocks.loadWorkspace,
+    login: mocks.login,
+    logout: mocks.logout,
     createRecord: mocks.createRecord,
     reviewRecord: mocks.reviewRecord,
     prepareExport: mocks.prepareExport,
@@ -49,45 +59,56 @@ function workspace(role: "EMPLOYEE" | "STORE_MANAGER" = "EMPLOYEE"): OnlineWorks
   };
 }
 
+function resolveWorkspace(value: OnlineWorkspace) {
+  mocks.getSession.mockResolvedValue(value.session);
+  mocks.loadHistory.mockResolvedValue(value.records);
+}
+
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.onlineExportSelectionError.mockImplementation((recordCount) => recordCount > 500
     ? "Chỉ có thể xuất tối đa 500 phiếu mỗi lần. Hãy giảm số phiếu đã chọn rồi thử lại."
     : null);
+  mocks.logout.mockResolvedValue(undefined);
 });
 
 describe("Online workspace boundary", () => {
   it("shows loading without demo records or a premature empty state", () => {
-    mocks.loadWorkspace.mockReturnValue(new Promise<OnlineWorkspace>(() => {}));
+    mocks.getSession.mockReturnValue(new Promise<OnlineWorkspace["session"]>(() => {}));
     render(<App />);
 
-    expect(screen.getAllByText("Đang tải lịch sử từ máy chủ…")).toHaveLength(2);
+    expect(screen.getByRole("status")).toHaveTextContent("Đang mở cửa hàng của bạn…");
     expect(screen.queryByText("Chưa có phiếu nào trên máy chủ.")).not.toBeInTheDocument();
     expect(screen.queryByText(DEMO_RECORDS[0]!.productName)).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Tạo phiếu TP khô/i })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: /Tạo phiếu TP khô/i })).not.toBeInTheDocument();
     expect(mocks.loadPilotRecords).not.toHaveBeenCalled();
   });
 
   it("keeps failed session data unavailable and allows retry into a genuine empty result", async () => {
-    mocks.loadWorkspace.mockRejectedValueOnce(new Error("Phiên đăng nhập đã hết hạn."));
+    mocks.getSession.mockRejectedValueOnce(new Error("Phiên đăng nhập đã hết hạn."));
     render(<App />);
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Phiên đăng nhập đã hết hạn.");
+    expect(await screen.findByText("Phiên đăng nhập đã hết hạn.")).toBeVisible();
     expect(screen.queryByText("Chưa có phiếu nào trên máy chủ.")).not.toBeInTheDocument();
     expect(screen.queryByText(DEMO_RECORDS[0]!.productName)).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Tạo phiếu TP khô/i })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: /Tạo phiếu TP khô/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Thiết lập cửa hàng/ })).not.toBeInTheDocument();
 
-    mocks.loadWorkspace.mockResolvedValueOnce({ ...workspace(), records: [] });
-    fireEvent.click(screen.getByRole("button", { name: "Thử tải lại" }));
-    await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
-    expect(screen.getAllByText("Chưa có phiếu nào trên máy chủ.")).toHaveLength(2);
+    const emptyWorkspace = { ...workspace(), records: [] };
+    mocks.login.mockResolvedValueOnce(emptyWorkspace.session);
+    mocks.loadHistory.mockResolvedValueOnce([]);
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên đăng nhập" }), { target: { value: "demo" } });
+    fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
+    expect(await screen.findAllByText("Chưa có phiếu nào trên máy chủ.")).toHaveLength(2);
     expect(screen.getByRole("button", { name: /Tạo phiếu TP khô/i })).toBeEnabled();
-    expect(mocks.loadWorkspace).toHaveBeenCalledTimes(2);
+    expect(mocks.getSession).toHaveBeenCalledOnce();
+    expect(mocks.login).toHaveBeenCalledWith("demo", "password");
+    expect(mocks.loadHistory).toHaveBeenCalledOnce();
   });
 
   it("keeps review, export and Pilot delete unavailable for online EMPLOYEE", async () => {
-    mocks.loadWorkspace.mockResolvedValue(workspace("EMPLOYEE"));
+    resolveWorkspace(workspace("EMPLOYEE"));
     render(<App />);
     await screen.findAllByText("Sản phẩm từ máy chủ");
 
@@ -117,7 +138,7 @@ describe("Online workspace boundary", () => {
     const managerWorkspace = workspace("STORE_MANAGER");
     const approved = { ...managerWorkspace.records[0]!, approvalStatus: "APPROVED" as const, reviewedBy: managerWorkspace.session.user.displayName };
     const exportStore = { ...managerWorkspace.store, code: "0456", name: "Snapshot từ máy chủ" };
-    mocks.loadWorkspace.mockResolvedValue(managerWorkspace);
+    resolveWorkspace(managerWorkspace);
     mocks.reviewRecord.mockResolvedValue(approved);
     mocks.prepareExport.mockResolvedValue({ exportId: "export-1", exportedAt: "2026-09-15T08:00:00Z", store: exportStore, records: [approved] });
     mocks.downloadKphWorkbook.mockResolvedValue("KPH.xlsx");
@@ -144,7 +165,7 @@ describe("Online workspace boundary", () => {
   it("surfaces the online export selection limit before sending a request", async () => {
     const managerWorkspace = workspace("STORE_MANAGER");
     const approved = { ...managerWorkspace.records[0]!, approvalStatus: "APPROVED" as const };
-    mocks.loadWorkspace.mockResolvedValue({
+    resolveWorkspace({
       ...managerWorkspace,
       records: [approved],
     });
@@ -163,7 +184,7 @@ describe("Online workspace boundary", () => {
 
   it("auto-filters inclusive detected dates with either bound and reports an inverted range", async () => {
     const base = workspace();
-    mocks.loadWorkspace.mockResolvedValue({
+    resolveWorkspace({
       ...base,
       records: [
         { ...base.records[0]!, id: "in-range", detectedDate: "10/09/2026", productName: "Trong khoảng" },
@@ -174,16 +195,16 @@ describe("Online workspace boundary", () => {
     await screen.findAllByText("Trong khoảng");
 
     fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "10/09/2026" } });
-    expect(screen.getAllByText("Trong khoảng")).toHaveLength(2);
+    expect(await screen.findAllByText("Trong khoảng")).toHaveLength(2);
     expect(screen.queryByText("Ngoài khoảng")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Xóa lọc ngày" }));
-    expect(screen.getAllByText("Trong khoảng")).toHaveLength(2);
+    expect(await screen.findAllByText("Trong khoảng")).toHaveLength(2);
     expect(screen.getAllByText("Ngoài khoảng")).toHaveLength(2);
 
     fireEvent.change(screen.getByLabelText("Đến ngày"), { target: { value: "09/09/2026" } });
-    expect(screen.queryByText("Trong khoảng")).not.toBeInTheDocument();
-    expect(screen.getAllByText("Ngoài khoảng")).toHaveLength(2);
+    await waitFor(() => expect(screen.queryByText("Trong khoảng")).not.toBeInTheDocument());
+    expect(await screen.findAllByText("Ngoài khoảng")).toHaveLength(2);
 
     fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "11/09/2026" } });
     expect(screen.getByRole("alert")).toHaveTextContent("Từ ngày không được sau đến ngày");

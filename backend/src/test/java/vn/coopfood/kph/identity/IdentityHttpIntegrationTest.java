@@ -36,6 +36,7 @@ class IdentityHttpIntegrationTest {
     private static final UUID ACTIVE_STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000001");
     private static final UUID INACTIVE_STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000002");
     private static final UUID REVOKED_STORE_ID = UUID.fromString("20000000-0000-4000-8000-000000000003");
+    private static final UUID REGION_ID = UUID.fromString("30000000-0000-4000-8000-000000000001");
 
     @Container
     @ServiceConnection
@@ -60,7 +61,7 @@ class IdentityHttpIntegrationTest {
 
     @BeforeEach
     void seedIdentity() {
-        database.execute("TRUNCATE TABLE app_users, stores CASCADE");
+        database.execute("TRUNCATE TABLE app_users, regions, stores CASCADE");
         Timestamp now = Timestamp.from(Instant.parse("2026-09-04T04:00:00Z"));
         database.execute(
                 "INSERT INTO app_users (id, username, password_hash, display_name, active, created_at, updated_at) "
@@ -71,6 +72,10 @@ class IdentityHttpIntegrationTest {
                 "Nguyễn Văn Demo",
                 now,
                 now);
+        database.execute("""
+                INSERT INTO regions (id, region_code, region_name, active, created_at, updated_at)
+                VALUES (?, 'R-01', 'Vùng 01', TRUE, ?, ?)
+                """, REGION_ID, now, now);
         insertStore(ACTIVE_STORE_ID, "0001", "Nguyễn Kiệm", true, now);
         insertStore(INACTIVE_STORE_ID, "0002", "Inactive store", false, now);
         insertStore(REVOKED_STORE_ID, "0003", "Revoked membership", true, now);
@@ -173,9 +178,10 @@ class IdentityHttpIntegrationTest {
 
     private void insertStore(UUID storeId, String code, String name, boolean active, Timestamp now) {
         database.execute(
-                "INSERT INTO stores (id, store_code, store_name, active, created_at, updated_at) "
-                        + "VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO stores (id, region_id, store_code, store_name, active, created_at, updated_at) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 storeId,
+                REGION_ID,
                 code,
                 name,
                 active,

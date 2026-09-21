@@ -1,142 +1,108 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-16
+Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`Online stability S01–S02 — CLOSED; PR #3 ready-for-review`
+`C01 catalog staging — CLOSED; integration PR #5 — OPEN`
 
-Pilot local-only theo ADR-0002 đã được project owner đóng ngày 2026-09-04 bằng
-acceptance tối thiểu. Pilot đang chạy được giữ nguyên, không tạo tag/deploy mới
-hoặc rehearsal rollback; `REL-01`–`REL-03` được waive một lần. Foundation-01 đã
-được owner chấp nhận và đóng ngày 2026-09-13. Owner mở Foundation-02 ngày
-2026-09-15 cho đúng một outcome: `STORE_MANAGER` duyệt/xuất online và người dùng
-lọc lịch sử theo khoảng ngày phát hiện.
+Repository là implementation mới của Co.op Food KPH. Hai repository cũ
+`coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
+tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
-Repository này là implementation mới. Hai repository tham chiếu
-`coopfood-kph-platform` và `tool-kph` chỉ được đọc để lấy provenance,
-business behavior và UI DNA; không tiếp tục phát triển sản phẩm trong đó.
+## Baseline đã chấp nhận
 
-## Đã mang sang
+- Pilot-00 local-only đã đóng ngày 2026-09-04 và được freeze theo ADR-0002;
+  IndexedDB chỉ là authority của từng thiết bị Pilot, không được mang sang online.
+- Foundation-01 đã đóng ngày 2026-09-13: login, store context, catalog lookup,
+  tạo/list phiếu và 1–3 ảnh private chạy qua backend online.
+- Foundation-02 đã đóng ngày 2026-09-16: lọc ngày phát hiện, duyệt có audit và
+  xuất phiếu `SUBMITTED + APPROVED` cho `STORE_MANAGER` đúng membership.
+- Online stability S01–S02 đã merge vào `main` qua PR #3 (`5358ad6`): response
+  tạo phiếu cũ không làm bẩn scope mới; duyệt lô đợi mọi request và báo kết quả
+  thành công/thất bại với concurrency giới hạn.
+- Online stability S03 đã được owner chấp nhận và merge vào `main` qua PR #4
+  ngày 2026-09-16 trên candidate
+  `05b462b`: workbook online dùng store snapshot từ response export; 500 phiếu
+  được gửi đủ, 501 bị chặn rõ ràng trước request. Cycle closeout ở
+  [plan](delivery/online-stability-s03/plan.json).
+- Online stability S04 được owner “tạm cho pass” ngày 2026-09-17 trên candidate
+  `ebc9cdc`: online history dùng TanStack Query làm authority duy nhất, cache
+  tách theo user/store/date filter và Pilot giữ local state riêng. Candidate chưa
+  rerun được real-backend E2E do Docker không sẵn sàng; giới hạn lịch sử này đã
+  được khép lại trong preflight PR #5 ngày 2026-09-21, xem
+  [S04 evidence](delivery/online-stability-s04/technical-evidence.md).
+- P01 provisioning policy được owner chấp nhận ngày 2026-09-17: hierarchy
+  `CHAIN_ADMIN` toàn chuỗi → `REGION_MANAGER` đúng vùng → `STORE_MANAGER` đúng
+  store; credential/bootstrap/lifecycle theo security baseline. P01 chỉ khóa
+  contract/fixture, chưa triển khai schema/API/Admin UI.
+- P02 scoped authorization đã được owner chấp nhận ngày 2026-09-21 trên branch
+  `codex/p02-scoped-authorization`: resolver scope store được tách khỏi policy
+  capability KPH; migration V6 dùng relational constraint chống race cho invariant
+  active store → active region; backend deny inherited scope khi store/region
+  inactive. Yêu cầu đặt lịch deactivate store/region trước tối thiểu 30 ngày
+  được chuyển sang contract lifecycle kế tiếp, không làm thay đổi candidate P02.
 
-- Hợp đồng nghiệp vụ ngày, KPH, catalog/barcode, ảnh và Excel trong
-  `docs/product/DOMAIN_RULES.md`.
-- UI DNA, behavior inventory và screen map legacy, có provenance rõ ràng.
-- Fixture tổng hợp cho biên ngày, option matrix KPH, catalog identifier,
-  image envelope/timestamp và cấu trúc Excel.
-- OpenAPI v1 tối thiểu cho health, session, store context, barcode lookup và
-  KPH create/list. Frontend và backend dùng contract này là ranh giới cộng tác.
-- Contract Lock kiểm schema/examples và golden option matrix. Migration V2
-  đồng bộ đơn vị `kg`, đủ năm tình trạng mỗi loại như Pilot, và số lượng `EA`
-  nguyên/`kg` thập phân dương; không tự làm tròn số lượng trước validation.
-  `DAMAGED` trong dữ liệu database cũ chuyển sang `OTHER` kèm provenance;
-  không suy diễn thành Dập úng hay Thối mốc, không migrate IndexedDB Pilot.
-- Store PWA đã có component shell React giữ brand header, store/session context,
-  hai entry TPCN/TPTS, lịch sử table/card responsive, form demo và tra hạn.
-- Pilot Store PWA cho cấu hình context cửa hàng/người dùng theo từng thiết bị,
-  lưu trong IndexedDB; tên và mã cửa hàng 4 chữ số là bắt buộc, thông tin nhân
-  sự là tùy chọn. Cấu hình local này không phải authorization của topology đích.
-- Admin Web đã có entry point riêng; `packages/ui` giữ các source component
-  shadcn-style trên Radix, không mang DOM/CSS bundle legacy sang.
-- `packages/kph-rules` chạy trực tiếp golden fixture ngày và KPH; API types được
-  sinh từ OpenAPI và transport dùng `openapi-fetch` với session/CSRF.
-- Backend Java 21/Spring Boot đã có baseline migration 15 bảng, security
-  default-deny, ProblemDetail, business clock, ArchUnit và database smoke test.
-- Foundation-01 đã có KPH create/list/photo HTTP handlers với idempotency,
-  catalog/store/actor snapshot bất biến và local private original/stamped media;
-  Store PWA có adapter online dùng cùng OpenAPI cho session, history, lookup và
-  create multipart, bật bằng `VITE_KPH_ONLINE=true`.
-- Catalog lookup và snapshot creation dùng chung resolver published/current;
-  test KPH bao gồm barcode miss giữ nhập tay, fixed business clock và thư mục
-  media tạm. Seed nâng cấp V1 tách khỏi seed có snapshot V4.
-- Có workflow PR `Verify Foundation` cho frontend và backend. Full backend
-  verification yêu cầu Docker; integration không tự skip khi thiếu runtime.
-- Verification local ngày 2026-09-09: `npm run verify` pass 117 test và build;
-  backend `./mvnw -q verify` qua OrbStack/PostgreSQL 17 pass 30 test, không skip,
-  gồm database sạch và nâng cấp V1→V4. Workflow CI chưa được chạy trên GitHub.
-- Đợt tiếp theo làm rõ vùng dùng chung Pilot/online: model hiển thị `RecordView`
-  tách khỏi fixture demo; table/card nhận callback thao tác từ workspace; bỏ
-  state duyệt trùng. Online context/người nhập chỉ đọc từ session, có trạng thái
-  loading/error/empty và retry tải workspace; dialog Pilot không mount ở online.
-- Verification frontend sau đợt ranh giới: `npm run verify` pass 121 test và
-  build, gồm 4 ca online loading/retry và capability EMPLOYEE/STORE_MANAGER.
-  Đây là component tests với gateway mock, chưa thay thế browser E2E.
-- Pilot đã có IndexedDB cho phiếu/stamped image/trash/export history, scanner
-  camera với fallback, image processing/viewer, service worker và Excel baseline.
-- Device/browser matrix và workbook TPCN/TPTS đã được đóng theo acceptance tối
-  thiểu của Pilot-00; acceptance ledger và runbook nằm trong `docs/pilot/`.
+## Hệ thống hiện có
 
-- Kiểm tra bản tích hợp ngày 2026-09-10: frontend 133 tests và build pass;
-  backend 36 tests, không skip; jOOQ 3.20.17/PostgreSQL 17 tương thích. Build
-  online riêng tại `.local/online-dist`; log tại `.local/verification` (gitignored).
-- Candidate cuối `92fb895` pass local frontend 135 tests/build, backend 36 tests
-  không skip và browser E2E 5 pass/3 viewport-specific skip. PR #2 pass đủ ba
-  job remote `frontend`, `backend`, `browser`; owner chấp nhận flow/UI và yêu cầu
-  chốt milestone ngày 2026-09-13.
+- Một Spring Boot modular monolith, PostgreSQL 17, Flyway và jOOQ; Store PWA và
+  Admin Web là hai entry point dùng chung OpenAPI 3.1/generated TypeScript client.
+- Backend giữ authority cho session, role, active store membership, store scope,
+  catalog published/current, snapshot KPH, approval/audit và private media.
+- Store PWA online hỗ trợ login → chọn cửa hàng → lookup barcode/manual fallback
+  → tạo phiếu → history/filter → duyệt → xuất Excel. Pilot tiếp tục có persistence,
+  trash, scanner, stamped image và export local riêng.
+- P03 bổ sung lịch ngừng hoạt động vùng/cửa hàng (tối thiểu 30 ngày), đổi/hủy/
+  thực thi thủ công khi đến hạn, audit và Admin Web cùng contract. Lịch không tự
+  chạy; owner đã chấp nhận lựa chọn tối thiểu này ngày 2026-09-21. Preview local
+  dùng dữ liệu tổng hợp riêng, không dùng dữ liệu vận hành thật.
+- C01 bổ sung catalog staging/validation CSV cho `CATALOG_ADMIN`: giữ identifier
+  dạng string, trả lỗi theo dòng, replay idempotent theo checksum và không tạo
+  catalog published. Owner đã chấp nhận ngày 2026-09-21.
+- Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
+  [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
-## Ngoài phạm vi đã hoãn
+## Kiểm chứng gần nhất
 
-- Chưa chốt hosting, PostgreSQL/object storage provider, retention, SSO/MFA,
-  primary supplier khi một product có nhiều NCC, edit workflow hoặc cửa sổ duyệt.
-- Online chỉ hỗ trợ JPEG/PNG; chưa có HEIC online, thiết bị iPhone thật, production
-  rollout hoặc offline sync. Các giới hạn này không thuộc
-  acceptance Foundation-01 và được giữ cho milestone sau.
+- PR #4 đã merge S03 vào `main`; nhánh hiện tại dùng đúng tree PR #4 làm nền và
+  chỉ lệch `origin/main` bởi merge commit, không có content conflict.
+- Ngày 2026-09-17, P01 Contract Lock bao phủ role hierarchy, cross-store/
+  cross-region denial, last-admin/last-manager và credential/bootstrap guard.
+- Ngày 2026-09-21, P02 scoped authorization full backend test PASS trên
+  PostgreSQL 17 qua Testcontainers, gồm clean/upgrade V1→V6, lifecycle
+  active store/region, inactive store/region denial, cross-region denial,
+  region grant/revoke request kế tiếp và chain-wide access; `npm run verify`
+  PASS. Owner đã cho pass phần còn lại ngày 2026-09-21.
+- Ngày 2026-09-21, C01 `npm run verify` PASS 155 frontend tests/build/Contract
+  Lock; 53 backend tests PASS trên PostgreSQL; real-backend browser E2E PASS
+  upload/replay/reject và lookup isolation. Owner đã cho pass cùng ngày.
+- Ngày 2026-09-17, S04 `npm run verify` PASS docs/Contract Lock, generated API
+  drift, TypeScript, 147 tests và build; browser fixture review pass 7 viewport.
+- Ngày 2026-09-21, preflight PR #5 đã chạy lại Foundation real-backend browser
+  suite trên PostgreSQL 17/backend thật sau migrations V1–V8: PASS 6, skip 4
+  theo viewport. Seed đã được đồng bộ với hierarchy V6 và expectation
+  `CHAIN_ADMIN` với policy P02. Warning chunk lớn vẫn là baseline chưa có số đo
+  thiết bị.
 
-## Ranh giới hiện tại
+## Ranh giới và phần hoãn
 
-- Modular monolith, hai frontend entry point, một OpenAPI contract.
-- Backend quyết định session, role, store membership và data isolation.
-- Không microservice, queue, Redis, offline outbox hay production infrastructure
-  trong foundation này.
-- Không copy DOM imperative, CSS override, generator API viết tay, JDBC mapping
-  hoặc EXIF parser tự viết từ implementation cũ.
-- Pilot đang chạy được freeze, chỉ nhận security/critical fix; dữ liệu Pilot
-  không được migrate sang authority online.
+- Không thêm microservice, queue, Redis, search engine, offline outbox hoặc
+  production infrastructure khi chưa có requirement/ADR.
+- Chưa chốt hosting/storage/retention, SSO/MFA, primary supplier nhiều NCC,
+  edit/invalidate workflow hoặc cửa sổ duyệt.
+- Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật, production rollout,
+  paging history và backup/restore online vẫn là backlog có outcome riêng.
+- Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
-## Checkpoint sau review nhánh — 2026-09-11
+## Điểm tiếp tục
 
-Scanner fix đã tích hợp tại `ca180af` và push lên origin; frontend hiện 135 tests
-và build pass. Chỉ có worktree chính, report E2E cũ được ignore đúng ở Foundation.
-Draft PR public đang chờ xác nhận do automatic approval review; không coi remote
-CI hoặc owner acceptance là đã hoàn tất. Chi tiết điểm tiếp tục ở NEXT.
-
-## UI feedback reopened — 2026-09-12
-
-Owner chưa chấp nhận giao diện. Đã cài `ui-ux-pro-max` và chuẩn hoá Store PWA:
-login riêng, phân cấp workspace/cửa hàng, thao tác mobile và form; thêm script
-review UI dùng fixture. Xem [UI evidence](evidence/foundation-01/ui-review-2026-09-12.md).
-Owner đã kiểm tra một số phần, chấp nhận flow/UI và yêu cầu chốt ngày 2026-09-13.
-Không triển khai Pilot trong đợt này.
-
-## Foundation-01 closeout — 2026-09-13
-
-PR #2 đã có remote CI xanh trên candidate `92fb895`; bằng chứng local, CI, nguồn
-owner acceptance và giới hạn hoãn được ghi tại
-[closeout](evidence/foundation-01/closeout-2026-09-13.md). Foundation-01 đóng;
-không tự khởi động milestone hoặc production rollout tiếp theo.
-
-## Foundation-02 closeout — 2026-09-16
-
-Cycle record: [foundation-02-online-review-export](delivery/foundation-02-online-review-export/plan.json).
-Revision 3 giữ khoảng ngày `detectedFrom`/`detectedTo` inclusive trên
-`detected_date`; approval `PENDING/APPROVED/REJECTED` có history/audit; export
-chỉ nhận record `SUBMITTED + APPROVED` cùng store/type và lấy reviewer snapshot
-cho cột R. Chỉ `STORE_MANAGER` đúng active membership được mutation;
-`EMPLOYEE` chỉ xem/tạo và `CHAIN_ADMIN` không bypass. Theo phản hồi owner,
-date filter chỉ còn hai ô, mũi tên và nút xóa; ngày hoàn chỉnh hợp lệ tự áp dụng,
-lọc một đầu được hỗ trợ. Desktop giữ một hàng compact, mobile đưa ngày vào hộp
-“Lọc & sắp xếp” hiện có. Integrated/browser/visual evidence revision 3 đã đạt;
-project owner chấp nhận candidate `f179b38` ngày 2026-09-16 và cycle đã đóng.
-Không có deploy, merge hoặc milestone kế tiếp được mở ngầm từ quyết định này.
-
-## Online stability S01–S02 closeout — 2026-09-16
-
-Cycle [online-stability-s01-s02](delivery/online-stability-s01-s02/plan.json)
-đã đóng ở revision 3 sau khi project owner xác nhận “pass, làm tiếp”. Candidate
-`6836bc5` chặn response tạo phiếu từ store/session cũ và xử lý duyệt lô theo
-settled result với giới hạn bốn request đồng thời. Quick runtime macOS có script
-start/stop, PostgreSQL/media/fixture tổng hợp riêng và đã pass lifecycle thực.
-
-PR #3 pass remote CI `frontend`, `backend`, `browser`, hiện đã chuyển từ draft
-sang ready-for-review. Chưa merge `main`, deploy hoặc mở S03; các bước đó cần
-yêu cầu riêng để không mở rộng scope ngầm.
+P03 và C01 đã đóng theo owner acceptance; close record ở
+[P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
+[C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
+accepted S04 → P01 → P02 → P03 → C01 đã mở và đang chờ remote CI/review. C02
+chưa nên mở trước khi chốt primary supplier; primary supplier và lookup current
+vẫn là quyết định nghiệp vụ riêng.
+Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
+Kết quả P02 nằm trong
+[P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
+đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).

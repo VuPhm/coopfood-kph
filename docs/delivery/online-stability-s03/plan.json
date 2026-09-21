@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "online-stability-s03",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Bảo đảm Store PWA online tạo workbook từ store snapshot authoritative của response export và báo rõ giới hạn 500 phiếu trước khi gửi request export.",
   "inScope": [
     "Giữ store snapshot trong OnlineExportBundle và chuyển nó thành StoreProfile dùng cho header workbook online",
@@ -42,13 +42,15 @@
       "id": "owner-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
       "sha": "05b462b4ee6632e14dbe4c147b6c341eb6a5d420",
-      "evidence": "docs/delivery/online-stability-s03/acceptance-handoff.md"
+      "evidence": "docs/delivery/online-stability-s03/acceptance-handoff.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "Codex user message 2026-09-17: tự xác minh, tôi cho pass, sau đó có thể tiếp rồi"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Project owner reviews the S03 handoff and accepts the candidate or gives one bounded correction list."
+  "nextAction": "Cycle đã đóng theo owner acceptance. Cập nhật CURRENT_STATE/NEXT, sau đó mở S04 theo yêu cầu tiếp tục riêng ngày 2026-09-17."
 }

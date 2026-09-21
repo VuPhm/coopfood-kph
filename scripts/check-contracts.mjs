@@ -11,6 +11,10 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const contractPath = path.join(repositoryRoot, "contracts/openapi/kph.openapi.yaml");
 const fixturesRoot = path.join(repositoryRoot, "contracts/fixtures");
 const manifestPath = path.join(fixturesRoot, "golden/fixture-manifest.json");
+const provisioningPolicyFixturePath = path.join(
+  fixturesRoot,
+  "golden/identity/provisioning-policy-cases.json",
+);
 const contractSchemaId = "urn:coopfood-kph:openapi";
 const acceptedKphLookupStatuses = ["FOUND", "NOT_FOUND", "MANUAL"];
 
@@ -22,6 +26,11 @@ const apiFixtureSchemas = new Map([
   ["api/kph-create.json", "KphCreateRequest"],
   ["api/kph-approval.json", "KphApprovalRequest"],
   ["api/kph-export.json", "KphExportRequest"],
+  ["api/lifecycle-targets.json", "LifecycleTarget"],
+  ["api/lifecycle-schedules.json", "LifecycleSchedule"],
+  ["api/catalog-imports.json", "CatalogImportBatch"],
+  ["api/catalog-import-detail.json", "CatalogImportDetail"],
+  ["api/catalog-import-upload.json", "CatalogImportUploadResponse"],
 ]);
 
 const acceptedKphPolicies = {
@@ -189,7 +198,11 @@ async function validateApiFixtures(openApi) {
 
   for (const [resource, componentName] of apiFixtureSchemas) {
     const fixture = await readJson(path.join(fixturesRoot, resource));
-    validateFixture(ajv, componentName, fixture, resource);
+    if (Array.isArray(fixture)) {
+      fixture.forEach((item, index) => validateFixture(ajv, componentName, item, `${resource}[${index}]`));
+    } else {
+      validateFixture(ajv, componentName, fixture, resource);
+    }
     fixtures.set(resource, fixture);
   }
 
@@ -379,6 +392,124 @@ async function validateGoldenKphEnums(openApi) {
   );
 }
 
+function assertProvisioningCase(casesById, caseId, decision, reason) {
+  const fixtureCase = casesById.get(caseId);
+  assert.ok(fixtureCase, `Missing required provisioning policy case ${caseId}.`);
+  assert.equal(fixtureCase.expected.decision, decision, `${caseId} decision changed.`);
+  assert.equal(fixtureCase.expected.reason, reason, `${caseId} reason changed.`);
+}
+
+function assertNoSensitiveFixtureKeys(value, location = "fixture") {
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => assertNoSensitiveFixtureKeys(entry, `${location}[${index}]`));
+    return;
+  }
+  if (value === null || typeof value !== "object") return;
+
+  for (const [key, child] of Object.entries(value)) {
+    assert.doesNotMatch(
+      key,
+      /(password|secret|hash|token|session)/i,
+      `${location}.${key} must not model or contain credential material.`,
+    );
+    assertNoSensitiveFixtureKeys(child, `${location}.${key}`);
+  }
+}
+
+async function validateProvisioningPolicyCases() {
+  const fixture = await readJson(provisioningPolicyFixturePath);
+  assert.equal(fixture.provenance, "synthetic", "Provisioning fixture must remain synthetic.");
+  assert.equal(fixture.approvalStatus, "accepted", "P01 fixture must reflect owner acceptance.");
+  assert.equal(fixture.policyVersion, 2, "Unexpected provisioning policy fixture version.");
+  assert.equal(
+    fixture.conventions?.listedGrantsAreActive,
+    true,
+    "Listed fixture grants must explicitly represent active grants.",
+  );
+  assert.equal(
+    fixture.conventions?.storeRegionSource,
+    "SERVER_AUTHORITY",
+    "Store-to-region scope must be resolved by the server.",
+  );
+  assert.ok(Array.isArray(fixture.cases) && fixture.cases.length > 0, "Provisioning cases must not be empty.");
+  assertNoSensitiveFixtureKeys(fixture);
+
+  const caseIds = fixture.cases.map((fixtureCase) => fixtureCase.caseId);
+  assert.equal(new Set(caseIds).size, caseIds.length, "Provisioning case IDs must be unique.");
+  const casesById = new Map(fixture.cases.map((fixtureCase) => [fixtureCase.caseId, fixtureCase]));
+
+  for (const fixtureCase of fixture.cases) {
+    assert.match(fixtureCase.caseId, /^ID-P01-\d{3}$/, "Provisioning case ID must use ID-P01-NNN.");
+    assert.ok(["ALLOW", "DENY"].includes(fixtureCase.expected?.decision), `${fixtureCase.caseId} has invalid decision.`);
+    assert.equal(typeof fixtureCase.expected?.reason, "string", `${fixtureCase.caseId} must state a reason.`);
+    assert.ok(Array.isArray(fixtureCase.expected?.effects), `${fixtureCase.caseId} effects must be an array.`);
+  }
+
+  assertProvisioningCase(casesById, "ID-P01-001", "ALLOW", "CHAIN_ADMIN_PROVISIONS_IDENTITY");
+  assertProvisioningCase(casesById, "ID-P01-002", "DENY", "IDENTITY_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-003", "DENY", "IDENTITY_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-004", "ALLOW", "CHAIN_WIDE_ADMIN");
+  assertProvisioningCase(casesById, "ID-P01-005", "ALLOW", "REGION_SCOPED_MANAGER");
+  assertProvisioningCase(casesById, "ID-P01-006", "DENY", "SELF_LOCKOUT_FORBIDDEN");
+  assertProvisioningCase(casesById, "ID-P01-007", "DENY", "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-009", "DENY", "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-010", "DENY", "LAST_ACTIVE_STORE_MANAGER_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-012", "DENY", "ACTIVE_STORE_MANAGER_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-013", "ALLOW", "ADMIN_RESETS_OTHER_USER");
+  assertProvisioningCase(casesById, "ID-P01-014", "DENY", "USE_SELF_CHANGE");
+  assertProvisioningCase(casesById, "ID-P01-016", "ALLOW", "FIRST_ADMIN_ONLY");
+  assertProvisioningCase(casesById, "ID-P01-017", "DENY", "BOOTSTRAP_ALREADY_CONSUMED");
+  assertProvisioningCase(casesById, "ID-P01-018", "ALLOW", "NO_ACTIVE_ADMIN");
+  assertProvisioningCase(casesById, "ID-P01-019", "DENY", "ACTIVE_ADMIN_EXISTS");
+  assertProvisioningCase(casesById, "ID-P01-020", "DENY", "SOFT_LIFECYCLE_ONLY");
+  assertProvisioningCase(casesById, "ID-P01-021", "DENY", "IDENTITY_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-022", "DENY", "SOFT_LIFECYCLE_ONLY");
+  assertProvisioningCase(casesById, "ID-P01-023", "DENY", "SOFT_LIFECYCLE_ONLY");
+  assertProvisioningCase(casesById, "ID-P01-024", "DENY", "LAST_ACTIVE_STORE_MANAGER_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-025", "DENY", "LAST_ACTIVE_STORE_MANAGER_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-026", "DENY", "ACTIVE_REGION_ASSIGNMENT_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-027", "ALLOW", "STORE_SCOPED_MANAGER");
+  assertProvisioningCase(casesById, "ID-P01-028", "DENY", "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-029", "ALLOW", "REGION_SCOPED_MEMBERSHIP_ADMIN");
+  assertProvisioningCase(casesById, "ID-P01-030", "DENY", "ACTIVE_REGION_ASSIGNMENT_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-031", "DENY", "CHAIN_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-032", "ALLOW", "CHAIN_ADMIN_MANAGES_REGION_SCOPE");
+  assertProvisioningCase(casesById, "ID-P01-033", "DENY", "IDENTITY_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-034", "DENY", "CHAIN_ADMIN_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-035", "DENY", "ACTIVE_REGION_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-036", "ALLOW", "CHAIN_WIDE_ADMIN");
+
+  assert.deepEqual(
+    casesById.get("ID-P01-004").actor.globalRoles,
+    ["CHAIN_ADMIN"],
+    "Chain-wide KPH access must explicitly exercise CHAIN_ADMIN.",
+  );
+  assert.deepEqual(
+    casesById.get("ID-P01-005").actor.regionAssignments,
+    ["REGION-SOUTH"],
+    "Regional KPH approval must require an explicit region assignment.",
+  );
+  assert.equal(
+    casesById.get("ID-P01-005").context.storeRegion,
+    "REGION-SOUTH",
+    "Regional allow case must resolve a store inside the assigned region.",
+  );
+  assert.equal(
+    casesById.get("ID-P01-026").context.storeRegion,
+    "REGION-NORTH",
+    "Regional deny case must exercise a valid store outside the assigned region.",
+  );
+  assert.deepEqual(
+    casesById.get("ID-P01-027").actor.memberships,
+    [{ store: "STORE-001", role: "STORE_MANAGER" }],
+    "Store-scoped KPH export must require an explicit store manager membership.",
+  );
+  assert.ok(
+    casesById.get("ID-P01-013").expected.effects.includes("INVALIDATE_EXISTING_ACCESS"),
+    "Admin credential reset must invalidate existing access.",
+  );
+}
+
 async function main() {
   await validateOpenApiStructure();
   const manifest = await validateManifestAndJsonSyntax();
@@ -386,6 +517,7 @@ async function main() {
   assert.equal(openApi.openapi, "3.1.0", "Contract Lock requires OpenAPI 3.1.0.");
   await validateApiFixtures(openApi);
   await validateGoldenKphEnums(openApi);
+  await validateProvisioningPolicyCases();
   console.log(
     `Contract Lock passed: ${manifest.fixtures.length} manifest resources, ${apiFixtureSchemas.size} API fixtures.`,
   );

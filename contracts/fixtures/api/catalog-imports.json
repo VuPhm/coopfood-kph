@@ -1,0 +1,32 @@
+[
+  {
+    "id": "71000000-0000-4000-8000-000000000001",
+    "checksumSha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "originalFilename": "catalog-valid.csv",
+    "fileSizeBytes": 246,
+    "status": "VALIDATED",
+    "rowCount": 2,
+    "validRowCount": 2,
+    "errorRowCount": 0,
+    "createdBy": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "displayName": "Quản trị catalog mẫu"
+    },
+    "createdAt": "2026-09-21T09:30:00+07:00"
+  },
+  {
+    "id": "71000000-0000-4000-8000-000000000002",
+    "checksumSha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+    "originalFilename": "catalog-conflict.csv",
+    "fileSizeBytes": 218,
+    "status": "REJECTED",
+    "rowCount": 2,
+    "validRowCount": 0,
+    "errorRowCount": 2,
+    "createdBy": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "displayName": "Quản trị catalog mẫu"
+    },
+    "createdAt": "2026-09-21T09:20:00+07:00"
+  }
+]

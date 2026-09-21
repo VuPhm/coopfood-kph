@@ -6,25 +6,30 @@ import type { RecordView } from "./record-view";
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
+  listStores: vi.fn(),
   loadHistory: vi.fn(),
   loadWorkspace: vi.fn(),
   login: vi.fn(),
   logout: vi.fn(),
   createRecord: vi.fn(),
   reviewRecord: vi.fn(),
+  prepareExport: vi.fn(),
   lookupBarcode: vi.fn(),
 }));
 
 vi.mock("./online-kph", () => ({
   onlineModeEnabled: () => true,
+  onlineExportSelectionError: () => null,
   createOnlineGateway: () => ({
     getSession: mocks.getSession,
+    listStores: mocks.listStores,
     loadHistory: mocks.loadHistory,
     loadWorkspace: mocks.loadWorkspace,
     login: mocks.login,
     logout: mocks.logout,
     createRecord: mocks.createRecord,
     reviewRecord: mocks.reviewRecord,
+    prepareExport: mocks.prepareExport,
     lookupBarcode: mocks.lookupBarcode,
   }),
 }));
@@ -180,15 +185,42 @@ describe("online identity and scoped query state", () => {
 
   it("applies a create response while the original session and store are still current", async () => {
     const pendingCreate = deferred<ReturnType<typeof record>>();
+    const created = record("created-in-current-scope", "Phiếu đúng scope");
+    let history = [record(storeA.id, "Phiếu cửa hàng A")];
+    mocks.loadHistory.mockImplementation((storeId: string) => Promise.resolve(storeId === storeA.id
+      ? history
+      : [record(storeB.id, "Phiếu cửa hàng B")]));
     mocks.createRecord.mockReturnValueOnce(pendingCreate.promise);
     render(<App />);
     await screen.findAllByText("Phiếu cửa hàng A");
     await submitOnlineRecord("Phiếu đúng scope");
 
-    await act(async () => pendingCreate.resolve(record("created-in-current-scope", "Phiếu đúng scope")));
+    history = [created, ...history];
+    await act(async () => pendingCreate.resolve(created));
     expect(await screen.findAllByText("Phiếu đúng scope")).toHaveLength(2);
     expectSelectedCount(1);
     expect(screen.getByText(/Đã tạo phiếu created-in-current-scope/)).toBeVisible();
+  });
+
+  it("refetches the active date scope without selecting a created record outside that filter", async () => {
+    const existing = record("existing-before-filter", "Phiếu trước khoảng lọc");
+    const createdOutsideFilter = record("created-outside-filter", "Phiếu ngoài khoảng lọc");
+    mocks.loadHistory.mockImplementation((_storeId: string, filter: { detectedFrom?: string } = {}) => Promise.resolve(
+      filter.detectedFrom ? [] : [existing],
+    ));
+    mocks.createRecord.mockResolvedValue(createdOutsideFilter);
+    render(<App />);
+    await screen.findAllByText(existing.productName);
+
+    fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "10/09/2026" } });
+    expect(await screen.findAllByText("Chưa có phiếu nào trên máy chủ.")).toHaveLength(2);
+    await submitOnlineRecord(createdOutsideFilter.productName);
+
+    expect(await screen.findByText(/Đã tạo phiếu created-outside-filter/)).toBeVisible();
+    expect(screen.queryByText(createdOutsideFilter.productName)).not.toBeInTheDocument();
+    expectSelectedCount(0);
+    expect(mocks.loadHistory).toHaveBeenLastCalledWith(storeA.id, { detectedFrom: "2026-09-10" }, expect.anything());
+    expect(mocks.loadHistory.mock.calls.filter(([, filter]) => filter?.detectedFrom === "2026-09-10")).toHaveLength(2);
   });
 
   it("waits for the whole review batch, reports partial failure, and retries only failed records", async () => {

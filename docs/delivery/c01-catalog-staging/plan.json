@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "id": "c01-catalog-staging",
+  "revision": 1,
+  "status": "CLOSED",
+  "objective": "Triển khai C01 catalog staging/validation từ CSV tổng hợp qua OpenAPI chung: CATALOG_ADMIN upload, xem batch và lỗi theo dòng; identifier được giữ dạng string, duplicate barcode bị reject, upload cùng checksum idempotent và dữ liệu staging tuyệt đối không xuất hiện trong lookup trước C02 publish.",
+  "inScope": [
+    "Khóa contract C01 cho UTF-8 CSV 5 cột NCC/Tên NCC/UPC/SKU/Tên sản phẩm, quoted field chuẩn CSV, identifier trim nhưng không ép số và giữ leading zero",
+    "Public OpenAPI, examples, fixtures và generated TypeScript client cho list/detail/upload catalog import batch",
+    "Một Flyway migration V8 bổ sung actor cho import batch; tái sử dụng schema staging V1, không tạo catalog version published",
+    "Backend chỉ cho active CATALOG_ADMIN; CHAIN_ADMIN không ngầm có quyền catalog; CSRF và session refresh giữ nguyên",
+    "Validation file/header/size/row count, required values, supplier/product consistency và barcode uniqueness với message theo dòng",
+    "Upload cùng SHA-256 trả batch immutable đã có; file khác tạo batch mới; batch có lỗi REJECTED, không lỗi VALIDATED",
+    "Audit append-only kết quả import không chứa file/raw row/PII đầy đủ",
+    "Admin Web chuyển workspace theo capability, upload CSV, hiển thị summary và lỗi theo dòng bằng table desktop/card mobile, feedback/focus accessible",
+    "Unit/component và PostgreSQL integration tests bao phủ leading zero, quoted comma, duplicate barcode, replay checksum, authorization, CSRF, audit và lookup isolation"
+  ],
+  "outOfScope": [
+    "Publish/retire catalog, chọn primary supplier hoặc làm staging thành current lookup",
+    "XLSX, Google Sheets, mapping cột tùy ý, background job hoặc object storage cho file import",
+    "Provision CATALOG_ADMIN, quản trị identity/credential, notification và production rollout",
+    "Sửa Store PWA, lookup semantics published hiện có hoặc migration dữ liệu thật"
+  ],
+  "baseSha": "b382c3b07bc6cd8544f4159b071ee53d420b5068",
+  "candidateSha": "7c73a13dabbc8bd63439b0705b249aa724551d88",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/kph.openapi.yaml",
+    "contracts/fixtures/catalog/**",
+    "contracts/fixtures/api/**",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "scripts/check-contracts.mjs",
+    "packages/api/src/generated/schema.d.ts",
+    "backend/src/main/resources/db/migration/V8__catalog_staging_actor.sql",
+    "backend/src/main/java/vn/coopfood/kph/catalog/**",
+    "backend/src/main/java/vn/coopfood/kph/foundation/security/SecurityConfiguration.java",
+    "backend/src/test/java/vn/coopfood/kph/catalog/**",
+    "backend/src/test/java/vn/coopfood/kph/foundation/DatabaseSmokeTest.java",
+    "apps/admin-web/src/**",
+    "e2e/scripts/review-admin-catalog.cjs",
+    "e2e/scripts/start-c01-acceptance.sh",
+    "e2e/scripts/stop-c01-acceptance.sh",
+    "e2e/scripts/verify-c01-catalog.cjs",
+    "e2e/seed/c01-catalog.sql",
+    "docs/product/CATALOG_STAGING_CONTRACT.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/c01-catalog-staging/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-catalog-staging",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "7c73a13dabbc8bd63439b0705b249aa724551d88",
+      "evidence": "docs/delivery/c01-catalog-staging/technical-evidence.md"
+    },
+    {
+      "id": "owner-catalog-staging-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "7c73a13dabbc8bd63439b0705b249aa724551d88",
+      "evidence": "docs/delivery/c01-catalog-staging/acceptance-decision.md",
+      "acceptedBy": "project owner",
+      "decisionRef": "Current Codex task, user message on 2026-09-21: pass, xem xét pr hoặc tiếp tục xem xét các candidate"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "C01 đã đóng theo owner acceptance. Đánh giá điểm tích hợp PR so với tiếp tục candidate kế tiếp; không tự mở C02 khi primary supplier chưa được chốt."
+}

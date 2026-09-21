@@ -16,6 +16,8 @@ tags:
   - name: Stores
   - name: Catalog
   - name: KPH
+  - name: Admin lifecycle
+  - name: Admin catalog
 security:
   - sessionCookie: []
 paths:
@@ -358,6 +360,287 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/admin/lifecycle/targets:
+    get:
+      tags: [Admin lifecycle]
+      operationId: listLifecycleTargets
+      summary: List active region/store targets the actor may schedule
+      description: |
+        CHAIN_ADMIN sees active regions and stores chain-wide. REGION_MANAGER
+        sees active stores only in active assigned regions. The backend derives
+        every effective region from PostgreSQL.
+      responses:
+        '200':
+          description: Authorized active lifecycle targets.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LifecycleTarget'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/lifecycle/schedules:
+    get:
+      tags: [Admin lifecycle]
+      operationId: listLifecycleSchedules
+      summary: List lifecycle schedules visible to the actor
+      responses:
+        '200':
+          description: Schedules newest first, constrained to current actor scope.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LifecycleSchedule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Admin lifecycle]
+      operationId: createLifecycleSchedule
+      summary: Schedule a store or region deactivation at least 30 days ahead
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleScheduleCreateRequest'
+      responses:
+        '201':
+          description: Deactivation schedule created; the target remains active.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/LifecycleValidation'
+
+  /api/v1/admin/lifecycle/schedules/{scheduleId}:
+    put:
+      tags: [Admin lifecycle]
+      operationId: rescheduleLifecycleDeactivation
+      summary: Move a pending lifecycle schedule to another valid effective date
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleRescheduleRequest'
+      responses:
+        '200':
+          description: Pending schedule updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/LifecycleValidation'
+
+  /api/v1/admin/lifecycle/schedules/{scheduleId}/cancel:
+    post:
+      tags: [Admin lifecycle]
+      operationId: cancelLifecycleSchedule
+      summary: Cancel a pending lifecycle schedule without deleting its history
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleReasonRequest'
+      responses:
+        '200':
+          description: Schedule marked cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/LifecycleValidation'
+
+  /api/v1/admin/lifecycle/schedules/{scheduleId}/execute:
+    post:
+      tags: [Admin lifecycle]
+      operationId: executeLifecycleSchedule
+      summary: Manually execute a due lifecycle schedule
+      description: |
+        The backend locks and revalidates schedule state, effective date,
+        target state, actor scope and lifecycle guards in the same transaction.
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LifecycleReasonRequest'
+      responses:
+        '200':
+          description: Target deactivated and schedule marked executed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleSchedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+        '422':
+          $ref: '#/components/responses/LifecycleValidation'
+
+  /api/v1/admin/catalog/imports:
+    get:
+      tags: [Admin catalog]
+      operationId: listCatalogImports
+      summary: List the latest immutable catalog staging batches
+      description: Requires active CATALOG_ADMIN; CHAIN_ADMIN is not an implicit catalog role.
+      responses:
+        '200':
+          description: At most 50 batches, newest first. Staging never affects store lookup.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogImportBatch'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Admin catalog]
+      operationId: uploadCatalogImport
+      summary: Validate and persist one UTF-8 catalog CSV as an immutable staging batch
+      description: |
+        The exact required header is `NCC,Tên NCC,UPC,SKU,Tên sản phẩm`.
+        Identifier fields remain strings. Replaying the exact file bytes returns
+        the existing batch with `replayed=true`; this endpoint never publishes.
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Exact bytes were already staged; existing immutable batch returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogImportUploadResponse'
+        '201':
+          description: New batch validated and persisted as VALIDATED or REJECTED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogImportUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/CatalogImportValidation'
+
+  /api/v1/admin/catalog/imports/{batchId}:
+    get:
+      tags: [Admin catalog]
+      operationId: getCatalogImport
+      summary: Read one staging batch and all row-level validation results
+      parameters:
+        - $ref: '#/components/parameters/CatalogBatchIdPath'
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 200
+      responses:
+        '200':
+          description: Immutable batch detail ordered by source row number.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogImportDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     sessionCookie:
@@ -399,6 +682,20 @@ components:
         type: string
         minLength: 16
         maxLength: 128
+    ScheduleIdPath:
+      name: scheduleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CatalogBatchIdPath:
+      name: batchId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
 
   responses:
     BadRequest:
@@ -437,6 +734,24 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
+    LifecycleValidation:
+      description: Invalid lifecycle date or reason; code identifies the failed rule.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    CatalogImportValidation:
+      description: File encoding, header, CSV structure or row limit is invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PayloadTooLarge:
+      description: Uploaded file exceeds the endpoint limit.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     ServiceUnavailable:
       description: Required infrastructure is unavailable.
       content:
@@ -523,6 +838,261 @@ components:
           type: string
         role:
           $ref: '#/components/schemas/StoreRole'
+
+    LifecycleTargetType:
+      type: string
+      enum: [REGION, STORE]
+
+    LifecycleScheduleStatus:
+      type: string
+      enum: [SCHEDULED, CANCELLED, EXECUTED]
+
+    LifecycleTarget:
+      type: object
+      additionalProperties: false
+      required: [type, id, code, name, regionId, regionCode, regionName]
+      properties:
+        type:
+          $ref: '#/components/schemas/LifecycleTargetType'
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: String identifier; leading zeroes are significant.
+        name:
+          type: string
+        regionId:
+          type: [string, 'null']
+          format: uuid
+        regionCode:
+          type: [string, 'null']
+        regionName:
+          type: [string, 'null']
+
+    LifecycleSchedule:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - target
+        - effectiveDate
+        - status
+        - reason
+        - createdBy
+        - createdAt
+        - updatedBy
+        - updatedAt
+        - cancelledAt
+        - executedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        target:
+          $ref: '#/components/schemas/LifecycleTarget'
+        effectiveDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/LifecycleScheduleStatus'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+        createdBy:
+          $ref: '#/components/schemas/ActorSnapshot'
+        createdAt:
+          type: string
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/ActorSnapshot'
+        updatedAt:
+          type: string
+          format: date-time
+        cancelledAt:
+          type: [string, 'null']
+          format: date-time
+        executedAt:
+          type: [string, 'null']
+          format: date-time
+
+    LifecycleScheduleCreateRequest:
+      type: object
+      additionalProperties: false
+      required: [targetType, targetId, effectiveDate, reason]
+      properties:
+        targetType:
+          $ref: '#/components/schemas/LifecycleTargetType'
+        targetId:
+          type: string
+          format: uuid
+        effectiveDate:
+          type: string
+          format: date
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    LifecycleRescheduleRequest:
+      type: object
+      additionalProperties: false
+      required: [effectiveDate, reason]
+      properties:
+        effectiveDate:
+          type: string
+          format: date
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    LifecycleReasonRequest:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    CatalogImportStatus:
+      type: string
+      enum: [STAGED, VALIDATED, PUBLISHED, REJECTED]
+
+    CatalogImportRowStatus:
+      type: string
+      enum: [VALID, WARNING, ERROR]
+
+    CatalogImportBatch:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - checksumSha256
+        - originalFilename
+        - fileSizeBytes
+        - status
+        - rowCount
+        - validRowCount
+        - errorRowCount
+        - createdBy
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        checksumSha256:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        originalFilename:
+          type: string
+        fileSizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 5242880
+        status:
+          $ref: '#/components/schemas/CatalogImportStatus'
+        rowCount:
+          type: integer
+          minimum: 0
+        validRowCount:
+          type: integer
+          minimum: 0
+        errorRowCount:
+          type: integer
+          minimum: 0
+        createdBy:
+          oneOf:
+            - $ref: '#/components/schemas/ActorSnapshot'
+            - type: 'null'
+          description: Null only for legacy batches created before C01 actor provenance.
+        createdAt:
+          type: string
+          format: date-time
+
+    CatalogImportUploadResponse:
+      type: object
+      additionalProperties: false
+      required: [batch, replayed]
+      properties:
+        batch:
+          $ref: '#/components/schemas/CatalogImportBatch'
+        replayed:
+          type: boolean
+
+    CatalogImportDetail:
+      type: object
+      additionalProperties: false
+      required: [batch, rows, rowTotal, rowOffset, rowLimit]
+      properties:
+        batch:
+          $ref: '#/components/schemas/CatalogImportBatch'
+        rows:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/CatalogImportRow'
+        rowTotal:
+          type: integer
+          minimum: 0
+        rowOffset:
+          type: integer
+          minimum: 0
+        rowLimit:
+          type: integer
+          minimum: 1
+          maximum: 500
+
+    CatalogImportRow:
+      type: object
+      additionalProperties: false
+      required: [rowNumber, status, raw, normalized, validationMessages]
+      properties:
+        rowNumber:
+          type: integer
+          minimum: 2
+        status:
+          $ref: '#/components/schemas/CatalogImportRowStatus'
+        raw:
+          $ref: '#/components/schemas/CatalogRowValues'
+        normalized:
+          $ref: '#/components/schemas/CatalogRowValues'
+        validationMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogValidationMessage'
+
+    CatalogRowValues:
+      type: object
+      additionalProperties: false
+      required: [supplierCode, supplierName, barcode, skuCode, productName]
+      properties:
+        supplierCode:
+          type: string
+        supplierName:
+          type: string
+        barcode:
+          type: string
+        skuCode:
+          type: string
+        productName:
+          type: string
+
+    CatalogValidationMessage:
+      type: object
+      additionalProperties: false
+      required: [code, field, message]
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
 
     BarcodeLookupResponse:
       oneOf:
