@@ -20,16 +20,27 @@ Các outcome đã được chấp nhận:
 
 Handoff chi tiết: [p02-scoped-authorization](delivery/p02-scoped-authorization/acceptance-handoff.md).
 
-## P03 scheduled lifecycle — đang kiểm chứng/nghiệm thu
+## P03 scheduled lifecycle — đã đóng
 
-Đã tiếp tục P03 trên `codex/p03-scheduled-lifecycle` sau khi P02 đóng. Backend,
+P03 trên `codex/p03-scheduled-lifecycle` đã được owner chấp nhận ngày 21/09/2026.
+Backend,
 OpenAPI, fixtures, generated client và Admin Web đã có create/reschedule/cancel/
 manual execute cho store/region; lịch tối thiểu 30 ngày và recheck guard/scope.
 Thực thi là thao tác thủ công khi đến hạn, không có tiến trình tự chạy.
 
-Hoàn tất technical evidence và nghiệm thu owner theo
-[P03 plan](delivery/p03-scheduled-lifecycle/plan.json). Không coi “tiếp” là
-nghiệm thu P03 và không tự mở thêm cycle sau điểm bàn giao này.
+Technical evidence, owner decision và close gate nằm tại
+[P03 plan](delivery/p03-scheduled-lifecycle/plan.json).
+
+## C01 catalog staging/validation — đang triển khai
+
+C01 mở theo yêu cầu “tiếp” sau khi P03 đóng. Slice nhận UTF-8 CSV tổng hợp,
+giữ identifier dạng string/leading zero, trả lỗi theo dòng và chặn duplicate
+barcode. Chỉ `CATALOG_ADMIN` có quyền; upload cùng checksum idempotent. Batch
+staging không được tạo published catalog hoặc xuất hiện trong lookup.
+
+Contract candidate: [CATALOG_STAGING_CONTRACT](product/CATALOG_STAGING_CONTRACT.md).
+Plan: [c01-catalog-staging](delivery/c01-catalog-staging/plan.json). C02 publish,
+primary supplier và mọi dữ liệu vận hành thật vẫn ngoài scope.
 
 ## Policy lifecycle đã khóa
 

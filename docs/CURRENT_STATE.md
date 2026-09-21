@@ -4,7 +4,7 @@ Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`P02 — CLOSED; P03 scheduled lifecycle — VERIFYING, chưa owner accepted`
+`P03 scheduled lifecycle — CLOSED; C01 catalog staging — EXECUTING`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -52,8 +52,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   trash, scanner, stamped image và export local riêng.
 - P03 bổ sung lịch ngừng hoạt động vùng/cửa hàng (tối thiểu 30 ngày), đổi/hủy/
   thực thi thủ công khi đến hạn, audit và Admin Web cùng contract. Lịch không tự
-  chạy; owner cần nghiệm thu lựa chọn tối thiểu này. Preview local dùng dữ liệu
-  tổng hợp riêng, không dùng dữ liệu vận hành thật.
+  chạy; owner đã chấp nhận lựa chọn tối thiểu này ngày 2026-09-21. Preview local
+  dùng dữ liệu tổng hợp riêng, không dùng dữ liệu vận hành thật.
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
@@ -84,12 +84,12 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-P02 scoped authorization đã đóng. P03 đã mở theo yêu cầu “tiếp nếu đã đóng P02”,
-đang hoàn tất kiểm chứng và chuẩn bị nghiệm thu tại
-[P03 plan](delivery/p03-scheduled-lifecycle/plan.json).
-Không đóng P03 hoặc mở cycle mới trước khi có quyết định owner. Thu hồi quyền,
-khóa user, reset credential và vô hiệu session vẫn thuộc slice khác; không hard
-delete và không xây generic scheduler khi chưa có nhu cầu.
+P03 đã đóng theo quyết định owner “cho pass p03, tiếp” trên candidate `b9e909d`;
+close record ở [P03 plan](delivery/p03-scheduled-lifecycle/plan.json). C01 catalog
+staging/validation đã mở theo thứ tự roadmap tại
+[C01 plan](delivery/c01-catalog-staging/plan.json). C01 không publish catalog;
+primary supplier và lookup current vẫn chờ C02 cùng quyết định nghiệp vụ riêng.
+Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).
