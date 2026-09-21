@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "p05-credential-self-service",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Triển khai vertical slice đổi mật khẩu của chính user trên Store PWA và Admin Web: xác minh mật khẩu hiện tại, áp dụng policy 15–64 Unicode code point và blocklist cục bộ, ghi hash mới PBKDF2 có định danh đồng thời tiếp tục xác minh BCrypt cũ, tăng credential version để mọi session cũ mất hiệu lực ở request kế tiếp, ghi audit không chứa secret và yêu cầu đăng nhập lại sau thành công.",
+  "inScope": [
+    "Public OpenAPI, example fixture và generated TypeScript client cho POST /api/v1/auth/password/change với currentPassword/newPassword và CSRF",
+    "Migration V9 thêm credential_version cho app_users để vô hiệu mọi session cũ sau đổi mật khẩu; dữ liệu hiện có mặc định version 1",
+    "PasswordEncoder dạng delegating: hash mới PBKDF2-HMAC-SHA256 600.000 vòng, salt 16 byte, tiếp tục verify BCrypt không prefix và hash có prefix để không buộc reset hàng loạt",
+    "Backend khóa credential row trong transaction, xác minh current password, chặn password giống cũ, enforce 15–64 Unicode code point và blocklist common/context-specific tối thiểu, cập nhật hash/version và audit CREDENTIAL_CHANGED không ghi password/hash/session",
+    "Principal mang credential version nội bộ; refresh mỗi request phải invalidate session khi version không còn khớp",
+    "Store PWA và Admin Web có dialog đổi mật khẩu cho user đang đăng nhập, visible labels, autocomplete đúng, cho phép paste/password manager, show-hide có accessible name, feedback rõ và quay về login sau thành công",
+    "Bổ sung unit/component/PostgreSQL integration tests cho policy, BCrypt compatibility, audit, CSRF, wrong current password và invalidation của hai session"
+  ],
+  "outOfScope": [
+    "Admin reset credential người khác, create user, temporary-password delivery, RESET_REQUIRED restricted session, bootstrap/recovery và reactivate user",
+    "SSO/MFA/passkey, email/SMS/self-service forgot-password, production secret delivery hoặc password rotation định kỳ",
+    "Merge hoặc phụ thuộc candidate P04 user deactivation, O01 backup/restore hay D01 paging đang ở nhánh khác",
+    "Thay đổi role/membership/region/store lifecycle, catalog, KPH nghiệp vụ, Pilot persistence hoặc production deployment",
+    "Kiểm thử kỹ thuật trong lượt triển khai hiện tại; toàn bộ test/check/build/E2E được hoãn theo chỉ đạo người dùng đến lượt test ngày mai"
+  ],
+  "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
+  "candidateSha": "",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/kph.openapi.yaml",
+    "contracts/fixtures/api/credential-change.json",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "packages/api/src/generated/schema.d.ts",
+    "backend/pom.xml",
+    "backend/src/main/resources/db/migration/V9__credential_version.sql",
+    "backend/src/main/java/vn/coopfood/kph/foundation/security/SecurityConfiguration.java",
+    "backend/src/main/java/vn/coopfood/kph/identity/**",
+    "backend/src/test/java/vn/coopfood/kph/identity/**",
+    "apps/store-pwa/src/**",
+    "apps/admin-web/src/**",
+    "docs/product/CREDENTIAL_SELF_SERVICE_CONTRACT.md",
+    "docs/adr/0005-password-hash-migration.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/p05-credential-self-service/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-credential-self-service",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-credential-self-service-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Implement revision 1 without running test/check/build/E2E; hand off changed files, assumptions, risks and the exact verification commands for the user's test pass tomorrow."
+}
