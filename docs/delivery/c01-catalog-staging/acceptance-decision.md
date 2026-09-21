@@ -1,8 +1,11 @@
 # C01 owner acceptance
 
-Ngày: 2026-09-21 (Asia/Ho_Chi_Minh)  
-Revision: 1  
-Candidate: `7c73a13dabbc8bd63439b0705b249aa724551d88`  
+Ngày: 2026-09-21 (Asia/Ho_Chi_Minh)
+
+Revision: 1
+
+Candidate: `7c73a13dabbc8bd63439b0705b249aa724551d88`
+
 Người chấp nhận: project owner
 
 ## Quyết định

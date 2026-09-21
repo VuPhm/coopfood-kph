@@ -4,7 +4,7 @@ Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`P03 scheduled lifecycle — CLOSED; C01 catalog staging — EXECUTING`
+`C01 catalog staging — CLOSED; integration PR checkpoint — READY`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -21,7 +21,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - Online stability S01–S02 đã merge vào `main` qua PR #3 (`5358ad6`): response
   tạo phiếu cũ không làm bẩn scope mới; duyệt lô đợi mọi request và báo kết quả
   thành công/thất bại với concurrency giới hạn.
-- Online stability S03 đã được owner chấp nhận ngày 2026-09-17 trên candidate
+- Online stability S03 đã được owner chấp nhận và merge vào `main` qua PR #4
+  ngày 2026-09-16 trên candidate
   `05b462b`: workbook online dùng store snapshot từ response export; 500 phiếu
   được gửi đủ, 501 bị chặn rõ ràng trước request. Cycle closeout ở
   [plan](delivery/online-stability-s03/plan.json).
@@ -54,12 +55,16 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   thực thi thủ công khi đến hạn, audit và Admin Web cùng contract. Lịch không tự
   chạy; owner đã chấp nhận lựa chọn tối thiểu này ngày 2026-09-21. Preview local
   dùng dữ liệu tổng hợp riêng, không dùng dữ liệu vận hành thật.
+- C01 bổ sung catalog staging/validation CSV cho `CATALOG_ADMIN`: giữ identifier
+  dạng string, trả lỗi theo dòng, replay idempotent theo checksum và không tạo
+  catalog published. Owner đã chấp nhận ngày 2026-09-21.
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
 ## Kiểm chứng gần nhất
 
-- PR #3 đã merge vào `main` và từng pass remote CI `frontend`, `backend`, `browser`.
+- PR #4 đã merge S03 vào `main`; nhánh hiện tại dùng đúng tree PR #4 làm nền và
+  chỉ lệch `origin/main` bởi merge commit, không có content conflict.
 - Ngày 2026-09-17, P01 Contract Lock bao phủ role hierarchy, cross-store/
   cross-region denial, last-admin/last-manager và credential/bootstrap guard.
 - Ngày 2026-09-21, P02 scoped authorization full backend test PASS trên
@@ -67,6 +72,9 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   active store/region, inactive store/region denial, cross-region denial,
   region grant/revoke request kế tiếp và chain-wide access; `npm run verify`
   PASS. Owner đã cho pass phần còn lại ngày 2026-09-21.
+- Ngày 2026-09-21, C01 `npm run verify` PASS 155 frontend tests/build/Contract
+  Lock; 53 backend tests PASS trên PostgreSQL; real-backend browser E2E PASS
+  upload/replay/reject và lookup isolation. Owner đã cho pass cùng ngày.
 - Ngày 2026-09-17, S04 `npm run verify` PASS docs/Contract Lock, generated API
   drift, TypeScript, 147 tests và build; browser fixture review pass 7 viewport.
 - S04 không đổi backend/OpenAPI. Real-backend browser suite chưa rerun vì Docker
@@ -84,11 +92,12 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-P03 đã đóng theo quyết định owner “cho pass p03, tiếp” trên candidate `b9e909d`;
-close record ở [P03 plan](delivery/p03-scheduled-lifecycle/plan.json). C01 catalog
-staging/validation đã mở theo thứ tự roadmap tại
-[C01 plan](delivery/c01-catalog-staging/plan.json). C01 không publish catalog;
-primary supplier và lookup current vẫn chờ C02 cùng quyết định nghiệp vụ riêng.
+P03 và C01 đã đóng theo owner acceptance; close record ở
+[P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
+[C01 plan](delivery/c01-catalog-staging/plan.json). Điểm dừng phù hợp kế tiếp là
+integration PR cho chuỗi accepted S04 → P01 → P02 → P03 → C01. C02 chưa nên mở
+trước khi chốt primary supplier; primary supplier và lookup current vẫn là quyết
+định nghiệp vụ riêng.
 Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog

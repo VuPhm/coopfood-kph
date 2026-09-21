@@ -1,6 +1,7 @@
 # Catalog staging contract — C01
 
-Trạng thái: **Candidate — chờ owner nghiệm thu C01**  
+Trạng thái: **Accepted — C01, 2026-09-21**
+
 Cập nhật: 2026-09-21
 
 ## Mục tiêu và quyền

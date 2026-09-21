@@ -1,8 +1,11 @@
 # P03 owner acceptance
 
-Ngày: 2026-09-21 (Asia/Ho_Chi_Minh)  
-Revision: 1  
-Candidate: `b9e909daeb2aaa92ccd51dadc08d1162d0481e7c`  
+Ngày: 2026-09-21 (Asia/Ho_Chi_Minh)
+
+Revision: 1
+
+Candidate: `b9e909daeb2aaa92ccd51dadc08d1162d0481e7c`
+
 Người chấp nhận: project owner
 
 ## Quyết định
