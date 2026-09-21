@@ -4,6 +4,9 @@ Candidate: `7c73a13dabbc8bd63439b0705b249aa724551d88`, branch
 `codex/c01-catalog-staging`, revision 1. P03 đã CLOSED và không mở lại. C01 chỉ
 staging/validation; chưa publish catalog.
 
+C01 được owner chấp nhận ngày 21/09/2026 với các hành vi và giới hạn bên dưới;
+quyết định được ghi tại [acceptance decision](acceptance-decision.md).
+
 ## Mở bản chạy thử
 
 - URL local: <http://127.0.0.1:4174>.
@@ -69,5 +72,6 @@ Log local: `/tmp/coopfood-kph-c01-acceptance/`; SHA chạy thật nằm ở file
 - Không có production rollout, dữ liệu thật, remote CI, PR/push hay nghiệm thu
   trên thiết bị vật lý trong vòng này.
 
-Nếu các hành vi và giới hạn trên đúng ý, owner có thể trả lời rõ `cho pass C01`.
-C01 chỉ CLOSED sau quyết định đó; technical pass không thay owner acceptance.
+Owner xác nhận “pass, xem xét pr hoặc tiếp tục xem xét các candidate” trong Codex
+task hiện tại ngày 21/09/2026. Technical pass và owner acceptance là hai gate
+riêng biệt; cả hai đã pass và C01 đã CLOSED.

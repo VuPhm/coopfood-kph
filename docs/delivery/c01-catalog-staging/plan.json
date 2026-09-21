@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "c01-catalog-staging",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Triển khai C01 catalog staging/validation từ CSV tổng hợp qua OpenAPI chung: CATALOG_ADMIN upload, xem batch và lỗi theo dòng; identifier được giữ dạng string, duplicate barcode bị reject, upload cùng checksum idempotent và dữ liệu staging tuyệt đối không xuất hiện trong lookup trước C02 publish.",
   "inScope": [
     "Khóa contract C01 cho UTF-8 CSV 5 cột NCC/Tên NCC/UPC/SKU/Tên sản phẩm, quoted field chuẩn CSV, identifier trim nhưng không ép số và giữ leading zero",
@@ -64,13 +64,15 @@
       "id": "owner-catalog-staging-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
       "sha": "7c73a13dabbc8bd63439b0705b249aa724551d88",
-      "evidence": "docs/delivery/c01-catalog-staging/acceptance-handoff.md"
+      "evidence": "docs/delivery/c01-catalog-staging/acceptance-decision.md",
+      "acceptedBy": "project owner",
+      "decisionRef": "Current Codex task, user message on 2026-09-21: pass, xem xét pr hoặc tiếp tục xem xét các candidate"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Owner dùng preview tổng hợp và xác nhận pass/reject C01; không mở C02 publish trước quyết định rõ ràng."
+  "nextAction": "C01 đã đóng theo owner acceptance. Đánh giá điểm tích hợp PR so với tiếp tục candidate kế tiếp; không tự mở C02 khi primary supplier chưa được chốt."
 }
