@@ -42,17 +42,16 @@ Contract accepted: [CATALOG_STAGING_CONTRACT](product/CATALOG_STAGING_CONTRACT.m
 Plan: [c01-catalog-staging](delivery/c01-catalog-staging/plan.json). C02 publish,
 primary supplier và mọi dữ liệu vận hành thật vẫn ngoài scope.
 
-## Điểm tích hợp hiện tại — PR #5
+## Điểm tích hợp hiện tại — PR #5 đã merge
 
-`origin/main` đã chứa S03 qua PR #4. PR #5 nối tiếp đúng tree đó và gồm các cycle
-đã đóng S04, P01, P02, P03, C01. Không gom thêm candidate: diff đã lớn, còn C02
-bị chặn bởi quyết định primary supplier, trong khi D01/O01/O02 là outcome độc lập
-nên nên bắt đầu từ main sau tích hợp.
+PR #5 đã merge các cycle S04, P01, P02, P03 và C01 vào `main` ngày 21/09/2026,
+với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, backend
+và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
+`docs/delivery/**`.
 
-Trước khi merge cần để remote CI chạy đầy đủ và review riêng các vùng rủi ro:
-migration V6–V8, authorization cross-store/cross-region, lifecycle execute guard,
-catalog checksum/validation và Admin workspace. Không squash bỏ provenance cycle
-nếu reviewer còn cần đối chiếu candidate/evidence.
+Không có milestone active sau closeout này. C02 vẫn bị chặn bởi quyết định
+primary supplier; D01/O01/O02 và lifecycle identity/credential là các outcome
+độc lập, chỉ mở cycle mới khi owner chọn ưu tiên tiếp theo.
 
 ## Policy lifecycle đã khóa
 
@@ -122,13 +121,12 @@ deactivate, các capability provisioning còn lại chờ cycle riêng.
 - P01: [p01-provisioning-policy](delivery/p01-provisioning-policy/plan.json),
   owner chấp nhận hierarchy và security policy ngày 2026-09-17.
 
-## Sau P02
+## Ưu tiên chưa mở cycle
 
-Sau provisioning, thứ tự đề xuất còn lại:
-
-1. C01 catalog staging/validation → C02 publish sau khi chốt primary supplier.
-2. D01 paging theo số đo; O01 backup/restore; O02 profile triển khai; A01 nghiệm
-   thu online trên thiết bị mục tiêu.
+1. Chốt primary supplier và semantics lookup current trước khi mở C02 publish.
+2. Chọn một outcome độc lập: lifecycle identity/credential, D01 paging theo số
+   đo, O01 backup/restore, O02 profile triển khai hoặc A01 nghiệm thu online trên
+   thiết bị mục tiêu.
 
 Chi tiết dependency/finding nằm tại
 [REVIEW_AND_ROADMAP_2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).

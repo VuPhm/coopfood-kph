@@ -4,7 +4,7 @@ Cập nhật: 2026-09-21
 
 ## Giai đoạn
 
-`C01 catalog staging — CLOSED; integration PR #5 — OPEN`
+`C01 catalog staging — CLOSED; integration PR #5 — MERGED`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -64,8 +64,9 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Kiểm chứng gần nhất
 
-- PR #4 đã merge S03 vào `main`; nhánh hiện tại dùng đúng tree PR #4 làm nền và
-  chỉ lệch `origin/main` bởi merge commit, không có content conflict.
+- PR #5 đã merge chuỗi accepted S04 → P01 → P02 → P03 → C01 vào `main` ngày
+  2026-09-21: head `048a7ff`, merge commit `3ffc774`. Remote CI của PR PASS cả
+  frontend, backend và browser.
 - Ngày 2026-09-17, P01 Contract Lock bao phủ role hierarchy, cross-store/
   cross-region denial, last-admin/last-manager và credential/bootstrap guard.
 - Ngày 2026-09-21, P02 scoped authorization full backend test PASS trên
@@ -99,9 +100,9 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
 [C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
-accepted S04 → P01 → P02 → P03 → C01 đã mở và đang chờ remote CI/review. C02
-chưa nên mở trước khi chốt primary supplier; primary supplier và lookup current
-vẫn là quyết định nghiệp vụ riêng.
+accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
+tích hợp của chuỗi này. Chưa mở cycle mới. C02 chỉ nên mở sau khi chốt primary
+supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ riêng.
 Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
