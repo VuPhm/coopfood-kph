@@ -28,6 +28,9 @@ const apiFixtureSchemas = new Map([
   ["api/kph-export.json", "KphExportRequest"],
   ["api/lifecycle-targets.json", "LifecycleTarget"],
   ["api/lifecycle-schedules.json", "LifecycleSchedule"],
+  ["api/catalog-imports.json", "CatalogImportBatch"],
+  ["api/catalog-import-detail.json", "CatalogImportDetail"],
+  ["api/catalog-import-upload.json", "CatalogImportUploadResponse"],
 ]);
 
 const acceptedKphPolicies = {

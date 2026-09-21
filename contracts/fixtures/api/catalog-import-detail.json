@@ -1,0 +1,72 @@
+{
+  "batch": {
+    "id": "71000000-0000-4000-8000-000000000002",
+    "checksumSha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+    "originalFilename": "catalog-conflict.csv",
+    "fileSizeBytes": 218,
+    "status": "REJECTED",
+    "rowCount": 2,
+    "validRowCount": 0,
+    "errorRowCount": 2,
+    "createdBy": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "displayName": "Quản trị catalog mẫu"
+    },
+    "createdAt": "2026-09-21T09:20:00+07:00"
+  },
+  "rows": [
+    {
+      "rowNumber": 2,
+      "status": "ERROR",
+      "raw": {
+        "supplierCode": "0007",
+        "supplierName": "NCC Demo",
+        "barcode": "0890123456789",
+        "skuCode": "SKU-000042",
+        "productName": "Sản phẩm thử nghiệm 01"
+      },
+      "normalized": {
+        "supplierCode": "0007",
+        "supplierName": "NCC Demo",
+        "barcode": "0890123456789",
+        "skuCode": "SKU-000042",
+        "productName": "Sản phẩm thử nghiệm 01"
+      },
+      "validationMessages": [
+        {
+          "code": "DUPLICATE_BARCODE",
+          "field": "barcode",
+          "message": "UPC bị lặp trong cùng file."
+        }
+      ]
+    },
+    {
+      "rowNumber": 3,
+      "status": "ERROR",
+      "raw": {
+        "supplierCode": "0008",
+        "supplierName": "NCC Khác",
+        "barcode": "0890123456789",
+        "skuCode": "SKU-000099",
+        "productName": "Sản phẩm xung đột"
+      },
+      "normalized": {
+        "supplierCode": "0008",
+        "supplierName": "NCC Khác",
+        "barcode": "0890123456789",
+        "skuCode": "SKU-000099",
+        "productName": "Sản phẩm xung đột"
+      },
+      "validationMessages": [
+        {
+          "code": "DUPLICATE_BARCODE",
+          "field": "barcode",
+          "message": "UPC bị lặp trong cùng file."
+        }
+      ]
+    }
+  ],
+  "rowTotal": 2,
+  "rowOffset": 0,
+  "rowLimit": 200
+}

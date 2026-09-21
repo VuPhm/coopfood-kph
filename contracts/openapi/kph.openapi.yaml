@@ -17,6 +17,7 @@ tags:
   - name: Catalog
   - name: KPH
   - name: Admin lifecycle
+  - name: Admin catalog
 security:
   - sessionCookie: []
 paths:
@@ -539,6 +540,107 @@ paths:
         '422':
           $ref: '#/components/responses/LifecycleValidation'
 
+  /api/v1/admin/catalog/imports:
+    get:
+      tags: [Admin catalog]
+      operationId: listCatalogImports
+      summary: List the latest immutable catalog staging batches
+      description: Requires active CATALOG_ADMIN; CHAIN_ADMIN is not an implicit catalog role.
+      responses:
+        '200':
+          description: At most 50 batches, newest first. Staging never affects store lookup.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogImportBatch'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Admin catalog]
+      operationId: uploadCatalogImport
+      summary: Validate and persist one UTF-8 catalog CSV as an immutable staging batch
+      description: |
+        The exact required header is `NCC,Tên NCC,UPC,SKU,Tên sản phẩm`.
+        Identifier fields remain strings. Replaying the exact file bytes returns
+        the existing batch with `replayed=true`; this endpoint never publishes.
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Exact bytes were already staged; existing immutable batch returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogImportUploadResponse'
+        '201':
+          description: New batch validated and persisted as VALIDATED or REJECTED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogImportUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/CatalogImportValidation'
+
+  /api/v1/admin/catalog/imports/{batchId}:
+    get:
+      tags: [Admin catalog]
+      operationId: getCatalogImport
+      summary: Read one staging batch and all row-level validation results
+      parameters:
+        - $ref: '#/components/parameters/CatalogBatchIdPath'
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 200
+      responses:
+        '200':
+          description: Immutable batch detail ordered by source row number.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogImportDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     sessionCookie:
@@ -587,6 +689,13 @@ components:
       schema:
         type: string
         format: uuid
+    CatalogBatchIdPath:
+      name: batchId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
 
   responses:
     BadRequest:
@@ -627,6 +736,18 @@ components:
             $ref: '#/components/schemas/ValidationProblem'
     LifecycleValidation:
       description: Invalid lifecycle date or reason; code identifies the failed rule.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    CatalogImportValidation:
+      description: File encoding, header, CSV structure or row limit is invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PayloadTooLarge:
+      description: Uploaded file exceeds the endpoint limit.
       content:
         application/problem+json:
           schema:
@@ -836,6 +957,142 @@ components:
           type: string
           minLength: 1
           maxLength: 500
+
+    CatalogImportStatus:
+      type: string
+      enum: [STAGED, VALIDATED, PUBLISHED, REJECTED]
+
+    CatalogImportRowStatus:
+      type: string
+      enum: [VALID, WARNING, ERROR]
+
+    CatalogImportBatch:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - checksumSha256
+        - originalFilename
+        - fileSizeBytes
+        - status
+        - rowCount
+        - validRowCount
+        - errorRowCount
+        - createdBy
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        checksumSha256:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        originalFilename:
+          type: string
+        fileSizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 5242880
+        status:
+          $ref: '#/components/schemas/CatalogImportStatus'
+        rowCount:
+          type: integer
+          minimum: 0
+        validRowCount:
+          type: integer
+          minimum: 0
+        errorRowCount:
+          type: integer
+          minimum: 0
+        createdBy:
+          oneOf:
+            - $ref: '#/components/schemas/ActorSnapshot'
+            - type: 'null'
+          description: Null only for legacy batches created before C01 actor provenance.
+        createdAt:
+          type: string
+          format: date-time
+
+    CatalogImportUploadResponse:
+      type: object
+      additionalProperties: false
+      required: [batch, replayed]
+      properties:
+        batch:
+          $ref: '#/components/schemas/CatalogImportBatch'
+        replayed:
+          type: boolean
+
+    CatalogImportDetail:
+      type: object
+      additionalProperties: false
+      required: [batch, rows, rowTotal, rowOffset, rowLimit]
+      properties:
+        batch:
+          $ref: '#/components/schemas/CatalogImportBatch'
+        rows:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/CatalogImportRow'
+        rowTotal:
+          type: integer
+          minimum: 0
+        rowOffset:
+          type: integer
+          minimum: 0
+        rowLimit:
+          type: integer
+          minimum: 1
+          maximum: 500
+
+    CatalogImportRow:
+      type: object
+      additionalProperties: false
+      required: [rowNumber, status, raw, normalized, validationMessages]
+      properties:
+        rowNumber:
+          type: integer
+          minimum: 2
+        status:
+          $ref: '#/components/schemas/CatalogImportRowStatus'
+        raw:
+          $ref: '#/components/schemas/CatalogRowValues'
+        normalized:
+          $ref: '#/components/schemas/CatalogRowValues'
+        validationMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogValidationMessage'
+
+    CatalogRowValues:
+      type: object
+      additionalProperties: false
+      required: [supplierCode, supplierName, barcode, skuCode, productName]
+      properties:
+        supplierCode:
+          type: string
+        supplierName:
+          type: string
+        barcode:
+          type: string
+        skuCode:
+          type: string
+        productName:
+          type: string
+
+    CatalogValidationMessage:
+      type: object
+      additionalProperties: false
+      required: [code, field, message]
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
 
     BarcodeLookupResponse:
       oneOf:

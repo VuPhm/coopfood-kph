@@ -302,6 +302,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/catalog/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the latest immutable catalog staging batches
+         * @description Requires active CATALOG_ADMIN; CHAIN_ADMIN is not an implicit catalog role.
+         */
+        get: operations["listCatalogImports"];
+        put?: never;
+        /**
+         * Validate and persist one UTF-8 catalog CSV as an immutable staging batch
+         * @description The exact required header is `NCC,Tên NCC,UPC,SKU,Tên sản phẩm`.
+         *     Identifier fields remain strings. Replaying the exact file bytes returns
+         *     the existing batch with `replayed=true`; this endpoint never publishes.
+         */
+        post: operations["uploadCatalogImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/imports/{batchId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read one staging batch and all row-level validation results */
+        get: operations["getCatalogImport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -389,6 +432,56 @@ export interface components {
         };
         LifecycleReasonRequest: {
             reason: string;
+        };
+        /** @enum {string} */
+        CatalogImportStatus: "STAGED" | "VALIDATED" | "PUBLISHED" | "REJECTED";
+        /** @enum {string} */
+        CatalogImportRowStatus: "VALID" | "WARNING" | "ERROR";
+        CatalogImportBatch: {
+            /** Format: uuid */
+            id: string;
+            checksumSha256: string;
+            originalFilename: string;
+            /** Format: int64 */
+            fileSizeBytes: number;
+            status: components["schemas"]["CatalogImportStatus"];
+            rowCount: number;
+            validRowCount: number;
+            errorRowCount: number;
+            /** @description Null only for legacy batches created before C01 actor provenance. */
+            createdBy: components["schemas"]["ActorSnapshot"] | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CatalogImportUploadResponse: {
+            batch: components["schemas"]["CatalogImportBatch"];
+            replayed: boolean;
+        };
+        CatalogImportDetail: {
+            batch: components["schemas"]["CatalogImportBatch"];
+            rows: components["schemas"]["CatalogImportRow"][];
+            rowTotal: number;
+            rowOffset: number;
+            rowLimit: number;
+        };
+        CatalogImportRow: {
+            rowNumber: number;
+            status: components["schemas"]["CatalogImportRowStatus"];
+            raw: components["schemas"]["CatalogRowValues"];
+            normalized: components["schemas"]["CatalogRowValues"];
+            validationMessages: components["schemas"]["CatalogValidationMessage"][];
+        };
+        CatalogRowValues: {
+            supplierCode: string;
+            supplierName: string;
+            barcode: string;
+            skuCode: string;
+            productName: string;
+        };
+        CatalogValidationMessage: {
+            code: string;
+            field: string;
+            message: string;
         };
         BarcodeLookupResponse: components["schemas"]["BarcodeFound"] | components["schemas"]["BarcodeNotFound"];
         BarcodeFound: {
@@ -637,6 +730,24 @@ export interface components {
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
+        /** @description File encoding, header, CSV structure or row limit is invalid. */
+        CatalogImportValidation: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description Uploaded file exceeds the endpoint limit. */
+        PayloadTooLarge: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description Required infrastructure is unavailable. */
         ServiceUnavailable: {
             headers: {
@@ -656,6 +767,7 @@ export interface components {
         /** @description Client-generated opaque key scoped to the authenticated actor. */
         IdempotencyKey: string;
         ScheduleIdPath: string;
+        CatalogBatchIdPath: string;
     };
     requestBodies: never;
     headers: never;
@@ -1152,6 +1264,99 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["LifecycleValidation"];
+        };
+    };
+    listCatalogImports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description At most 50 batches, newest first. Staging never affects store lookup. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportBatch"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    uploadCatalogImport: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Exact bytes were already staged; existing immutable batch returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportUploadResponse"];
+                };
+            };
+            /** @description New batch validated and persisted as VALIDATED or REJECTED. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportUploadResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            413: components["responses"]["PayloadTooLarge"];
+            422: components["responses"]["CatalogImportValidation"];
+        };
+    };
+    getCatalogImport: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                batchId: components["parameters"]["CatalogBatchIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Immutable batch detail ordered by source row number. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
 }

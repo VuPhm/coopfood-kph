@@ -79,6 +79,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/exports").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/stores/*/kph/*/approval").authenticated()
                         .requestMatchers("/api/v1/admin/lifecycle/**").authenticated()
+                        .requestMatchers("/api/v1/admin/catalog/imports/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                         .anyRequest().denyAll())
                 .exceptionHandling(exceptions -> exceptions

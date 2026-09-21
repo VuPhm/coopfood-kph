@@ -4,6 +4,9 @@ import { describe, expect, it, vi } from "vitest";
 
 import schedulesFixture from "../../../contracts/fixtures/api/lifecycle-schedules.json";
 import targetsFixture from "../../../contracts/fixtures/api/lifecycle-targets.json";
+import catalogImportsFixture from "../../../contracts/fixtures/api/catalog-imports.json";
+import catalogDetailFixture from "../../../contracts/fixtures/api/catalog-import-detail.json";
+import catalogUploadFixture from "../../../contracts/fixtures/api/catalog-import-upload.json";
 import sessionFixture from "../../../contracts/fixtures/api/session.json";
 import { App } from "./app";
 import type { LifecycleAdminGateway } from "./lifecycle-admin";
@@ -11,6 +14,10 @@ import type { LifecycleAdminGateway } from "./lifecycle-admin";
 const session = {
   ...sessionFixture,
   user: { ...sessionFixture.user, globalRoles: ["CHAIN_ADMIN" as const] },
+};
+const catalogSession = {
+  ...sessionFixture,
+  user: { ...sessionFixture.user, globalRoles: ["CATALOG_ADMIN" as const] },
 };
 const targets = targetsFixture as Awaited<ReturnType<LifecycleAdminGateway["listTargets"]>>;
 const futureDate = new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10);
@@ -27,6 +34,9 @@ function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdmin
     reschedule: vi.fn().mockResolvedValue(schedules[0]),
     cancel: vi.fn().mockResolvedValue({ ...schedules[0], status: "CANCELLED" }),
     execute: vi.fn().mockResolvedValue({ ...schedules[0], status: "EXECUTED" }),
+    listCatalogImports: vi.fn().mockResolvedValue([]),
+    getCatalogImport: vi.fn().mockRejectedValue(new Error("Không có batch catalog")),
+    uploadCatalogImport: vi.fn().mockRejectedValue(new Error("Chưa cấu hình catalog")),
     ...overrides,
   };
 }
@@ -133,5 +143,63 @@ describe("Admin lifecycle workspace", () => {
 
     await waitFor(() => expect(api.cancel).toHaveBeenCalledWith(schedules[0]!.id, "Kế hoạch thay đổi"));
     expect(await screen.findByText("Đã hủy lịch CF-0012.")).toBeVisible();
+  });
+});
+
+describe("Admin catalog staging workspace", () => {
+  it("opens catalog for CATALOG_ADMIN without requesting lifecycle scope", async () => {
+    const api = gateway({
+      getSession: vi.fn().mockResolvedValue(catalogSession),
+      listCatalogImports: vi.fn().mockResolvedValue(catalogImportsFixture as Awaited<ReturnType<LifecycleAdminGateway["listCatalogImports"]>>),
+      getCatalogImport: vi.fn().mockResolvedValue(catalogDetailFixture as Awaited<ReturnType<LifecycleAdminGateway["getCatalogImport"]>>),
+    });
+    renderApp(api);
+
+    expect(await screen.findByRole("heading", { name: "Kiểm tra catalog CSV" })).toBeVisible();
+    expect(await screen.findByText("catalog-conflict.csv")).toBeVisible();
+    expect((await screen.findAllByText("UPC bị lặp trong cùng file."))[0]).toBeVisible();
+    expect(api.listTargets).not.toHaveBeenCalled();
+    expect(api.listSchedules).not.toHaveBeenCalled();
+  });
+
+  it("uploads a CSV, announces the result and opens the returned batch", async () => {
+    const api = gateway({
+      getSession: vi.fn().mockResolvedValue(catalogSession),
+      listCatalogImports: vi.fn().mockResolvedValue([]),
+      getCatalogImport: vi.fn().mockResolvedValue({
+        ...(catalogDetailFixture as Awaited<ReturnType<LifecycleAdminGateway["getCatalogImport"]>>),
+        batch: (catalogUploadFixture as Awaited<ReturnType<LifecycleAdminGateway["uploadCatalogImport"]>>).batch,
+      }),
+      uploadCatalogImport: vi.fn().mockResolvedValue(catalogUploadFixture as Awaited<ReturnType<LifecycleAdminGateway["uploadCatalogImport"]>>),
+    });
+    renderApp(api);
+    const input = await screen.findByLabelText(/File UTF-8 CSV/);
+    const file = new File(["NCC,Tên NCC,UPC,SKU,Tên sản phẩm\n0007,NCC Demo,00123,SKU-1,Sản phẩm\n"], "catalog.csv", { type: "text/csv" });
+    fireEvent.change(input, { target: { files: [file] } });
+    fireEvent.click(screen.getByRole("button", { name: "Tải lên và kiểm tra" }));
+
+    await waitFor(() => expect(api.uploadCatalogImport).toHaveBeenCalledWith(file));
+    expect(await screen.findByRole("status")).toHaveTextContent("không có lỗi");
+    await waitFor(() => expect(api.getCatalogImport).toHaveBeenCalledWith(
+      (catalogUploadFixture as Awaited<ReturnType<LifecycleAdminGateway["uploadCatalogImport"]>>).batch.id,
+      0,
+      expect.any(AbortSignal),
+    ));
+  });
+
+  it("puts upload errors in a focusable alert near the file field", async () => {
+    const api = gateway({
+      getSession: vi.fn().mockResolvedValue(catalogSession),
+      listCatalogImports: vi.fn().mockResolvedValue([]),
+      uploadCatalogImport: vi.fn().mockRejectedValue(new Error("Header catalog không hợp lệ.")),
+    });
+    renderApp(api);
+    const input = await screen.findByLabelText(/File UTF-8 CSV/);
+    fireEvent.change(input, { target: { files: [new File(["bad"], "bad.csv", { type: "text/csv" })] } });
+    fireEvent.click(screen.getByRole("button", { name: "Tải lên và kiểm tra" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Header catalog không hợp lệ.");
+    expect(alert).toHaveFocus();
   });
 });

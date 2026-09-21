@@ -4,6 +4,9 @@ export type AdminSession = components["schemas"]["SessionResponse"];
 export type LifecycleTarget = components["schemas"]["LifecycleTarget"];
 export type LifecycleSchedule = components["schemas"]["LifecycleSchedule"];
 export type LifecycleTargetType = components["schemas"]["LifecycleTargetType"];
+export type CatalogImportBatch = components["schemas"]["CatalogImportBatch"];
+export type CatalogImportDetail = components["schemas"]["CatalogImportDetail"];
+export type CatalogImportUploadResponse = components["schemas"]["CatalogImportUploadResponse"];
 
 export class AdminApiError extends Error {
   readonly status: number | undefined;
@@ -32,6 +35,9 @@ export type LifecycleAdminGateway = {
   reschedule(id: string, effectiveDate: string, reason: string): Promise<LifecycleSchedule>;
   cancel(id: string, reason: string): Promise<LifecycleSchedule>;
   execute(id: string, reason: string): Promise<LifecycleSchedule>;
+  listCatalogImports(signal?: AbortSignal): Promise<CatalogImportBatch[]>;
+  getCatalogImport(id: string, offset?: number, signal?: AbortSignal): Promise<CatalogImportDetail>;
+  uploadCatalogImport(file: File): Promise<CatalogImportUploadResponse>;
 };
 
 export function createLifecycleAdminGateway(
@@ -116,7 +122,38 @@ export function createLifecycleAdminGateway(
     return response.data;
   }
 
-  return { getSession, login, logout, listTargets, listSchedules, createSchedule, reschedule, cancel, execute };
+  async function listCatalogImports(signal?: AbortSignal) {
+    const response = await client.GET("/api/v1/admin/catalog/imports", signal ? { signal } : {});
+    if (response.error || !response.data) throw apiError(response, "Không thể tải lịch sử kiểm tra catalog.");
+    return response.data;
+  }
+
+  async function getCatalogImport(id: string, offset = 0, signal?: AbortSignal) {
+    const response = await client.GET("/api/v1/admin/catalog/imports/{batchId}", {
+      params: { path: { batchId: id }, query: { offset, limit: 200 } },
+      ...(signal ? { signal } : {}),
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể tải chi tiết batch catalog.");
+    return response.data;
+  }
+
+  async function uploadCatalogImport(file: File) {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    const response = await client.POST("/api/v1/admin/catalog/imports", {
+      params: { header: { "X-CSRF-TOKEN": csrfToken } },
+      body: { file: file as unknown as string },
+      bodySerializer: () => form,
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể kiểm tra file catalog.");
+    return response.data;
+  }
+
+  return {
+    getSession, login, logout,
+    listTargets, listSchedules, createSchedule, reschedule, cancel, execute,
+    listCatalogImports, getCatalogImport, uploadCatalogImport,
+  };
 }
 
 function apiError(
@@ -140,6 +177,15 @@ function apiError(
     REGION_HAS_ACTIVE_STORES: "Vùng vẫn còn cửa hàng hoạt động. Hãy ngừng hoạt động các cửa hàng trước.",
     STORE_REGION_INACTIVE: "Vùng của cửa hàng không còn hoạt động. Vui lòng kiểm tra lại.",
     ACTIVE_STORE_MANAGER_REQUIRED: "Cửa hàng phải còn ít nhất một quản lý đang hoạt động trước khi thực thi.",
+    CATALOG_ADMIN_REQUIRED: "Bạn chưa có quyền quản trị catalog.",
+    CATALOG_IMPORT_NOT_FOUND: "Không tìm thấy batch catalog này.",
+    CATALOG_FILE_EMPTY: "Hãy chọn file CSV có dữ liệu.",
+    CATALOG_FILE_TOO_LARGE: "File catalog không được vượt quá 5 MiB.",
+    CATALOG_FILE_UNREADABLE: "Không thể đọc file catalog này.",
+    CATALOG_ENCODING_INVALID: "File catalog phải dùng UTF-8.",
+    CATALOG_HEADER_INVALID: "Header phải đúng thứ tự: NCC, Tên NCC, UPC, SKU, Tên sản phẩm.",
+    CATALOG_CSV_MALFORMED: "Cấu trúc CSV không hợp lệ. Hãy kiểm tra dấu phẩy và dấu ngoặc kép.",
+    CATALOG_ROW_LIMIT_EXCEEDED: "File catalog không được vượt quá 50.000 dòng dữ liệu.",
   };
   return new AdminApiError((problem?.code && messages[problem.code]) || fallback, response.response?.status, problem?.code);
 }
