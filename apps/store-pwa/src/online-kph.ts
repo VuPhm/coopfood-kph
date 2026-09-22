@@ -55,6 +55,7 @@ export type OnlineGateway = {
   loadWorkspace: (signal?: AbortSignal) => Promise<OnlineWorkspace>;
   login: (username: string, password: string, signal?: AbortSignal) => Promise<Session>;
   logout: () => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   createRecord: (storeId: string, draft: CreatedRecordDraft) => Promise<RecordView>;
   reviewRecord: (storeId: string, recordId: string, status: KphApprovalStatus) => Promise<RecordView>;
   prepareExport: (storeId: string, type: components["schemas"]["KphType"], recordIds: string[]) => Promise<OnlineExportBundle>;
@@ -116,6 +117,17 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
       params: { header: { "X-CSRF-TOKEN": csrfToken } },
     });
     if (response.error) throw apiError(response, "Không thể đăng xuất khỏi phiên hiện tại.");
+    csrfToken = "";
+    pendingCreates.clear();
+    keySignatures.clear();
+  }
+
+  async function changePassword(currentPassword: string, newPassword: string) {
+    const response = await client.POST("/api/v1/auth/password/change", {
+      params: { header: { "X-CSRF-TOKEN": csrfToken } },
+      body: { currentPassword, newPassword },
+    });
+    if (response.error) throw apiError(response, "Không thể đổi mật khẩu lúc này.");
     csrfToken = "";
     pendingCreates.clear();
     keySignatures.clear();
@@ -215,7 +227,7 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     return response.data as components["schemas"]["BarcodeLookupResponse"];
   }
 
-  return { getSession, listStores, loadHistory, loadWorkspace, login, logout, createRecord, reviewRecord, prepareExport, lookupBarcode };
+  return { getSession, listStores, loadHistory, loadWorkspace, login, logout, changePassword, createRecord, reviewRecord, prepareExport, lookupBarcode };
 }
 
 function apiError(response: { error?: unknown; response?: Response }, fallback: string) {
@@ -223,10 +235,16 @@ function apiError(response: { error?: unknown; response?: Response }, fallback: 
   const status = typeof response.response?.status === "number"
     ? response.response.status
     : typeof error?.status === "number" ? error.status : undefined;
-  const detail = status === 401
+  const messages: Record<string, string> = {
+    CURRENT_PASSWORD_INVALID: "Mật khẩu hiện tại không đúng.",
+    PASSWORD_LENGTH_INVALID: "Mật khẩu mới phải dài từ 15 đến 64 ký tự Unicode.",
+    PASSWORD_BLOCKED: "Mật khẩu mới quá phổ biến hoặc có thông tin dễ đoán của tài khoản.",
+    PASSWORD_REUSE_FORBIDDEN: "Mật khẩu mới phải khác mật khẩu hiện tại.",
+  };
+  const code = typeof error?.code === "string" ? error.code : undefined;
+  const detail = code && messages[code] ? messages[code] : status === 401
     ? fallback
     : typeof error?.detail === "string" ? error.detail : typeof error?.title === "string" ? error.title : fallback;
-  const code = typeof error?.code === "string" ? error.code : undefined;
   return new OnlineApiError(detail, status, code);
 }
 

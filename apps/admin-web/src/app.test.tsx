@@ -28,6 +28,7 @@ function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdmin
     getSession: vi.fn().mockResolvedValue(session),
     login: vi.fn().mockResolvedValue(session),
     logout: vi.fn().mockResolvedValue(undefined),
+    changePassword: vi.fn().mockResolvedValue(undefined),
     listTargets: vi.fn().mockResolvedValue(targets),
     listSchedules: vi.fn().mockResolvedValue(schedules),
     createSchedule: vi.fn().mockResolvedValue(schedules[0]),
@@ -71,6 +72,26 @@ describe("Admin lifecycle workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Tải lại lịch ngừng hoạt động" }));
     await screen.findByRole("heading", { name: "Đăng nhập quản trị" });
     expect(screen.queryByText("CF-0012 · Nguyễn Kiệm")).not.toBeInTheDocument();
+  });
+
+  it("changes the current password and requires a fresh login", async () => {
+    const api = gateway();
+    renderApp(api);
+    await screen.findByText("CF-0012 · Nguyễn Kiệm");
+
+    fireEvent.click(screen.getByRole("button", { name: "Đổi mật khẩu" }));
+    const dialog = screen.getByRole("dialog", { name: "Đổi mật khẩu" });
+    fireEvent.change(within(dialog).getByLabelText("Mật khẩu hiện tại"), { target: { value: "correct-password" } });
+    fireEvent.change(within(dialog).getByLabelText("Mật khẩu mới"), { target: { value: "Một mật khẩu rất riêng 2026!" } });
+    fireEvent.change(within(dialog).getByLabelText("Nhập lại mật khẩu mới"), { target: { value: "Một mật khẩu rất riêng 2026!" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Đổi mật khẩu" }));
+
+    await waitFor(() => expect(api.changePassword).toHaveBeenCalledWith(
+      "correct-password",
+      "Một mật khẩu rất riêng 2026!",
+    ));
+    expect(await screen.findByText("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Đăng nhập quản trị" })).toBeVisible();
   });
 
   it("resets a dismissed action draft and allows clearing an invalid date", async () => {

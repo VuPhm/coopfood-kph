@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "p05-credential-self-service",
-  "revision": 1,
-  "status": "EXECUTING",
+  "revision": 2,
+  "status": "VERIFYING",
   "objective": "Triển khai vertical slice đổi mật khẩu của chính user trên Store PWA và Admin Web: xác minh mật khẩu hiện tại, áp dụng policy 15–64 Unicode code point và blocklist cục bộ, ghi hash mới PBKDF2 có định danh đồng thời tiếp tục xác minh BCrypt cũ, tăng credential version để mọi session cũ mất hiệu lực ở request kế tiếp, ghi audit không chứa secret và yêu cầu đăng nhập lại sau thành công.",
   "inScope": [
     "Public OpenAPI, example fixture và generated TypeScript client cho POST /api/v1/auth/password/change với currentPassword/newPassword và CSRF",
@@ -17,8 +17,7 @@
     "Admin reset credential người khác, create user, temporary-password delivery, RESET_REQUIRED restricted session, bootstrap/recovery và reactivate user",
     "SSO/MFA/passkey, email/SMS/self-service forgot-password, production secret delivery hoặc password rotation định kỳ",
     "Merge hoặc phụ thuộc candidate P04 user deactivation, O01 backup/restore hay D01 paging đang ở nhánh khác",
-    "Thay đổi role/membership/region/store lifecycle, catalog, KPH nghiệp vụ, Pilot persistence hoặc production deployment",
-    "Kiểm thử kỹ thuật trong lượt triển khai hiện tại; toàn bộ test/check/build/E2E được hoãn theo chỉ đạo người dùng đến lượt test ngày mai"
+    "Thay đổi role/membership/region/store lifecycle, catalog, KPH nghiệp vụ, Pilot persistence hoặc production deployment"
   ],
   "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
   "candidateSha": "",
@@ -27,6 +26,7 @@
     "contracts/openapi/kph.openapi.yaml",
     "contracts/fixtures/api/credential-change.json",
     "contracts/fixtures/golden/fixture-manifest.json",
+    "scripts/check-contracts.mjs",
     "packages/api/src/generated/schema.d.ts",
     "backend/pom.xml",
     "backend/src/main/resources/db/migration/V9__credential_version.sql",
@@ -50,7 +50,7 @@
       "kind": "technical",
       "required": true,
       "status": "pending",
-      "revision": 1,
+      "revision": 2,
       "sha": "",
       "evidence": ""
     },
@@ -59,12 +59,20 @@
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 1,
+      "revision": 2,
       "sha": "",
       "evidence": ""
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Tạm chưa nghiệm thu; hoàn thành phần implementation bị ngắt và để việc kiểm tra tập trung sang ngày kế tiếp.",
+      "source": "Owner request 2026-09-22.",
+      "impact": "Hoàn thiện implementation và test source trong phạm vi P05 nhưng không chạy test/check/lint/build/E2E, không tạo technical evidence và không đánh dấu gate pass. P04/O01/D01 vẫn là candidate độc lập, không tích hợp vào P05.",
+      "decision": "Giữ P05 ở VERIFYING với candidateSha rỗng và cả hai gate pending cho đến khi owner chạy hoặc cho phép chạy technical gates."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Implement revision 1 without running test/check/build/E2E; hand off changed files, assumptions, risks and the exact verification commands for the user's test pass tomorrow."
+  "nextAction": "Ngày 2026-09-23 chạy các lệnh trong verification-handoff.md, sửa blocker nếu có, rồi mới tạo candidate SHA và technical evidence; chưa mở owner acceptance trước đó."
 }

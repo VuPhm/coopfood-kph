@@ -89,6 +89,35 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /api/v1/auth/password/change:
+    post:
+      tags: [Auth]
+      operationId: changeOwnPassword
+      summary: Change the authenticated user's password
+      description: |
+        Verifies the current password, applies the published password policy,
+        writes a new algorithm-prefixed hash and invalidates every session issued
+        before this change. Password values are never returned or audited.
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '204':
+          description: Password changed; the current session is invalidated.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/CredentialValidation'
+
   /api/v1/stores:
     get:
       tags: [Stores]
@@ -746,6 +775,12 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+    CredentialValidation:
+      description: Current password or new-password policy validation failed; code identifies the rule.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     PayloadTooLarge:
       description: Uploaded file exceeds the endpoint limit.
       content:
@@ -780,6 +815,23 @@ components:
         password:
           type: string
           format: password
+          minLength: 1
+          maxLength: 256
+
+    ChangePasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+          format: password
+          minLength: 1
+          maxLength: 256
+        newPassword:
+          type: string
+          format: password
+          description: 15–64 Unicode code points; the server evaluates the full value without trimming or normalization.
           minLength: 1
           maxLength: 256
 

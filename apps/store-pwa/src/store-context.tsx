@@ -10,11 +10,12 @@ type StoreContextProps = {
   storeOptions?: readonly { id: string; code: string; name: string }[] | undefined;
   selectedStoreId?: string | null | undefined;
   onStoreChange?: ((storeId: string) => void) | undefined;
+  onChangePassword?: (() => void) | undefined;
   onLogout?: (() => void) | undefined;
   loggingOut?: boolean;
 };
 
-export function StoreContext({ storeLabel, actorLabel, storageLabel, storageHint, disabled, onConfigure, storeOptions, selectedStoreId, onStoreChange, onLogout, loggingOut = false }: StoreContextProps) {
+export function StoreContext({ storeLabel, actorLabel, storageLabel, storageHint, disabled, onConfigure, storeOptions, selectedStoreId, onStoreChange, onChangePassword, onLogout, loggingOut = false }: StoreContextProps) {
   const content = <>
     <Store className="store-context-icon" size={20} aria-hidden="true" />
     <span className="store-context-copy">
@@ -38,6 +39,9 @@ export function StoreContext({ storeLabel, actorLabel, storageLabel, storageHint
         {storeOptions?.map((store) => <option key={store.id} value={store.id}>{store.code} · {store.name}</option>)}
       </select>
     </label> : null}
-    {onLogout ? <button type="button" className="online-logout-button" disabled={disabled || loggingOut} onClick={onLogout}>{loggingOut ? "Đang đăng xuất…" : "Đăng xuất"}</button> : null}
+    {onChangePassword || onLogout ? <div className="online-account-actions">
+      {onChangePassword ? <button type="button" className="online-account-button" disabled={disabled || loggingOut} onClick={onChangePassword}>Đổi mật khẩu</button> : null}
+      {onLogout ? <button type="button" className="online-logout-button" disabled={disabled || loggingOut} onClick={onLogout}>{loggingOut ? "Đang đăng xuất…" : "Đăng xuất"}</button> : null}
+    </div> : null}
   </div>;
 }

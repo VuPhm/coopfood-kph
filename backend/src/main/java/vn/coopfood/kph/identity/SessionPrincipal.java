@@ -8,10 +8,14 @@ import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-public record SessionPrincipal(SessionUser user) implements Serializable {
+public record SessionPrincipal(SessionUser user, long credentialVersion) implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public SessionPrincipal(SessionUser user) {
+        this(user, 1L);
+    }
 
     public UUID userId() {
         return user.id();

@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-21
+Cập nhật: 2026-09-22
 
 ## Giai đoạn
 
-`C01 catalog staging — CLOSED; integration PR #5 — MERGED`
+`P05 credential self-service — IMPLEMENTED, chờ technical verification`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -59,6 +59,11 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - C01 bổ sung catalog staging/validation CSV cho `CATALOG_ADMIN`: giữ identifier
   dạng string, trả lỗi theo dòng, replay idempotent theo checksum và không tạo
   catalog published. Owner đã chấp nhận ngày 2026-09-21.
+- Candidate P05 trên `codex/p05-credential-self-service` bổ sung self-change
+  password cho Store PWA và Admin Web, credential version để vô hiệu session cũ,
+  hash mới PBKDF2 có prefix và khả năng đọc BCrypt legacy. Implementation và test
+  source đã hoàn tất; toàn bộ technical gate được chủ động để lại đến ngày
+  2026-09-23 theo yêu cầu owner, nên chưa có kết quả pass và chưa nghiệm thu.
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
@@ -91,8 +96,9 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   production infrastructure khi chưa có requirement/ADR.
 - Chưa chốt hosting/storage/retention, SSO/MFA, primary supplier nhiều NCC,
   edit/invalidate workflow hoặc cửa sổ duyệt.
-- Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật, production rollout,
-  paging history và backup/restore online vẫn là backlog có outcome riêng.
+- Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật và production rollout
+  vẫn là backlog. D01 paging history và O01 backup/restore đã có candidate trên
+  nhánh riêng nhưng chưa được owner nghiệm thu hoặc tích hợp.
 - Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
 ## Điểm tiếp tục
@@ -101,9 +107,10 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
 [C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
-tích hợp của chuỗi này. Chưa mở cycle mới. C02 chỉ nên mở sau khi chốt primary
-supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ riêng.
-Thu hồi quyền, khóa user, reset credential và vô hiệu session vẫn thuộc slice khác.
+tích hợp của chuỗi này. P05 đang ở trạng thái candidate chưa kiểm chứng trên nhánh
+riêng; không được coi là accepted hoặc tích hợp. C02 chỉ nên mở sau khi chốt
+primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
+riêng. Admin reset credential, bootstrap/recovery và khóa user vẫn thuộc slice khác.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).
