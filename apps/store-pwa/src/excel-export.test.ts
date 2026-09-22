@@ -1,9 +1,74 @@
-import { describe, expect, it } from "vitest";
+import ExcelJS from "exceljs";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DEMO_RECORDS } from "./demo-records";
 import { buildKphWorkbook, escapeFormulaText } from "./excel-export";
 
+// jsdom does not decode images. Model a browser where Blob URLs fail but
+// self-contained image data still decodes; FileReader and ExcelJS remain real.
+function mockImageDecoder(dimensions = { width: 800, height: 400 }, corrupt = false) {
+  const sources: string[] = [];
+  vi.stubGlobal("Image", class {
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    naturalWidth = dimensions.width;
+    naturalHeight = dimensions.height;
+    set src(value: string) {
+      sources.push(value);
+      queueMicrotask(() => {
+        if (corrupt || !value.startsWith("data:image/")) this.onerror?.();
+        else this.onload?.();
+      });
+    }
+    removeAttribute() {}
+  });
+  return sources;
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
 describe("KPH Excel export", () => {
+  it("exports stored image bytes in order even when temporary Blob URLs cannot load", async () => {
+    const sources = mockImageDecoder();
+    const fetchSpy = vi.fn(() => { throw new Error("Preview URL has expired"); });
+    vi.stubGlobal("fetch", fetchSpy);
+    vi.stubGlobal("URL", { createObjectURL: () => "blob:unreadable", revokeObjectURL: vi.fn() });
+    const photos = ["image/jpeg", "image/png", "image/jpeg"].map((type, index) => ({
+      id: `photo-${index}`,
+      src: `blob:expired-preview-${index}`,
+      alt: "Ảnh kiểm thử",
+      blob: new Blob([`evidence-${index}`], { type }),
+    }));
+    const workbook = await buildKphWorkbook("TPCN", [{ ...DEMO_RECORDS[0]!, photos }]);
+    const reloaded = new ExcelJS.Workbook();
+    await reloaded.xlsx.load(await workbook.xlsx.writeBuffer());
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(sources).toHaveLength(3);
+    const images = reloaded.worksheets[0]!.getImages();
+    expect(images).toHaveLength(3);
+    images.forEach((image, index) => {
+      const media = reloaded.getImage(Number(image.imageId));
+      expect(new TextDecoder().decode(new Uint8Array(media.buffer!))).toBe(`evidence-${index}`);
+      expect(media.extension).toBe(index === 1 ? "png" : "jpeg");
+      expect(image.range.tl.nativeCol).toBe(14 + index);
+      const { ext } = image.range as unknown as ExcelJS.ImagePosition;
+      expect(ext.width / ext.height).toBeCloseTo(2, 1);
+    });
+  });
+
+  it.each([
+    [true, 800, "Không thể đọc kích thước ảnh minh chứng"],
+    [false, 0, "Ảnh minh chứng không có kích thước hợp lệ"],
+  ])("rejects invalid evidence instead of exporting without it (%s, %s)", async (corrupt, width, message) => {
+    mockImageDecoder({ width, height: 400 }, corrupt);
+    const photos = [{ id: "broken", src: "blob:preview", alt: "Ảnh lỗi", blob: new Blob(["invalid"], { type: "image/jpeg" }) }];
+    await expect(buildKphWorkbook("TPCN", [{ ...DEMO_RECORDS[0]!, photos }])).rejects.toThrow(message);
+  });
+
   it("guards spreadsheet formulas without changing normal text", () => {
     expect(escapeFormulaText("  =2+2")).toBe("'  =2+2");
     expect(escapeFormulaText("Sản phẩm A")).toBe("Sản phẩm A");

@@ -24,11 +24,34 @@ function safeText(value: string) {
   return escapeFormulaText(value.trim());
 }
 
-function imageDimensions(source: string) {
-  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+function photoDataUrl(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => typeof reader.result === "string"
+      ? resolve(reader.result)
+      : reject(new Error("Không thể đọc dữ liệu ảnh minh chứng"));
+    reader.onerror = reader.onabort = () => reject(new Error("Không thể đọc dữ liệu ảnh minh chứng"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function loadExportImage(source: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
-    image.onerror = () => reject(new Error("Không thể đọc kích thước ảnh minh chứng"));
+    const fail = (message: string) => {
+      image.onload = image.onerror = null;
+      image.removeAttribute("src");
+      reject(new Error(message));
+    };
+    image.onload = () => {
+      if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+        fail("Ảnh minh chứng không có kích thước hợp lệ");
+        return;
+      }
+      image.onload = image.onerror = null;
+      resolve(image);
+    };
+    image.onerror = () => fail("Không thể đọc kích thước ảnh minh chứng");
     image.src = source;
   });
 }
@@ -42,12 +65,15 @@ async function normalizePhoto(photo: DemoPhoto) {
     if (!response.ok) throw new Error(`Không thể tải ảnh minh chứng (${response.status})`);
     sourceBlob = await response.blob();
   }
-  const sourceUrl = URL.createObjectURL(sourceBlob);
+  // Decode and embed the same stored bytes without depending on temporary Blob
+  // URLs, which may stop loading during a long-lived mobile browser session.
+  const sourceUrl = await photoDataUrl(sourceBlob);
+  const image = await loadExportImage(sourceUrl);
 
   try {
-    const dimensions = await imageDimensions(sourceUrl);
+    const dimensions = { width: image.naturalWidth, height: image.naturalHeight };
     if (sourceBlob.type === "image/png" || sourceBlob.type === "image/jpeg") {
-      return { blob: sourceBlob, extension: sourceBlob.type === "image/png" ? "png" as const : "jpeg" as const, ...dimensions };
+      return { base64: sourceUrl, extension: sourceBlob.type === "image/png" ? "png" as const : "jpeg" as const, ...dimensions };
     }
 
     const canvas = document.createElement("canvas");
@@ -55,17 +81,11 @@ async function normalizePhoto(photo: DemoPhoto) {
     canvas.height = dimensions.height;
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Trình duyệt không hỗ trợ chuyển ảnh sang PNG");
-    const image = new Image();
-    await new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = () => reject(new Error("Không thể chuyển ảnh minh chứng sang PNG"));
-      image.src = sourceUrl;
-    });
     context.drawImage(image, 0, 0);
     const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error("Không thể tạo ảnh PNG")), "image/png"));
-    return { blob, extension: "png" as const, ...dimensions };
+    return { base64: await photoDataUrl(blob), extension: "png" as const, ...dimensions };
   } finally {
-    URL.revokeObjectURL(sourceUrl);
+    image.removeAttribute("src");
   }
 }
 
@@ -167,8 +187,7 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
 
     for (const [photoIndex, photo] of record.photos.slice(0, 3).entries()) {
       const normalized = await normalizePhoto(photo);
-      const buffer = await normalized.blob.arrayBuffer();
-      const imageId = workbook.addImage({ buffer: buffer as never, extension: normalized.extension });
+      const imageId = workbook.addImage({ base64: normalized.base64, extension: normalized.extension });
       const columnPixels = (worksheet.getColumn(15 + photoIndex).width ?? 10) * 7;
       const rowPixels = 105 * (96 / 72);
       const imagePadding = 8;
