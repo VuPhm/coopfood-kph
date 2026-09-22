@@ -128,7 +128,11 @@ class IdentityAdminHttpIntegrationTest {
 
         HttpResponse<String> staleMutation = post(oldAdmin,
                 "/api/v1/admin/users/" + TARGET + "/deactivate", "{\"reason\":\"Stale session\"}");
-        assertThat(staleMutation.statusCode()).isEqualTo(401);
+        // Principal refresh invalidates the session before CSRF evaluates this POST.
+        assertThat(staleMutation.statusCode()).isEqualTo(403);
+        assertThat(objectMapper.readTree(staleMutation.body()).path("code").asText())
+                .isEqualTo("CSRF_VALIDATION_FAILED");
+        assertThat(get(oldAdmin, "/api/v1/admin/users").statusCode()).isEqualTo(401);
         assertThat(get(changingAdmin, "/api/v1/admin/users").statusCode()).isEqualTo(401);
         assertThat(database.fetchValue("SELECT active FROM app_users WHERE id = ?", TARGET)).isEqualTo(true);
         assertThat(database.fetchValue("SELECT count(*) FROM audit_events WHERE action = 'USER_DEACTIVATED'"))
