@@ -35,7 +35,8 @@
     "apps/admin-web/src/**",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
-    "docs/delivery/p04-user-deactivation/**"
+    "docs/delivery/p04-user-deactivation/**",
+    "e2e/scripts/verify-p04-identity.cjs"
   ],
   "reviewLimit": 2,
   "reviewRound": 2,
