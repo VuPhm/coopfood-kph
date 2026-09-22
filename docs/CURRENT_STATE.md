@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-21
+Cập nhật: 2026-09-23
 
 ## Giai đoạn
 
-`P04 user deactivation — EXECUTING on revision 2`
+`P04 user deactivation — tích hợp baseline P05, đang kiểm chứng`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -59,15 +59,23 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - C01 bổ sung catalog staging/validation CSV cho `CATALOG_ADMIN`: giữ identifier
   dạng string, trả lỗi theo dòng, replay idempotent theo checksum và không tạo
   catalog published. Owner đã chấp nhận ngày 2026-09-21.
-- P04 đang triển khai lát cắt identity lifecycle đầu tiên: `CHAIN_ADMIN` xem
-  directory và vô hiệu hóa user khác với reason/audit; session target mất quyền
-  ở request kế tiếp. Guard transaction chặn self-deactivate, last active
-  `CHAIN_ADMIN` và last active `STORE_MANAGER` của active store. Reset credential,
-  role/assignment/membership revoke và reactivate vẫn ngoài slice.
+- P05 trên `codex/p05-credential-self-service` bổ sung self-change
+  password cho Store PWA và Admin Web, credential version để vô hiệu session cũ,
+  hash mới PBKDF2 có prefix và khả năng đọc BCrypt legacy. Technical verification
+  đã pass trên candidate `39c0cff`; browser preview đã kiểm tra đến ngay trước
+  submit ở cả hai entry point. Owner đã xác nhận “pass” ngày 23/09/2026;
+  cycle đã đóng theo [owner acceptance](delivery/p05-credential-self-service/acceptance-handoff.md).
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
 ## Kiểm chứng gần nhất
+
+- P05 đã merge qua [PR #7](https://github.com/VuPhm/coopfood-kph/pull/7),
+  commit `2d32ffd`, ngày 23/09/2026. CI frontend/backend/browser PASS trên
+  head `0374016`; cây nội dung merge trùng head đã kiểm chứng.
+- P04 tiếp tục từ candidate `92dedf7` trên `codex/p04-user-deactivation` và tích hợp
+  P05. Chỉ CHAIN_ADMIN được khóa user khác; giữ guard self/last-admin/last-manager,
+  audit và session invalidation. Evidence cũ chưa chứng minh bản tích hợp mới.
 
 - PR #5 đã merge chuỗi accepted S04 → P01 → P02 → P03 → C01 vào `main` ngày
   2026-09-21: head `048a7ff`, merge commit `3ffc774`. Remote CI của PR PASS cả
@@ -96,8 +104,9 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   production infrastructure khi chưa có requirement/ADR.
 - Chưa chốt hosting/storage/retention, SSO/MFA, primary supplier nhiều NCC,
   edit/invalidate workflow hoặc cửa sổ duyệt.
-- Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật, production rollout,
-  paging history và backup/restore online vẫn là backlog có outcome riêng.
+- Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật và production rollout
+  vẫn là backlog. D01 paging history và O01 backup/restore đã có candidate trên
+  nhánh riêng nhưng chưa được owner nghiệm thu hoặc tích hợp.
 - Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
 ## Điểm tiếp tục
@@ -106,15 +115,10 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
 [C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
-tích hợp của chuỗi này. Chưa mở cycle mới. C02 chỉ nên mở sau khi chốt primary
-supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ riêng.
-Thu hồi role/assignment/membership, reset credential và session-version invalidation
-vẫn thuộc slice khác; P04 chỉ vô hiệu hóa toàn bộ user và dựa vào principal refresh.
+tích hợp của chuỗi này. P05 đã được owner chấp nhận và merge vào `main` ngày 23/09/2026.
+P04 là cycle active, đang kiểm chứng lại trên baseline P05; chưa owner acceptance. C02 chỉ nên mở sau khi chốt
+primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
+riêng. Admin reset credential, bootstrap/recovery và khóa user vẫn thuộc slice khác.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).
-
-P04 đã mở từ `main` tại `f308e0e`; kế hoạch revision 2 nằm ở
-[p04-user-deactivation](delivery/p04-user-deactivation/plan.json). Tiếp tục từ
-technical verification và owner acceptance của đúng slice này; không mở thêm
-credential/reset hoặc C02 trong cùng cycle.

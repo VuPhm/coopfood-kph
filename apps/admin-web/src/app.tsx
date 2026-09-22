@@ -1,10 +1,11 @@
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Input, Tag } from "@coopfood-kph/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarClock, CheckCircle2, Clock3, Leaf, LogOut, MapPinned, RefreshCw, ShieldCheck, Store, XCircle } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock3, KeyRound, Leaf, LogOut, MapPinned, RefreshCw, ShieldCheck, Store, XCircle } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { CatalogWorkspace } from "./catalog-workspace";
 import { IdentityWorkspace } from "./identity-workspace";
+import { ChangePasswordDialog } from "./change-password-dialog";
 import { createLifecycleAdminGateway, type AdminSession, type LifecycleAdminGateway, type LifecycleSchedule, type LifecycleTarget } from "./lifecycle-admin";
 
 type AppProps = { gateway?: LifecycleAdminGateway };
@@ -25,6 +26,8 @@ export function App({ gateway: providedGateway }: AppProps) {
   const gateway = useMemo(() => providedGateway ?? createLifecycleAdminGateway(), [providedGateway]);
   const queryClient = useQueryClient();
   const [workspace, setWorkspace] = useState<"catalog" | "identity" | "lifecycle">("catalog");
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [loginNotice, setLoginNotice] = useState<string | null>(null);
   const sessionQuery = useQuery({ queryKey: queryKeys.session, queryFn: async ({ signal }) => {
     try { return await gateway.getSession(signal); }
     catch (error) { if (isUnauthorized(error)) return null; throw error; }
@@ -65,6 +68,7 @@ export function App({ gateway: providedGateway }: AppProps) {
   const login = useMutation({
     mutationFn: ({ username, password }: { username: string; password: string }) => gateway.login(username, password),
     onSuccess(session) {
+      setLoginNotice(null);
       queryClient.setQueryData(queryKeys.session, session);
       const catalog = session.user.globalRoles.includes("CATALOG_ADMIN");
       setWorkspace(catalog ? "catalog" : "lifecycle");
@@ -85,27 +89,40 @@ export function App({ gateway: providedGateway }: AppProps) {
   if (sessionQuery.isPending) return <LoadingScreen />;
   if (!sessionQuery.data || expired) {
     if (!sessionQuery.error || isUnauthorized(sessionQuery.error) || expired) {
-      return <LoginScreen busy={login.isPending} error={login.error instanceof Error ? login.error.message : null} onLogin={(username, password) => login.mutate({ username, password })} />;
+      return <LoginScreen busy={login.isPending} error={login.error instanceof Error ? login.error.message : null} notice={loginNotice} onLogin={(username, password) => login.mutate({ username, password })} />;
     }
     return <LoadFailure message="Không thể kiểm tra phiên Admin Web." onRetry={() => void sessionQuery.refetch()} />;
   }
 
+  const passwordDialog = <ChangePasswordDialog
+    open={changePasswordOpen}
+    onOpenChange={setChangePasswordOpen}
+    onSubmit={(currentPassword, newPassword) => gateway.changePassword(currentPassword, newPassword)}
+    onChanged={() => {
+      setChangePasswordOpen(false);
+      setLoginNotice("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.");
+      clearSession();
+    }}
+  />;
+
   if (activeWorkspace === "catalog") {
-    return <CatalogWorkspace
+    return <><CatalogWorkspace
       gateway={gateway}
       session={sessionQuery.data}
+      onChangePassword={() => setChangePasswordOpen(true)}
       onLogout={() => logout.mutate()}
       logoutBusy={logout.isPending}
       onError={handleError}
       onOpenLifecycle={() => setWorkspace("lifecycle")}
       {...(hasChainAdmin ? { onOpenIdentity: () => setWorkspace("identity") } : {})}
-    />;
+    />{passwordDialog}</>;
   }
 
   if (activeWorkspace === "identity") {
-    return <IdentityWorkspace
+    return <><IdentityWorkspace
       gateway={gateway}
       session={sessionQuery.data}
+      onChangePassword={() => setChangePasswordOpen(true)}
       users={usersQuery.data ?? []}
       loading={usersQuery.isPending}
       loadError={logout.error instanceof Error ? logout.error.message : usersQuery.error instanceof Error ? usersQuery.error.message : null}
@@ -115,10 +132,10 @@ export function App({ gateway: providedGateway }: AppProps) {
       onError={handleError}
       onOpenLifecycle={() => setWorkspace("lifecycle")}
       {...(hasCatalog ? { onOpenCatalog: () => setWorkspace("catalog") } : {})}
-    />;
+    />{passwordDialog}</>;
   }
 
-  return <LifecycleWorkspace
+  return <><LifecycleWorkspace
     gateway={gateway}
     session={sessionQuery.data}
     targets={targetsQuery.data ?? []}
@@ -128,13 +145,14 @@ export function App({ gateway: providedGateway }: AppProps) {
     onRefresh={() => { void targetsQuery.refetch(); void schedulesQuery.refetch(); }}
     onLogout={() => logout.mutate()}
     logoutBusy={logout.isPending}
+    onChangePassword={() => setChangePasswordOpen(true)}
     onError={handleError}
     {...(hasCatalog ? { onOpenCatalog: () => setWorkspace("catalog") } : {})}
     {...(hasChainAdmin ? { onOpenIdentity: () => setWorkspace("identity") } : {})}
-  />;
+  />{passwordDialog}</>;
 }
 
-function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loadError, onRefresh, onLogout, logoutBusy, onError, onOpenCatalog, onOpenIdentity }: {
+function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loadError, onRefresh, onLogout, logoutBusy, onChangePassword, onError, onOpenCatalog, onOpenIdentity }: {
   gateway: LifecycleAdminGateway;
   session: AdminSession;
   targets: LifecycleTarget[];
@@ -144,6 +162,7 @@ function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loa
   onRefresh(): void;
   onLogout(): void;
   logoutBusy: boolean;
+  onChangePassword(): void;
   onError(error: unknown): void;
   onOpenCatalog?: () => void;
   onOpenIdentity?: () => void;
@@ -192,7 +211,7 @@ function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loa
     <header className="sticky top-0 z-20 bg-brand text-white shadow-panel">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-brand"><Leaf aria-hidden="true" /></span><div className="min-w-0"><strong className="block truncate text-base font-black sm:text-lg">Co.op Food KPH</strong><span className="block truncate text-xs text-white/80">Quản trị vùng và cửa hàng</span></div></div>
-        <div className="flex flex-wrap items-center justify-end gap-2">{onOpenIdentity ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenIdentity} variant="secondary">Tài khoản</Button> : null}{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
+        <div className="flex flex-wrap items-center justify-end gap-2">{onOpenIdentity ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenIdentity} variant="secondary">Tài khoản</Button> : null}{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đổi mật khẩu" className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onChangePassword} size="icon" variant="secondary"><KeyRound aria-hidden="true" size={18} /></Button><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
       </div>
     </header>
 
@@ -263,10 +282,10 @@ function ScheduleActionDialog({ action, gateway, onClose, onSuccess, onError }: 
   return <Dialog open={Boolean(action)} onOpenChange={(open) => { if (!open && !mutation.isPending) onClose(); }}><DialogContent><DialogHeader><DialogTitle>{copy.title}</DialogTitle><DialogDescription>{action ? `${action.schedule.target.code} · ${action.schedule.target.name}. ${copy.description}` : copy.description}</DialogDescription></DialogHeader><form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); mutation.mutate(); }}>{action?.type === "reschedule" ? <Field htmlFor="reschedule-date" label="Ngày hiệu lực mới" required><Input id="reschedule-date" inputMode="numeric" placeholder="dd/mm/yyyy" value={date} onChange={(event) => setDate(event.target.value)} /></Field> : null}<Field htmlFor="action-reason" label="Lý do" required><textarea id="action-reason" className="min-h-24 w-full resize-y rounded-xl border-2 border-surface-strong px-3 py-2 text-base" maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} /></Field>{mutation.error instanceof Error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm font-semibold text-danger" role="alert">{mutation.error.message}</p> : null}<div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><Button type="button" variant="ghost" onClick={onClose} disabled={mutation.isPending}>Quay lại</Button><Button type="submit" variant={action?.type === "execute" ? "danger" : "primary"} disabled={mutation.isPending}>{mutation.isPending ? "Đang xử lý…" : copy.submit}</Button></div></form></DialogContent></Dialog>;
 }
 
-function LoginScreen({ busy, error, onLogin }: { busy: boolean; error: string | null; onLogin(username: string, password: string): void }) {
+function LoginScreen({ busy, error, notice, onLogin }: { busy: boolean; error: string | null; notice: string | null; onLogin(username: string, password: string): void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  return <main className="grid min-h-dvh place-items-center bg-canvas px-4 py-8 text-ink"><section className="w-full max-w-md rounded-3xl border border-surface-strong bg-white p-6 shadow-panel sm:p-8"><span className="grid size-12 place-items-center rounded-2xl bg-brand text-white"><Leaf aria-hidden="true" /></span><p className="mt-6 text-xs font-black uppercase tracking-[.14em] text-brand">Admin Web</p><h1 className="mt-2 text-3xl font-black">Đăng nhập quản trị</h1><p className="mt-3 text-sm leading-6 text-ink-muted">Dành cho quản trị catalog, quản trị chuỗi hoặc quản lý vùng đã được cấp quyền.</p><form className="mt-6 grid gap-4" onSubmit={(event) => { event.preventDefault(); onLogin(username.trim(), password); }}><Field htmlFor="username" label="Tên đăng nhập" required><Input id="username" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} /></Field><Field htmlFor="password" label="Mật khẩu" required><Input id="password" autoComplete="current-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></Field>{error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm font-semibold text-danger" role="alert">{error}</p> : null}<Button disabled={busy || !username.trim() || !password} type="submit">{busy ? "Đang đăng nhập…" : "Đăng nhập"}</Button></form></section></main>;
+  return <main className="grid min-h-dvh place-items-center bg-canvas px-4 py-8 text-ink"><section className="w-full max-w-md rounded-3xl border border-surface-strong bg-white p-6 shadow-panel sm:p-8"><span className="grid size-12 place-items-center rounded-2xl bg-brand text-white"><Leaf aria-hidden="true" /></span><p className="mt-6 text-xs font-black uppercase tracking-[.14em] text-brand">Admin Web</p><h1 className="mt-2 text-3xl font-black">Đăng nhập quản trị</h1><p className="mt-3 text-sm leading-6 text-ink-muted">Dành cho quản trị catalog, quản trị chuỗi hoặc quản lý vùng đã được cấp quyền.</p>{notice ? <p className="mt-4 rounded-xl bg-brand-soft px-3 py-3 text-sm font-semibold text-brand" role="status">{notice}</p> : null}<form className="mt-6 grid gap-4" onSubmit={(event) => { event.preventDefault(); onLogin(username.trim(), password); }}><Field htmlFor="username" label="Tên đăng nhập" required><Input id="username" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} /></Field><Field htmlFor="password" label="Mật khẩu" required><Input id="password" autoComplete="current-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></Field>{error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm font-semibold text-danger" role="alert">{error}</p> : null}<Button disabled={busy || !username.trim() || !password} type="submit">{busy ? "Đang đăng nhập…" : "Đăng nhập"}</Button></form></section></main>;
 }
 
 function LoadingScreen() { return <main className="grid min-h-dvh place-items-center bg-canvas text-ink"><p className="flex items-center gap-3 font-bold" role="status"><RefreshCw className="animate-spin motion-reduce:animate-none text-brand" aria-hidden="true" />Đang mở Admin Web…</p></main>; }

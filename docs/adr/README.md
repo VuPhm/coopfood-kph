@@ -17,3 +17,5 @@ ADR accepted hiện hành:
   support matrix và giữ migration path rõ.
 - `0004-scoped-management-hierarchy.md`: quyền kế thừa explicit cho admin toàn
   chuỗi, quản lý đúng vùng và quản lý đúng store.
+- `0005-password-hash-migration.md`: hash PBKDF2 có prefix, đọc BCrypt legacy và
+  credential version để thu hồi session sau self-change; accepted cùng P05.

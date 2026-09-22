@@ -7,6 +7,7 @@ import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useSta
 import { assetUrl } from "./asset-url";
 import { formatBusinessDate } from "./business-date";
 import { CalendarInput } from "./calendar-input";
+import { ChangePasswordDialog } from "./change-password-dialog";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
 import { DEMO_RECORDS } from "./demo-records";
 import { approvalLabels, type ApprovalStatus, type EvidencePhotoView, type RecordView } from "./record-view";
@@ -215,6 +216,7 @@ function WorkspaceApp() {
   const [onlineStoreId, setOnlineStoreId] = useState<string | null>(null);
   const [onlineGateway] = useState(() => onlinePersistenceEnabled ? createOnlineGateway() : null);
   const [onlineAuthRequired, setOnlineAuthRequired] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const onlineMutationScopeRef = useRef<OnlineMutationScope>({ generation: 0, storeId: null, userId: null });
   const queryClient = useQueryClient();
   const sessionQuery = useQuery<OnlineSession>({
@@ -395,8 +397,20 @@ function WorkspaceApp() {
     setOnlineStoreId(null);
     setSelected(new Set());
     setDialogOpen(false);
+    setChangePasswordOpen(false);
     queryClient.removeQueries({ queryKey: ["online", "history"] });
     setStorageError(sessionExpiryMessage(error));
+  }
+
+  function completePasswordChange() {
+    invalidateOnlineMutationScope();
+    setOnlineAuthRequired(true);
+    setOnlineStoreId(null);
+    setSelected(new Set());
+    setDialogOpen(false);
+    setChangePasswordOpen(false);
+    queryClient.removeQueries({ queryKey: ["online"] });
+    setStorageError("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.");
   }
 
   useEffect(() => {
@@ -964,6 +978,7 @@ function WorkspaceApp() {
               storeOptions={onlinePersistenceEnabled ? onlineStores : undefined}
               selectedStoreId={onlinePersistenceEnabled ? onlineStoreId : undefined}
               onStoreChange={onlinePersistenceEnabled ? changeOnlineStore : undefined}
+              onChangePassword={onlinePersistenceEnabled && onlineSession ? () => setChangePasswordOpen(true) : undefined}
               onLogout={onlinePersistenceEnabled && onlineSession ? () => logoutMutation.mutate() : undefined}
               loggingOut={logoutMutation.isPending}
             />
@@ -1129,6 +1144,12 @@ function WorkspaceApp() {
           : undefined}
       />
       {!onlinePersistenceEnabled ? <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} /> : null}
+      {onlinePersistenceEnabled && onlineGateway ? <ChangePasswordDialog
+        open={changePasswordOpen}
+        onOpenChange={setChangePasswordOpen}
+        onSubmit={(currentPassword, newPassword) => onlineGateway.changePassword(currentPassword, newPassword)}
+        onChanged={completePasswordChange}
+      /> : null}
 
       {!onlinePersistenceEnabled ?
         <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>

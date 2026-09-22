@@ -79,6 +79,21 @@ class IdentityController {
         }
     }
 
+    @PostMapping("/password/change")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void changePassword(
+            @Valid @RequestBody ChangePasswordRequest requestBody,
+            Authentication authentication,
+            HttpServletRequest request) {
+        SessionPrincipal principal = requirePrincipal(authentication);
+        identityService.changeOwnPassword(
+                principal, requestBody.currentPassword(), requestBody.newPassword());
+        SecurityContextHolder.clearContext();
+        if (request.getSession(false) != null) {
+            request.getSession(false).invalidate();
+        }
+    }
+
     private SessionResponse response(
             SessionPrincipal principal,
             HttpServletRequest request,

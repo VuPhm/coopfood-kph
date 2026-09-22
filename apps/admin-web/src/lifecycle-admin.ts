@@ -25,6 +25,7 @@ export type LifecycleAdminGateway = {
   getSession(signal?: AbortSignal): Promise<AdminSession>;
   login(username: string, password: string): Promise<AdminSession>;
   logout(): Promise<void>;
+  changePassword(currentPassword: string, newPassword: string): Promise<void>;
   listTargets(signal?: AbortSignal): Promise<LifecycleTarget[]>;
   listSchedules(signal?: AbortSignal): Promise<LifecycleSchedule[]>;
   createSchedule(input: {
@@ -69,6 +70,15 @@ export function createLifecycleAdminGateway(
       params: { header: { "X-CSRF-TOKEN": csrfToken } },
     });
     if (response.error) throw apiError(response, "Không thể đăng xuất lúc này.");
+    csrfToken = "";
+  }
+
+  async function changePassword(currentPassword: string, newPassword: string) {
+    const response = await client.POST("/api/v1/auth/password/change", {
+      params: { header: { "X-CSRF-TOKEN": csrfToken } },
+      body: { currentPassword, newPassword },
+    });
+    if (response.error) throw apiError(response, "Không thể đổi mật khẩu lúc này.");
     csrfToken = "";
   }
 
@@ -168,7 +178,7 @@ export function createLifecycleAdminGateway(
   }
 
   return {
-    getSession, login, logout,
+    getSession, login, logout, changePassword,
     listTargets, listSchedules, createSchedule, reschedule, cancel, execute,
     listCatalogImports, getCatalogImport, uploadCatalogImport,
     listUsers, deactivateUser,
@@ -183,6 +193,10 @@ function apiError(
   const messages: Record<string, string> = {
     AUTHENTICATION_REQUIRED: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
     INVALID_CREDENTIALS: "Tên đăng nhập hoặc mật khẩu không đúng.",
+    CURRENT_PASSWORD_INVALID: "Mật khẩu hiện tại không đúng.",
+    PASSWORD_LENGTH_INVALID: "Mật khẩu mới phải dài từ 15 đến 64 ký tự Unicode.",
+    PASSWORD_BLOCKED: "Mật khẩu mới quá phổ biến hoặc có thông tin dễ đoán của tài khoản.",
+    PASSWORD_REUSE_FORBIDDEN: "Mật khẩu mới phải khác mật khẩu hiện tại.",
     LIFECYCLE_ADMIN_REQUIRED: "Bạn chưa có quyền quản trị chuỗi hoặc vùng đang hoạt động.",
     LIFECYCLE_TARGET_SCOPE_DENIED: "Vùng hoặc cửa hàng này nằm ngoài phạm vi của bạn.",
     LIFECYCLE_TARGET_NOT_FOUND: "Không tìm thấy vùng hoặc cửa hàng này.",

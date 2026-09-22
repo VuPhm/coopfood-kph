@@ -1,11 +1,11 @@
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Tag } from "@coopfood-kph/ui";
 import { useMutation } from "@tanstack/react-query";
-import { CheckCircle2, Leaf, LogOut, RefreshCw, ShieldCheck, UserRound, UserRoundX } from "lucide-react";
+import { CheckCircle2, KeyRound, Leaf, LogOut, RefreshCw, ShieldCheck, UserRound, UserRoundX } from "lucide-react";
 import { useState } from "react";
 
 import type { AdminSession, AdminUser, LifecycleAdminGateway } from "./lifecycle-admin";
 
-export function IdentityWorkspace({ gateway, session, users, loading, loadError, onRefresh, onLogout, logoutBusy, onError, onOpenLifecycle, onOpenCatalog }: {
+export function IdentityWorkspace({ gateway, session, users, loading, loadError, onRefresh, onLogout, logoutBusy, onChangePassword, onError, onOpenLifecycle, onOpenCatalog }: {
   gateway: LifecycleAdminGateway;
   session: AdminSession;
   users: AdminUser[];
@@ -14,6 +14,7 @@ export function IdentityWorkspace({ gateway, session, users, loading, loadError,
   onRefresh(): void;
   onLogout(): void;
   logoutBusy: boolean;
+  onChangePassword(): void;
   onError(error: unknown): void;
   onOpenLifecycle(): void;
   onOpenCatalog?: () => void;
@@ -27,7 +28,7 @@ export function IdentityWorkspace({ gateway, session, users, loading, loadError,
     <header className="sticky top-0 z-20 bg-brand text-white shadow-panel">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-brand"><Leaf aria-hidden="true" /></span><div className="min-w-0"><strong className="block truncate text-base font-black sm:text-lg">Co.op Food KPH</strong><span className="block truncate text-xs text-white/80">Quản trị tài khoản</span></div></div>
-        <div className="flex flex-wrap items-center justify-end gap-2"><Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenLifecycle} variant="secondary">Lifecycle</Button>{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
+        <div className="flex flex-wrap items-center justify-end gap-2"><Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenLifecycle} variant="secondary">Lifecycle</Button>{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đổi mật khẩu" className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onChangePassword} size="icon" variant="secondary"><KeyRound aria-hidden="true" size={18} /></Button><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
       </div>
     </header>
 

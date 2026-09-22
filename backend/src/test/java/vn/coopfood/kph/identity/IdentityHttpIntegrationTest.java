@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -54,9 +54,6 @@ class IdentityHttpIntegrationTest {
     private DSLContext database;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -68,7 +65,7 @@ class IdentityHttpIntegrationTest {
                         + "VALUES (?, ?, ?, ?, TRUE, ?, ?)",
                 USER_ID,
                 "manager.demo",
-                passwordEncoder.encode("correct-password"),
+                new BCryptPasswordEncoder().encode("correct-password"),
                 "Nguyễn Văn Demo",
                 now,
                 now);
@@ -170,6 +167,74 @@ class IdentityHttpIntegrationTest {
                 request("/api/v1/auth/session").GET().build(),
                 HttpResponse.BodyHandlers.ofString());
         assertThat(sessionAfterDeactivation.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void selfChangeMigratesHashAuditsAndInvalidatesEveryOldSession() throws Exception {
+        CookieManager firstCookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+        CookieManager secondCookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+        HttpClient first = HttpClient.newBuilder().cookieHandler(firstCookies).build();
+        HttpClient second = HttpClient.newBuilder().cookieHandler(secondCookies).build();
+
+        HttpResponse<String> firstLogin = login(first, "correct-password");
+        HttpResponse<String> secondLogin = login(second, "correct-password");
+        assertThat(firstLogin.statusCode()).isEqualTo(200);
+        assertThat(secondLogin.statusCode()).isEqualTo(200);
+        String csrfToken = objectMapper.readTree(firstLogin.body()).path("csrfToken").asText();
+        String newPassword = "Mật khẩu mới riêng tư 2026!";
+
+        HttpResponse<String> rejected = first.send(
+                request("/api/v1/auth/password/change")
+                        .header("Content-Type", "application/json")
+                        .header("X-CSRF-TOKEN", csrfToken)
+                        .POST(HttpRequest.BodyPublishers.ofString("""
+                                {"currentPassword":"wrong-password","newPassword":"%s"}
+                                """.formatted(newPassword)))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString());
+        assertThat(rejected.statusCode()).isEqualTo(422);
+        assertThat(objectMapper.readTree(rejected.body()).path("code").asText())
+                .isEqualTo("CURRENT_PASSWORD_INVALID");
+
+        HttpResponse<String> changed = first.send(
+                request("/api/v1/auth/password/change")
+                        .header("Content-Type", "application/json")
+                        .header("X-CSRF-TOKEN", csrfToken)
+                        .POST(HttpRequest.BodyPublishers.ofString("""
+                                {"currentPassword":"correct-password","newPassword":"%s"}
+                                """.formatted(newPassword)))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString());
+        assertThat(changed.statusCode()).isEqualTo(204);
+
+        assertThat(second.send(request("/api/v1/auth/session").GET().build(),
+                HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(401);
+        assertThat(login(HttpClient.newHttpClient(), "correct-password").statusCode()).isEqualTo(401);
+        assertThat(login(HttpClient.newHttpClient(), newPassword).statusCode()).isEqualTo(200);
+
+        String storedHash = (String) database.fetchValue(
+                "SELECT password_hash FROM app_users WHERE id = ?", USER_ID);
+        Long version = ((Number) database.fetchValue(
+                "SELECT credential_version FROM app_users WHERE id = ?", USER_ID)).longValue();
+        String metadata = (String) database.fetchValue("""
+                SELECT metadata::text FROM audit_events
+                WHERE actor_user_id = ? AND action = 'CREDENTIAL_CHANGED'
+                ORDER BY occurred_at DESC LIMIT 1
+                """, USER_ID);
+        assertThat(storedHash).startsWith("{pbkdf2}").doesNotContain(newPassword);
+        assertThat(version).isEqualTo(2L);
+        assertThat(metadata).contains("credentialVersion").doesNotContain("password").doesNotContain(storedHash);
+    }
+
+    private HttpResponse<String> login(HttpClient client, String password) throws Exception {
+        return client.send(
+                request("/api/v1/auth/login")
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString("""
+                                {"username":"manager.demo","password":"%s"}
+                                """.formatted(password)))
+                        .build(),
+                HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpRequest.Builder request(String path) {

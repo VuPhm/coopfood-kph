@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "p04-user-deactivation",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 3,
+  "status": "VERIFYING",
   "objective": "Triển khai vertical slice vô hiệu hóa user: chỉ active CHAIN_ADMIN được xem directory toàn chuỗi và deactivate một user khác với lý do bắt buộc; mutation có audit, chặn self-deactivate, last active CHAIN_ADMIN và last active STORE_MANAGER của mọi active store trong cùng transaction, làm mọi session của target mất quyền ở request kế tiếp; Admin Web cho phép owner xác nhận và dùng thử flow qua OpenAPI chung.",
   "inScope": [
     "Public OpenAPI, example fixture và generated TypeScript client cho list admin users và deactivate user với reason bắt buộc",
@@ -19,8 +19,8 @@
     "Lifecycle store/region, catalog publish, paging, backup/restore, production deployment, SSO/MFA và notification",
     "Delegated identity administration cho REGION_MANAGER hoặc CATALOG_ADMIN"
   ],
-  "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
-  "candidateSha": "4f7c2cb166ade696f327c31188a2cee0c92f3483",
+  "baseSha": "2d32ffd873f26d4ac2bc4153b0115f31d228f61f",
+  "candidateSha": "",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -38,26 +38,26 @@
     "docs/delivery/p04-user-deactivation/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "technical-user-deactivation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "4f7c2cb166ade696f327c31188a2cee0c92f3483",
-      "evidence": "docs/delivery/p04-user-deactivation/technical-evidence.md"
+      "status": "pending",
+      "revision": 3,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "owner-user-deactivation-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 2,
+      "revision": 3,
       "sha": "",
-      "evidence": "docs/delivery/p04-user-deactivation/acceptance-handoff.md"
+      "evidence": ""
     }
   ],
   "changes": [
@@ -67,8 +67,15 @@
       "source": "Review bắt buộc theo docs/product/PROVISIONING_POLICY.md và AGENTS.md ngày 2026-09-21.",
       "impact": "Backend phải khóa/kiểm các active store mà target đang quản lý; integration test và thông báo UI bổ sung conflict tương ứng. Evidence revision 1 chưa tồn tại và không được dùng.",
       "decision": "Sửa kế hoạch trước verification; giữ nguyên boundary không thêm membership revoke/reactivate."
+    },
+    {
+      "revision": 3,
+      "request": "Tiếp tục P04 sau khi P05 đã merge.",
+      "source": "Owner message “tiếp” ngày 23/09/2026 trong task 01a0ca34-2ef9-7992-9aaa-5c64d21587a1.",
+      "impact": "Tích hợp main/P05 vào candidate P04; giữ cả credential version/password change và admin directory/deactivation, kết hợp navigation/cache cleanup. Chạy lại technical gates; evidence revision 2 chỉ là lịch sử.",
+      "decision": "Giữ scope P04, không thêm migration; revision 3 VERIFYING và owner gate pending."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner chạy kịch bản trên preview local và xác nhận acceptance hoặc nêu thay đổi cụ thể; không merge/đóng cycle trước quyết định đó."
+  "nextAction": "Kiểm chứng frontend/backend/browser bản P04 + P05 rồi chuẩn bị preview và owner handoff."
 }

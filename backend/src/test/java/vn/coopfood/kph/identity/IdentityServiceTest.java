@@ -7,6 +7,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +32,11 @@ class IdentityServiceTest {
     void setUp() {
         repository = new FakeIdentityRepository();
         passwordEncoder = new RecordingPasswordEncoder();
-        service = new IdentityService(repository, passwordEncoder);
+        service = new IdentityService(
+                repository,
+                passwordEncoder,
+                new PasswordPolicy(),
+                Clock.fixed(Instant.parse("2026-09-22T00:00:00Z"), ZoneOffset.UTC));
     }
 
     @Test
@@ -44,7 +51,7 @@ class IdentityServiceTest {
                         "CF-DEMO-001",
                         "Nguyễn Kiệm",
                         StoreRole.STORE_MANAGER)));
-        repository.credentials = Optional.of(new IdentityRepository.UserCredentials(USER_ID, "stored-hash"));
+        repository.credentials = Optional.of(new IdentityRepository.UserCredentials(USER_ID, "stored-hash", 7L));
         repository.user = Optional.of(sessionUser);
         passwordEncoder.matches = true;
 
@@ -54,6 +61,7 @@ class IdentityServiceTest {
         assertThat(passwordEncoder.rawPassword).isEqualTo("correct-password");
         assertThat(passwordEncoder.encodedPassword).isEqualTo("stored-hash");
         assertThat(principal.user()).isEqualTo(sessionUser);
+        assertThat(principal.credentialVersion()).isEqualTo(7L);
         assertThat(principal.authorities()).extracting("authority").containsExactly("ROLE_CHAIN_ADMIN");
     }
 
@@ -65,12 +73,12 @@ class IdentityServiceTest {
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Username or password is invalid.");
         assertThat(passwordEncoder.rawPassword).isEqualTo("submitted-password");
-        assertThat(passwordEncoder.encodedPassword).startsWith("$2a$10$").hasSize(60);
+        assertThat(passwordEncoder.encodedPassword).isEqualTo("dummy-hash");
     }
 
     @Test
     void rejectsUserDeactivatedAfterCredentialRead() {
-        repository.credentials = Optional.of(new IdentityRepository.UserCredentials(USER_ID, "stored-hash"));
+        repository.credentials = Optional.of(new IdentityRepository.UserCredentials(USER_ID, "stored-hash", 1L));
         repository.user = Optional.empty();
         passwordEncoder.matches = true;
 
@@ -104,10 +112,65 @@ class IdentityServiceTest {
         assertThat(restored).isEqualTo(principal);
     }
 
+    @Test
+    void changesPasswordAtomicallyWithVersionAndSecretFreeAudit() {
+        SessionUser user = sessionUser();
+        SessionPrincipal principal = new SessionPrincipal(user, 7L);
+        repository.credentials = Optional.of(new IdentityRepository.UserCredentials(
+                USER_ID, "encoded:correct-password", 7L));
+        service = new IdentityService(
+                repository,
+                new PlainPasswordEncoder(),
+                new PasswordPolicy(),
+                Clock.fixed(Instant.parse("2026-09-22T00:00:00Z"), ZoneOffset.UTC));
+
+        service.changeOwnPassword(principal, "correct-password", "Mật khẩu mới rất riêng 2026!");
+
+        assertThat(repository.updatedPasswordHash).isEqualTo("encoded:Mật khẩu mới rất riêng 2026!");
+        assertThat(repository.expectedVersion).isEqualTo(7L);
+        assertThat(repository.updatedVersion).isEqualTo(8L);
+        assertThat(repository.auditVersion).isEqualTo(8L);
+        assertThat(repository.updatedAt).isEqualTo(Instant.parse("2026-09-22T00:00:00Z"));
+    }
+
+    @Test
+    void rejectsAnIncorrectCurrentPasswordWithoutWriting() {
+        SessionPrincipal principal = new SessionPrincipal(sessionUser(), 3L);
+        repository.credentials = Optional.of(new IdentityRepository.UserCredentials(
+                USER_ID, "encoded:correct-password", 3L));
+        service = new IdentityService(
+                repository,
+                new PlainPasswordEncoder(),
+                new PasswordPolicy(),
+                Clock.systemUTC());
+
+        assertThatThrownBy(() -> service.changeOwnPassword(
+                principal, "wrong-password", "Mật khẩu mới rất riêng 2026!"))
+                .isInstanceOfSatisfying(
+                        IdentityProblemException.class,
+                        problem -> assertThat(problem.code()).isEqualTo("CURRENT_PASSWORD_INVALID"));
+        assertThat(repository.updatedPasswordHash).isNull();
+        assertThat(repository.auditVersion).isNull();
+    }
+
+    private SessionUser sessionUser() {
+        return new SessionUser(
+                USER_ID,
+                "manager.demo",
+                "Nguyễn Văn Demo",
+                Set.of(),
+                List.of());
+    }
+
     private static final class FakeIdentityRepository extends IdentityRepository {
         private Optional<UserCredentials> credentials = Optional.empty();
         private Optional<SessionUser> user = Optional.empty();
         private String requestedUsername;
+        private String updatedPasswordHash;
+        private Long expectedVersion;
+        private Long updatedVersion;
+        private Long auditVersion;
+        private Instant updatedAt;
 
         private FakeIdentityRepository() {
             super(null);
@@ -123,6 +186,29 @@ class IdentityServiceTest {
         Optional<SessionUser> findActiveUser(UUID userId) {
             return user;
         }
+
+        @Override
+        Optional<UserCredentials> lockActiveCredentials(UUID userId) {
+            return credentials;
+        }
+
+        @Override
+        void updatePassword(
+                UUID userId,
+                long expectedVersion,
+                String passwordHash,
+                long nextVersion,
+                Instant now) {
+            this.expectedVersion = expectedVersion;
+            this.updatedPasswordHash = passwordHash;
+            this.updatedVersion = nextVersion;
+            this.updatedAt = now;
+        }
+
+        @Override
+        void insertCredentialChangedAudit(UUID actorId, long credentialVersion, Instant now) {
+            this.auditVersion = credentialVersion;
+        }
     }
 
     private static final class RecordingPasswordEncoder implements PasswordEncoder {
@@ -132,7 +218,7 @@ class IdentityServiceTest {
 
         @Override
         public String encode(CharSequence rawPassword) {
-            throw new UnsupportedOperationException();
+            return "dummy-hash";
         }
 
         @Override
@@ -140,6 +226,18 @@ class IdentityServiceTest {
             this.rawPassword = rawPassword.toString();
             this.encodedPassword = encodedPassword;
             return matches;
+        }
+    }
+
+    private static final class PlainPasswordEncoder implements PasswordEncoder {
+        @Override
+        public String encode(CharSequence rawPassword) {
+            return "encoded:" + rawPassword;
+        }
+
+        @Override
+        public boolean matches(CharSequence rawPassword, String encodedPassword) {
+            return encode(rawPassword).equals(encodedPassword);
         }
     }
 }

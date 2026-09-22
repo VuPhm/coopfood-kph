@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.BadCredentialsException;
 
 import vn.coopfood.kph.identity.IdentityAdminException;
+import vn.coopfood.kph.identity.IdentityProblemException;
 
 @RestControllerAdvice
 public class ProblemDetailAdvice {
@@ -30,6 +31,12 @@ public class ProblemDetailAdvice {
 
     @ExceptionHandler(IdentityAdminException.class)
     ResponseEntity<ProblemDetail> handleIdentityAdminProblem(IdentityAdminException exception) {
+        ProblemDetail problem = problem(exception.status(), exception.code(), exception.getMessage());
+        return ResponseEntity.status(exception.status()).body(problem);
+    }
+
+    @ExceptionHandler(IdentityProblemException.class)
+    ResponseEntity<ProblemDetail> handleIdentityProblem(IdentityProblemException exception) {
         ProblemDetail problem = problem(exception.status(), exception.code(), exception.getMessage());
         return ResponseEntity.status(exception.status()).body(problem);
     }

@@ -1,18 +1,31 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-09-21
+Cập nhật: 2026-09-23
 
-## P04 user deactivation — đang thực hiện
+## P04 user deactivation — đang kiểm chứng bản tích hợp
 
-Cycle revision 2 triển khai directory toàn chuỗi và deactivate user cho active
-`CHAIN_ADMIN`. Mutation phải có reason/audit, giữ role/assignment/membership để
-reactivate explicit về sau và làm session target mất quyền ở request kế tiếp.
-Trong cùng transaction phải chặn self-deactivate, không để mất active
-`CHAIN_ADMIN` cuối cùng và không để active store mất `STORE_MANAGER` cuối cùng.
+Tiếp tục cycle P04 revision 3 trên `codex/p04-user-deactivation` từ yêu cầu
+“tiếp” ngày 23/09/2026. Tích hợp main/P05 và giải quyết contract/Admin UI dùng
+chung, sau đó kiểm frontend/backend/browser trên dữ liệu tổng hợp. P04 giữ
+CHAIN_ADMIN-only, self/last-admin/last-manager guards, audit và hiệu lực ở request
+kế tiếp. Chưa mở create/reactivate/reset/revoke hoặc migration mới.
 
-Ngoài scope P04: create/update/reactivate user, grant/revoke role/assignment/
-membership, reset/change credential, bootstrap/recovery và production delivery.
-Plan: [p04-user-deactivation](delivery/p04-user-deactivation/plan.json).
+Bước tiếp theo: đạt technical gates trên candidate mới, mở preview cho owner
+nghiệm thu; không xem pass P05 là pass P04.
+
+## P05 credential self-service — đã đóng và tích hợp
+
+Implementation candidate trên `codex/p05-credential-self-service` đã có contract,
+migration V9, backend, Store PWA, Admin Web và test source cho đổi mật khẩu của
+chính user. Hash mới dùng PBKDF2 có prefix, BCrypt cũ vẫn được xác minh và
+`credential_version` làm mọi session cũ mất hiệu lực ở request kế tiếp.
+
+Technical verification đã pass trên candidate `39c0cff` với evidence tại
+[technical evidence](delivery/p05-credential-self-service/technical-evidence.md).
+Owner đã xác nhận “pass” ngày 23/09/2026 và yêu cầu làm tiếp.
+[Owner decision](delivery/p05-credential-self-service/acceptance-handoff.md) đóng
+cycle P05. [PR #7](https://github.com/VuPhm/coopfood-kph/pull/7) đã merge vào
+`main` tại `2d32ffd` ngày 23/09/2026; CI frontend/backend/browser PASS. Chưa deploy.
 
 ## P02 scoped authorization — đã đóng
 
@@ -61,9 +74,8 @@ với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, b
 và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
 `docs/delivery/**`.
 
-Không có milestone active sau closeout này. C02 vẫn bị chặn bởi quyết định
-primary supplier; D01/O01/O02 và lifecycle identity/credential là các outcome
-độc lập, chỉ mở cycle mới khi owner chọn ưu tiên tiếp theo.
+P05 đã đóng và tích hợp. P04 tiếp tục trên baseline đó, chờ kiểm chứng/nghiệm thu
+bản tích hợp. C02 vẫn bị chặn bởi primary supplier; D01/O01 và O02 tiếp tục độc lập.
 
 ## Policy lifecycle đã khóa
 

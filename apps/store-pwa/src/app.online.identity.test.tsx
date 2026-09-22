@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   loadWorkspace: vi.fn(),
   login: vi.fn(),
   logout: vi.fn(),
+  changePassword: vi.fn(),
   createRecord: vi.fn(),
   reviewRecord: vi.fn(),
   prepareExport: vi.fn(),
@@ -27,6 +28,7 @@ vi.mock("./online-kph", () => ({
     loadWorkspace: mocks.loadWorkspace,
     login: mocks.login,
     logout: mocks.logout,
+    changePassword: mocks.changePassword,
     createRecord: mocks.createRecord,
     reviewRecord: mocks.reviewRecord,
     prepareExport: mocks.prepareExport,
@@ -94,6 +96,7 @@ beforeEach(() => {
   mocks.loadHistory.mockImplementation((storeId: string) => Promise.resolve([record(storeId, storeId === storeA.id ? "Phiếu cửa hàng A" : "Phiếu cửa hàng B")]));
   mocks.login.mockResolvedValue(session);
   mocks.logout.mockResolvedValue(undefined);
+  mocks.changePassword.mockResolvedValue(undefined);
 });
 
 describe("online identity and scoped query state", () => {
@@ -130,6 +133,23 @@ describe("online identity and scoped query state", () => {
     fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
     expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
     expect(mocks.logout).toHaveBeenCalledTimes(2);
+  });
+
+  it("changes the current password and clears the authenticated workspace", async () => {
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "Đổi mật khẩu" }));
+    const dialog = screen.getByRole("dialog", { name: "Đổi mật khẩu" });
+    fireEvent.change(within(dialog).getByLabelText("Mật khẩu hiện tại"), { target: { value: "correct-password" } });
+    fireEvent.change(within(dialog).getByLabelText("Mật khẩu mới"), { target: { value: "Một mật khẩu rất riêng 2026!" } });
+    fireEvent.change(within(dialog).getByLabelText("Nhập lại mật khẩu mới"), { target: { value: "Một mật khẩu rất riêng 2026!" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Đổi mật khẩu" }));
+
+    await waitFor(() => expect(mocks.changePassword).toHaveBeenCalledWith(
+      "correct-password",
+      "Một mật khẩu rất riêng 2026!",
+    ));
+    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(screen.getByRole("status")).toHaveTextContent("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.");
   });
 
   it("keys history by user and store and clears the previous store records immediately", async () => {

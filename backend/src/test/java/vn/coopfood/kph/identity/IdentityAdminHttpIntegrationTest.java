@@ -118,6 +118,37 @@ class IdentityAdminHttpIntegrationTest {
     }
 
     @Test
+    void passwordChangeRevokesOldAdminSessionsBeforeUserDeactivation() throws Exception {
+        AuthenticatedClient changingAdmin = login("admin.a");
+        AuthenticatedClient oldAdmin = login("admin.a");
+        String newPassword = "A fresh synthetic password 2026!";
+        assertThat(post(changingAdmin, "/api/v1/auth/password/change", """
+                {"currentPassword":"correct-password","newPassword":"%s"}
+                """.formatted(newPassword)).statusCode()).isEqualTo(204);
+
+        HttpResponse<String> staleMutation = post(oldAdmin,
+                "/api/v1/admin/users/" + TARGET + "/deactivate", "{\"reason\":\"Stale session\"}");
+        assertThat(staleMutation.statusCode()).isEqualTo(401);
+        assertThat(get(changingAdmin, "/api/v1/admin/users").statusCode()).isEqualTo(401);
+        assertThat(database.fetchValue("SELECT active FROM app_users WHERE id = ?", TARGET)).isEqualTo(true);
+        assertThat(database.fetchValue("SELECT count(*) FROM audit_events WHERE action = 'USER_DEACTIVATED'"))
+                .isEqualTo(0L);
+
+        CookieManager cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+        HttpClient client = HttpClient.newBuilder().cookieHandler(cookies).build();
+        JsonNode payload = body(rawLogin("admin.a", newPassword, client), 200);
+        AuthenticatedClient freshAdmin = new AuthenticatedClient(client, payload.path("csrfToken").asText());
+        AuthenticatedClient target = login("target.user");
+        assertThat(post(freshAdmin, "/api/v1/admin/users/" + TARGET + "/deactivate",
+                "{\"reason\":\"Synthetic fresh-session test\"}").statusCode()).isEqualTo(200);
+        assertThat(get(target, "/api/v1/auth/session").statusCode()).isEqualTo(401);
+        assertThat(database.fetchValue("SELECT count(*) FROM audit_events WHERE action = 'CREDENTIAL_CHANGED'"))
+                .isEqualTo(1L);
+        assertThat(database.fetchValue("SELECT count(*) FROM audit_events WHERE action = 'USER_DEACTIVATED'"))
+                .isEqualTo(1L);
+    }
+
+    @Test
     void rejectsNonAdminSelfBlankUnknownAndMissingCsrfWithoutMutation() throws Exception {
         AuthenticatedClient admin = login("admin.a");
         AuthenticatedClient target = login("target.user");
@@ -215,11 +246,15 @@ class IdentityAdminHttpIntegrationTest {
     }
 
     private HttpResponse<String> rawLogin(String username, HttpClient client) throws Exception {
+        return rawLogin(username, "correct-password", client);
+    }
+
+    private HttpResponse<String> rawLogin(String username, String password, HttpClient client) throws Exception {
         return client.send(request("/api/v1/auth/login")
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString("""
-                        {"username":"%s","password":"correct-password"}
-                        """.formatted(username)))
+                        {"username":"%s","password":"%s"}
+                        """.formatted(username, password)))
                 .build(), HttpResponse.BodyHandlers.ofString());
     }
 
