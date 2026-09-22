@@ -212,11 +212,11 @@ class IdentityHttpIntegrationTest {
         assertThat(login(HttpClient.newHttpClient(), "correct-password").statusCode()).isEqualTo(401);
         assertThat(login(HttpClient.newHttpClient(), newPassword).statusCode()).isEqualTo(200);
 
-        String storedHash = database.fetchValue(
+        String storedHash = (String) database.fetchValue(
                 "SELECT password_hash FROM app_users WHERE id = ?", USER_ID);
-        Long version = database.fetchValue(
-                "SELECT credential_version FROM app_users WHERE id = ?", USER_ID);
-        String metadata = database.fetchValue("""
+        Long version = ((Number) database.fetchValue(
+                "SELECT credential_version FROM app_users WHERE id = ?", USER_ID)).longValue();
+        String metadata = (String) database.fetchValue("""
                 SELECT metadata::text FROM audit_events
                 WHERE actor_user_id = ? AND action = 'CREDENTIAL_CHANGED'
                 ORDER BY occurred_at DESC LIMIT 1

@@ -147,7 +147,7 @@ class IdentityServiceTest {
         assertThatThrownBy(() -> service.changeOwnPassword(
                 principal, "wrong-password", "Mật khẩu mới rất riêng 2026!"))
                 .isInstanceOfSatisfying(
-                        vn.coopfood.kph.foundation.web.ApiProblemException.class,
+                        IdentityProblemException.class,
                         problem -> assertThat(problem.code()).isEqualTo("CURRENT_PASSWORD_INVALID"));
         assertThat(repository.updatedPasswordHash).isNull();
         assertThat(repository.auditVersion).isNull();

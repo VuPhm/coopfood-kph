@@ -81,9 +81,9 @@ describe("Admin lifecycle workspace", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Đổi mật khẩu" }));
     const dialog = screen.getByRole("dialog", { name: "Đổi mật khẩu" });
-    fireEvent.change(within(dialog).getByLabelText("Mật khẩu hiện tại"), { target: { value: "correct-password" } });
-    fireEvent.change(within(dialog).getByLabelText("Mật khẩu mới"), { target: { value: "Một mật khẩu rất riêng 2026!" } });
-    fireEvent.change(within(dialog).getByLabelText("Nhập lại mật khẩu mới"), { target: { value: "Một mật khẩu rất riêng 2026!" } });
+    fireEvent.change(within(dialog).getByLabelText(/Mật khẩu hiện tại/), { target: { value: "correct-password" } });
+    fireEvent.change(within(dialog).getByLabelText(/Mật khẩu mới/), { target: { value: "Một mật khẩu rất riêng 2026!" } });
+    fireEvent.change(within(dialog).getByLabelText(/Nhập lại mật khẩu mới/), { target: { value: "Một mật khẩu rất riêng 2026!" } });
     fireEvent.click(within(dialog).getByRole("button", { name: "Đổi mật khẩu" }));
 
     await waitFor(() => expect(api.changePassword).toHaveBeenCalledWith(

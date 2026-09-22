@@ -11,8 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import vn.coopfood.kph.foundation.web.ApiProblemException;
-
 @Service
 public class IdentityService {
 
@@ -71,21 +69,21 @@ public class IdentityService {
             String currentPassword,
             String newPassword) {
         IdentityRepository.UserCredentials credentials = repository.lockActiveCredentials(actor.userId())
-                .orElseThrow(() -> new ApiProblemException(
+                .orElseThrow(() -> new IdentityProblemException(
                         HttpStatus.UNAUTHORIZED, "AUTHENTICATION_REQUIRED", "Authentication is required."));
         if (credentials.credentialVersion() != actor.credentialVersion()) {
-            throw new ApiProblemException(
+            throw new IdentityProblemException(
                     HttpStatus.UNAUTHORIZED, "AUTHENTICATION_REQUIRED", "Authentication is required.");
         }
         if (!passwordEncoder.matches(currentPassword, credentials.passwordHash())) {
-            throw new ApiProblemException(
+            throw new IdentityProblemException(
                     HttpStatus.UNPROCESSABLE_ENTITY,
                     "CURRENT_PASSWORD_INVALID",
                     "Current password is invalid.");
         }
         passwordPolicy.validate(newPassword, actor.user().username());
         if (passwordEncoder.matches(newPassword, credentials.passwordHash())) {
-            throw new ApiProblemException(
+            throw new IdentityProblemException(
                     HttpStatus.UNPROCESSABLE_ENTITY,
                     "PASSWORD_REUSE_FORBIDDEN",
                     "New password must differ from the current password.");

@@ -6,8 +6,6 @@ import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import vn.coopfood.kph.foundation.web.ApiProblemException;
-
 @Component
 class PasswordPolicy {
 
@@ -46,7 +44,7 @@ class PasswordPolicy {
         }
     }
 
-    private ApiProblemException problem(String code, String message) {
-        return new ApiProblemException(HttpStatus.UNPROCESSABLE_ENTITY, code, message);
+    private IdentityProblemException problem(String code, String message) {
+        return new IdentityProblemException(HttpStatus.UNPROCESSABLE_ENTITY, code, message);
     }
 }
