@@ -74,5 +74,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Owner thực hiện submit đổi mật khẩu trên Store PWA và Admin Web theo acceptance-handoff; ghi sign-off hoặc yêu cầu sửa cụ thể trước khi close."
+  "nextAction": "Owner thực hiện submit đổi mật khẩu trên Store PWA và Admin Web theo docs/delivery/p05-credential-self-service/acceptance-handoff.md; ghi sign-off hoặc yêu cầu sửa cụ thể trước khi close."
 }
