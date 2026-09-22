@@ -2,17 +2,17 @@
 
 Cập nhật: 2026-09-22
 
-## P05 credential self-service — chờ kiểm chứng
+## P05 credential self-service — chờ owner acceptance
 
 Implementation candidate trên `codex/p05-credential-self-service` đã có contract,
 migration V9, backend, Store PWA, Admin Web và test source cho đổi mật khẩu của
 chính user. Hash mới dùng PBKDF2 có prefix, BCrypt cũ vẫn được xác minh và
 `credential_version` làm mọi session cũ mất hiệu lực ở request kế tiếp.
 
-Theo yêu cầu owner, chưa chạy test/check/lint/build/E2E trong lượt 22/09 và chưa
-mở nghiệm thu. Bước tiếp theo là chạy đúng technical gates trong
-[verification handoff](delivery/p05-credential-self-service/verification-handoff.md),
-sửa blocker nếu có, rồi mới tạo candidate SHA/evidence và xin nghiệm thu.
+Technical verification đã pass trên candidate `39c0cff` với evidence tại
+[technical evidence](delivery/p05-credential-self-service/technical-evidence.md).
+Bước tiếp theo là owner thực hiện submit đổi mật khẩu trên Store PWA và Admin Web,
+ghi sign-off hoặc yêu cầu sửa cụ thể; chưa tích hợp vào `main`.
 
 ## P02 scoped authorization — đã đóng
 
@@ -61,8 +61,8 @@ với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, b
 và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
 `docs/delivery/**`.
 
-P05 là milestone active nhưng đang dừng ở cổng technical verification; chưa tích
-hợp vào `main`. C02 vẫn bị chặn bởi quyết định primary supplier; các candidate
+P05 là milestone active, đã pass technical verification và đang chờ owner
+acceptance; chưa tích hợp vào `main`. C02 vẫn bị chặn bởi quyết định primary supplier; các candidate
 D01/P04/O01 và O02 tiếp tục độc lập, không được nhập ngầm vào P05.
 
 ## Policy lifecycle đã khóa

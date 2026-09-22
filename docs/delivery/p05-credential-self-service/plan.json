@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p05-credential-self-service",
   "revision": 2,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Triển khai vertical slice đổi mật khẩu của chính user trên Store PWA và Admin Web: xác minh mật khẩu hiện tại, áp dụng policy 15–64 Unicode code point và blocklist cục bộ, ghi hash mới PBKDF2 có định danh đồng thời tiếp tục xác minh BCrypt cũ, tăng credential version để mọi session cũ mất hiệu lực ở request kế tiếp, ghi audit không chứa secret và yêu cầu đăng nhập lại sau thành công.",
   "inScope": [
     "Public OpenAPI, example fixture và generated TypeScript client cho POST /api/v1/auth/password/change với currentPassword/newPassword và CSRF",
@@ -20,7 +20,7 @@
     "Thay đổi role/membership/region/store lifecycle, catalog, KPH nghiệp vụ, Pilot persistence hoặc production deployment"
   ],
   "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
-  "candidateSha": "",
+  "candidateSha": "39c0cff23f0565a42166f0c41c06f3f7ff450612",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -49,10 +49,10 @@
       "id": "technical-credential-self-service",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "39c0cff23f0565a42166f0c41c06f3f7ff450612",
+      "evidence": "docs/delivery/p05-credential-self-service/technical-evidence.md"
     },
     {
       "id": "owner-credential-self-service-acceptance",
@@ -74,5 +74,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Ngày 2026-09-23 chạy các lệnh trong verification-handoff.md, sửa blocker nếu có, rồi mới tạo candidate SHA và technical evidence; chưa mở owner acceptance trước đó."
+  "nextAction": "Owner thực hiện submit đổi mật khẩu trên Store PWA và Admin Web theo acceptance-handoff; ghi sign-off hoặc yêu cầu sửa cụ thể trước khi close."
 }
