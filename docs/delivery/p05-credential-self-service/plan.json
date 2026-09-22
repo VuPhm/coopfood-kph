@@ -20,7 +20,7 @@
     "Thay đổi role/membership/region/store lifecycle, catalog, KPH nghiệp vụ, Pilot persistence hoặc production deployment"
   ],
   "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
-  "candidateSha": "39c0cff23f0565a42166f0c41c06f3f7ff450612",
+  "candidateSha": "63aed66",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -51,7 +51,7 @@
       "required": true,
       "status": "pass",
       "revision": 2,
-      "sha": "39c0cff23f0565a42166f0c41c06f3f7ff450612",
+      "sha": "63aed66",
       "evidence": "docs/delivery/p05-credential-self-service/technical-evidence.md"
     },
     {

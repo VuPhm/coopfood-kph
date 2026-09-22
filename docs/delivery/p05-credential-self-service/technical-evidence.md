@@ -1,7 +1,9 @@
 # P05 — Technical evidence
 
 Ngày kiểm chứng: 2026-09-22, Asia/Ho_Chi_Minh  
-Candidate: `39c0cff23f0565a42166f0c41c06f3f7ff450612`  
+Code candidate tested: `39c0cff23f0565a42166f0c41c06f3f7ff450612`  
+Record checkpoint: `63aed66` (docs-only after the code candidate; no code,
+contract or generated artifact changed)  
 Branch: `codex/p05-credential-self-service`
 
 ## Technical gates
