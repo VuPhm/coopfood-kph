@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "id": "p05-credential-self-service",
+  "revision": 2,
+  "status": "CLOSED",
+  "objective": "Triển khai vertical slice đổi mật khẩu của chính user trên Store PWA và Admin Web: xác minh mật khẩu hiện tại, áp dụng policy 15–64 Unicode code point và blocklist cục bộ, ghi hash mới PBKDF2 có định danh đồng thời tiếp tục xác minh BCrypt cũ, tăng credential version để mọi session cũ mất hiệu lực ở request kế tiếp, ghi audit không chứa secret và yêu cầu đăng nhập lại sau thành công.",
+  "inScope": [
+    "Public OpenAPI, example fixture và generated TypeScript client cho POST /api/v1/auth/password/change với currentPassword/newPassword và CSRF",
+    "Migration V9 thêm credential_version cho app_users để vô hiệu mọi session cũ sau đổi mật khẩu; dữ liệu hiện có mặc định version 1",
+    "PasswordEncoder dạng delegating: hash mới PBKDF2-HMAC-SHA256 600.000 vòng, salt 16 byte, tiếp tục verify BCrypt không prefix và hash có prefix để không buộc reset hàng loạt",
+    "Backend khóa credential row trong transaction, xác minh current password, chặn password giống cũ, enforce 15–64 Unicode code point và blocklist common/context-specific tối thiểu, cập nhật hash/version và audit CREDENTIAL_CHANGED không ghi password/hash/session",
+    "Principal mang credential version nội bộ; refresh mỗi request phải invalidate session khi version không còn khớp",
+    "Store PWA và Admin Web có dialog đổi mật khẩu cho user đang đăng nhập, visible labels, autocomplete đúng, cho phép paste/password manager, show-hide có accessible name, feedback rõ và quay về login sau thành công",
+    "Bổ sung unit/component/PostgreSQL integration tests cho policy, BCrypt compatibility, audit, CSRF, wrong current password và invalidation của hai session"
+  ],
+  "outOfScope": [
+    "Admin reset credential người khác, create user, temporary-password delivery, RESET_REQUIRED restricted session, bootstrap/recovery và reactivate user",
+    "SSO/MFA/passkey, email/SMS/self-service forgot-password, production secret delivery hoặc password rotation định kỳ",
+    "Merge hoặc phụ thuộc candidate P04 user deactivation, O01 backup/restore hay D01 paging đang ở nhánh khác",
+    "Thay đổi role/membership/region/store lifecycle, catalog, KPH nghiệp vụ, Pilot persistence hoặc production deployment"
+  ],
+  "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
+  "candidateSha": "052017d670f4d584c8f2c769f9a252ef5e9b96c4",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/kph.openapi.yaml",
+    "contracts/fixtures/api/credential-change.json",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "scripts/check-contracts.mjs",
+    "packages/api/src/generated/schema.d.ts",
+    "backend/pom.xml",
+    "backend/src/main/resources/db/migration/V9__credential_version.sql",
+    "backend/src/main/java/vn/coopfood/kph/foundation/security/SecurityConfiguration.java",
+    "backend/src/main/java/vn/coopfood/kph/identity/**",
+    "backend/src/test/java/vn/coopfood/kph/identity/**",
+    "apps/store-pwa/src/**",
+    "apps/admin-web/src/**",
+    "docs/product/CREDENTIAL_SELF_SERVICE_CONTRACT.md",
+    "docs/adr/0005-password-hash-migration.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/p05-credential-self-service/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-credential-self-service",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "052017d670f4d584c8f2c769f9a252ef5e9b96c4",
+      "evidence": "docs/delivery/p05-credential-self-service/technical-evidence.md"
+    },
+    {
+      "id": "owner-credential-self-service-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "052017d670f4d584c8f2c769f9a252ef5e9b96c4",
+      "evidence": "docs/delivery/p05-credential-self-service/acceptance-handoff.md",
+      "acceptedBy": "Project owner (người dùng)",
+      "decisionRef": "Task 01a0ca34-2ef9-7992-9aaa-5c64d21587a1, user message 2026-09-23: chuyển về p05, pass, làm tiếp"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Tạm chưa nghiệm thu; hoàn thành phần implementation bị ngắt và để việc kiểm tra tập trung sang ngày kế tiếp.",
+      "source": "Owner request 2026-09-22.",
+      "impact": "Hoàn thiện implementation và test source trong phạm vi P05 nhưng không chạy test/check/lint/build/E2E, không tạo technical evidence và không đánh dấu gate pass. P04/O01/D01 vẫn là candidate độc lập, không tích hợp vào P05.",
+      "decision": "Giữ P05 ở VERIFYING với candidateSha rỗng và cả hai gate pending cho đến khi owner chạy hoặc cho phép chạy technical gates."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "P05 CLOSED theo owner pass ngày 2026-09-23. Theo yêu cầu làm tiếp, chuẩn bị PR riêng vào main và theo dõi CI; chưa merge/deploy, không nhập candidate P04/D01/O01."
+}

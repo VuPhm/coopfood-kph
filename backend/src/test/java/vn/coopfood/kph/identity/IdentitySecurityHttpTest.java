@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -149,6 +151,45 @@ class IdentitySecurityHttpTest {
     }
 
     @Test
+    void passwordChangeRequiresCsrfAndInvalidatesTheCurrentSession() throws Exception {
+        identityService.authenticated = true;
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"manager.demo","password":"correct-password"}
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+        MockHttpSession session = (MockHttpSession) login.getRequest().getSession(false);
+        String csrfToken = objectMapper.readTree(login.getResponse().getContentAsByteArray())
+                .path("csrfToken")
+                .asText();
+        String body = """
+                {"currentPassword":"correct-password","newPassword":"A long private password 2026!"}
+                """;
+
+        mockMvc.perform(post("/api/v1/auth/password/change")
+                        .session(session)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("CSRF_VALIDATION_FAILED"));
+
+        mockMvc.perform(post("/api/v1/auth/password/change")
+                        .session(session)
+                        .header("X-CSRF-TOKEN", csrfToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isNoContent());
+
+        assertThat(identityService.changedCurrentPassword).isEqualTo("correct-password");
+        assertThat(identityService.changedNewPassword).isEqualTo("A long private password 2026!");
+        assertThat(session.isInvalid()).isTrue();
+        mockMvc.perform(get("/api/v1/auth/session"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void unauthenticatedStoreRequestUsesContractProblemShape() throws Exception {
         mockMvc.perform(get("/api/v1/stores"))
                 .andExpect(status().isUnauthorized())
@@ -245,9 +286,11 @@ class IdentitySecurityHttpTest {
 
         private SessionPrincipal principal;
         private boolean authenticated;
+        private String changedCurrentPassword;
+        private String changedNewPassword;
 
         private StubIdentityService() {
-            super(null, null);
+            super(null, new BCryptPasswordEncoder(), new PasswordPolicy(), Clock.systemUTC());
         }
 
         @Override
@@ -263,6 +306,24 @@ class IdentitySecurityHttpTest {
             return principal != null && principal.userId().equals(userId)
                     ? Optional.of(principal)
                     : Optional.empty();
+        }
+
+        @Override
+        public Optional<SessionPrincipal> refresh(SessionPrincipal existing) {
+            return principal != null
+                    && principal.userId().equals(existing.userId())
+                    && principal.credentialVersion() == existing.credentialVersion()
+                    ? Optional.of(principal)
+                    : Optional.empty();
+        }
+
+        @Override
+        public void changeOwnPassword(
+                SessionPrincipal actor,
+                String currentPassword,
+                String newPassword) {
+            changedCurrentPassword = currentPassword;
+            changedNewPassword = newPassword;
         }
     }
 }

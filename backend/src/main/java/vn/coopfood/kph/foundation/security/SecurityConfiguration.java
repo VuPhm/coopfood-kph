@@ -1,6 +1,7 @@
 package vn.coopfood.kph.foundation.security;
 
 import java.io.IOException;
+import java.util.Map;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -15,7 +16,10 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -37,7 +41,13 @@ public class SecurityConfiguration {
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+        Pbkdf2PasswordEncoder pbkdf2 = new Pbkdf2PasswordEncoder(
+                "", 16, 600_000, SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
+        DelegatingPasswordEncoder encoder = new DelegatingPasswordEncoder(
+                "pbkdf2", Map.of("pbkdf2", pbkdf2, "bcrypt", bcrypt));
+        encoder.setDefaultPasswordEncoderForMatches(bcrypt);
+        return encoder;
     }
 
     @Bean
@@ -74,6 +84,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/session", "/api/v1/stores").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/password/change").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/catalog/barcodes/*").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/*/photos/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/exports").authenticated()

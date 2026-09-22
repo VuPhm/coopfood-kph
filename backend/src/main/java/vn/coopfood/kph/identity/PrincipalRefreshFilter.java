@@ -33,7 +33,7 @@ public class PrincipalRefreshFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
         Authentication current = SecurityContextHolder.getContext().getAuthentication();
         if (current != null && current.getPrincipal() instanceof SessionPrincipal existing) {
-            identityService.refresh(existing.userId()).ifPresentOrElse(refreshed -> {
+            identityService.refresh(existing).ifPresentOrElse(refreshed -> {
                 Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
                         refreshed,
                         null,

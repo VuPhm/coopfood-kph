@@ -1,6 +1,20 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-09-21
+Cập nhật: 2026-09-23
+
+## P05 credential self-service — đã đóng, chuẩn bị tích hợp
+
+Implementation candidate trên `codex/p05-credential-self-service` đã có contract,
+migration V9, backend, Store PWA, Admin Web và test source cho đổi mật khẩu của
+chính user. Hash mới dùng PBKDF2 có prefix, BCrypt cũ vẫn được xác minh và
+`credential_version` làm mọi session cũ mất hiệu lực ở request kế tiếp.
+
+Technical verification đã pass trên candidate `39c0cff` với evidence tại
+[technical evidence](delivery/p05-credential-self-service/technical-evidence.md).
+Owner đã xác nhận “pass” ngày 23/09/2026 và yêu cầu làm tiếp.
+[Owner decision](delivery/p05-credential-self-service/acceptance-handoff.md) đóng
+cycle P05. Bước tiếp theo: chuẩn bị PR riêng từ nhánh P05 vào `main`, theo dõi
+CI và giữ các candidate chưa nghiệm thu ngoài phạm vi. Chưa merge/deploy.
 
 ## P02 scoped authorization — đã đóng
 
@@ -49,9 +63,9 @@ với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, b
 và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
 `docs/delivery/**`.
 
-Không có milestone active sau closeout này. C02 vẫn bị chặn bởi quyết định
-primary supplier; D01/O01/O02 và lifecycle identity/credential là các outcome
-độc lập, chỉ mở cycle mới khi owner chọn ưu tiên tiếp theo.
+P05 đã đóng theo owner acceptance; công việc hiện tại là chuẩn bị tích hợp riêng
+P05, chưa mở feature cycle mới. C02 vẫn bị chặn bởi quyết định primary supplier; các candidate
+D01/P04/O01 và O02 tiếp tục độc lập, không được nhập ngầm vào P05.
 
 ## Policy lifecycle đã khóa
 

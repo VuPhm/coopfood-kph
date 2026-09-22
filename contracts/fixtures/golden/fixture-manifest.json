@@ -15,6 +15,7 @@
     {"resource":"golden/images/expected-manifest.json","tracePrefix":"IMG-"},
     {"resource":"golden/excel/expected-structure.json","tracePrefix":"XLSX-"},
     {"resource":"api/session.json","tracePrefix":"ID-"},
+    {"resource":"api/credential-change.json","tracePrefix":"ID-P01-015"},
     {"resource":"api/barcode-found.json","tracePrefix":"SCAN-"},
     {"resource":"api/barcode-not-found.json","tracePrefix":"SCAN-"},
     {"resource":"api/kph-record.json","tracePrefix":"KPH-"},
