@@ -1,6 +1,6 @@
 # ADR 0005 — Password hash migration cho self-service
 
-Status: Proposed — P05 implementation candidate 2026-09-22
+Status: Accepted — owner chấp nhận P05 ngày 2026-09-23
 
 ## Bối cảnh
 
@@ -9,7 +9,7 @@ cắt đầu vào sau 72 byte, trái với policy cho phép 15–64 Unicode code
 không được silently truncate. P05 cần mở self-change mà không buộc reset toàn bộ
 user hoặc tạo migration chứa secret.
 
-## Quyết định đề xuất
+## Quyết định
 
 - Dùng Spring Security `DelegatingPasswordEncoder` với hash mới
   `{pbkdf2}...`: PBKDF2-HMAC-SHA256, 600.000 vòng, salt 16 byte, output 256 bit.

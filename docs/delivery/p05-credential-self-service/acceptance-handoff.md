@@ -1,12 +1,12 @@
 # P05 — Owner acceptance handoff
 
-Trạng thái: **pending owner decision**  
-Technical candidate: `39c0cff`  
+Trạng thái: **ACCEPTED — 23/09/2026**
+Technical candidate: `39c0cff`
 Record checkpoint: `63aed66`
 
 ## Cách nghiệm thu
 
-Dùng hai preview loopback đang chạy:
+Preview loopback đã dùng ở đợt verification 22/09/2026 (không khẳng định còn chạy):
 
 - Store PWA: `http://localhost:4173`
 - Admin Web: `http://localhost:4175`
@@ -23,14 +23,20 @@ mỗi entry point, mở “Đổi mật khẩu” và xác nhận:
 
 Automated backend đã xác nhận các outcome mutation/session/audit ở
 `IdentityHttpIntegrationTest`; browser review đã xác nhận form/accessibility đến
-ngay trước submit. Bước submit cuối cần owner thực hiện trực tiếp.
+ngay trước submit. Đây là phạm vi bằng chứng tự động/browser ngày 22/09; quyết định owner bên dưới
+được ghi riêng, không suy diễn thành một lần chạy browser mới.
 
 ## Quyết định owner
 
-Chưa có sign-off. Khi nghiệm thu xong, ghi trong message thực tế của owner:
+- `acceptedBy`: project owner (người dùng).
+- `decisionRef`: task `01a0ca34-2ef9-7992-9aaa-5c64d21587a1`, message ngày
+  23/09/2026: “chuyển về p05, pass, làm tiếp”.
+- Kết luận: **PASS P05**; không yêu cầu sửa bổ sung. Cycle đóng và tiếp tục
+  chuẩn bị PR tích hợp riêng P05.
+- Code được nghiệm thu: `39c0cff`; branch checkpoint khi nhận sign-off:
+  `cabc300`. Diff giữa hai commit chỉ là tài liệu, không thay behavior.
 
-- `acceptedBy`: tên/role owner;
-- `decisionRef`: tham chiếu message sign-off;
-- kết luận pass hoặc danh sách thay đổi cụ thể.
-
-Không đánh dấu P05 `CLOSED` hoặc tích hợp vào `main` khi thiếu sign-off này.
+Owner không cung cấp log thao tác từng scenario/thiết bị. Sign-off này là quyết
+định nghiệm thu thực, không được ghi thành bằng chứng iPhone hoặc production.
+P04/D01/O01 và primary supplier/C02 tiếp tục ngoài scope; pass không đồng nghĩa
+đã merge hoặc deploy.

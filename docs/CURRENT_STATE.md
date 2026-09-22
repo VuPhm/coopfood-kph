@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-22
+Cập nhật: 2026-09-23
 
 ## Giai đoạn
 
-`P05 credential self-service — technical verification PASS, chờ owner acceptance`
+`P05 credential self-service — owner accepted; chuẩn bị tích hợp`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -59,12 +59,12 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - C01 bổ sung catalog staging/validation CSV cho `CATALOG_ADMIN`: giữ identifier
   dạng string, trả lỗi theo dòng, replay idempotent theo checksum và không tạo
   catalog published. Owner đã chấp nhận ngày 2026-09-21.
-- Candidate P05 trên `codex/p05-credential-self-service` bổ sung self-change
+- P05 trên `codex/p05-credential-self-service` bổ sung self-change
   password cho Store PWA và Admin Web, credential version để vô hiệu session cũ,
   hash mới PBKDF2 có prefix và khả năng đọc BCrypt legacy. Technical verification
   đã pass trên candidate `39c0cff`; browser preview đã kiểm tra đến ngay trước
-  submit ở cả hai entry point. Owner acceptance vẫn pending vì chưa có owner
-  sign-off cho mutation credential cuối cùng.
+  submit ở cả hai entry point. Owner đã xác nhận “pass” ngày 23/09/2026;
+  cycle đã đóng theo [owner acceptance](delivery/p05-credential-self-service/acceptance-handoff.md).
 - Business contract ngày/HSD, KPH, catalog, ảnh và Excel nằm tại
   [DOMAIN_RULES](product/DOMAIN_RULES.md); accepted ADR nằm tại [ADR](adr/README.md).
 
@@ -108,8 +108,8 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
 [C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
-tích hợp của chuỗi này. P05 đã pass technical verification nhưng đang chờ owner
-acceptance trên nhánh riêng; không được coi là accepted hoặc tích hợp. C02 chỉ nên mở sau khi chốt
+tích hợp của chuỗi này. P05 đã được owner chấp nhận ngày 23/09/2026 trên nhánh riêng; bước tiếp theo
+là PR tích hợp vào `main`, chưa merge hoặc deploy. C02 chỉ nên mở sau khi chốt
 primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
 riêng. Admin reset credential, bootstrap/recovery và khóa user vẫn thuộc slice khác.
 Kết quả P02 nằm trong

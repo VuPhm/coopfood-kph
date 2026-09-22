@@ -1,7 +1,7 @@
 # P05 — Hợp đồng đổi mật khẩu của chính user
 
-Trạng thái: **Implementation candidate — chờ technical verification và owner acceptance**  
-Cập nhật: 2026-09-22
+Trạng thái: **Accepted — owner xác nhận P05 pass ngày 23/09/2026**
+Cập nhật: 2026-09-23
 
 ## Outcome
 
