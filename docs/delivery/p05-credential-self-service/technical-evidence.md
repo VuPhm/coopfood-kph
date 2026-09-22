@@ -74,8 +74,20 @@ nhận mutation end-to-end; owner acceptance vẫn pending.
 
 ## Limitations
 
-- Chưa có nghiệm thu owner cho thao tác submit đổi password thực tế trên UI;
-  chưa được đánh dấu accepted/closed.
+- Tại thời điểm verification 22/09 chưa có owner acceptance. Owner đã xác nhận
+  pass ngày 23/09; xem acceptance-handoff.md. Không có browser rerun trong closeout.
 - Browser là Chromium in-app trên loopback; chưa phải thiết bị iPhone thật.
 - Mockito/JDK dynamic-agent và chunk-size là warning hiện hữu, không làm fail
   gate.
+
+## Closeout 23/09/2026 — tái sử dụng evidence
+
+Checkpoint đóng vòng: `052017d670f4d584c8f2c769f9a252ef5e9b96c4`; revision 2 giữ nguyên scope.
+So với code đã test `39c0cff`, checkpoint chỉ đổi tài liệu state/NEXT, contract
+status, ADR status và hồ sơ delivery; không đổi runtime, test, OpenAPI, fixture,
+generated client hoặc migration. Vì vậy tái sử dụng 155 frontend tests và 59
+backend tests ngày 22/09; không trình bày chúng là test chạy lại hôm nay.
+
+Closeout đã chạy `npm run check:docs` và `git diff --check`: PASS.
+Owner sign-off ở acceptance-handoff.md áp dụng cho cùng implementation.
+Remote main được kiểm tra ngày 23/09: `f308e0e`; chưa có PR P05 khi bắt đầu.

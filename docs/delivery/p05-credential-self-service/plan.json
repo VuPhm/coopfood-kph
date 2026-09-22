@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p05-credential-self-service",
   "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Triển khai vertical slice đổi mật khẩu của chính user trên Store PWA và Admin Web: xác minh mật khẩu hiện tại, áp dụng policy 15–64 Unicode code point và blocklist cục bộ, ghi hash mới PBKDF2 có định danh đồng thời tiếp tục xác minh BCrypt cũ, tăng credential version để mọi session cũ mất hiệu lực ở request kế tiếp, ghi audit không chứa secret và yêu cầu đăng nhập lại sau thành công.",
   "inScope": [
     "Public OpenAPI, example fixture và generated TypeScript client cho POST /api/v1/auth/password/change với currentPassword/newPassword và CSRF",
@@ -20,7 +20,7 @@
     "Thay đổi role/membership/region/store lifecycle, catalog, KPH nghiệp vụ, Pilot persistence hoặc production deployment"
   ],
   "baseSha": "f308e0ee072b485dd95480986e5a23f453b9b081",
-  "candidateSha": "63aed66",
+  "candidateSha": "052017d670f4d584c8f2c769f9a252ef5e9b96c4",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -51,17 +51,19 @@
       "required": true,
       "status": "pass",
       "revision": 2,
-      "sha": "63aed66",
+      "sha": "052017d670f4d584c8f2c769f9a252ef5e9b96c4",
       "evidence": "docs/delivery/p05-credential-self-service/technical-evidence.md"
     },
     {
       "id": "owner-credential-self-service-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "052017d670f4d584c8f2c769f9a252ef5e9b96c4",
+      "evidence": "docs/delivery/p05-credential-self-service/acceptance-handoff.md",
+      "acceptedBy": "Project owner (người dùng)",
+      "decisionRef": "Task 01a0ca34-2ef9-7992-9aaa-5c64d21587a1, user message 2026-09-23: chuyển về p05, pass, làm tiếp"
     }
   ],
   "changes": [
@@ -74,5 +76,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Owner thực hiện submit đổi mật khẩu trên Store PWA và Admin Web theo docs/delivery/p05-credential-self-service/acceptance-handoff.md; ghi sign-off hoặc yêu cầu sửa cụ thể trước khi close."
+  "nextAction": "P05 CLOSED theo owner pass ngày 2026-09-23. Theo yêu cầu làm tiếp, chuẩn bị PR riêng vào main và theo dõi CI; chưa merge/deploy, không nhập candidate P04/D01/O01."
 }
