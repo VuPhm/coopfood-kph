@@ -158,8 +158,11 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   vùng có nút làm mới riêng để xóa lọc hoặc sắp xếp. Không lặp label field hoặc
   tách thêm control chọn chiều. Cả hai breakpoint dùng cùng khuôn meta một dòng;
   heading vùng và choice-card được compact, choice chưa chọn không tô nền.
-- Filter chạy trước sort, count tổng phản ánh tập đang hiển thị và thay filter
-  phải xóa selection để không giữ thao tác trên dòng đã bị ẩn.
+- Filter chạy trước sort. Ở online, cả hai chạy trên toàn bộ dữ liệu đúng store
+  tại server trước khi phân trang 25 phiếu; badge title là tổng kết quả đã lọc,
+  còn count hai tab phản ánh store + khoảng ngày để không bị co theo trang/type/
+  trạng thái duyệt hiện tại. Thay tab/filter/sort/store/user hoặc trang phải xóa
+  selection để không giữ thao tác trên dòng đã bị ẩn.
 - Khoảng ngày phát hiện chỉ giữ hai field “Từ”/“Đến”, mũi tên chỉ hướng ở giữa
   và nút xóa lọc; accessible name đầy đủ vẫn là “Từ ngày phát hiện”/“Đến ngày
   phát hiện”. Giá trị nhập và hiển thị theo `dd/mm/yyyy`. Trên desktop, cụm ngày
@@ -196,8 +199,11 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   đúng region và `CHAIN_ADMIN` toàn chuỗi. `EMPLOYEE` chỉ xem/tạo. Backend vẫn
   kiểm effective scope; UI không phải authorization boundary.
 - Export chỉ bật khi có selection; “chọn tất cả” áp dụng trong loại phiếu hiện
-  hành, không xuyên tab. Online chỉ bật export khi toàn bộ selection đã duyệt;
-  Store PWA không hiển thị xóa/vô hiệu hóa cho CHT.
+  hành, không xuyên tab. Với online, selection/select-all chỉ thuộc trang hiện
+  tại; điều hướng trước/sau hiển thị trang và khoảng dòng, có trạng thái busy,
+  disabled, accessible name và vùng chạm tối thiểu 44px. Online chỉ bật export
+  khi toàn bộ selection đã duyệt; Store PWA không hiển thị xóa/vô hiệu hóa cho
+  CHT.
 - Empty state nói rõ dữ liệu “trong phiên”. Hệ thống mới phải đổi copy/state cho
   dữ liệu server/offline nhưng giữ khả năng hiểu ngay phạm vi danh sách.
 

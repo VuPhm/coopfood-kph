@@ -4,7 +4,7 @@ Cập nhật: 2026-09-23
 
 ## Giai đoạn
 
-`P04 user deactivation — technical PASS trên baseline P05, chờ owner acceptance`
+`D01 history paging — tiếp tục revision 2 trên baseline P04/P05`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -77,8 +77,7 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   P05. Chỉ CHAIN_ADMIN được khóa user khác; giữ guard self/last-admin/last-manager,
   audit và session invalidation. Revision 3 đã pass 161 frontend/package tests,
   64 backend tests và browser real-backend ở 4 viewport. Bản tích hợp đã kiểm
-  đổi mật khẩu từ workspace Tài khoản và chặn phiên admin cũ; owner acceptance
-  P04 vẫn pending. [Evidence](delivery/p04-user-deactivation/technical-evidence.md).
+  đổi mật khẩu từ workspace Tài khoản và chặn phiên admin cũ; owner đã chấp nhận P04 ngày 23/09/2026. [Evidence](delivery/p04-user-deactivation/technical-evidence.md).
 
 - PR #5 đã merge chuỗi accepted S04 → P01 → P02 → P03 → C01 vào `main` ngày
   2026-09-21: head `048a7ff`, merge commit `3ffc774`. Remote CI của PR PASS cả
@@ -119,8 +118,9 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 [C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
 tích hợp của chuỗi này. P05 đã được owner chấp nhận và merge vào `main` ngày 23/09/2026.
-P04 là cycle active, đã pass kỹ thuật trên baseline P05 và đang chờ owner
-acceptance tại preview local. C02 chỉ nên mở sau khi chốt
+P04 đã CLOSED theo owner “pass p04” ngày 23/09/2026; chưa merge/deploy.
+D01 là cycle active revision 2, tái sử dụng candidate cũ và tích hợp trên baseline
+P04/P05 theo yêu cầu owner, giao backend/Store PWA/E2E cho model nhỏ. C02 chỉ nên mở sau khi chốt
 primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
 riêng. Admin reset credential, bootstrap/recovery và khóa user vẫn thuộc slice khác.
 Kết quả P02 nằm trong

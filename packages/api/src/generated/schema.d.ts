@@ -673,6 +673,29 @@ export interface components {
             unit: "kg";
             quantity: number;
         });
+        /** @enum {string} */
+        KphHistorySort: "detectedDate" | "product" | "supplier" | "quantity" | "condition" | "resolution" | "approval";
+        /**
+         * @default descending
+         * @enum {string}
+         */
+        KphHistorySortDirection: "ascending" | "descending";
+        KphRecordPage: {
+            items: components["schemas"]["KphRecord"][];
+            page: number;
+            pageSize: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int64 */
+            totalPages: number;
+            typeTotals: components["schemas"]["KphTypeTotals"];
+        };
+        KphTypeTotals: {
+            /** Format: int64 */
+            tpcn: number;
+            /** Format: int64 */
+            tpts: number;
+        };
         KphRecord: {
             /** Format: uuid */
             id: string;
@@ -1050,6 +1073,13 @@ export interface operations {
                 detectedFrom?: string;
                 /** @description Inclusive upper bound of the KPH detected date. Must not precede detectedFrom. */
                 detectedTo?: string;
+                approvalStatus?: components["schemas"]["KphApprovalStatus"];
+                /** @description Global sort applied before pagination. Omit for newest-created first. */
+                sort?: components["schemas"]["KphHistorySort"];
+                direction?: components["schemas"]["KphHistorySortDirection"];
+                /** @description One-based page number. */
+                page?: number;
+                pageSize?: number;
             };
             header?: never;
             path: {
@@ -1060,13 +1090,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Store-scoped history, newest first. */
+            /** @description Store-scoped history filtered and sorted before pagination. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["KphRecord"][];
+                    "application/json": components["schemas"]["KphRecordPage"];
                 };
             };
             400: components["responses"]["BadRequest"];

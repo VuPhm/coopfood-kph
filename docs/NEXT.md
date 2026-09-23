@@ -2,18 +2,20 @@
 
 Cập nhật: 2026-09-23
 
-## P04 user deactivation — chờ owner acceptance
+## D01 history paging — đang triển khai revision 2
 
-Tiếp tục cycle P04 revision 3 trên `codex/p04-user-deactivation` từ yêu cầu
-“tiếp” ngày 23/09/2026. Tích hợp main/P05 và giải quyết contract/Admin UI dùng
-chung, sau đó kiểm frontend/backend/browser trên dữ liệu tổng hợp. P04 giữ
-CHAIN_ADMIN-only, self/last-admin/last-manager guards, audit và hiệu lực ở request
-kế tiếp. Chưa mở create/reactivate/reset/revoke hoặc migration mới.
+Owner chọn D01 ngày 23/09/2026 sau khi xác nhận “pass p04”. Tái sử dụng
+candidate `9f099e1`/nhánh `codex/d01-history-paging`, hoàn thiện trên baseline
+P04/P05 ở `codex/d01-p04-integration`. GPT-6 Luna nhận backend, Store PWA và E2E
+trong worktree riêng; integration owner giữ contract/examples/generated client.
+Không thêm migration nếu chưa có số đo chứng minh cần thiết. Technical evidence
+revision 1 là lịch sử, không dùng làm PASS bản tích hợp revision 2.
 
-Technical gates revision 3 đã pass: 161 frontend/package tests, 64 backend tests
-và browser real-backend 4 viewport. Preview dữ liệu tổng hợp sạch đang phục vụ
-ở http://localhost:4174. Owner thử theo [handoff](delivery/p04-user-deactivation/acceptance-handoff.md)
-và xác nhận pass hoặc nêu lỗi cụ thể; không xem pass P05 là pass P04.
+## P04 user deactivation — đã đóng
+
+Owner chấp nhận revision 3 ngày 23/09/2026 bằng “pass p04”. Candidate
+`e502886` đã pass 161 frontend/package tests, 64 backend tests và browser
+real-backend 4 viewport. Close checker PASS; chưa merge/deploy.
 
 ## P05 credential self-service — đã đóng và tích hợp
 
@@ -76,8 +78,8 @@ với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, b
 và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
 `docs/delivery/**`.
 
-P05 đã đóng và tích hợp. P04 trên baseline đó đã đạt technical gates, chờ
-nghiệm thu owner bản tích hợp. C02 vẫn bị chặn bởi primary supplier; D01/O01 và O02 tiếp tục độc lập.
+P05 đã đóng và tích hợp. P04 đã được owner chấp nhận. D01 active revision 2;
+C02 vẫn bị chặn bởi primary supplier, O01/O02 tiếp tục hoãn.
 
 ## Policy lifecycle đã khóa
 
