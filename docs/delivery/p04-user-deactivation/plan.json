@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "p04-user-deactivation",
   "revision": 3,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Triển khai vertical slice vô hiệu hóa user: chỉ active CHAIN_ADMIN được xem directory toàn chuỗi và deactivate một user khác với lý do bắt buộc; mutation có audit, chặn self-deactivate, last active CHAIN_ADMIN và last active STORE_MANAGER của mọi active store trong cùng transaction, làm mọi session của target mất quyền ở request kế tiếp; Admin Web cho phép owner xác nhận và dùng thử flow qua OpenAPI chung.",
   "inScope": [
     "Public OpenAPI, example fixture và generated TypeScript client cho list admin users và deactivate user với reason bắt buộc",
@@ -20,7 +20,7 @@
     "Delegated identity administration cho REGION_MANAGER hoặc CATALOG_ADMIN"
   ],
   "baseSha": "2d32ffd873f26d4ac2bc4153b0115f31d228f61f",
-  "candidateSha": "",
+  "candidateSha": "e502886e2466b748f976f3686e62e1f9afb62a3d",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/openapi/kph.openapi.yaml",
@@ -46,10 +46,10 @@
       "id": "technical-user-deactivation",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 3,
-      "sha": "",
-      "evidence": ""
+      "sha": "e502886e2466b748f976f3686e62e1f9afb62a3d",
+      "evidence": "docs/delivery/p04-user-deactivation/technical-evidence.md"
     },
     {
       "id": "owner-user-deactivation-acceptance",
@@ -58,7 +58,7 @@
       "status": "pending",
       "revision": 3,
       "sha": "",
-      "evidence": ""
+      "evidence": "docs/delivery/p04-user-deactivation/acceptance-handoff.md"
     }
   ],
   "changes": [
@@ -78,5 +78,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Kiểm chứng frontend/backend/browser bản P04 + P05 rồi chuẩn bị preview và owner handoff."
+  "nextAction": "Owner dùng preview sạch http://localhost:4174 theo acceptance-handoff.md, xác nhận P04 pass hoặc lỗi cụ thể. Không merge/close P04 trước owner decision."
 }

@@ -1,7 +1,8 @@
 # P04 — nghiệm thu vô hiệu hóa tài khoản
 
-Candidate: `4f7c2cb166ade696f327c31188a2cee0c92f3483`, branch
-`codex/p04-user-deactivation`, revision 2. Technical gate đã PASS; owner gate
+Code candidate: `b4a73fb1647a86e803a6ffd0e254ebc25e475ba5`; delivery checkpoint
+`e502886e2466b748f976f3686e62e1f9afb62a3d`. Branch
+`codex/p04-user-deactivation`, revision 3 (tích hợp main/P05). Technical gate đã PASS; owner gate
 đang chờ quyết định thực tế.
 
 ## Bản chạy thử
@@ -10,7 +11,8 @@ Candidate: `4f7c2cb166ade696f327c31188a2cee0c92f3483`, branch
 - Tài khoản quản trị: `chain.p03`.
 - Mật khẩu **chỉ cho dữ liệu tổng hợp local**: `admin-e2e-password`.
 - Backend thật ở 8081, PostgreSQL 17 riêng ở 55433, chỉ bind loopback.
-- Preview đang mở sẵn tại workspace **Tài khoản**; không phải deployment.
+- Preview đã reset dữ liệu sạch sau automated browser acceptance; đăng nhập rồi
+  chọn **Tài khoản**. Đây là backend thật với dữ liệu tổng hợp, không phải deployment.
 
 Nếu preview không còn chạy, từ repository root, với Docker/OrbStack hoạt động:
 
@@ -40,7 +42,7 @@ Log nằm tại `/tmp/coopfood-kph-p03-acceptance/`; SHA runtime ở file `revis
    cho cửa hàng; tài khoản vẫn **Đang hoạt động**. Đây là last-manager guard.
 3. Tùy chọn kiểm session: trước bước tiếp theo, mở cửa sổ riêng và đăng nhập
    `region.p03` / cùng mật khẩu. Ở cửa sổ quản trị chuỗi, chọn `region.p03`, nhập
-   lý do rồi xác nhận. Kỳ vọng thẻ chuyển **Đã vô hiệu hóa**, nút biến mất; request
+   lý do rồi xác nhận. Kỳ vọng thẻ chuyển **Đã vô hiệu hóa**, nút chuyển sang trạng thái không thể thao tác; request
    tiếp theo ở cửa sổ `region.p03` trả về màn hình đăng nhập và login mới bị từ
    chối.
 4. Thu nhỏ cửa sổ hoặc xoay landscape. Kỳ vọng card/dialog không tràn ngang,
@@ -63,3 +65,13 @@ Chi tiết kiểm tra tự động và visual QA ở [technical evidence](techni
 Owner acceptance chỉ được ghi khi có xác nhận trực tiếp; technical PASS không tự
 được coi là nghiệm thu.
 
+
+## Kiểm chứng mới ngày 23/09/2026
+
+161 frontend/package tests, 64 backend tests (0 skip) và real-backend browser
+4 viewport PASS. Thử thêm nút **Đổi mật khẩu** tại workspace Tài khoản để kiểm
+P05 vẫn hiện diện. Phiên admin cũ sau đổi mật khẩu đã được integration test xác
+nhận không thể khóa user. Trên màn hình ngang thấp, có thể cuộn nội dung dialog
+để thấy nút xác nhận đầy đủ.
+
+Owner chưa gửi quyết định P04. Sau khi thử, phản hồi “P04 pass” hoặc lỗi cụ thể.
