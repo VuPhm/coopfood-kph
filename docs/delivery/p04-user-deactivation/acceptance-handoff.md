@@ -74,4 +74,6 @@ P05 vẫn hiện diện. Phiên admin cũ sau đổi mật khẩu đã được 
 nhận không thể khóa user. Trên màn hình ngang thấp, có thể cuộn nội dung dialog
 để thấy nút xác nhận đầy đủ.
 
-Owner chưa gửi quyết định P04. Sau khi thử, phản hồi “P04 pass” hoặc lỗi cụ thể.
+Owner xác nhận ngày 23/09/2026: “pass p04, tiếp tục phân task để các model nhỏ implement”.
+Nguồn: task `01a0ccf7-c6e3-7fc1-a392-b3e5f7ed6955`. Chấp nhận candidate
+`e502886e2466b748f976f3686e62e1f9afb62a3d`, revision 3. Cycle CLOSED; chưa merge/deploy.
