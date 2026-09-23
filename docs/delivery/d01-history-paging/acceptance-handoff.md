@@ -2,7 +2,7 @@
 
 Ngày: 24/09/2026. Bản tích hợp P04/P05 + D01 trên
 `codex/d01-p04-integration`; application/browser candidate `7fc9b8d`, delivery candidate `7a160a6` (chỉ thêm docs).
-Owner acceptance **pending**; xác nhận P04 trước đó không được tính là pass D01.
+Owner acceptance **PASS — CLOSED**, ngày 24/09/2026. Quyết định D01 riêng sau handoff này.
 
 ## Bản dùng thử
 
@@ -35,4 +35,11 @@ Owner acceptance **pending**; xác nhận P04 trước đó không được tín
   case/dấu có thể khác Pilot `Intl.Collator` (numeric/base). Sort số lượng numeric.
 - Chromium desktop/mobile không thay nghiệm thu thiết bị thật hoặc production load.
 - Evidence và các sửa lỗi review: [technical evidence](technical-evidence-r2.md),
-  [review](review-r2.md). Owner thử rồi xác nhận D01 pass hoặc nêu lỗi cụ thể.
+  [review](review-r2.md). Owner đã xác nhận “pass” sau handoff D01.
+
+## Quyết định owner
+
+Ngày 24/09/2026, owner trả lời **“pass”** ngay sau bàn giao D01 revision 2
+trong task `01a0ccf7-c6e3-7fc1-a392-b3e5f7ed6955`. Chấp nhận delivery candidate
+`7a160a65011d3bc6ee7f2125bce28cade874cda8`, application/browser `7fc9b8d`.
+Không thay đổi scope hoặc code. Cycle CLOSED; chưa push/merge/deploy.
