@@ -1,7 +1,7 @@
 # D01 — Hợp đồng phân trang lịch sử KPH online
 
-Trạng thái: revision 2 technical PASS trên baseline P04/P05 — 2026-09-24.
-Nghiệp vụ revision 1 được giữ; owner chọn tiếp tục D01, chưa nghiệm thu bản tích hợp.
+Trạng thái: Accepted — owner chấp nhận D01 revision 2 ngày 2026-09-24.
+Bản tích hợp trên baseline P04/P05; owner decision tại handoff D01.
 
 ## Outcome
 

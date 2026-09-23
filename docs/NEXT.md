@@ -2,19 +2,20 @@
 
 Cập nhật: 2026-09-24
 
-## D01 history paging — chờ owner acceptance revision 2
+## D01 history paging — đã đóng revision 2
 
 Owner chọn D01 ngày 23/09/2026 sau khi xác nhận “pass p04”. Backend, Store PWA
 và E2E do GPT-6 Luna triển khai đã tích hợp trên baseline P04/P05 ở
 `codex/d01-p04-integration`. Candidate code/browser `7fc9b8d`; technical PASS:
 162 frontend/package tests, 65 backend tests và browser 8 PASS / 4 skip theo viewport.
 
-Preview sạch: <http://127.0.0.1:4173>. Owner thử theo
-[handoff](delivery/d01-history-paging/acceptance-handoff.md): tổng 30 phiếu TPTS,
-25/5 qua hai trang, global sort/filter, selection từng trang và desktop/mobile.
-[Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md) phân biệt
-kết quả mới với revision 1. Chờ owner xác nhận D01 pass hoặc lỗi cụ thể; không
-coi pass P04 là pass D01, không tự mở cycle tiếp theo. Chưa merge/deploy.
+Owner xác nhận “pass” ngày 24/09/2026 sau
+[handoff](delivery/d01-history-paging/acceptance-handoff.md). Cycle CLOSED;
+close checker PASS tại `8144b7c`. [Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md)
+giữ nguyên kết quả kỹ thuật; lượt đóng chỉ ghi quyết định, không sửa code.
+Chưa push/merge/deploy; không tự mở cycle mới.
+
+Bước nhỏ đề xuất: tích hợp P04 + D01 vào main qua PR và CI khi owner yêu cầu.
 
 ## P04 user deactivation — đã đóng
 
@@ -83,7 +84,7 @@ với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, b
 và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
 `docs/delivery/**`.
 
-P05 đã đóng và tích hợp. P04 đã được owner chấp nhận. D01 active revision 2;
+P05 đã đóng và tích hợp. P04 đã được owner chấp nhận. D01 revision 2 đã đóng;
 C02 vẫn bị chặn bởi primary supplier, O01/O02 tiếp tục hoãn.
 
 ## Policy lifecycle đã khóa
@@ -157,8 +158,7 @@ deactivate, các capability provisioning còn lại chờ cycle riêng.
 ## Ưu tiên chưa mở cycle
 
 1. Chốt primary supplier và semantics lookup current trước khi mở C02 publish.
-2. Chọn một outcome độc lập: lifecycle identity/credential, D01 paging theo số
-   đo, O01 backup/restore, O02 profile triển khai hoặc A01 nghiệm thu online trên
+2. Chọn một outcome độc lập: lifecycle identity/credential, O01 backup/restore, O02 profile triển khai hoặc A01 nghiệm thu online trên
    thiết bị mục tiêu.
 
 Chi tiết dependency/finding nằm tại

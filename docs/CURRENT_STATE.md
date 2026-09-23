@@ -4,7 +4,7 @@ Cập nhật: 2026-09-24
 
 ## Giai đoạn
 
-`D01 history paging — technical PASS revision 2, chờ owner acceptance`
+`D01 history paging — CLOSED revision 2, owner accepted 2026-09-24`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -75,7 +75,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   `7fc9b8d`; 162 frontend/package tests, 65 backend tests và real-backend browser
   8 PASS / 4 skip theo viewport. Query-plan 20.000 phiếu + 40.000 dòng ảnh tổng hợp
   xác nhận page-before-photo; chưa cần index/migration mới. Preview sạch
-  <http://127.0.0.1:4173>, owner acceptance pending.
+  <http://127.0.0.1:4173>; owner đã xác nhận “pass” ngày 24/09/2026.
+  Cycle CLOSED, close checker PASS tại `8144b7c`; chưa merge/deploy.
   [Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md).
 
 
@@ -116,7 +117,7 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - Chưa chốt hosting/storage/retention, SSO/MFA, primary supplier nhiều NCC,
   edit/invalidate workflow hoặc cửa sổ duyệt.
 - Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật và production rollout
-  vẫn là backlog. D01 đã tích hợp trên nhánh P04/P05 nhưng chờ owner nghiệm thu; O01 backup/restore
+  vẫn là backlog. D01 đã được owner nghiệm thu trên nhánh P04/P05, chưa merge main; O01 backup/restore
   còn candidate riêng, chưa được owner nghiệm thu hoặc tích hợp.
 - Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
@@ -128,9 +129,10 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
 tích hợp của chuỗi này. P05 đã được owner chấp nhận và merge vào `main` ngày 23/09/2026.
 P04 đã CLOSED theo owner “pass p04” ngày 23/09/2026; chưa merge/deploy.
-D01 là cycle active revision 2, đã tích hợp và đạt technical gates trên baseline
-P04/P05. Owner thử preview theo [handoff D01](delivery/d01-history-paging/acceptance-handoff.md);
-chưa merge/deploy, chưa mở cycle khác. C02 chỉ nên mở sau khi chốt
+D01 revision 2 đã CLOSED theo owner “pass” ngày 24/09/2026 trên baseline
+P04/P05; [owner decision](delivery/d01-history-paging/acceptance-handoff.md).
+Chưa merge/deploy, không còn cycle active. Bước đề xuất kế tiếp là tích hợp
+P04 + D01 vào main qua PR/CI khi được yêu cầu. C02 chỉ nên mở sau khi chốt
 primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
 riêng. Admin reset credential và bootstrap/recovery vẫn thuộc slice khác; khóa user đã có ở P04.
 Kết quả P02 nằm trong
