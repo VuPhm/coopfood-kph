@@ -311,8 +311,8 @@ class KphHttpIntegrationTest {
                        DATE '2026-08-01' + (g % 5), NULL, g, 'EA', 'NEAR_EXPIRY', NULL,
                        'CANCEL', NULL, lpad(g::text, 13, '0'), 'NOT_FOUND',
                        'SKU-' || lpad(g::text, 4, '0'), 'Sản phẩm ' || g, 'NCC ' || (g % 3),
-                       'SUBMITTED', ?::timestamptz + g * interval '1 second',
-                       ?::timestamptz + g * interval '1 second', '0001', 'Store One',
+                       'SUBMITTED', ?::timestamptz,
+                       ?::timestamptz, '0001', 'Store One',
                        'KPH Demo', CASE WHEN g % 4 = 0 THEN 'PENDING' ELSE 'APPROVED' END,
                        CASE WHEN g % 4 = 0 THEN NULL ELSE ?::uuid END,
                        CASE WHEN g % 4 = 0 THEN NULL ELSE ?::timestamptz END,
@@ -361,11 +361,56 @@ class KphHttpIntegrationTest {
         first.path("items").forEach(item -> firstIds.add(item.path("id").asText()));
         assertThat(second.path("items")).allSatisfy(item ->
                 assertThat(firstIds).doesNotContain(item.path("id").asText()));
+        List<JsonNode> adjacentPages = new java.util.ArrayList<>();
+        first.path("items").forEach(adjacentPages::add);
+        second.path("items").forEach(adjacentPages::add);
+        assertThat(adjacentPages).hasSize(15);
+        for (int index = 1; index < adjacentPages.size(); index++) {
+            JsonNode previous = adjacentPages.get(index - 1);
+            JsonNode current = adjacentPages.get(index);
+            int dateOrder = previous.path("detectedDate").asText()
+                    .compareTo(current.path("detectedDate").asText());
+            assertThat(dateOrder).isLessThanOrEqualTo(0);
+            if (dateOrder == 0) {
+                assertThat(previous.path("id").asText()).isGreaterThan(current.path("id").asText());
+            }
+        }
         assertThat(first.path("items")).allSatisfy(item -> {
             assertThat(item.path("type").asText()).isEqualTo("TPCN");
             assertThat(item.path("approvalStatus").asText()).isEqualTo("PENDING");
             assertThat(item.path("photos")).hasSize(1);
         });
+
+        database.execute("""
+                UPDATE kph_records
+                SET condition_code = CASE quantity::int % 5
+                        WHEN 0 THEN 'NEAR_EXPIRY' WHEN 1 THEN 'EXPIRED'
+                        WHEN 2 THEN 'TORN_PACKAGING' ELSE 'OTHER' END,
+                    condition_detail = CASE quantity::int % 5
+                        WHEN 3 THEN '  Bao bì sai nhãn  ' ELSE '   ' END,
+                    resolution_code = CASE quantity::int % 5
+                        WHEN 0 THEN 'CANCEL' WHEN 1 THEN 'EXCHANGE' WHEN 2 THEN 'RETURN'
+                        ELSE 'OTHER' END,
+                    resolution_detail = CASE quantity::int % 5
+                        WHEN 3 THEN '  ANCC xử lý  ' ELSE '   ' END
+                WHERE store_id = ? AND type = 'TPCN'
+                """, STORE_ID);
+        JsonNode conditionAscending = sortedPage(login, "condition", "ascending");
+        JsonNode conditionDescending = sortedPage(login, "condition", "descending");
+        assertThat(displayedConditions(conditionAscending)).containsExactly(
+                "Bao bì sai nhãn", "Cận date", "Hết HSD", "Khác", "Rách bao bì");
+        assertThat(displayedConditions(conditionDescending)).containsExactly(
+                "Rách bao bì", "Khác", "Hết HSD", "Cận date", "Bao bì sai nhãn");
+        JsonNode resolutionAscending = sortedPage(login, "resolution", "ascending");
+        JsonNode resolutionDescending = sortedPage(login, "resolution", "descending");
+        assertThat(displayedResolutions(resolutionAscending)).containsExactly(
+                "ANCC xử lý", "ĐỔI", "HỦY", "KHÁC", "XUẤT TRẢ");
+        assertThat(displayedResolutions(resolutionDescending)).containsExactly(
+                "XUẤT TRẢ", "KHÁC", "HỦY", "ĐỔI", "ANCC xử lý");
+        assertThat(displayedApprovals(sortedPage(login, "approval", "ascending")))
+                .containsExactly("Chờ duyệt", "Đã duyệt");
+        assertThat(displayedApprovals(sortedPage(login, "approval", "descending")))
+                .containsExactly("Đã duyệt", "Chờ duyệt");
 
         for (String sort : List.of("detectedDate", "product", "supplier", "quantity", "condition",
                 "resolution", "approval")) {
@@ -391,9 +436,86 @@ class KphHttpIntegrationTest {
             assertThat(sortedIds).doesNotHaveDuplicates().containsExactlyElementsOf(repeatedIds);
         }
 
+        JsonNode ascendingQuantity = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("sort", "quantity").queryParam("direction", "ascending")
+                        .queryParam("pageSize", "60").session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+        JsonNode descendingQuantity = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("sort", "quantity").queryParam("direction", "descending")
+                        .queryParam("pageSize", "60").session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+        List<Integer> ascendingValues = new java.util.ArrayList<>();
+        List<Integer> descendingValues = new java.util.ArrayList<>();
+        ascendingQuantity.path("items").forEach(item -> ascendingValues.add(item.path("quantity").asInt()));
+        descendingQuantity.path("items").forEach(item -> descendingValues.add(item.path("quantity").asInt()));
+        assertThat(ascendingValues).isSorted().containsExactlyElementsOf(
+                descendingValues.stream().sorted().toList());
+        assertThat(descendingValues).isSortedAccordingTo(java.util.Comparator.reverseOrder());
+
+        JsonNode outOfRange = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("page", "99").queryParam("pageSize", "10").session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+        assertThat(outOfRange.path("items")).isEmpty();
+        assertThat(outOfRange.path("page").asInt()).isEqualTo(99);
+        assertThat(outOfRange.path("totalItems").asLong()).isEqualTo(60);
+        assertThat(outOfRange.path("totalPages").asLong()).isEqualTo(6);
+
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("page", "0").session(login.session()))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("pageSize", "0").session(login.session()))
+                .andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .queryParam("pageSize", "101").session(login.session()))
                 .andExpect(status().isBadRequest());
+    }
+
+    private JsonNode sortedPage(Login login, String sort, String direction) throws Exception {
+        return objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("type", "TPCN").queryParam("sort", sort)
+                        .queryParam("direction", direction).queryParam("pageSize", "60")
+                        .session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+    }
+
+    private List<String> displayedConditions(JsonNode page) {
+        return distinctLabels(page, item -> switch (item.path("condition").asText()) {
+            case "NEAR_EXPIRY" -> "Cận date";
+            case "EXPIRED" -> "Hết HSD";
+            case "TORN_PACKAGING" -> "Rách bao bì";
+            case "OTHER" -> item.path("conditionDetail").asText().trim().isEmpty()
+                    ? "Khác" : item.path("conditionDetail").asText().trim();
+            default -> item.path("condition").asText();
+        });
+    }
+
+    private List<String> displayedResolutions(JsonNode page) {
+        return distinctLabels(page, item -> switch (item.path("resolution").asText()) {
+            case "CANCEL" -> "HỦY";
+            case "EXCHANGE" -> "ĐỔI";
+            case "RETURN" -> "XUẤT TRẢ";
+            case "OTHER" -> item.path("resolutionDetail").asText().trim().isEmpty()
+                    ? "KHÁC" : item.path("resolutionDetail").asText().trim();
+            default -> item.path("resolution").asText();
+        });
+    }
+
+    private List<String> displayedApprovals(JsonNode page) {
+        return distinctLabels(page, item -> switch (item.path("approvalStatus").asText()) {
+            case "PENDING" -> "Chờ duyệt";
+            case "APPROVED" -> "Đã duyệt";
+            default -> "Không duyệt";
+        });
+    }
+
+    private List<String> distinctLabels(JsonNode page, java.util.function.Function<JsonNode, String> label) {
+        List<String> labels = new java.util.ArrayList<>();
+        page.path("items").forEach(item -> {
+            String displayed = label.apply(item);
+            if (labels.isEmpty() || !labels.getLast().equals(displayed)) labels.add(displayed);
+        });
+        return labels;
     }
 
     @Test
@@ -424,7 +546,10 @@ class KphHttpIntegrationTest {
                 VALUES (?, ?, TRUE, ?, ?)
                 """, USER_ID, REGION_ID, now, now);
         Login manager = login();
-        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID)
+                        .queryParam("page", "1").queryParam("pageSize", "1")
+                        .queryParam("sort", "quantity").queryParam("direction", "ascending")
+                        .session(manager.session()))
                 .andExpect(status().isForbidden());
         MvcResult pendingExport = mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
                         .contentType(MediaType.APPLICATION_JSON).content(exportBody)

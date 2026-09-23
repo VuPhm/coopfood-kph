@@ -174,18 +174,40 @@ class KphRepository {
         String sqlDirection = direction == KphHistorySortDirection.ascending ? "ASC" : "DESC";
         String primary = switch (sort) {
             case detectedDate -> "r.detected_date " + sqlDirection;
-            case product -> "lower(COALESCE(r.snapshot_sku_code, r.scanned_barcode, '')) " + sqlDirection
-                    + ", lower(COALESCE(r.snapshot_product_name, '')) " + sqlDirection;
-            case supplier -> "lower(COALESCE(r.snapshot_supplier_name, '')) " + sqlDirection;
-            case quantity -> "r.quantity " + sqlDirection;
-            case condition -> "r.condition_code " + sqlDirection + ", lower(COALESCE(r.condition_detail, '')) "
+            case product -> "(COALESCE(r.snapshot_sku_code, r.scanned_barcode, 'NHẬP TAY') || ' ' || "
+                    + "COALESCE(r.snapshot_product_name, 'Sản phẩm nhập tay')) COLLATE \"vi-x-icu\" "
                     + sqlDirection;
-            case resolution -> "r.resolution_code " + sqlDirection
-                    + ", lower(COALESCE(r.resolution_detail, '')) " + sqlDirection;
-            case approval -> "CASE r.approval_status WHEN 'PENDING' THEN 1 WHEN 'APPROVED' THEN 2 ELSE 3 END "
+            case supplier -> "COALESCE(r.snapshot_supplier_name, 'Chưa nhập nhà cung cấp') COLLATE \"vi-x-icu\" "
+                    + sqlDirection;
+            case quantity -> "r.quantity " + sqlDirection;
+            case condition -> conditionLabelExpression() + " COLLATE \"vi-x-icu\" " + sqlDirection;
+            case resolution -> resolutionLabelExpression() + " COLLATE \"vi-x-icu\" " + sqlDirection;
+            case approval -> "CASE r.approval_status WHEN 'PENDING' THEN 'Chờ duyệt' "
+                    + "WHEN 'APPROVED' THEN 'Đã duyệt' ELSE 'Không duyệt' END COLLATE \"vi-x-icu\" "
                     + sqlDirection;
         };
         return primary + ", r.created_at DESC, r.id DESC";
+    }
+
+    private String conditionLabelExpression() {
+        return "CASE r.condition_code "
+                + "WHEN 'NEAR_EXPIRY' THEN 'Cận date' "
+                + "WHEN 'EXPIRED' THEN 'Hết HSD' "
+                + "WHEN 'TORN_PACKAGING' THEN 'Rách bao bì' "
+                + "WHEN 'VACUUM_LEAK' THEN 'Xì chân không' "
+                + "WHEN 'BRUISED_WATERLOGGED' THEN 'Dập úng' "
+                + "WHEN 'ROTTEN_MOLDY' THEN 'Thối mốc' "
+                + "WHEN 'OTHER' THEN COALESCE(NULLIF(btrim(r.condition_detail), ''), 'Khác') "
+                + "ELSE r.condition_code END";
+    }
+
+    private String resolutionLabelExpression() {
+        return "CASE r.resolution_code "
+                + "WHEN 'CANCEL' THEN 'HỦY' "
+                + "WHEN 'EXCHANGE' THEN 'ĐỔI' "
+                + "WHEN 'RETURN' THEN 'XUẤT TRẢ' "
+                + "WHEN 'OTHER' THEN COALESCE(NULLIF(btrim(r.resolution_detail), ''), 'KHÁC') "
+                + "ELSE r.resolution_code END";
     }
 
     List<KphRecordResponse> findAllByIds(UUID storeId, KphType type, List<UUID> recordIds) {
