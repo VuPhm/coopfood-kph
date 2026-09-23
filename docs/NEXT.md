@@ -13,15 +13,17 @@ Owner xác nhận “pass” ngày 24/09/2026 sau
 [handoff](delivery/d01-history-paging/acceptance-handoff.md). Cycle CLOSED;
 close checker PASS tại `8144b7c`. [Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md)
 giữ nguyên kết quả kỹ thuật; lượt đóng chỉ ghi quyết định, không sửa code.
-Chưa push/merge/deploy; không tự mở cycle mới.
-
-Bước nhỏ đề xuất: tích hợp P04 + D01 vào main qua PR và CI khi owner yêu cầu.
+P04 + D01 đã merge vào `main` qua
+[PR #8](https://github.com/VuPhm/coopfood-kph/pull/8), commit `1a339f3`, ngày
+24/09/2026. CI frontend, backend và browser đều PASS. Chưa deploy; không tự mở
+cycle mới.
 
 ## P04 user deactivation — đã đóng
 
 Owner chấp nhận revision 3 ngày 23/09/2026 bằng “pass p04”. Candidate
 `e502886` đã pass 161 frontend/package tests, 64 backend tests và browser
-real-backend 4 viewport. Close checker PASS; chưa merge/deploy.
+real-backend 4 viewport. Close checker PASS; đã tích hợp vào `main` cùng D01
+qua PR #8; chưa deploy.
 
 ## P05 credential self-service — đã đóng và tích hợp
 

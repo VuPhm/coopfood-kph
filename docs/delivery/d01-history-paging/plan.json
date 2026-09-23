@@ -97,7 +97,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "D01 CLOSED theo owner acceptance ngày 2026-09-24. Dừng cycle; chưa push/merge/deploy. Bước đề xuất khi được yêu cầu: tích hợp P04 + D01 vào main qua PR và CI.",
+  "nextAction": "D01 CLOSED theo owner acceptance ngày 2026-09-24. P04 + D01 đã merge vào main qua PR #8 tại 1a339f3 ngày 2026-09-24; CI frontend/backend/browser PASS. Chưa deploy; dừng cycle.",
   "completedTeams": [
     {
       "id": "e2e",

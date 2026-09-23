@@ -80,5 +80,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "P04 CLOSED theo owner acceptance ngày 2026-09-23. Chưa merge/deploy; tiếp tục phân task cycle kế tiếp theo yêu cầu owner."
+  "nextAction": "P04 CLOSED theo owner acceptance ngày 2026-09-23. Đã merge cùng D01 vào main qua PR #8 tại 1a339f3 ngày 2026-09-24; CI frontend/backend/browser PASS. Chưa deploy."
 }
