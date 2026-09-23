@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "d01-history-paging",
   "revision": 2,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Phân trang lịch sử KPH online trên toàn tập dữ liệu với filter/sort phía server và thứ tự ổn định: backend phân trang record trước khi nạp ảnh, Store PWA hiển thị tổng đúng và điều hướng accessible, selection chỉ thuộc trang hiện tại; ghi baseline/query-plan trên dữ liệu tổng hợp và không thay đổi Pilot local-only.",
   "inScope": [
     "Khóa contract D01 cho page 1-based, pageSize 1–100 mặc định 25, totalItems/totalPages, tổng theo TPCN/TPTS, approval filter và bảy sort hiện có với tie-breaker createdAt/id ổn định",
@@ -21,7 +21,7 @@
     "Dùng dữ liệu vận hành thật, production load test, hosting capacity/SLO hoặc production rollout"
   ],
   "baseSha": "52ec92fc5dd57888716b6b7430d9ec92ac21a9cf",
-  "candidateSha": "",
+  "candidateSha": "7a160a65011d3bc6ee7f2125bce28cade874cda8",
   "integrationOwner": "/root",
   "sharedPaths": [
     "contracts/**",
@@ -37,7 +37,7 @@
     "docs/delivery/d01-history-paging/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [
     {
       "id": "backend",
@@ -70,10 +70,10 @@
       "id": "technical-history-paging",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "7a160a65011d3bc6ee7f2125bce28cade874cda8",
+      "evidence": "docs/delivery/d01-history-paging/technical-evidence-r2.md"
     },
     {
       "id": "owner-history-paging-acceptance",
@@ -82,7 +82,7 @@
       "status": "pending",
       "revision": 2,
       "sha": "",
-      "evidence": ""
+      "evidence": "docs/delivery/d01-history-paging/acceptance-handoff.md"
     }
   ],
   "changes": [
@@ -95,7 +95,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Integrated backend/frontend/E2E; run npm verify, full backend verify, real-backend browser, benchmark and preview on candidate.",
+  "nextAction": "Owner thử preview sạch http://127.0.0.1:4173 theo handoff và xác nhận D01 pass hoặc lỗi cụ thể. Technical PASS revision 2; chưa merge/deploy hoặc mở cycle khác.",
   "completedTeams": [
     {
       "id": "e2e",

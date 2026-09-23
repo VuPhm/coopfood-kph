@@ -1,7 +1,7 @@
 # D01 — nghiệm thu phân trang lịch sử, revision 2
 
 Ngày: 24/09/2026. Bản tích hợp P04/P05 + D01 trên
-`codex/d01-p04-integration`; application/browser candidate `7fc9b8d`.
+`codex/d01-p04-integration`; application/browser candidate `7fc9b8d`, delivery candidate `7a160a6` (chỉ thêm docs).
 Owner acceptance **pending**; xác nhận P04 trước đó không được tính là pass D01.
 
 ## Bản dùng thử
