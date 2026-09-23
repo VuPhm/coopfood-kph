@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -175,8 +176,11 @@ class KphHttpIntegrationTest {
         MvcResult list = mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID).session(login.session()))
                 .andExpect(status().isOk())
                 .andReturn();
-        assertThat(objectMapper.readTree(list.getResponse().getContentAsByteArray()).get(0).path("id").asText())
+        JsonNode page = objectMapper.readTree(list.getResponse().getContentAsByteArray());
+        assertThat(page.path("items").get(0).path("id").asText())
                 .isEqualTo(recordId);
+        assertThat(page.path("totalItems").asLong()).isEqualTo(1);
+        assertThat(page.path("typeTotals").path("tpcn").asLong()).isEqualTo(1);
         mockMvc.perform(get("/api/v1/stores/{storeId}/kph/{recordId}/photos/1", OTHER_STORE_ID, recordId)
                         .session(login.session()))
                 .andExpect(status().isForbidden());
@@ -217,7 +221,7 @@ class KphHttpIntegrationTest {
         assertThat(objectMapper.readTree(changed.getResponse().getContentAsByteArray()).path("code").asText())
                 .isEqualTo("IDEMPOTENCY_KEY_REUSED");
         assertThat(objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID).session(login.session()))
-                .andReturn().getResponse().getContentAsByteArray()).size()).isEqualTo(1);
+                .andReturn().getResponse().getContentAsByteArray()).path("items")).hasSize(1);
 
         mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID)
                         .file(payload(null, "Cross store")).file(firstPhoto).session(login.session())
@@ -251,7 +255,7 @@ class KphHttpIntegrationTest {
         assertThat(persisted.get("catalog_version_id")).isNull();
         JsonNode reloaded = objectMapper.readTree(mockMvc.perform(
                         get("/api/v1/stores/{storeId}/kph", STORE_ID).session(login.session()))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray()).get(0);
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray()).path("items").get(0);
         assertThat(reloaded).isEqualTo(body);
     }
 
@@ -272,14 +276,15 @@ class KphHttpIntegrationTest {
                         .queryParam("detectedTo", "2026-09-01")
                         .session(login.session()))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
-        assertThat(included).hasSize(1);
-        assertThat(included.get(0).path("id").asText()).isEqualTo(recordId.toString());
+        assertThat(included.path("items")).hasSize(1);
+        assertThat(included.path("items").get(0).path("id").asText()).isEqualTo(recordId.toString());
 
         JsonNode excluded = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .queryParam("detectedFrom", "2026-09-02")
                         .session(login.session()))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
-        assertThat(excluded).isEmpty();
+        assertThat(excluded.path("items")).isEmpty();
+        assertThat(excluded.path("totalItems").asLong()).isZero();
 
         MvcResult inverted = mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .queryParam("detectedFrom", "2026-09-03")
@@ -288,6 +293,107 @@ class KphHttpIntegrationTest {
                 .andExpect(status().isUnprocessableEntity()).andReturn();
         assertThat(objectMapper.readTree(inverted.getResponse().getContentAsByteArray()).path("code").asText())
                 .isEqualTo("DATE_RANGE_INVALID");
+    }
+
+    @Test
+    void paginatesFilteredHistoryBeforeJoiningPhotosWithStableTotalsAndOrder() throws Exception {
+        database.execute("""
+                INSERT INTO kph_records (
+                    id, store_id, created_by, type, detected_date, processed_date,
+                    quantity, unit, condition_code, condition_detail, resolution_code,
+                    resolution_detail, scanned_barcode, catalog_lookup_status,
+                    snapshot_sku_code, snapshot_product_name, snapshot_supplier_name,
+                    lifecycle_state, created_at, updated_at, snapshot_store_code,
+                    snapshot_store_name, snapshot_actor_display_name, approval_status,
+                    reviewed_by, reviewed_at, snapshot_reviewer_display_name)
+                SELECT md5('paging-record-' || g)::uuid, ?, ?,
+                       CASE WHEN g % 2 = 0 THEN 'TPCN' ELSE 'TPTS' END,
+                       DATE '2026-08-01' + (g % 5), NULL, g, 'EA', 'NEAR_EXPIRY', NULL,
+                       'CANCEL', NULL, lpad(g::text, 13, '0'), 'NOT_FOUND',
+                       'SKU-' || lpad(g::text, 4, '0'), 'Sản phẩm ' || g, 'NCC ' || (g % 3),
+                       'SUBMITTED', ?::timestamptz + g * interval '1 second',
+                       ?::timestamptz + g * interval '1 second', '0001', 'Store One',
+                       'KPH Demo', CASE WHEN g % 4 = 0 THEN 'PENDING' ELSE 'APPROVED' END,
+                       CASE WHEN g % 4 = 0 THEN NULL ELSE ?::uuid END,
+                       CASE WHEN g % 4 = 0 THEN NULL ELSE ?::timestamptz END,
+                       CASE WHEN g % 4 = 0 THEN NULL ELSE 'KPH Demo' END
+                FROM generate_series(1, 60) AS g
+                """, STORE_ID, USER_ID, Timestamp.from(NOW.minusSeconds(3600)),
+                Timestamp.from(NOW.minusSeconds(3600)), USER_ID, Timestamp.from(NOW));
+        database.execute("""
+                INSERT INTO kph_photos (
+                    id, kph_record_id, ordinal, original_storage_key, stamped_storage_key,
+                    content_type, original_size_bytes, stamped_size_bytes,
+                    original_sha256, stamped_sha256, captured_at, created_at)
+                SELECT md5('paging-photo-' || g)::uuid, md5('paging-record-' || g)::uuid, 1,
+                       'paging/' || g || '.original.jpg', 'paging/' || g || '.stamped.jpg',
+                       'image/jpeg', 10, 10, repeat('a', 64), repeat('b', 64), ?, ?
+                FROM generate_series(1, 60) AS g
+                """, Timestamp.from(NOW), Timestamp.from(NOW));
+        Login login = login();
+
+        JsonNode first = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("type", "TPCN")
+                        .queryParam("approvalStatus", "PENDING")
+                        .queryParam("sort", "detectedDate")
+                        .queryParam("direction", "ascending")
+                        .queryParam("page", "1")
+                        .queryParam("pageSize", "10")
+                        .session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+        JsonNode second = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("type", "TPCN")
+                        .queryParam("approvalStatus", "PENDING")
+                        .queryParam("sort", "detectedDate")
+                        .queryParam("direction", "ascending")
+                        .queryParam("page", "2")
+                        .queryParam("pageSize", "10")
+                        .session(login.session()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+
+        assertThat(first.path("items")).hasSize(10);
+        assertThat(second.path("items")).hasSize(5);
+        assertThat(first.path("totalItems").asLong()).isEqualTo(15);
+        assertThat(first.path("totalPages").asLong()).isEqualTo(2);
+        assertThat(first.path("typeTotals").path("tpcn").asLong()).isEqualTo(30);
+        assertThat(first.path("typeTotals").path("tpts").asLong()).isEqualTo(30);
+        Set<String> firstIds = new java.util.HashSet<>();
+        first.path("items").forEach(item -> firstIds.add(item.path("id").asText()));
+        assertThat(second.path("items")).allSatisfy(item ->
+                assertThat(firstIds).doesNotContain(item.path("id").asText()));
+        assertThat(first.path("items")).allSatisfy(item -> {
+            assertThat(item.path("type").asText()).isEqualTo("TPCN");
+            assertThat(item.path("approvalStatus").asText()).isEqualTo("PENDING");
+            assertThat(item.path("photos")).hasSize(1);
+        });
+
+        for (String sort : List.of("detectedDate", "product", "supplier", "quantity", "condition",
+                "resolution", "approval")) {
+            JsonNode sorted = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                            .queryParam("type", "TPCN")
+                            .queryParam("sort", sort)
+                            .queryParam("direction", "ascending")
+                            .queryParam("pageSize", "7")
+                            .session(login.session()))
+                    .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+            JsonNode repeated = objectMapper.readTree(mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                            .queryParam("type", "TPCN")
+                            .queryParam("sort", sort)
+                            .queryParam("direction", "ascending")
+                            .queryParam("pageSize", "7")
+                            .session(login.session()))
+                    .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());
+            assertThat(sorted.path("items")).hasSize(7);
+            List<String> sortedIds = new java.util.ArrayList<>();
+            List<String> repeatedIds = new java.util.ArrayList<>();
+            sorted.path("items").forEach(item -> sortedIds.add(item.path("id").asText()));
+            repeated.path("items").forEach(item -> repeatedIds.add(item.path("id").asText()));
+            assertThat(sortedIds).doesNotHaveDuplicates().containsExactlyElementsOf(repeatedIds);
+        }
+
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .queryParam("pageSize", "101").session(login.session()))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

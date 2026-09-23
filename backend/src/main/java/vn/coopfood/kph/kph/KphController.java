@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @RestController
 @Validated
@@ -38,11 +40,17 @@ class KphController {
     }
 
     @GetMapping
-    List<KphRecordResponse> list(@PathVariable UUID storeId, @RequestParam(required = false) KphType type,
+    KphRecordPageResponse list(@PathVariable UUID storeId, @RequestParam(required = false) KphType type,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate detectedFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate detectedTo,
+            @RequestParam(required = false) KphApprovalStatus approvalStatus,
+            @RequestParam(required = false) KphHistorySort sort,
+            @RequestParam(defaultValue = "descending") KphHistorySortDirection direction,
+            @RequestParam(defaultValue = "1") @Min(1) int page,
+            @RequestParam(defaultValue = "25") @Min(1) @Max(100) int pageSize,
             Authentication authentication) {
-        return service.list(storeId, type, detectedFrom, detectedTo, authentication);
+        return service.list(storeId, type, detectedFrom, detectedTo, approvalStatus, sort, direction,
+                page, pageSize, authentication);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
