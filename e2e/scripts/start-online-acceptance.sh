@@ -146,6 +146,7 @@ wait_for_url "Backend" "http://127.0.0.1:8080/actuator/health"
 docker exec -i "${container_name}" \
   psql -U kph_e2e -d coopfood_kph_e2e -v ON_ERROR_STOP=1 \
   <"${seed_file}" >/dev/null
+node "${script_dir}/seed-foundation-paging-media.mjs" "${media_dir}"
 
 printf '5/5 Khởi động online preview...\n'
 launchctl submit \
