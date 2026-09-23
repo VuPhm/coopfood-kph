@@ -70,7 +70,7 @@ type KphRecordPage = {
   pageSize: number;
   totalItems: number;
   totalPages: number;
-  typeTotals: { TPCN: number; TPTS: number };
+  typeTotals: { tpcn: number; tpts: number };
 };
 
 function apiUrl(path: string) {
@@ -451,7 +451,7 @@ test.describe("Store PWA browser acceptance", () => {
     const firstPayload = await firstPage.json() as KphRecordPage;
     expect(firstPayload.totalItems).toBeGreaterThanOrEqual(30);
     expect(firstPayload.totalPages).toBeGreaterThanOrEqual(2);
-    expect(firstPayload.typeTotals.TPTS).toBe(firstPayload.totalItems);
+    expect(firstPayload.typeTotals.tpts).toBe(firstPayload.totalItems);
     expect(firstPayload.items).toHaveLength(25);
     expect(firstPayload.page).toBe(1);
     expect(firstPayload.pageSize).toBe(25);
@@ -459,7 +459,7 @@ test.describe("Store PWA browser acceptance", () => {
       [...firstPayload.items.map(({ quantity }) => quantity)].sort((left, right) => left - right),
     );
     await expect(page.locator(`[aria-label="${firstPayload.totalItems} phiếu"]`).first()).toBeVisible();
-    await expect(page.getByRole("tab", { name: /TP Tươi sống/i }).getByLabel(`${firstPayload.typeTotals.TPTS} phiếu`)).toBeVisible();
+    await expect(page.getByRole("tab", { name: /TP Tươi sống/i }).getByLabel(`${firstPayload.typeTotals.tpts} phiếu`)).toBeVisible();
 
     const firstCheckbox = await firstVisible(page.getByRole("checkbox", { name: /Chọn phiếu/ }));
     await firstCheckbox.click();
