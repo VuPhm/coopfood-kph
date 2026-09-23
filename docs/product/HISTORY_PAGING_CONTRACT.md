@@ -1,6 +1,7 @@
 # D01 — Hợp đồng phân trang lịch sử KPH online
 
-Trạng thái: revision 1 technical candidate, chờ owner nghiệm thu — 2026-09-22.
+Trạng thái: revision 2 đang tích hợp trên baseline P04/P05 — 2026-09-23.
+Nghiệp vụ revision 1 được giữ; owner chọn tiếp tục D01, chưa nghiệm thu bản tích hợp.
 
 ## Outcome
 

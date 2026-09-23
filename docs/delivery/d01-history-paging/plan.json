@@ -48,7 +48,8 @@
       ],
       "dependsOn": [],
       "model": "gpt-6-luna",
-      "reasoningEffort": "high"
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_backend"
     },
     {
       "id": "frontend",
@@ -58,7 +59,8 @@
       ],
       "dependsOn": [],
       "model": "gpt-6-luna",
-      "reasoningEffort": "high"
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_frontend"
     },
     {
       "id": "e2e",
@@ -68,7 +70,8 @@
       ],
       "dependsOn": [],
       "model": "gpt-6-luna",
-      "reasoningEffort": "high"
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_e2e"
     }
   ],
   "gates": [

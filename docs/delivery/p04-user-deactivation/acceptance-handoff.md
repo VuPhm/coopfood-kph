@@ -2,8 +2,7 @@
 
 Code candidate: `b4a73fb1647a86e803a6ffd0e254ebc25e475ba5`; delivery checkpoint
 `e502886e2466b748f976f3686e62e1f9afb62a3d`. Branch
-`codex/p04-user-deactivation`, revision 3 (tích hợp main/P05). Technical gate đã PASS; owner gate
-đang chờ quyết định thực tế.
+`codex/p04-user-deactivation`, revision 3 (tích hợp main/P05). Technical gate đã PASS; owner đã xác nhận “pass p04” ngày 23/09/2026.
 
 ## Bản chạy thử
 

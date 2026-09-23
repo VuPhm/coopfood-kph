@@ -1,3 +1,11 @@
+# D01 revision 2 — chưa sẵn sàng nghiệm thu
+
+Owner chọn tiếp tục D01 ngày 23/09/2026. Đang tích hợp trên baseline P04/P05;
+URL/candidate/checks bên dưới là handoff **lịch sử revision 1**, không chứng minh
+runtime hay technical PASS của revision 2. Handoff mới sẽ thay thế khi tích hợp xong.
+
+---
+
 # D01 — nghiệm thu phân trang lịch sử KPH online
 
 Candidate: `9f099e134c0894707e3be302fd0df29f1123c040`, branch
