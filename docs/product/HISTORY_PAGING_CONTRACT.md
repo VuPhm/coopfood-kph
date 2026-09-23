@@ -18,6 +18,12 @@ trang. Pilot local-only theo ADR-0002 giữ nguyên authority và hành vi hiệ
 - Sort gồm `detectedDate`, `product`, `supplier`, `quantity`, `condition`,
   `resolution`, `approval`; direction là `ascending` hoặc `descending`. Không
   truyền sort giữ mặc định `createdAt` mới nhất trước.
+- Sort text online dùng nhãn hiển thị (kể cả nội dung `OTHER` và fallback nhập tay)
+  với collation PostgreSQL `vi-x-icu`, không dùng mã enum làm thứ tự. PostgreSQL
+  17 cần có collation này; kiểm integration phải chạy trên image thực. Collation
+  database không cam kết giống từng tie của `Intl.Collator(vi, numeric: true,
+  sensitivity: base)` trong Pilot: chuỗi chứa số/case/dấu có thể khác thứ tự phụ.
+  Sort số lượng vẫn là numeric.
 - Mọi thứ tự đều kết thúc bằng `createdAt DESC, id DESC` để không trùng/mất dòng
   giữa các trang khi dataset không đổi.
 - Response gồm `items`, `page`, `pageSize`, `totalItems`, `totalPages` và

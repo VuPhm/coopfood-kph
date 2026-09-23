@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "d01-history-paging",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "VERIFYING",
   "objective": "Phân trang lịch sử KPH online trên toàn tập dữ liệu với filter/sort phía server và thứ tự ổn định: backend phân trang record trước khi nạp ảnh, Store PWA hiển thị tổng đúng và điều hướng accessible, selection chỉ thuộc trang hiện tại; ghi baseline/query-plan trên dữ liệu tổng hợp và không thay đổi Pilot local-only.",
   "inScope": [
     "Khóa contract D01 cho page 1-based, pageSize 1–100 mặc định 25, totalItems/totalPages, tổng theo TPCN/TPTS, approval filter và bảy sort hiện có với tie-breaker createdAt/id ổn định",
@@ -37,7 +37,7 @@
     "docs/delivery/d01-history-paging/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [
     {
       "id": "backend",
@@ -48,7 +48,9 @@
       ],
       "dependsOn": [],
       "model": "gpt-6-luna",
-      "reasoningEffort": "high"
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_backend_resume",
+      "resultSha": "af6e97990b241c44b5245ed710bb61f43966dcc5"
     },
     {
       "id": "frontend",
@@ -58,7 +60,9 @@
       ],
       "dependsOn": [],
       "model": "gpt-6-luna",
-      "reasoningEffort": "high"
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_frontend_resume",
+      "resultSha": "8434cb0b8a4088ef39e42589eb351d722ce5dd8e"
     }
   ],
   "gates": [
@@ -91,7 +95,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Resume interrupted D01: E2E commit e1b4c92 integrated at 52ec92f; /tmp worktrees lost. Restore backend/frontend in .local worktrees from existing D01 diff + recorded review fixes. Run integrated gates before owner acceptance.",
+  "nextAction": "Integrated backend/frontend/E2E; run npm verify, full backend verify, real-backend browser, benchmark and preview on candidate.",
   "completedTeams": [
     {
       "id": "e2e",
