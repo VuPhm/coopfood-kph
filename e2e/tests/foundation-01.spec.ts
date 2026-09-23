@@ -491,18 +491,12 @@ test.describe("Store PWA browser acceptance", () => {
     await expect(page.getByText(/Trang 2 \/ \d+/)).toBeVisible();
     await expect(page.getByText("Đã chọn", { exact: false })).toContainText("0");
 
-    const returnResponsePromise = page.waitForResponse((response) => {
-      const url = new URL(response.url());
-      return url.pathname.endsWith(`/stores/${STORES.primary.id}/kph`)
-        && url.searchParams.get("type") === "TPTS"
-        && url.searchParams.get("sort") === "quantity"
-        && url.searchParams.get("direction") === "ascending"
-        && url.searchParams.get("page") === "1";
-    });
+    // Returning to a fresh cached page need not issue another HTTP request.
     await page.getByRole("button", { name: "Trang trước" }).click();
-    const returnedPage = await returnResponsePromise;
-    expect(returnedPage.status()).toBe(200);
-    expect((await returnedPage.json() as KphRecordPage).items.map(({ id }) => id))
+    const visibleHistory = page.locator(testInfo.project.name.includes("mobile")
+      ? ".mobile-history" : ".desktop-history");
+    await expect.poll(async () => visibleHistory.getByRole("checkbox", { name: /^Chọn phiếu / })
+      .evaluateAll((inputs) => inputs.map((input) => input.getAttribute("aria-label")!.replace("Chọn phiếu ", ""))))
       .toEqual(firstPayload.items.map(({ id }) => id));
     await expect(page.getByText(/Trang 1 \/ \d+/)).toBeVisible();
     await expectVisible(page.getByText(firstPayload.items[0]!.catalogSnapshot.productName!, { exact: true }));
