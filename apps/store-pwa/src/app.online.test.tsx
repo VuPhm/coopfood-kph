@@ -184,6 +184,16 @@ describe("Online workspace boundary", () => {
     expect(screen.getAllByText("Phiếu trang một")).toHaveLength(2);
     expect(screen.getByRole("navigation", { name: "Phân trang lịch sử phiếu" })).toHaveAttribute("aria-busy", "true");
     expect(screen.getByRole("button", { name: "Trang trước" })).toBeDisabled();
+    expect(screen.getAllByRole("checkbox", { name: "Chọn phiếu page-1" }).every((checkbox) => (checkbox as HTMLInputElement).disabled)).toBe(true);
+    expect((screen.getByRole("checkbox", { name: "Chọn tất cả phiếu" }) as HTMLInputElement).disabled).toBe(true);
+    expect(screen.getAllByRole("combobox", { name: "Trạng thái duyệt phiếu page-1" }).every((control) => (control as HTMLSelectElement).disabled)).toBe(true);
+    fireEvent.click(screen.getAllByRole("checkbox", { name: "Chọn phiếu page-1" })[0]!);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả phiếu" }));
+    expect(screen.getByText("Đã chọn", { exact: false })).toHaveTextContent("Đã chọn 0");
+    expect(screen.queryByRole("button", { name: "Duyệt 1 phiếu" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Xuất Excel" })).not.toBeInTheDocument();
+    expect(mocks.reviewRecord).not.toHaveBeenCalled();
+    expect(mocks.prepareExport).not.toHaveBeenCalled();
     await act(async () => resolveSecondPage({
       records: [second],
       page: 2,

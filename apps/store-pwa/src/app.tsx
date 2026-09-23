@@ -343,9 +343,15 @@ function WorkspaceApp() {
     });
   }, [activeKind, approvalFilter, dateFilter, deletedIds, recordSort, records, trashMode]);
   const selectedRecords = useMemo(
-    () => records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
-    [activeKind, deletedIds, records, selected, trashMode],
+    () => onlinePersistenceEnabled && onlineHistoryQuery.isPlaceholderData
+      ? []
+      : records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
+    [activeKind, deletedIds, onlineHistoryQuery.isPlaceholderData, records, selected, trashMode],
   );
+  const onlineHistoryActionsBlocked = onlinePersistenceEnabled && onlineHistoryQuery.isPlaceholderData;
+  const historyActionBusyIds = useMemo(() => onlineHistoryActionsBlocked
+    ? new Set(visibleRecords.map(({ id }) => id))
+    : reviewingIds, [onlineHistoryActionsBlocked, reviewingIds, visibleRecords]);
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
   const storeConfigured = onlinePersistenceEnabled ? onlineStoreId !== null : isStoreProfileConfigured(storeProfile);
@@ -531,6 +537,7 @@ function WorkspaceApp() {
   }
 
   function openExport() {
+    if (onlineHistoryActionsBlocked) return;
     if (!storeConfigured) {
       setNotice(onlinePersistenceEnabled ? "Không có cửa hàng hợp lệ để xuất Excel." : "Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
       if (!onlinePersistenceEnabled) setStoreSettingsOpen(true);
@@ -562,6 +569,7 @@ function WorkspaceApp() {
   }
 
   function toggleSelection(id: string) {
+    if (onlineHistoryActionsBlocked || (onlinePersistenceEnabled && !visibleRecords.some((record) => record.id === id))) return;
     setSelected((current) => {
       const next = new Set(current);
       if (next.has(id)) next.delete(id);
@@ -571,6 +579,7 @@ function WorkspaceApp() {
   }
 
   function toggleAllVisible() {
+    if (onlineHistoryActionsBlocked) return;
     setSelected(allVisibleSelected ? new Set() : new Set(visibleRecords.map(({ id }) => id)));
   }
 
@@ -694,7 +703,7 @@ function WorkspaceApp() {
 
   async function updateApproval(recordId: string, status: ApprovalStatus) {
     if (onlinePersistenceEnabled) {
-      if (!canManageOnline || !onlineStoreId || !onlineGateway) return;
+      if (onlineHistoryActionsBlocked || !canManageOnline || !onlineStoreId || !onlineGateway) return;
       const mutationScope: OnlineMutationScope = {
         generation: onlineMutationScopeRef.current.generation,
         storeId: onlineStoreId,
@@ -743,7 +752,7 @@ function WorkspaceApp() {
 
   async function approveSelected() {
     if (onlinePersistenceEnabled) {
-      if (!canManageOnline || !onlineStoreId || !onlineGateway) return;
+      if (onlineHistoryActionsBlocked || !canManageOnline || !onlineStoreId || !onlineGateway) return;
       const recordIds = [...selected];
       const storeId = onlineStoreId;
       const reviewRecord = onlineGateway.reviewRecord;
@@ -949,7 +958,7 @@ function WorkspaceApp() {
   }
 
   async function exportSelected() {
-    if (!selectedRecords.length) return;
+    if (onlineHistoryActionsBlocked || !selectedRecords.length) return;
     if (!storeConfigured) {
       setExportOpen(false);
       setNotice("Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
@@ -1010,7 +1019,7 @@ function WorkspaceApp() {
     : storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…";
 
   const recordActions: RecordActions | undefined = onlinePersistenceEnabled
-    ? canManageOnline ? { approve: updateApproval, busyIds: reviewingIds } : undefined
+    ? canManageOnline ? { approve: updateApproval, busyIds: historyActionBusyIds } : undefined
     : { approve: updateApproval, busyIds: reviewingIds, remove: requestDelete, restore: restoreRecord };
   const workspaceError = logoutMutation.isError && !isSessionExpiryError(logoutMutation.error)
     ? "Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại."
@@ -1167,10 +1176,10 @@ function WorkspaceApp() {
                     {selected.size > 0 && (!onlinePersistenceEnabled || canManageOnline)
                       ? trashMode
                         ? <button type="button" className="selection-count selection-approve selection-restore" onClick={restoreSelected}>Khôi phục <strong>{selected.size}</strong> phiếu</button>
-                        : <button type="button" className="selection-count selection-approve" disabled={reviewingIds.size > 0} onClick={approveSelected}>{reviewingIds.size > 0 ? "Đang duyệt…" : <>Duyệt <strong>{selected.size}</strong> phiếu</>}</button>
+                        : <button type="button" className="selection-count selection-approve" disabled={onlineHistoryActionsBlocked || reviewingIds.size > 0} onClick={approveSelected}>{reviewingIds.size > 0 ? "Đang duyệt…" : <>Duyệt <strong>{selected.size}</strong> phiếu</>}</button>
                       : <span className="selection-count" aria-live="polite">Đã chọn <strong>{selected.size}</strong></span>}
                     <label className="select-all-history" aria-label="Chọn tất cả phiếu" title="Chọn tất cả">
-                      <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
+                      <input type="checkbox" checked={allVisibleSelected} disabled={onlineHistoryActionsBlocked} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
                     </label>
                   </div>
                   {selected.size > 0 && (!onlinePersistenceEnabled || canManageOnline) ? (
@@ -1198,10 +1207,10 @@ function WorkspaceApp() {
                   <th className="px-3 py-0">Ảnh</th>
                   <SortableHeader label="Duyệt" onSort={toggleRecordSort} sort={recordSort} sortKey="approval" />
                   <th className="w-12 px-3 py-0 text-center"><span className="sr-only">Thao tác dòng</span></th>
-                </tr>
+              </tr>
               </thead>
               <tbody>{visibleRecords.length > 0
-                ? visibleRecords.map((record) => <RecordRow key={record.id} actions={recordActions} record={record} selected={selected.has(record.id)} trashMode={trashMode} onToggle={toggleSelection} />)
+                ? visibleRecords.map((record) => <RecordRow key={record.id} actions={recordActions} record={record} selected={selected.has(record.id)} selectionDisabled={onlineHistoryActionsBlocked} trashMode={trashMode} onToggle={toggleSelection} />)
                 : <tr><td className="empty-history-cell" colSpan={10}>{emptyHistoryMessage}</td></tr>}
               </tbody>
             </table>
@@ -1209,7 +1218,7 @@ function WorkspaceApp() {
 
           <div className="grid gap-3 mobile-history">
             {visibleRecords.length > 0
-              ? visibleRecords.map((record) => <RecordCard key={record.id} actions={recordActions} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
+              ? visibleRecords.map((record) => <RecordCard key={record.id} actions={recordActions} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} selectionDisabled={onlineHistoryActionsBlocked} trashMode={trashMode} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
               : <p className="empty-history-card">{emptyHistoryMessage}</p>}
           </div>
           {onlinePersistenceEnabled && onlineHistory ? <HistoryPagination

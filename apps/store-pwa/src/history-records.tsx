@@ -18,14 +18,15 @@ type RecordProps = {
   expanded?: boolean;
   record: RecordView;
   selected: boolean;
+  selectionDisabled?: boolean;
   trashMode: boolean;
   onExpansionChange?: (id: string, expanded: boolean) => void;
   onToggle: (id: string) => void;
 };
 
-export function RecordRow({ actions, onToggle, record, selected, trashMode }: RecordProps) {
+export function RecordRow({ actions, onToggle, record, selected, selectionDisabled = false, trashMode }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
-    <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
+    <td className="p-3 text-center"><input type="checkbox" checked={selected} disabled={selectionDisabled} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
     <td className="p-3"><span className="font-mono text-xs font-bold text-brand">{record.sku}</span><br /><strong>{record.productName}</strong></td>
     <td className="max-w-56 p-3 text-ink-muted">{record.supplier}</td>
@@ -38,7 +39,7 @@ export function RecordRow({ actions, onToggle, record, selected, trashMode }: Re
   </tr>;
 }
 
-export function RecordCard({ actions, expanded = false, onExpansionChange, onToggle, record, selected, trashMode }: RecordProps) {
+export function RecordCard({ actions, expanded = false, onExpansionChange, onToggle, record, selected, selectionDisabled = false, trashMode }: RecordProps) {
   function isInteractiveTarget(event: MouseEvent<HTMLElement>) {
     return event.target instanceof HTMLElement && event.target.closest("button, input, select, label") !== null;
   }
@@ -59,7 +60,7 @@ export function RecordCard({ actions, expanded = false, onExpansionChange, onTog
           {expanded ? <ChevronUp size={18} aria-hidden="true" /> : <ChevronDown size={18} aria-hidden="true" />}
         </button>
         <label className="record-card-select-slot">
-          <input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} />
+          <input type="checkbox" checked={selected} disabled={selectionDisabled} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} />
         </label>
       </div>
     </header>
