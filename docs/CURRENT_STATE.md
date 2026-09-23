@@ -76,7 +76,9 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
   8 PASS / 4 skip theo viewport. Query-plan 20.000 phiếu + 40.000 dòng ảnh tổng hợp
   xác nhận page-before-photo; chưa cần index/migration mới. Preview sạch
   <http://127.0.0.1:4173>; owner đã xác nhận “pass” ngày 24/09/2026.
-  Cycle CLOSED, close checker PASS tại `8144b7c`; chưa merge/deploy.
+  Cycle CLOSED, close checker PASS tại `8144b7c`; tích hợp cùng P04 qua
+  [PR #8](https://github.com/VuPhm/coopfood-kph/pull/8), merge commit
+  `1a339f3` ngày 24/09/2026. CI frontend/backend/browser đều PASS; chưa deploy.
   [Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md).
 
 
@@ -117,7 +119,7 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - Chưa chốt hosting/storage/retention, SSO/MFA, primary supplier nhiều NCC,
   edit/invalidate workflow hoặc cửa sổ duyệt.
 - Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật và production rollout
-  vẫn là backlog. D01 đã được owner nghiệm thu trên nhánh P04/P05, chưa merge main; O01 backup/restore
+  vẫn là backlog. O01 backup/restore
   còn candidate riêng, chưa được owner nghiệm thu hoặc tích hợp.
 - Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
@@ -128,11 +130,12 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 [C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
 tích hợp của chuỗi này. P05 đã được owner chấp nhận và merge vào `main` ngày 23/09/2026.
-P04 đã CLOSED theo owner “pass p04” ngày 23/09/2026; chưa merge/deploy.
+P04 đã CLOSED theo owner “pass p04” ngày 23/09/2026 và tích hợp cùng D01 qua
+[PR #8](https://github.com/VuPhm/coopfood-kph/pull/8) vào `main` tại
+`1a339f3` ngày 24/09/2026; CI frontend/backend/browser đều PASS. Chưa deploy.
 D01 revision 2 đã CLOSED theo owner “pass” ngày 24/09/2026 trên baseline
 P04/P05; [owner decision](delivery/d01-history-paging/acceptance-handoff.md).
-Chưa merge/deploy, không còn cycle active. Bước đề xuất kế tiếp là tích hợp
-P04 + D01 vào main qua PR/CI khi được yêu cầu. C02 chỉ nên mở sau khi chốt
+Đã tích hợp, không còn cycle active và chưa deploy. C02 chỉ nên mở sau khi chốt
 primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
 riêng. Admin reset credential và bootstrap/recovery vẫn thuộc slice khác; khóa user đã có ở P04.
 Kết quả P02 nằm trong
