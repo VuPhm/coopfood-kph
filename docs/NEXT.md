@@ -1,15 +1,20 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-09-23
+Cập nhật: 2026-09-24
 
-## D01 history paging — đang triển khai revision 2
+## D01 history paging — chờ owner acceptance revision 2
 
-Owner chọn D01 ngày 23/09/2026 sau khi xác nhận “pass p04”. Tái sử dụng
-candidate `9f099e1`/nhánh `codex/d01-history-paging`, hoàn thiện trên baseline
-P04/P05 ở `codex/d01-p04-integration`. GPT-6 Luna nhận backend, Store PWA và E2E
-trong worktree riêng; integration owner giữ contract/examples/generated client.
-Không thêm migration nếu chưa có số đo chứng minh cần thiết. Technical evidence
-revision 1 là lịch sử, không dùng làm PASS bản tích hợp revision 2.
+Owner chọn D01 ngày 23/09/2026 sau khi xác nhận “pass p04”. Backend, Store PWA
+và E2E do GPT-6 Luna triển khai đã tích hợp trên baseline P04/P05 ở
+`codex/d01-p04-integration`. Candidate code/browser `7fc9b8d`; technical PASS:
+162 frontend/package tests, 65 backend tests và browser 8 PASS / 4 skip theo viewport.
+
+Preview sạch: <http://127.0.0.1:4173>. Owner thử theo
+[handoff](delivery/d01-history-paging/acceptance-handoff.md): tổng 30 phiếu TPTS,
+25/5 qua hai trang, global sort/filter, selection từng trang và desktop/mobile.
+[Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md) phân biệt
+kết quả mới với revision 1. Chờ owner xác nhận D01 pass hoặc lỗi cụ thể; không
+coi pass P04 là pass D01, không tự mở cycle tiếp theo. Chưa merge/deploy.
 
 ## P04 user deactivation — đã đóng
 

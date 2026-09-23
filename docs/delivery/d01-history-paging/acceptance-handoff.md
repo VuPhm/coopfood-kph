@@ -1,75 +1,38 @@
-# D01 revision 2 — chưa sẵn sàng nghiệm thu
+# D01 — nghiệm thu phân trang lịch sử, revision 2
 
-Owner chọn tiếp tục D01 ngày 23/09/2026. Đang tích hợp trên baseline P04/P05;
-URL/candidate/checks bên dưới là handoff **lịch sử revision 1**, không chứng minh
-runtime hay technical PASS của revision 2. Handoff mới sẽ thay thế khi tích hợp xong.
+Ngày: 24/09/2026. Bản tích hợp P04/P05 + D01 trên
+`codex/d01-p04-integration`; application/browser candidate `7fc9b8d`.
+Owner acceptance **pending**; xác nhận P04 trước đó không được tính là pass D01.
 
----
+## Bản dùng thử
 
-# D01 — nghiệm thu phân trang lịch sử KPH online
+- URL: <http://127.0.0.1:4173>.
+- CHT: `manager.e2e` / `manager-e2e-password`.
+- Tài khoản, phiếu và ảnh đều tổng hợp local; backend thật 8080, PostgreSQL 17
+  ở 55432. Chưa push/merge/deploy.
+- Khởi động lại: `./e2e/scripts/start-online-acceptance.sh` với OrbStack hoạt động.
+  Runtime có revision tại `/tmp/coopfood-kph-online-acceptance/revision`.
+  Reset bằng stop script rồi start script cùng thư mục.
 
-Candidate: `9f099e134c0894707e3be302fd0df29f1123c040`, branch
-`codex/d01-history-paging`, revision 1. Technical gate đã pass; owner gate vẫn
-đang **pending** theo yêu cầu tạm chưa nghiệm thu.
+## Thử nhanh
 
-## Mở bản chạy thử
+1. Đăng nhập, chọn tab **TP Tươi sống**: 30 phiếu, trang 1 có 25, trang 2 có 5;
+   ảnh hiển thị được, tổng vẫn 30 khi chuyển trang.
+2. Sort **Số lượng tăng dần**, đi trang 1 → 2 → 1: thứ tự áp dụng trên toàn bộ
+   tập dữ liệu, trở lại đúng các phiếu ở trang 1. Quay lại có thể dùng cache.
+3. Chọn một phiếu hoặc chọn tất cả rồi sang trang khác: selection về 0. Trong
+   lúc chờ trang mới, các dòng cũ đang giữ chỗ không được chọn/duyệt/xuất.
+4. Đổi filter/ngày/tab/cửa hàng: trở về trang 1, không hiển thị dữ liệu sai store;
+   count hai tab và tổng kết quả theo contract.
+5. Thu hẹp màn hình như điện thoại: điều hướng/card vẫn đọc và thao tác được.
+   Nút **Đổi mật khẩu** P05 vẫn hiện diện.
 
-- URL local: <http://127.0.0.1:4173>.
-- Cửa hàng trưởng: `manager.e2e` / `manager-e2e-password`.
-- Nhân viên: `employee.e2e` / `employee-e2e-password`.
-- Backend 8080, PostgreSQL 17 ở 55432, chỉ bind loopback.
-- Toàn bộ tài khoản, phiếu và ảnh là dữ liệu tổng hợp local; không dùng dữ liệu
-  vận hành thật và đây không phải deployment.
+## Giới hạn
 
-Nếu preview chưa chạy, mở Docker/OrbStack rồi chạy từ repository root:
-
-```sh
-./e2e/scripts/start-online-acceptance.sh
-```
-
-Script không tự ghi đè runtime không khỏe hoặc giết process lạ đang chiếm port.
-Muốn reset lại fixture tổng hợp, dừng rồi khởi động lại:
-
-```sh
-./e2e/scripts/stop-online-acceptance.sh
-./e2e/scripts/start-online-acceptance.sh
-```
-
-Log và revision local nằm tại `/tmp/coopfood-kph-online-acceptance/`.
-
-## Kịch bản ngắn cho owner
-
-1. Đăng nhập `manager.e2e`, mở lịch sử và chọn tab **TPTS**. Kỳ vọng có 30
-   phiếu, 25 phiếu ở trang 1 và 5 phiếu ở trang 2; tổng không đổi khi chuyển
-   trang và ảnh minh chứng hiển thị được.
-2. Chọn sắp xếp **Số lượng tăng dần**, đi trang 1 → 2 → 1. Kỳ vọng thứ tự áp
-   dụng trên toàn bộ 30 phiếu, không phải sort riêng từng trang; điều hướng có
-   trạng thái trang hiện tại và feedback khi đang tải.
-3. Chọn một phiếu hoặc chọn tất cả trên trang 1 rồi sang trang 2. Kỳ vọng selection
-   được xóa; select-all chỉ tác động trang đang thấy, không chọn ngầm trang khác.
-4. Đổi filter/ngày/tab rồi đổi giữa cửa hàng `0001` và `0002`. Kỳ vọng về trang
-   1, selection xóa, không ló dữ liệu của scope trước trong lúc tải; tổng theo
-   TPCN/TPTS và tổng kết quả phản ánh đúng filter.
-5. Thu hẹp cửa sổ như điện thoại và lặp lại chuyển trang. Kỳ vọng card history,
-   nút điều hướng và nhãn vẫn đọc/bấm được, không tràn ngang.
-
-## Những gì đã đổi
-
-- OpenAPI, fixture và generated client: page/filter/sort contract đồng bộ.
-- Backend KPH: filter/sort/count phía server, phân trang record trước khi nạp
-  ảnh, thứ tự tie-break ổn định và giữ nguyên authorization/store scope.
-- Store PWA online: query key cách ly đúng scope/filter/page, totals, điều hướng
-  accessible, loading feedback và selection chỉ thuộc trang hiện tại.
-- Unit/integration/E2E: page boundary, bảy sort, cross-store cache isolation,
-  desktop/mobile và ảnh synthetic có thể chạy lại. Xem
-  [technical evidence](technical-evidence.md).
-
-## Giới hạn cần biết khi nghiệm thu
-
-- D01 dùng offset pagination, không phải cursor/infinite scroll.
-- Không có select-all xuyên trang, search full-text hoặc export contract mới.
-- Không thêm migration/index mới vì benchmark synthetic chưa cho thấy nhu cầu;
-  production monitoring/capacity nằm ngoài vòng này.
-- Kiểm tra mobile dùng Chromium viewport, không thay thế nghiệm thu thiết bị thật.
-- Chưa push/merge/PR; cycle chỉ được CLOSED sau khi owner xác nhận rõ kết quả.
-
+- Offset pagination; selection chỉ thuộc trang hiện tại. Không select-all xuyên
+  trang, không đổi giới hạn export 500, không thêm migration/index.
+- Text sort dùng nhãn tiếng Việt và PostgreSQL `vi-x-icu`; thứ tự chuỗi chứa số,
+  case/dấu có thể khác Pilot `Intl.Collator` (numeric/base). Sort số lượng numeric.
+- Chromium desktop/mobile không thay nghiệm thu thiết bị thật hoặc production load.
+- Evidence và các sửa lỗi review: [technical evidence](technical-evidence-r2.md),
+  [review](review-r2.md). Owner thử rồi xác nhận D01 pass hoặc nêu lỗi cụ thể.

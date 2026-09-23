@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-23
+Cập nhật: 2026-09-24
 
 ## Giai đoạn
 
-`D01 history paging — tiếp tục revision 2 trên baseline P04/P05`
+`D01 history paging — technical PASS revision 2, chờ owner acceptance`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -70,6 +70,15 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Kiểm chứng gần nhất
 
+- D01 revision 2 đã tích hợp backend/Store PWA/E2E do GPT-6 Luna triển khai trên
+  baseline P04/P05, nhánh `codex/d01-p04-integration`. Application/browser candidate
+  `7fc9b8d`; 162 frontend/package tests, 65 backend tests và real-backend browser
+  8 PASS / 4 skip theo viewport. Query-plan 20.000 phiếu + 40.000 dòng ảnh tổng hợp
+  xác nhận page-before-photo; chưa cần index/migration mới. Preview sạch
+  <http://127.0.0.1:4173>, owner acceptance pending.
+  [Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md).
+
+
 - P05 đã merge qua [PR #7](https://github.com/VuPhm/coopfood-kph/pull/7),
   commit `2d32ffd`, ngày 23/09/2026. CI frontend/backend/browser PASS trên
   head `0374016`; cây nội dung merge trùng head đã kiểm chứng.
@@ -107,8 +116,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - Chưa chốt hosting/storage/retention, SSO/MFA, primary supplier nhiều NCC,
   edit/invalidate workflow hoặc cửa sổ duyệt.
 - Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật và production rollout
-  vẫn là backlog. D01 paging history và O01 backup/restore đã có candidate trên
-  nhánh riêng nhưng chưa được owner nghiệm thu hoặc tích hợp.
+  vẫn là backlog. D01 đã tích hợp trên nhánh P04/P05 nhưng chờ owner nghiệm thu; O01 backup/restore
+  còn candidate riêng, chưa được owner nghiệm thu hoặc tích hợp.
 - Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
 ## Điểm tiếp tục
@@ -119,10 +128,11 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
 tích hợp của chuỗi này. P05 đã được owner chấp nhận và merge vào `main` ngày 23/09/2026.
 P04 đã CLOSED theo owner “pass p04” ngày 23/09/2026; chưa merge/deploy.
-D01 là cycle active revision 2, tái sử dụng candidate cũ và tích hợp trên baseline
-P04/P05 theo yêu cầu owner, giao backend/Store PWA/E2E cho model nhỏ. C02 chỉ nên mở sau khi chốt
+D01 là cycle active revision 2, đã tích hợp và đạt technical gates trên baseline
+P04/P05. Owner thử preview theo [handoff D01](delivery/d01-history-paging/acceptance-handoff.md);
+chưa merge/deploy, chưa mở cycle khác. C02 chỉ nên mở sau khi chốt
 primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
-riêng. Admin reset credential, bootstrap/recovery và khóa user vẫn thuộc slice khác.
+riêng. Admin reset credential và bootstrap/recovery vẫn thuộc slice khác; khóa user đã có ở P04.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).
