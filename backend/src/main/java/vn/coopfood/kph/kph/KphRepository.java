@@ -100,33 +100,114 @@ class KphRepository {
                 """, UUID.randomUUID(), actorId, recordId, storeId, toTimestamp(occurredAt));
     }
 
-    List<KphRecordResponse> findAll(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo) {
+    KphRecordPageResponse findPage(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
+            KphApprovalStatus approvalStatus, KphHistorySort sort, KphHistorySortDirection direction,
+            int page, int pageSize) {
+        SqlFragment filtered = filters(storeId, type, detectedFrom, detectedTo, approvalStatus);
+        long totalItems = database.fetchOne(
+                "SELECT count(*) AS total FROM kph_records r WHERE " + filtered.sql(),
+                filtered.params().toArray()).get("total", Long.class);
+        long totalPages = totalItems == 0 ? 0 : (totalItems + pageSize - 1) / pageSize;
+
+        SqlFragment typeScope = filters(storeId, null, detectedFrom, detectedTo, null);
+        Record totals = database.fetchOne("""
+                SELECT count(*) FILTER (WHERE r.type = 'TPCN') AS tpcn,
+                       count(*) FILTER (WHERE r.type = 'TPTS') AS tpts
+                FROM kph_records r
+                WHERE
+                """ + typeScope.sql(), typeScope.params().toArray());
+        var typeTotals = new KphRecordPageResponse.TypeTotals(
+                totals.get("tpcn", Long.class), totals.get("tpts", Long.class));
+
+        String orderBy = orderBy(sort, direction);
+        List<Object> pageParams = new ArrayList<>(filtered.params());
+        pageParams.add(pageSize);
+        pageParams.add((long) (page - 1) * pageSize);
         String sql = """
+                WITH page_records AS (
+                    SELECT r.*
+                    FROM kph_records r
+                    WHERE
+                """ + filtered.sql() + " ORDER BY " + orderBy + " LIMIT ? OFFSET ?"
+                + """
+                )
                 SELECT r.*, r.snapshot_store_code AS store_code, r.snapshot_store_name AS store_name,
                        r.snapshot_actor_display_name AS display_name,
                        r.snapshot_reviewer_display_name AS reviewer_display_name,
                        p.ordinal AS photo_ordinal, p.stamped_storage_key, p.captured_at
-                FROM kph_records r
-                JOIN stores s ON s.id = r.store_id
-                JOIN app_users u ON u.id = r.created_by
+                FROM page_records r
                 JOIN kph_photos p ON p.kph_record_id = r.id
-                WHERE r.store_id = ?
-                """ + (type == null ? "" : " AND r.type = ? ")
-                + (detectedFrom == null ? "" : " AND r.detected_date >= ? ")
-                + (detectedTo == null ? "" : " AND r.detected_date <= ? ")
-                + " ORDER BY r.created_at DESC, r.id, p.ordinal";
+                ORDER BY
+                """ + orderBy + ", p.ordinal";
+        List<KphRecordResponse> items = mapRows(database.fetch(sql, pageParams.toArray()));
+        return new KphRecordPageResponse(items, page, pageSize, totalItems, totalPages, typeTotals);
+    }
+
+    private SqlFragment filters(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
+            KphApprovalStatus approvalStatus) {
+        StringBuilder sql = new StringBuilder("r.store_id = ?");
         List<Object> params = new ArrayList<>();
         params.add(storeId);
         if (type != null) {
+            sql.append(" AND r.type = ?");
             params.add(type.name());
         }
         if (detectedFrom != null) {
+            sql.append(" AND r.detected_date >= ?");
             params.add(detectedFrom);
         }
         if (detectedTo != null) {
+            sql.append(" AND r.detected_date <= ?");
             params.add(detectedTo);
         }
-        return mapRows(database.fetch(sql, params.toArray()));
+        if (approvalStatus != null) {
+            sql.append(" AND r.approval_status = ?");
+            params.add(approvalStatus.name());
+        }
+        return new SqlFragment(sql.toString(), params);
+    }
+
+    private String orderBy(KphHistorySort sort, KphHistorySortDirection direction) {
+        if (sort == null) {
+            return "r.created_at DESC, r.id DESC";
+        }
+        String sqlDirection = direction == KphHistorySortDirection.ascending ? "ASC" : "DESC";
+        String primary = switch (sort) {
+            case detectedDate -> "r.detected_date " + sqlDirection;
+            case product -> "(COALESCE(r.snapshot_sku_code, r.scanned_barcode, 'NHẬP TAY') || ' ' || "
+                    + "COALESCE(r.snapshot_product_name, 'Sản phẩm nhập tay')) COLLATE \"vi-x-icu\" "
+                    + sqlDirection;
+            case supplier -> "COALESCE(r.snapshot_supplier_name, 'Chưa nhập nhà cung cấp') COLLATE \"vi-x-icu\" "
+                    + sqlDirection;
+            case quantity -> "r.quantity " + sqlDirection;
+            case condition -> conditionLabelExpression() + " COLLATE \"vi-x-icu\" " + sqlDirection;
+            case resolution -> resolutionLabelExpression() + " COLLATE \"vi-x-icu\" " + sqlDirection;
+            case approval -> "CASE r.approval_status WHEN 'PENDING' THEN 'Chờ duyệt' "
+                    + "WHEN 'APPROVED' THEN 'Đã duyệt' ELSE 'Không duyệt' END COLLATE \"vi-x-icu\" "
+                    + sqlDirection;
+        };
+        return primary + ", r.created_at DESC, r.id DESC";
+    }
+
+    private String conditionLabelExpression() {
+        return "CASE r.condition_code "
+                + "WHEN 'NEAR_EXPIRY' THEN 'Cận date' "
+                + "WHEN 'EXPIRED' THEN 'Hết HSD' "
+                + "WHEN 'TORN_PACKAGING' THEN 'Rách bao bì' "
+                + "WHEN 'VACUUM_LEAK' THEN 'Xì chân không' "
+                + "WHEN 'BRUISED_WATERLOGGED' THEN 'Dập úng' "
+                + "WHEN 'ROTTEN_MOLDY' THEN 'Thối mốc' "
+                + "WHEN 'OTHER' THEN COALESCE(NULLIF(btrim(r.condition_detail), ''), 'Khác') "
+                + "ELSE r.condition_code END";
+    }
+
+    private String resolutionLabelExpression() {
+        return "CASE r.resolution_code "
+                + "WHEN 'CANCEL' THEN 'HỦY' "
+                + "WHEN 'EXCHANGE' THEN 'ĐỔI' "
+                + "WHEN 'RETURN' THEN 'XUẤT TRẢ' "
+                + "WHEN 'OTHER' THEN COALESCE(NULLIF(btrim(r.resolution_detail), ''), 'KHÁC') "
+                + "ELSE r.resolution_code END";
     }
 
     List<KphRecordResponse> findAllByIds(UUID storeId, KphType type, List<UUID> recordIds) {
@@ -332,5 +413,8 @@ class KphRepository {
     }
 
     record ReviewState(KphApprovalStatus approvalStatus, String lifecycleState) {
+    }
+
+    private record SqlFragment(String sql, List<Object> params) {
     }
 }

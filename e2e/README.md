@@ -6,9 +6,11 @@ mock API calls. The only controlled network failure is the retry test, where
 the first committed response is discarded before the browser receives it.
 
 The database seed is synthetic and local-only. It creates two store managers,
-one employee, one unassigned `CHAIN_ADMIN`, three stores and one current
-published catalog with a primary supplier. The backend itself has no demo-user
-bootstrap path.
+one employee, one region manager assigned to the first region, one unassigned
+`CHAIN_ADMIN`, three stores and one current published catalog with a primary
+supplier. Thirty additional TPTS records exercise server paging and use small
+synthetic JPEG files generated under the configured media root. The backend
+itself has no demo-user bootstrap path.
 
 ## Run
 
@@ -61,7 +63,7 @@ env KPH_DATABASE_URL=jdbc:postgresql://127.0.0.1:55432/coopfood_kph_e2e KPH_DATA
 After the health endpoint is available, seed the database:
 
 ```bash
-./e2e/scripts/seed-foundation-01.sh
+E2E_MEDIA_ROOT=/tmp/coopfood-kph-foundation-01-media ./e2e/scripts/seed-foundation-01.sh
 ```
 
 Start the online Store PWA on the origin configured by the integration owner.
@@ -93,10 +95,13 @@ The fixed seed credentials are only for this local database:
 | --- | --- | --- |
 | `manager.e2e` | `manager-e2e-password` | `0001` and `0002`, `STORE_MANAGER` |
 | `employee.e2e` | `employee-e2e-password` | `0001`, `EMPLOYEE` |
+| `region-manager.e2e` | `manager-e2e-password` | Region E2E-A; effective access to `0001` and `0002` |
 | `chain-admin.e2e` | `admin-e2e-password` | no store membership; `CHAIN_ADMIN` |
 
 Re-run the seed script before a fresh acceptance run. It truncates the
 Foundation-01 tables only after the script's loopback E2E URL guard passes.
+It also writes the tiny synthetic evidence images used by the paging fixture to
+`E2E_MEDIA_ROOT` (the documented backend media root by default).
 Do not point it at a shared, staging or production database.
 
 If the host has no `psql`, use the client inside the disposable container after

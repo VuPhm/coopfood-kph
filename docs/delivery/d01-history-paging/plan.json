@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "id": "d01-history-paging",
+  "revision": 2,
+  "status": "CLOSED",
+  "objective": "Phân trang lịch sử KPH online trên toàn tập dữ liệu với filter/sort phía server và thứ tự ổn định: backend phân trang record trước khi nạp ảnh, Store PWA hiển thị tổng đúng và điều hướng accessible, selection chỉ thuộc trang hiện tại; ghi baseline/query-plan trên dữ liệu tổng hợp và không thay đổi Pilot local-only.",
+  "inScope": [
+    "Khóa contract D01 cho page 1-based, pageSize 1–100 mặc định 25, totalItems/totalPages, tổng theo TPCN/TPTS, approval filter và bảy sort hiện có với tie-breaker createdAt/id ổn định",
+    "Cập nhật OpenAPI, fixture/example, generated TypeScript client, backend và Store PWA trong cùng vertical slice",
+    "Backend authorization/store scope giữ nguyên; count/filter/sort áp dụng trước LIMIT/OFFSET và chỉ join 1–3 ảnh sau khi đã chọn record IDs của trang",
+    "Store PWA online đưa type/date/approval/sort/page vào TanStack Query key; đổi store/user/tab/filter/sort/page xóa selection và selection/select-all chỉ áp dụng trang hiện tại",
+    "Giữ tab count theo loại và badge tổng kết quả sau filter; thêm điều hướng trang có current state, accessible name, disabled/loading feedback và touch target phù hợp",
+    "Benchmark dữ liệu tổng hợp cùng EXPLAIN/EXPLAIN ANALYZE trước/sau; chỉ thêm một migration index nếu bằng chứng cho thấy cần thiết",
+    "Regression backend cross-store/date filter/sort/page ổn định, frontend Pilot không đổi, online cache isolation và browser flow desktop/mobile"
+  ],
+  "outOfScope": [
+    "Cursor/keyset pagination, infinite scroll, virtualized list, saved URL/deep-link state hoặc thay đổi layout/style system",
+    "Select-all xuyên nhiều trang, bulk approval/export API mới, export trên 500 phiếu hoặc thay đổi workbook",
+    "Search full-text, dashboard/analytics, Redis/cache server, queue, microservice hoặc background prefetch platform",
+    "Thay đổi KPH create/review authorization, lifecycle/invalidation, private media, Pilot IndexedDB hoặc Admin Web",
+    "Dùng dữ liệu vận hành thật, production load test, hosting capacity/SLO hoặc production rollout"
+  ],
+  "baseSha": "52ec92fc5dd57888716b6b7430d9ec92ac21a9cf",
+  "candidateSha": "7a160a65011d3bc6ee7f2125bce28cade874cda8",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/**",
+    "packages/api/**",
+    "packages/ui/**",
+    "package.json",
+    "package-lock.json",
+    "backend/src/main/resources/db/migration/**",
+    "scripts/check-contracts.mjs",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/**",
+    "docs/delivery/d01-history-paging/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 2,
+  "teams": [
+    {
+      "id": "backend",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/d01-backend",
+      "allowedPaths": [
+        "backend/src/main/java/vn/coopfood/kph/kph/**",
+        "backend/src/test/java/vn/coopfood/kph/kph/**"
+      ],
+      "dependsOn": [],
+      "model": "gpt-6-luna",
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_backend_resume",
+      "resultSha": "af6e97990b241c44b5245ed710bb61f43966dcc5"
+    },
+    {
+      "id": "frontend",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/d01-frontend",
+      "allowedPaths": [
+        "apps/store-pwa/src/**"
+      ],
+      "dependsOn": [],
+      "model": "gpt-6-luna",
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_frontend_resume",
+      "resultSha": "8434cb0b8a4088ef39e42589eb351d722ce5dd8e"
+    }
+  ],
+  "gates": [
+    {
+      "id": "technical-history-paging",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "7a160a65011d3bc6ee7f2125bce28cade874cda8",
+      "evidence": "docs/delivery/d01-history-paging/technical-evidence-r2.md"
+    },
+    {
+      "id": "owner-history-paging-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "7a160a65011d3bc6ee7f2125bce28cade874cda8",
+      "evidence": "docs/delivery/d01-history-paging/acceptance-handoff.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "Owner message “pass” after D01 revision 2 handoff, 2026-09-24, task 01a0ccf7-c6e3-7fc1-a392-b3e5f7ed6955"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Owner: pass p04, tiếp tục phân task để các model nhỏ implement; chọn D01 — phân trang lịch sử.",
+      "source": "Owner messages 2026-09-23, task 01a0ccf7-c6e3-7fc1-a392-b3e5f7ed6955",
+      "impact": "Reuse D01 revision 1 code from 2109abf while preserving accepted P04/P05. Backend, Store PWA and E2E in isolated worktrees; integrator owns shared contract. All integrated technical gates rerun; prior evidence historical only.",
+      "decision": "Resume D01 revision 2; GPT-6 Luna high for bounded implementation. No production deployment, merge or new migration."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "D01 CLOSED theo owner acceptance ngày 2026-09-24. Dừng cycle; chưa push/merge/deploy. Bước đề xuất khi được yêu cầu: tích hợp P04 + D01 vào main qua PR và CI.",
+  "completedTeams": [
+    {
+      "id": "e2e",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/d01-e2e",
+      "allowedPaths": [
+        "e2e/**"
+      ],
+      "dependsOn": [],
+      "model": "gpt-6-luna",
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_e2e",
+      "commit": "e1b4c92e5816d2f8238a9511945dac30769e45a3",
+      "integratedAt": "52ec92fc5dd57888716b6b7430d9ec92ac21a9cf"
+    }
+  ]
+}

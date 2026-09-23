@@ -102,7 +102,7 @@ sau khi validation xác nhận `HSD > NSX`; `HSD == NSX` phải trả lỗi.
 
 | ID | Hành vi quan sát được | Phân loại / hợp đồng mới |
 |---|---|---|
-| UI-01 | Tab loại phiếu có count; selection và select-all chỉ tác động list của tab hiện hành | Giữ |
+| UI-01 | Tab loại phiếu có count; selection và select-all chỉ tác động list của tab hiện hành | Giữ; online phân trang 25 phiếu và giới hạn selection/select-all ở trang hiện tại; đổi user/store/tab/filter/sort/page phải xóa selection |
 | UI-02 | Export/xóa disabled khi chưa chọn; selected row/card có visual state | Giữ selection/export; loại bỏ xóa khỏi Store PWA |
 | UI-03 | Export và delete có confirm modal; delete copy phân biệt 1/nhiều phiếu | Giữ confirm export; loại bỏ delete/invalidate khỏi UI CHT |
 | UI-04 | Overlay/modal khóa body scroll; mobile body modal cuộn và chứa overscroll | Giữ outcome |
@@ -110,6 +110,7 @@ sau khi validation xác nhận `HSD > NSX`; `HSD == NSX` phải trả lỗi.
 | UI-06 | Focus đôi lúc được đưa vào close/field và trả trigger; không có focus trap nhất quán, KPH modal không đóng bằng Escape chung | Loại bỏ nợ kỹ thuật; thêm focus trap/restore focus có test |
 | UI-07 | Reduced-motion bỏ FAB animation và transition đáng kể | Giữ |
 | UI-08 | Lịch sử lọc theo khoảng ngày phát hiện | Foundation-02: hai đầu mút inclusive; một đầu có thể để trống; `from > to` báo lỗi cạnh control; backend lọc theo `detected_date`, không theo `created_at`; áp dụng/xóa lọc phải xóa selection. Desktop dùng một hàng compact; mobile tích hợp vào hộp “Lọc & sắp xếp” hiện có |
+| UI-09 | Lịch sử online có thể vượt quá một màn hình dữ liệu | D01: backend filter/sort toàn tập rồi phân trang record trước khi join ảnh; page 1-based, mặc định 25; title dùng `totalItems`, tab dùng `typeTotals`; điều hướng trước/sau accessible và giữ scope user/store trong query key |
 
 ## Excel compatibility
 

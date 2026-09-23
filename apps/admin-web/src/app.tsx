@@ -4,6 +4,7 @@ import { CalendarClock, CheckCircle2, Clock3, KeyRound, Leaf, LogOut, MapPinned,
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { CatalogWorkspace } from "./catalog-workspace";
+import { IdentityWorkspace } from "./identity-workspace";
 import { ChangePasswordDialog } from "./change-password-dialog";
 import { createLifecycleAdminGateway, type AdminSession, type LifecycleAdminGateway, type LifecycleSchedule, type LifecycleTarget } from "./lifecycle-admin";
 
@@ -18,12 +19,13 @@ const queryKeys = {
   session: ["admin-session"] as const,
   targets: ["lifecycle-targets"] as const,
   schedules: ["lifecycle-schedules"] as const,
+  users: ["admin-users"] as const,
 };
 
 export function App({ gateway: providedGateway }: AppProps) {
   const gateway = useMemo(() => providedGateway ?? createLifecycleAdminGateway(), [providedGateway]);
   const queryClient = useQueryClient();
-  const [workspace, setWorkspace] = useState<"catalog" | "lifecycle">("catalog");
+  const [workspace, setWorkspace] = useState<"catalog" | "identity" | "lifecycle">("catalog");
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [loginNotice, setLoginNotice] = useState<string | null>(null);
   const sessionQuery = useQuery({ queryKey: queryKeys.session, queryFn: async ({ signal }) => {
@@ -31,27 +33,36 @@ export function App({ gateway: providedGateway }: AppProps) {
     catch (error) { if (isUnauthorized(error)) return null; throw error; }
   }, retry: false });
   const hasCatalog = Boolean(sessionQuery.data?.user.globalRoles.includes("CATALOG_ADMIN"));
-  const activeWorkspace = hasCatalog ? workspace : "lifecycle";
+  const hasChainAdmin = Boolean(sessionQuery.data?.user.globalRoles.includes("CHAIN_ADMIN"));
+  const activeWorkspace = workspace === "catalog" && !hasCatalog
+    ? "lifecycle"
+    : workspace === "identity" && !hasChainAdmin
+      ? hasCatalog ? "catalog" : "lifecycle"
+      : workspace;
   const targetsQuery = useQuery({ queryKey: [...queryKeys.targets, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listTargets(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "lifecycle", retry: false });
   const schedulesQuery = useQuery({ queryKey: [...queryKeys.schedules, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listSchedules(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "lifecycle", retry: false });
+  const usersQuery = useQuery({ queryKey: [...queryKeys.users, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listUsers(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "identity", retry: false });
   const clearSession = useCallback(() => {
     queryClient.setQueryData(queryKeys.session, null);
     void queryClient.cancelQueries({ queryKey: queryKeys.targets });
     void queryClient.cancelQueries({ queryKey: queryKeys.schedules });
+    void queryClient.cancelQueries({ queryKey: queryKeys.users });
     void queryClient.cancelQueries({ queryKey: ["catalog-imports"] });
     void queryClient.cancelQueries({ queryKey: ["catalog-import"] });
     queryClient.removeQueries({ queryKey: queryKeys.targets });
     queryClient.removeQueries({ queryKey: queryKeys.schedules });
+    queryClient.removeQueries({ queryKey: queryKeys.users });
     queryClient.removeQueries({ queryKey: ["catalog-imports"] });
     queryClient.removeQueries({ queryKey: ["catalog-import"] });
   }, [queryClient]);
   const handleError = useCallback((error: unknown) => { if (isUnauthorized(error)) clearSession(); }, [clearSession]);
-  const expired = isUnauthorized(targetsQuery.error) || isUnauthorized(schedulesQuery.error);
+  const expired = isUnauthorized(targetsQuery.error) || isUnauthorized(schedulesQuery.error) || isUnauthorized(usersQuery.error);
   useEffect(() => {
     if (expired) {
       queryClient.setQueryData(queryKeys.session, null);
       queryClient.removeQueries({ queryKey: queryKeys.targets });
       queryClient.removeQueries({ queryKey: queryKeys.schedules });
+      queryClient.removeQueries({ queryKey: queryKeys.users });
     }
   }, [expired, queryClient]);
   const login = useMutation({
@@ -66,6 +77,7 @@ export function App({ gateway: providedGateway }: AppProps) {
         void queryClient.invalidateQueries({ queryKey: queryKeys.targets });
         void queryClient.invalidateQueries({ queryKey: queryKeys.schedules });
       }
+      if (session.user.globalRoles.includes("CHAIN_ADMIN")) void queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
   });
   const logout = useMutation({
@@ -82,6 +94,17 @@ export function App({ gateway: providedGateway }: AppProps) {
     return <LoadFailure message="Không thể kiểm tra phiên Admin Web." onRetry={() => void sessionQuery.refetch()} />;
   }
 
+  const passwordDialog = <ChangePasswordDialog
+    open={changePasswordOpen}
+    onOpenChange={setChangePasswordOpen}
+    onSubmit={(currentPassword, newPassword) => gateway.changePassword(currentPassword, newPassword)}
+    onChanged={() => {
+      setChangePasswordOpen(false);
+      setLoginNotice("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.");
+      clearSession();
+    }}
+  />;
+
   if (activeWorkspace === "catalog") {
     return <><CatalogWorkspace
       gateway={gateway}
@@ -91,11 +114,25 @@ export function App({ gateway: providedGateway }: AppProps) {
       logoutBusy={logout.isPending}
       onError={handleError}
       onOpenLifecycle={() => setWorkspace("lifecycle")}
-    /><ChangePasswordDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen} onSubmit={(currentPassword, newPassword) => gateway.changePassword(currentPassword, newPassword)} onChanged={() => {
-      setChangePasswordOpen(false);
-      setLoginNotice("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.");
-      clearSession();
-    }} /></>;
+      {...(hasChainAdmin ? { onOpenIdentity: () => setWorkspace("identity") } : {})}
+    />{passwordDialog}</>;
+  }
+
+  if (activeWorkspace === "identity") {
+    return <><IdentityWorkspace
+      gateway={gateway}
+      session={sessionQuery.data}
+      onChangePassword={() => setChangePasswordOpen(true)}
+      users={usersQuery.data ?? []}
+      loading={usersQuery.isPending}
+      loadError={logout.error instanceof Error ? logout.error.message : usersQuery.error instanceof Error ? usersQuery.error.message : null}
+      onRefresh={() => void usersQuery.refetch()}
+      onLogout={() => logout.mutate()}
+      logoutBusy={logout.isPending}
+      onError={handleError}
+      onOpenLifecycle={() => setWorkspace("lifecycle")}
+      {...(hasCatalog ? { onOpenCatalog: () => setWorkspace("catalog") } : {})}
+    />{passwordDialog}</>;
   }
 
   return <><LifecycleWorkspace
@@ -111,14 +148,11 @@ export function App({ gateway: providedGateway }: AppProps) {
     onChangePassword={() => setChangePasswordOpen(true)}
     onError={handleError}
     {...(hasCatalog ? { onOpenCatalog: () => setWorkspace("catalog") } : {})}
-  /><ChangePasswordDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen} onSubmit={(currentPassword, newPassword) => gateway.changePassword(currentPassword, newPassword)} onChanged={() => {
-    setChangePasswordOpen(false);
-    setLoginNotice("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.");
-    clearSession();
-  }} /></>;
+    {...(hasChainAdmin ? { onOpenIdentity: () => setWorkspace("identity") } : {})}
+  />{passwordDialog}</>;
 }
 
-function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loadError, onRefresh, onLogout, logoutBusy, onChangePassword, onError, onOpenCatalog }: {
+function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loadError, onRefresh, onLogout, logoutBusy, onChangePassword, onError, onOpenCatalog, onOpenIdentity }: {
   gateway: LifecycleAdminGateway;
   session: AdminSession;
   targets: LifecycleTarget[];
@@ -131,6 +165,7 @@ function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loa
   onChangePassword(): void;
   onError(error: unknown): void;
   onOpenCatalog?: () => void;
+  onOpenIdentity?: () => void;
 }) {
   const queryClient = useQueryClient();
   const [targetKey, setTargetKey] = useState("");
@@ -176,7 +211,7 @@ function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loa
     <header className="sticky top-0 z-20 bg-brand text-white shadow-panel">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-brand"><Leaf aria-hidden="true" /></span><div className="min-w-0"><strong className="block truncate text-base font-black sm:text-lg">Co.op Food KPH</strong><span className="block truncate text-xs text-white/80">Quản trị vùng và cửa hàng</span></div></div>
-        <div className="flex items-center gap-2">{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đổi mật khẩu" className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onChangePassword} size="icon" variant="secondary"><KeyRound aria-hidden="true" size={18} /></Button><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
+        <div className="flex flex-wrap items-center justify-end gap-2">{onOpenIdentity ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenIdentity} variant="secondary">Tài khoản</Button> : null}{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đổi mật khẩu" className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onChangePassword} size="icon" variant="secondary"><KeyRound aria-hidden="true" size={18} /></Button><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
       </div>
     </header>
 

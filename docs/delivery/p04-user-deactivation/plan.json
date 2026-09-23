@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "id": "p04-user-deactivation",
+  "revision": 3,
+  "status": "CLOSED",
+  "objective": "Triển khai vertical slice vô hiệu hóa user: chỉ active CHAIN_ADMIN được xem directory toàn chuỗi và deactivate một user khác với lý do bắt buộc; mutation có audit, chặn self-deactivate, last active CHAIN_ADMIN và last active STORE_MANAGER của mọi active store trong cùng transaction, làm mọi session của target mất quyền ở request kế tiếp; Admin Web cho phép owner xác nhận và dùng thử flow qua OpenAPI chung.",
+  "inScope": [
+    "Public OpenAPI, example fixture và generated TypeScript client cho list admin users và deactivate user với reason bắt buộc",
+    "Backend CHAIN_ADMIN-only resolve actor từ session; list trả identity/status/global roles tối thiểu, không trả credential hoặc membership ngoài nhu cầu của flow",
+    "Deactivate khóa và kiểm target cùng tập active CHAIN_ADMIN và active store-manager scope trong transaction; chặn target không tồn tại, đã inactive, self-deactivate, last active CHAIN_ADMIN và last active STORE_MANAGER của bất kỳ active store nào",
+    "Deactivate đặt app_users.active=false, giữ role/assignment/membership để có thể reactivate explicit về sau và ghi audit USER_DEACTIVATED không chứa PII đầy đủ/secret/session",
+    "Principal refresh hiện có phải làm session target nhận 401 ở request kế tiếp; login mới của target bị từ chối",
+    "Admin Web có workspace tài khoản cho CHAIN_ADMIN, dialog xác nhận, reason 1-500 ký tự, loading/success/error rõ, keyboard/accessibility và responsive layout theo UI DNA",
+    "Contract, frontend component và PostgreSQL integration tests bao phủ quyền, self/last-admin/last-manager/concurrency guard, audit, login/session invalidation và UI feedback"
+  ],
+  "outOfScope": [
+    "Create/update/reactivate user, hard delete, grant/revoke global role, region assignment hoặc store membership",
+    "Credential create/reset/change, encoder migration, bootstrap/recovery và temporary-password delivery",
+    "Lifecycle store/region, catalog publish, paging, backup/restore, production deployment, SSO/MFA và notification",
+    "Delegated identity administration cho REGION_MANAGER hoặc CATALOG_ADMIN"
+  ],
+  "baseSha": "2d32ffd873f26d4ac2bc4153b0115f31d228f61f",
+  "candidateSha": "e502886e2466b748f976f3686e62e1f9afb62a3d",
+  "integrationOwner": "/root",
+  "sharedPaths": [
+    "contracts/openapi/kph.openapi.yaml",
+    "contracts/fixtures/api/admin-users.json",
+    "contracts/fixtures/golden/fixture-manifest.json",
+    "scripts/check-contracts.mjs",
+    "packages/api/src/generated/schema.d.ts",
+    "backend/src/main/java/vn/coopfood/kph/foundation/security/SecurityConfiguration.java",
+    "backend/src/main/java/vn/coopfood/kph/foundation/web/ProblemDetailAdvice.java",
+    "backend/src/main/java/vn/coopfood/kph/identity/**",
+    "backend/src/test/java/vn/coopfood/kph/identity/**",
+    "apps/admin-web/src/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/p04-user-deactivation/**",
+    "e2e/scripts/verify-p04-identity.cjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 2,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-user-deactivation",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 3,
+      "sha": "e502886e2466b748f976f3686e62e1f9afb62a3d",
+      "evidence": "docs/delivery/p04-user-deactivation/technical-evidence.md"
+    },
+    {
+      "id": "owner-user-deactivation-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "revision": 3,
+      "sha": "e502886e2466b748f976f3686e62e1f9afb62a3d",
+      "evidence": "docs/delivery/p04-user-deactivation/acceptance-handoff.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "Owner message “pass p04, tiếp tục phân task để các model nhỏ implement”, 2026-09-23, task 01a0ccf7-c6e3-7fc1-a392-b3e5f7ed6955"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Bổ sung guard last active STORE_MANAGER khi deactivate user.",
+      "source": "Review bắt buộc theo docs/product/PROVISIONING_POLICY.md và AGENTS.md ngày 2026-09-21.",
+      "impact": "Backend phải khóa/kiểm các active store mà target đang quản lý; integration test và thông báo UI bổ sung conflict tương ứng. Evidence revision 1 chưa tồn tại và không được dùng.",
+      "decision": "Sửa kế hoạch trước verification; giữ nguyên boundary không thêm membership revoke/reactivate."
+    },
+    {
+      "revision": 3,
+      "request": "Tiếp tục P04 sau khi P05 đã merge.",
+      "source": "Owner message “tiếp” ngày 23/09/2026 trong task 01a0ca34-2ef9-7992-9aaa-5c64d21587a1.",
+      "impact": "Tích hợp main/P05 vào candidate P04; giữ cả credential version/password change và admin directory/deactivation, kết hợp navigation/cache cleanup. Chạy lại technical gates; evidence revision 2 chỉ là lịch sử.",
+      "decision": "Giữ scope P04, không thêm migration; revision 3 VERIFYING và owner gate pending."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "P04 CLOSED theo owner acceptance ngày 2026-09-23. Chưa merge/deploy; tiếp tục phân task cycle kế tiếp theo yêu cầu owner."
+}

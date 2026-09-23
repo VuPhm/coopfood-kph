@@ -122,14 +122,16 @@ class KphService {
     }
 
     @Transactional(readOnly = true)
-    List<KphRecordResponse> list(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
-            Authentication authentication) {
+    KphRecordPageResponse list(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
+            KphApprovalStatus approvalStatus, KphHistorySort sort, KphHistorySortDirection direction,
+            int page, int pageSize, Authentication authentication) {
         accessPolicy.requireViewCreate(storeId, authentication);
         if (detectedFrom != null && detectedTo != null && detectedFrom.isAfter(detectedTo)) {
             throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "DATE_RANGE_INVALID",
                     "detectedFrom must be on or before detectedTo.");
         }
-        return repository.findAll(storeId, type, detectedFrom, detectedTo);
+        return repository.findPage(storeId, type, detectedFrom, detectedTo, approvalStatus, sort, direction,
+                page, pageSize);
     }
 
     @Transactional

@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 seed_file="${script_dir}/../seed/foundation-01.sql"
+media_dir="${E2E_MEDIA_ROOT:-/tmp/coopfood-kph-foundation-01-media}"
 
 e2e_database_url="${E2E_DATABASE_URL:-postgresql://kph_e2e:local-e2e-only@127.0.0.1:55432/coopfood_kph_e2e}"
 
@@ -22,3 +23,4 @@ command -v psql >/dev/null 2>&1 || {
 }
 
 psql "${e2e_database_url}" -v ON_ERROR_STOP=1 -f "${seed_file}"
+node "${script_dir}/seed-foundation-paging-media.mjs" "${media_dir}"

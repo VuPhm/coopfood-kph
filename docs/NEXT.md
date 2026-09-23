@@ -1,8 +1,29 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-09-23
+Cập nhật: 2026-09-24
 
-## P05 credential self-service — đã đóng, chuẩn bị tích hợp
+## D01 history paging — đã đóng revision 2
+
+Owner chọn D01 ngày 23/09/2026 sau khi xác nhận “pass p04”. Backend, Store PWA
+và E2E do GPT-6 Luna triển khai đã tích hợp trên baseline P04/P05 ở
+`codex/d01-p04-integration`. Candidate code/browser `7fc9b8d`; technical PASS:
+162 frontend/package tests, 65 backend tests và browser 8 PASS / 4 skip theo viewport.
+
+Owner xác nhận “pass” ngày 24/09/2026 sau
+[handoff](delivery/d01-history-paging/acceptance-handoff.md). Cycle CLOSED;
+close checker PASS tại `8144b7c`. [Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md)
+giữ nguyên kết quả kỹ thuật; lượt đóng chỉ ghi quyết định, không sửa code.
+Chưa push/merge/deploy; không tự mở cycle mới.
+
+Bước nhỏ đề xuất: tích hợp P04 + D01 vào main qua PR và CI khi owner yêu cầu.
+
+## P04 user deactivation — đã đóng
+
+Owner chấp nhận revision 3 ngày 23/09/2026 bằng “pass p04”. Candidate
+`e502886` đã pass 161 frontend/package tests, 64 backend tests và browser
+real-backend 4 viewport. Close checker PASS; chưa merge/deploy.
+
+## P05 credential self-service — đã đóng và tích hợp
 
 Implementation candidate trên `codex/p05-credential-self-service` đã có contract,
 migration V9, backend, Store PWA, Admin Web và test source cho đổi mật khẩu của
@@ -13,8 +34,8 @@ Technical verification đã pass trên candidate `39c0cff` với evidence tại
 [technical evidence](delivery/p05-credential-self-service/technical-evidence.md).
 Owner đã xác nhận “pass” ngày 23/09/2026 và yêu cầu làm tiếp.
 [Owner decision](delivery/p05-credential-self-service/acceptance-handoff.md) đóng
-cycle P05. Bước tiếp theo: chuẩn bị PR riêng từ nhánh P05 vào `main`, theo dõi
-CI và giữ các candidate chưa nghiệm thu ngoài phạm vi. Chưa merge/deploy.
+cycle P05. [PR #7](https://github.com/VuPhm/coopfood-kph/pull/7) đã merge vào
+`main` tại `2d32ffd` ngày 23/09/2026; CI frontend/backend/browser PASS. Chưa deploy.
 
 ## P02 scoped authorization — đã đóng
 
@@ -63,9 +84,8 @@ với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, b
 và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
 `docs/delivery/**`.
 
-P05 đã đóng theo owner acceptance; công việc hiện tại là chuẩn bị tích hợp riêng
-P05, chưa mở feature cycle mới. C02 vẫn bị chặn bởi quyết định primary supplier; các candidate
-D01/P04/O01 và O02 tiếp tục độc lập, không được nhập ngầm vào P05.
+P05 đã đóng và tích hợp. P04 đã được owner chấp nhận. D01 revision 2 đã đóng;
+C02 vẫn bị chặn bởi primary supplier, O01/O02 tiếp tục hoãn.
 
 ## Policy lifecycle đã khóa
 
@@ -138,8 +158,7 @@ deactivate, các capability provisioning còn lại chờ cycle riêng.
 ## Ưu tiên chưa mở cycle
 
 1. Chốt primary supplier và semantics lookup current trước khi mở C02 publish.
-2. Chọn một outcome độc lập: lifecycle identity/credential, D01 paging theo số
-   đo, O01 backup/restore, O02 profile triển khai hoặc A01 nghiệm thu online trên
+2. Chọn một outcome độc lập: lifecycle identity/credential, O01 backup/restore, O02 profile triển khai hoặc A01 nghiệm thu online trên
    thiết bị mục tiêu.
 
 Chi tiết dependency/finding nằm tại

@@ -1,0 +1,122 @@
+DO
+BEGIN
+CREATE TABLE
+CREATE TABLE
+INSERT 0 20000
+INSERT 0 40000
+DO
+ANALYZE
+ANALYZE
+ records 
+---------
+   20000
+(1 row)
+
+ photos 
+--------
+  40000
+(1 row)
+
+Old join-all shape
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=18665.09..18765.09 rows=40000 width=636) (actual time=123.806..135.510 rows=40000 loops=1)
+   Sort Key: r.created_at DESC, r.id, p.ordinal
+   Sort Method: external merge  Disk: 14968kB
+   Buffers: local hit=1 read=2607, temp read=1871 written=1875
+   InitPlan 1
+     ->  Limit  (cost=0.00..0.05 rows=1 width=16) (actual time=0.013..0.016 rows=1 loops=1)
+           Buffers: local hit=1
+           ->  Seq Scan on bench_records  (cost=0.00..902.00 rows=20000 width=16) (actual time=0.007..0.008 rows=1 loops=1)
+                 Buffers: local hit=1
+   ->  Hash Join  (cost=2805.00..4257.00 rows=40000 width=636) (actual time=23.802..45.090 rows=40000 loops=1)
+         Hash Cond: (r.id = p.kph_record_id)
+         Buffers: local hit=1 read=2607
+         ->  Seq Scan on bench_records r  (cost=0.00..952.00 rows=20000 width=489) (actual time=0.119..4.616 rows=20000 loops=1)
+               Filter: (store_id = (InitPlan 1).col1)
+               Buffers: local hit=1 read=702
+         ->  Hash  (cost=2305.00..2305.00 rows=40000 width=91) (actual time=23.066..23.067 rows=40000 loops=1)
+               Buckets: 65536  Batches: 1  Memory Usage: 5512kB
+               Buffers: local read=1905
+               ->  Seq Scan on bench_photos p  (cost=0.00..2305.00 rows=40000 width=91) (actual time=0.086..11.777 rows=40000 loops=1)
+                     Buffers: local read=1905
+ Planning:
+   Buffers: shared hit=129, local hit=4 read=8
+ Planning Time: 2.098 ms
+ Execution Time: 140.266 ms
+(24 rows)
+
+D01 count
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1052.05..1052.06 rows=1 width=8) (actual time=4.439..4.441 rows=1 loops=1)
+   Buffers: local hit=703 read=1
+   InitPlan 1
+     ->  Limit  (cost=0.00..0.05 rows=1 width=16) (actual time=0.035..0.036 rows=1 loops=1)
+           Buffers: local hit=2
+           ->  Seq Scan on bench_records  (cost=0.00..902.00 rows=20000 width=16) (actual time=0.034..0.035 rows=1 loops=1)
+                 Buffers: local hit=2
+   ->  Seq Scan on bench_records r  (cost=0.00..1002.00 rows=20000 width=0) (actual time=0.046..3.363 rows=20000 loops=1)
+         Filter: ((store_id = (InitPlan 1).col1) AND ((type)::text = 'TPTS'::text))
+         Buffers: local hit=703 read=1
+ Planning Time: 0.098 ms
+ Execution Time: 4.463 ms
+(12 rows)
+
+D01 type totals
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1152.05..1152.06 rows=1 width=16) (actual time=5.620..5.622 rows=1 loops=1)
+   Buffers: local hit=704
+   InitPlan 1
+     ->  Limit  (cost=0.00..0.05 rows=1 width=16) (actual time=0.002..0.003 rows=1 loops=1)
+           Buffers: local hit=2
+           ->  Seq Scan on bench_records  (cost=0.00..902.00 rows=20000 width=16) (actual time=0.002..0.002 rows=1 loops=1)
+                 Buffers: local hit=2
+   ->  Seq Scan on bench_records r  (cost=0.00..952.00 rows=20000 width=5) (actual time=0.009..2.963 rows=20000 loops=1)
+         Filter: (store_id = (InitPlan 1).col1)
+         Buffers: local hit=704
+ Planning Time: 0.141 ms
+ Execution Time: 5.646 ms
+(12 rows)
+
+D01 record-first page with photo fan-out afterward
+                                                                                       QUERY PLAN                                                                                        
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Incremental Sort  (cost=10.64..307.18 rows=50 width=636) (actual time=0.239..0.313 rows=50 loops=1)
+   Sort Key: r.created_at DESC, r.id DESC, p.ordinal
+   Presorted Key: r.created_at, r.id
+   Full-sort Groups: 2  Sort Method: quicksort  Average Memory: 37kB  Peak Memory: 37kB
+   Buffers: local hit=54 read=27
+   ->  Nested Loop  (cost=4.63..304.93 rows=50 width=636) (actual time=0.094..0.239 rows=50 loops=1)
+         Buffers: local hit=54 read=27
+         ->  Limit  (cost=0.48..5.03 rows=25 width=489) (actual time=0.073..0.078 rows=25 loops=1)
+               Buffers: local hit=3 read=2
+               InitPlan 1
+                 ->  Limit  (cost=0.00..0.05 rows=1 width=16) (actual time=0.011..0.011 rows=1 loops=1)
+                       Buffers: local hit=2
+                       ->  Seq Scan on bench_records  (cost=0.00..902.00 rows=20000 width=16) (actual time=0.010..0.011 rows=1 loops=1)
+                             Buffers: local hit=2
+               ->  Incremental Sort  (cost=0.43..3641.35 rows=20000 width=489) (actual time=0.072..0.074 rows=25 loops=1)
+                     Sort Key: r.created_at DESC, r.id DESC
+                     Presorted Key: r.created_at
+                     Full-sort Groups: 1  Sort Method: quicksort  Average Memory: 37kB  Peak Memory: 37kB
+                     Buffers: local hit=3 read=2
+                     ->  Index Scan using bench_records_store_id_created_at_idx on bench_records r  (cost=0.29..2741.35 rows=20000 width=489) (actual time=0.048..0.054 rows=26 loops=1)
+                           Index Cond: (store_id = (InitPlan 1).col1)
+                           Filter: ((type)::text = 'TPTS'::text)
+                           Buffers: local hit=3 read=2
+         ->  Bitmap Heap Scan on bench_photos p  (cost=4.15..11.98 rows=2 width=91) (actual time=0.005..0.005 rows=2 loops=25)
+               Recheck Cond: (kph_record_id = r.id)
+               Heap Blocks: exact=26
+               Buffers: local hit=51 read=25
+               ->  Bitmap Index Scan on bench_photos_kph_record_id_ordinal_key  (cost=0.00..4.14 rows=2 width=0) (actual time=0.004..0.004 rows=2 loops=25)
+                     Index Cond: (kph_record_id = r.id)
+                     Buffers: local hit=25 read=25
+ Planning:
+   Buffers: shared hit=17, local hit=7 read=5
+ Planning Time: 1.032 ms
+ Execution Time: 0.563 ms
+(34 rows)
+
+ROLLBACK

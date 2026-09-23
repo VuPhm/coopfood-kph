@@ -1,7 +1,7 @@
 import { parseDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, ChevronDown, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Trash2 } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
@@ -21,7 +21,7 @@ import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPil
 import { StoreContext } from "./store-context";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
-import { createOnlineGateway, onlineExportSelectionError, onlineModeEnabled, type OnlineSession } from "./online-kph";
+import { createOnlineGateway, onlineExportSelectionError, onlineModeEnabled, type OnlineHistoryPage, type OnlineSession } from "./online-kph";
 
 export { formatBusinessDate } from "./business-date";
 
@@ -55,6 +55,7 @@ const pilotPersistenceEnabled = import.meta.env.MODE !== "test" && !onlinePersis
 const initialRecords = pilotPersistenceEnabled || onlinePersistenceEnabled ? [] : DEMO_RECORDS;
 const onlineSessionQueryKey = ["online", "session"] as const;
 const onlineApprovalConcurrency = 4;
+const onlineHistoryPageSize = 25;
 
 async function settleWithConcurrency<T, R>(items: readonly T[], limit: number, task: (item: T) => Promise<R>) {
   const results = new Array<PromiseSettledResult<R>>(items.length);
@@ -196,6 +197,7 @@ function WorkspaceApp() {
   const [expandedMobileRecords, setExpandedMobileRecords] = useState<ReadonlySet<string>>(new Set());
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
+  const [historyPage, setHistoryPage] = useState(1);
   const [reviewingIds, setReviewingIds] = useState<ReadonlySet<string>>(new Set());
   const [dateFromInput, setDateFromInput] = useState("");
   const [dateToInput, setDateToInput] = useState("");
@@ -228,16 +230,44 @@ function WorkspaceApp() {
   const onlineSession = onlineAuthRequired ? undefined : sessionQuery.data;
   const onlineStores = onlineSession?.user.stores ?? [];
   const onlineHistoryScopeKey = ["online", "history", onlineSession?.user.id ?? "anonymous", onlineStoreId ?? "none"] as const;
-  const onlineHistoryKey = [...onlineHistoryScopeKey, dateFilter.detectedFrom ?? "", dateFilter.detectedTo ?? ""] as const;
+  const onlineHistoryFilter = {
+    type: activeKind,
+    ...(dateFilter.detectedFrom ? { detectedFrom: dateFilter.detectedFrom } : {}),
+    ...(dateFilter.detectedTo ? { detectedTo: dateFilter.detectedTo } : {}),
+    ...(approvalFilter !== "ALL" ? { approvalStatus: approvalFilter } : {}),
+    ...(recordSort ? { sort: recordSort.key, direction: recordSort.direction } : {}),
+    page: historyPage,
+    pageSize: onlineHistoryPageSize,
+  } as const;
+  const onlineHistoryKey = [
+    ...onlineHistoryScopeKey,
+    activeKind,
+    dateFilter.detectedFrom ?? "",
+    dateFilter.detectedTo ?? "",
+    approvalFilter,
+    recordSort?.key ?? "createdAt",
+    recordSort?.direction ?? "descending",
+    historyPage,
+    onlineHistoryPageSize,
+  ] as const;
   const onlineHistoryKeyRef = useRef(onlineHistoryKey);
   onlineHistoryKeyRef.current = onlineHistoryKey;
-  const onlineHistoryQuery = useQuery<readonly RecordView[]>({
+  const onlineHistoryQuery = useQuery<OnlineHistoryPage>({
     queryKey: onlineHistoryKey,
-    queryFn: ({ signal }) => onlineGateway?.loadHistory(onlineStoreId!, dateFilter, signal) ?? Promise.reject(new Error("Gateway lịch sử chưa sẵn sàng.")),
+    queryFn: ({ signal }) => onlineGateway?.loadHistory(onlineStoreId!, onlineHistoryFilter, signal) ?? Promise.reject(new Error("Gateway lịch sử chưa sẵn sàng.")),
     enabled: onlinePersistenceEnabled && !onlineAuthRequired && Boolean(onlineSession && onlineStoreId),
+    placeholderData: (previousData, previousQuery) => {
+      const previousKey = previousQuery?.queryKey;
+      const pageIndex = onlineHistoryKey.length - 2;
+      return previousKey?.length === onlineHistoryKey.length
+        && previousKey.every((value, index) => index === pageIndex || value === onlineHistoryKey[index])
+        ? previousData
+        : undefined;
+    },
     retry: false,
   });
-  const records = onlinePersistenceEnabled ? (onlineHistoryQuery.data ?? []) : localRecords;
+  const onlineHistory = onlineHistoryQuery.data;
+  const records = onlinePersistenceEnabled ? (onlineHistory?.records ?? []) : localRecords;
   const onlineLoading = onlinePersistenceEnabled && !onlineAuthRequired
     && (sessionQuery.isPending || Boolean(onlineSession && onlineStoreId && onlineHistoryQuery.isPending));
   const onlineQueryError = sessionQuery.error ?? onlineHistoryQuery.error;
@@ -264,6 +294,7 @@ function WorkspaceApp() {
       logoutMutation.reset();
       setOnlineAuthRequired(false);
       setStorageError("");
+      setHistoryPage(1);
       setSelected(new Set());
       setOnlineStoreId(session.user.stores[0]?.id ?? null);
       queryClient.setQueryData(onlineSessionQueryKey, session);
@@ -277,6 +308,7 @@ function WorkspaceApp() {
       invalidateOnlineMutationScope();
       setOnlineAuthRequired(true);
       setOnlineStoreId(null);
+      setHistoryPage(1);
       setSelected(new Set());
       setDialogOpen(false);
       queryClient.removeQueries({ queryKey: ["online"] });
@@ -289,6 +321,7 @@ function WorkspaceApp() {
   });
   const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
+    if (onlinePersistenceEnabled) return records;
     const scopedRecords = records.filter(({ kind, id, approvalStatus, detectedDate }) => {
       const hasExpectedDeletionState = trashMode ? deletedIds.has(id) : !deletedIds.has(id);
       const detected = detectedDateValue(detectedDate);
@@ -310,9 +343,15 @@ function WorkspaceApp() {
     });
   }, [activeKind, approvalFilter, dateFilter, deletedIds, recordSort, records, trashMode]);
   const selectedRecords = useMemo(
-    () => records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
-    [activeKind, deletedIds, records, selected, trashMode],
+    () => onlinePersistenceEnabled && onlineHistoryQuery.isPlaceholderData
+      ? []
+      : records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
+    [activeKind, deletedIds, onlineHistoryQuery.isPlaceholderData, records, selected, trashMode],
   );
+  const onlineHistoryActionsBlocked = onlinePersistenceEnabled && onlineHistoryQuery.isPlaceholderData;
+  const historyActionBusyIds = useMemo(() => onlineHistoryActionsBlocked
+    ? new Set(visibleRecords.map(({ id }) => id))
+    : reviewingIds, [onlineHistoryActionsBlocked, reviewingIds, visibleRecords]);
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
   const storeConfigured = onlinePersistenceEnabled ? onlineStoreId !== null : isStoreProfileConfigured(storeProfile);
@@ -320,6 +359,13 @@ function WorkspaceApp() {
   const canManageOnline = selectedOnlineStore?.role === "STORE_MANAGER";
   const selectedRecordsAreExportable = selectedRecords.length > 0
     && selectedRecords.every(({ approvalStatus }) => approvalStatus === "APPROVED");
+  const historyTotal = onlinePersistenceEnabled ? (onlineHistory?.totalItems ?? 0) : visibleRecords.length;
+  const historyTypeTotals = onlinePersistenceEnabled
+    ? (onlineHistory?.typeTotals ?? { TPCN: 0, TPTS: 0 })
+    : Object.fromEntries(kphKinds.map((kind) => [
+        kind,
+        records.filter((record) => record.kind === kind && (trashMode ? deletedIds.has(record.id) : !deletedIds.has(record.id))).length,
+      ])) as Record<KphKind, number>;
   const dateFilterActive = Boolean(dateFilter.detectedFrom || dateFilter.detectedTo);
   const filterInitialMonth = formatBusinessDate(new Date()).iso as LocalDate;
   const storageWarning = storageReady ? storageHealthWarning(storageHealth) : null;
@@ -387,6 +433,16 @@ function WorkspaceApp() {
   }, [onlineQueryError]);
 
   useEffect(() => {
+    if (!onlinePersistenceEnabled || !onlineHistory) return;
+    const lastPage = Math.max(1, onlineHistory.totalPages);
+    if (historyPage > lastPage) {
+      setHistoryPage(lastPage);
+      setSelected(new Set());
+      setExpandedMobileRecords(new Set());
+    }
+  }, [historyPage, onlineHistory]);
+
+  useEffect(() => {
     if (!onlinePersistenceEnabled || !onlineSession || onlineLoading || onlineStores.length > 0 || storageError) return;
     setStorageError("Tài khoản chưa được gán cửa hàng hoạt động. Hãy liên hệ quản trị viên.");
   }, [onlineLoading, onlineSession, onlineStores.length, storageError]);
@@ -395,6 +451,7 @@ function WorkspaceApp() {
     invalidateOnlineMutationScope();
     setOnlineAuthRequired(true);
     setOnlineStoreId(null);
+    setHistoryPage(1);
     setSelected(new Set());
     setDialogOpen(false);
     setChangePasswordOpen(false);
@@ -462,6 +519,7 @@ function WorkspaceApp() {
     invalidateOnlineMutationScope();
     setOnlineAuthRequired(false);
     setOnlineStoreId(null);
+    setHistoryPage(1);
     setSelected(new Set());
     void queryClient.invalidateQueries({ queryKey: onlineSessionQueryKey });
   }
@@ -470,6 +528,7 @@ function WorkspaceApp() {
     if (!onlineStores.some(({ id }) => id === storeId) || storeId === onlineStoreId) return;
     invalidateOnlineMutationScope();
     setOnlineStoreId(storeId);
+    setHistoryPage(1);
     setSelected(new Set());
     setReviewingIds(new Set());
     setExpandedMobileRecords(new Set());
@@ -478,6 +537,7 @@ function WorkspaceApp() {
   }
 
   function openExport() {
+    if (onlineHistoryActionsBlocked) return;
     if (!storeConfigured) {
       setNotice(onlinePersistenceEnabled ? "Không có cửa hàng hợp lệ để xuất Excel." : "Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
       if (!onlinePersistenceEnabled) setStoreSettingsOpen(true);
@@ -509,6 +569,7 @@ function WorkspaceApp() {
   }
 
   function toggleSelection(id: string) {
+    if (onlineHistoryActionsBlocked || (onlinePersistenceEnabled && !visibleRecords.some((record) => record.id === id))) return;
     setSelected((current) => {
       const next = new Set(current);
       if (next.has(id)) next.delete(id);
@@ -518,6 +579,7 @@ function WorkspaceApp() {
   }
 
   function toggleAllVisible() {
+    if (onlineHistoryActionsBlocked) return;
     setSelected(allVisibleSelected ? new Set() : new Set(visibleRecords.map(({ id }) => id)));
   }
 
@@ -543,12 +605,16 @@ function WorkspaceApp() {
 
   function selectKind(kind: KphKind) {
     setActiveKind(kind);
+    setHistoryPage(1);
     setSelected(new Set());
+    setExpandedMobileRecords(new Set());
   }
 
   function changeApprovalFilter(filter: ApprovalFilter) {
     setApprovalFilter(filter);
+    setHistoryPage(1);
     setSelected(new Set());
+    setExpandedMobileRecords(new Set());
   }
 
   function applyDateFilterInputs(nextFromInput: string, nextToInput: string) {
@@ -570,7 +636,9 @@ function WorkspaceApp() {
         ...(detectedTo ? { detectedTo } : {}),
       });
       setDateFilterError("");
+      setHistoryPage(1);
       setSelected(new Set());
+      setExpandedMobileRecords(new Set());
     } catch {
       setDateFilterError("Nhập ngày hợp lệ theo định dạng dd/mm/yyyy.");
     }
@@ -591,13 +659,18 @@ function WorkspaceApp() {
     setDateToInput("");
     setDateFilter({});
     setDateFilterError("");
+    setHistoryPage(1);
     setSelected(new Set());
+    setExpandedMobileRecords(new Set());
   }
 
   function toggleRecordSort(key: RecordSortKey) {
     setRecordSort((current) => current?.key === key
       ? { key, direction: current.direction === "ascending" ? "descending" : "ascending" }
       : { key, direction: "ascending" });
+    setHistoryPage(1);
+    setSelected(new Set());
+    setExpandedMobileRecords(new Set());
   }
 
   function cycleMobileRecordSort(key: RecordSortKey) {
@@ -606,11 +679,31 @@ function WorkspaceApp() {
       if (current.direction === "ascending") return { key, direction: "descending" };
       return null;
     });
+    setHistoryPage(1);
+    setSelected(new Set());
+    setExpandedMobileRecords(new Set());
+  }
+
+  function clearRecordSort() {
+    setRecordSort(null);
+    setHistoryPage(1);
+    setSelected(new Set());
+    setExpandedMobileRecords(new Set());
+  }
+
+  function changeHistoryPage(page: number) {
+    if (!onlineHistory || onlineHistoryQuery.isFetching) return;
+    const lastPage = Math.max(1, onlineHistory.totalPages);
+    const nextPage = Math.min(Math.max(1, page), lastPage);
+    if (nextPage === historyPage) return;
+    setHistoryPage(nextPage);
+    setSelected(new Set());
+    setExpandedMobileRecords(new Set());
   }
 
   async function updateApproval(recordId: string, status: ApprovalStatus) {
     if (onlinePersistenceEnabled) {
-      if (!canManageOnline || !onlineStoreId || !onlineGateway) return;
+      if (onlineHistoryActionsBlocked || !canManageOnline || !onlineStoreId || !onlineGateway) return;
       const mutationScope: OnlineMutationScope = {
         generation: onlineMutationScopeRef.current.generation,
         storeId: onlineStoreId,
@@ -621,7 +714,11 @@ function WorkspaceApp() {
       try {
         const reviewed = await onlineGateway.reviewRecord(onlineStoreId, recordId, status);
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
-        queryClient.setQueriesData<readonly RecordView[]>({ queryKey: historyScopeKey }, (current) => current?.map((record) => record.id === recordId ? reviewed : record));
+        queryClient.setQueriesData<OnlineHistoryPage>({ queryKey: historyScopeKey }, (current) => current
+          ? { ...current, records: current.records.map((record) => record.id === recordId ? reviewed : record) }
+          : current);
+        await queryClient.invalidateQueries({ queryKey: historyScopeKey });
+        if (!isOnlineMutationScopeCurrent(mutationScope)) return;
         setSelected((current) => new Set([...current].filter((id) => id !== recordId)));
         setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” trên máy chủ.`);
       } catch (error) {
@@ -655,7 +752,7 @@ function WorkspaceApp() {
 
   async function approveSelected() {
     if (onlinePersistenceEnabled) {
-      if (!canManageOnline || !onlineStoreId || !onlineGateway) return;
+      if (onlineHistoryActionsBlocked || !canManageOnline || !onlineStoreId || !onlineGateway) return;
       const recordIds = [...selected];
       const storeId = onlineStoreId;
       const reviewRecord = onlineGateway.reviewRecord;
@@ -683,7 +780,9 @@ function WorkspaceApp() {
           .map(({ value }) => value);
         const failedIds = results.flatMap((result, index) => result.status === "rejected" ? [recordIds[index]!] : []);
         const byId = new Map(reviewedRecords.map((record) => [record.id, record]));
-        queryClient.setQueriesData<readonly RecordView[]>({ queryKey: historyScopeKey }, (current) => current?.map((record) => byId.get(record.id) ?? record));
+        queryClient.setQueriesData<OnlineHistoryPage>({ queryKey: historyScopeKey }, (current) => current
+          ? { ...current, records: current.records.map((record) => byId.get(record.id) ?? record) }
+          : current);
         await queryClient.invalidateQueries({ queryKey: historyScopeKey });
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
         setSelected(new Set(failedIds));
@@ -797,10 +896,11 @@ function WorkspaceApp() {
       try {
         const created = await onlineGateway.createRecord(onlineStoreId, draft);
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
+        setHistoryPage(1);
         await queryClient.invalidateQueries({ queryKey: historyScopeKey });
         if (!isOnlineMutationScopeCurrent(mutationScope)) return;
-        const currentHistory = queryClient.getQueryData<readonly RecordView[]>(onlineHistoryKeyRef.current);
-        const createdIsVisible = currentHistory?.some(({ id }) => id === created.id) ?? false;
+        const currentHistory = queryClient.getQueryData<OnlineHistoryPage>(onlineHistoryKeyRef.current);
+        const createdIsVisible = currentHistory?.records.some(({ id }) => id === created.id) ?? false;
         if (createdIsVisible) setActiveKind(draft.kind);
         setSelected(createdIsVisible ? new Set([created.id]) : new Set());
         setNotice(`Đã tạo phiếu ${created.id} và lưu trên máy chủ.`);
@@ -858,7 +958,7 @@ function WorkspaceApp() {
   }
 
   async function exportSelected() {
-    if (!selectedRecords.length) return;
+    if (onlineHistoryActionsBlocked || !selectedRecords.length) return;
     if (!storeConfigured) {
       setExportOpen(false);
       setNotice("Thiết lập tên và mã cửa hàng trước khi xuất Excel.");
@@ -919,7 +1019,7 @@ function WorkspaceApp() {
     : storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…";
 
   const recordActions: RecordActions | undefined = onlinePersistenceEnabled
-    ? canManageOnline ? { approve: updateApproval, busyIds: reviewingIds } : undefined
+    ? canManageOnline ? { approve: updateApproval, busyIds: historyActionBusyIds } : undefined
     : { approve: updateApproval, busyIds: reviewingIds, remove: requestDelete, restore: restoreRecord };
   const workspaceError = logoutMutation.isError && !isSessionExpiryError(logoutMutation.error)
     ? "Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại."
@@ -991,7 +1091,7 @@ function WorkspaceApp() {
             <div className="history-title-row pr-3">
               <div className="history-title-group">
                 <h2 id="history-title" className="history-title">
-                  <span className="history-total-count" aria-label={`${visibleRecords.length} phiếu`}>{visibleRecords.length}</span>
+                  <span className="history-total-count" aria-label={`${historyTotal} phiếu`}>{historyTotal}</span>
                   {trashMode ? "Phiếu đã xoá" : "Phiếu đã khai báo"}
                 </h2>
                 {onlinePersistenceEnabled
@@ -1011,7 +1111,7 @@ function WorkspaceApp() {
                   onDateToChange={changeDateToInput}
                   onFilterChange={changeApprovalFilter}
                   onSort={cycleMobileRecordSort}
-                  onSortReset={() => setRecordSort(null)}
+                  onSortReset={clearRecordSort}
                   sort={recordSort}
                 />
                   {!onlinePersistenceEnabled ? <button
@@ -1044,7 +1144,7 @@ function WorkspaceApp() {
             <div className="history-controls-row">
               <div className="history-tabs" role="tablist" aria-label="Loại phiếu">
                 {kphKinds.map((kind) => {
-                  const count = records.filter((record) => record.kind === kind && (trashMode ? deletedIds.has(record.id) : !deletedIds.has(record.id))).length;
+                  const count = historyTypeTotals[kind];
                   return (
                     <button
                       key={kind}
@@ -1076,10 +1176,10 @@ function WorkspaceApp() {
                     {selected.size > 0 && (!onlinePersistenceEnabled || canManageOnline)
                       ? trashMode
                         ? <button type="button" className="selection-count selection-approve selection-restore" onClick={restoreSelected}>Khôi phục <strong>{selected.size}</strong> phiếu</button>
-                        : <button type="button" className="selection-count selection-approve" disabled={reviewingIds.size > 0} onClick={approveSelected}>{reviewingIds.size > 0 ? "Đang duyệt…" : <>Duyệt <strong>{selected.size}</strong> phiếu</>}</button>
+                        : <button type="button" className="selection-count selection-approve" disabled={onlineHistoryActionsBlocked || reviewingIds.size > 0} onClick={approveSelected}>{reviewingIds.size > 0 ? "Đang duyệt…" : <>Duyệt <strong>{selected.size}</strong> phiếu</>}</button>
                       : <span className="selection-count" aria-live="polite">Đã chọn <strong>{selected.size}</strong></span>}
                     <label className="select-all-history" aria-label="Chọn tất cả phiếu" title="Chọn tất cả">
-                      <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
+                      <input type="checkbox" checked={allVisibleSelected} disabled={onlineHistoryActionsBlocked} onChange={toggleAllVisible} aria-label="Chọn tất cả phiếu" />
                     </label>
                   </div>
                   {selected.size > 0 && (!onlinePersistenceEnabled || canManageOnline) ? (
@@ -1107,10 +1207,10 @@ function WorkspaceApp() {
                   <th className="px-3 py-0">Ảnh</th>
                   <SortableHeader label="Duyệt" onSort={toggleRecordSort} sort={recordSort} sortKey="approval" />
                   <th className="w-12 px-3 py-0 text-center"><span className="sr-only">Thao tác dòng</span></th>
-                </tr>
+              </tr>
               </thead>
               <tbody>{visibleRecords.length > 0
-                ? visibleRecords.map((record) => <RecordRow key={record.id} actions={recordActions} record={record} selected={selected.has(record.id)} trashMode={trashMode} onToggle={toggleSelection} />)
+                ? visibleRecords.map((record) => <RecordRow key={record.id} actions={recordActions} record={record} selected={selected.has(record.id)} selectionDisabled={onlineHistoryActionsBlocked} trashMode={trashMode} onToggle={toggleSelection} />)
                 : <tr><td className="empty-history-cell" colSpan={10}>{emptyHistoryMessage}</td></tr>}
               </tbody>
             </table>
@@ -1118,9 +1218,17 @@ function WorkspaceApp() {
 
           <div className="grid gap-3 mobile-history">
             {visibleRecords.length > 0
-              ? visibleRecords.map((record) => <RecordCard key={record.id} actions={recordActions} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
+              ? visibleRecords.map((record) => <RecordCard key={record.id} actions={recordActions} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} selectionDisabled={onlineHistoryActionsBlocked} trashMode={trashMode} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
               : <p className="empty-history-card">{emptyHistoryMessage}</p>}
           </div>
+          {onlinePersistenceEnabled && onlineHistory ? <HistoryPagination
+            busy={onlineHistoryQuery.isFetching}
+            page={historyPage}
+            pageSize={onlineHistory.pageSize}
+            totalItems={onlineHistory.totalItems}
+            totalPages={onlineHistory.totalPages}
+            onPageChange={changeHistoryPage}
+          /> : null}
         </section>
 
         <div className="workspace-side-stack">
@@ -1194,6 +1302,33 @@ function WorkspaceApp() {
       <PwaStatus />
     </div>
   );
+}
+
+function HistoryPagination({ busy, onPageChange, page, pageSize, totalItems, totalPages }: {
+  busy: boolean;
+  onPageChange: (page: number) => void;
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}) {
+  const lastPage = Math.max(1, totalPages);
+  const firstItem = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const lastItem = totalItems === 0 ? 0 : Math.min(page * pageSize, totalItems);
+
+  return <nav className="history-pagination" aria-label="Phân trang lịch sử phiếu" aria-busy={busy}>
+    <button type="button" aria-label="Trang trước" disabled={busy || page <= 1} onClick={() => onPageChange(page - 1)}>
+      <ChevronLeft aria-hidden="true" />
+    </button>
+    <p className="history-pagination-status" role="status" aria-live="polite">
+      <strong>Trang {Math.min(page, lastPage)} / {lastPage}</strong>
+      <span>{firstItem}–{lastItem} trên {totalItems} phiếu</span>
+      {busy ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
+    </p>
+    <button type="button" aria-label="Trang sau" disabled={busy || totalPages === 0 || page >= totalPages} onClick={() => onPageChange(page + 1)}>
+      <ChevronRight aria-hidden="true" />
+    </button>
+  </nav>;
 }
 
 type OnlineLoginPanelProps = {

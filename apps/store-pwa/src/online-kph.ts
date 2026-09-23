@@ -9,8 +9,23 @@ type KphRecord = components["schemas"]["KphRecord"];
 type KphApprovalStatus = components["schemas"]["KphApprovalStatus"];
 
 export type OnlineHistoryFilter = {
+  type?: components["schemas"]["KphType"];
   detectedFrom?: string;
   detectedTo?: string;
+  approvalStatus?: components["schemas"]["KphApprovalStatus"];
+  sort?: components["schemas"]["KphHistorySort"];
+  direction?: components["schemas"]["KphHistorySortDirection"];
+  page?: number;
+  pageSize?: number;
+};
+
+export type OnlineHistoryPage = {
+  records: RecordView[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  typeTotals: { TPCN: number; TPTS: number };
 };
 
 export type OnlineExportBundle = {
@@ -51,7 +66,7 @@ export type OnlineWorkspace = {
 export type OnlineGateway = {
   getSession: (signal?: AbortSignal) => Promise<Session>;
   listStores: (signal?: AbortSignal) => Promise<components["schemas"]["StoreContext"][]>;
-  loadHistory: (storeId: string, filter?: OnlineHistoryFilter, signal?: AbortSignal) => Promise<RecordView[]>;
+  loadHistory: (storeId: string, filter?: OnlineHistoryFilter, signal?: AbortSignal) => Promise<OnlineHistoryPage>;
   loadWorkspace: (signal?: AbortSignal) => Promise<OnlineWorkspace>;
   login: (username: string, password: string, signal?: AbortSignal) => Promise<Session>;
   logout: () => Promise<void>;
@@ -91,14 +106,21 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
       ...(signal ? { signal } : {}),
     });
     if (response.error || !response.data) throw apiError(response, "Không thể tải lịch sử phiếu KPH.");
-    return response.data.map(toRecordView);
+    return {
+      records: response.data.items.map(toRecordView),
+      page: response.data.page,
+      pageSize: response.data.pageSize,
+      totalItems: response.data.totalItems,
+      totalPages: response.data.totalPages,
+      typeTotals: { TPCN: response.data.typeTotals.tpcn, TPTS: response.data.typeTotals.tpts },
+    };
   }
 
   async function loadWorkspace(signal?: AbortSignal): Promise<OnlineWorkspace> {
     const session = await getSession(signal);
     const store = session.user.stores[0];
     if (!store) throw new Error("Tài khoản chưa được gán cửa hàng hoạt động.");
-    return { session, store, records: await loadHistory(store.id, {}, signal) };
+    return { session, store, records: (await loadHistory(store.id, {}, signal)).records };
   }
 
   async function login(username: string, password: string, signal?: AbortSignal): Promise<Session> {

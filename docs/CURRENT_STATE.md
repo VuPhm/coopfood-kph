@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-23
+Cập nhật: 2026-09-24
 
 ## Giai đoạn
 
-`P05 credential self-service — owner accepted; chuẩn bị tích hợp`
+`D01 history paging — CLOSED revision 2, owner accepted 2026-09-24`
 
 Repository là implementation mới của Co.op Food KPH. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -70,6 +70,25 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Kiểm chứng gần nhất
 
+- D01 revision 2 đã tích hợp backend/Store PWA/E2E do GPT-6 Luna triển khai trên
+  baseline P04/P05, nhánh `codex/d01-p04-integration`. Application/browser candidate
+  `7fc9b8d`; 162 frontend/package tests, 65 backend tests và real-backend browser
+  8 PASS / 4 skip theo viewport. Query-plan 20.000 phiếu + 40.000 dòng ảnh tổng hợp
+  xác nhận page-before-photo; chưa cần index/migration mới. Preview sạch
+  <http://127.0.0.1:4173>; owner đã xác nhận “pass” ngày 24/09/2026.
+  Cycle CLOSED, close checker PASS tại `8144b7c`; chưa merge/deploy.
+  [Evidence revision 2](delivery/d01-history-paging/technical-evidence-r2.md).
+
+
+- P05 đã merge qua [PR #7](https://github.com/VuPhm/coopfood-kph/pull/7),
+  commit `2d32ffd`, ngày 23/09/2026. CI frontend/backend/browser PASS trên
+  head `0374016`; cây nội dung merge trùng head đã kiểm chứng.
+- P04 tiếp tục từ candidate `92dedf7` trên `codex/p04-user-deactivation` và tích hợp
+  P05. Chỉ CHAIN_ADMIN được khóa user khác; giữ guard self/last-admin/last-manager,
+  audit và session invalidation. Revision 3 đã pass 161 frontend/package tests,
+  64 backend tests và browser real-backend ở 4 viewport. Bản tích hợp đã kiểm
+  đổi mật khẩu từ workspace Tài khoản và chặn phiên admin cũ; owner đã chấp nhận P04 ngày 23/09/2026. [Evidence](delivery/p04-user-deactivation/technical-evidence.md).
+
 - PR #5 đã merge chuỗi accepted S04 → P01 → P02 → P03 → C01 vào `main` ngày
   2026-09-21: head `048a7ff`, merge commit `3ffc774`. Remote CI của PR PASS cả
   frontend, backend và browser.
@@ -98,8 +117,8 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - Chưa chốt hosting/storage/retention, SSO/MFA, primary supplier nhiều NCC,
   edit/invalidate workflow hoặc cửa sổ duyệt.
 - Online hiện hỗ trợ JPEG/PNG; HEIC, thiết bị iPhone thật và production rollout
-  vẫn là backlog. D01 paging history và O01 backup/restore đã có candidate trên
-  nhánh riêng nhưng chưa được owner nghiệm thu hoặc tích hợp.
+  vẫn là backlog. D01 đã được owner nghiệm thu trên nhánh P04/P05, chưa merge main; O01 backup/restore
+  còn candidate riêng, chưa được owner nghiệm thu hoặc tích hợp.
 - Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
 ## Điểm tiếp tục
@@ -108,10 +127,14 @@ P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
 [C01 plan](delivery/c01-catalog-staging/plan.json). Integration PR #5 cho chuỗi
 accepted S04 → P01 → P02 → P03 → C01 đã merge vào `main`; không còn blocker
-tích hợp của chuỗi này. P05 đã được owner chấp nhận ngày 23/09/2026 trên nhánh riêng; bước tiếp theo
-là PR tích hợp vào `main`, chưa merge hoặc deploy. C02 chỉ nên mở sau khi chốt
+tích hợp của chuỗi này. P05 đã được owner chấp nhận và merge vào `main` ngày 23/09/2026.
+P04 đã CLOSED theo owner “pass p04” ngày 23/09/2026; chưa merge/deploy.
+D01 revision 2 đã CLOSED theo owner “pass” ngày 24/09/2026 trên baseline
+P04/P05; [owner decision](delivery/d01-history-paging/acceptance-handoff.md).
+Chưa merge/deploy, không còn cycle active. Bước đề xuất kế tiếp là tích hợp
+P04 + D01 vào main qua PR/CI khi được yêu cầu. C02 chỉ nên mở sau khi chốt
 primary supplier; primary supplier và lookup current vẫn là quyết định nghiệp vụ
-riêng. Admin reset credential, bootstrap/recovery và khóa user vẫn thuộc slice khác.
+riêng. Admin reset credential và bootstrap/recovery vẫn thuộc slice khác; khóa user đã có ở P04.
 Kết quả P02 nằm trong
 [P02 handoff](delivery/p02-scoped-authorization/acceptance-handoff.md); backlog
 đầy đủ ở [roadmap 2026-09-16](REVIEW_AND_ROADMAP_2026-09-16.md).

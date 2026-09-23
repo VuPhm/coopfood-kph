@@ -13,6 +13,10 @@ const USERS = {
     username: process.env.E2E_EMPLOYEE_USERNAME ?? "employee.e2e",
     password: process.env.E2E_EMPLOYEE_PASSWORD ?? "employee-e2e-password",
   },
+  regionManager: {
+    username: process.env.E2E_REGION_MANAGER_USERNAME ?? "region-manager.e2e",
+    password: process.env.E2E_REGION_MANAGER_PASSWORD ?? "manager-e2e-password",
+  },
   chainAdmin: {
     username: process.env.E2E_CHAIN_ADMIN_USERNAME ?? "chain-admin.e2e",
     password: process.env.E2E_CHAIN_ADMIN_PASSWORD ?? "admin-e2e-password",
@@ -46,6 +50,7 @@ type Store = (typeof STORES)[keyof typeof STORES];
 type KphRecord = {
   id: string;
   type: "TPCN" | "TPTS";
+  quantity: number;
   barcode: string | null;
   lookupStatus: "FOUND" | "NOT_FOUND" | "MANUAL";
   catalogSnapshot: {
@@ -58,6 +63,14 @@ type KphRecord = {
   store: { id: string; code: string; name: string };
   approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
   reviewedBy: { id: string; displayName: string } | null;
+};
+type KphRecordPage = {
+  items: KphRecord[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  typeTotals: { tpcn: number; tpts: number };
 };
 
 function apiUrl(path: string) {
@@ -248,7 +261,7 @@ async function saveDialog(dialog: Locator) {
 async function listRecords(context: BrowserContext, storeId: string): Promise<KphRecord[]> {
   const response = await context.request.get(apiUrl(`/api/v1/stores/${storeId}/kph`));
   expect(response.status()).toBe(200);
-  return await response.json() as KphRecord[];
+  return (await response.json() as KphRecordPage).items;
 }
 
 async function loginViaApi(api: APIRequestContext, credentials: Credentials) {
@@ -367,7 +380,8 @@ test.describe("Store PWA browser acceptance", () => {
     await waitForWorkspace(page);
     await page.getByRole("tab", { name: /TP Tươi sống/i }).click();
     await expectVisible(page.getByText(marker, { exact: true }));
-    await expect(page.locator(".desktop-history .record-photo-gallery").filter({ has: page.locator("img") }).last()).toHaveAttribute("aria-label", /3 ảnh minh chứng/);
+    const createdRow = page.locator(".desktop-history .record-row").filter({ hasText: marker });
+    await expect(createdRow.locator(".record-photo-gallery")).toHaveAttribute("aria-label", /3 ảnh minh chứng/);
   });
 
   test("mobile viewport renders the online history as expandable cards with ordered photos", async ({ page }, testInfo) => {
@@ -402,6 +416,90 @@ test.describe("Store PWA browser acceptance", () => {
     await page.reload();
     await waitForWorkspace(page);
     await expectVisible(page.locator(".mobile-history .record-card").filter({ hasText: marker }));
+  });
+
+  test("history paging sorts the full server result and clears page-local selection", async ({ page }, testInfo) => {
+    await loginViaUi(page, USERS.manager);
+
+    const typeResponse = page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return url.pathname.endsWith(`/stores/${STORES.primary.id}/kph`)
+        && url.searchParams.get("type") === "TPTS"
+        && url.searchParams.get("page") === "1";
+    });
+    await page.getByRole("tab", { name: /TP Tươi sống/i }).click();
+    expect((await typeResponse).status()).toBe(200);
+
+    const sortedResponsePromise = page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return url.pathname.endsWith(`/stores/${STORES.primary.id}/kph`)
+        && url.searchParams.get("type") === "TPTS"
+        && url.searchParams.get("sort") === "quantity"
+        && url.searchParams.get("direction") === "ascending"
+        && url.searchParams.get("page") === "1";
+    });
+    if (testInfo.project.name.includes("mobile")) {
+      await page.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" }).click();
+      const controls = page.getByRole("dialog", { name: "Lọc & sắp xếp" });
+      await controls.getByRole("button", { name: "Sắp xếp theo Số lượng" }).click();
+      await controls.getByRole("button", { name: "Đóng" }).click();
+    } else {
+      await page.getByRole("button", { name: "Sắp xếp theo SL · ĐVT" }).click();
+    }
+    const firstPage = await sortedResponsePromise;
+    expect(firstPage.status()).toBe(200);
+    const firstPayload = await firstPage.json() as KphRecordPage;
+    expect(firstPayload.totalItems).toBeGreaterThanOrEqual(30);
+    expect(firstPayload.totalPages).toBeGreaterThanOrEqual(2);
+    expect(firstPayload.typeTotals.tpts).toBe(firstPayload.totalItems);
+    expect(firstPayload.items).toHaveLength(25);
+    expect(firstPayload.page).toBe(1);
+    expect(firstPayload.pageSize).toBe(25);
+    expect(firstPayload.items.map(({ quantity }) => quantity)).toEqual(
+      [...firstPayload.items.map(({ quantity }) => quantity)].sort((left, right) => left - right),
+    );
+    await expect(page.locator(`[aria-label="${firstPayload.totalItems} phiếu"]`).first()).toBeVisible();
+    await expect(page.getByRole("tab", { name: /TP Tươi sống/i }).getByLabel(`${firstPayload.typeTotals.tpts} phiếu`)).toBeVisible();
+
+    const firstCheckbox = await firstVisible(page.getByRole("checkbox", { name: /Chọn phiếu/ }));
+    await firstCheckbox.click();
+    await expect(firstCheckbox).toBeChecked();
+
+    const nextResponsePromise = page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return url.pathname.endsWith(`/stores/${STORES.primary.id}/kph`)
+        && url.searchParams.get("type") === "TPTS"
+        && url.searchParams.get("sort") === "quantity"
+        && url.searchParams.get("direction") === "ascending"
+        && url.searchParams.get("page") === "2";
+    });
+    await page.getByRole("button", { name: "Trang sau" }).click();
+    const secondPage = await nextResponsePromise;
+    expect(secondPage.status()).toBe(200);
+    const secondPayload = await secondPage.json() as KphRecordPage;
+    expect(secondPayload.totalItems).toBe(firstPayload.totalItems);
+    expect(secondPayload.totalPages).toBe(firstPayload.totalPages);
+    expect(new Set(firstPayload.items.map(({ id }) => id)).size).toBe(firstPayload.items.length);
+    expect(new Set(secondPayload.items.map(({ id }) => id)).size).toBe(secondPayload.items.length);
+    const firstIds = new Set(firstPayload.items.map(({ id }) => id));
+    expect(secondPayload.items.every(({ id }) => !firstIds.has(id))).toBe(true);
+    expect(secondPayload.page).toBe(2);
+    expect(secondPayload.items.map(({ quantity }) => quantity)).toEqual(
+      [...secondPayload.items.map(({ quantity }) => quantity)].sort((left, right) => left - right),
+    );
+    expect(firstPayload.items.at(-1)!.quantity).toBeLessThanOrEqual(secondPayload.items[0]!.quantity);
+    await expect(page.getByText(/Trang 2 \/ \d+/)).toBeVisible();
+    await expect(page.getByText("Đã chọn", { exact: false })).toContainText("0");
+
+    // Returning to a fresh cached page need not issue another HTTP request.
+    await page.getByRole("button", { name: "Trang trước" }).click();
+    const visibleHistory = page.locator(testInfo.project.name.includes("mobile")
+      ? ".mobile-history" : ".desktop-history");
+    await expect.poll(async () => visibleHistory.getByRole("checkbox", { name: /^Chọn phiếu / })
+      .evaluateAll((inputs) => inputs.map((input) => input.getAttribute("aria-label")!.replace("Chọn phiếu ", ""))))
+      .toEqual(firstPayload.items.map(({ id }) => id));
+    await expect(page.getByText(/Trang 1 \/ \d+/)).toBeVisible();
+    await expectVisible(page.getByText(firstPayload.items[0]!.catalogSnapshot.productName!, { exact: true }));
   });
 
   test("STORE_MANAGER filters by detected date, reviews a record and downloads the authorized Excel", async ({ page, context }, testInfo) => {
@@ -458,6 +556,7 @@ test.describe("Store PWA browser acceptance", () => {
 
     const managerApi = await directApiContext();
     const employeeApi = await directApiContext();
+    const regionApi = await directApiContext();
     const adminApi = await directApiContext();
     const anonymousApi = await directApiContext();
     try {
@@ -468,6 +567,7 @@ test.describe("Store PWA browser acceptance", () => {
       ]);
       const employeeSession = await loginViaApi(employeeApi, USERS.employee);
       expect(employeeSession.user.stores).toEqual([{ id: STORES.primary.id, code: "0001", name: STORES.primary.name, role: "EMPLOYEE" }]);
+      await loginViaApi(regionApi, USERS.regionManager);
       const adminSession = await loginViaApi(adminApi, USERS.chainAdmin);
       expect(adminSession.user.stores).toEqual([]);
 
@@ -475,11 +575,14 @@ test.describe("Store PWA browser acceptance", () => {
       expect(employeeRecordsResponse.status()).toBe(200);
       expect((await employeeApi.get(`/api/v1/stores/${STORES.secondary.id}/kph`)).status()).toBe(403);
       expect((await managerApi.get(`/api/v1/stores/${STORES.outsideMembership.id}/kph`)).status()).toBe(403);
+      expect((await regionApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(200);
+      expect((await regionApi.get(`/api/v1/stores/${STORES.secondary.id}/kph`)).status()).toBe(200);
+      expect((await regionApi.get(`/api/v1/stores/${STORES.outsideMembership.id}/kph`)).status()).toBe(403);
       expect((await adminApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(200);
       expect((await adminApi.get(`/api/v1/catalog/barcodes/${FOUND_BARCODE}?storeId=${STORES.primary.id}`)).status()).toBe(200);
       expect((await anonymousApi.get(`/api/v1/stores/${STORES.primary.id}/kph`)).status()).toBe(401);
 
-      const record = (await employeeRecordsResponse.json() as KphRecord[])[0];
+      const record = (await employeeRecordsResponse.json() as KphRecordPage).items[0];
       if (record) {
         expect((await employeeApi.put(`/api/v1/stores/${STORES.primary.id}/kph/${record.id}/approval`, {
           headers: { "X-CSRF-TOKEN": employeeSession.csrfToken },
@@ -493,7 +596,7 @@ test.describe("Store PWA browser acceptance", () => {
       expect(logout.status()).toBe(204);
       expect((await managerApi.get("/api/v1/auth/session")).status()).toBe(401);
     } finally {
-      await Promise.all([managerApi.dispose(), employeeApi.dispose(), adminApi.dispose(), anonymousApi.dispose()]);
+      await Promise.all([managerApi.dispose(), employeeApi.dispose(), regionApi.dispose(), adminApi.dispose(), anonymousApi.dispose()]);
     }
   });
 });

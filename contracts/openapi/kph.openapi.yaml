@@ -16,6 +16,7 @@ tags:
   - name: Stores
   - name: Catalog
   - name: KPH
+  - name: Admin identity
   - name: Admin lifecycle
   - name: Admin catalog
 security:
@@ -199,15 +200,45 @@ paths:
           schema:
             type: string
             format: date
+        - name: approvalStatus
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KphApprovalStatus'
+        - name: sort
+          in: query
+          required: false
+          description: Global sort applied before pagination. Omit for newest-created first.
+          schema:
+            $ref: '#/components/schemas/KphHistorySort'
+        - name: direction
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KphHistorySortDirection'
+        - name: page
+          in: query
+          required: false
+          description: One-based page number.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
       responses:
         '200':
-          description: Store-scoped history, newest first.
+          description: Store-scoped history filtered and sorted before pagination.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/KphRecord'
+                $ref: '#/components/schemas/KphRecordPage'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -388,6 +419,66 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /api/v1/admin/users:
+    get:
+      tags: [Admin identity]
+      operationId: listAdminUsers
+      summary: List the chain-wide user directory
+      description: Requires an active CHAIN_ADMIN. Credential data is never returned.
+      responses:
+        '200':
+          description: Users ordered by canonical username.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/users/{userId}/deactivate:
+    post:
+      tags: [Admin identity]
+      operationId: deactivateAdminUser
+      summary: Immediately deactivate another user
+      description: |
+        Requires an active CHAIN_ADMIN. The backend locks and revalidates the
+        target and active CHAIN_ADMIN set in one transaction. Self-deactivation
+        and deactivating the last active CHAIN_ADMIN or the last active
+        STORE_MANAGER of an active store are forbidden. Existing sessions of
+        the target lose authority on their next request.
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDeactivateRequest'
+      responses:
+        '200':
+          description: User deactivated; roles and assignments remain stored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
 
   /api/v1/admin/lifecycle/targets:
     get:
@@ -725,6 +816,13 @@ components:
       schema:
         type: string
         format: uuid
+    UserIdPath:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
 
   responses:
     BadRequest:
@@ -890,6 +988,40 @@ components:
           type: string
         role:
           $ref: '#/components/schemas/StoreRole'
+
+    AdminUser:
+      type: object
+      additionalProperties: false
+      required: [id, username, displayName, active, globalRoles]
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        active:
+          type: boolean
+        globalRoles:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/GlobalRole'
+
+    UserDeactivateRequest:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
 
     LifecycleTargetType:
       type: string
@@ -1366,6 +1498,56 @@ components:
             quantity:
               type: number
               exclusiveMinimum: 0
+
+    KphHistorySort:
+      type: string
+      enum: [detectedDate, product, supplier, quantity, condition, resolution, approval]
+
+    KphHistorySortDirection:
+      type: string
+      enum: [ascending, descending]
+      default: descending
+
+    KphRecordPage:
+      type: object
+      additionalProperties: false
+      required: [items, page, pageSize, totalItems, totalPages, typeTotals]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/KphRecord'
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+          maximum: 100
+        totalItems:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          format: int64
+          minimum: 0
+        typeTotals:
+          $ref: '#/components/schemas/KphTypeTotals'
+
+    KphTypeTotals:
+      type: object
+      additionalProperties: false
+      required: [tpcn, tpts]
+      properties:
+        tpcn:
+          type: integer
+          format: int64
+          minimum: 0
+        tpts:
+          type: integer
+          format: int64
+          minimum: 0
 
     KphRecord:
       type: object
