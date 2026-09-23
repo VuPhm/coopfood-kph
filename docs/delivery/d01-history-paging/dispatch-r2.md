@@ -21,3 +21,12 @@ Return actual commit, changed paths, commands/results and limitations. Two revie
 
 Integrator runs full gates at integrated SHA and provides runnable synthetic preview.
 Owner acceptance pending; previous revision 1 results are historical, not current PASS.
+
+## Interruption recovery 2026-09-23
+
+Owner asked “tiếp tục đoạn bị ngắt”. Temporary worktree folders no longer exist.
+E2E commit e1b4c92 survives and is integrated at 52ec92f. Backend/frontend refs
+still point at 6935138; uncommitted changes lost, no live agents remain. Recreate
+worktrees under ignored .local/worktrees; reassign only unfinished parts. Preserve
+original scope/revision and review findings: displayed-label server sort; disable
+stale-page selection/actions during placeholder loading; keep P05 password mocks.
