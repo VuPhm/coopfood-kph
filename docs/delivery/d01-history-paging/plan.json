@@ -20,7 +20,7 @@
     "Thay đổi KPH create/review authorization, lifecycle/invalidation, private media, Pilot IndexedDB hoặc Admin Web",
     "Dùng dữ liệu vận hành thật, production load test, hosting capacity/SLO hoặc production rollout"
   ],
-  "baseSha": "6935138eb2efe4067d64766e3011519c69c47411",
+  "baseSha": "52ec92fc5dd57888716b6b7430d9ec92ac21a9cf",
   "candidateSha": "",
   "integrationOwner": "/root",
   "sharedPaths": [
@@ -59,17 +59,6 @@
       "dependsOn": [],
       "model": "gpt-6-luna",
       "reasoningEffort": "high"
-    },
-    {
-      "id": "e2e",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/d01-e2e",
-      "allowedPaths": [
-        "e2e/**"
-      ],
-      "dependsOn": [],
-      "model": "gpt-6-luna",
-      "reasoningEffort": "high",
-      "agentId": "/root/d01_e2e"
     }
   ],
   "gates": [
@@ -102,5 +91,20 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Resume interrupted D01: E2E commit e1b4c92 integrated at 52ec92f; /tmp worktrees lost. Restore backend/frontend in .local worktrees from existing D01 diff + recorded review fixes. Run integrated gates before owner acceptance."
+  "nextAction": "Resume interrupted D01: E2E commit e1b4c92 integrated at 52ec92f; /tmp worktrees lost. Restore backend/frontend in .local worktrees from existing D01 diff + recorded review fixes. Run integrated gates before owner acceptance.",
+  "completedTeams": [
+    {
+      "id": "e2e",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/d01-e2e",
+      "allowedPaths": [
+        "e2e/**"
+      ],
+      "dependsOn": [],
+      "model": "gpt-6-luna",
+      "reasoningEffort": "high",
+      "agentId": "/root/d01_e2e",
+      "commit": "e1b4c92e5816d2f8238a9511945dac30769e45a3",
+      "integratedAt": "52ec92fc5dd57888716b6b7430d9ec92ac21a9cf"
+    }
+  ]
 }
