@@ -2,7 +2,7 @@
 
 Cập nhật: 2026-09-23
 
-## P04 user deactivation — đang kiểm chứng bản tích hợp
+## P04 user deactivation — chờ owner acceptance
 
 Tiếp tục cycle P04 revision 3 trên `codex/p04-user-deactivation` từ yêu cầu
 “tiếp” ngày 23/09/2026. Tích hợp main/P05 và giải quyết contract/Admin UI dùng
@@ -10,8 +10,10 @@ chung, sau đó kiểm frontend/backend/browser trên dữ liệu tổng hợp. 
 CHAIN_ADMIN-only, self/last-admin/last-manager guards, audit và hiệu lực ở request
 kế tiếp. Chưa mở create/reactivate/reset/revoke hoặc migration mới.
 
-Bước tiếp theo: đạt technical gates trên candidate mới, mở preview cho owner
-nghiệm thu; không xem pass P05 là pass P04.
+Technical gates revision 3 đã pass: 161 frontend/package tests, 64 backend tests
+và browser real-backend 4 viewport. Preview dữ liệu tổng hợp sạch đang phục vụ
+ở http://localhost:4174. Owner thử theo [handoff](delivery/p04-user-deactivation/acceptance-handoff.md)
+và xác nhận pass hoặc nêu lỗi cụ thể; không xem pass P05 là pass P04.
 
 ## P05 credential self-service — đã đóng và tích hợp
 
@@ -74,8 +76,8 @@ với head `048a7ff` và merge commit `3ffc774`. Remote CI PASS cả frontend, b
 và browser. Provenance và evidence của từng cycle tiếp tục được giữ trong
 `docs/delivery/**`.
 
-P05 đã đóng và tích hợp. P04 tiếp tục trên baseline đó, chờ kiểm chứng/nghiệm thu
-bản tích hợp. C02 vẫn bị chặn bởi primary supplier; D01/O01 và O02 tiếp tục độc lập.
+P05 đã đóng và tích hợp. P04 trên baseline đó đã đạt technical gates, chờ
+nghiệm thu owner bản tích hợp. C02 vẫn bị chặn bởi primary supplier; D01/O01 và O02 tiếp tục độc lập.
 
 ## Policy lifecycle đã khóa
 
