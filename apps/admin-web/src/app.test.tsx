@@ -254,7 +254,7 @@ describe("Admin identity workspace", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận vô hiệu hóa" }));
 
     await waitFor(() => expect(api.deactivateUser).toHaveBeenCalledWith(adminUsers[1]!.id, "Nhân sự đã nghỉ việc"));
-    expect(await screen.findByRole("status")).toHaveTextContent(/request kế tiếp/);
+    expect(await screen.findByRole("status")).toHaveTextContent(/mất quyền ở lần thao tác tiếp theo/);
   });
 
   it("does not offer self-deactivation and surfaces backend guard failures", async () => {
