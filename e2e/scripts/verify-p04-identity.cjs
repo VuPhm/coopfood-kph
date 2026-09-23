@@ -40,7 +40,9 @@ function card(page, username) {
       await card(page, 'manager.p03').getByRole('button', { name: 'Vô hiệu hóa', exact: true }).click();
       const dialog = page.getByRole('dialog', { name: 'Vô hiệu hóa tài khoản' });
       await expect(dialog.getByLabel(/Lý do/)).toBeFocused();
-      await expect(dialog.getByRole('button', { name: 'Xác nhận vô hiệu hóa' })).toBeInViewport();
+      const confirm = dialog.getByRole('button', { name: 'Xác nhận vô hiệu hóa' });
+      await confirm.scrollIntoViewIfNeeded();
+      await expect(confirm).toBeInViewport({ ratio: 1 });
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, name + ': dialog overflow');
       await page.screenshot({ path: `${output}/${name}.png` });
       await dialog.getByRole('button', { name: 'Quay lại', exact: true }).click();

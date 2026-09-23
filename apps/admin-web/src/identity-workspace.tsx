@@ -34,7 +34,7 @@ export function IdentityWorkspace({ gateway, session, users, loading, loadError,
 
     <main id="admin-main" className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
       <section className="rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="users-heading">
-        <div className="flex flex-wrap items-start justify-between gap-4"><div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><ShieldCheck aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">P04 · Toàn chuỗi</p><h1 id="users-heading" className="mt-1 text-2xl font-black tracking-tight">Tài khoản người dùng</h1><p className="mt-2 text-sm leading-6 text-ink-muted">{activeCount} đang hoạt động · {users.length} tài khoản. Vô hiệu hóa có hiệu lực với session hiện có từ request kế tiếp.</p></div></div><Button aria-label="Tải lại danh sách tài khoản" onClick={onRefresh} size="icon" variant="secondary"><RefreshCw aria-hidden="true" size={18} /></Button></div>
+        <div className="flex flex-wrap items-start justify-between gap-4"><div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><ShieldCheck aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">Quản trị toàn chuỗi</p><h1 id="users-heading" className="mt-1 text-2xl font-black tracking-tight">Tài khoản người dùng</h1><p className="mt-2 text-sm leading-6 text-ink-muted">{activeCount} đang hoạt động · {users.length} tài khoản. Sau khi vô hiệu hóa, người dùng sẽ mất quyền ở lần thao tác tiếp theo.</p></div></div><Button aria-label="Tải lại danh sách tài khoản" onClick={onRefresh} size="icon" variant="secondary"><RefreshCw aria-hidden="true" size={18} /></Button></div>
 
         {notice ? <p className="mt-5 flex items-start gap-2 rounded-xl border border-brand/20 bg-brand-soft px-3 py-3 text-sm font-semibold text-brand" role="status"><CheckCircle2 className="mt-0.5 shrink-0" aria-hidden="true" size={17} />{notice}</p> : null}
         {loadError ? <p className="mt-5 rounded-xl bg-danger-soft px-3 py-3 text-sm font-semibold text-danger" role="alert">{loadError}</p> : null}
@@ -61,7 +61,7 @@ export function IdentityWorkspace({ gateway, session, users, loading, loadError,
       onClose={() => setSelected(null)}
       onError={onError}
       onSuccess={() => {
-        setNotice(`Đã vô hiệu hóa ${selected.username}. Quyền truy cập kết thúc từ request kế tiếp.`);
+        setNotice(`Đã vô hiệu hóa ${selected.username}. Người dùng sẽ mất quyền ở lần thao tác tiếp theo.`);
         setSelected(null);
         onRefresh();
       }}
@@ -88,7 +88,7 @@ function DeactivateUserDialog({ gateway, user, onClose, onSuccess, onError }: {
   });
   return <Dialog open onOpenChange={(open) => { if (!open && !mutation.isPending) onClose(); }}>
     <DialogContent>
-      <DialogHeader><DialogTitle>Vô hiệu hóa tài khoản</DialogTitle><DialogDescription>{user.displayName} · {user.username}. Thao tác có hiệu lực ngay: session hiện có sẽ bị từ chối ở request kế tiếp. Role và assignment được giữ để phục vụ reactivation explicit về sau.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Vô hiệu hóa tài khoản</DialogTitle><DialogDescription>{user.displayName} · {user.username}. Các phiên đang đăng nhập sẽ mất quyền ở lần thao tác tiếp theo. Thông tin tài khoản và các quyền đã cấp vẫn được giữ lại.</DialogDescription></DialogHeader>
       <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); mutation.mutate(); }}>
         <Field htmlFor="deactivate-user-reason" label="Lý do" hint="1–500 ký tự; được lưu vào audit, không nhập mật khẩu hoặc thông tin nhạy cảm." required><textarea autoFocus id="deactivate-user-reason" className="min-h-28 w-full resize-y rounded-xl border-2 border-surface-strong bg-white px-3 py-2 text-base" maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} disabled={mutation.isPending} /></Field>
         {mutation.error instanceof Error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm font-semibold text-danger" role="alert">{mutation.error.message}</p> : null}
