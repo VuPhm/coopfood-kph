@@ -160,7 +160,14 @@ describe("online KPH gateway", () => {
     };
     const fetcher = vi.fn<typeof fetch>()
       .mockResolvedValueOnce(new Response(JSON.stringify(sessionFixture), { status: 200, headers: { "Content-Type": "application/json" } }))
-      .mockResolvedValueOnce(new Response(JSON.stringify([recordFixture]), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        items: [recordFixture],
+        page: 2,
+        pageSize: 25,
+        totalItems: 27,
+        totalPages: 2,
+        typeTotals: { tpcn: 20, tpts: 7 },
+      }), { status: 200, headers: { "Content-Type": "application/json" } }))
       .mockResolvedValueOnce(new Response(JSON.stringify(approvedRecord), { status: 200, headers: { "Content-Type": "application/json" } }))
       .mockResolvedValueOnce(new Response(JSON.stringify({
         exportId: "50000000-0000-4000-8000-000000000001",
@@ -171,13 +178,25 @@ describe("online KPH gateway", () => {
     const gateway = createOnlineGateway({ baseUrl: "http://localhost", fetch: fetcher });
 
     await gateway.login("demo", "password");
-    await gateway.loadHistory(recordFixture.store.id, { detectedFrom: "2026-09-01", detectedTo: "2026-09-15" });
+    const history = await gateway.loadHistory(recordFixture.store.id, {
+      type: "TPCN",
+      detectedFrom: "2026-09-01",
+      detectedTo: "2026-09-15",
+      approvalStatus: "PENDING",
+      sort: "detectedDate",
+      direction: "ascending",
+      page: 2,
+      pageSize: 25,
+    });
     const reviewed = await gateway.reviewRecord(recordFixture.store.id, recordFixture.id, "APPROVED");
     const exported = await gateway.prepareExport(recordFixture.store.id, "TPCN", [recordFixture.id]);
 
     const requests = fetcher.mock.calls.map(([request]) => request as Request);
     expect(requests[1]!.url).toContain("detectedFrom=2026-09-01");
     expect(requests[1]!.url).toContain("detectedTo=2026-09-15");
+    expect(requests[1]!.url).toContain("approvalStatus=PENDING");
+    expect(requests[1]!.url).toContain("sort=detectedDate");
+    expect(requests[1]!.url).toContain("page=2");
     expect(requests[2]!.method).toBe("PUT");
     expect(requests[2]!.headers.get("X-CSRF-TOKEN")).toBe(sessionFixture.csrfToken);
     expect(await requests[2]!.json()).toEqual({ status: "APPROVED" });
@@ -185,6 +204,7 @@ describe("online KPH gateway", () => {
     expect(requests[3]!.headers.get("X-CSRF-TOKEN")).toBe(sessionFixture.csrfToken);
     expect(await requests[3]!.json()).toEqual({ type: "TPCN", recordIds: [recordFixture.id] });
     expect(reviewed.approvalStatus).toBe("APPROVED");
+    expect(history).toMatchObject({ page: 2, totalItems: 27, totalPages: 2, typeTotals: { TPCN: 20, TPTS: 7 } });
     expect(exported.store).toEqual(recordFixture.store);
     expect(exported.records[0]?.reviewedBy).toBe(sessionFixture.user.displayName);
   });

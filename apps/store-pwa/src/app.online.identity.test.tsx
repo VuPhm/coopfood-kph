@@ -24,7 +24,21 @@ vi.mock("./online-kph", () => ({
   createOnlineGateway: () => ({
     getSession: mocks.getSession,
     listStores: mocks.listStores,
-    loadHistory: mocks.loadHistory,
+    loadHistory: async (...args: unknown[]) => {
+      const value = await mocks.loadHistory(...args);
+      if (!Array.isArray(value)) return value;
+      return {
+        records: value,
+        page: 1,
+        pageSize: 25,
+        totalItems: value.length,
+        totalPages: value.length === 0 ? 0 : 1,
+        typeTotals: {
+          TPCN: value.filter((record) => record.kind === "TPCN").length,
+          TPTS: value.filter((record) => record.kind === "TPTS").length,
+        },
+      };
+    },
     loadWorkspace: mocks.loadWorkspace,
     login: mocks.login,
     logout: mocks.logout,
@@ -153,12 +167,22 @@ describe("online identity and scoped query state", () => {
   });
 
   it("keys history by user and store and clears the previous store records immediately", async () => {
+    const storeBHistory = deferred<ReturnType<typeof record>[]>();
+    mocks.loadHistory.mockImplementation((storeId: string) => storeId === storeA.id
+      ? Promise.resolve([record(storeA.id, "Phiếu cửa hàng A")])
+      : storeBHistory.promise);
     render(<App />);
     expect(await screen.findAllByText("Phiếu cửa hàng A")).toHaveLength(2);
     const context = screen.getByRole("group", { name: /Cửa hàng hiện tại/ });
     const switcher = within(context).getByRole("combobox", { name: "Chọn cửa hàng" });
     fireEvent.change(switcher, { target: { value: storeB.id } });
-    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledWith(storeB.id, {}, expect.anything()));
+    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledWith(storeB.id, {
+      type: "TPCN",
+      page: 1,
+      pageSize: 25,
+    }, expect.anything()));
+    expect(screen.queryByText("Phiếu cửa hàng A")).not.toBeInTheDocument();
+    await act(async () => storeBHistory.resolve([record(storeB.id, "Phiếu cửa hàng B")]));
     expect(await screen.findAllByText("Phiếu cửa hàng B")).toHaveLength(2);
     expect(screen.queryByText("Phiếu cửa hàng A")).not.toBeInTheDocument();
   });
@@ -239,7 +263,12 @@ describe("online identity and scoped query state", () => {
     expect(await screen.findByText(/Đã tạo phiếu created-outside-filter/)).toBeVisible();
     expect(screen.queryByText(createdOutsideFilter.productName)).not.toBeInTheDocument();
     expectSelectedCount(0);
-    expect(mocks.loadHistory).toHaveBeenLastCalledWith(storeA.id, { detectedFrom: "2026-09-10" }, expect.anything());
+    expect(mocks.loadHistory).toHaveBeenLastCalledWith(storeA.id, {
+      type: "TPCN",
+      detectedFrom: "2026-09-10",
+      page: 1,
+      pageSize: 25,
+    }, expect.anything());
     expect(mocks.loadHistory.mock.calls.filter(([, filter]) => filter?.detectedFrom === "2026-09-10")).toHaveLength(2);
   });
 
