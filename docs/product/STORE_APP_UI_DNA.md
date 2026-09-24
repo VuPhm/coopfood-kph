@@ -1,6 +1,6 @@
 # Store App UI DNA
 
-Status: Round 1 direction consolidated for owner review in R1-D04. This document
+Status: Round 1 direction accepted by the owner in R1-D04. This document
 records the Store App principles carried through the R1-D01 audit, R1-D02
 comparison, and accepted R1-D03 convergence. It is not a token specification or
 permission to begin Round 2. Accepted business behavior remains governed by the

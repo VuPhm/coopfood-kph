@@ -2,11 +2,11 @@
 
 Cập nhật: 2026-09-24
 
-## Store App pivot — R1-D04 handoff
+## Store App pivot — R1-D04 đã được chấp nhận
 
-R1-D01 đến R1-D03 đã được chấp nhận và tích hợp. R1-D04 ghi lại
-[Store App UI DNA](product/STORE_APP_UI_DNA.md) và chuẩn bị
-[Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md) cho owner review.
+R1-D01 đến R1-D04 đã được chấp nhận và tích hợp. Hướng giao diện nằm ở
+[Store App UI DNA](product/STORE_APP_UI_DNA.md); slice kiểm chứng tiếp theo nằm
+ở [Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md).
 Đọc [Store App baseline](STORE_APP_BASELINE.md) và
 [contract index](product/STORE_APP_CONTRACTS.md) cho ranh giới; Round 2 chưa bắt
 đầu. Các cycle D01/P04/P05 bên dưới là lịch sử delivery đã đóng, không phải task

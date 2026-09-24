@@ -4,7 +4,7 @@ Cập nhật: 2026-09-24
 
 ## Giai đoạn
 
-`Round 1 — R1-D04 UI DNA stabilization và Round 2 handoff đang chờ owner review.`
+`Round 1 — R1-D04 UI DNA stabilization và Round 2 handoff đã được owner chấp nhận.`
 Hướng đã hội tụ nằm ở [Store App UI DNA](product/STORE_APP_UI_DNA.md); slice
 kiểm chứng tiếp theo nằm ở [Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md).
 Round 2 chưa bắt đầu.

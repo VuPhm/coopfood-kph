@@ -1,6 +1,6 @@
 # Round 2 handoff — shared Store App shell and KPH validation slice
 
-Status: R1-D04 handoff candidate for owner review. Round 2 has not started.
+Status: R1-D04 handoff accepted by the owner. Round 2 has not started.
 The [Store App UI DNA](STORE_APP_UI_DNA.md) gives the design direction;
 [Store App contracts](STORE_APP_CONTRACTS.md) and accepted ADRs govern behavior,
 scope, and data. This document defines the minimum slice to validate, not the
