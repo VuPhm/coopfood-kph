@@ -4,11 +4,14 @@ Cập nhật: 2026-09-24
 
 ## Giai đoạn
 
-`Round 0 — Store App documentation baseline; Round 1 UI/UX/Brand DNA tiếp theo.`
+`Round 1 — R1-D04 UI DNA stabilization và Round 2 handoff đang chờ owner review.`
+Hướng đã hội tụ nằm ở [Store App UI DNA](product/STORE_APP_UI_DNA.md); slice
+kiểm chứng tiếp theo nằm ở [Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md).
+Round 2 chưa bắt đầu.
 D01 history paging là milestone implementation gần nhất đã CLOSED và được owner
 chấp nhận ngày 2026-09-24. Store App pivot không thay đổi nghiệm thu D01;
 xem [baseline](STORE_APP_BASELINE.md) và
-[contract index](product/STORE_APP_CONTRACTS.md) trước Round 1.
+[contract index](product/STORE_APP_CONTRACTS.md) trước Round 2.
 
 Repository hiện tiến hóa thành Co.op Food Store Operations App. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
