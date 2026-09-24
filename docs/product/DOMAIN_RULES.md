@@ -38,8 +38,9 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
   `REGION_MANAGER` có active assignment tới region đang chứa cửa hàng; và
   `CHAIN_ADMIN` có scope toàn chuỗi. Ba cấp được xem/tạo/duyệt/xuất trong scope
   tương ứng nhưng không được xóa hoặc vô hiệu hóa phiếu. Backend phải xác định
-  store → region từ database ở mỗi request và có test deny cross-store/
-  cross-region; UI visibility không thay authorization.
+  store → region từ dữ liệu authoritative khi authorize; thay đổi scope có hiệu
+  lực chậm nhất ở request kế tiếp. Luôn test deny cross-store/cross-region;
+  UI visibility không thay authorization.
 - Cửa sổ thời gian sửa/duyệt chưa chốt; implementation không được tự đặt giới hạn.
 - Ảnh gốc upload và bản stamped dẫn xuất đều private, giữ theo vòng đời phiếu;
   stamped không thay thế evidence gốc. Ngoại lệ pilot local-only theo ADR-0002

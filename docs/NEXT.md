@@ -2,6 +2,14 @@
 
 Cập nhật: 2026-09-24
 
+## Store App pivot — điểm vào Round 1
+
+Sau Round 0, bước kế là UI/UX/Brand DNA. Đọc
+[Store App baseline](STORE_APP_BASELINE.md) và
+[contract index](product/STORE_APP_CONTRACTS.md) cho ranh giới thiết kế;
+implementation shell vẫn ngoài phạm vi bước tài liệu này. Các cycle D01/P04/P05
+bên dưới là lịch sử delivery đã đóng, không phải task tiếp tục tự động.
+
 ## D01 history paging — đã đóng revision 2
 
 Owner chọn D01 ngày 23/09/2026 sau khi xác nhận “pass p04”. Backend, Store PWA

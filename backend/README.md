@@ -13,19 +13,20 @@ Set `KPH_DATABASE_URL`, `KPH_DATABASE_USERNAME` and `KPH_DATABASE_PASSWORD`, the
 ```
 
 Public operational endpoints are limited to `/actuator/health`, its probe paths,
-`/actuator/info` and `POST /api/v1/auth/login`. Authenticated sessions can call
-`GET /api/v1/auth/session`, `GET /api/v1/stores`, the store-scoped catalog
-lookup/KPH create-list-photo endpoints and `POST /api/v1/auth/logout`; all
-other routes remain denied by default. KPH create requires CSRF,
+`/actuator/info` and `POST /api/v1/auth/login`. Authenticated routes include
+session, store-scoped catalog/KPH, credential self-change and the scoped Admin
+APIs in the [OpenAPI contract](../contracts/openapi/kph.openapi.yaml); unmatched
+routes remain denied by default. KPH create requires CSRF,
 `Idempotency-Key` and one to three JPEG/PNG multipart photos. Local private
 media is stored under `KPH_MEDIA_ROOT` (or `.data/kph-media` by default) and is
 served only through the authorized stamped-photo endpoint.
 
 Login reads active users, global roles and active store memberships from the
-database. Passwords must be stored as BCrypt hashes. Successful login returns a
-CSRF token for the `X-CSRF-TOKEN` header and creates the HttpOnly
-`KPH_SESSION` cookie. There is intentionally no demo user or provisioning API in
-this slice.
+database. New password hashes use prefixed PBKDF2; legacy BCrypt hashes remain
+verifiable under [ADR-0005](../docs/adr/0005-password-hash-migration.md).
+Successful login returns a CSRF token for the `X-CSRF-TOKEN` header and creates
+the HttpOnly `KPH_SESSION` cookie. There is no demo-user bootstrap or
+self-service signup.
 
 ## Verify
 

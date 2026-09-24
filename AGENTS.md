@@ -1,14 +1,16 @@
 # Hướng dẫn cho coding agent
 
-Áp dụng cho toàn bộ repository Co.op Food KPH.
+Áp dụng cho toàn bộ repository Co.op Food Store Operations App. Round 0 khóa
+baseline; Round 1 tiếp theo là UI/UX/Brand DNA, chưa phải triển khai shell.
 
 ## Thứ tự đọc bắt buộc
 
 1. `docs/CURRENT_STATE.md`
 2. `docs/NEXT.md`
 3. `docs/ENGINEERING_PRINCIPLES.md`
-4. Tài liệu product/contract của feature đang làm
-5. ADR đã accepted trong `docs/adr/`
+4. `docs/STORE_APP_BASELINE.md` và `docs/product/STORE_APP_CONTRACTS.md`
+5. Tài liệu product/contract của feature đang làm
+6. ADR đã accepted trong `docs/adr/`
 
 Nếu tài liệu mâu thuẫn, contract nghiệp vụ và ADR accepted được ưu tiên. Dừng
 và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
@@ -23,11 +25,27 @@ và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
   khi chưa có requirement thực và ADR.
 - Hai repository cũ chỉ là nguồn provenance read-only; không chỉnh sửa chúng từ
   repository này.
+- Xem code/test thực tế trước khi đề xuất thay implementation; giữ contract
+  nghiệp vụ, API, dữ liệu và bảo mật khi refactor.
+
+## Git và Pages
+
+- `main` là baseline tích hợp Store App đã chấp nhận. Việc mới dùng nhánh theo
+  task (`store-app/<task-id>-<slug>`); thử nghiệm cần thiết dùng `exp/<task-id>-<slug>`.
+  Tên nhánh xác định task, không xác định Codex hay Antigravity.
+- Mỗi task có một worktree và một writer active; handoff giữ nguyên nhánh,
+  worktree, base SHA và phạm vi sửa. Task song song chỉ làm trên scope độc lập.
+- `codex/github-pages-pwa` là nhánh Pages đang được bảo vệ, không dùng cho Store
+  App. Tag annotated `preserve/github-pages-pwa-2026-09-24-c789714` trỏ đến
+  `c789714870eff5912e10fe89361bd845d9e3983d` và là mốc bảo tồn bất biến.
+- Thay Pages là một cutover riêng, explicit và có đường quay lại; không suy ra
+  quyền deploy từ việc tích hợp Store App. Xem [baseline](docs/STORE_APP_BASELINE.md).
 
 ## Ownership tránh conflict
 
 - Chỉ một task được sửa `contracts/openapi/**` tại một thời điểm.
 - Chỉ một schema migration active tại một thời điểm.
+- Migration đã áp dụng chỉ được nối tiếp bằng migration mới, không sửa ngược.
 - `packages/ui`, root lockfile và root config có một integration owner.
 - Feature agent chỉ sửa allowed paths được giao.
 - API đổi phải cập nhật OpenAPI, examples và generated client trong cùng slice.
@@ -46,8 +64,10 @@ và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
   `REGION_MANAGER` có active assignment tới region chứa store, và `CHAIN_ADMIN`
   trên toàn chuỗi được duyệt/xuất trong scope tương ứng; luôn test cross-store/
   cross-region. Store PWA không cho xóa/vô hiệu hóa.
-- UI giữ UI DNA và interaction đã accepted; cải tiến accessibility không được
-  đổi nghiệp vụ.
+- Giữ workflow và interaction nghiệp vụ đã accepted; shell, navigation, IA,
+  screen composition và visual tokens có thể đổi trong Round 1. Xem
+  [contract index](docs/product/STORE_APP_CONTRACTS.md) và
+  [UI DNA](docs/product/UI_DNA.md).
 
 ## Cách làm
 

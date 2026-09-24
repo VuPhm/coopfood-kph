@@ -150,9 +150,10 @@ session sau reset theo
 
 ## Hiệu lực session và concurrency
 
-- Principal tiếp tục refresh từ database mỗi request. User/region/store,
-  global role, region assignment hoặc store membership đổi trạng thái/scope có
-  hiệu lực ở request kế tiếp.
+- User/region/store, global role, region assignment hoặc store membership đổi
+  trạng thái/scope phải có hiệu lực chậm nhất ở request kế tiếp. Implementation
+  hiện refresh principal từ database mỗi request; cách truy vấn này không phải
+  yêu cầu contract nếu chiến lược khác vẫn giữ cùng hiệu lực và test deny.
 - Session principal phải mang credential/session version; mismatch sau reset/change
   làm session bị invalidate ở request kế tiếp.
 - Guard last-admin và last-manager phải khóa/kiểm trong cùng transaction với

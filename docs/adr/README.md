@@ -19,3 +19,5 @@ ADR accepted hiện hành:
   chuỗi, quản lý đúng vùng và quản lý đúng store.
 - `0005-password-hash-migration.md`: hash PBKDF2 có prefix, đọc BCrypt legacy và
   credential version để thu hồi session sau self-change; accepted cùng P05.
+- `0006-store-app-evolution.md`: tiến hóa Store App theo slice, giữ contract và
+  Pages baseline riêng; branch/worktree theo task thay vì executor.
