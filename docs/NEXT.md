@@ -2,16 +2,19 @@
 
 Cập nhật: 2026-09-24
 
-## Store App pivot — R2-01 đã đóng
+## Store App pivot — R2-02 đã đóng
 
 R1-D01 đến R1-D04 đã được chấp nhận và tích hợp. Hướng giao diện nằm ở
 [Store App UI DNA](product/STORE_APP_UI_DNA.md). R2-01 Shared Store App Shell
-Spine đã được owner “pass” ngày 2026-09-24 trên candidate `3799a30`; cycle
-CLOSED, close checker PASS tại `c2db4bf`. [R2-01 handoff](delivery/r2-01-shell-spine/acceptance-handoff.md)
-giữ nguyên quyết định: UI visual refinement deferred, shell này không phải
-final design system. Chưa merge vào `main`, chưa deploy, chưa cutover Pages.
-R2-02 chưa mở; chỉ lập scope mới khi owner yêu cầu. Các cycle D01/P04/P05 bên
-dưới là lịch sử delivery đã đóng, không phải task tiếp tục tự động.
+Spine đã được owner chấp nhận và merge vào `main` tại `4fab688`. R2-02
+Representative KPH Create đã được owner “pass R2-02” ngày 2026-09-24 trên
+candidate `1e6c810`; cycle CLOSED, close checker PASS tại `e3ab5d5`.
+[R2-02 handoff](delivery/r2-02-kph-create/acceptance-handoff.md) giữ quyết định
+và giới hạn technical. Owner chấp nhận functional behavior/workflow, đồng thời
+đánh giá visual/UI hiện tại vẫn xấu; visual refinement được hoãn, không là
+blocker R2-02 và chưa được nghiệm thu là final UI/design system. Chưa deploy, chưa
+cutover Pages và R2-02 chưa merge vào `main`. Không tự mở R2-03; cần yêu cầu
+scope riêng. Các cycle D01/P04/P05 bên dưới là lịch sử delivery đã đóng.
 
 ## D01 history paging — đã đóng revision 2
 

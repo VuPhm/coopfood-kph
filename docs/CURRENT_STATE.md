@@ -4,17 +4,19 @@ Cập nhật: 2026-09-24
 
 ## Giai đoạn
 
-`Round 2 — R2-01 Shared Store App Shell Spine đã CLOSED theo owner acceptance.`
-Candidate ứng dụng `3799a30` trên `store-app/r2-01-shell-spine` tạo shell online
-nhỏ với lối vào trực tiếp TPCN, TPTS và History, dùng account/store context từ
-session. Technical gate và close checker PASS; [acceptance handoff](delivery/r2-01-shell-spine/acceptance-handoff.md)
-ghi owner “pass” ngày 2026-09-24. UI visual refinement được hoãn; đây chưa phải
-final design system. Chưa merge, deploy hoặc cutover Pages. Hướng UI DNA và ranh
-giới slice nằm ở [Store App UI DNA](product/STORE_APP_UI_DNA.md) và
-[Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md).
-D01 history paging đã CLOSED và được owner chấp nhận trước R2-01; Store App pivot
-không thay đổi nghiệm thu D01. Xem [baseline](STORE_APP_BASELINE.md) và
-[contract index](product/STORE_APP_CONTRACTS.md).
+`Round 2 — R2-02 Representative KPH Create đã CLOSED theo owner acceptance.`
+Owner xác nhận “pass R2-02” ngày 2026-09-24 trên candidate `1e6c810` ở
+`store-app/r2-02-kph-create`; close checker PASS tại `e3ab5d5`.
+[Handoff](delivery/r2-02-kph-create/acceptance-handoff.md) giữ các giới hạn
+technical: browser dùng fixture synthetic tại phone 390×844 và desktop;
+real-backend/PostgreSQL E2E chưa chạy lại vì Docker không sẵn sàng. R2-01 shell
+đã được owner chấp nhận trước đó và merge vào `main` tại `4fab688`, là base
+R2-02. Owner chỉ chấp nhận functional behavior và workflow của slice; owner
+đánh giá visual/UI hiện tại vẫn xấu. Visual refinement được hoãn, không là
+blocker R2-02 và chưa được nghiệm thu là final UI/design system. R2-02 chưa
+merge vào `main`, chưa deploy hoặc cutover Pages. Xem [UI DNA](product/STORE_APP_UI_DNA.md),
+[Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md),
+[baseline](STORE_APP_BASELINE.md) và [contract index](product/STORE_APP_CONTRACTS.md).
 
 Repository hiện tiến hóa thành Co.op Food Store Operations App. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -135,10 +137,10 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Điểm tiếp tục
 
-R2-01 đã CLOSED trên candidate `3799a30`; [technical evidence](delivery/r2-01-shell-spine/technical-evidence.md)
-và owner acceptance ghi rõ preview tổng hợp, giới hạn chưa chạy lại real-backend
-E2E khi Docker không sẵn sàng, và visual refinement được hoãn. Không tự mở
-R2-02 hoặc suy ra quyền merge/deploy từ nghiệm thu này.
+R2-02 đã CLOSED theo owner “pass R2-02”; [technical evidence](delivery/r2-02-kph-create/technical-evidence.md)
+ghi `npm run verify` PASS, browser fixture PASS hai viewport và giới hạn
+real-backend/thiết bị thật. Không tự mở R2-03 hoặc suy ra quyền merge/deploy từ
+nghiệm thu này. R2-01 đã merge vào `main` tại `4fab688`; Pages vẫn được bảo vệ.
 
 P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
