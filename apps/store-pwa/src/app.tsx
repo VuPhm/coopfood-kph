@@ -19,6 +19,7 @@ import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord
 import { readStorageHealth, requestPersistentStorage, storageHealthWarning, storageUsageLabel, type StorageHealth } from "./storage-health";
 import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
 import { StoreContext } from "./store-context";
+import { StoreAppShell } from "./store-app-shell";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 import { createOnlineGateway, onlineExportSelectionError, onlineModeEnabled, type OnlineHistoryPage, type OnlineSession } from "./online-kph";
@@ -1052,8 +1053,25 @@ function WorkspaceApp() {
           />
         )
       ) : <main className="workspace-layout mx-auto max-w-[1440px] px-3 py-5 sm:px-6 sm:py-7">
-        <section className={cn("history-board", trashMode && "is-trash-mode")} aria-labelledby="workspace-title">
-          <div className="workspace-header">
+        {onlinePersistenceEnabled && onlineSession ? <StoreAppShell
+          canCreate={storageReady && !onlineLoading && storeConfigured}
+          onCreate={openCreate}
+          context={<StoreContext
+            storeLabel={selectedOnlineStore ? `Co.op Food ${selectedOnlineStore.name} · ${selectedOnlineStore.code}` : "Chưa có cửa hàng trong phiên"}
+            actorLabel={`Tài khoản: ${onlineSession.user.displayName} · ${onlineSession.user.username}`}
+            storageLabel="Dữ liệu: máy chủ"
+            storageHint="Phiếu được lưu trên máy chủ"
+            disabled={!storageReady}
+            storeOptions={onlineStores}
+            selectedStoreId={onlineStoreId}
+            onStoreChange={changeOnlineStore}
+            onChangePassword={() => setChangePasswordOpen(true)}
+            onLogout={() => logoutMutation.mutate()}
+            loggingOut={logoutMutation.isPending}
+          />}
+        /> : null}
+        <section className={cn("history-board", trashMode && "is-trash-mode")} aria-labelledby={onlinePersistenceEnabled ? "history-title" : "workspace-title"}>
+          {!onlinePersistenceEnabled ? <div className="workspace-header">
             <div className="workspace-header-meta">
               <h1 id="workspace-title">Theo dõi hàng không phù hợp</h1>
               <p>Khai báo và tra cứu phiếu tại cửa hàng</p>
@@ -1082,7 +1100,7 @@ function WorkspaceApp() {
               onLogout={onlinePersistenceEnabled && onlineSession ? () => logoutMutation.mutate() : undefined}
               loggingOut={logoutMutation.isPending}
             />
-          </div>
+          </div> : null}
           {workspaceError ? <div className="storage-error-banner" role="alert">
             <p>{workspaceError}</p>
             {onlinePersistenceEnabled ? <Button variant="ghost" disabled={loginMutation.isPending || logoutMutation.isPending} onClick={retryOnlineWorkspace}>Thử tải lại</Button> : null}

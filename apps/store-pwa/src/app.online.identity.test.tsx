@@ -114,6 +114,38 @@ beforeEach(() => {
 });
 
 describe("online identity and scoped query state", () => {
+  it("exposes direct KPH tasks in the authenticated Store App shell", async () => {
+    render(<App />);
+    const shell = await screen.findByRole("region", { name: "Store App" });
+    expect(within(shell).getByText("Store App")).toBeVisible();
+    expect(within(shell).getByText("Nghiệp vụ đang hoạt động · KPH")).toBeVisible();
+    expect(within(shell).getByText("Tài khoản: Nguyễn Văn Demo · manager.demo")).toBeVisible();
+    expect(within(shell).getByText("Co.op Food Nguyễn Kiệm · CF-DEMO-001")).toBeVisible();
+    expect(within(shell).getByRole("link", { name: /Lịch sử/ })).toHaveAttribute("href", "#history-title");
+
+    await waitFor(() => expect(within(shell).getByRole("button", { name: /Tạo phiếu TP khô/ })).toBeEnabled());
+    fireEvent.click(within(shell).getByRole("button", { name: /Tạo phiếu TP khô/ }));
+    expect(await screen.findByRole("dialog", { name: /Tạo phiếu KPH.*Thực phẩm khô/i })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
+    fireEvent.click(within(shell).getByRole("button", { name: /Tạo phiếu TP tươi sống/ }));
+    expect(await screen.findByRole("dialog", { name: /Tạo phiếu KPH.*Thực phẩm tươi/i })).toBeVisible();
+  });
+
+  it("shows only session context when an inherited-scope actor has no listed stores", async () => {
+    mocks.getSession.mockResolvedValueOnce({
+      ...session,
+      user: { ...session.user, globalRoles: ["CHAIN_ADMIN"], stores: [] },
+    });
+    render(<App />);
+    const shell = await screen.findByRole("region", { name: "Store App" });
+    expect(within(shell).getByText("Chưa có cửa hàng trong phiên")).toBeVisible();
+    expect(within(shell).getByText("Tài khoản: Nguyễn Văn Demo · manager.demo")).toBeVisible();
+    expect(within(shell).queryByRole("combobox", { name: "Chọn cửa hàng" })).not.toBeInTheDocument();
+    expect(within(shell).getByRole("button", { name: /Tạo phiếu TP khô/ })).toBeDisabled();
+    expect(within(shell).getByRole("link", { name: /Lịch sử/ })).toBeVisible();
+    expect(mocks.loadHistory).not.toHaveBeenCalled();
+  });
+
   it("shows login after session expiry, logs in, and logs out through the API", async () => {
     const expired = Object.assign(new Error("Phiên đăng nhập đã hết hạn."), { status: 401 });
     mocks.getSession.mockRejectedValueOnce(expired);

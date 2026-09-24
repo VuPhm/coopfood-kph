@@ -558,7 +558,7 @@ html[data-focus-modality="keyboard"] .action-dialog-field textarea:focus { borde
 .evidence-zoom-lens { position: fixed; z-index: 70; display: none; pointer-events: none; border: 4px solid #fff; border-radius: 50%; background-color: var(--color-surface-muted); background-repeat: no-repeat; box-shadow: 0 18px 48px rgb(0 40 20 / .22), 0 0 0 2px rgb(0 102 51 / .7); }
 .evidence-zoom-lens.is-visible { display: block; }
 
-.pwa-status-toast { position: fixed; right: max(var(--space-4), env(safe-area-inset-right)); bottom: max(var(--space-4), env(safe-area-inset-bottom)); z-index: 80; display: grid; width: min(26rem, calc(100vw - var(--space-8))); grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-2); border: 1px solid var(--color-border); border-radius: 16px; background: #fff; padding: var(--space-3); color: var(--color-ink); box-shadow: var(--shadow-panel); }
+.pwa-status-toast { position: fixed; right: max(var(--space-4), env(safe-area-inset-right)); bottom: max(var(--space-4), env(safe-area-inset-bottom)); z-index: 40; display: grid; width: min(26rem, calc(100vw - var(--space-8))); grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-2); border: 1px solid var(--color-border); border-radius: 16px; background: #fff; padding: var(--space-3); color: var(--color-ink); box-shadow: var(--shadow-panel); }
 .pwa-status-icon { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; border-radius: 12px; background: var(--color-brand-soft); color: var(--color-brand); }
 .pwa-status-icon svg { width: 1.125rem; height: 1.125rem; stroke-width: 2.4; }
 .pwa-status-copy { display: grid; min-width: 0; gap: 2px; }
