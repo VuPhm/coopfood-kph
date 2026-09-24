@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "r2-01-shell-spine",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Tạo authenticated Store App shell tối thiểu quanh online KPH, nhận diện KPH là một capability của Store App và cho vào trực tiếp TPCN, TPTS, Lịch sử mà không qua overview bắt buộc.",
+  "inScope": [
+    "Store PWA-local composition seam cho shell, Store App identity và KPH capability đang hoạt động",
+    "Hiển thị acting account và current operational store từ session/context hiện có; giữ backend làm authority scope",
+    "Direct entry Tạo TPCN, Tạo TPTS và Lịch sử, giữ workflow KPH và D01 hiện tại",
+    "Mobile-first shell kiểm chứng trên phone khoảng 390×844 và desktop khoảng 1440×1000, không che task controls hoặc giảm mật độ so sánh history desktop",
+    "Focused component tests, relevant Store PWA check/build, integrated gate, synthetic phone/desktop preview và technical evidence"
+  ],
+  "outOfScope": [
+    "OpenAPI, backend, database/migration, KPH domain rules, D01 paging/selection semantics, online authorization, Pilot authority và Pages configuration/cutover",
+    "Routes hoạt động cho Inventory, Receiving, DATE, Reporting hay module tương lai",
+    "Inherited-store discovery cho REGION_MANAGER/CHAIN_ADMIN hoặc selector UI làm authority authorization",
+    "packages/ui design-system extraction, brand token/palette cuối cùng, big-bang refactor",
+    "Deploy, merge main, R2-02 và owner acceptance tự suy diễn từ technical verification"
+  ],
+  "baseSha": "1855eff78cd91cdf6c83b8db30f99f9376e50e0d",
+  "candidateSha": "",
+  "integrationOwner": "Codex primary in /Users/vup/Documents/coopfood-kph-worktrees/r2-01",
+  "sharedPaths": [
+    "apps/store-pwa/src/app.tsx",
+    "apps/store-pwa/src/styles.css",
+    "docs/delivery/r2-01-shell-spine/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical-shell",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Commit delivery record, run dispatch checkpoint, inspect Store PWA implementation, then build and verify the bounded shell candidate."
+}
