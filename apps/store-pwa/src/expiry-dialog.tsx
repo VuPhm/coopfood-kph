@@ -61,10 +61,21 @@ function positiveWholeNumber(value: string) {
   return Number.isInteger(number) && number > 0 ? number : null;
 }
 
-export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
+type ExpiryWorkbenchProps = {
+  today?: LocalDate;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+
+export function ExpiryWorkbench({ today, open, onOpenChange }: ExpiryWorkbenchProps) {
   const businessToday = today ?? formatBusinessDate(new Date()).iso;
   const workbenchRef = useRef<HTMLElement>(null);
-  const [expanded, setExpanded] = useState(false);
+  const [uncontrolledExpanded, setUncontrolledExpanded] = useState(false);
+  const expanded = open ?? uncontrolledExpanded;
+  function setExpanded(next: boolean) {
+    if (open === undefined) setUncontrolledExpanded(next);
+    onOpenChange?.(next);
+  }
   const [showInitialHint, setShowInitialHint] = useState(true);
   const [knownManufactureDate, setKnownManufactureDate] = useState(true);
   const [nsx, setNsx] = useState("");
@@ -81,6 +92,9 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
   useEffect(() => {
     if (!expanded) return;
     if (workbenchRef.current) workbenchRef.current.scrollTop = 0;
+    if (open !== undefined) {
+      window.requestAnimationFrame(() => workbenchRef.current?.querySelector<HTMLButtonElement>(".expiry-workbench-toggle")?.focus());
+    }
 
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
@@ -247,7 +261,7 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
 
   function toggleWorkbench() {
     setShowInitialHint(false);
-    setExpanded((current) => !current);
+    setExpanded(!expanded);
   }
 
   return (

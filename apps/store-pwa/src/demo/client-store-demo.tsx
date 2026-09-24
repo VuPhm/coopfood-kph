@@ -1,12 +1,13 @@
 import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import {
-  BarChart3, Check, ChevronRight, ClipboardCheck, Download, Home, PackageSearch,
+  BarChart3, CalendarDays, Check, ChevronRight, ClipboardCheck, Download, Home, PackageSearch,
   ScanBarcode, Search, Store, TriangleAlert,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { assetUrl } from "../asset-url";
 import { BarcodeScannerDialog } from "../barcode-scanner-dialog";
+import { ExpiryWorkbench } from "../expiry-dialog";
 import {
   createDemoState, decideSession, demoProducts, demoToday, inventoryQuantity, lotDate,
   saveEntry, signed, type DateBand, type DemoActor, type DemoProduct, type DemoState,
@@ -37,6 +38,7 @@ const diff = (entry: StocktakeEntry) => entry.actualQuantity - entry.systemQuant
 export function ClientStoreDemo({ children }: { children: ReactNode }) {
   const [surface, setSurface] = useState<Surface>("home");
   const [actor, setActor] = useState<DemoActor>("employee");
+  const [expiryOpen, setExpiryOpen] = useState(false);
   const [state, setState] = useState<DemoState>(createDemoState);
   const pending = state.sessions.filter((session) => session.status === "SUBMITTED").length;
   const attention = state.lots.filter((lot) => lotDate(lot).status !== "SAFE").length;
@@ -63,7 +65,7 @@ export function ClientStoreDemo({ children }: { children: ReactNode }) {
         onClick={() => setSurface(id)}><Icon aria-hidden="true" size={19} /><span>{label}</span></button>)}
     </nav>
     <main className="cd-main">
-      {surface === "home" && <HomeSurface actor={actor} pending={pending} attention={attention} state={state} navigate={setSurface} />}
+      {surface === "home" && <HomeSurface actor={actor} pending={pending} attention={attention} state={state} navigate={setSurface} onOpenExpiry={() => setExpiryOpen(true)} />}
       {surface === "kph" && <section className="cd-kph" aria-label="KPH sử dụng lại">
         <p className="cd-kph-note">KPH dùng phiên online hiện có. Vai trò demo phía trên chỉ điều khiển luồng Kiểm kê và duyệt Tồn kho.</p>
         {children}
@@ -72,6 +74,7 @@ export function ClientStoreDemo({ children }: { children: ReactNode }) {
       {surface === "inventory" && <InventorySurface actor={actor} state={state} setState={setState} />}
       {surface === "reports" && <ReportsSurface state={state} navigate={setSurface} />}
     </main>
+    <div className="workspace-side-stack cd-expiry-host"><ExpiryWorkbench open={expiryOpen} onOpenChange={setExpiryOpen} /></div>
     <div className="cd-demo-label">DEMO · Dữ liệu kiểm kê/tồn kho chỉ lưu trong bộ nhớ trình duyệt</div>
   </div>;
 }
@@ -79,36 +82,34 @@ export function ClientStoreDemo({ children }: { children: ReactNode }) {
 function Heading({ eyebrow, title, children }: { eyebrow: string; title: string; children?: ReactNode }) {
   return <div className="cd-heading"><p>{eyebrow}</p><h1>{title}</h1>{children && <span>{children}</span>}</div>;
 }
-function HomeSurface({ actor, pending, attention, state, navigate }: {
-  actor: DemoActor; pending: number; attention: number; state: DemoState; navigate: Navigate;
+function HomeSurface({ actor, pending, attention, state, navigate, onOpenExpiry }: {
+  actor: DemoActor; pending: number; attention: number; state: DemoState; navigate: Navigate; onOpenExpiry: () => void;
 }) {
   const active = state.sessions.filter((session) => session.status === "IN_PROGRESS" || session.status === "RECOUNT_REQUIRED").length;
-  const tasks: { id: Surface; title: string; subtitle: string; icon: typeof Home }[] = [
-    { id: "kph", title: "KPH", subtitle: "Ghi nhận & xử lý hàng không phù hợp", icon: ClipboardCheck },
-    { id: "stocktake", title: "Kiểm kê", subtitle: "Kiểm tra tồn thực tế tại cửa hàng", icon: ScanBarcode },
-    { id: "inventory", title: "Tồn kho", subtitle: "Tra SKU, lô, HSD và trạng thái hàng", icon: PackageSearch },
-    { id: "reports", title: "Báo cáo", subtitle: "Xem nhanh tình hình vận hành", icon: BarChart3 },
+  const tasks: { id: Surface | "expiry"; title: string; subtitle: string; icon: typeof Home }[] = [
+    { id: "kph", title: "KPH", subtitle: "Ghi nhận hàng không phù hợp", icon: ClipboardCheck },
+    { id: "stocktake", title: "Kiểm kê", subtitle: "Đếm hàng tại cửa hàng", icon: ScanBarcode },
+    { id: "inventory", title: "Tồn kho", subtitle: "Tra SKU và lô hàng", icon: PackageSearch },
+    { id: "expiry", title: "Tra cứu lùi hàng", subtitle: "Tính DATE và hạn lùi", icon: CalendarDays },
+    { id: "reports", title: "Báo cáo", subtitle: "Xem tình hình vận hành", icon: BarChart3 },
   ];
   return <>
-    <div className="cd-hero"><p>HÔM NAY · {formatDisplayDate(demoToday())}</p>
-      <h1>Ca làm tại Co.op Food Nguyễn Kiệm</h1>
-      <span>{actorNames[actor]} · CF-DEMO-001</span>
-      <button className="cd-primary" type="button" onClick={() => navigate(actor === "employee" ? "stocktake" : "inventory")}>
-        {actor === "employee" ? "Tiếp tục kiểm kê" : "Xem phiếu chờ duyệt"} <ChevronRight size={18} aria-hidden="true" />
-      </button>
+    <div className="cd-home-intro">
+      <p>HÔM NAY · {formatDisplayDate(demoToday())}</p>
+      <h1>Chào, {actor === "employee" ? "Trần Minh Anh" : "Nguyễn Văn Demo"}</h1>
+      <span>Co.op Food Nguyễn Kiệm · {actor === "employee" ? "Nhân viên" : "Quản lý"}</span>
     </div>
-    <div className="cd-home-grid">
-      <section className="cd-panel"><h2>Việc cần chú ý</h2>
+    <section className="cd-home-functions" aria-labelledby="cd-functions-title">
+      <h2 id="cd-functions-title">Chức năng</h2>
+      <div className="cd-task-grid">{tasks.map(({ id, title, subtitle, icon: Icon }) => <button key={id} type="button" onClick={() => id === "expiry" ? onOpenExpiry() : navigate(id)}>
+        <Icon size={22} aria-hidden="true" /><span><strong>{title}</strong><small>{subtitle}</small></span><ChevronRight size={17} aria-hidden="true" />
+      </button>)}</div>
+    </section>
+    <section className="cd-panel cd-home-attention" aria-labelledby="cd-attention-title"><h2 id="cd-attention-title">Việc cần chú ý</h2>
         <button className="cd-attention" type="button" onClick={() => navigate("inventory")}><strong>{pending} đợt kiểm kê chờ duyệt</strong><small>Chỉ thay đổi tồn sau khi quản lý chấp nhận</small><ChevronRight size={18} /></button>
         <button className="cd-attention" type="button" onClick={() => navigate("stocktake")}><strong>{active} đợt đang kiểm / kiểm lại</strong><small>Mở kiểm kê để tiếp tục quét sản phẩm</small><ChevronRight size={18} /></button>
         <button className="cd-attention" type="button" onClick={() => navigate("inventory")}><strong>{attention} lô cần chú ý DATE</strong><small>Xem HSD, ngày cảnh báo và ngày lùi</small><ChevronRight size={18} /></button>
-      </section>
-      <section className="cd-panel"><h2>Bắt đầu công việc</h2>
-        <div className="cd-task-grid">{tasks.map(({ id, title, subtitle, icon: Icon }) => <button key={id} type="button" onClick={() => navigate(id)}>
-          <Icon size={21} aria-hidden="true" /><span><strong>{title}</strong><small>{subtitle}</small></span><ChevronRight size={17} aria-hidden="true" />
-        </button>)}</div>
-      </section>
-    </div>
+    </section>
   </>;
 }
 

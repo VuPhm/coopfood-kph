@@ -189,7 +189,7 @@ function sortValue(record: RecordView, key: RecordSortKey, approvalStatus: Appro
   }
 }
 
-function WorkspaceApp() {
+function WorkspaceApp({ showExpiryWorkbench }: { showExpiryWorkbench: boolean }) {
   const [localRecords, setLocalRecords] = useState<readonly RecordView[]>(initialRecords);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [createKind, setCreateKind] = useState<KphKind | null>(null);
@@ -1249,9 +1249,9 @@ function WorkspaceApp() {
           /> : null}
         </section>
 
-        <div className="workspace-side-stack">
+        {showExpiryWorkbench ? <div className="workspace-side-stack">
           <ExpiryWorkbench />
-        </div>
+        </div> : null}
       </main>}
 
       <CreateRecordDialog
@@ -1408,9 +1408,9 @@ const appQueryClientDefaults = {
   queries: { refetchOnWindowFocus: false, staleTime: 30_000, retry: false },
 };
 
-export function App() {
+export function App({ showExpiryWorkbench = true }: { showExpiryWorkbench?: boolean } = {}) {
   const [queryClient] = useState(() => new QueryClient({ defaultOptions: appQueryClientDefaults }));
-  return <QueryClientProvider client={queryClient}><WorkspaceApp /></QueryClientProvider>;
+  return <QueryClientProvider client={queryClient}><WorkspaceApp showExpiryWorkbench={showExpiryWorkbench} /></QueryClientProvider>;
 }
 
 type HistoryControlsContentProps = {

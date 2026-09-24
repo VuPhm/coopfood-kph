@@ -6,6 +6,11 @@ import { App, formatBusinessDate } from "./app";
 afterEach(() => vi.useRealTimers());
 
 describe("Store workspace", () => {
+  it("allows the demo shell to host the single expiry workbench", () => {
+    render(<App showExpiryWorkbench={false} />);
+    expect(screen.queryByRole("complementary", { name: "Tra cứu lùi hàng" })).not.toBeInTheDocument();
+  });
+
   it("shows the Co.op Food logo and today's business date in the header", () => {
     render(<App />);
     const today = formatBusinessDate(new Date());

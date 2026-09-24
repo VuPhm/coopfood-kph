@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       {import.meta.env.VITE_CLIENT_STORE_DEMO === "true" && import.meta.env.VITE_KPH_ONLINE === "true"
-        ? <ClientStoreDemo><App /></ClientStoreDemo>
+        ? <ClientStoreDemo><App showExpiryWorkbench={false} /></ClientStoreDemo>
         : <App />}
     </QueryClientProvider>
   </StrictMode>,

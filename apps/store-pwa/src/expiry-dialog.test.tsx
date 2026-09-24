@@ -10,6 +10,22 @@ function openWorkbench() {
 }
 
 describe("Expiry lookup", () => {
+  it("opens from a parent action and closes through the existing workbench", () => {
+    const onOpenChange = vi.fn();
+    const { rerender } = render(<ExpiryWorkbench today="2026-08-24" open={false} onOpenChange={onOpenChange} />);
+
+    expect(screen.queryByLabelText("Ngày sản xuất")).not.toBeInTheDocument();
+    rerender(<ExpiryWorkbench today="2026-08-24" open onOpenChange={onOpenChange} />);
+    fireEvent.change(screen.getByLabelText("Ngày sản xuất"), { target: { value: "01082026" } });
+    fireEvent.change(screen.getByLabelText("Hạn sử dụng (HSD)"), { target: { value: "30082026" } });
+    expect(screen.getByText("24/08/2026")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Đóng tra cứu lùi hàng" }));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    rerender(<ExpiryWorkbench today="2026-08-24" open={false} onOpenChange={onOpenChange} />);
+    expect(screen.queryByLabelText("Ngày sản xuất")).not.toBeInTheDocument();
+  });
+
   it("formats dates and updates the result without a separate submit", () => {
     render(<ExpiryWorkbench today="2026-08-24" />);
     openWorkbench();
