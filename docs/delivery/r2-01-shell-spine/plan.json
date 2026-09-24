@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "r2-01-shell-spine",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Tạo authenticated Store App shell tối thiểu quanh online KPH, nhận diện KPH là một capability của Store App và cho vào trực tiếp TPCN, TPTS, Lịch sử mà không qua overview bắt buộc.",
   "inScope": [
     "Store PWA-local composition seam cho shell, Store App identity và KPH capability đang hoạt động",
@@ -43,13 +43,15 @@
       "id": "owner-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
       "sha": "3799a30cdc64976f9eb77009d9dd49942e7038dc",
-      "evidence": "docs/delivery/r2-01-shell-spine/acceptance-handoff.md"
+      "evidence": "docs/delivery/r2-01-shell-spine/acceptance-handoff.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "Owner message ‘pass, UI visual refinement deferred; không phải final design system’, 2026-09-24, current R2-01 task"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Owner dùng thử shell trên synthetic preview, xác nhận direct TPCN/TPTS/History và account/store context; ghi quyết định nghiệm thu hoặc defect cụ thể. Không merge/deploy hoặc mở R2-02 tự động."
+  "nextAction": "R2-01 CLOSED theo owner acceptance. Giữ UI visual refinement cho slice sau; candidate này không phải final design system. Không tự merge/deploy hoặc mở R2-02."
 }

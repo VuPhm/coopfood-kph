@@ -1,7 +1,12 @@
 # R2-01 owner acceptance handoff
 
-Status: awaiting owner decision. Technical candidate:
+Status: accepted by the project owner on 2026-09-24. Technical candidate:
 `3799a30cdc64976f9eb77009d9dd49942e7038dc`.
+
+Owner decision in the current R2-01 task: “pass, *UI visual refinement
+deferred; không phải final design system*”. This accepts the bounded shared
+shell spine and keeps visual refinement for later work. It does not approve a
+final palette/token system, deployment, Pages cutover, or a new Round 2 slice.
 
 Synthetic, read-only online preview: <http://127.0.0.1:4175/> while the local
 Vite preview and fixture API are running. The session starts as
@@ -16,7 +21,7 @@ For owner review:
    its controls remain reachable. Close each form without submitting.
 3. Open Lịch sử directly; compare the phone card and desktop table and confirm
    the current page/filter controls remain recognizable.
-4. Report a specific blocking defect or an explicit acceptance decision.
+4. Owner accepted this R2-01 candidate with visual refinement deferred.
 
 Screenshots and command evidence: [technical evidence](technical-evidence.md).
 Real-backend and real-device behavior remain separate evidence, as documented
