@@ -1,6 +1,6 @@
 # R2-02 owner review
 
-Status: `AWAITING_ACCEPTANCE`. Candidate:
+Status: `CLOSED` after project owner acceptance on 2026-09-24. Candidate:
 `1e6c8102c983b5654aa6f596fa6756e36dd94529` on
 `store-app/r2-02-kph-create`, based on R2-01-merged `main` at `4fab688`.
 
@@ -24,6 +24,19 @@ authorization, or private media derivatives.
    and confirm the order in review before sending.
 
 Technical evidence and viewport screenshots are in
-[technical-evidence.md](technical-evidence.md). Please record acceptance or a
-concrete in-scope issue in this R2-02 task. Visual shell refinement remains
-deferred; R2-03 and Pages cutover are outside this review.
+[technical-evidence.md](technical-evidence.md).
+
+## Owner acceptance decision
+
+- Gate: `owner-acceptance` — `pass`, revision `1`, candidate
+  `1e6c8102c983b5654aa6f596fa6756e36dd94529`.
+- Accepted by: Project owner.
+- Decision reference: owner message 2026-09-24: “vẫn chỉ là giao diện xấu, pass”.
+- Functional flow and contract of R2-02 are accepted.
+- Owner still evaluates the current visual/UI as ugly. Visual refinement is
+  deferred and is not an R2-02 blocker.
+- This acceptance is **not** approval of the final visual design or design system.
+
+The decision preserves the documented technical limits. It does not authorize
+merge, deployment, Pages cutover, or R2-03. No further work is opened by this
+decision.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "r2-02-kph-create",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Validate the representative online KPH create path from direct TPCN/TPTS entry through scan or manual lookup, distinct FOUND/NOT_FOUND/CATALOG_UNAVAILABLE recovery, type-specific details, ordered inspectable 1–3 private photos, explicit review, and submit on the R2-01 Store App shell.",
   "inScope": [
     "Continuous online create composition within the existing Store PWA entry and KPH form, with explicit review and edit-before-submit boundary",
@@ -27,9 +27,9 @@
     { "id": "focused-create-states", "kind": "technical", "required": true, "status": "pass", "revision": 1, "sha": "1e6c8102c983b5654aa6f596fa6756e36dd94529", "evidence": "docs/delivery/r2-02-kph-create/technical-evidence.md" },
     { "id": "integrated-verify", "kind": "technical", "required": true, "status": "pass", "revision": 1, "sha": "1e6c8102c983b5654aa6f596fa6756e36dd94529", "evidence": "docs/delivery/r2-02-kph-create/technical-evidence.md" },
     { "id": "browser-phone-desktop", "kind": "technical", "required": true, "status": "pass", "revision": 1, "sha": "1e6c8102c983b5654aa6f596fa6756e36dd94529", "evidence": "docs/delivery/r2-02-kph-create/technical-evidence.md" },
-    { "id": "owner-acceptance", "kind": "user", "required": true, "status": "pending" }
+    { "id": "owner-acceptance", "kind": "user", "required": true, "status": "pass", "revision": 1, "sha": "1e6c8102c983b5654aa6f596fa6756e36dd94529", "evidence": "docs/delivery/r2-02-kph-create/acceptance-handoff.md", "acceptedBy": "Project owner", "decisionRef": "owner message 2026-09-24: “vẫn chỉ là giao diện xấu, pass”" }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Owner reviews the R2-02 candidate at the synthetic preview and records acceptance or an in-scope issue; no merge, Pages deploy, or R2-03 until a separate decision."
+  "nextAction": "R2-02 CLOSED by owner acceptance. Stop this cycle; merge/deploy and R2-03 require separate decisions."
 }
