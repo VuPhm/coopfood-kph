@@ -1,0 +1,47 @@
+.store-app-shell {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 24rem);
+  gap: 1rem 1.5rem;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: #fff;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-panel);
+}
+.store-app-shell-heading { display: grid; align-content: start; gap: .35rem; min-width: 0; }
+.store-app-shell-identity { margin: 0 0 .45rem; color: var(--color-brand); font-size: .83rem; font-weight: 800; letter-spacing: .01em; }
+.store-app-shell-identity span { margin-left: .35rem; border-left: 1px solid var(--color-border); padding-left: .55rem; color: var(--color-ink); }
+.store-app-shell-capability { display: flex; align-items: center; gap: .7rem; }
+.store-app-shell-capability-mark { width: .55rem; height: 2.4rem; flex: 0 0 auto; border-radius: 99px; background: var(--color-brand); }
+.store-app-shell-eyebrow { margin: 0; color: var(--color-ink-muted); font-size: .72rem; font-weight: 700; }
+.store-app-shell h1 { margin: .1rem 0 0; color: var(--color-ink); font-size: clamp(1.25rem, 2vw, 1.55rem); line-height: 1.3; }
+.store-app-shell-description { margin: .25rem 0 0; color: var(--color-ink-muted); font-size: .82rem; line-height: 1.45; }
+.store-app-shell-tasks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; min-width: 0; }
+.store-app-shell-task { display: flex; align-items: center; gap: .65rem; min-width: 0; min-height: 3.75rem; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); padding: .65rem .75rem; color: var(--color-ink); text-align: left; text-decoration: none; }
+.store-app-shell-task:hover { border-color: var(--color-brand); background: var(--color-brand-soft); }
+.store-app-shell-task:disabled { opacity: .55; cursor: not-allowed; }
+.store-app-shell-task svg { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; color: var(--color-brand); }
+.store-app-shell-task span { display: grid; min-width: 0; gap: .1rem; }
+.store-app-shell-task strong { font-size: .84rem; line-height: 1.2; }
+.store-app-shell-task small { color: var(--color-ink-muted); font-size: .72rem; line-height: 1.25; }
+.store-app-shell-context { grid-column: 2; grid-row: 1 / 3; min-width: 0; }
+.store-app-shell-context .store-context { width: 100%; height: 100%; box-shadow: none; }
+.store-app-shell-context .store-context-copy strong { font-size: .95rem; }
+#history-title { scroll-margin-top: calc(5rem + env(safe-area-inset-top)); }
+
+@media (max-width: 850px) {
+  .store-app-shell { grid-template-columns: minmax(0, 1fr); }
+  .store-app-shell-context { grid-column: 1; grid-row: auto; }
+  .store-app-shell-tasks { grid-row: 3; }
+}
+@media (max-width: 700px) {
+  .store-app-shell { gap: .9rem; border-radius: 0; border-inline: 0; padding: 1rem; box-shadow: none; }
+  .store-app-shell-tasks { gap: .5rem; }
+  .store-app-shell-task { min-height: 4.25rem; flex-direction: column; align-items: flex-start; justify-content: center; gap: .3rem; padding: .55rem; }
+  .store-app-shell-task svg { width: 1.1rem; height: 1.1rem; }
+  .store-app-shell-task strong { font-size: .8rem; }
+  .store-app-shell-task small { font-size: .67rem; }
+  .store-app-shell-context .store-context { padding: .7rem; }
+}
