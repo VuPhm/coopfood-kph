@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "r2-01-shell-spine",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Tạo authenticated Store App shell tối thiểu quanh online KPH, nhận diện KPH là một capability của Store App và cho vào trực tiếp TPCN, TPTS, Lịch sử mà không qua overview bắt buộc.",
   "inScope": [
     "Store PWA-local composition seam cho shell, Store App identity và KPH capability đang hoạt động",
@@ -19,7 +19,7 @@
     "Deploy, merge main, R2-02 và owner acceptance tự suy diễn từ technical verification"
   ],
   "baseSha": "1855eff78cd91cdf6c83b8db30f99f9376e50e0d",
-  "candidateSha": "",
+  "candidateSha": "3799a30cdc64976f9eb77009d9dd49942e7038dc",
   "integrationOwner": "Codex primary in /Users/vup/Documents/coopfood-kph-worktrees/r2-01",
   "sharedPaths": [
     "apps/store-pwa/src/app.tsx",
@@ -27,23 +27,29 @@
     "docs/delivery/r2-01-shell-spine/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical-shell",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "3799a30cdc64976f9eb77009d9dd49942e7038dc",
+      "evidence": "docs/delivery/r2-01-shell-spine/technical-evidence.md"
     },
     {
       "id": "owner-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pending",
+      "revision": 1,
+      "sha": "3799a30cdc64976f9eb77009d9dd49942e7038dc",
+      "evidence": "docs/delivery/r2-01-shell-spine/acceptance-handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Commit delivery record, run dispatch checkpoint, inspect Store PWA implementation, then build and verify the bounded shell candidate."
+  "nextAction": "Owner dùng thử shell trên synthetic preview, xác nhận direct TPCN/TPTS/History và account/store context; ghi quyết định nghiệm thu hoặc defect cụ thể. Không merge/deploy hoặc mở R2-02 tự động."
 }
