@@ -79,6 +79,8 @@ type PhotoDraft = {
   url: string;
 };
 
+type LookupState = "idle" | "loading" | "FOUND" | "NOT_FOUND" | "CATALOG_UNAVAILABLE" | "error";
+
 export type CreatedRecordDraft = {
   kind: KphKind;
   detectedDate: string;
@@ -146,7 +148,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [barcodeLookupMessage, setBarcodeLookupMessage] = useState("");
+  const [lookupState, setLookupState] = useState<LookupState>("idle");
   const [lookupRetryValue, setLookupRetryValue] = useState("");
+  const [reviewReady, setReviewReady] = useState(false);
+  const reviewRef = useRef<HTMLElement | null>(null);
   const lookupRequestId = useRef(0);
   const autoFilledLookup = useRef({ barcode: "", productName: "", supplier: "" });
   const idempotencyKeyRef = useRef<string | null>(null);
@@ -187,7 +192,9 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     clearPhotos();
     setPhotoError("");
     setBarcodeLookupMessage("");
+    setLookupState("idle");
     setLookupRetryValue("");
+    setReviewReady(false);
     lookupRequestId.current += 1;
     idempotencyKeyRef.current = null;
     clearAutoFilledLookup();
@@ -199,7 +206,9 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     clearPhotos();
     setPhotoError("");
     setBarcodeLookupMessage("");
+    setLookupState("idle");
     setLookupRetryValue("");
+    setReviewReady(false);
     lookupRequestId.current += 1;
     idempotencyKeyRef.current = null;
     clearAutoFilledLookup();
@@ -207,7 +216,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
 
   useEffect(() => {
     const subscription = watch(() => {
-      if (!savingRecordRef.current) idempotencyKeyRef.current = null;
+      if (!savingRecordRef.current) {
+        idempotencyKeyRef.current = null;
+        setReviewReady(false);
+      }
     });
     return () => subscription.unsubscribe();
   }, [watch]);
@@ -238,12 +250,15 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
       lookupRequestId.current += 1;
       clearAutoFilledLookup();
       setBarcodeLookupMessage("");
+      setLookupState("idle");
       setLookupRetryValue("");
       return;
     }
     if (!onBarcodeLookup) return;
     const requestId = ++lookupRequestId.current;
     clearAutoFilledLookup();
+    setReviewReady(false);
+    setLookupState("loading");
     setBarcodeLookupMessage("Đang tra cứu barcode…");
     setLookupRetryValue("");
     try {
@@ -258,18 +273,49 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
           supplier: result.product.primarySupplier.name,
         };
         setBarcodeLookupMessage(`Đã tìm thấy ${result.product.skuCode}.`);
+        setLookupState("FOUND");
       } else {
         clearAutoFilledLookup();
         setBarcodeLookupMessage("Không tìm thấy barcode. Có thể nhập tên hàng hóa và NCC thủ công; mã đã quét sẽ được giữ lại.");
+        setLookupState("NOT_FOUND");
       }
     } catch (error) {
       if (requestId !== lookupRequestId.current || getValues("barcode").trim() !== normalized) return;
-      setBarcodeLookupMessage(error instanceof Error ? error.message : "Không thể tra cứu barcode lúc này.");
+      const catalogUnavailable = typeof error === "object" && error !== null && "code" in error && error.code === "CATALOG_UNAVAILABLE";
+      setLookupState(catalogUnavailable ? "CATALOG_UNAVAILABLE" : "error");
+      setBarcodeLookupMessage(catalogUnavailable
+        ? "Danh mục đang tạm không sẵn sàng. Chưa thể xác nhận mã này; thử tra cứu lại khi dịch vụ phục hồi."
+        : "Không thể tra cứu barcode lúc này. Thử lại để xác nhận sản phẩm trước khi gửi phiếu.");
       setLookupRetryValue(normalized);
     }
   }
 
+  const prepareReview = handleSubmit(() => {
+    if (processingPhotos) {
+      setPhotoError("Vui lòng chờ ảnh được xử lý xong");
+      return;
+    }
+    if (photos.length < 1) {
+      setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
+      return;
+    }
+    if (onlineMode && barcode.trim() && lookupState !== "FOUND" && lookupState !== "NOT_FOUND") {
+      setBarcodeLookupMessage(lookupState === "CATALOG_UNAVAILABLE"
+        ? "Danh mục đang tạm không sẵn sàng. Thử tra cứu lại trước khi gửi phiếu."
+        : "Tra cứu mã trước khi xem lại và gửi phiếu.");
+      return;
+    }
+    setPhotoError("");
+    setReviewReady(true);
+    window.requestAnimationFrame(() => reviewRef.current?.scrollIntoView?.({ block: "nearest", behavior: "smooth" }));
+  });
+
   const submit = handleSubmit(async (values) => {
+    if (onlineMode && !reviewReady) return;
+    if (onlineMode && values.barcode.trim() && lookupState !== "FOUND" && lookupState !== "NOT_FOUND") {
+      setReviewReady(false);
+      return;
+    }
     if (processingPhotos) {
       setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
       return;
@@ -322,7 +368,15 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
       idempotencyKeyRef.current = null;
       onOpenChange(false);
     } catch (error) {
-      setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
+      const catalogUnavailable = typeof error === "object" && error !== null && "code" in error && error.code === "CATALOG_UNAVAILABLE";
+      if (onlineMode && catalogUnavailable) {
+        setLookupState("CATALOG_UNAVAILABLE");
+        setReviewReady(false);
+        setLookupRetryValue(values.barcode.trim());
+      }
+      setPhotoError(catalogUnavailable
+        ? "Danh mục đang tạm không sẵn sàng. Thử tra cứu mã lại trước khi gửi phiếu."
+        : error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
     } finally {
       setSavingRecord(false);
       savingRecordRef.current = false;
@@ -374,6 +428,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
       const next = [...photoRef.current, ...additions];
       photoRef.current = next;
       setPhotos(next);
+      setReviewReady(false);
       idempotencyKeyRef.current = null;
     } catch (error) {
       additions.forEach((photo) => URL.revokeObjectURL(photo.url));
@@ -389,6 +444,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     const next = photos.filter((photo) => photo.id !== id);
     photoRef.current = next;
     setPhotos(next);
+    setReviewReady(false);
     idempotencyKeyRef.current = null;
     if (activePhoto?.id === id) setActivePhoto(null);
   }
@@ -404,7 +460,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
             </DialogDescription>
           </DialogHeader>
 
-          <form className="create-dialog-form" onSubmit={submit}>
+          <form className="create-dialog-form" onSubmit={onlineMode ? prepareReview : submit}>
             <FormSection number="1" title="Thông tin phát hiện">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
@@ -414,6 +470,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
                   <div className="relative">
                   <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", { onChange: (event) => {
                     lookupRequestId.current += 1;
+                    setLookupState("idle");
+                    setReviewReady(false);
                     setBarcodeLookupMessage("");
                     setLookupRetryValue("");
                     if (autoFilledLookup.current.barcode && event.target.value.trim() !== autoFilledLookup.current.barcode) clearAutoFilledLookup();
@@ -422,13 +480,16 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
                       <ScanLine aria-hidden="true" size={18} />
                     </button>
                   </div>
-                  {barcodeLookupMessage ? <p className="mt-1 text-xs text-ink-muted" role="status">{barcodeLookupMessage}{lookupRetryValue ? <button type="button" className="ml-2 underline" onClick={() => void lookupBarcode(lookupRetryValue)}>Thử tra cứu lại</button> : null}</p> : null}
+                  {onlineMode && barcode.trim() ? <p className="mt-2 text-sm font-semibold" role={lookupState === "CATALOG_UNAVAILABLE" || lookupState === "error" ? "alert" : "status"}>
+                    {lookupState === "FOUND" ? "FOUND · Sản phẩm trong danh mục" : lookupState === "NOT_FOUND" ? "NOT_FOUND · Nhập thông tin hàng thủ công" : lookupState === "CATALOG_UNAVAILABLE" ? "CATALOG_UNAVAILABLE · Danh mục tạm không sẵn sàng" : lookupState === "loading" ? "Đang tra cứu…" : "Chưa xác nhận mã"}
+                  </p> : null}
+                  {barcodeLookupMessage ? <p className="mt-1 text-sm text-ink-muted" role="status">{barcodeLookupMessage}{lookupRetryValue ? <button type="button" className="ml-2 underline" onClick={() => void lookupBarcode(lookupRetryValue)}>Thử tra cứu lại</button> : null}{lookupState === "NOT_FOUND" ? <button type="button" className="ml-2 underline" onClick={() => setScannerOpen(true)}>Quét lại</button> : null}</p> : null}
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
-                  <Input id="supplier" placeholder="Điền tên NCC" {...register("supplier")} />
+                  <Input id="supplier" placeholder="Điền tên NCC" readOnly={onlineMode && lookupState === "FOUND"} {...register("supplier")} />
                 </Field>
                 <Field label="Tên hàng hóa" htmlFor="product-name" error={errors.productName?.message}>
-                  <Input id="product-name" placeholder="Điền tên hàng hóa" {...register("productName")} />
+                  <Input id="product-name" placeholder="Điền tên hàng hóa" readOnly={onlineMode && lookupState === "FOUND"} {...register("productName")} />
                 </Field>
               </div>
             </FormSection>
@@ -466,12 +527,12 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
               </Field>
               <div className="mt-3">
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
-                <p className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
+                <p className="mt-1 text-sm text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
                   <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
                 </div>
-                {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
+                {photos.length ? <div className="photo-previews" aria-label={`Ảnh đã chọn, ${photos.length} trên 3 ảnh`}>{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
                 <p className={cn("mt-2 text-xs font-semibold", photoError ? "text-danger" : "text-ink-muted")} role={photoError ? "alert" : "status"}>
                   {photoError || (processingPhotos ? "Đang tối ưu và đóng tem ảnh…" : photos.length ? `Đã xử lý ${photos.length}/3 ảnh · chạm ảnh để xem chi tiết` : "Chưa chọn ảnh")}
                 </p>
@@ -481,15 +542,37 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
               </Field>
             </FormSection>
 
+            {onlineMode && reviewReady ? <section ref={reviewRef} className="form-section create-review" aria-labelledby="create-review-title">
+              <h3 id="create-review-title">Xem lại trước khi gửi</h3>
+              <p className="text-sm text-ink-muted">Phiếu sẽ được lưu trên máy chủ sau khi bạn chọn “Gửi phiếu”. Bạn có thể chỉnh sửa thông tin ở trên trước khi gửi.</p>
+              <dl className="create-review-grid">
+                <div><dt>Loại phiếu</dt><dd>{kind} · {kindLabels[kind]}</dd></div>
+                <div><dt>Cửa hàng</dt><dd>{profile.storeCode} · {profile.storeName}</dd></div>
+                <div><dt>Người nhập</dt><dd>{profile.fullName}</dd></div>
+                <div><dt>Ngày phát hiện</dt><dd>{getValues("detectedDate")}</dd></div>
+                <div><dt>Mã và tra cứu</dt><dd>{barcode.trim() || "Nhập tay không có mã"} · {barcode.trim() ? lookupState : "MANUAL"}</dd></div>
+                <div><dt>Hàng hóa / NCC</dt><dd>{getValues("productName") || "Chưa nhập tên"} / {getValues("supplier") || "Chưa nhập NCC"}</dd></div>
+                <div><dt>Số lượng</dt><dd>{getValues("quantity")} {getValues("unit")}</dd></div>
+                <div><dt>Tình trạng</dt><dd>{resolveChoiceLabel(options.conditions.find(({ value }) => value === getValues("condition")) ?? options.conditions[0]!, getValues("conditionDetail"))}</dd></div>
+                <div><dt>Biện pháp</dt><dd>{resolveChoiceLabel(options.resolutions.find(({ value }) => value === getValues("resolution")) ?? options.resolutions[0]!, getValues("resolutionDetail"))}</dd></div>
+                <div><dt>Ngày xử lý</dt><dd>{getValues("treatmentDate") || "Chưa có"}</dd></div>
+                <div><dt>Ghi chú</dt><dd>{getValues("note") || "Không có"}</dd></div>
+              </dl>
+              <p className="mt-4 text-sm font-bold">Ảnh minh chứng · {photos.length}/3 theo thứ tự gửi</p>
+              <ol className="create-review-photos">{photos.map((photo, index) => <li key={photo.id}><button type="button" onClick={() => setActivePhoto(photo)} aria-label={`Xem lại ảnh ${index + 1}: ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}<span>{index + 1}. {photo.fileName}</span></button></li>)}</ol>
+              <p className="mt-2 text-sm text-ink-muted">Ảnh gốc được gửi riêng tư; bản đóng tem do máy chủ tạo sau khi lưu.</p>
+            </section> : null}
+
             <footer className="create-dialog-footer">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Hủy</Button>
-              <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : "Lưu phiếu"}</Button>
+              {onlineMode && reviewReady ? <Button type="button" variant="ghost" onClick={() => setReviewReady(false)}>Chỉnh sửa</Button> : null}
+              <Button type={onlineMode && reviewReady ? "button" : "submit"} onClick={onlineMode && reviewReady ? () => void submit() : undefined} disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang gửi phiếu"}</> : onlineMode ? reviewReady ? "Gửi phiếu" : "Xem lại trước khi gửi" : "Lưu phiếu"}</Button>
             </footer>
           </form>
         </DialogContent>
       </Dialog>
 
-      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
+      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName}${onlineMode ? " trước khi gửi" : " đã đóng tem"}` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
 
       <BarcodeScannerDialog
         open={scannerOpen}

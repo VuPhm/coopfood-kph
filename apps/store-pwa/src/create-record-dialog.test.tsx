@@ -116,7 +116,10 @@ describe("Create KPH record", () => {
     expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
     expect(processEvidencePhoto).not.toHaveBeenCalled();
     fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Hàng online" } });
-    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Xem lại trước khi gửi" }));
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(await screen.findByRole("region", { name: "Xem lại trước khi gửi" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Gửi phiếu" }));
 
     await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({
       photos: [expect.objectContaining({ originalFile: file, blob: file })],
@@ -227,6 +230,78 @@ describe("Create KPH record", () => {
     fireEvent.blur(barcode);
     expect(await screen.findByText(/Không tìm thấy barcode/)).toBeVisible();
     expect(onBarcodeLookup).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps FOUND, NOT_FOUND and CATALOG_UNAVAILABLE distinct with recovery", async () => {
+    const unavailable = Object.assign(new Error("catalog offline"), { code: "CATALOG_UNAVAILABLE", status: 503 });
+    const onBarcodeLookup = vi.fn()
+      .mockResolvedValueOnce({ status: "FOUND", barcode: "A", product: { id: "p", barcode: "A", skuCode: "SKU-A", name: "Sản phẩm A", primarySupplier: { code: "NCC-A", name: "NCC A" } } })
+      .mockResolvedValueOnce({ status: "NOT_FOUND", barcode: "B" })
+      .mockRejectedValueOnce(unavailable)
+      .mockResolvedValueOnce({ status: "NOT_FOUND", barcode: "C" });
+    renderDialog("TPCN", vi.fn(), DEFAULT_STORE_PROFILE, onBarcodeLookup, true);
+    const barcode = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+
+    fireEvent.change(barcode, { target: { value: "A" } });
+    fireEvent.blur(barcode);
+    expect(await screen.findByText(/FOUND · Sản phẩm/)).toBeVisible();
+    expect(screen.getByRole("textbox", { name: "Tên hàng hóa" })).toHaveValue("Sản phẩm A");
+
+    fireEvent.change(barcode, { target: { value: "B" } });
+    fireEvent.blur(barcode);
+    expect(await screen.findByText(/NOT_FOUND · Nhập/)).toBeVisible();
+    expect(screen.getByRole("textbox", { name: "Tên hàng hóa" })).toHaveValue("");
+    expect(screen.getByRole("button", { name: "Quét lại" })).toBeVisible();
+
+    fireEvent.change(barcode, { target: { value: "C" } });
+    fireEvent.blur(barcode);
+    expect(await screen.findByText(/CATALOG_UNAVAILABLE · Danh mục/)).toBeVisible();
+    expect(screen.queryByText(/NOT_FOUND · Nhập/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Thử tra cứu lại" }));
+    expect(await screen.findByText(/NOT_FOUND · Nhập/)).toBeVisible();
+    expect(onBarcodeLookup).toHaveBeenCalledTimes(4);
+  });
+
+  it("requires resolved lookup and explicit review, then invalidates review after an edit", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:review-photo") });
+    const onBarcodeLookup = vi.fn().mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" });
+    const onSaved = renderDialog("TPTS", vi.fn(), { ...DEFAULT_STORE_PROFILE, fullName: "Nguyễn Văn Demo" }, onBarcodeLookup, true);
+    const barcode = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    fireEvent.change(barcode, { target: { value: "000123" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Rau kiểm thử" } });
+    fireEvent.change(screen.getByText("Chọn ảnh").closest("label")!.querySelector("input")!, { target: { files: [new File(["original"], "one.jpg", { type: "image/jpeg" })] } });
+    await screen.findByText(/Đã xử lý 1\/3 ảnh/);
+    fireEvent.click(screen.getByRole("button", { name: "Xem lại trước khi gửi" }));
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(await screen.findByText(/Tra cứu mã trước khi xem lại/)).toBeVisible();
+
+    fireEvent.blur(barcode);
+    expect(await screen.findByText(/NOT_FOUND · Nhập/)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Xem lại trước khi gửi" }));
+    expect(await screen.findByRole("region", { name: "Xem lại trước khi gửi" })).toHaveTextContent("TPTS");
+    expect(onSaved).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Rau đã sửa" } });
+    expect(screen.queryByRole("button", { name: "Gửi phiếu" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Xem lại trước khi gửi" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Gửi phiếu" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ kind: "TPTS", barcode: "000123", productName: "Rau đã sửa" })));
+  });
+
+  it("reviews online photos in selection order and permits inspection before submit", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockImplementation((file: File) => `blob:${file.name}`) });
+    const onSaved = renderDialog("TPCN", vi.fn(), { ...DEFAULT_STORE_PROFILE, fullName: "Nguyễn Văn Demo" }, undefined, true);
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Hàng ảnh" } });
+    const files = ["first.jpg", "second.jpg", "third.jpg"].map((name) => new File([name], name, { type: "image/jpeg" }));
+    fireEvent.change(screen.getByText("Chọn ảnh").closest("label")!.querySelector("input")!, { target: { files } });
+    await screen.findByText(/Đã xử lý 3\/3 ảnh/);
+    fireEvent.click(screen.getByRole("button", { name: "Xem lại trước khi gửi" }));
+    const review = await screen.findByRole("region", { name: "Xem lại trước khi gửi" });
+    expect(within(review).getAllByRole("button", { name: /Xem lại ảnh/ }).map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Xem lại ảnh 1: first.jpg", "Xem lại ảnh 2: second.jpg", "Xem lại ảnh 3: third.jpg",
+    ]);
+    fireEvent.click(within(review).getByRole("button", { name: "Xem lại ảnh 2: second.jpg" }));
+    expect(screen.getByAltText("Ảnh minh chứng second.jpg trước khi gửi")).toHaveAttribute("src", "blob:second.jpg");
+    expect(onSaved).not.toHaveBeenCalled();
   });
 
   it("locks the detected date, opens the treatment date calendar and allows date selection", () => {

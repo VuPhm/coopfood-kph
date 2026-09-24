@@ -254,7 +254,9 @@ async function addPhotos(dialog: Locator, count: number, prefix: string) {
 }
 
 async function saveDialog(dialog: Locator) {
-  await dialog.getByRole("button", { name: /lưu phiếu|save/i }).click();
+  await dialog.getByRole("button", { name: "Xem lại trước khi gửi" }).click();
+  await expect(dialog.getByRole("region", { name: "Xem lại trước khi gửi" })).toBeVisible();
+  await dialog.getByRole("button", { name: "Gửi phiếu" }).click();
   await expect(dialog).toBeHidden();
 }
 
@@ -349,9 +351,10 @@ test.describe("Store PWA browser acceptance", () => {
       await route.continue();
     });
 
-    await dialog.getByRole("button", { name: /lưu phiếu|save/i }).click();
+    await dialog.getByRole("button", { name: "Xem lại trước khi gửi" }).click();
+    await dialog.getByRole("button", { name: "Gửi phiếu" }).click();
     await expect(dialog.getByRole("alert")).toContainText(/không thể|lưu phiếu|failed|network/i);
-    await dialog.getByRole("button", { name: /lưu phiếu|save/i }).click();
+    await dialog.getByRole("button", { name: "Gửi phiếu" }).click();
     await expect(dialog).toBeHidden();
     await page.unroute(endpoint);
 

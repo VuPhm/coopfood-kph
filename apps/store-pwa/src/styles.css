@@ -527,6 +527,16 @@ html[data-focus-modality="keyboard"] .photo-preview-open:focus { outline: 3px so
 .photo-preview-remove { position: absolute; top: .5rem; right: .5rem; display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 12px; background: rgb(255 255 255 / .94); color: var(--color-danger); box-shadow: 0 4px 12px rgb(0 0 0 / .18); }
 .photo-preview-remove:hover { background: var(--color-danger); color: #fff; }
 html[data-focus-modality="keyboard"] .photo-preview-remove:focus { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.create-review { scroll-margin-block: 1rem; }
+.create-review-grid { display: grid; gap: .75rem; margin-top: 1rem; }
+.create-review-grid > div { border-bottom: 1px solid var(--color-border); padding-bottom: .65rem; }
+.create-review-grid dt { color: var(--color-ink-muted); font-size: .8125rem; }
+.create-review-grid dd { margin: .2rem 0 0; overflow-wrap: anywhere; font-weight: 650; }
+.create-review-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin-top: .5rem; }
+.create-review-photos button { width: 100%; min-height: 7rem; border: 1px solid var(--color-border); border-radius: 12px; background: #fff; padding: .5rem; text-align: left; }
+.create-review-photos img { width: 100%; height: 5rem; border-radius: 8px; object-fit: cover; }
+.create-review-photos span { display: block; margin-top: .35rem; overflow-wrap: anywhere; font-size: .8125rem; }
+.create-review-photos button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .create-dialog-footer { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--space-4)); display: flex; flex-direction: column-reverse; gap: var(--control-gap); border-radius: 0 0 24px 24px; background: #fff; padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom)); box-shadow: 0 -10px 24px rgb(0 66 33 / .08); }
 
 .action-dialog { width: min(30rem, calc(100% - 2rem)); gap: var(--space-3); padding: var(--space-5); }
@@ -859,6 +869,7 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
   .create-dialog-header { padding-inline: 1.5rem 4rem; }
   .create-dialog-form { padding-inline: 1.25rem; }
   .create-dialog-footer { margin-inline: -1.25rem; flex-direction: row; justify-content: flex-end; padding-inline: 1.25rem; }
+  .create-review-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 480px) {

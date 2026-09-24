@@ -91,7 +91,8 @@ async function submitOnlineRecord(productName: string) {
   const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
   fireEvent.change(picker!, { target: { files: [new File(["evidence"], "evidence.jpg", { type: "image/jpeg" })] } });
   expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
-  fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+  fireEvent.click(screen.getByRole("button", { name: "Xem lại trước khi gửi" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Gửi phiếu" }));
   await waitFor(() => expect(mocks.createRecord).toHaveBeenCalledOnce());
 }
 
