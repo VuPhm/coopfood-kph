@@ -4,14 +4,17 @@ Cập nhật: 2026-09-24
 
 ## Giai đoạn
 
-`Round 1 — R1-D04 UI DNA stabilization và Round 2 handoff đã được owner chấp nhận.`
-Hướng đã hội tụ nằm ở [Store App UI DNA](product/STORE_APP_UI_DNA.md); slice
-kiểm chứng tiếp theo nằm ở [Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md).
-Round 2 chưa bắt đầu.
-D01 history paging là milestone implementation gần nhất đã CLOSED và được owner
-chấp nhận ngày 2026-09-24. Store App pivot không thay đổi nghiệm thu D01;
-xem [baseline](STORE_APP_BASELINE.md) và
-[contract index](product/STORE_APP_CONTRACTS.md) trước Round 2.
+`Round 2 — R2-01 Shared Store App Shell Spine đã CLOSED theo owner acceptance.`
+Candidate ứng dụng `3799a30` trên `store-app/r2-01-shell-spine` tạo shell online
+nhỏ với lối vào trực tiếp TPCN, TPTS và History, dùng account/store context từ
+session. Technical gate và close checker PASS; [acceptance handoff](delivery/r2-01-shell-spine/acceptance-handoff.md)
+ghi owner “pass” ngày 2026-09-24. UI visual refinement được hoãn; đây chưa phải
+final design system. Chưa merge, deploy hoặc cutover Pages. Hướng UI DNA và ranh
+giới slice nằm ở [Store App UI DNA](product/STORE_APP_UI_DNA.md) và
+[Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md).
+D01 history paging đã CLOSED và được owner chấp nhận trước R2-01; Store App pivot
+không thay đổi nghiệm thu D01. Xem [baseline](STORE_APP_BASELINE.md) và
+[contract index](product/STORE_APP_CONTRACTS.md).
 
 Repository hiện tiến hóa thành Co.op Food Store Operations App. Hai repository cũ
 `coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
@@ -131,6 +134,11 @@ tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 - Pilot chỉ nhận security/critical fix; không migrate IndexedDB Pilot sang online.
 
 ## Điểm tiếp tục
+
+R2-01 đã CLOSED trên candidate `3799a30`; [technical evidence](delivery/r2-01-shell-spine/technical-evidence.md)
+và owner acceptance ghi rõ preview tổng hợp, giới hạn chưa chạy lại real-backend
+E2E khi Docker không sẵn sàng, và visual refinement được hoãn. Không tự mở
+R2-02 hoặc suy ra quyền merge/deploy từ nghiệm thu này.
 
 P03 và C01 đã đóng theo owner acceptance; close record ở
 [P03 plan](delivery/p03-scheduled-lifecycle/plan.json) và
