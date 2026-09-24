@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>R1-D02 · UI direction board</title>
+  <style>
+    :root { color-scheme: light; font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: #18251e; background: #f4f6f3; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, select { font: inherit; }
+    button { cursor: pointer; }
+    .frame { max-width: 1280px; margin: auto; padding: 24px; }
+    .toolbar { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; background: #fff; padding: 16px; border: 1px solid #dce3dd; border-radius: 12px; }
+    .toolbar label { display: grid; gap: 5px; color: #4b5c51; font-size: 13px; font-weight: 650; }
+    select { min-height: 44px; min-width: 220px; border: 1px solid #aebbb1; border-radius: 7px; padding: 8px 36px 8px 10px; background: white; color: #18251e; }
+    .intro { margin: 0 0 16px; }
+    h1 { margin: 0 0 4px; font-size: 24px; line-height: 1.2; }
+    .intro p { color: #526157; margin: 0; }
+    .stage { margin-top: 18px; background: #fff; border: 1px solid #dce3dd; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 28px #1835220c; }
+    .brandbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 62px; padding: 12px 20px; border-bottom: 1px solid #e3e9e4; }
+    .wordmark { font-weight: 800; color: #12623a; letter-spacing: -.03em; }
+    .wordmark small { display: block; color: #78867c; letter-spacing: 0; font-weight: 500; font-size: 11px; }
+    .top-context { color: #46574b; font-size: 13px; }
+    .top-context strong { color: #18251e; }
+    .layout { display: grid; grid-template-columns: 190px 1fr; min-height: 690px; }
+    .side { background: #f8faf8; border-right: 1px solid #e3e9e4; padding: 18px 12px; }
+    .side-a, .side-b, .side-c { display: none; }
+    .dir-a .side-a, .dir-b .side-b, .dir-c .side-c { display: block; }
+    .side-label { margin: 0 8px 10px; color: #758278; font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .07em; }
+    .side-link { display: block; width: 100%; text-align: left; color: #34473a; background: transparent; border: 0; border-radius: 7px; padding: 10px 11px; margin: 3px 0; }
+    .side-link.active { color: #0b653a; background: #e9f4ec; font-weight: 750; }
+    .future { color: #808a83; }
+    .content { padding: 26px; min-width: 0; }
+    .eyebrow { color: #6a796f; font-size: 12px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; }
+    h2 { margin: 4px 0 18px; font-size: 25px; letter-spacing: -.025em; }
+    h3 { margin: 0 0 10px; font-size: 17px; }
+    p { margin-top: 0; }
+    .context { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; border: 1px solid #dce5dd; background: #f7faf7; border-radius: 9px; padding: 12px 14px; margin-bottom: 20px; font-size: 13px; }
+    .context span { display: block; color: #738077; font-size: 11px; }
+    .context strong { font-size: 14px; }
+    .tag { display: inline-flex; align-items: center; min-height: 27px; border-radius: 999px; padding: 3px 9px; background: #eef1ef; color: #394840; font-size: 12px; font-weight: 700; }
+    .tag.warn { color: #784a08; background: #fff1d7; }
+    .tag.good { color: #175d38; background: #e5f3e9; }
+    .tag.bad { color: #8b3030; background: #ffebeb; }
+    .btn { min-height: 44px; border: 1px solid #b7c2b9; border-radius: 7px; padding: 9px 14px; background: white; color: #24362a; font-weight: 700; }
+    .btn.primary { color: white; background: #12623a; border-color: #12623a; }
+    .btn.subtle { border-color: transparent; background: #edf4ee; color: #165f3a; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+    .panel { border: 1px solid #e0e7e1; border-radius: 10px; padding: 16px; background: white; min-width: 0; }
+    .panel.tint { background: #f8faf8; }
+    .panel p { color: #59685e; font-size: 14px; margin-bottom: 8px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .task-list { display: grid; gap: 10px; }
+    .task { display: flex; justify-content: space-between; align-items: center; gap: 14px; min-height: 76px; padding: 15px; border: 1px solid #e0e7e1; border-radius: 9px; background: white; }
+    .task small { color: #68766c; display: block; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 5px; color: #536258; font-size: 12px; font-weight: 650; }
+    .input { min-height: 42px; padding: 9px 10px; color: #24362a; background: #fff; border: 1px solid #c5cec7; border-radius: 6px; font-size: 14px; }
+    .lookup { border-left: 4px solid #bb7411; background: #fff8ec; padding: 12px; border-radius: 0 7px 7px 0; color: #503f23; }
+    .lookup p { margin: 3px 0 0; font-size: 13px; }
+    .photos { display: flex; gap: 10px; margin-top: 12px; }
+    .photo { width: 82px; height: 88px; border: 1px solid #ccd6ce; border-radius: 7px; background: linear-gradient(145deg,#dce9d8,#f6e5bf 48%,#bcccb7); display: grid; place-items: end start; padding: 6px; color: #26392b; font-size: 11px; font-weight: 750; }
+    .photo:nth-child(2) { background: linear-gradient(145deg,#d9e5ee,#ead8bd 48%,#b7c9ae); }
+    .photo.empty { background: #f8faf8; border-style: dashed; color: #758278; place-items: center; }
+    .steps { display: flex; gap: 6px; margin: -4px 0 16px; }
+    .step { flex: 1; padding: 8px 10px; border-radius: 5px; background: #f0f3f0; color: #69776c; font-size: 12px; }
+    .step.active { background: #e4f1e7; color: #175d38; font-weight: 750; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .filter-chip { border: 1px solid #d7dfd8; padding: 7px 10px; border-radius: 6px; color: #405046; background: #fff; font-size: 12px; }
+    .table-wrap { overflow-x: auto; border: 1px solid #e0e7e1; border-radius: 8px; }
+    table { border-collapse: collapse; width: 100%; min-width: 750px; font-size: 12px; }
+    th, td { padding: 11px 10px; border-bottom: 1px solid #e8ede9; text-align: left; white-space: nowrap; }
+    th { background: #f6f8f6; color: #607066; font-size: 11px; }
+    tr:last-child td { border: 0; }
+    .check { width: 17px; height: 17px; accent-color: #12623a; vertical-align: middle; }
+    .product { font-weight: 750; }
+    .product small { display: block; color: #728076; font-weight: 500; }
+    .record { display: flex; gap: 10px; align-items: start; border-bottom: 1px solid #e8ede9; padding: 13px 0; }
+    .record:last-child { border: 0; }
+    .record input { margin-top: 4px; }
+    .record-main { flex: 1; min-width: 0; }
+    .record-main strong { display: block; }
+    .record-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 7px; color: #68766c; font-size: 12px; }
+    .selection { position: sticky; bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; background: #f0f6f1; border: 1px solid #cadbce; border-radius: 8px; padding: 12px; margin-top: 14px; }
+    .pagination { display: flex; justify-content: space-between; align-items: center; color: #657268; font-size: 12px; padding-top: 14px; }
+    .nav-mobile, .mobile-context, .mobile-back { display: none; }
+    .nav-a, .nav-b, .nav-c { display: none; }
+    .mobile-history-cards { display: none; }
+    .mobile-workspaces { display: none; }
+    .dir-a .layout { grid-template-columns: 96px 1fr; }
+    .dir-a .side-a { display: flex; flex-direction: column; gap: 8px; align-items: stretch; background: #fff; padding: 20px 10px; }
+    .dir-a .side-a .side-link { text-align: center; font-size: 12px; }
+    .dir-a .side-a .side-link:last-child { margin-top: auto; }
+    .dir-a .content { max-width: 1000px; }
+    .dir-a.scenario-create .content { max-width: 760px; }
+    .dir-b .layout { grid-template-columns: 228px 1fr; }
+    .dir-b .side-b { background: #f2f6f3; padding: 20px 13px; }
+    .dir-b .side-b .side-link { min-height: 44px; }
+    .dir-b .side-b .side-link[disabled] { cursor: default; opacity: .65; }
+    .dir-b .content { max-width: 1080px; }
+    .workspace-label { display: inline-flex; gap: 8px; align-items: center; color: #175d38; font-weight: 750; margin: 0 0 12px; }
+    .b-create-layout { display: grid; grid-template-columns: 170px minmax(0,1fr); gap: 16px; }
+    .b-step-rail { display: grid; align-content: start; gap: 8px; }
+    .b-step-rail .step { min-height: 62px; padding: 12px; }
+    .b-step-rail .step.done { color: #175d38; background: #eef6f0; }
+    .b-current { border-top: 4px solid #12623a; }
+    .b-prior { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+    .b-stage-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+    .a-sheet { border: 1px solid #dde6de; background: #fff; border-radius: 14px; padding: 18px; }
+    .a-sheet section + section { border-top: 1px solid #e5ebe6; margin-top: 18px; padding-top: 18px; }
+    .a-sheet .panel { border: 0; padding: 0; }
+    .a-section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .a-section-title h3 { margin: 0; }
+    .a-section-title .tag { background: #eaf4ed; color: #175d38; }
+    .c-create-layout { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(250px,.85fr); gap: 14px; align-items: start; }
+    .c-evidence { position: sticky; top: 14px; border-left: 4px solid #12623a; }
+    .c-evidence .photos { flex-wrap: wrap; }
+    .dir-c .layout { grid-template-columns: 74px 1fr; }
+    .dir-c .side-c { width: 74px; }
+    .dir-c .side-link { text-align: center; font-size: 11px; padding-inline: 4px; }
+    .dir-c .context { position: sticky; top: 0; z-index: 2; border-left: 4px solid #12623a; }
+    .dir-c .scenario-history .table-wrap { max-height: 410px; }
+    .split { display: grid; grid-template-columns: minmax(0,1.65fr) minmax(250px,.85fr); gap: 14px; }
+    .inspector { border-left: 3px solid #dbe8dc; }
+    .note { color: #78847c; font-size: 12px; margin: 14px 0 0; }
+    @media (max-width: 700px) {
+      .frame { padding: 14px 10px 82px; }
+      .intro { padding: 2px 4px; }
+      h1 { font-size: 20px; }
+      .toolbar { gap: 8px; padding: 10px; }
+      .toolbar label { flex: 1; min-width: 140px; }
+      select { min-width: 0; width: 100%; }
+      .stage { margin-top: 12px; border-radius: 10px; }
+      .brandbar { min-height: 54px; padding: 9px 13px; }
+      .top-context { display: none; }
+      .layout, .dir-a .layout, .dir-b .layout, .dir-c .layout { display: block; min-height: 0; }
+      .dir-a .side-a, .dir-b .side-b, .dir-c .side-c { display: none; }
+      .content { padding: 18px 14px 112px; }
+      h2 { font-size: 22px; margin-bottom: 14px; }
+      .mobile-context { display: block; color: #4d5e52; background: #f4f8f5; border-bottom: 1px solid #e0e7e1; padding: 9px 14px; font-size: 12px; }
+      .mobile-context strong { color: #21362a; }
+      .dir-b .mobile-workspaces { display: flex; flex-wrap: wrap; gap: 5px 9px; align-items: center; padding: 10px 14px; border-bottom: 1px solid #e0e7e1; background: #f2f6f3; font-size: 12px; }
+      .dir-b .mobile-workspaces strong { color: #175d38; }
+      .dir-b .mobile-workspaces .future { font-size: 11px; }
+      .grid, .form-grid, .split { grid-template-columns: 1fr; }
+      .b-create-layout, .c-create-layout { grid-template-columns: 1fr; }
+      .b-step-rail { display: flex; overflow: hidden; }
+      .b-step-rail .step { flex: 1; min-height: 54px; font-size: 11px; padding: 8px; }
+      .b-stage-actions { flex-wrap: wrap; }
+      .a-sheet { padding: 14px; }
+      .c-evidence { position: static; }
+      .dir-c .context { display: none; }
+      .dir-c .mobile-context { position: sticky; top: 0; z-index: 2; border-left: 4px solid #12623a; }
+      .dir-c .inspector { border-left: 0; }
+      .mobile-history-cards { display: block; }
+      .desktop-history { display: none; }
+      .task { min-height: 68px; }
+      .selection { position: fixed; z-index: 3; left: 10px; right: 10px; bottom: 62px; margin: 0; box-shadow: 0 4px 18px #132f1b1c; }
+      .selection .btn { padding-inline: 10px; }
+      .nav-mobile { position: fixed; z-index: 4; justify-content: space-around; align-items: center; inset: auto 0 0; min-height: 58px; background: #fff; border-top: 1px solid #dce3dd; padding: 6px 4px max(6px, env(safe-area-inset-bottom)); }
+      .dir-a .nav-a, .dir-b .nav-b, .dir-c .nav-c { display: flex; }
+      .nav-mobile button { min-width: 64px; min-height: 44px; background: transparent; border: 0; color: #526157; font-size: 11px; }
+      .nav-mobile button.active { color: #12623a; font-weight: 800; }
+      .dir-a .nav-a { gap: 8px; padding-inline: 10px; }
+      .dir-a .nav-a button { flex: 1; border-radius: 8px; background: #eaf4ed; color: #175d38; font-size: 13px; font-weight: 750; }
+      .dir-a .nav-a button:first-child { background: #12623a; color: #fff; }
+      .dir-b .nav-b { justify-content: space-between; padding-inline: 12px; }
+      .dir-b .nav-b .workspace-switch { flex: 1; text-align: left; border: 1px solid #cbdccf; border-radius: 7px; padding-inline: 12px; background: #eef6f0; color: #175d38; font-size: 13px; font-weight: 750; }
+      .dir-b .nav-b .workspace-switch small { display: block; color: #64776a; font-weight: 500; }
+      .mobile-back { display: inline-block; margin: -6px 0 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="frame">
+    <header class="intro">
+      <h1>R1-D02 · Representative workflow comparison</h1>
+      <p>Synthetic exploration board · responsive at mobile ~390×844 and desktop ~1440×1000</p>
+    </header>
+    <section class="toolbar" aria-label="Comparison controls">
+      <label>Direction<select id="direction"><option value="a">A · Task launchpad</option><option value="b">B · Capability workspace</option><option value="c">C · Context/action surface</option></select></label>
+      <label>Scenario<select id="scenario"><option value="entry">Signed-in entry</option><option value="create">KPH creation · NOT_FOUND</option><option value="history">History decision</option></select></label>
+      <span class="note">The content and outcomes stay constant while the information architecture changes.</span>
+    </section>
+    <section class="stage dir-a" id="stage">
+      <div class="brandbar"><div class="wordmark">Co.op Food<small>STORE OPERATIONS · EXPLORATION</small></div><div class="top-context"><strong>Nguyễn Minh Anh</strong> · current store <strong>CH Co.op Food Nguyễn Trãi</strong></div></div>
+      <div class="mobile-context">Đang thao tác: <strong>Nguyễn Minh Anh</strong> · <strong>CH Co.op Food Nguyễn Trãi</strong> <span class="tag">Phạm vi hiện tại</span></div>
+      <div class="mobile-workspaces"><strong>Không gian: KPH · đang mở</strong><span class="future">Nhận hàng · Dự kiến　 Kiểm kê · Dự kiến</span></div>
+      <div class="layout">
+        <nav class="side side-a" aria-label="Task launchpad navigation"><p class="side-label">Lối tắt</p><button class="side-link active">Bắt đầu</button><button class="side-link">Lịch sử</button><button class="side-link">Tài khoản</button></nav>
+        <nav class="side side-b" aria-label="Capability workspaces"><p class="side-label">Không gian làm việc</p><button class="side-link">Tổng quan</button><button class="side-link active">KPH · Phiếu chất lượng</button><button class="side-link future" disabled>Nhận hàng · Dự kiến</button><button class="side-link future" disabled>Kiểm kê · Dự kiến</button><button class="side-link future" disabled>Tồn kho · Dự kiến</button><p class="side-label" style="margin-top:28px">Tài khoản</p><button class="side-link">Nguyễn Minh Anh</button></nav>
+        <nav class="side side-c" aria-label="Context and tasks"><p class="side-label">Ngữ cảnh</p><button class="side-link active">Cửa hàng</button><button class="side-link">Tác vụ</button></nav>
+        <div class="content" id="content"></div>
+      </div>
+      <nav class="nav-mobile nav-a" aria-label="Quick task entry"><button>Tạo TPCN</button><button>Tạo TPTS</button></nav>
+      <nav class="nav-mobile nav-b" aria-label="Workspace switching"><button class="workspace-switch">Không gian: KPH <small>Đổi không gian ▴</small></button><button>Tổng quan</button></nav>
+      <nav class="nav-mobile nav-c" aria-label="Task switching"><button class="active">Ngữ cảnh</button><button>Tạo phiếu</button><button>Lịch sử</button></nav>
+    </section>
+  </main>
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const context = `<div class="context"><div><span>TÀI KHOẢN ĐANG THAO TÁC</span><strong>Nguyễn Minh Anh · Quản lý vùng</strong></div><div><span>CỬA HÀNG HIỆN TẠI</span><strong>CH Co.op Food Nguyễn Trãi</strong></div><span class="tag">Phạm vi cửa hàng hiện tại</span><button class="btn subtle">Xem ngữ cảnh</button></div>`;
+    const entryA = `<div class="eyebrow">Việc cần làm</div><h2>Bắt đầu nhanh</h2>${context}<div class="task-list"><button class="task"><span><strong>Tạo phiếu KPH · Thực phẩm khô</strong><small>Quét hoặc nhập mã hàng</small></span><span class="tag">TPCN →</span></button><button class="task"><span><strong>Tạo phiếu KPH · Thực phẩm tươi sống</strong><small>Ghi nhận vấn đề và ảnh</small></span><span class="tag">TPTS →</span></button><button class="task"><span><strong>Xem lịch sử KPH</strong><small>Lọc · xem duyệt · xuất hợp lệ</small></span><span class="tag">Mở →</span></button><section class="panel tint"><h3>Khả năng sắp có</h3><p>Nhận hàng · Kiểm kê · Theo dõi hạn dùng</p><span class="tag">Chưa triển khai</span></section></div>`;
+    const entryB = `<div class="eyebrow">Không gian làm việc / Store App</div><h2>Tổng quan cửa hàng</h2>${context}<div class="grid"><section class="panel"><h3>KPH</h3><p>Ghi nhận, xem xét và xuất phiếu chất lượng.</p><div class="actions"><button class="btn primary">Mở không gian KPH</button></div><p><span class="tag warn">2 phiếu cần xem</span></p></section><section class="panel tint"><h3>Các khả năng khác</h3><p>Nhận hàng · Kiểm kê · Tồn kho</p><span class="tag">Dự kiến</span></section></div><section class="panel" style="margin-top:14px"><h3>Trong không gian KPH</h3><div class="actions"><button class="btn primary">Tạo TPCN</button><button class="btn">Tạo TPTS</button><button class="btn">Lịch sử &amp; duyệt</button></div></section>`;
+    const entryC = `<div class="eyebrow">Ngữ cảnh hiện tại</div><h2>Nguyễn Trãi · cửa hàng đang thao tác</h2>${context}<div class="grid"><section class="panel"><span class="eyebrow">Hành động chính</span><h3>Ghi nhận vấn đề hàng hóa</h3><p>Thông tin này sẽ dùng phạm vi cửa hàng đang hiển thị ở trên.</p><div class="actions"><button class="btn primary">Tạo phiếu KPH</button><button class="btn">Mở lịch sử KPH</button></div></section><section class="panel tint"><h3>Chuyển tới khả năng</h3><p>KPH · Tra cứu hàng hóa</p><p class="future">Nhận hàng · dự kiến</p><p class="future">Kiểm kê · dự kiến</p></section></div><p class="note">Phạm vi được quyết định bởi quyền hiện hành của hệ thống; nội dung này chỉ giúp nhận biết ngữ cảnh.</p>`;
+    const createBase = `<div class="eyebrow">Tác vụ trực tiếp / TPCN</div><h2>Ghi nhận hàng hóa</h2>${context}<div class="a-sheet"><section><div class="a-section-title"><span class="tag">Loại phiếu</span><h3>Thực phẩm khô &amp; khác</h3></div><div class="actions"><button class="btn primary">TPCN · đang chọn</button><button class="btn">TPTS</button></div></section><section><div class="a-section-title"><span class="tag">Tra cứu</span><h3>Sản phẩm</h3></div><label class="field">Mã vạch / SKU<div style="display:flex;gap:8px"><input class="input" value="8934567890123" style="flex:1;min-width:0"><button class="btn">Quét lại</button></div></label><div class="actions"><button class="btn primary">Tra cứu</button><button class="btn">Nhập tay</button></div><div class="lookup" style="margin-top:14px"><strong>Không tìm thấy sản phẩm (NOT_FOUND)</strong><p>Đã giữ mã 8934567890123. Bạn có thể quét lại hoặc nhập thông tin thủ công. Không có sản phẩm nào được tự suy đoán.</p></div></section><section><div class="a-section-title"><span class="tag">Ghi nhận</span><h3>Thông tin phiếu</h3></div><div class="form-grid"><label class="field">Tên sản phẩm<input class="input" placeholder="Nhập tay: Nước mắm cá cơm"></label><label class="field">Nhà cung cấp<input class="input" placeholder="Nhập tên hoặc mã NCC"></label><label class="field">Số lượng<input class="input" value="1"></label><label class="field">Ngày phát hiện<input class="input" value="24/09/2026" readonly></label></div><p class="note">TPCN · tình trạng mặc định: Cận date · ngày theo giờ Việt Nam</p></section><section><div class="a-section-title"><span class="tag">Bằng chứng</span><h3>Ảnh · 2/3</h3></div><p>Ảnh gốc và bản có dấu thời gian được giữ riêng tư theo phiếu. Thứ tự lưu: 01 → 02.</p><div class="photos"><div class="photo">01 · ảnh gốc</div><div class="photo">02 · ảnh gốc</div><div class="photo empty">+ Ảnh 3</div></div><div class="actions"><button class="btn">Xem ảnh 1</button><button class="btn">Thêm ảnh</button></div></section></div><div class="selection"><strong>Bản nháp · TPCN · Nguyễn Trãi</strong><button class="btn primary">Xem lại phiếu</button></div><p class="note">Liên quan: FOUND hiển thị đúng một kết quả catalog; CATALOG_UNAVAILABLE thông báo dịch vụ catalog không sẵn sàng, khác với không tìm thấy, và cho thử lại.</p>`;
+    const createB = `<div class="eyebrow">Không gian KPH / Phiếu mới</div><h2>Tạo phiếu · bước 3 trong 3</h2>${context}<div class="workspace-label">KPH · Quy trình tạo phiếu</div><div class="b-create-layout"><div class="b-step-rail" aria-label="Tiến trình tạo phiếu"><div class="step done">✓ 1 · Chọn loại</div><div class="step done">✓ 2 · Tra cứu</div><div class="step active">3 · Ghi nhận &amp; ảnh</div></div><div><div class="b-prior"><span class="tag">TPCN đã chọn</span><span class="tag warn">NOT_FOUND · 8934567890123</span><span>Quét lại hoặc tiếp tục nhập tay; không suy đoán sản phẩm.</span></div><section class="panel b-current"><h3>Chi tiết phiếu</h3><div class="form-grid"><label class="field">Tên sản phẩm<input class="input" placeholder="Nhập tay: Nước mắm cá cơm"></label><label class="field">Nhà cung cấp<input class="input" placeholder="Nhập tên hoặc mã NCC"></label><label class="field">Số lượng<input class="input" value="1"></label><label class="field">Ngày phát hiện<input class="input" value="24/09/2026" readonly></label></div><p class="note">TPCN · tình trạng mặc định: Cận date · ngày theo giờ Việt Nam</p><h3 style="margin-top:20px">Bằng chứng ảnh · 2/3</h3><p>Ảnh gốc và bản đóng dấu được giữ riêng tư. Thứ tự lưu: 01 → 02.</p><div class="photos"><div class="photo">01 · ảnh gốc</div><div class="photo">02 · ảnh gốc</div><div class="photo empty">+ Ảnh 3</div></div><div class="actions"><button class="btn">Xem ảnh 1</button><button class="btn">Thêm ảnh</button></div></section><div class="b-stage-actions"><button class="btn">← Quay lại tra cứu</button><button class="btn primary">Tiếp tục: xem lại phiếu →</button></div></div></div><p class="note">Bước tra cứu: FOUND = một kết quả catalog; NOT_FOUND giữ mã để quét lại hoặc nhập tay; CATALOG_UNAVAILABLE = dịch vụ không sẵn sàng và cho thử lại.</p>`;
+    const createC = `<div class="eyebrow">Tác vụ KPH · ngữ cảnh cố định</div><h2>Ghi nhận tại Nguyễn Trãi</h2>${context}<div class="c-create-layout"><div><section class="panel"><h3>Loại phiếu và tra cứu</h3><div class="actions"><button class="btn primary">TPCN · đang chọn</button><button class="btn">TPTS</button></div><label class="field" style="margin-top:14px">Mã vạch / SKU<input class="input" value="8934567890123"></label><div class="actions"><button class="btn">Quét lại</button><button class="btn primary">Tra cứu</button><button class="btn">Nhập tay</button></div><div class="lookup" style="margin-top:12px"><strong>Không tìm thấy sản phẩm (NOT_FOUND)</strong><p>Giữ mã đã quét · quét lại hoặc nhập tay · không tự gán sản phẩm.</p></div></section><section class="panel" style="margin-top:12px"><h3>Chi tiết phiếu</h3><div class="form-grid"><label class="field">Tên sản phẩm<input class="input" placeholder="Nhập tay"></label><label class="field">Nhà cung cấp<input class="input" placeholder="Mã / tên NCC"></label><label class="field">Số lượng<input class="input" value="1"></label><label class="field">Ngày phát hiện<input class="input" value="24/09/2026" readonly></label></div><p class="note">TPCN · tình trạng mặc định: Cận date · ngày theo giờ Việt Nam</p></section></div><aside class="panel c-evidence"><div class="eyebrow">Gắn với ngữ cảnh hiện tại</div><h3>Nguyễn Trãi · TPCN</h3><p>Người thao tác: Nguyễn Minh Anh. Ảnh minh chứng thuộc phiếu trong cửa hàng này.</p><h3>Bằng chứng ảnh · 2/3</h3><div class="photos"><div class="photo">01 · ảnh gốc</div><div class="photo">02 · ảnh gốc</div><div class="photo empty">+ Ảnh 3</div></div><p class="note">Thứ tự 01 → 02 được giữ khi lưu. Ảnh gốc và bản đóng dấu đều riêng tư.</p><div class="actions"><button class="btn">Xem ảnh 1</button><button class="btn">Thêm ảnh</button></div></aside></div><div class="selection"><span><strong>Nguyễn Trãi</strong> · TPCN · 2 ảnh</span><button class="btn primary">Xem lại phiếu</button></div><p class="note">FOUND = một kết quả catalog. CATALOG_UNAVAILABLE = dịch vụ chưa sẵn sàng, có thể thử lại; không phải trạng thái không tìm thấy.</p>`;
+    const rows = `<tr><td><input class="check" type="checkbox" checked aria-label="Chọn phiếu KPH-260924-018"></td><td>24/09/2026</td><td class="product">8934567890123<small>Nước mắm cá cơm 500ml</small></td><td>Minh Phú</td><td>12 chai</td><td><span class="tag warn">Cận date</span></td><td><span class="tag warn">Đang chờ</span> <button class="btn">Xem duyệt</button></td></tr><tr><td><input class="check" type="checkbox" aria-label="Chọn phiếu KPH-260924-017"></td><td>24/09/2026</td><td class="product">8934000123456<small>Rau cải xanh</small></td><td>HTX An Bình</td><td>4 kg</td><td><span class="tag bad">Dập úng</span></td><td><span class="tag good">Đã duyệt</span></td></tr><tr><td><input class="check" type="checkbox" checked aria-label="Chọn phiếu KPH-260924-016"></td><td>23/09/2026</td><td class="product">8934567000456<small>Bánh quy bơ 180g</small></td><td>Thành Công</td><td>6 gói</td><td><span class="tag warn">Rách bao bì</span></td><td><span class="tag good">Đã duyệt</span></td></tr>`;
+    const cards = `<div class="record"><input class="check" type="checkbox" checked aria-label="Chọn phiếu KPH-260924-018"><div class="record-main"><strong>Nước mắm cá cơm 500ml</strong><small>8934567890123 · 24/09/2026</small><div class="record-meta"><span class="tag warn">Cận date</span><span class="tag warn">Đang chờ duyệt</span><span>12 chai · Minh Phú</span><button class="btn">Mở xem xét</button></div></div></div><div class="record"><input class="check" type="checkbox" aria-label="Chọn phiếu KPH-260924-017"><div class="record-main"><strong>Rau cải xanh</strong><small>8934000123456 · 24/09/2026</small><div class="record-meta"><span class="tag bad">Dập úng</span><span class="tag good">Đã duyệt</span><span>4 kg · HTX An Bình</span></div></div></div><div class="record"><input class="check" type="checkbox" checked aria-label="Chọn phiếu KPH-260924-016"><div class="record-main"><strong>Bánh quy bơ 180g</strong><small>8934567000456 · 23/09/2026</small><div class="record-meta"><span class="tag warn">Rách bao bì</span><span class="tag good">Đã duyệt</span><span>6 gói · Thành Công</span></div></div></div>`;
+    const historyShell = `<div class="eyebrow">KPH / Lịch sử</div><h2>Phiếu KPH <span class="tag">48 kết quả</span></h2>${context}<div class="filters"><button class="filter-chip">18–24/09/2026 ▾</button><button class="filter-chip">Loại: Tất cả ▾</button><button class="filter-chip">Trạng thái: Tất cả ▾</button><button class="filter-chip">Sắp xếp: mới nhất ▾</button><button class="btn">Lọc</button></div>`;
+    const historyA = `${historyShell}<div class="table-wrap desktop-history"><table><thead><tr><th><input class="check" type="checkbox" aria-label="Chọn tất cả trên trang hiện tại"></th><th>Ngày</th><th>Sản phẩm</th><th>NCC</th><th>SL</th><th>Tình trạng</th><th>Duyệt</th></tr></thead><tbody>${rows}</tbody></table></div><section class="panel mobile-history-cards">${cards}</section><div class="pagination"><span>Trang 2 / 4 · chọn trong trang hiện tại</span><span>← Trước　 Sau →</span></div><div class="selection"><span><strong>2 đã chọn</strong> · 1 đủ điều kiện xuất</span><button class="btn primary">Xem &amp; xuất</button></div><p class="note">Xác nhận trước khi tải: TPCN · trang 2 · 1 phiếu đã duyệt/đã gửi · 1 phiếu đang chờ sẽ không xuất.</p>`;
+    const historyB = `${historyShell}<div class="panel"><div class="filters"><span class="tag">48 phiếu khớp bộ lọc</span><span class="tag">Đang xem: trang 2 / 4</span><button class="filter-chip">12 dòng / trang</button></div><div class="table-wrap desktop-history"><table><thead><tr><th><input class="check" type="checkbox" aria-label="Chọn toàn trang hiện tại"></th><th>Ngày / người ghi nhận</th><th>Sản phẩm / mã</th><th>NCC</th><th>Số lượng</th><th>Tình trạng</th><th>Duyệt</th></tr></thead><tbody>${rows}</tbody></table></div><section class="mobile-history-cards">${cards}</section><div class="pagination"><span>13–24 / 48 · chọn trang hiện tại</span><span>← Trước　 Sau →</span></div></div><div class="selection"><span><strong>2 phiếu trên trang này</strong> · 1 đủ điều kiện: SUBMITTED + APPROVED</span><button class="btn primary">Xuất Excel…</button></div><p class="note">Xác nhận: đúng cửa hàng, loại TPCN, 1 phiếu đủ điều kiện; các phiếu còn lại không đưa vào workbook.</p>`;
+    const historyC = `${historyShell}<div class="split"><section class="panel"><div class="filters"><span class="tag">Trang 2 / 4 · 48 phiếu</span><span class="tag">2 đã chọn trên trang</span></div>${cards}<div class="pagination"><span>12 phiếu ở trang này</span><span>← Trang trước　 Trang sau →</span></div></section><aside class="panel inspector"><div class="eyebrow">Quyết định với lựa chọn hiện tại</div><h3>Xuất TPCN</h3><p>2 phiếu đang chọn ở trang 2. Chỉ bản ghi SUBMITTED + APPROVED được đưa vào Excel.</p><p><span class="tag good">1 đủ điều kiện</span> <span class="tag warn">1 đang chờ</span></p><p>Cửa hàng: <strong>Nguyễn Trãi</strong></p><button class="btn primary">Kiểm tra &amp; xác nhận</button><p class="note">Trang/filter giữ nguyên khi xem chi tiết. Xác nhận nêu loại, cửa hàng, số đủ điều kiện và thứ tự ảnh.</p></aside></div>`;
+    const templates = {a:{entry:entryA,create:createBase,history:historyA},b:{entry:entryB,create:createB,history:historyB},c:{entry:entryC,create:createC,history:historyC}};
+    function render(){const d=$('#direction').value,s=$('#scenario').value;$('#stage').className=`stage dir-${d} scenario-${s}`;$('#content').innerHTML=templates[d][s];$('#stage').querySelectorAll('.side-link').forEach(x=>x.classList.remove('active'));const active=$('#stage').querySelector(d==='a'?(s==='history'?'.side-a .side-link:nth-of-type(2)':'.side-a .side-link:first-of-type'):d==='b'?(s==='entry'?'.side-b .side-link:first-of-type':'.side-b .side-link:nth-of-type(2)'):'.side-c .side-link:first-of-type');if(active)active.classList.add('active');}
+    $('#direction').addEventListener('change',render);$('#scenario').addEventListener('change',render);render();
+  </script>
+</body>
+</html>
