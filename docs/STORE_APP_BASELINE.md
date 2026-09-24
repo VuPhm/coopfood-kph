@@ -50,8 +50,10 @@ Round 1 được thiết kế lại shell, global navigation, IA, ranh giới sc
 responsive composition, component hierarchy, token và biểu đạt thương hiệu.
 Workflow nhận biết được và capability semantics của scope, scan → lookup, tạo
 KPH, history/review/export và evidence ảnh phải tiếp tục đúng theo
-[contract index](product/STORE_APP_CONTRACTS.md) và
-[UI DNA](product/UI_DNA.md). Tài liệu này không chốt UI mới.
+[contract index](product/STORE_APP_CONTRACTS.md). Hướng UI đã hội tụ nằm ở
+[Store App UI DNA](product/STORE_APP_UI_DNA.md); [UI DNA Tool KPH](product/UI_DNA.md)
+chỉ là evidence kế thừa. [Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md)
+xác định slice kiểm chứng tối thiểu, chưa khởi động implementation.
 
 ## Pages được bảo tồn riêng
 

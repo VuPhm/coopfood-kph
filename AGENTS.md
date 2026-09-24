@@ -1,7 +1,7 @@
 # Hướng dẫn cho coding agent
 
 Áp dụng cho toàn bộ repository Co.op Food Store Operations App. Round 0 khóa
-baseline; Round 1 tiếp theo là UI/UX/Brand DNA, chưa phải triển khai shell.
+baseline; Round 1 hội tụ UI/UX/Brand DNA, chưa triển khai shell Round 2.
 
 ## Thứ tự đọc bắt buộc
 
@@ -67,7 +67,8 @@ và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
 - Giữ workflow và interaction nghiệp vụ đã accepted; shell, navigation, IA,
   screen composition và visual tokens có thể đổi trong Round 1. Xem
   [contract index](docs/product/STORE_APP_CONTRACTS.md) và
-  [UI DNA](docs/product/UI_DNA.md).
+  [Store App UI DNA](docs/product/STORE_APP_UI_DNA.md). Tài liệu
+  [UI DNA Tool KPH](docs/product/UI_DNA.md) là evidence kế thừa.
 
 ## Cách làm
 
