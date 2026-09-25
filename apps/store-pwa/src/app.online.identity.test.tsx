@@ -86,7 +86,8 @@ function deferred<T>() {
 }
 
 async function submitOnlineRecord(productName: string) {
-  fireEvent.click(await screen.findByRole("button", { name: /Tạo phiếu TP khô/i }));
+  fireEvent.click(await screen.findByRole("button", { name: "Tạo phiếu" }));
+  fireEvent.click(screen.getByRole("button", { name: "Thực phẩm khô & khác" }));
   fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: productName } });
   const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
   fireEvent.change(picker!, { target: { files: [new File(["evidence"], "evidence.jpg", { type: "image/jpeg" })] } });
@@ -124,11 +125,13 @@ describe("online identity and scoped query state", () => {
     expect(within(shell).getByText("Co.op Food Nguyễn Kiệm · CF-DEMO-001")).toBeVisible();
     expect(within(shell).getByRole("link", { name: /Lịch sử/ })).toHaveAttribute("href", "#history-title");
 
-    await waitFor(() => expect(within(shell).getByRole("button", { name: /Tạo phiếu TP khô/ })).toBeEnabled());
-    fireEvent.click(within(shell).getByRole("button", { name: /Tạo phiếu TP khô/ }));
+    await waitFor(() => expect(within(shell).getByRole("button", { name: "Tạo phiếu" })).toBeEnabled());
+    fireEvent.click(within(shell).getByRole("button", { name: "Tạo phiếu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Thực phẩm khô & khác" }));
     expect(await screen.findByRole("dialog", { name: /Tạo phiếu KPH.*Thực phẩm khô/i })).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
-    fireEvent.click(within(shell).getByRole("button", { name: /Tạo phiếu TP tươi sống/ }));
+    fireEvent.click(within(shell).getByRole("button", { name: "Tạo phiếu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Thực phẩm tươi sống" }));
     expect(await screen.findByRole("dialog", { name: /Tạo phiếu KPH.*Thực phẩm tươi/i })).toBeVisible();
   });
 
@@ -142,7 +145,7 @@ describe("online identity and scoped query state", () => {
     expect(within(shell).getByText("Chưa có cửa hàng trong phiên")).toBeVisible();
     expect(within(shell).getByText("Tài khoản: Nguyễn Văn Demo · manager.demo")).toBeVisible();
     expect(within(shell).queryByRole("combobox", { name: "Chọn cửa hàng" })).not.toBeInTheDocument();
-    expect(within(shell).getByRole("button", { name: /Tạo phiếu TP khô/ })).toBeDisabled();
+    expect(within(shell).getByRole("button", { name: "Tạo phiếu" })).toBeDisabled();
     expect(within(shell).getByRole("link", { name: /Lịch sử/ })).toBeVisible();
     expect(mocks.loadHistory).not.toHaveBeenCalled();
   });

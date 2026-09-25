@@ -20,10 +20,10 @@ describe("Store workspace", () => {
     expect(screen.getByText(today.display)).toHaveAttribute("datetime", today.iso);
   });
 
-  it("keeps both KPH entry actions visible", () => {
+  it("shows one KPH create action", () => {
     render(<App />);
-    expect(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i })).toBeVisible();
-    expect(screen.getByRole("button", { name: /Tạo phiếu TP tươi sống/i })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Tạo phiếu" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: /Tạo TPCN|Tạo TPTS/ })).not.toBeInTheDocument();
   });
 
   it("requires store settings before creating a record", async () => {
@@ -44,7 +44,8 @@ describe("Store workspace", () => {
     fireEvent.click(warningTrigger);
     expect(warningTrigger).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("note", { name: "Lưu ý dữ liệu Pilot" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Thực phẩm khô & khác" }));
 
     const settings = screen.getByRole("dialog", { name: "Thiết lập cửa hàng" });
     expect(screen.getByText("Thiết lập tên và mã cửa hàng trước khi tạo phiếu.")).toBeVisible();
@@ -53,7 +54,8 @@ describe("Store workspace", () => {
     fireEvent.click(within(settings).getByRole("button", { name: "Lưu thiết lập" }));
     await waitFor(() => expect(settings).not.toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Thực phẩm khô & khác" }));
     expect(screen.getByRole("dialog", { name: /Tạo phiếu KPH · Thực phẩm khô & khác/i })).toBeVisible();
   });
 

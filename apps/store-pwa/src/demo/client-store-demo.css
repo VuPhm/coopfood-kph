@@ -119,6 +119,15 @@
 .cd-field { display: grid; gap: .35rem; margin-top: .8rem; font-size: .8rem; font-weight: 750; }
 .cd-field input, .cd-field select, .cd-field textarea { width: 100%; }
 .cd-helper, .cd-empty { color: var(--cd-muted); font-size: .8rem; }
+.cd-reference-source .cd-helper { overflow-wrap: anywhere; }
+.cd-import-button { position: relative; overflow: hidden; margin-top: .5rem; cursor: pointer; }
+.cd-import-button input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.cd-import-button:focus-within { outline: 3px solid #ea9a25; outline-offset: 2px; }
+.cd-reference-comparison { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .5rem; margin-top: .8rem; border-radius: 10px; background: var(--cd-soft); padding: .85rem; }
+.cd-reference-comparison > span { display: grid; min-width: 0; gap: .2rem; font-size: .76rem; }
+.cd-reference-comparison b { font-size: .95rem; }
+.cd-reference-comparison small { color: var(--cd-muted); overflow-wrap: anywhere; }
+.cd-reference-comparison > strong { grid-column: 1 / -1; border-top: 1px solid var(--cd-line); padding-top: .55rem; font-size: .88rem; }
 .cd-divider { height: 1px; margin: 1rem 0; background: var(--cd-line); }
 .cd-scan { display: flex; align-items: center; justify-content: center; gap: .65rem; width: 100%; min-height: 76px; border: 2px solid var(--cd-green); border-radius: 12px; background: #edf6e9; color: var(--cd-green); font-size: 1rem; font-weight: 800; }
 .cd-scan:hover { background: #ddf0d9; }
@@ -237,6 +246,7 @@ html:has(.cd-expiry-host > .expiry-workbench:not(.is-collapsed)) { overflow: hid
   .cd-receive-actions button { width: 100%; }
   .cd-mobile-only, .cd-mobile-session { display: flex; }
   .cd-stocktake .cd-work-grid { gap: .7rem; }
+  .cd-reference-comparison { gap: .35rem; padding: .7rem; }
   .cd-stocktake-start:has(.cd-stocktake-lookup.has-product) { display: none; }
   .cd-stocktake-picker.is-closed { display: none; }
   .cd-mobile-session { align-items: center; justify-content: space-between; gap: .5rem; width: 100%; min-height: 58px; border: 1px solid var(--cd-line); border-radius: 10px; background: var(--cd-soft); padding: .6rem; text-align: left; }

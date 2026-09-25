@@ -1,7 +1,7 @@
 import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import {
-  ArrowLeft, BarChart3, Bell, CalendarDays, Check, ChevronRight, ClipboardCheck, Download, Home,
-  PackagePlus, PackageSearch, ScanBarcode, Search, Settings2, Store, UserRound,
+  ArrowLeft, BarChart3, Bell, CalendarDays, ChevronRight, ClipboardCheck, Download, Home,
+  PackagePlus, PackageSearch, ScanBarcode, Search, Settings2, Store, UserRound, Upload,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
@@ -9,9 +9,10 @@ import { assetUrl } from "../asset-url";
 import { BarcodeScannerDialog } from "../barcode-scanner-dialog";
 import { ExpiryWorkbench } from "../expiry-dialog";
 import {
-  createDemoState, decideSession, demoProducts, demoToday, inventoryQuantity, lotDate, lotLabel,
-  saveEntry, signed, type DateBand, type DemoActor, type DemoProduct, type DemoState,
-  type SessionStatus, type StocktakeEntry,
+  activeInventoryReferenceSnapshot, createDemoState, demoProducts, demoToday,
+  importDemoInventoryReference, inventoryQuantity, inventoryReferenceQuantity, latestCheckedQuantity,
+  latestInventoryCheck, lotDate, lotLabel, recordInventoryCheck, signed,
+  type DateBand, type DemoActor, type DemoProduct, type DemoState,
 } from "./client-store-demo-data";
 import { ReceivingSurface } from "./receiving-surface";
 import "./client-store-demo.css";
@@ -24,15 +25,14 @@ const nav = [
   { id: "settings", label: "Cài đặt", icon: Settings2 },
 ] as const;
 const actorNames = { employee: "Nhân viên · Trần Minh Anh", manager: "Quản lý · Nguyễn Văn Demo" };
-const statusNames: Record<SessionStatus, string> = {
-  IN_PROGRESS: "Đang kiểm", SUBMITTED: "Chờ duyệt", APPROVED: "Đã duyệt", RECOUNT_REQUIRED: "Cần kiểm lại",
-};
 const dateBands: { id: DateBand; label: string }[] = [
   { id: "OVER_70", label: ">70%" }, { id: "50_70", label: "50–70%" },
   { id: "20_50", label: "20–50%" }, { id: "UNDER_20", label: "<20%" },
 ];
 const product = (id: string) => demoProducts.find((item) => item.id === id)!;
-const diff = (entry: StocktakeEntry) => entry.actualQuantity - entry.systemQuantity;
+const displayTimestamp = (value: string) => new Intl.DateTimeFormat("vi-VN", {
+  timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric",
+}).format(new Date(value));
 
 export function ClientStoreDemo({ children }: { children: ReactNode }) {
   const [surface, setSurface] = useState<Surface>("home");
@@ -67,13 +67,13 @@ export function ClientStoreDemo({ children }: { children: ReactNode }) {
       {surface === "notifications" && <NotificationsSurface state={state} navigate={setSurface} />}
       {surface === "settings" && <SettingsSurface actor={actor} setActor={setActor} />}
       {surface === "kph" && <section className="cd-kph" aria-label="KPH sử dụng lại">{children}</section>}
-      {surface === "stocktake" && <StocktakeSurface state={state} setState={setState} navigate={setSurface} />}
+      {surface === "stocktake" && <StocktakeSurface actor={actor} state={state} setState={setState} />}
       {surface === "receiving" && <ReceivingSurface state={state} setState={setState} onHome={() => setSurface("home")} />}
-      {surface === "inventory" && <InventorySurface actor={actor} state={state} setState={setState} />}
+      {surface === "inventory" && <InventorySurface actor={actor} state={state} navigate={setSurface} />}
       {surface === "reports" && <ReportsSurface state={state} navigate={setSurface} />}
     </main>
     <div className="workspace-side-stack cd-expiry-host"><ExpiryWorkbench open={expiryOpen} onOpenChange={setExpiryOpen} /></div>
-    <div className="cd-demo-label">DEMO · Dữ liệu nhập hàng/kiểm kê/tồn kho chỉ lưu trong bộ nhớ trình duyệt</div>
+    <div className="cd-demo-label">DEMO · Dữ liệu nhập hàng/kiểm khớp/tồn kho chỉ lưu trong bộ nhớ trình duyệt</div>
   </div>;
 }
 
@@ -85,7 +85,7 @@ function HomeSurface({ actor, navigate, onOpenExpiry }: {
 }) {
   const tasks: { id: Surface | "expiry"; title: string; subtitle: string; icon: typeof Home }[] = [
     { id: "kph", title: "KPH", subtitle: "Ghi nhận hàng không phù hợp", icon: ClipboardCheck },
-    { id: "stocktake", title: "Kiểm kê", subtitle: "Đếm hàng tại cửa hàng", icon: ScanBarcode },
+    { id: "stocktake", title: "Kiểm khớp", subtitle: "So tồn tham chiếu với thực tế", icon: ScanBarcode },
     { id: "receiving", title: "Nhập hàng", subtitle: "Quét và nhận lô hàng", icon: PackagePlus },
     { id: "inventory", title: "Tồn kho", subtitle: "Tra SKU và lô hàng", icon: PackageSearch },
     { id: "expiry", title: "Tra cứu lùi hàng", subtitle: "Tính DATE và hạn lùi", icon: CalendarDays },
@@ -104,15 +104,16 @@ function HomeSurface({ actor, navigate, onOpenExpiry }: {
 }
 
 function NotificationsSurface({ state, navigate }: { state: DemoState; navigate: Navigate }) {
-  const pending = state.sessions.filter((session) => session.status === "SUBMITTED");
-  const recount = state.sessions.filter((session) => session.status === "RECOUNT_REQUIRED");
   const dateLots = state.lots.filter((lot) => lotDate(lot).status !== "SAFE");
+  const mismatches = demoProducts.map((item) => ({ item, latest: latestInventoryCheck(state, item.id), reference: inventoryReferenceQuantity(state, item.id) }))
+    .filter(({ latest, reference }) => latest && reference !== undefined && latest.actualQuantity !== reference);
+  const recent = state.inventoryCheckLogs.slice(-3).reverse();
   const items = [
-    ...pending.map((session) => ({ key: session.id, title: "Kiểm kê chờ duyệt", detail: `${session.id} · ${session.entries.length} sản phẩm`, source: "Tồn kho", destination: "inventory" as Surface, icon: ClipboardCheck })),
-    ...recount.map((session) => ({ key: session.id, title: "Cần kiểm lại", detail: `${session.id} · tiếp tục đếm hàng`, source: "Kiểm kê", destination: "stocktake" as Surface, icon: ScanBarcode })),
+    ...mismatches.map(({ item, latest, reference }) => ({ key: `mismatch-${item.id}`, title: `Chênh lệch: ${item.name}`, detail: `Tồn tham chiếu ${reference} · kiểm gần nhất ${latest!.actualQuantity} · ${signed(latest!.actualQuantity - reference!)}`, source: "Kiểm khớp", destination: "stocktake" as Surface, icon: ScanBarcode })),
+    ...recent.map((check) => ({ key: check.id, title: `Lần kiểm mới: ${product(check.productId).name}`, detail: `${check.checkerName} · ${displayTimestamp(check.checkedAt)}`, source: "Kiểm khớp", destination: "stocktake" as Surface, icon: ClipboardCheck })),
     ...dateLots.map((lot) => ({ key: lot.id, title: product(lot.productId).name, detail: `${lotLabel(lot)} · HSD ${formatDisplayDate(lot.hsd)}`, source: "DATE · Tồn kho", destination: "inventory" as Surface, icon: CalendarDays })),
   ];
-  return <div className="cd-utility-page"><Heading eyebrow="CÔNG VIỆC CẦN CHÚ Ý" title="Thông báo">{items.length} mục từ dữ liệu demo hiện tại.</Heading>
+  return <div className="cd-utility-page"><Heading eyebrow="CÔNG VIỆC CẦN CHÚ Ý" title="Thông báo">{mismatches.length} sản phẩm còn lệch so với snapshot tồn kho.</Heading>
     <section className="cd-panel cd-notification-list" aria-label="Danh sách thông báo">{items.length ? items.map(({ key, title, detail, source, destination, icon: Icon }) => <button type="button" key={key} onClick={() => navigate(destination)}>
       <span className="cd-notification-icon"><Icon size={20} aria-hidden="true" /></span><span><small>{source}</small><strong>{title}</strong><span>{detail}</span></span><ChevronRight size={18} aria-hidden="true" />
     </button>) : <p className="cd-empty">Chưa có việc cần chú ý.</p>}</section>
@@ -125,129 +126,129 @@ function SettingsSurface({ actor, setActor }: { actor: DemoActor; setActor: (act
       <div className="cd-settings-line"><Store size={21} aria-hidden="true" /><span><small>Cửa hàng hiện tại</small><strong>Co.op Food Nguyễn Kiệm · CF-DEMO-001</strong></span></div>
       <label className="cd-field" htmlFor="cd-settings-actor">Vai trò demo<select id="cd-settings-actor" aria-label="Vai trò demo" value={actor} onChange={(event) => setActor(event.target.value as DemoActor)}>
         <option value="employee">{actorNames.employee}</option><option value="manager">{actorNames.manager}</option>
-      </select></label><p className="cd-helper">Vai trò này chỉ điều khiển Kiểm kê và duyệt Tồn kho trong bản demo.</p></section>
+      </select></label><p className="cd-helper">Vai trò demo xác định người ghi nhận lần Kiểm khớp.</p></section>
   </div>;
 }
 
-function StocktakeSurface({ state, setState, navigate }: {
-  state: DemoState; setState: React.Dispatch<React.SetStateAction<DemoState>>; navigate: Navigate;
+function StocktakeSurface({ actor, state, setState }: {
+  actor: DemoActor; state: DemoState; setState: React.Dispatch<React.SetStateAction<DemoState>>;
 }) {
-  const [sessionId, setSessionId] = useState("");
   const [barcode, setBarcode] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
   const [actual, setActual] = useState("");
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
   const [message, setMessage] = useState("");
-  const [sessionPickerOpen, setSessionPickerOpen] = useState(true);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [importMessage, setImportMessage] = useState("");
+  const [importErrors, setImportErrors] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const activeSessions = state.sessions.filter((session) => session.status === "IN_PROGRESS" || session.status === "RECOUNT_REQUIRED");
-  const session = state.sessions.find((item) => item.id === sessionId);
   const matched = demoProducts.find((item) => item.barcode === barcode.trim() || item.sku.toLowerCase() === barcode.trim().toLowerCase());
-  const previous = session?.entries.find((entry) => entry.productId === matched?.id);
+  const snapshot = activeInventoryReferenceSnapshot(state);
+  const externalReference = matched ? inventoryReferenceQuantity(state, matched.id) : undefined;
+  const previous = matched ? latestInventoryCheck(state, matched.id) : undefined;
+  const comparisonReference = previous?.actualQuantity ?? externalReference;
+  const productHistory = matched ? state.inventoryCheckLogs.filter((entry) => entry.productId === matched.id).slice().reverse() : [];
   useEffect(() => {
-    setActual(previous ? String(previous.actualQuantity) : matched ? String(inventoryQuantity(state, matched.id)) : "");
-    setReason(previous?.reason ?? ""); setNote(previous?.note ?? "");
-  }, [matched?.id, sessionId]);
+    setActual(previous ? String(previous.actualQuantity) : "");
+    setReason(""); setNote("");
+  }, [matched?.id]);
   useEffect(() => { if (matched) window.scrollTo(0, 0); }, [matched?.id]);
-  function startSession() {
-    const id = `KK-${demoToday().replaceAll("-", "")}-${String(state.sessions.length + 1).padStart(2, "0")}`;
-    setState((current) => ({ ...current, sessions: [...current.sessions, {
-      id, date: demoToday(), employee: "Trần Minh Anh", status: "IN_PROGRESS", entries: [],
-    }] }));
-    setSessionId(id); setSessionPickerOpen(false); setMessage("Đã bắt đầu đợt kiểm kê.");
+
+  async function importReference(file?: File) {
+    if (!file) return;
+    const result = importDemoInventoryReference(state, file.name, await file.text());
+    setImportErrors(result.errors.map((error) => `Dòng ${error.row}: ${error.message}`));
+    if (result.errors.length) { setImportMessage("Không nạp được snapshot. Kiểm tra mapping CSV demo."); return; }
+    setState(result.state); setImportMessage(`Đã nạp snapshot ${result.state.activeInventoryReferenceSnapshotId}.`);
+    setMessage("");
   }
+
   function save() {
-    if (!session || !matched) return;
+    if (!matched || comparisonReference === undefined) return;
     const quantity = Number(actual);
-    const systemQuantity = previous?.systemQuantity ?? inventoryQuantity(state, matched.id);
     if (!Number.isSafeInteger(quantity) || quantity < 0) { setMessage("Nhập số lượng nguyên từ 0 trở lên."); return; }
-    if (quantity !== systemQuantity && !reason) { setMessage("Chọn lý do khi số đếm bị lệch."); return; }
-    setState((current) => saveEntry(current, session.id, {
-      productId: matched.id, systemQuantity, actualQuantity: quantity, reason, note: note.trim(),
+    const checkerName = actorNames[actor].split(" · ")[1]!;
+    setState((current) => recordInventoryCheck(current, {
+      productId: matched.id, actualQuantity: quantity, checkerName, reason: reason.trim(), note: note.trim(),
     }));
-    setMessage(`Đã lưu ${matched.name}. Tồn đã duyệt vẫn là ${inventoryQuantity(state, matched.id)} ${matched.unit.toLowerCase()}.`);
+    setMessage(`Đã ghi nhận ${matched.name}. Số kiểm gần nhất đã cập nhật.`);
     setBarcode(""); setActual(""); setReason(""); setNote("");
     requestAnimationFrame(() => inputRef.current?.focus());
   }
+
+  const history = matched ? productHistory : state.inventoryCheckLogs.slice().reverse();
   return <div className="cd-stocktake">
-    <Heading eyebrow="NHÂN VIÊN · TRÊN QUẦY" title="Kiểm kê">Quét sản phẩm, nhập số thực tế và gửi kết quả để quản lý duyệt.</Heading>
+    <Heading eyebrow="ĐỐI CHIẾU TỒN KHO" title="Kiểm khớp">Quét sản phẩm, so với snapshot từ ứng dụng tồn kho riêng và ghi nhận số thực tế. Mỗi lần kiểm được lưu riêng, không cần duyệt.</Heading>
+    <section className="cd-panel cd-reference-source">
+      <div className="cd-section-title"><h2>Tồn tham chiếu</h2><span>{snapshot ? `${snapshot.rows.length} SKU` : "Chưa nạp"}</span></div>
+      {snapshot ? <p className="cd-helper">Nguồn: {snapshot.sourceApp} · {snapshot.sourceFile} · Snapshot {snapshot.id} · nhập {displayTimestamp(snapshot.importedAt)}</p> : <p className="cd-empty">Chưa có snapshot tồn kho.</p>}
+      <label className="cd-secondary cd-import-button"><Upload size={17} aria-hidden="true" /> Nạp CSV demo<input type="file" accept=".csv,text/csv" aria-label="Nạp CSV snapshot tồn kho demo" onChange={(event) => { void importReference(event.currentTarget.files?.[0]); event.currentTarget.value = ""; }} /></label>
+      <p className="cd-helper">Mapping demo-only: UTF-8 CSV có đúng hai cột <code>SKU,Reference quantity</code>. Chưa có export thật để xác nhận cột sản xuất.</p>
+      {importMessage && <p className="cd-feedback" role="status">{importMessage}</p>}{importErrors.map((error) => <p className="cd-feedback" role="alert" key={error}>{error}</p>)}
+    </section>
     <div className="cd-work-grid">
       <section className="cd-panel cd-stocktake-start">
-        <div className="cd-section-title"><h2>Đợt kiểm kê</h2><span>1 · Chọn đợt</span></div>
-        {session && !sessionPickerOpen && <button type="button" className="cd-mobile-session" onClick={() => setSessionPickerOpen(true)}><span><strong>{session.id}</strong><small>{session.entries.length} sản phẩm · {statusNames[session.status]}</small></span><span>Đổi đợt</span></button>}
-        <div className={`cd-row cd-stocktake-picker ${session && !sessionPickerOpen ? "is-closed" : ""}`}><select aria-label="Chọn đợt kiểm kê" value={sessionId} onChange={(event) => { setSessionId(event.target.value); setBarcode(""); setSessionPickerOpen(false); }}>
-          <option value="">Chọn đợt đang mở</option>
-          {activeSessions.map((item) => <option key={item.id} value={item.id}>{item.id} · {statusNames[item.status]}</option>)}
-        </select><button type="button" className="cd-secondary" onClick={startSession}>+ Đợt mới</button></div>
-        {session && <p className="cd-helper">{session.id} · {session.entries.length} sản phẩm đã lưu · {statusNames[session.status]}</p>}
-        {session && <div className={`cd-stocktake-lookup ${matched ? "has-product" : ""}`}><div className="cd-divider" />
-          <div className="cd-section-title"><h2>Quét hoặc nhập mã</h2><span>2 · Sản phẩm</span></div>
+        <div className={`cd-stocktake-lookup ${matched ? "has-product" : ""}`}>
+          <div className="cd-section-title"><h2>Quét hoặc nhập mã</h2><span>1 · Sản phẩm</span></div>
           <button type="button" className="cd-scan" onClick={() => setScannerOpen(true)}><ScanBarcode size={26} aria-hidden="true" /> Quét barcode</button>
           <label className="cd-field">Nhập barcode / SKU thủ công<input ref={inputRef} inputMode="numeric" value={barcode}
-            onChange={(event) => { setBarcode(event.target.value); setMessage(""); }} placeholder="Ví dụ 8938501434012" /></label></div>}
+            onChange={(event) => { setBarcode(event.target.value); setMessage(""); }} placeholder="Ví dụ 8938501434012" /></label>
+        </div>
         {barcode && !matched && <p className="cd-feedback" role="status">Chưa tìm thấy trong danh mục demo. Quét lại hoặc nhập mã khác.</p>}
-        {matched && session && <div className="cd-found"><strong>{matched.name}</strong><span>{matched.sku} · {matched.barcode}</span>
-          <span>Tồn đã duyệt: <b>{inventoryQuantity(state, matched.id)} {matched.unit}</b></span></div>}
+        {matched && <div className="cd-found"><strong>{matched.name}</strong><span>{matched.sku} · {matched.barcode}</span>
+          <span>Tồn tham chiếu: <b>{externalReference ?? "Chưa có trong snapshot"} {externalReference !== undefined ? matched.unit : ""}</b></span>
+          <span>Số kiểm gần nhất: <b>{latestCheckedQuantity(state, matched.id) ?? "Chưa kiểm"} {latestCheckedQuantity(state, matched.id) !== undefined ? matched.unit : ""}</b></span></div>}
       </section>
       <section className={`cd-panel cd-stocktake-count ${matched ? "has-product" : ""}`}>
-        <div className="cd-section-title"><h2>Số lượng thực tế</h2><span>3 · Lưu dòng</span></div>
-        {matched && session ? <>
-          <div className="cd-found"><strong>{matched.name}</strong><span>{matched.sku} · Tồn đã duyệt {inventoryQuantity(state, matched.id)} {matched.unit}</span></div>
+        <div className="cd-section-title"><h2>Số lượng thực tế</h2><span>2 · Ghi nhận</span></div>
+        {matched ? externalReference === undefined ? <p className="cd-empty">SKU này chưa có trong snapshot đang chọn. Nạp snapshot có SKU này để so sánh.</p> : <>
+          <div className="cd-found"><strong>{matched.name}</strong><span>{matched.sku} · Tồn tham chiếu ngoài: {externalReference} {matched.unit}</span>
+            <span>{previous ? `Lần kiểm gần nhất: ${previous.actualQuantity} ${matched.unit} · ${displayTimestamp(previous.checkedAt)}` : "Chưa có lần kiểm trước"}</span></div>
           <button type="button" className="cd-mobile-only cd-text-action" onClick={() => setBarcode("")}><ArrowLeft size={16} aria-hidden="true" /> Đổi sản phẩm</button>
-          <label className="cd-field">Đếm thực tế ({matched.unit})<input type="number" min="0" step="1" inputMode="numeric"
+          <label className="cd-field">Thực tế ({matched.unit})<input type="number" min="0" step="1" inputMode="numeric"
             value={actual} onChange={(event) => setActual(event.target.value)} /></label>
-          <div className="cd-difference">Hệ thống {previous?.systemQuantity ?? inventoryQuantity(state, matched.id)} → Thực tế {actual || "—"}
-            <strong>{actual !== "" && Number.isFinite(Number(actual)) ? signed(Number(actual) - (previous?.systemQuantity ?? inventoryQuantity(state, matched.id))) : "—"}</strong></div>
-          {actual !== "" && Number(actual) !== (previous?.systemQuantity ?? inventoryQuantity(state, matched.id)) && <>
-            <label className="cd-field">Lý do chênh lệch<select value={reason} onChange={(event) => setReason(event.target.value)}>
-              <option value="">Chọn lý do</option><option>Hao hụt</option><option>Hàng hỏng</option><option>Nhầm vị trí</option><option>Khác</option>
+          <div className="cd-reference-comparison"><span>Tồn tham chiếu dùng lần này <b>{comparisonReference} {matched.unit}</b><small>{previous ? "Lần kiểm gần nhất" : `Snapshot ${snapshot?.id}`}</small></span><ChevronRight size={18} aria-hidden="true" /><span>Thực tế <b>{actual || "—"} {actual ? matched.unit : ""}</b></span><strong>Chênh lệch {actual !== "" && Number.isFinite(Number(actual)) ? signed(Number(actual) - comparisonReference!) : "—"}</strong></div>
+          {actual !== "" && Number(actual) !== comparisonReference && <>
+            <label className="cd-field">Lý do (không bắt buộc)<select value={reason} onChange={(event) => setReason(event.target.value)}>
+              <option value="">Không chọn</option><option>Hao hụt</option><option>Hàng hỏng</option><option>Nhầm vị trí</option><option>Khác</option>
             </select></label>
             <label className="cd-field">Ghi chú (không bắt buộc)<textarea value={note} onChange={(event) => setNote(event.target.value)} rows={2} /></label>
           </>}
-          <button type="button" className="cd-primary cd-save" onClick={save}>Lưu & quét tiếp <ChevronRight size={18} /></button>
-        </> : <p className="cd-empty">Chọn đợt và quét sản phẩm để nhập số lượng.</p>}
+          <button type="button" className="cd-primary cd-save" onClick={save}>Ghi nhận & kiểm tiếp <ChevronRight size={18} /></button>
+        </> : <p className="cd-empty">Quét hoặc nhập mã sản phẩm để xem tồn tham chiếu.</p>}
         {message && <p className="cd-feedback" role="status">{message}</p>}
       </section>
     </div>
-    {session && <section className="cd-panel cd-session-list"><div className="cd-section-title"><h2>Đã kiểm · {session.entries.length}</h2><span>Tồn chưa thay đổi</span></div>
-      <button type="button" className="cd-mobile-only cd-history-toggle" aria-expanded={historyOpen} onClick={() => setHistoryOpen(!historyOpen)}>{historyOpen ? "Ẩn danh sách đã kiểm" : "Xem danh sách đã kiểm"}<ChevronRight size={17} aria-hidden="true" /></button>
+    <section className="cd-panel cd-session-list"><div className="cd-section-title"><h2>Lịch sử Kiểm khớp{matched ? ` · ${matched.name}` : ""}</h2><span>{history.length} lần</span></div>
+      <button type="button" className="cd-mobile-only cd-history-toggle" aria-expanded={historyOpen} onClick={() => setHistoryOpen(!historyOpen)}>{historyOpen ? "Ẩn lịch sử" : "Xem lịch sử"}<ChevronRight size={17} aria-hidden="true" /></button>
       <div className={historyOpen ? "cd-stocktake-history is-open" : "cd-stocktake-history"}>
-      {session.entries.length ? session.entries.map((entry) => <div className="cd-line" key={entry.productId}><span><strong>{product(entry.productId).name}</strong><small>{entry.reason || "Khớp"}</small></span><b>{entry.systemQuantity} → {entry.actualQuantity} ({signed(diff(entry))})</b></div>) : <p className="cd-empty">Chưa có sản phẩm nào được lưu.</p>}
+      {history.length ? history.map((entry) => <div className="cd-line" key={entry.id}><span><strong>{product(entry.productId).name} · {entry.checkerName}</strong><small>{displayTimestamp(entry.checkedAt)} · Snapshot {entry.referenceSnapshotId} · {entry.referenceSourceFile}{entry.reason ? ` · ${entry.reason}` : ""}{entry.note ? ` · ${entry.note}` : ""}</small></span><b>{entry.referenceQuantity} → {entry.actualQuantity} ({signed(entry.difference)})</b></div>) : <p className="cd-empty">Chưa có lần kiểm nào được ghi nhận.</p>}
       </div>
-      {session.entries.length > 0 && <button type="button" className="cd-primary" onClick={() => {
-        setState((current) => ({ ...current, sessions: current.sessions.map((item) => item.id === session.id ? { ...item, status: "SUBMITTED" } : item) }));
-        setSessionId(""); setBarcode(""); setMessage("Đã gửi kiểm kê. Tồn chỉ đổi sau khi quản lý duyệt."); navigate("inventory");
-      }}>Gửi kết quả chờ duyệt</button>}
-    </section>}
+    </section>
     <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={(code) => { setBarcode(code); setScannerOpen(false); }} />
   </div>;
 }
 
-function InventorySurface({ actor, state, setState }: {
-  actor: DemoActor; state: DemoState; setState: React.Dispatch<React.SetStateAction<DemoState>>;
+function InventorySurface({ actor, state, navigate }: {
+  actor: DemoActor; state: DemoState; navigate: Navigate;
 }) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(demoProducts[0]!.id);
-  const [sessionId, setSessionId] = useState("");
-  const [mobileView, setMobileView] = useState<"list" | "product" | "lot" | "queue" | "review">("list");
+  const [mobileView, setMobileView] = useState<"list" | "product" | "lot">("list");
   const [selectedLotId, setSelectedLotId] = useState("");
   const filtered = demoProducts.filter((item) => [item.name, item.sku, item.barcode, item.group].some((value) => value.toLowerCase().includes(query.toLowerCase().trim())));
   const selected = filtered.find((item) => item.id === selectedId) ?? filtered[0];
-  const pending = state.sessions.filter((item) => item.status === "SUBMITTED");
-  const selectedSession = pending.find((item) => item.id === sessionId) ?? pending[0];
   useEffect(() => { window.scrollTo(0, 0); }, [mobileView]);
   return <div className="cd-inventory" data-mobile-view={mobileView}>
-    <Heading eyebrow="TRA CỨU & PHÊ DUYỆT" title="Tồn kho">Xem tồn đã duyệt, chi tiết lô và quyết định kiểm kê chờ duyệt.</Heading>
+    <Heading eyebrow="TRA CỨU TỒN KHO" title="Tồn kho">Xem số tham chiếu từ snapshot, số kiểm gần nhất và chi tiết lô.</Heading>
     <div className="cd-work-grid cd-inventory-grid">
       <section className="cd-panel cd-inventory-list">
         <div className="cd-section-title"><h2>Danh mục tồn kho</h2><span>{filtered.length} SKU</span></div>
-        <button type="button" className="cd-mobile-only cd-review-launch" onClick={() => setMobileView("queue")}>Hàng chờ duyệt <strong>{pending.length}</strong><ChevronRight size={17} aria-hidden="true" /></button>
         <label className="cd-search"><Search size={18} aria-hidden="true" /><input aria-label="Tìm SKU hoặc sản phẩm" value={query}
           onChange={(event) => { setQuery(event.target.value); setMobileView("list"); }} placeholder="Tìm SKU, barcode, tên hàng…" /></label>
         <div className="cd-product-list">{filtered.map((item) => <button className={selected?.id === item.id ? "selected" : ""} type="button"
-          key={item.id} onClick={() => { setSelectedId(item.id); setMobileView("product"); setSelectedLotId(""); }}><span><strong>{item.name}</strong><small>{item.sku} · {item.location}</small></span><b>{inventoryQuantity(state, item.id)}</b></button>)}
+          key={item.id} onClick={() => { setSelectedId(item.id); setMobileView("product"); setSelectedLotId(""); }}><span><strong>{item.name}</strong><small>{item.sku} · {item.location}</small></span><b>{latestCheckedQuantity(state, item.id) ?? "—"}</b></button>)}
           {!filtered.length && <p className="cd-empty">Không có sản phẩm phù hợp.</p>}
         </div>
       </section>
@@ -255,7 +256,9 @@ function InventorySurface({ actor, state, setState }: {
         <button type="button" className="cd-mobile-only cd-text-action cd-inventory-back" onClick={() => setMobileView(mobileView === "lot" ? "product" : "list")}><ArrowLeft size={16} aria-hidden="true" /> {mobileView === "lot" ? "Sản phẩm" : "Danh sách"}</button>
         <div className="cd-section-title"><h2>{selected.name}</h2><span>{selected.sku}</span></div>
         <div className="cd-facts cd-product-facts"><span>Barcode <b>{selected.barcode}</b></span><span>Nhà cung cấp <b>{selected.supplier}</b></span>
-          <span>Nhóm hàng <b>{selected.group}</b></span><span>Tồn đã duyệt <b>{inventoryQuantity(state, selected.id)} {selected.unit}</b></span></div>
+          <span>Nhóm hàng <b>{selected.group}</b></span><span>Tồn tham chiếu <b>{inventoryReferenceQuantity(state, selected.id) ?? "Chưa có snapshot"} {inventoryReferenceQuantity(state, selected.id) !== undefined ? selected.unit : ""}</b></span>
+          <span>Số kiểm gần nhất <b>{latestCheckedQuantity(state, selected.id) ?? "Chưa kiểm"} {latestCheckedQuantity(state, selected.id) !== undefined ? selected.unit : ""}</b></span>
+          <span>Tồn theo lô nhập demo <b>{inventoryQuantity(state, selected.id)} {selected.unit}</b></span></div>
         <h3 className="cd-subheading cd-lot-list-title">Lô & DATE</h3>
         {state.lots.filter((lot) => lot.productId === selected.id).map((lot) => {
           const date = lotDate(lot);
@@ -269,34 +272,24 @@ function InventorySurface({ actor, state, setState }: {
         })}
       </section>}
     </div>
-    <section className="cd-panel cd-mobile-only cd-review-queue"><button type="button" className="cd-text-action" onClick={() => setMobileView("list")}><ArrowLeft size={16} aria-hidden="true" /> Tồn kho</button>
-      <h2>Hàng chờ duyệt · {pending.length}</h2>{pending.length ? pending.map((item) => <button type="button" className="cd-review-item" key={item.id} onClick={() => { setSessionId(item.id); setMobileView("review"); }}><span><strong>{item.id}</strong><small>{item.entries.length} sản phẩm · {item.entries.filter((entry) => diff(entry) !== 0).length} lệch</small></span><ChevronRight size={17} aria-hidden="true" /></button>) : <p className="cd-empty">Không còn đợt kiểm kê chờ duyệt.</p>}
-    </section>
-    <section className="cd-panel cd-approval">
-      <button type="button" className="cd-mobile-only cd-text-action" onClick={() => setMobileView("queue")}><ArrowLeft size={16} aria-hidden="true" /> Hàng chờ duyệt</button>
-      <div className="cd-section-title"><h2>Kiểm kê chờ duyệt</h2><span>{pending.length} đợt</span></div>
-      {pending.length ? <>
-        <div className="cd-row"><select aria-label="Chọn phiếu chờ duyệt" value={selectedSession?.id ?? ""} onChange={(event) => setSessionId(event.target.value)}>
-          {pending.map((item) => <option key={item.id} value={item.id}>{item.id} · {item.entries.length} sản phẩm · {item.entries.filter((entry) => diff(entry) !== 0).length} lệch</option>)}
-        </select><span className="cd-status warning">Chờ duyệt</span></div>
-        {selectedSession && <><p className="cd-helper">{selectedSession.employee} · {formatDisplayDate(selectedSession.date)} · Tồn vẫn giữ số đã duyệt</p>
-          {selectedSession.entries.map((entry) => <div key={entry.productId} className="cd-line"><span><strong>{product(entry.productId).name}</strong>
-            <small>{entry.reason || "Khớp"}{entry.note ? ` · ${entry.note}` : ""}</small></span><b>{entry.systemQuantity} → {entry.actualQuantity} ({signed(diff(entry))})</b></div>)}
-          {actor === "manager" ? <div className="cd-actions">
-            <button type="button" className="cd-primary" onClick={() => { setState((current) => decideSession(current, selectedSession.id, "APPROVED")); setSessionId(""); setMobileView("queue"); }}><Check size={18} /> Chấp nhận</button>
-            <button type="button" className="cd-secondary" onClick={() => { setState((current) => decideSession(current, selectedSession.id, "RECOUNT_REQUIRED")); setSessionId(""); setMobileView("queue"); }}>Yêu cầu kiểm lại</button>
-          </div> : <p className="cd-feedback">Chuyển vai trò demo sang Quản lý để duyệt hoặc yêu cầu kiểm lại.</p>}</>}
-      </> : <p className="cd-empty">Không còn đợt kiểm kê chờ duyệt.</p>}
+    <section className="cd-panel cd-approval"><div className="cd-section-title"><h2>Lịch sử Kiểm khớp · {selected?.name ?? ""}</h2><span>{state.inventoryCheckLogs.filter((entry) => entry.productId === selected?.id).length} lần</span></div>
+      {selected && state.inventoryCheckLogs.filter((entry) => entry.productId === selected.id).slice().reverse().map((entry) => <div className="cd-line" key={entry.id}><span><strong>{entry.checkerName} · {displayTimestamp(entry.checkedAt)}</strong><small>Snapshot {entry.referenceSnapshotId} · {entry.referenceSourceFile}</small></span><b>{entry.referenceQuantity} → {entry.actualQuantity} ({signed(entry.difference)})</b></div>)}
+      {actor === "manager" && <p className="cd-helper">Quản lý có thể kiểm tra lại SKU. Lần kiểm mới sẽ được thêm vào lịch sử và cập nhật trạng thái gần nhất.</p>}
+      <button className="cd-secondary" type="button" onClick={() => navigate("stocktake")}>Mở Kiểm khớp <ChevronRight size={17} aria-hidden="true" /></button>
     </section>
   </div>;
 }
 
-type ReportKind = "overview" | "inventory" | "stocktake" | "date" | "kph" | "processed";
-type ReportRow = { key: string; name: string; detail: string; quantity: string; status: string; group: string; supplier: string; band: DateBand | ""; date: string };
+type ReportKind = "overview" | "inventory" | "reconciliation" | "checks" | "date" | "kph";
+type ReportRow = {
+  key: string; name: string; detail: string; quantity: string; status: string; group: string; supplier: string;
+  band: DateBand | ""; date: string; externalReference?: string; latestChecked?: string; difference?: string;
+  checker?: string; checkedAt?: string; checkCount?: string;
+};
 const reportKinds: { id: ReportKind; label: string }[] = [
   { id: "overview", label: "Tổng quan" }, { id: "inventory", label: "Tồn kho" },
-  { id: "stocktake", label: "Kiểm kê & chênh lệch" }, { id: "date", label: "Hàng cần DATE" },
-  { id: "kph", label: "KPH" }, { id: "processed", label: "Đã xử lý" },
+  { id: "reconciliation", label: "Kiểm khớp & chênh lệch" }, { id: "checks", label: "Lịch sử Kiểm khớp" },
+  { id: "date", label: "Hàng cần DATE" }, { id: "kph", label: "KPH" },
 ];
 function reportRows(state: DemoState, kind: ReportKind): ReportRow[] {
   if (kind === "inventory" || kind === "overview" || kind === "date") {
@@ -307,16 +300,31 @@ function reportRows(state: DemoState, kind: ReportKind): ReportRow[] {
         group: item.group, supplier: item.supplier, band: date.band, date: lot.hsd };
     });
   }
-  if (kind === "stocktake") return state.sessions.flatMap((session) => session.entries.map((entry) => {
+  if (kind === "reconciliation") return demoProducts.flatMap((item) => {
+    const reference = inventoryReferenceQuantity(state, item.id);
+    if (reference === undefined) return [];
+    const latest = latestInventoryCheck(state, item.id);
+    const quantity = latest?.actualQuantity;
+    const count = state.inventoryCheckLogs.filter((entry) => entry.productId === item.id).length;
+    const difference = quantity === undefined ? undefined : quantity - reference;
+    return [{ key: `reconcile-${item.id}`, name: item.name,
+      detail: `${item.sku} · ${latest ? `${latest.checkerName} · ${displayTimestamp(latest.checkedAt)}` : "Chưa kiểm"} · ${count} lần kiểm`,
+      quantity: `${reference} → ${quantity ?? "Chưa kiểm"}${difference === undefined ? "" : ` (${signed(difference)})`}`,
+      status: difference === undefined ? "Chưa kiểm" : difference === 0 ? "Khớp" : "Còn chênh lệch",
+      group: item.group, supplier: item.supplier, band: "" as const, date: latest?.checkedAt.slice(0, 10) ?? demoToday(),
+      externalReference: String(reference), latestChecked: quantity === undefined ? "" : String(quantity),
+      difference: difference === undefined ? "" : String(difference), checker: latest?.checkerName ?? "",
+      checkedAt: latest?.checkedAt ?? "", checkCount: String(count) }];
+  });
+  if (kind === "checks") return state.inventoryCheckLogs.map((entry) => {
     const item = product(entry.productId);
-    return { key: `${session.id}-${entry.productId}`, name: item.name, detail: `${session.id} · ${item.sku} · ${entry.reason || "Khớp"}`,
-      quantity: `${entry.systemQuantity} → ${entry.actualQuantity} (${signed(diff(entry))})`, status: statusNames[session.status],
-      group: item.group, supplier: item.supplier, band: "" as const, date: session.date };
-  }));
-  if (kind === "processed") return state.adjustments.map((adjustment) => {
-    const item = product(adjustment.productId);
-    return { key: adjustment.id, name: item.name, detail: `${adjustment.sessionId} · ${item.sku} · Kiểm kê`,
-      quantity: signed(adjustment.delta), status: "Đã xử lý", group: item.group, supplier: item.supplier, band: "" as const, date: adjustment.date };
+    return { key: entry.id, name: item.name,
+      detail: `${item.sku} · ${entry.checkerName} · ${displayTimestamp(entry.checkedAt)} · Snapshot ${entry.referenceSnapshotId} · ${entry.referenceSourceFile}${entry.reason ? ` · ${entry.reason}` : ""}`,
+      quantity: `${entry.referenceQuantity} → ${entry.actualQuantity} (${signed(entry.difference)})`,
+      status: "Đã ghi nhận", group: item.group, supplier: item.supplier, band: "" as const, date: entry.checkedAt.slice(0, 10),
+      externalReference: String(entry.externalReferenceQuantity), latestChecked: String(entry.actualQuantity),
+      difference: String(entry.difference), checker: entry.checkerName, checkedAt: entry.checkedAt,
+      checkCount: String(state.inventoryCheckLogs.filter((item) => item.productId === entry.productId).length) };
   });
   return [];
 }
@@ -342,9 +350,13 @@ function ReportsSurface({ state, navigate }: { state: DemoState; navigate: Navig
   const quantityDateFilter = kind === "overview" || kind === "inventory" || kind === "date";
   function updateDraft(key: keyof Filters, value: string) { setDraft((current) => ({ ...current, [key]: value })); }
   function exportCsv() {
-    const cells = [["Sản phẩm", "Chi tiết", "Số lượng", "Trạng thái", "Nhóm hàng", "Nhà cung cấp"],
-      ...filtered.map((row) => [row.name, row.detail, row.quantity, row.status, row.group, row.supplier])];
-    const csv = "\uFEFF" + cells.map((line) => line.map((cell) => `"${cell.replaceAll('"', '""')}"`).join(",")).join("\r\n");
+    const cells = [["Sản phẩm", "Chi tiết", "Số lượng", "Trạng thái", "Nhóm hàng", "Nhà cung cấp", "Tồn tham chiếu bên ngoài", "Số kiểm gần nhất", "Chênh lệch mới nhất", "Người kiểm gần nhất", "Thời gian kiểm gần nhất", "Số lần kiểm"],
+      ...filtered.map((row) => [row.name, row.detail, row.quantity, row.status, row.group, row.supplier,
+        row.externalReference ?? "", row.latestChecked ?? "", row.difference ?? "", row.checker ?? "", row.checkedAt ?? "", row.checkCount ?? ""])];
+    const csv = "\uFEFF" + cells.map((line) => line.map((cell) => {
+      const safeCell = /^[=+\-@]/.test(cell) ? `'${cell}` : cell;
+      return `"${safeCell.replaceAll('"', '""')}"`;
+    }).join(",")).join("\r\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const link = document.createElement("a"); link.href = url; link.download = `coopfood-demo-${kind}-${demoToday()}.csv`;
     link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -366,14 +378,14 @@ function ReportsSurface({ state, navigate }: { state: DemoState; navigate: Navig
     <div className="cd-report-overview">
       <section className="cd-panel"><h2>Phân bố DATE theo lô</h2>{dateCounts.map((band) => <div className="cd-bar-row" key={band.id}><span>{band.label}</span><div><i style={{ width: `${state.lots.length ? band.lots.length / state.lots.length * 100 : 0}%` }} /></div><b>{band.lots.length}</b></div>)}</section>
       <section className="cd-panel"><h2>Ưu tiên xử lý</h2>
-        <p>{state.sessions.filter((item) => item.status === "SUBMITTED").length} đợt chờ duyệt · {state.sessions.filter((item) => item.status === "RECOUNT_REQUIRED").length} cần kiểm lại · {state.adjustments.length} điều chỉnh đã xử lý</p>
+        <p>{demoProducts.filter((item) => { const latest = latestInventoryCheck(state, item.id); const reference = inventoryReferenceQuantity(state, item.id); return latest && reference !== undefined && latest.actualQuantity !== reference; }).length} sản phẩm còn lệch · {state.inventoryCheckLogs.length} lần kiểm đã ghi nhận</p>
         {state.lots.filter((lot) => lotDate(lot).status !== "SAFE").sort((a, b) => lotDate(b).percent - lotDate(a).percent).slice(0, 3).map((lot) => <div className="cd-line" key={lot.id}><span><strong>{product(lot.productId).name}</strong><small>{lotLabel(lot)}</small></span><b>{lotDate(lot).percent}% DATE</b></div>)}
       </section>
       <section className="cd-panel"><h2>Tồn cao nhất & chênh lệch lớn</h2>
         {demoProducts.map((item) => ({ item, quantity: inventoryQuantity(state, item.id) })).sort((a, b) => b.quantity - a.quantity).slice(0, 3).map(({ item, quantity }) => <div className="cd-line" key={item.id}><span><strong>{item.name}</strong><small>{item.sku}</small></span><b>{quantity} {item.unit}</b></div>)}
-        <h3>Chênh lệch kiểm kê</h3>
-        {state.sessions.flatMap((session) => session.entries.map((entry) => ({ session, entry }))).filter(({ entry }) => diff(entry) !== 0)
-          .sort((a, b) => Math.abs(diff(b.entry)) - Math.abs(diff(a.entry))).slice(0, 3).map(({ session, entry }) => <div className="cd-line" key={session.id + entry.productId}><span><strong>{product(entry.productId).name}</strong><small>{session.id} · {statusNames[session.status]}</small></span><b>{signed(diff(entry))}</b></div>)}
+        <h3>Chênh lệch Kiểm khớp</h3>
+        {demoProducts.flatMap((item) => { const latest = latestInventoryCheck(state, item.id); const reference = inventoryReferenceQuantity(state, item.id); return latest && reference !== undefined && latest.actualQuantity !== reference ? [{ item, latest, difference: latest.actualQuantity - reference }] : []; })
+          .sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference)).slice(0, 3).map(({ item, latest, difference }) => <div className="cd-line" key={item.id}><span><strong>{item.name}</strong><small>{latest.checkerName} · {displayTimestamp(latest.checkedAt)}</small></span><b>{signed(difference)}</b></div>)}
       </section>
     </div></div>}
     {kind === "kph" ? <section className="cd-panel"><h2>Dữ liệu KPH thật</h2><p>Phiếu KPH dùng luồng online hiện có. Mở KPH để xem lịch sử, lọc và xuất phiếu theo quyền hiện tại.</p><button className="cd-primary" type="button" onClick={() => navigate("kph")}>Mở KPH <ChevronRight size={18} /></button></section> : <>

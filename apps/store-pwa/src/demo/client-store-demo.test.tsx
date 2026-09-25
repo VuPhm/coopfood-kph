@@ -63,10 +63,56 @@ describe("Client Store Demo", () => {
     const navigation = screen.getByRole("navigation", { name: "Điều hướng Store App" });
     fireEvent.click(within(navigation).getByRole("button", { name: "Thông báo" }));
     expect(screen.getByRole("heading", { name: "Thông báo" })).toBeVisible();
-    expect(screen.getByText("Kiểm kê chờ duyệt")).toBeVisible();
+    expect(screen.getByText(/Chênh lệch: Bánh mì sandwich/)).toBeVisible();
+    expect(screen.queryByText(/chờ duyệt/i)).not.toBeInTheDocument();
     fireEvent.click(within(navigation).getByRole("button", { name: "Cài đặt" }));
     expect(screen.getByRole("heading", { name: "Cài đặt" })).toBeVisible();
     fireEvent.change(screen.getByRole("combobox", { name: "Vai trò demo" }), { target: { value: "manager" } });
     expect(screen.getByRole("button", { name: /Tài khoản Quản lý · Nguyễn Văn Demo/i })).toBeVisible();
+  });
+
+  it("records a first check and a re-check as separate logs against the latest local count", () => {
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<ClientStoreDemo><div>KPH workspace</div></ClientStoreDemo>);
+    fireEvent.click(screen.getByRole("button", { name: /Kiểm khớp So tồn tham chiếu với thực tế/i }));
+
+    expect(screen.getAllByText(/inventory-reference-demo.csv/).length).toBeGreaterThan(0);
+    fireEvent.change(screen.getByLabelText("Nhập barcode / SKU thủ công"), { target: { value: "SP000123" } });
+    expect(screen.getByText(/Tồn tham chiếu ngoài: 24 Hộp/)).toBeVisible();
+    fireEvent.change(screen.getByLabelText("Thực tế (Hộp)"), { target: { value: "18" } });
+    expect(screen.getByText(/Chênh lệch -6/)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: /Ghi nhận & kiểm tiếp/i }));
+    expect(screen.getByRole("status")).toHaveTextContent("Số kiểm gần nhất đã cập nhật");
+
+    fireEvent.change(screen.getByLabelText("Nhập barcode / SKU thủ công"), { target: { value: "SP000123" } });
+    expect(screen.getByText((_, element) => element?.tagName === "SPAN" && element.textContent?.includes("Tồn tham chiếu dùng lần này") === true)).toHaveTextContent("18 Hộp");
+    fireEvent.change(screen.getByLabelText("Thực tế (Hộp)"), { target: { value: "20" } });
+    expect(screen.getByText(/Chênh lệch \+2/)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: /Ghi nhận & kiểm tiếp/i }));
+    expect(screen.queryByText(/Chờ duyệt|Yêu cầu kiểm lại|đợt kiểm kê/i)).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Nhập barcode / SKU thủ công"), { target: { value: "SP000123" } });
+    expect(screen.getByText((_, element) => element?.tagName === "SPAN" && element.textContent?.includes("Tồn tham chiếu:") === true)).toHaveTextContent("24 Hộp");
+    expect(screen.getByText((_, element) => element?.tagName === "SPAN" && element.textContent?.includes("Số kiểm gần nhất:") === true)).toHaveTextContent("20 Hộp");
+
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Điều hướng Store App" })).getByRole("button", { name: "Trang chủ" }));
+    fireEvent.click(screen.getByRole("button", { name: /Báo cáo Xem tình hình vận hành/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Kiểm khớp & chênh lệch" }));
+    expect(screen.getByText("Sữa tươi TH true milk 1L")).toBeVisible();
+    expect(screen.getByText(/24 → 20 \(-4\)/)).toBeVisible();
+    expect(screen.getAllByText(/Trần Minh Anh/).length).toBeGreaterThan(0);
+  });
+
+  it("imports the demo CSV mapping as a new reference snapshot before checking", async () => {
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<ClientStoreDemo><div>KPH workspace</div></ClientStoreDemo>);
+    fireEvent.click(screen.getByRole("button", { name: /Kiểm khớp So tồn tham chiếu với thực tế/i }));
+    const file = new File(["SKU,Reference quantity\nSP000123,26\n"], "inventory-export-demo.csv", { type: "text/csv" });
+    Object.defineProperty(file, "text", { value: async () => "SKU,Reference quantity\nSP000123,26\n" });
+    fireEvent.change(screen.getByLabelText("Nạp CSV snapshot tồn kho demo"), { target: { files: [file] } });
+    expect(await screen.findByText(/inventory-export-demo.csv/)).toBeVisible();
+    fireEvent.change(screen.getByLabelText("Nhập barcode / SKU thủ công"), { target: { value: "SP000123" } });
+    expect(screen.getByText((_, element) => element?.tagName === "SPAN" && element.textContent?.includes("Tồn tham chiếu:") === true)).toHaveTextContent("26 Hộp");
+    fireEvent.change(screen.getByLabelText("Thực tế (Hộp)"), { target: { value: "25" } });
+    expect(screen.getByText(/Chênh lệch -1/)).toBeVisible();
   });
 });

@@ -96,7 +96,7 @@ describe("Online workspace boundary", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Đang mở cửa hàng của bạn…");
     expect(screen.queryByText("Chưa có phiếu nào trên máy chủ.")).not.toBeInTheDocument();
     expect(screen.queryByText(DEMO_RECORDS[0]!.productName)).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Tạo phiếu TP khô/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Tạo phiếu" })).not.toBeInTheDocument();
     expect(mocks.loadPilotRecords).not.toHaveBeenCalled();
   });
 
@@ -107,7 +107,7 @@ describe("Online workspace boundary", () => {
     expect(await screen.findByText("Phiên đăng nhập đã hết hạn.")).toBeVisible();
     expect(screen.queryByText("Chưa có phiếu nào trên máy chủ.")).not.toBeInTheDocument();
     expect(screen.queryByText(DEMO_RECORDS[0]!.productName)).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Tạo phiếu TP khô/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Tạo phiếu" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Thiết lập cửa hàng/ })).not.toBeInTheDocument();
 
     const emptyWorkspace = { ...workspace(), records: [] };
@@ -117,7 +117,7 @@ describe("Online workspace boundary", () => {
     fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "password" } });
     fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
     expect(await screen.findAllByText("Chưa có phiếu nào trên máy chủ.")).toHaveLength(2);
-    expect(screen.getByRole("button", { name: /Tạo phiếu TP khô/i })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Tạo phiếu" })).toBeEnabled();
     expect(mocks.getSession).toHaveBeenCalledOnce();
     expect(mocks.login).toHaveBeenCalledWith("demo", "password");
     expect(mocks.loadHistory).toHaveBeenCalledOnce();
@@ -139,7 +139,8 @@ describe("Online workspace boundary", () => {
     expect(screen.queryByRole("button", { name: /Duyệt.*phiếu/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("combobox", { name: /Trạng thái duyệt phiếu/ })).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Thực phẩm khô & khác" }));
     const actor = screen.getByRole("textbox", { name: /Tên người nhập/ });
     expect(actor).toHaveValue(sessionFixture.user.displayName);
     expect(actor).toHaveAttribute("readonly");

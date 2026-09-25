@@ -1,6 +1,8 @@
 import type { KphKind } from "@coopfood-kph/kph-rules";
-import { History, PackagePlus, Salad } from "lucide-react";
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
+import { ClipboardPlus, History } from "lucide-react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 
 import "./store-app-shell.css";
 
@@ -12,6 +14,11 @@ type StoreAppShellProps = {
 
 /** The authenticated Store App composition seam. KPH tasks remain direct actions. */
 export function StoreAppShell({ canCreate, context, onCreate }: StoreAppShellProps) {
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  function chooseCategory(kind: KphKind) {
+    setCategoryOpen(false);
+    onCreate(kind);
+  }
   return <section className="store-app-shell" aria-label="Store App">
     <div className="store-app-shell-heading">
       <p className="store-app-shell-identity">Co.op Food <span>Store App</span></p>
@@ -26,13 +33,9 @@ export function StoreAppShell({ canCreate, context, onCreate }: StoreAppShellPro
     </div>
 
     <nav className="store-app-shell-tasks" aria-label="Công việc KPH">
-      <button type="button" className="store-app-shell-task" disabled={!canCreate} aria-label="Tạo phiếu TP khô & khác (TPCN)" onClick={() => onCreate("TPCN")}>
-        <PackagePlus aria-hidden="true" />
-        <span><strong>Tạo TPCN</strong><small>TP khô & khác</small></span>
-      </button>
-      <button type="button" className="store-app-shell-task" disabled={!canCreate} aria-label="Tạo phiếu TP tươi sống (TPTS)" onClick={() => onCreate("TPTS")}>
-        <Salad aria-hidden="true" />
-        <span><strong>Tạo TPTS</strong><small>TP tươi sống</small></span>
+      <button type="button" className="store-app-shell-task" aria-label="Tạo phiếu" disabled={!canCreate} onClick={() => setCategoryOpen(true)}>
+        <ClipboardPlus aria-hidden="true" />
+        <span><strong>Tạo phiếu</strong><small>Ghi nhận hàng không phù hợp</small></span>
       </button>
       <a className="store-app-shell-task store-app-shell-history" href="#history-title">
         <History aria-hidden="true" />
@@ -41,5 +44,17 @@ export function StoreAppShell({ canCreate, context, onCreate }: StoreAppShellPro
     </nav>
 
     <div className="store-app-shell-context">{context}</div>
+    <Dialog open={categoryOpen} onOpenChange={setCategoryOpen}>
+      <DialogContent aria-describedby="create-kind-description">
+        <DialogHeader>
+          <DialogTitle>Chọn nhóm thực phẩm</DialogTitle>
+          <DialogDescription id="create-kind-description">Chọn nhóm để mở phiếu KPH.</DialogDescription>
+        </DialogHeader>
+        <div className="store-app-shell-category-options">
+          <Button type="button" onClick={() => chooseCategory("TPCN")}>Thực phẩm khô &amp; khác</Button>
+          <Button type="button" variant="secondary" onClick={() => chooseCategory("TPTS")}>Thực phẩm tươi sống</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </section>;
 }

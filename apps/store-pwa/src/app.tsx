@@ -1,7 +1,7 @@
 import { parseDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Trash2 } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
@@ -194,6 +194,7 @@ function WorkspaceApp({ showExpiryWorkbench }: { showExpiryWorkbench: boolean })
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [createKind, setCreateKind] = useState<KphKind | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [createCategoryOpen, setCreateCategoryOpen] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [expandedMobileRecords, setExpandedMobileRecords] = useState<ReadonlySet<string>>(new Set());
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
@@ -1077,13 +1078,11 @@ function WorkspaceApp({ showExpiryWorkbench }: { showExpiryWorkbench: boolean })
               <p>Khai báo và tra cứu phiếu tại cửa hàng</p>
             </div>
 
-            <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
-              {kphKinds.map((kind) => (
-                <button key={kind} type="button" disabled={!storageReady || onlineLoading || (onlinePersistenceEnabled && !storeConfigured)} className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
-                  {kind === "TPCN" ? <PackagePlus aria-hidden="true" /> : <Salad aria-hidden="true" />}
-                  <span><small>Tạo phiếu</small>{kindCopy[kind].action}</span>
-                </button>
-              ))}
+            <div className="workspace-actions" aria-label="Tạo phiếu">
+              <button type="button" aria-label="Tạo phiếu" disabled={!storageReady || onlineLoading || (onlinePersistenceEnabled && !storeConfigured)} className="workspace-create workspace-create-tpcn" onClick={() => setCreateCategoryOpen(true)}>
+                <PackagePlus aria-hidden="true" />
+                <span>Tạo phiếu</span>
+              </button>
             </div>
 
             <StoreContext
@@ -1253,6 +1252,17 @@ function WorkspaceApp({ showExpiryWorkbench }: { showExpiryWorkbench: boolean })
           <ExpiryWorkbench />
         </div> : null}
       </main>}
+
+      <Dialog open={createCategoryOpen} onOpenChange={setCreateCategoryOpen}>
+        <DialogContent aria-describedby="create-category-description">
+          <DialogTitle>Chọn nhóm thực phẩm</DialogTitle>
+          <DialogDescription id="create-category-description">Chọn nhóm để mở phiếu KPH.</DialogDescription>
+          <div className="store-app-shell-category-options">
+            <Button onClick={() => { setCreateCategoryOpen(false); openCreate("TPCN"); }}>Thực phẩm khô &amp; khác</Button>
+            <Button variant="secondary" onClick={() => { setCreateCategoryOpen(false); openCreate("TPTS"); }}>Thực phẩm tươi sống</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <CreateRecordDialog
         kind={createKind}
