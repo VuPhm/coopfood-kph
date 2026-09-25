@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createDemoState, decideSession, inventoryQuantity, lotDate, saveEntry } from "./client-store-demo-data";
+import { createDemoState, decideSession, inventoryQuantity, lotDate, receiveLot, saveEntry } from "./client-store-demo-data";
 
 describe("DEMO-01 stocktake boundary", () => {
   it("keeps approved stock unchanged until manager approval, then updates lots and reports source", () => {
@@ -39,5 +39,32 @@ describe("DEMO-01 stocktake boundary", () => {
     const bread = lotDate(state.lots.find((lot) => lot.productId === "bread")!, "2026-09-25");
     expect(bread.status).toBe("DANGER");
     expect(bread.withdrawalDate).toBe("2026-09-25");
+  });
+
+  it("receives a new lot into the shared inventory state with accepted DATE calculations", () => {
+    const initial = createDemoState("2026-09-25");
+    const received = receiveLot(initial, {
+      productId: "milk", nsx: "2026-09-01", hsd: "2026-09-30", receivedOn: "2026-09-25",
+      quantity: 7, lotCode: "LOT123",
+    }, "2026-09-25");
+
+    expect(inventoryQuantity(initial, "milk")).toBe(24);
+    expect(inventoryQuantity(received.state, "milk")).toBe(31);
+    expect(received.lot).toEqual(expect.objectContaining({ productId: "milk", quantity: 7, lotCode: "LOT123", receivedOn: "2026-09-25" }));
+    expect(lotDate(received.lot, "2026-09-25")).toEqual(expect.objectContaining({ shelfLifeDays: 30, withdrawalDate: "2026-09-24", status: "DANGER" }));
+    expect(received.state.lots).toHaveLength(initial.lots.length + 1);
+    const next = receiveLot(received.state, { productId: "milk", nsx: "2026-09-01", hsd: "2026-09-30",
+      receivedOn: "2026-09-25", quantity: 3 }, "2026-09-25");
+    expect(next.lot.id).not.toBe(received.lot.id);
+    expect(inventoryQuantity(next.state, "milk")).toBe(34);
+  });
+
+  it("rejects an impossible receiving date or quantity without changing stock", () => {
+    const initial = createDemoState("2026-09-25");
+    const input = { productId: "milk", nsx: "2026-09-01" as const, hsd: "2026-09-30" as const,
+      receivedOn: "2026-09-25" as const, quantity: 7 };
+    expect(() => receiveLot(initial, { ...input, receivedOn: "2026-08-31" }, "2026-09-25")).toThrow("Ngày nhập phải từ ngày sản xuất");
+    expect(() => receiveLot(initial, { ...input, quantity: 0 }, "2026-09-25")).toThrow("Số lượng phải là số nguyên");
+    expect(inventoryQuantity(initial, "milk")).toBe(24);
   });
 });

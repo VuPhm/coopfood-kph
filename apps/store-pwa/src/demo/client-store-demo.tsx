@@ -1,6 +1,6 @@
 import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import {
-  BarChart3, CalendarDays, Check, ChevronRight, ClipboardCheck, Download, Home, PackageSearch,
+  BarChart3, CalendarDays, Check, ChevronRight, ClipboardCheck, Download, Home, PackagePlus, PackageSearch,
   ScanBarcode, Search, Store, TriangleAlert,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -9,13 +9,14 @@ import { assetUrl } from "../asset-url";
 import { BarcodeScannerDialog } from "../barcode-scanner-dialog";
 import { ExpiryWorkbench } from "../expiry-dialog";
 import {
-  createDemoState, decideSession, demoProducts, demoToday, inventoryQuantity, lotDate,
+  createDemoState, decideSession, demoProducts, demoToday, inventoryQuantity, lotDate, lotLabel,
   saveEntry, signed, type DateBand, type DemoActor, type DemoProduct, type DemoState,
   type SessionStatus, type StocktakeEntry,
 } from "./client-store-demo-data";
+import { ReceivingSurface } from "./receiving-surface";
 import "./client-store-demo.css";
 
-type Surface = "home" | "kph" | "stocktake" | "inventory" | "reports";
+type Surface = "home" | "kph" | "stocktake" | "receiving" | "inventory" | "reports";
 type Navigate = (surface: Surface) => void;
 const nav = [
   { id: "home", label: "Trang chủ", icon: Home },
@@ -71,11 +72,12 @@ export function ClientStoreDemo({ children }: { children: ReactNode }) {
         {children}
       </section>}
       {surface === "stocktake" && <StocktakeSurface state={state} setState={setState} navigate={setSurface} />}
+      {surface === "receiving" && <ReceivingSurface state={state} setState={setState} onHome={() => setSurface("home")} />}
       {surface === "inventory" && <InventorySurface actor={actor} state={state} setState={setState} />}
       {surface === "reports" && <ReportsSurface state={state} navigate={setSurface} />}
     </main>
     <div className="workspace-side-stack cd-expiry-host"><ExpiryWorkbench open={expiryOpen} onOpenChange={setExpiryOpen} /></div>
-    <div className="cd-demo-label">DEMO · Dữ liệu kiểm kê/tồn kho chỉ lưu trong bộ nhớ trình duyệt</div>
+    <div className="cd-demo-label">DEMO · Dữ liệu nhập hàng/kiểm kê/tồn kho chỉ lưu trong bộ nhớ trình duyệt</div>
   </div>;
 }
 
@@ -89,6 +91,7 @@ function HomeSurface({ actor, pending, attention, state, navigate, onOpenExpiry 
   const tasks: { id: Surface | "expiry"; title: string; subtitle: string; icon: typeof Home }[] = [
     { id: "kph", title: "KPH", subtitle: "Ghi nhận hàng không phù hợp", icon: ClipboardCheck },
     { id: "stocktake", title: "Kiểm kê", subtitle: "Đếm hàng tại cửa hàng", icon: ScanBarcode },
+    { id: "receiving", title: "Nhập hàng", subtitle: "Quét và nhận lô hàng", icon: PackagePlus },
     { id: "inventory", title: "Tồn kho", subtitle: "Tra SKU và lô hàng", icon: PackageSearch },
     { id: "expiry", title: "Tra cứu lùi hàng", subtitle: "Tính DATE và hạn lùi", icon: CalendarDays },
     { id: "reports", title: "Báo cáo", subtitle: "Xem tình hình vận hành", icon: BarChart3 },
@@ -229,9 +232,10 @@ function InventorySurface({ actor, state, setState }: {
         <h3 className="cd-subheading">Lô & DATE</h3>
         {state.lots.filter((lot) => lot.productId === selected.id).map((lot) => {
           const date = lotDate(lot);
-          return <article className="cd-lot" key={lot.id}><div><strong>{lot.id}</strong><span className={`cd-status ${date.status.toLowerCase()}`}>{date.status === "SAFE" ? "An toàn" : date.status === "WARNING" ? "Cảnh báo" : date.status === "DANGER" ? "Đến ngày lùi" : "Hết hạn"}</span></div>
+          return <article className="cd-lot" key={lot.id}><div><strong>{lotLabel(lot)}</strong><span className={`cd-status ${date.status.toLowerCase()}`}>{date.status === "SAFE" ? "An toàn" : date.status === "WARNING" ? "Cảnh báo" : date.status === "DANGER" ? "Đến ngày lùi" : "Hết hạn"}</span></div>
             <div className="cd-facts"><span>NSX <b>{formatDisplayDate(lot.nsx)}</b></span><span>HSD <b>{formatDisplayDate(lot.hsd)}</b></span>
               <span>Số lượng <b>{lot.quantity} {selected.unit}</b></span><span>DATE đã qua <b>{date.percent}%</b></span>
+              {lot.receivedOn && <span>Ngày nhập <b>{formatDisplayDate(lot.receivedOn)}</b></span>}
               <span>Cảnh báo từ <b>{date.warningDate ? formatDisplayDate(date.warningDate) : "Không áp dụng"}</b></span>
               <span>Ngày lùi <b>{formatDisplayDate(date.withdrawalDate)}</b></span></div></article>;
         })}
@@ -266,7 +270,7 @@ function reportRows(state: DemoState, kind: ReportKind): ReportRow[] {
   if (kind === "inventory" || kind === "overview" || kind === "date") {
     return state.lots.filter((lot) => kind !== "date" || lotDate(lot).status !== "SAFE").map((lot) => {
       const item = product(lot.productId); const date = lotDate(lot);
-      return { key: lot.id, name: item.name, detail: `${item.sku} · ${lot.id} · HSD ${formatDisplayDate(lot.hsd)}`,
+      return { key: lot.id, name: item.name, detail: `${item.sku} · ${lotLabel(lot)} · HSD ${formatDisplayDate(lot.hsd)}${lot.receivedOn ? ` · Nhập ${formatDisplayDate(lot.receivedOn)}` : ""}`,
         quantity: `${lot.quantity} ${item.unit}`, status: date.status === "SAFE" ? "An toàn" : date.status === "WARNING" ? "Cảnh báo" : date.status === "DANGER" ? "Đến ngày lùi" : "Hết hạn",
         group: item.group, supplier: item.supplier, band: date.band, date: lot.hsd };
     });
@@ -325,7 +329,7 @@ function ReportsSurface({ state, navigate }: { state: DemoState; navigate: Navig
       <section className="cd-panel"><h2>Phân bố DATE theo lô</h2>{dateCounts.map((band) => <div className="cd-bar-row" key={band.id}><span>{band.label}</span><div><i style={{ width: `${state.lots.length ? band.lots.length / state.lots.length * 100 : 0}%` }} /></div><b>{band.lots.length}</b></div>)}</section>
       <section className="cd-panel"><h2>Ưu tiên xử lý</h2>
         <p>{state.sessions.filter((item) => item.status === "SUBMITTED").length} đợt chờ duyệt · {state.sessions.filter((item) => item.status === "RECOUNT_REQUIRED").length} cần kiểm lại · {state.adjustments.length} điều chỉnh đã xử lý</p>
-        {state.lots.filter((lot) => lotDate(lot).status !== "SAFE").sort((a, b) => lotDate(b).percent - lotDate(a).percent).slice(0, 3).map((lot) => <div className="cd-line" key={lot.id}><span><strong>{product(lot.productId).name}</strong><small>{lot.id}</small></span><b>{lotDate(lot).percent}% DATE</b></div>)}
+        {state.lots.filter((lot) => lotDate(lot).status !== "SAFE").sort((a, b) => lotDate(b).percent - lotDate(a).percent).slice(0, 3).map((lot) => <div className="cd-line" key={lot.id}><span><strong>{product(lot.productId).name}</strong><small>{lotLabel(lot)}</small></span><b>{lotDate(lot).percent}% DATE</b></div>)}
       </section>
       <section className="cd-panel"><h2>Tồn cao nhất & chênh lệch lớn</h2>
         {demoProducts.map((item) => ({ item, quantity: inventoryQuantity(state, item.id) })).sort((a, b) => b.quantity - a.quantity).slice(0, 3).map(({ item, quantity }) => <div className="cd-line" key={item.id}><span><strong>{item.name}</strong><small>{item.sku}</small></span><b>{quantity} {item.unit}</b></div>)}

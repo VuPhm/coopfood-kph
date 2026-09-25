@@ -5,7 +5,7 @@ export type DemoActor = "employee" | "manager";
 export type SessionStatus = "IN_PROGRESS" | "SUBMITTED" | "APPROVED" | "RECOUNT_REQUIRED";
 export type DateBand = "OVER_70" | "50_70" | "20_50" | "UNDER_20";
 export type DemoProduct = { id: string; sku: string; barcode: string; name: string; group: string; unit: string; supplier: string; location: string };
-export type DemoLot = { id: string; productId: string; nsx: LocalDate; hsd: LocalDate; quantity: number };
+export type DemoLot = { id: string; productId: string; nsx: LocalDate; hsd: LocalDate; quantity: number; lotCode?: string; receivedOn?: LocalDate };
 export type StocktakeEntry = { productId: string; systemQuantity: number; actualQuantity: number; reason: string; note: string };
 export type StocktakeSession = { id: string; date: LocalDate; employee: string; status: SessionStatus; entries: StocktakeEntry[] };
 export type InventoryAdjustment = { id: string; sessionId: string; productId: string; delta: number; date: LocalDate; source: "STOCKTAKE"; status: "APPROVED" };
@@ -43,6 +43,35 @@ export function createDemoState(today = demoToday()): DemoState {
 export function inventoryQuantity(state: DemoState, productId: string) {
   return state.lots.filter((lot) => lot.productId === productId).reduce((sum, lot) => sum + lot.quantity, 0);
 }
+export const lotLabel = (lot: DemoLot) => lot.lotCode || lot.id;
+
+export type ReceiveLotInput = {
+  productId: string;
+  nsx: LocalDate;
+  hsd: LocalDate;
+  receivedOn: LocalDate;
+  quantity: number;
+  lotCode?: string;
+};
+
+export function receiveLot(state: DemoState, input: ReceiveLotInput, today = demoToday()): { state: DemoState; lot: DemoLot } {
+  if (!demoProducts.some((item) => item.id === input.productId)) throw new Error("Sản phẩm không có trong danh mục demo.");
+  calculateShelfLife(input.nsx, input.hsd, today);
+  if (daysBetween(input.nsx, input.receivedOn) < 0) throw new Error("Ngày nhập phải từ ngày sản xuất trở đi.");
+  if (daysBetween(input.receivedOn, today) < 0) throw new Error("Ngày nhập không được sau hôm nay.");
+  if (!Number.isSafeInteger(input.quantity) || input.quantity <= 0) throw new Error("Số lượng phải là số nguyên lớn hơn 0.");
+  const lotCode = input.lotCode?.trim();
+  if (lotCode && lotCode.length > 40) throw new Error("Số lô tối đa 40 ký tự.");
+  let sequence = 1;
+  let id = "";
+  do {
+    id = `NH-${today.replaceAll("-", "")}-${String(sequence++).padStart(2, "0")}`;
+  } while (state.lots.some((lot) => lot.id === id));
+  const lot: DemoLot = { id, productId: input.productId, nsx: input.nsx, hsd: input.hsd,
+    receivedOn: input.receivedOn, quantity: input.quantity, ...(lotCode ? { lotCode } : {}) };
+  return { state: { ...state, lots: [...state.lots, lot] }, lot };
+}
+
 export function lotDate(lot: DemoLot, today = demoToday()) {
   const rule = calculateShelfLife(lot.nsx, lot.hsd, today);
   const elapsed = Math.max(0, daysBetween(lot.nsx, today));
