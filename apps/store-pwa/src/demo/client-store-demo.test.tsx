@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { addDays, formatDisplayDate } from "@coopfood-kph/kph-rules";
@@ -13,14 +13,16 @@ describe("Client Store Demo", () => {
     render(<ClientStoreDemo><div>KPH workspace</div></ClientStoreDemo>);
 
     const functions = screen.getByRole("region", { name: "Chức năng" });
-    const attention = screen.getByRole("region", { name: "Việc cần chú ý" });
-    expect(functions.compareDocumentPosition(attention) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(functions).getAllByRole("button")).toHaveLength(6);
+    expect(screen.queryByRole("region", { name: "Việc cần chú ý" })).not.toBeInTheDocument();
+    const navigation = screen.getByRole("navigation", { name: "Điều hướng Store App" });
+    expect(within(navigation).getAllByRole("button").map((button) => button.textContent)).toEqual(["Trang chủ", "Thông báo", "Cài đặt"]);
     expect(document.querySelectorAll(".expiry-workbench")).toHaveLength(1);
 
     fireEvent.click(screen.getByRole("button", { name: /Tra cứu lùi hàng Tính DATE và hạn lùi/i }));
     expect(screen.getByLabelText("Ngày sản xuất")).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Đóng tra cứu lùi hàng" }));
-    fireEvent.click(screen.getByRole("button", { name: "KPH" }));
+    fireEvent.click(within(functions).getByRole("button", { name: /KPH Ghi nhận hàng không phù hợp/i }));
     expect(screen.getByText("KPH workspace")).toBeVisible();
     expect(document.querySelectorAll(".expiry-workbench")).toHaveLength(1);
   });
@@ -45,11 +47,26 @@ describe("Client Store Demo", () => {
     expect(screen.getByRole("heading", { name: "Đã lưu lô hàng" })).toBeVisible();
     expect(screen.getByText("LOT123", { exact: false })).toBeVisible();
     expect(screen.getByText("31 Hộp")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Tồn kho" }));
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Điều hướng Store App" })).getByRole("button", { name: "Trang chủ" }));
+    fireEvent.click(screen.getByRole("button", { name: /Tồn kho Tra SKU và lô hàng/i }));
     expect(screen.getByText("LOT123")).toBeVisible();
     expect(screen.getByText("31 Hộp")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Báo cáo" }));
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Điều hướng Store App" })).getByRole("button", { name: "Trang chủ" }));
+    fireEvent.click(screen.getByRole("button", { name: /Báo cáo Xem tình hình vận hành/i }));
     expect(screen.getByRole("heading", { name: "Kết quả · 8 dòng" })).toBeVisible();
     expect(screen.getByText(/LOT123 · HSD/)).toBeVisible();
+  });
+
+  it("moves operational attention to Notifications and role control to Settings", () => {
+    vi.stubGlobal("scrollTo", vi.fn());
+    render(<ClientStoreDemo><div>KPH workspace</div></ClientStoreDemo>);
+    const navigation = screen.getByRole("navigation", { name: "Điều hướng Store App" });
+    fireEvent.click(within(navigation).getByRole("button", { name: "Thông báo" }));
+    expect(screen.getByRole("heading", { name: "Thông báo" })).toBeVisible();
+    expect(screen.getByText("Kiểm kê chờ duyệt")).toBeVisible();
+    fireEvent.click(within(navigation).getByRole("button", { name: "Cài đặt" }));
+    expect(screen.getByRole("heading", { name: "Cài đặt" })).toBeVisible();
+    fireEvent.change(screen.getByRole("combobox", { name: "Vai trò demo" }), { target: { value: "manager" } });
+    expect(screen.getByRole("button", { name: /Tài khoản Quản lý · Nguyễn Văn Demo/i })).toBeVisible();
   });
 });
