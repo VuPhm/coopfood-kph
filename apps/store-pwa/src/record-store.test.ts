@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import type { DemoRecord } from "./demo-records";
 import {
+  getPilotSetting,
   getPilotExportRuns,
   loadPilotRecords,
   patchPilotRecords,
@@ -70,5 +71,25 @@ describe("pilot IndexedDB repository", () => {
     expect(run).toMatchObject({ recordIds: [value.id], templateVersion: "BM-331.CF-01" });
     expect(await getPilotExportRuns()).toEqual([expect.objectContaining({ fileName: "Phieu_KPH_27-08-2026.xlsx" })]);
     expect((await loadPilotRecords())[0]?.lastExportedAt).toBe(run.createdAt);
+  });
+
+  it("opens a pre-existing higher-version settings database without resetting it", async () => {
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open("coopfood-kph-pilot", 2);
+      request.onupgradeneeded = () => request.result.createObjectStore("settings", { keyPath: "key" });
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const transaction = db.transaction("settings", "readwrite");
+        transaction.objectStore("settings").put({ key: "existing-setting", value: "kept", updatedAt: "2026-09-27T00:00:00.000Z" });
+        transaction.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        transaction.onerror = () => reject(transaction.error);
+      };
+    });
+
+    expect(await getPilotSetting("existing-setting")).toBe("kept");
   });
 });

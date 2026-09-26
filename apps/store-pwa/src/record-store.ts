@@ -4,7 +4,6 @@ import { type DBSchema, openDB } from "idb";
 import type { DemoApprovalStatus, DemoRecord } from "./demo-records";
 
 const DATABASE_NAME = "coopfood-kph-pilot";
-const DATABASE_VERSION = 1;
 
 export type PilotPhoto = {
   id: string;
@@ -78,7 +77,8 @@ interface PilotDatabase extends DBSchema {
 let databasePromise: ReturnType<typeof openDB<PilotDatabase>> | undefined;
 
 function database() {
-  databasePromise ??= openDB<PilotDatabase>(DATABASE_NAME, DATABASE_VERSION, {
+  // Open the existing version when a browser already has a newer compatible schema.
+  databasePromise ??= openDB<PilotDatabase>(DATABASE_NAME, undefined, {
     upgrade(db) {
       const records = db.createObjectStore("records", { keyPath: "id" });
       records.createIndex("by-kind", "kind");
