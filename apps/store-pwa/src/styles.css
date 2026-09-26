@@ -105,22 +105,20 @@ html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px
   display: grid;
   min-height: 100dvh;
   place-items: center;
-  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
-  background: var(--color-canvas);
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background: var(--color-surface);
 }
 .pin-lock-card {
   width: min(100%, 24rem);
   padding: 1.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 1.5rem;
   background: var(--color-surface);
-  box-shadow: var(--shadow-panel);
   text-align: center;
 }
-.pin-lock-logo { width: auto; height: 3.5rem; max-width: min(12rem, 70vw); margin-inline: auto; object-fit: contain; }
-.pin-lock-card h1 { margin: 1.25rem 0 .35rem; color: var(--color-ink); font-size: 1.25rem; font-weight: 700; }
+.pin-lock-logo { display: block; width: min(100%, 17rem); height: auto; margin-inline: auto; object-fit: contain; }
+.pin-lock-card h1 { margin: 1.25rem 0 .75rem; color: var(--color-ink); font-size: 1.25rem; font-weight: 700; }
 .pin-lock-description, .pin-lock-hint, .pin-lock-error { margin: 0; color: var(--color-ink-muted); font-size: .9rem; line-height: 1.5; }
 .pin-lock-form { display: grid; gap: .75rem; margin-top: 1.25rem; }
+.pin-lock-label { color: var(--color-ink); font-size: .9rem; font-weight: 700; text-align: left; }
 .pin-lock-input {
   width: 100%;
   min-height: 3.25rem;
@@ -134,8 +132,11 @@ html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px
   text-align: center;
 }
 .pin-lock-input[aria-invalid="true"] { border-color: var(--color-danger); }
+.pin-lock-store-code { letter-spacing: .5rem; }
 .pin-lock-error { color: var(--color-danger); }
+.pin-lock-notice { margin: 0; color: var(--color-brand); font-size: .9rem; line-height: 1.5; }
 .pin-lock-submit { min-height: 2.75rem; width: 100%; }
+.pin-lock-link { min-height: 2.75rem; width: 100%; margin-top: .5rem; }
 .app-header { box-shadow: 0 6px 20px rgb(0 45 20 / .15); }
 .app-header-inner {
   display: flex;

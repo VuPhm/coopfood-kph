@@ -200,8 +200,17 @@ export async function getPilotExportRuns() {
 }
 
 export async function setPilotSetting(key: string, value: unknown) {
+  await setPilotSettings([{ key, value }]);
+}
+
+export async function setPilotSettings(settings: readonly { key: string; value: unknown }[]) {
   const db = await database();
-  await db.put("settings", { key, value, updatedAt: new Date().toISOString() });
+  const transaction = db.transaction("settings", "readwrite");
+  const updatedAt = new Date().toISOString();
+  for (const { key, value } of settings) {
+    await transaction.store.put({ key, value, updatedAt });
+  }
+  await transaction.done;
 }
 
 export async function getPilotSetting<T>(key: string): Promise<T | undefined> {

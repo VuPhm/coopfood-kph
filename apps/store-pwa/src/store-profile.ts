@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { getPilotSetting, setPilotSetting } from "./record-store";
+import { getPilotSetting, setPilotSettings } from "./record-store";
+import { PIN_STATE_SETTING_KEY } from "./pin-state";
 
 export const STORE_PROFILE_SETTING_KEY = "store-profile";
 
@@ -55,6 +56,13 @@ export async function loadPilotStoreProfile() {
 
 export async function savePilotStoreProfile(profile: StoreProfile) {
   const normalized = storeProfileSchema.parse(profile);
-  await setPilotSetting(STORE_PROFILE_SETTING_KEY, normalized);
+  const currentProfile = await loadPilotStoreProfile();
+  const settings: { key: string; value: unknown }[] = [
+    { key: STORE_PROFILE_SETTING_KEY, value: normalized },
+  ];
+  if (currentProfile.storeCode !== normalized.storeCode) {
+    settings.push({ key: PIN_STATE_SETTING_KEY, value: { pinOverride: null } });
+  }
+  await setPilotSettings(settings);
   return normalized;
 }
