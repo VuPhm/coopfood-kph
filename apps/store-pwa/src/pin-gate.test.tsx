@@ -1,11 +1,13 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DemoRecord } from "./demo-records";
 import { getPilotSetting, loadPilotRecords, resetPilotDatabaseForTests, savePilotRecord, setPilotSetting } from "./record-store";
 import { effectivePilotPin, loadPilotPinState, normalizePilotPinState, PIN_STATE_SETTING_KEY } from "./pin-state";
 import { loadPilotStoreProfile, STORE_PROFILE_SETTING_KEY, savePilotStoreProfile } from "./store-profile";
 import { PinGate } from "./pin-gate";
+import * as pinStateModule from "./pin-state";
+import * as storeProfileModule from "./store-profile";
 
 function record(): DemoRecord {
   return {
@@ -30,7 +32,15 @@ function record(): DemoRecord {
 
 function enterPin(value: string) {
   fireEvent.change(screen.getByLabelText("Mã truy cập"), { target: { value } });
-  fireEvent.click(screen.getByRole("button", { name: "Mở ứng dụng" }));
+}
+
+function enterPinDigits(value: string) {
+  const input = screen.getByLabelText("Mã truy cập");
+  let entered = "";
+  for (const digit of value) {
+    entered += digit;
+    fireEvent.change(input, { target: { value: entered } });
+  }
 }
 
 async function openRecovery() {
@@ -46,6 +56,70 @@ async function submitRecovery(previousPin: string) {
 
 describe("store PIN gate", () => {
   beforeEach(async () => resetPilotDatabaseForTests());
+  afterEach(() => vi.restoreAllMocks());
+
+  it("auto unlocks on the fourth correct digit without clicking the button", async () => {
+    await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "1234", role: "", fullName: "", employeeCode: "" });
+    const profileLookup = vi.spyOn(storeProfileModule, "loadPilotStoreProfile");
+    const pinLookup = vi.spyOn(pinStateModule, "loadPilotPinState");
+    render(<PinGate><div>Store workspace</div></PinGate>);
+    expect(screen.getByText(/Mặc định là 0000 nếu chưa thiết lập mã cửa hàng/)).toBeVisible();
+
+    enterPinDigits("123");
+    expect(screen.queryByText("Store workspace")).not.toBeInTheDocument();
+    expect(profileLookup).not.toHaveBeenCalled();
+    expect(pinLookup).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByLabelText("Mã truy cập"), { target: { value: "1234" } });
+    expect(await screen.findByText("Store workspace")).toBeVisible();
+    expect(profileLookup).toHaveBeenCalledTimes(1);
+    expect(pinLookup).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears a wrong PIN, focuses the input, then auto unlocks after a correct retry", async () => {
+    await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "1234", role: "", fullName: "", employeeCode: "" });
+    render(<PinGate><div>Store workspace</div></PinGate>);
+    enterPinDigits("9999");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Mã truy cập chưa đúng");
+    expect(screen.getByLabelText("Mã truy cập")).toHaveValue("");
+    await waitFor(() => expect(screen.getByLabelText("Mã truy cập")).toHaveFocus());
+
+    enterPinDigits("1234");
+    expect(await screen.findByText("Store workspace")).toBeVisible();
+  });
+
+  it("keeps the manual button enabled and shares one in-flight verification", async () => {
+    await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "1234", role: "", fullName: "", employeeCode: "" });
+    const loadProfile = storeProfileModule.loadPilotStoreProfile;
+    const profileLookup = vi.spyOn(storeProfileModule, "loadPilotStoreProfile");
+    const pinLookup = vi.spyOn(pinStateModule, "loadPilotPinState");
+    let releaseLookup!: () => void;
+    let startedLookup!: () => void;
+    const waitForLookup = new Promise<void>((resolve) => { releaseLookup = resolve; });
+    const lookupStarted = new Promise<void>((resolve) => { startedLookup = resolve; });
+    profileLookup.mockImplementation(async () => {
+      startedLookup();
+      await waitForLookup;
+      return loadProfile();
+    });
+    render(<PinGate><div>Store workspace</div></PinGate>);
+
+    const input = screen.getByLabelText("Mã truy cập");
+    fireEvent.change(input, { target: { value: "1234" } });
+    await lookupStarted;
+    const button = screen.getByRole("button", { name: "Đang kiểm tra…" });
+    expect(button).toBeVisible();
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+    expect(profileLookup).toHaveBeenCalledTimes(1);
+    expect(pinLookup).toHaveBeenCalledTimes(1);
+
+    releaseLookup();
+    expect(await screen.findByText("Store workspace")).toBeVisible();
+    expect(profileLookup).toHaveBeenCalledTimes(1);
+    expect(pinLookup).toHaveBeenCalledTimes(1);
+  });
 
   it("uses 0000 on a fresh install and keeps recovery available without previous PIN history", async () => {
     await setPilotSetting("existing-pilot-setting", { retained: true });
@@ -96,13 +170,13 @@ describe("store PIN gate", () => {
     expect(await loadPilotPinState()).toEqual({ pinOverride: null, previousPin: null });
   });
 
-  it("uses the store code as PIN and preserves leading zeroes", async () => {
+  it("auto verifies the store code PIN and preserves leading zeroes", async () => {
     await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "0123", role: "", fullName: "", employeeCode: "" });
     const state = await loadPilotPinState();
     expect(effectivePilotPin(state, "0123")).toBe("0123");
 
     render(<PinGate><div>Store workspace</div></PinGate>);
-    enterPin("0123");
+    enterPinDigits("0123");
     expect(await screen.findByText("Store workspace")).toBeVisible();
   });
 

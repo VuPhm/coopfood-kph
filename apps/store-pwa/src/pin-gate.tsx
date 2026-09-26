@@ -1,5 +1,5 @@
 import { Button } from "@coopfood-kph/ui";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { assetUrl } from "./asset-url";
 import { effectivePilotPin, loadPilotPinState, recoverPilotPinWithPreviousPin } from "./pin-state";
@@ -12,22 +12,30 @@ export function PinGate({ children }: PinGateProps) {
   const [unlocked, setUnlocked] = useState(false);
   const [screen, setScreen] = useState<PinScreen>("login");
   const [pin, setPin] = useState("");
+  const pinInputRef = useRef<HTMLInputElement>(null);
+  const verificationInFlight = useRef(false);
   const [previousPin, setPreviousPin] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [checking, setChecking] = useState(false);
 
-  async function verifyPin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (pin.length !== 4 || checking) return;
+  useEffect(() => {
+    if (error && screen === "login") pinInputRef.current?.focus();
+  }, [error, screen]);
 
+  async function verifyPin(candidatePin: string) {
+    if (!/^\d{4}$/.test(candidatePin) || verificationInFlight.current) return;
+
+    verificationInFlight.current = true;
     setChecking(true);
     setError("");
+    let didUnlock = false;
     try {
       const [profile, pinState] = await Promise.all([loadPilotStoreProfile(), loadPilotPinState()]);
-      if (pin === effectivePilotPin(pinState, profile.storeCode)) {
+      if (candidatePin === effectivePilotPin(pinState, profile.storeCode)) {
         setPin("");
         setUnlocked(true);
+        didUnlock = true;
         return;
       }
       setPin("");
@@ -35,8 +43,24 @@ export function PinGate({ children }: PinGateProps) {
     } catch {
       setError("Không thể đọc thiết lập cửa hàng trên thiết bị.");
     } finally {
+      verificationInFlight.current = false;
       setChecking(false);
+      if (!didUnlock) pinInputRef.current?.focus();
     }
+  }
+
+  function handlePinChange(value: string) {
+    if (verificationInFlight.current) return;
+    const normalizedPin = value.replace(/\D/g, "").slice(0, 4);
+    setPin(normalizedPin);
+    setError("");
+    setNotice("");
+    if (/^\d{4}$/.test(normalizedPin)) void verifyPin(normalizedPin);
+  }
+
+  function submitPin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void verifyPin(pin);
   }
 
   function openRecovery() {
@@ -90,10 +114,12 @@ export function PinGate({ children }: PinGateProps) {
         {screen === "login" ? (
           <>
             <h1 id="pin-lock-title">Nhập mã truy cập</h1>
-            <form className="pin-lock-form" onSubmit={(event) => void verifyPin(event)}>
+            <p className="pin-lock-description">Nhập 4 số để mở ứng dụng. Mặc định là 0000 nếu chưa thiết lập mã cửa hàng.</p>
+            <form className="pin-lock-form" onSubmit={submitPin}>
               <label className="sr-only" htmlFor="store-pin">Mã truy cập</label>
               <input
                 id="store-pin"
+                ref={pinInputRef}
                 className="pin-lock-input"
                 type="password"
                 inputMode="numeric"
@@ -101,18 +127,15 @@ export function PinGate({ children }: PinGateProps) {
                 maxLength={4}
                 autoComplete="off"
                 autoFocus
+                disabled={checking}
                 value={pin}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? "store-pin-error" : undefined}
-                onChange={(event) => {
-                  setPin(event.target.value.replace(/\D/g, "").slice(0, 4));
-                  setError("");
-                  setNotice("");
-                }}
+                onChange={(event) => handlePinChange(event.target.value)}
               />
               {error ? <p id="store-pin-error" className="pin-lock-error" role="alert">{error}</p> : null}
               {notice ? <p className="pin-lock-notice" role="status">{notice}</p> : null}
-              <Button className="pin-lock-submit" type="submit" disabled={pin.length !== 4 || checking}>
+              <Button className="pin-lock-submit" type="submit" disabled={pin.length !== 4}>
                 {checking ? "Đang kiểm tra…" : "Mở ứng dụng"}
               </Button>
             </form>

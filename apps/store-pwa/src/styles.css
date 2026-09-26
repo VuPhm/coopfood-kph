@@ -109,34 +109,35 @@ html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px
   background: var(--color-surface);
 }
 .pin-lock-card {
-  width: min(100%, 24rem);
-  padding: 1.5rem;
+  width: min(100%, 23rem);
+  padding: 1.25rem;
   background: var(--color-surface);
   text-align: center;
 }
-.pin-lock-logo { display: block; width: min(100%, 17rem); height: auto; margin-inline: auto; object-fit: contain; }
-.pin-lock-card h1 { margin: 1.25rem 0 .75rem; color: var(--color-ink); font-size: 1.25rem; font-weight: 700; }
-.pin-lock-description, .pin-lock-hint, .pin-lock-error { margin: 0; color: var(--color-ink-muted); font-size: .9rem; line-height: 1.5; }
-.pin-lock-form { display: grid; gap: .75rem; margin-top: 1.25rem; }
-.pin-lock-label { color: var(--color-ink); font-size: .9rem; font-weight: 700; text-align: left; }
+.pin-lock-logo { display: block; width: min(100%, 15.5rem); height: auto; margin-inline: auto; object-fit: contain; }
+.pin-lock-card h1 { margin: .875rem 0 .375rem; color: var(--color-ink); font-size: 1.25rem; font-weight: 700; line-height: 1.25; }
+.pin-lock-description, .pin-lock-hint, .pin-lock-error { margin: 0; color: var(--color-ink-muted); font-size: .8125rem; line-height: 1.4; }
+.pin-lock-form { display: grid; gap: .75rem; margin-top: .875rem; }
+.pin-lock-label { color: var(--color-ink); font-size: .875rem; font-weight: 650; text-align: left; }
 .pin-lock-input {
   width: 100%;
-  min-height: 3.25rem;
-  border: 2px solid var(--color-border);
-  border-radius: .75rem;
+  min-height: 3.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: .8125rem;
   background: var(--color-surface);
   color: var(--color-ink);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-variant-numeric: tabular-nums;
-  letter-spacing: .75rem;
+  font-weight: 550;
+  letter-spacing: .375rem;
   text-align: center;
 }
-.pin-lock-input[aria-invalid="true"] { border-color: var(--color-danger); }
+.pin-lock-input[aria-invalid="true"] { border-color: var(--color-danger); background: var(--color-danger-soft); }
 .pin-lock-store-code { letter-spacing: .5rem; }
-.pin-lock-error { color: var(--color-danger); }
-.pin-lock-notice { margin: 0; color: var(--color-brand); font-size: .9rem; line-height: 1.5; }
-.pin-lock-submit { min-height: 2.75rem; width: 100%; }
-.pin-lock-link { min-height: 2.75rem; width: 100%; margin-top: .5rem; }
+.pin-lock-error { color: var(--color-danger); font-size: .875rem; font-weight: 600; line-height: 1.4; }
+.pin-lock-notice { margin: 0; color: var(--color-brand); font-size: .875rem; line-height: 1.4; }
+.pin-lock-submit { min-height: 2.875rem; width: 100%; font-size: .9375rem; font-weight: 650; }
+.pin-lock-link { min-height: 2.75rem; width: 100%; margin-top: .25rem; color: var(--color-ink-muted); font-size: .875rem; font-weight: 600; }
 .app-header { box-shadow: 0 6px 20px rgb(0 45 20 / .15); }
 .app-header-inner {
   display: flex;
