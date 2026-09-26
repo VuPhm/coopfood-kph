@@ -10,7 +10,6 @@ import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord 
 import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import { EvidenceImageViewer } from "./image-viewer";
-import { PwaStatus } from "./pwa-status";
 import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord, type PilotRecord } from "./record-store";
 import { readStorageHealth, requestPersistentStorage, storageUsageLabel, type StorageHealth } from "./storage-health";
 import { actorIdentity, DEFAULT_STORE_PROFILE, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
@@ -665,7 +664,6 @@ export function App() {
         </DialogContent>
       </Dialog>
       {notice ? <button type="button" className="notice-toast fixed bottom-20 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-xl" onClick={() => setNotice("")}>{notice}</button> : null}
-      <PwaStatus />
     </div>
   );
 }

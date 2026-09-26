@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 
 import { App } from "./app";
 import { PinGate } from "./pin-gate";
+import { PwaStatus } from "./pwa-status";
 import "./styles.css";
 
 const queryClient = new QueryClient({
@@ -22,9 +23,8 @@ document.addEventListener("pointerdown", () => {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <PinGate>
-        <App />
-      </PinGate>
+      <PwaStatus />
+      <PinGate><App /></PinGate>
     </QueryClientProvider>
   </StrictMode>,
 );
