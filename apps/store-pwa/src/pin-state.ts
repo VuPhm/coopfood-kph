@@ -51,7 +51,8 @@ export async function loadPilotPinState(): Promise<PilotPinState> {
 export async function recoverPilotPinWithPreviousPin(enteredPreviousPin: string): Promise<boolean> {
   return transactPilotSettings([PIN_STATE_SETTING_KEY], (current) => {
     const pinState = normalizePilotPinState(current.get(PIN_STATE_SETTING_KEY));
-    if (!/^\d{4}$/.test(enteredPreviousPin) || enteredPreviousPin !== pinState.previousPin) {
+    const expectedRecoveryPin = pinState.previousPin ?? "0000";
+    if (!/^\d{4}$/.test(enteredPreviousPin) || enteredPreviousPin !== expectedRecoveryPin) {
       return { writes: [], result: false };
     }
 

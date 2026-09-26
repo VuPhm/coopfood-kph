@@ -13,8 +13,6 @@ export function PinGate({ children }: PinGateProps) {
   const [screen, setScreen] = useState<PinScreen>("login");
   const [pin, setPin] = useState("");
   const [previousPin, setPreviousPin] = useState("");
-  const [hasPreviousPin, setHasPreviousPin] = useState(false);
-  const [recoveryReady, setRecoveryReady] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [checking, setChecking] = useState(false);
@@ -41,22 +39,12 @@ export function PinGate({ children }: PinGateProps) {
     }
   }
 
-  async function openRecovery() {
+  function openRecovery() {
     setScreen("recovery");
     setPin("");
     setPreviousPin("");
-    setHasPreviousPin(false);
-    setRecoveryReady(false);
     setError("");
     setNotice("");
-    try {
-      const pinState = await loadPilotPinState();
-      setHasPreviousPin(Boolean(pinState.previousPin));
-    } catch {
-      setError("Không thể đọc thiết lập cửa hàng trên thiết bị.");
-    } finally {
-      setRecoveryReady(true);
-    }
   }
 
   function returnToLogin() {
@@ -135,46 +123,31 @@ export function PinGate({ children }: PinGateProps) {
         ) : (
           <>
             <h1 id="pin-lock-title">Khôi phục mật khẩu</h1>
-            {!recoveryReady ? <p className="pin-lock-description" role="status">Đang kiểm tra thiết lập cửa hàng…</p> : null}
-            {recoveryReady && error && !hasPreviousPin ? (
-              <>
-                <p className="pin-lock-error" role="alert">{error}</p>
-                <Button className="pin-lock-submit" type="button" onClick={returnToLogin}>Quay lại</Button>
-              </>
-            ) : null}
-            {recoveryReady && !error && !hasPreviousPin ? (
-              <>
-                <p className="pin-lock-description" role="status">Không có mật khẩu trước đó để khôi phục.</p>
-                <Button className="pin-lock-submit" type="button" onClick={returnToLogin}>Quay lại</Button>
-              </>
-            ) : null}
-            {recoveryReady && hasPreviousPin ? (
-              <form className="pin-lock-form" onSubmit={(event) => void recoverPin(event)}>
-                <label className="pin-lock-label" htmlFor="previous-pin">Mật khẩu trước đó</label>
-                <input
-                  id="previous-pin"
-                  className="pin-lock-input"
-                  type="password"
-                  inputMode="numeric"
-                  pattern="[0-9]{4}"
-                  maxLength={4}
-                  autoComplete="off"
-                  autoFocus
-                  value={previousPin}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? "recovery-error" : undefined}
-                  onChange={(event) => {
-                    setPreviousPin(event.target.value.replace(/\D/g, "").slice(0, 4));
-                    setError("");
-                  }}
-                />
-                {error ? <p id="recovery-error" className="pin-lock-error" role="alert">{error}</p> : null}
-                <Button className="pin-lock-submit" type="submit" disabled={previousPin.length !== 4 || checking}>
-                  {checking ? "Đang xác thực…" : "Đặt lại mật khẩu"}
-                </Button>
-                <Button className="pin-lock-link" variant="ghost" type="button" onClick={returnToLogin}>Quay lại</Button>
-              </form>
-            ) : null}
+            <form className="pin-lock-form" onSubmit={(event) => void recoverPin(event)}>
+              <label className="pin-lock-label" htmlFor="previous-pin">Mật khẩu trước đó</label>
+              <input
+                id="previous-pin"
+                className="pin-lock-input"
+                type="password"
+                inputMode="numeric"
+                pattern="[0-9]{4}"
+                maxLength={4}
+                autoComplete="off"
+                autoFocus
+                value={previousPin}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "recovery-error" : undefined}
+                onChange={(event) => {
+                  setPreviousPin(event.target.value.replace(/\D/g, "").slice(0, 4));
+                  setError("");
+                }}
+              />
+              {error ? <p id="recovery-error" className="pin-lock-error" role="alert">{error}</p> : null}
+              <Button className="pin-lock-submit" type="submit" disabled={previousPin.length !== 4 || checking}>
+                {checking ? "Đang xác thực…" : "Đặt lại mật khẩu"}
+              </Button>
+              <Button className="pin-lock-link" variant="ghost" type="button" onClick={returnToLogin}>Quay lại</Button>
+            </form>
           </>
         )}
       </section>

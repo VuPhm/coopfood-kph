@@ -47,7 +47,7 @@ async function submitRecovery(previousPin: string) {
 describe("store PIN gate", () => {
   beforeEach(async () => resetPilotDatabaseForTests());
 
-  it("uses 0000 on a fresh install and reports that no previous PIN is available", async () => {
+  it("uses 0000 on a fresh install and keeps recovery available without previous PIN history", async () => {
     await setPilotSetting("existing-pilot-setting", { retained: true });
     await savePilotRecord(record());
     render(<PinGate><div>Store workspace</div></PinGate>);
@@ -58,7 +58,9 @@ describe("store PIN gate", () => {
     expect(screen.getByRole("img", { name: /Co\.op Food/ })).toHaveAttribute("src", "/brand/logo-coopfood-light.webp");
     expect(screen.getByRole("img", { name: /Co\.op Food/ })).toHaveAttribute("width", "640");
     await openRecovery();
-    expect(await screen.findByText("Không có mật khẩu trước đó để khôi phục.")).toBeVisible();
+    expect(screen.getByLabelText("Mật khẩu trước đó")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Đặt lại mật khẩu" })).toBeVisible();
+    expect(screen.queryByText("Không có mật khẩu trước đó để khôi phục.")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Mã cửa hàng")).not.toBeInTheDocument();
     expect(await getPilotSetting(STORE_PROFILE_SETTING_KEY)).toBeUndefined();
     expect(await getPilotSetting("existing-pilot-setting")).toEqual({ retained: true });
@@ -82,6 +84,16 @@ describe("store PIN gate", () => {
     expect(await screen.findByText("Mã truy cập đã được đặt lại về 0000.")).toBeVisible();
     expect(screen.queryByText("Store workspace")).not.toBeInTheDocument();
     expect(await loadPilotPinState()).toEqual({ pinOverride: "0000", previousPin: null });
+  });
+
+  it("accepts only 0000 when there is no previous PIN", async () => {
+    render(<PinGate><div>Store workspace</div></PinGate>);
+    await openRecovery();
+    await submitRecovery("1234");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Thông tin xác thực không đúng.");
+    expect(screen.queryByText("Store workspace")).not.toBeInTheDocument();
+    expect(await loadPilotPinState()).toEqual({ pinOverride: null, previousPin: null });
   });
 
   it("uses the store code as PIN and preserves leading zeroes", async () => {
@@ -111,6 +123,7 @@ describe("store PIN gate", () => {
   it("recovers 1234 → 5678 with 1234 and returns to login at 0000 without changing store code", async () => {
     await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "1234", role: "", fullName: "", employeeCode: "" });
     await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "5678", role: "", fullName: "", employeeCode: "" });
+    await setPilotSetting("unrelated-pilot-setting", { retained: true });
     await savePilotRecord(record());
     const firstBootstrap = render(<PinGate><div>Store workspace</div></PinGate>);
     await openRecovery();
@@ -121,6 +134,7 @@ describe("store PIN gate", () => {
     expect(screen.queryByText("Store workspace")).not.toBeInTheDocument();
     expect(await loadPilotPinState()).toEqual({ pinOverride: "0000", previousPin: null });
     expect((await loadPilotStoreProfile()).storeCode).toBe("5678");
+    expect(await getPilotSetting("unrelated-pilot-setting")).toEqual({ retained: true });
     expect((await loadPilotRecords()).map(({ id }) => id)).toEqual([record().id]);
     firstBootstrap.unmount();
 
@@ -131,12 +145,12 @@ describe("store PIN gate", () => {
     expect(await screen.findByText("Store workspace")).toBeVisible();
   });
 
-  it("does not reset for an incorrect previous PIN and gives one-use recovery only", async () => {
+  it("does not let fallback 0000 bypass a stored previous PIN and gives one-use recovery only", async () => {
     await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "1234", role: "", fullName: "", employeeCode: "" });
     await savePilotStoreProfile({ storeName: "Cống Quỳnh", storeCode: "5678", role: "", fullName: "", employeeCode: "" });
     render(<PinGate><div>Store workspace</div></PinGate>);
     await openRecovery();
-    await submitRecovery("9999");
+    await submitRecovery("0000");
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Thông tin xác thực không đúng.");
     expect(await loadPilotPinState()).toEqual({ pinOverride: null, previousPin: "1234" });
@@ -146,8 +160,8 @@ describe("store PIN gate", () => {
     expect(await loadPilotPinState()).toEqual({ pinOverride: "0000", previousPin: null });
 
     await openRecovery();
-    expect(await screen.findByText("Không có mật khẩu trước đó để khôi phục.")).toBeVisible();
-    expect(screen.queryByLabelText("Mật khẩu trước đó")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Mật khẩu trước đó")).toBeVisible();
+    expect(screen.queryByText("Không có mật khẩu trước đó để khôi phục.")).not.toBeInTheDocument();
   });
 
   it("keeps a leading-zero previous PIN when the store code changes", async () => {
@@ -156,6 +170,13 @@ describe("store PIN gate", () => {
 
     expect(await loadPilotPinState()).toEqual({ pinOverride: null, previousPin: "0123" });
     expect(effectivePilotPin(await loadPilotPinState(), "0456")).toBe("0456");
+
+    render(<PinGate><div>Store workspace</div></PinGate>);
+    await openRecovery();
+    await submitRecovery("0123");
+
+    expect(await screen.findByText("Mã truy cập đã được đặt lại về 0000.")).toBeVisible();
+    expect(await loadPilotPinState()).toEqual({ pinOverride: "0000", previousPin: null });
   });
 
   it("does not overwrite previous PIN when saving the same store code", async () => {
@@ -184,5 +205,54 @@ describe("store PIN gate", () => {
     expect(normalizePilotPinState({ pinOverride: "0000" })).toEqual({ pinOverride: "0000", previousPin: null });
     expect(await getPilotSetting("unrelated-pilot-setting")).toEqual({ retained: true });
     expect((await loadPilotRecords()).map(({ id }) => id)).toEqual([record().id]);
+  });
+
+  it("keeps a legacy store code as the login PIN and allows fallback recovery when pin state is absent", async () => {
+    await setPilotSetting(STORE_PROFILE_SETTING_KEY, {
+      storeName: "Cống Quỳnh",
+      storeCode: "1111",
+      role: "",
+      fullName: "",
+      employeeCode: "",
+    });
+    await setPilotSetting("unrelated-pilot-setting", { retained: true });
+    await savePilotRecord(record());
+
+    expect(await getPilotSetting(PIN_STATE_SETTING_KEY)).toBeUndefined();
+    expect(effectivePilotPin(await loadPilotPinState(), "1111")).toBe("1111");
+    const firstLogin = render(<PinGate><div>Store workspace</div></PinGate>);
+    enterPin("1111");
+    expect(await screen.findByText("Store workspace")).toBeVisible();
+    firstLogin.unmount();
+
+    render(<PinGate><div>Store workspace</div></PinGate>);
+    await openRecovery();
+    await submitRecovery("0000");
+
+    expect(await screen.findByText("Mã truy cập đã được đặt lại về 0000.")).toBeVisible();
+    expect(screen.queryByText("Store workspace")).not.toBeInTheDocument();
+    expect(await loadPilotStoreProfile()).toMatchObject({ storeCode: "1111" });
+    expect(await loadPilotPinState()).toEqual({ pinOverride: "0000", previousPin: null });
+    expect(effectivePilotPin(await loadPilotPinState(), "1111")).toBe("0000");
+    expect(await getPilotSetting("unrelated-pilot-setting")).toEqual({ retained: true });
+    expect((await loadPilotRecords()).map(({ id }) => id)).toEqual([record().id]);
+  });
+
+  it("allows fallback recovery for legacy override state without changing the store code", async () => {
+    await setPilotSetting(STORE_PROFILE_SETTING_KEY, {
+      storeName: "Cống Quỳnh",
+      storeCode: "1111",
+      role: "",
+      fullName: "",
+      employeeCode: "",
+    });
+    await setPilotSetting(PIN_STATE_SETTING_KEY, { pinOverride: "0000", previousPin: null });
+    render(<PinGate><div>Store workspace</div></PinGate>);
+    await openRecovery();
+    await submitRecovery("0000");
+
+    expect(await screen.findByText("Mã truy cập đã được đặt lại về 0000.")).toBeVisible();
+    expect(await loadPilotStoreProfile()).toMatchObject({ storeCode: "1111" });
+    expect(await loadPilotPinState()).toEqual({ pinOverride: "0000", previousPin: null });
   });
 });
