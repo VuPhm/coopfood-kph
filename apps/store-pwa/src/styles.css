@@ -101,6 +101,41 @@
 html[data-focus-modality="keyboard"] .dialog-close-hit-area:focus { outline: 3px solid var(--color-focus); outline-offset: 0; }
 
 .safe-top { padding-top: env(safe-area-inset-top); }
+.pin-lock-screen {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+  background: var(--color-canvas);
+}
+.pin-lock-card {
+  width: min(100%, 24rem);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+  text-align: center;
+}
+.pin-lock-logo { width: auto; height: 3.5rem; max-width: min(12rem, 70vw); margin-inline: auto; object-fit: contain; }
+.pin-lock-card h1 { margin: 1.25rem 0 .35rem; color: var(--color-ink); font-size: 1.25rem; font-weight: 700; }
+.pin-lock-description, .pin-lock-hint, .pin-lock-error { margin: 0; color: var(--color-ink-muted); font-size: .9rem; line-height: 1.5; }
+.pin-lock-form { display: grid; gap: .75rem; margin-top: 1.25rem; }
+.pin-lock-input {
+  width: 100%;
+  min-height: 3.25rem;
+  border: 2px solid var(--color-border);
+  border-radius: .75rem;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .75rem;
+  text-align: center;
+}
+.pin-lock-input[aria-invalid="true"] { border-color: var(--color-danger); }
+.pin-lock-error { color: var(--color-danger); }
+.pin-lock-submit { min-height: 2.75rem; width: 100%; }
 .app-header { box-shadow: 0 6px 20px rgb(0 45 20 / .15); }
 .app-header-inner {
   display: flex;

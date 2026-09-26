@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { App } from "./app";
+import { PinGate } from "./pin-gate";
 import "./styles.css";
 
 const queryClient = new QueryClient({
@@ -21,7 +22,9 @@ document.addEventListener("pointerdown", () => {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <PinGate>
+        <App />
+      </PinGate>
     </QueryClientProvider>
   </StrictMode>,
 );
