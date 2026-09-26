@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { getPilotSetting, setPilotSettings } from "./record-store";
-import { PIN_STATE_SETTING_KEY } from "./pin-state";
+import { getPilotSetting, transactPilotSettings } from "./record-store";
+import { normalizePilotPinState, PIN_STATE_SETTING_KEY, pinStateAfterStoreCodeChange } from "./pin-state";
 
 export const STORE_PROFILE_SETTING_KEY = "store-profile";
 
@@ -56,13 +56,19 @@ export async function loadPilotStoreProfile() {
 
 export async function savePilotStoreProfile(profile: StoreProfile) {
   const normalized = storeProfileSchema.parse(profile);
-  const currentProfile = await loadPilotStoreProfile();
-  const settings: { key: string; value: unknown }[] = [
-    { key: STORE_PROFILE_SETTING_KEY, value: normalized },
-  ];
-  if (currentProfile.storeCode !== normalized.storeCode) {
-    settings.push({ key: PIN_STATE_SETTING_KEY, value: { pinOverride: null } });
-  }
-  await setPilotSettings(settings);
+  await transactPilotSettings([STORE_PROFILE_SETTING_KEY, PIN_STATE_SETTING_KEY], (current) => {
+    const currentProfile = normalizeStoreProfile(current.get(STORE_PROFILE_SETTING_KEY));
+    const writes: { key: string; value: unknown }[] = [
+      { key: STORE_PROFILE_SETTING_KEY, value: normalized },
+    ];
+    if (currentProfile.storeCode !== normalized.storeCode) {
+      const pinState = normalizePilotPinState(current.get(PIN_STATE_SETTING_KEY));
+      writes.push({
+        key: PIN_STATE_SETTING_KEY,
+        value: pinStateAfterStoreCodeChange(pinState, currentProfile.storeCode, normalized.storeCode),
+      });
+    }
+    return { writes, result: undefined };
+  });
   return normalized;
 }

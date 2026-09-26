@@ -2,23 +2,18 @@ import { Button } from "@coopfood-kph/ui";
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import { assetUrl } from "./asset-url";
-import { loadPilotPinOverride, savePilotPinOverride } from "./pin-state";
+import { effectivePilotPin, loadPilotPinState, recoverPilotPinWithPreviousPin } from "./pin-state";
 import { loadPilotStoreProfile } from "./store-profile";
 
 type PinGateProps = { children: ReactNode };
 type PinScreen = "login" | "recovery";
 
-function effectivePin(pinOverride: "0000" | null, currentStoreCode: string) {
-  return pinOverride ?? (currentStoreCode || "0000");
-}
-
 export function PinGate({ children }: PinGateProps) {
   const [unlocked, setUnlocked] = useState(false);
   const [screen, setScreen] = useState<PinScreen>("login");
   const [pin, setPin] = useState("");
-  const [recentPin, setRecentPin] = useState("");
-  const [recoveryStoreCode, setRecoveryStoreCode] = useState("");
-  const [hasStoreCode, setHasStoreCode] = useState(false);
+  const [previousPin, setPreviousPin] = useState("");
+  const [hasPreviousPin, setHasPreviousPin] = useState(false);
   const [recoveryReady, setRecoveryReady] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -31,8 +26,8 @@ export function PinGate({ children }: PinGateProps) {
     setChecking(true);
     setError("");
     try {
-      const [profile, pinOverride] = await Promise.all([loadPilotStoreProfile(), loadPilotPinOverride()]);
-      if (pin === effectivePin(pinOverride, profile.storeCode)) {
+      const [profile, pinState] = await Promise.all([loadPilotStoreProfile(), loadPilotPinState()]);
+      if (pin === effectivePilotPin(pinState, profile.storeCode)) {
         setPin("");
         setUnlocked(true);
         return;
@@ -49,15 +44,14 @@ export function PinGate({ children }: PinGateProps) {
   async function openRecovery() {
     setScreen("recovery");
     setPin("");
-    setRecentPin("");
-    setRecoveryStoreCode("");
-    setHasStoreCode(false);
+    setPreviousPin("");
+    setHasPreviousPin(false);
     setRecoveryReady(false);
     setError("");
     setNotice("");
     try {
-      const profile = await loadPilotStoreProfile();
-      setHasStoreCode(Boolean(profile.storeCode));
+      const pinState = await loadPilotPinState();
+      setHasPreviousPin(Boolean(pinState.previousPin));
     } catch {
       setError("Không thể đọc thiết lập cửa hàng trên thiết bị.");
     } finally {
@@ -67,28 +61,19 @@ export function PinGate({ children }: PinGateProps) {
 
   function returnToLogin() {
     setScreen("login");
-    setRecentPin("");
-    setRecoveryStoreCode("");
+    setPreviousPin("");
     setError("");
   }
 
   async function recoverPin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (recentPin.length !== 4 || recoveryStoreCode.length !== 4 || checking) return;
+    if (previousPin.length !== 4 || checking) return;
 
     setChecking(true);
     setError("");
     try {
-      const [profile, pinOverride] = await Promise.all([loadPilotStoreProfile(), loadPilotPinOverride()]);
-      const currentStoreCode = profile.storeCode;
-      if (
-        /^\d{4}$/.test(currentStoreCode)
-        && recentPin === effectivePin(pinOverride, currentStoreCode)
-        && recoveryStoreCode === currentStoreCode
-      ) {
-        await savePilotPinOverride("0000");
-        setRecentPin("");
-        setRecoveryStoreCode("");
+      if (await recoverPilotPinWithPreviousPin(previousPin)) {
+        setPreviousPin("");
         setPin("");
         setScreen("login");
         setNotice("Mã truy cập đã được đặt lại về 0000.");
@@ -151,23 +136,23 @@ export function PinGate({ children }: PinGateProps) {
           <>
             <h1 id="pin-lock-title">Khôi phục mật khẩu</h1>
             {!recoveryReady ? <p className="pin-lock-description" role="status">Đang kiểm tra thiết lập cửa hàng…</p> : null}
-            {recoveryReady && error && !hasStoreCode ? (
+            {recoveryReady && error && !hasPreviousPin ? (
               <>
                 <p className="pin-lock-error" role="alert">{error}</p>
                 <Button className="pin-lock-submit" type="button" onClick={returnToLogin}>Quay lại</Button>
               </>
             ) : null}
-            {recoveryReady && !error && !hasStoreCode ? (
+            {recoveryReady && !error && !hasPreviousPin ? (
               <>
-                <p className="pin-lock-description" role="status">Chưa có mã cửa hàng. Mã truy cập mặc định hiện tại là 0000.</p>
+                <p className="pin-lock-description" role="status">Không có mật khẩu trước đó để khôi phục.</p>
                 <Button className="pin-lock-submit" type="button" onClick={returnToLogin}>Quay lại</Button>
               </>
             ) : null}
-            {recoveryReady && hasStoreCode ? (
+            {recoveryReady && hasPreviousPin ? (
               <form className="pin-lock-form" onSubmit={(event) => void recoverPin(event)}>
-                <label className="pin-lock-label" htmlFor="recent-pin">Mật khẩu gần nhất</label>
+                <label className="pin-lock-label" htmlFor="previous-pin">Mật khẩu trước đó</label>
                 <input
-                  id="recent-pin"
+                  id="previous-pin"
                   className="pin-lock-input"
                   type="password"
                   inputMode="numeric"
@@ -175,33 +160,16 @@ export function PinGate({ children }: PinGateProps) {
                   maxLength={4}
                   autoComplete="off"
                   autoFocus
-                  value={recentPin}
+                  value={previousPin}
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? "recovery-error" : undefined}
                   onChange={(event) => {
-                    setRecentPin(event.target.value.replace(/\D/g, "").slice(0, 4));
-                    setError("");
-                  }}
-                />
-                <label className="pin-lock-label" htmlFor="recovery-store-code">Mã cửa hàng</label>
-                <input
-                  id="recovery-store-code"
-                  className="pin-lock-input pin-lock-store-code"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]{4}"
-                  maxLength={4}
-                  autoComplete="off"
-                  value={recoveryStoreCode}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? "recovery-error" : undefined}
-                  onChange={(event) => {
-                    setRecoveryStoreCode(event.target.value.replace(/\D/g, "").slice(0, 4));
+                    setPreviousPin(event.target.value.replace(/\D/g, "").slice(0, 4));
                     setError("");
                   }}
                 />
                 {error ? <p id="recovery-error" className="pin-lock-error" role="alert">{error}</p> : null}
-                <Button className="pin-lock-submit" type="submit" disabled={recentPin.length !== 4 || recoveryStoreCode.length !== 4 || checking}>
+                <Button className="pin-lock-submit" type="submit" disabled={previousPin.length !== 4 || checking}>
                   {checking ? "Đang xác thực…" : "Đặt lại mật khẩu"}
                 </Button>
                 <Button className="pin-lock-link" variant="ghost" type="button" onClick={returnToLogin}>Quay lại</Button>

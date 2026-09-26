@@ -204,13 +204,26 @@ export async function setPilotSetting(key: string, value: unknown) {
 }
 
 export async function setPilotSettings(settings: readonly { key: string; value: unknown }[]) {
+  await transactPilotSettings([], () => ({ writes: settings, result: undefined }));
+}
+
+export async function transactPilotSettings<T>(
+  keys: readonly string[],
+  update: (current: ReadonlyMap<string, unknown>) => { writes: readonly { key: string; value: unknown }[]; result: T },
+): Promise<T> {
   const db = await database();
   const transaction = db.transaction("settings", "readwrite");
+  const current = new Map<string, unknown>();
+  for (const key of keys) {
+    current.set(key, (await transaction.store.get(key))?.value);
+  }
+  const { writes, result } = update(current);
   const updatedAt = new Date().toISOString();
-  for (const { key, value } of settings) {
+  for (const { key, value } of writes) {
     await transaction.store.put({ key, value, updatedAt });
   }
   await transaction.done;
+  return result;
 }
 
 export async function getPilotSetting<T>(key: string): Promise<T | undefined> {
