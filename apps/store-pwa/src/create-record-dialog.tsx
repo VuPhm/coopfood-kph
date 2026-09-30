@@ -36,6 +36,7 @@ import { z } from "zod";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
+import { parseFreshFoodWeightKg } from "./fresh-food-weight";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 import { primeScanSuccessSound } from "./scanner-sound";
@@ -155,6 +156,14 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const detectedDate = watch("detectedDate");
   const treatmentDate = watch("treatmentDate");
   const initialMonth = formatBusinessDate(new Date()).iso;
+
+  function applyFreshFoodWeight(barcode: string) {
+    if (kind !== "TPTS") return;
+    const weightKg = parseFreshFoodWeightKg(barcode);
+    if (weightKg === null) return;
+    setValue("quantity", String(weightKg), { shouldDirty: true, shouldValidate: true });
+    setValue("unit", "kg", { shouldDirty: true });
+  }
 
   function clearPhotos() {
     for (const photo of photoRef.current) {
@@ -281,7 +290,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
-                    <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode")} />
+                    <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", { onBlur: (event) => applyFreshFoodWeight(event.target.value) })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => {
                       primeScanSuccessSound();
                       setScannerOpen(true);
@@ -362,6 +371,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         onOpenChange={setScannerOpen}
         onScan={(scannedBarcode) => {
           setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
+          applyFreshFoodWeight(scannedBarcode);
           window.setTimeout(() => setFocus("barcode"), 0);
         }}
       />

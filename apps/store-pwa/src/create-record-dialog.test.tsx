@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { BrowserMultiFormatReader, type Result } from "@zxing/library";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { formatBusinessDate } from "./business-date";
@@ -59,6 +60,93 @@ describe("Create KPH record", () => {
     expect(within(condition).queryByRole("radio", { name: "Hư hỏng" })).not.toBeInTheDocument();
     expect(within(resolution).getAllByRole("radio")).toHaveLength(2);
     expect(within(resolution).queryByRole("radio", { name: "ĐỔI" })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["2912345612345", "1.234"],
+    ["2912345602505", "0.25"],
+    ["2912345699995", "9.999"],
+  ])("fills TPTS quantity and kg on blur for %s, without parsing during typing", (barcode, quantity) => {
+    renderDialog("TPTS");
+    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
+    fireEvent.change(barcodeInput, { target: { value: barcode } });
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7");
+    expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+
+    fireEvent.blur(barcodeInput);
+
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue(quantity);
+    expect(screen.getByRole("radio", { name: "kg" })).toBeChecked();
+    expect(screen.getByRole("textbox", { name: "Tên hàng hóa" })).toHaveValue("");
+    expect(screen.getByRole("textbox", { name: "Nhà cung cấp" })).toHaveValue("");
+  });
+
+  it.each([
+    ["TPCN", "2912345612345"],
+    ["TPTS", "2812345612345"],
+    ["TPTS", "29"],
+    ["TPTS", "291234"],
+    ["TPTS", "29ABCDEF12345"],
+    ["TPTS", "291234561234X"],
+  ] as const)("preserves entered quantity and unit for %s barcode %s", (kind, barcode) => {
+    renderDialog(kind);
+    fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
+    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    fireEvent.change(barcodeInput, { target: { value: barcode } });
+    fireEvent.blur(barcodeInput);
+
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7");
+    expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+    expect(screen.getByRole("button", { name: "Lưu phiếu" })).toBeEnabled();
+  });
+
+  it("fills zero weight but still rejects it through the existing quantity validation", async () => {
+    const onSaved = renderDialog("TPTS");
+    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    fireEvent.change(barcodeInput, { target: { value: "2912345600005" } });
+    fireEvent.blur(barcodeInput);
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("0");
+    expect(screen.getByRole("radio", { name: "kg" })).toBeChecked();
+
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+
+    expect(await screen.findByText("Số lượng phải lớn hơn 0")).toBeVisible();
+    expect(onSaved).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["TPTS", "2912345612345", "1.234", "kg"],
+    ["TPTS", "2912345602505", "0.25", "kg"],
+    ["TPCN", "2912345612345", "7", "EA"],
+    ["TPTS", "2812345612345", "7", "EA"],
+    ["TPTS", "29ABCDEF12345", "7", "EA"],
+  ] as const)("applies the same weight rule immediately to scanned %s barcode %s", async (kind, barcode, quantity, unit) => {
+    const originalMediaDevices = navigator.mediaDevices;
+    const track = { stop: vi.fn(), getSettings: () => ({}) };
+    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: {
+      getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [track], getVideoTracks: () => [track] }),
+      enumerateDevices: vi.fn().mockResolvedValue([]),
+    } });
+    vi.stubGlobal("BarcodeDetector", undefined);
+    vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
+    vi.spyOn(BrowserMultiFormatReader.prototype, "decodeContinuously").mockImplementation((_source, callback) => {
+      callback({ getText: () => barcode } as Result, undefined);
+    });
+    try {
+      renderDialog(kind);
+      fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
+      fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
+
+      await waitFor(() => expect(screen.getByRole("textbox", { name: "Mã SKU / UPC" })).toHaveValue(barcode), { timeout: 1_500 });
+
+      expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue(quantity);
+      expect(screen.getByRole("radio", { name: unit })).toBeChecked();
+    } finally {
+      Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: originalMediaDevices });
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
   });
 
   it("keeps the three-photo cap without discarding the current draft", () => {
@@ -168,4 +256,3 @@ describe("Create KPH record", () => {
       })));
   });
 });
-
