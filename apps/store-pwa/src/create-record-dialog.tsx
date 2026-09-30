@@ -138,6 +138,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const [savingRecord, setSavingRecord] = useState(false);
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [weightExtracted, setWeightExtracted] = useState(false);
+  const weightTimeoutRef = useRef<number | null>(null);
   const {
     formState: { errors },
     handleSubmit,
@@ -157,12 +159,31 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const treatmentDate = watch("treatmentDate");
   const initialMonth = formatBusinessDate(new Date()).iso;
 
+  function cancelPendingWeightExtraction() {
+    if (weightTimeoutRef.current !== null) window.clearTimeout(weightTimeoutRef.current);
+    weightTimeoutRef.current = null;
+  }
+
+  function clearWeightExtraction() {
+    cancelPendingWeightExtraction();
+    setWeightExtracted(false);
+  }
+
   function applyFreshFoodWeight(barcode: string) {
+    clearWeightExtraction();
     if (kind !== "TPTS") return;
     const weightKg = parseFreshFoodWeightKg(barcode);
     if (weightKg === null) return;
     setValue("quantity", String(weightKg), { shouldDirty: true, shouldValidate: true });
     setValue("unit", "kg", { shouldDirty: true });
+    setWeightExtracted(true);
+  }
+
+  function scheduleFreshFoodWeight(barcode: string) {
+    clearWeightExtraction();
+    if (kind === "TPTS") {
+      weightTimeoutRef.current = window.setTimeout(() => applyFreshFoodWeight(barcode), 500);
+    }
   }
 
   function clearPhotos() {
@@ -175,13 +196,19 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   }
 
   useEffect(() => {
+    clearWeightExtraction();
     if (!kind) return;
     reset(defaultValues(kind, profile));
     clearPhotos();
     setPhotoError("");
   }, [kind, profile, reset]);
 
+  useEffect(() => {
+    if (!open) clearWeightExtraction();
+  }, [open]);
+
   useEffect(() => () => {
+    cancelPendingWeightExtraction();
     for (const photo of photoRef.current) {
       if (photo.url) URL.revokeObjectURL(photo.url);
     }
@@ -219,6 +246,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
       });
       reset(defaultValues(kind, profile));
+      clearWeightExtraction();
       clearPhotos();
       onOpenChange(false);
     } catch (error) {
@@ -290,7 +318,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
-                    <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", { onBlur: (event) => applyFreshFoodWeight(event.target.value) })} />
+                    <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", {
+                      onChange: (event) => scheduleFreshFoodWeight(event.target.value),
+                      onBlur: (event) => applyFreshFoodWeight(event.target.value),
+                    })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => {
                       primeScanSuccessSound();
                       setScannerOpen(true);
@@ -311,15 +342,16 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
             <FormSection number="2" title="Số lượng & đơn vị">
               <div className="grid max-w-md grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                 <Field label="Số lượng" htmlFor="quantity" required error={errors.quantity?.message}>
-                  <Input id="quantity" inputMode="decimal" {...register("quantity")} />
+                  <Input id="quantity" inputMode="decimal" aria-describedby={weightExtracted ? "quantity-extraction-note" : undefined} {...register("quantity", { onChange: clearWeightExtraction })} />
                 </Field>
                 <fieldset className="unit-fieldset">
                   <legend className="text-sm font-bold">Đơn vị</legend>
                   <div className="unit-options">
-                    {(["EA", "kg"] as const).map((unit) => <label key={unit}><input className="sr-only" type="radio" value={unit} {...register("unit")} /><span>{unit}</span></label>)}
+                    {(["EA", "kg"] as const).map((unit) => <label key={unit}><input className="sr-only" type="radio" value={unit} {...register("unit", { onChange: clearWeightExtraction })} /><span>{unit}</span></label>)}
                   </div>
                 </fieldset>
               </div>
+              {weightExtracted ? <p id="quantity-extraction-note" className="mt-2 text-xs text-ink-muted" role="status">Trọng lượng đã được trích xuất từ mã barcode.</p> : null}
             </FormSection>
 
             <FormSection number="3" title="Tình trạng hàng">

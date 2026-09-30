@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { BrowserMultiFormatReader, type Result } from "@zxing/library";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -82,6 +82,79 @@ describe("Create KPH record", () => {
     expect(screen.getByRole("textbox", { name: "Nhà cung cấp" })).toHaveValue("");
   });
 
+  it("waits for a 500 ms typing pause, then fills weight and shows its source without blur", async () => {
+    vi.useFakeTimers();
+    try {
+      renderDialog("TPTS");
+      const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+      fireEvent.focus(barcodeInput);
+      fireEvent.change(barcodeInput, { target: { value: "291234561234" } });
+      await act(async () => { vi.advanceTimersByTime(300); });
+      fireEvent.change(barcodeInput, { target: { value: "2912345612345" } });
+      await act(async () => { vi.advanceTimersByTime(499); });
+      expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("1");
+      expect(screen.queryByText("Trọng lượng đã được trích xuất từ mã barcode.")).not.toBeInTheDocument();
+
+      await act(async () => { vi.advanceTimersByTime(1); });
+
+      const quantityInput = screen.getByRole("textbox", { name: "Số lượng" });
+      expect(quantityInput).toHaveValue("1.234");
+      expect(screen.getByRole("radio", { name: "kg" })).toBeChecked();
+      expect(screen.getByText("Trọng lượng đã được trích xuất từ mã barcode.")).toHaveAttribute("role", "status");
+      expect(quantityInput).toHaveAttribute("aria-describedby", "quantity-extraction-note");
+
+      fireEvent.change(quantityInput, { target: { value: "2" } });
+      expect(screen.queryByText("Trọng lượng đã được trích xuất từ mã barcode.")).not.toBeInTheDocument();
+      expect(quantityInput).not.toHaveAttribute("aria-describedby");
+      await act(async () => { vi.advanceTimersByTime(500); });
+      expect(quantityInput).toHaveValue("2");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each([
+    ["TPCN", "2912345612345"],
+    ["TPTS", "2812345612345"],
+    ["TPTS", "291234"],
+    ["TPTS", "291234561234X"],
+  ] as const)("does not fill after a typing pause for %s barcode %s", async (kind, barcode) => {
+    vi.useFakeTimers();
+    try {
+      renderDialog(kind);
+      fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
+      fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: barcode } });
+      await act(async () => { vi.advanceTimersByTime(500); });
+      expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7");
+      expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+      expect(screen.queryByText("Trọng lượng đã được trích xuất từ mã barcode.")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("cancels pending extraction and clears the source note when the barcode changes or the dialog closes", async () => {
+    vi.useFakeTimers();
+    try {
+      const props = { kind: "TPTS" as const, onOpenChange: vi.fn(), onSaved: vi.fn() };
+      const { rerender } = render(<CreateRecordDialog {...props} open />);
+      const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+      fireEvent.change(barcodeInput, { target: { value: "2912345612345" } });
+      await act(async () => { vi.advanceTimersByTime(500); });
+      expect(screen.getByText("Trọng lượng đã được trích xuất từ mã barcode.")).toBeVisible();
+
+      fireEvent.change(barcodeInput, { target: { value: "2912345602505" } });
+      expect(screen.queryByText("Trọng lượng đã được trích xuất từ mã barcode.")).not.toBeInTheDocument();
+      rerender(<CreateRecordDialog {...props} open={false} />);
+      await act(async () => { vi.advanceTimersByTime(500); });
+      rerender(<CreateRecordDialog {...props} open />);
+      expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("1.234");
+      expect(screen.queryByText("Trọng lượng đã được trích xuất từ mã barcode.")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it.each([
     ["TPCN", "2912345612345"],
     ["TPTS", "2812345612345"],
@@ -142,6 +215,8 @@ describe("Create KPH record", () => {
 
       expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue(quantity);
       expect(screen.getByRole("radio", { name: unit })).toBeChecked();
+      if (unit === "kg") expect(screen.getByText("Trọng lượng đã được trích xuất từ mã barcode.")).toBeVisible();
+      else expect(screen.queryByText("Trọng lượng đã được trích xuất từ mã barcode.")).not.toBeInTheDocument();
     } finally {
       Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: originalMediaDevices });
       vi.unstubAllGlobals();
