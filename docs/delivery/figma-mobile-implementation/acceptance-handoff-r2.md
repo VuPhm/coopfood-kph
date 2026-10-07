@@ -2,7 +2,7 @@
 
 Technical implementation is ready for owner review; this handoff does not record
 acceptance. The local memory-only preview is served by Vite at
-`http://127.0.0.1:5176/` (`VITE_STORE_APP_MOCK=true`). It is attached to the current
+`http://127.0.0.1:5175/` (`VITE_STORE_APP_MOCK=true`). It is attached to the current
 Codex window if the browser panel has completed opening.
 
 Suggested review scenarios:

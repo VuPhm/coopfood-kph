@@ -19,7 +19,7 @@
     "Merge/push/deploy hoặc protected Pages cutover; DATE thêm theo dõi workflow chưa có design"
   ],
   "baseSha": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe",
-  "candidateSha": "",
+  "candidateSha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
   "integrationOwner": "GPT-6 Luna — sole implementation/integration writer after START; root standby for review/coordination",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -66,37 +66,37 @@
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",

@@ -1,6 +1,6 @@
 # Technical evidence — revision 2
 
-Date: 2026-10-07. Candidate SHA: set after the implementation checkpoint commit.
+Date: 2026-10-07. Candidate SHA: `31fc41a64e8430fceddbd4041f85f77fb87e7ec0`.
 Scope: Figma `aEDpXtz0IiEkPiVucqjQ3Q`, mobile and desktop, memory-only mock.
 
 ## Workspace and contract
