@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-10-07
+Cập nhật: 2026-10-08
 
 ## Giai đoạn
 
@@ -13,6 +13,11 @@ và [handoff Luna 6](delivery/figma-mobile-implementation/luna-6-handoff.md)
 theo dõi scope/gates. S0–S7 đã triển khai và technical gates PASS trên candidate
 r2; full verify, workflow/export và responsive Playwright đều đạt. Owner visual
 acceptance vẫn pending. Evidence 03/10 là lịch sử, không dùng thay cho kết quả r2.
+
+Ngày 08/10, owner xác nhận bộ icon **Feather React** và yêu cầu tiếp tục loop,
+cho phép dùng sub mới. Root đang điều phối một review icon có phạm vi nhỏ bằng
+sub mới read-only; code candidate và technical evidence chưa đổi. Xem
+[owner follow-up](delivery/figma-mobile-implementation/owner-followup-2026-10-08.md).
 
 Theo yêu cầu owner ngày 03/10/2026, giao diện mobile từ Figma `aEDpXtz0IiEkPiVucqjQ3Q`
 đã được triển khai trên working tree nhánh `store-app/figma-mobile-implementation`.

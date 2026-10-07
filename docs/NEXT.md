@@ -1,6 +1,6 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-10-07
+Cập nhật: 2026-10-08
 
 ## Figma implementation — revision 2 chờ nghiệm thu
 
@@ -11,9 +11,11 @@ context/screenshot của mobile, desktop và component/theme trong Figma
 không mở cycle song song. Luna là sole writer; technical gates PASS, owner acceptance
 đang pending.
 
-Bước nhỏ tiếp theo: owner kiểm tra preview/scenarios trong acceptance handoff và
-đưa ra quyết định visual/workflow. Technical PASS không tự đóng cycle. API wiring
-tiếp tục ngoài scope.
+Bước nhỏ tiếp theo theo owner ngày 08/10: review icon Feather React bằng sub mới
+read-only, gom mismatch xác nhận và feedback preview thành phạm vi sửa nhỏ nếu
+cần. Owner vẫn chưa đưa ra quyết định visual/workflow. Technical PASS không tự
+đóng cycle. API wiring tiếp tục ngoài scope. Xem
+[follow-up](delivery/figma-mobile-implementation/owner-followup-2026-10-08.md).
 
 ## Figma mobile implementation — evidence revision 1
 
