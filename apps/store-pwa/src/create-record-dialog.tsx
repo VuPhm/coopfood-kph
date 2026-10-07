@@ -40,6 +40,7 @@ import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
+import { figmaAsset } from "./figma-assets";
 
 function isDisplayDate(value: string) {
   try {
@@ -101,6 +102,7 @@ export type CreatedRecordDraft = {
 };
 
 type CreateRecordDialogProps = {
+  presentation?: "dialog" | "screen";
   kind: KphKind | null;
   open: boolean;
   profile?: StoreProfile;
@@ -135,7 +137,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false }: CreateRecordDialogProps) {
+export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog" }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -143,6 +145,9 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   const [photoError, setPhotoError] = useState("");
   const [processingPhotos, setProcessingPhotos] = useState(false);
   const [savingRecord, setSavingRecord] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
+  const screenPresentation = presentation === "screen";
+  const assetScreen = activeKind === "TPCN" ? "203-701" : "203-847";
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [barcodeLookupMessage, setBarcodeLookupMessage] = useState("");
@@ -184,6 +189,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   useEffect(() => {
     if (!kind) return;
     reset(defaultValues(kind, profile));
+    setReviewing(false);
     clearPhotos();
     setPhotoError("");
     setBarcodeLookupMessage("");
@@ -196,6 +202,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   useEffect(() => {
     if (open || !kind) return;
     reset(defaultValues(kind, profile));
+    setReviewing(false);
     clearPhotos();
     setPhotoError("");
     setBarcodeLookupMessage("");
@@ -285,6 +292,11 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     }
     const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
     const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
+    if (screenPresentation && !reviewing) {
+      setPhotoError("");
+      setReviewing(true);
+      return;
+    }
     setSavingRecord(true);
     savingRecordRef.current = true;
     setPhotoError("");
@@ -396,16 +408,25 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0" aria-describedby="create-description">
+        <DialogContent className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
           <DialogHeader className="create-dialog-header">
-            <DialogTitle className="create-dialog-title">Tạo phiếu KPH · {kindLabels[kind]}</DialogTitle>
+            {screenPresentation ? <button type="button" className="store-form-back" aria-label={reviewing ? "Chỉnh sửa phiếu" : "Về danh sách KPH"} onClick={() => { if (reviewing) setReviewing(false); else onOpenChange(false); }}><img src={figmaAsset(assetScreen, "imgFeatherArrowLeft")} alt="" /></button> : null}
+            <DialogTitle className="create-dialog-title">{screenPresentation ? <>{reviewing ? "Xem lại phiếu KPH" : "Tạo phiếu KPH"}<small>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</small></> : <>Tạo phiếu KPH · {kindLabels[kind]}</>}</DialogTitle>
             <DialogDescription id="create-description" className="sr-only">
               Tạo phiếu hàng không phù hợp; trường có dấu sao là bắt buộc.
             </DialogDescription>
           </DialogHeader>
 
-          <form className="create-dialog-form" onSubmit={submit}>
-            <FormSection number="1" title="Thông tin phát hiện">
+          {screenPresentation && reviewing ? <div className="store-form-review">
+            <p className={cn("store-review-notice", photoError && "is-error")} role={photoError ? "alert" : "status"}><img src={figmaAsset(photoError ? "280-1915" : "279-1299", photoError ? "imgFeatherWifiOff" : "imgFeatherAlertCircle")} alt="" /><span><strong>{photoError ? "Chưa gửi được phiếu" : "Chưa gửi"}</strong><small>{photoError || "Phiếu chỉ được tạo sau khi bạn bấm “Gửi phiếu”."}</small></span></p>
+            <ReviewSection title="Hàng hóa" rows={[["Cửa hàng", profile.storeName], ["Ngày phát hiện", getValues("detectedDate")], ["Mã SKU / UPC", getValues("barcode") || "—"], ["Tên hàng hóa", getValues("productName") || "—"], ["Nhà cung cấp", getValues("supplier") || "—"], ["Số lượng", `${getValues("quantity")} ${getValues("unit")}`]]} />
+            <ReviewSection title="Xử lý" rows={[["Tình trạng", resolveChoiceLabel(options.conditions.find(c => c.value === getValues("condition"))!, getValues("conditionDetail"))], ["Biện pháp", resolveChoiceLabel(options.resolutions.find(c => c.value === getValues("resolution"))!, getValues("resolutionDetail"))], ["Ngày xử lý", getValues("treatmentDate") || "Chưa có"]]} />
+            <ReviewSection title="Ghi nhận" rows={[["Người phát hiện", getValues("detectedBy")], ["Ghi chú", getValues("note") || "Không có"]]} />
+            <div className="store-form-evidence"><strong>Ảnh · {photos.length}/3</strong><div>{photos.map((p, i) => <button key={p.id} type="button" onClick={() => setActivePhoto(p)} aria-label={`Xem ảnh minh chứng ${i + 1}`}><img src={p.url} alt="" /><span>{i + 1}</span></button>)}</div></div>
+            <footer className="create-dialog-footer"><Button variant="ghost" disabled={savingRecord} onClick={() => { setReviewing(false); setPhotoError(""); }}>Chỉnh sửa</Button><Button disabled={savingRecord} onClick={() => void submit()}>{savingRecord ? "Đang gửi…" : "Gửi phiếu"}</Button></footer>
+          </div> : null}
+          <form className="create-dialog-form" hidden={screenPresentation && reviewing} onSubmit={submit}>
+            <FormSection number="1" title={screenPresentation ? "Hàng hóa" : "Thông tin phát hiện"}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
                   <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} readOnly onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
@@ -419,10 +440,10 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
                     if (autoFilledLookup.current.barcode && event.target.value.trim() !== autoFilledLookup.current.barcode) clearAutoFilledLookup();
                   }, onBlur: () => void lookupBarcode() })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
-                      <ScanLine aria-hidden="true" size={18} />
+                      {screenPresentation ? <img src={figmaAsset(assetScreen, "imgFeatherMaximize")} alt="" /> : <ScanLine aria-hidden="true" size={18} />}
                     </button>
                   </div>
-                  {barcodeLookupMessage ? <p className="mt-1 text-xs text-ink-muted" role="status">{barcodeLookupMessage}{lookupRetryValue ? <button type="button" className="ml-2 underline" onClick={() => void lookupBarcode(lookupRetryValue)}>Thử tra cứu lại</button> : null}</p> : null}
+                  {barcodeLookupMessage ? <p className={cn("mt-1 text-xs text-ink-muted", screenPresentation && "store-lookup-notice")} role="status">{barcodeLookupMessage}{lookupRetryValue ? <button type="button" className="ml-2 underline" onClick={() => void lookupBarcode(lookupRetryValue)}>Thử tra cứu lại</button> : null}{screenPresentation && !barcodeLookupMessage.startsWith("Đã tìm thấy") && !barcodeLookupMessage.startsWith("Đang") ? <button type="button" onClick={() => setScannerOpen(true)}>Quét lại</button> : null}</p> : null}
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
                   <Input id="supplier" placeholder="Điền tên NCC" {...register("supplier")} />
@@ -433,7 +454,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
               </div>
             </FormSection>
 
-            <FormSection number="2" title="Số lượng & đơn vị">
+            <FormSection number="2" title={screenPresentation ? "Số lượng" : "Số lượng & đơn vị"}>
               <div className="grid max-w-md grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                 <Field label="Số lượng" htmlFor="quantity" required error={errors.quantity?.message}>
                   <Input id="quantity" inputMode="decimal" {...register("quantity")} />
@@ -447,29 +468,29 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
               </div>
             </FormSection>
 
-            <FormSection number="3" title="Tình trạng hàng">
-              <ChoiceGroup legend="Tình trạng" name="condition" register={register} choices={options.conditions} />
+            <FormSection number="3" title={screenPresentation ? "Tình trạng" : "Tình trạng hàng"}>
+              <ChoiceGroup legend="Tình trạng" name="condition" register={register} choices={options.conditions} assetScreen={screenPresentation ? assetScreen : undefined} />
               {selectedCondition === "OTHER" ? <Field className="mt-3" label="Nội dung tình trạng khác" htmlFor="condition-detail" error={errors.conditionDetail?.message}><Input id="condition-detail" placeholder="Để trống sẽ giữ nhãn “Khác”" {...register("conditionDetail")} /></Field> : null}
             </FormSection>
 
-            <FormSection number="4" title="Biện pháp xử lý">
-              <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} />
+            <FormSection number="4" title={screenPresentation ? "Xử lý" : "Biện pháp xử lý"}>
+              <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} assetScreen={screenPresentation ? assetScreen : undefined} />
               {selectedResolution === "OTHER" ? <Field className="mt-3" label="Nội dung biện pháp khác" htmlFor="resolution-detail" error={errors.resolutionDetail?.message}><Input id="resolution-detail" placeholder="Để trống sẽ giữ nhãn “KHÁC”" {...register("resolutionDetail")} /></Field> : null}
               <Field className="mt-3" label="Ngày xử lý (nếu có)" htmlFor="treatment-date" error={errors.treatmentDate?.message}>
                 <CalendarInput id="treatment-date" initialMonth={initialMonth} label="Ngày xử lý (nếu có)" value={treatmentDate} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
               </Field>
             </FormSection>
 
-            <FormSection number="5" title="Người phát hiện & ảnh">
-              <Field label="Tên người nhập" htmlFor="detected-by" required error={errors.detectedBy?.message}>
+            <FormSection number="5" title={screenPresentation ? "Ghi nhận" : "Người phát hiện & ảnh"}>
+              <Field label={screenPresentation ? "Người phát hiện" : "Tên người nhập"} htmlFor="detected-by" required error={errors.detectedBy?.message}>
                 <Input id="detected-by" readOnly={actorReadOnly} {...register("detectedBy")} />
               </Field>
               <div className="mt-3">
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
                 <p className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
-                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={<Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
+                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img src={figmaAsset(assetScreen, "imgFeatherCamera")} alt="" /> : <Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
+                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img src={figmaAsset(assetScreen, "imgFeatherImage")} alt="" /> : <Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
                 </div>
                 {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
                 <p className={cn("mt-2 text-xs font-semibold", photoError ? "text-danger" : "text-ink-muted")} role={photoError ? "alert" : "status"}>
@@ -483,15 +504,16 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
 
             <footer className="create-dialog-footer">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Hủy</Button>
-              <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : "Lưu phiếu"}</Button>
+              <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : screenPresentation ? "Xem lại" : "Lưu phiếu"}</Button>
             </footer>
           </form>
         </DialogContent>
       </Dialog>
 
-      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
+      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName}${onlineMode ? "" : " đã đóng tem"}` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} presentation={presentation} index={Math.max(0, photos.findIndex(p => p.id === activePhoto?.id))} total={photos.length} onPrevious={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i > 0) setActivePhoto(photos[i - 1]!); }} onNext={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i < photos.length - 1) setActivePhoto(photos[i + 1]!); }} onRemove={screenPresentation && !reviewing && activePhoto ? () => removePhoto(activePhoto.id) : undefined} />
 
       <BarcodeScannerDialog
+        presentation={presentation}
         open={scannerOpen}
         onOpenChange={setScannerOpen}
           onScan={(scannedBarcode) => {
@@ -510,13 +532,14 @@ function FormSection({ children, number, title }: { children: ReactNode; number:
 }
 
 type ChoiceGroupProps = {
+  assetScreen?: "203-701" | "203-847" | undefined;
   legend: string;
   name: "condition" | "resolution";
   register: UseFormRegister<FormData>;
   choices: readonly { value: string; label: string; tone: string }[];
 };
 
-function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
+function ChoiceGroup({ choices, legend, name, register, assetScreen }: ChoiceGroupProps) {
   return (
     <fieldset>
       <legend className="sr-only">{legend}</legend>
@@ -524,13 +547,30 @@ function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
         {choices.map((choice) => (
           <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`)}>
             <input className="sr-only" type="radio" value={choice.value} {...register(name)} />
-            <span className="choice-icon">{choiceIcon(choice.value)}</span>
+            <span className="choice-icon">{assetScreen ? <img src={figmaAsset(assetScreen, choiceAsset(choice.value))} alt="" /> : choiceIcon(choice.value)}</span>
             <span>{choice.label}</span>
           </label>
         ))}
       </div>
     </fieldset>
   );
+}
+
+function choiceAsset(value: string) {
+  if (value === "NEAR_EXPIRY") return "imgFeatherClock";
+  if (value === "EXPIRED") return "imgFeatherCalendar";
+  if (value === "TORN_PACKAGING") return "imgFeatherPackage";
+  if (value === "VACUUM_LEAK") return "imgFeatherPackage";
+  if (value === "BRUISED_WATERLOGGED") return "imgFeatherAlertTriangle";
+  if (value === "ROTTEN_MOLDY") return "imgFeatherAlertTriangle1";
+  if (value === "CANCEL") return "imgFeatherTrash2";
+  if (value === "EXCHANGE") return "imgFeatherRepeat";
+  if (value === "RETURN") return "imgFeatherCornerUpLeft";
+  return "imgFeatherMoreHorizontal";
+}
+
+function ReviewSection({ title, rows }: { title: string; rows: readonly (readonly [string, string])[] }) {
+  return <section className="store-review-section"><h3>{title}</h3><dl className="store-summary">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section>;
 }
 
 function choiceIcon(value: string) {

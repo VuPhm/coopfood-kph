@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@coopfood-kph/ui";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type SyntheticEvent } from "react";
 import { createPortal } from "react-dom";
+import { figmaAsset } from "./figma-assets";
 
 export type ViewableEvidenceImage = { src: string; alt: string };
 
@@ -12,7 +13,11 @@ const VIEWER_MAX_HEIGHT_REM = 54;
 const VIEWER_VIEWPORT_WIDTH_RATIO = 0.94;
 const VIEWER_VIEWPORT_HEIGHT_RATIO = 0.9;
 
-export function EvidenceImageViewer({ image, onOpenChange, open }: { image: ViewableEvidenceImage | null; onOpenChange: (open: boolean) => void; open: boolean }) {
+export function EvidenceImageViewer({ image, onOpenChange, open, presentation = "dialog", index = 0, total = 1, onPrevious, onNext, onRemove }: {
+  image: ViewableEvidenceImage | null; onOpenChange: (open: boolean) => void; open: boolean;
+  presentation?: "dialog" | "screen"; index?: number; total?: number;
+  onPrevious?: (() => void) | undefined; onNext?: (() => void) | undefined; onRemove?: (() => void) | undefined;
+}) {
   const [lens, setLens] = useState<LensState>(hiddenLens);
   const [frame, setFrame] = useState<{ height: number; width: number } | null>(null);
   const naturalSize = useRef<{ height: number; width: number } | null>(null);
@@ -89,8 +94,9 @@ export function EvidenceImageViewer({ image, onOpenChange, open }: { image: View
 
   return (
     <Dialog open={open} onOpenChange={(next) => { hideLens(); onOpenChange(next); }}>
-      <DialogContent className="evidence-viewer-content" style={frame ?? undefined} onPointerDownOutside={hideLens}>
+      <DialogContent className={`evidence-viewer-content ${presentation === "screen" ? "store-evidence-screen" : ""}`} style={presentation === "screen" ? undefined : frame ?? undefined} onPointerDownOutside={hideLens}>
         <DialogTitle className="sr-only">Xem ảnh minh chứng</DialogTitle>
+        {presentation === "screen" ? <div className="store-viewer-header"><button aria-label="Đóng ảnh minh chứng" onClick={() => onOpenChange(false)}><img src={figmaAsset("215-1147", "imgCloseIcon")} alt="" /></button><div><strong>Ảnh minh chứng</strong><small>{index + 1} / {total}</small></div>{onRemove ? <button aria-label="Xóa ảnh đang xem" onClick={onRemove}><img src={figmaAsset("215-1147", "imgDeleteIcon")} alt="" /></button> : <span />}</div> : null}
         {image ? (
           <figure className="evidence-viewer-stage">
             <img
@@ -108,6 +114,7 @@ export function EvidenceImageViewer({ image, onOpenChange, open }: { image: View
             />
           </figure>
         ) : null}
+        {presentation === "screen" ? <div className="store-viewer-navigation"><button aria-label="Ảnh trước" disabled={!onPrevious || index <= 0} onClick={onPrevious}><img src={figmaAsset("215-1147", "imgPreviousIcon")} alt="" /></button><span>Ảnh {index + 1} / {total}</span><button aria-label="Ảnh sau" disabled={!onNext || index >= total - 1} onClick={onNext}><img src={figmaAsset("215-1147", "imgNextIcon")} alt="" /></button></div> : null}
       </DialogContent>
       {open && typeof document !== "undefined"
         ? createPortal(<div className={lens.visible ? "evidence-zoom-lens is-visible" : "evidence-zoom-lens"} style={lens} aria-hidden="true" />, document.body)

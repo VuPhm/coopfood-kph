@@ -1,46 +1,37 @@
 @import "tailwindcss";
+@import "@coopfood-kph/ui/tokens.css";
 @source "../../../packages/ui/src";
 
-@theme {
-  --color-brand: #006633;
-  --color-brand-hover: #005229;
-  --color-brand-active: #004221;
-  --color-brand-soft: #e9f5ed;
+@theme inline {
+  --color-brand: var(--cf-color-brand);
+  --color-brand-hover: var(--cf-color-brand-hover);
+  --color-brand-active: var(--cf-color-brand-active);
+  --color-brand-soft: var(--cf-color-brand-soft);
+  --color-amber: var(--cf-color-amber);
+  --color-amber-soft: var(--cf-color-amber-soft);
   --color-lime: #93c11f;
-  --color-focus: #b7dd4b;
-  --color-danger: #e20514;
-  --color-danger-soft: #fdebec;
-  --color-orange: #f29200;
-  --color-warning-soft: #fff1dc;
-  --color-canvas: #eef3ef;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f3f7f4;
-  --color-surface-strong: #e4ece6;
-  --color-border: #cfdbd1;
-  --color-ink: #1c261c;
-  --color-ink-muted: #667366;
-  --color-line: #dce4dc;
-  --shadow-panel: 0 12px 32px rgba(0, 66, 33, 0.08);
-  --shadow-overlay: 0 24px 64px rgba(0, 40, 20, 0.22);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --color-focus: var(--cf-color-focus);
+  --color-danger: var(--cf-color-danger);
+  --color-danger-soft: var(--cf-color-danger-soft);
+  --color-orange: var(--cf-color-warning);
+  --color-warning-soft: var(--cf-color-amber-soft);
+  --color-canvas: var(--cf-color-canvas);
+  --color-surface: var(--cf-color-surface);
+  --color-surface-muted: var(--cf-color-surface-muted);
+  --color-surface-strong: var(--cf-color-surface-strong);
+  --color-border: var(--cf-color-border);
+  --color-ink: var(--cf-color-ink);
+  --color-ink-muted: var(--cf-color-ink-muted);
+  --color-line: var(--cf-color-line);
+  --shadow-card: var(--cf-shadow-card);
+  --shadow-panel: var(--cf-shadow-panel);
+  --shadow-overlay: var(--cf-shadow-overlay);
+  --font-sans: var(--cf-font-family);
 }
 
 :root {
-  --space-1: .25rem;
-  --space-1-5: .375rem;
-  --space-2: .5rem;
-  --space-2-5: .625rem;
-  --space-3: .75rem;
-  --space-3-5: .875rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
   --panel-inset: var(--space-5);
   --control-gap: var(--space-2);
-  --motion-fast: 150ms;
-  --motion-ui: 240ms;
-  --motion-enter: 320ms;
-  --motion-ease-out: cubic-bezier(.2, .8, .2, 1);
 }
 
 @keyframes content-enter {
@@ -71,16 +62,6 @@
 @keyframes dialog-exit {
   from { opacity: 1; scale: 1; }
   to { opacity: 0; scale: .99; }
-}
-
-@keyframes lookup-trigger-hint {
-  0%, 100% { width: 3.5rem; box-shadow: 0 10px 24px rgb(0 66 33 / .24); }
-  18%, 72% { width: 13rem; box-shadow: 0 14px 30px rgb(0 66 33 / .32); }
-}
-
-@keyframes lookup-trigger-text-hint {
-  0%, 12%, 88%, 100% { max-width: 0; opacity: 0; }
-  24%, 72% { max-width: 8.25rem; opacity: 1; }
 }
 
 @layer base {
@@ -572,13 +553,11 @@ html[data-focus-modality="keyboard"] .action-dialog-field textarea:focus { borde
 .expiry-workbench-overlay { display: none; z-index: 44; cursor: default; }
 .expiry-workbench:not(.is-collapsed) { gap: var(--space-2); padding: var(--panel-inset); }
 .expiry-workbench-toggle { font-weight: 850; }
-.expiry-workbench-toggle.is-trigger { display: inline-flex; width: 3.5rem; height: 3.5rem; align-items: center; justify-content: flex-start; gap: var(--space-2); overflow: hidden; border-radius: 18px; background: var(--color-brand); padding-inline: var(--space-4); color: #fff; box-shadow: 0 10px 24px rgb(0 66 33 / .24); }
-.expiry-workbench-toggle.is-trigger.has-entry-hint { animation: lookup-trigger-hint 2.8s var(--motion-ease-out) both; will-change: width; }
+.expiry-workbench-toggle.is-trigger { display: inline-flex; width: 3.25rem; height: 3.25rem; align-items: center; justify-content: center; gap: 0; overflow: hidden; border: 1px solid rgb(255 255 255 / .25); border-radius: 50%; background: var(--color-ink); padding: 0; color: #fff; box-shadow: 0 8px 20px rgb(20 38 25 / .24); }
 .expiry-workbench-toggle.is-trigger .utility-panel-action-visual { flex: 0 0 1.5rem; }
 .expiry-workbench-toggle.is-trigger .utility-panel-action-visual svg { width: 1.5rem; height: 1.5rem; }
 .expiry-workbench-toggle.is-trigger .utility-panel-action-text { display: none; }
-.expiry-workbench-toggle.is-trigger.has-entry-hint .utility-panel-action-text { display: inline; flex: 0 0 auto; animation: lookup-trigger-text-hint 2.8s var(--motion-ease-out) both; }
-.expiry-workbench-toggle.is-trigger:hover { transform: translateY(-2px); background: var(--color-brand-hover); color: #fff; box-shadow: 0 14px 30px rgb(0 66 33 / .3); }
+.expiry-workbench-toggle.is-trigger:hover { transform: translateY(-2px); background: #111a13; color: #fff; box-shadow: 0 12px 26px rgb(20 38 25 / .3); }
 html[data-focus-modality="keyboard"] .expiry-workbench-toggle:focus { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .expiry-workbench.is-collapsed { width: auto; border-color: transparent; background: transparent; box-shadow: none; }
 .expiry-workbench-body { display: grid; gap: var(--space-3-5); min-width: 0; animation: content-enter var(--motion-enter) var(--motion-ease-out) both; }
@@ -807,25 +786,6 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
 @media (min-width: 1280px) {
   .workspace-layout:has(.workspace-side-stack > :not(.expiry-workbench.is-collapsed)) { grid-template-columns: minmax(0, 1fr) minmax(21.5rem, 22.5rem); }
   .expiry-timeline-track { width: 100%; min-width: 0; }
-}
-
-@media (min-width: 1025px) {
-  .expiry-workbench-toggle.is-trigger,
-  .expiry-workbench-toggle.is-trigger.has-entry-hint {
-    width: auto;
-    max-width: calc(100vw - 3rem);
-    animation: none;
-    will-change: auto;
-  }
-  .expiry-workbench-toggle.is-trigger .utility-panel-action-text,
-  .expiry-workbench-toggle.is-trigger.has-entry-hint .utility-panel-action-text {
-    display: inline;
-    max-width: none;
-    flex: 0 0 auto;
-    overflow: visible;
-    opacity: 1;
-    animation: none;
-  }
 }
 
 @media (min-width: 1025px) and (max-width: 1279px) {

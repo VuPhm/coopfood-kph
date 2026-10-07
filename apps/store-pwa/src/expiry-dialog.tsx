@@ -25,14 +25,19 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
 type DurationSource = "date" | "days" | "months";
-const LOOKUP_HINT_DURATION_MS = 2_800;
+
+type ExpiryWorkbenchProps = {
+  today?: LocalDate;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
 
 const statusCopy = {
   SAFE: { label: "An toàn", icon: ShieldCheck },
@@ -61,11 +66,11 @@ function positiveWholeNumber(value: string) {
   return Number.isInteger(number) && number > 0 ? number : null;
 }
 
-export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
+export function ExpiryWorkbench({ today, open: controlledOpen, onOpenChange }: ExpiryWorkbenchProps) {
   const businessToday = today ?? formatBusinessDate(new Date()).iso;
   const workbenchRef = useRef<HTMLElement>(null);
-  const [expanded, setExpanded] = useState(false);
-  const [showInitialHint, setShowInitialHint] = useState(true);
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const expanded = controlledOpen ?? internalExpanded;
   const [knownManufactureDate, setKnownManufactureDate] = useState(true);
   const [nsx, setNsx] = useState("");
   const [hsd, setHsd] = useState("");
@@ -73,10 +78,10 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
   const [months, setMonths] = useState("");
   const [durationSource, setDurationSource] = useState<DurationSource>("date");
 
-  useEffect(() => {
-    const hintTimer = window.setTimeout(() => setShowInitialHint(false), LOOKUP_HINT_DURATION_MS);
-    return () => window.clearTimeout(hintTimer);
-  }, []);
+  const updateExpanded = useCallback((next: boolean) => {
+    if (controlledOpen === undefined) setInternalExpanded(next);
+    onOpenChange?.(next);
+  }, [controlledOpen, onOpenChange]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -85,7 +90,7 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
       if (workbenchRef.current?.querySelector('[role="dialog"][aria-label="Lịch chọn ngày"]')) return;
-      setExpanded(false);
+      updateExpanded(false);
       window.setTimeout(() => workbenchRef.current?.querySelector<HTMLButtonElement>(".expiry-workbench-toggle")?.focus(), 0);
     }
 
@@ -93,7 +98,7 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
     return () => {
       document.removeEventListener("keydown", closeOnEscape);
     };
-  }, [expanded]);
+  }, [expanded, updateExpanded]);
 
   const liveState = useMemo(() => {
     const parsedNsx = tryParseDate(nsx);
@@ -246,8 +251,7 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
   }
 
   function toggleWorkbench() {
-    setShowInitialHint(false);
-    setExpanded((current) => !current);
+    updateExpanded(!expanded);
   }
 
   return (
@@ -257,19 +261,18 @@ export function ExpiryWorkbench({ today }: { today?: LocalDate }) {
           type="button"
           className="expiry-workbench-overlay fixed inset-0 bg-ink/55 backdrop-blur-[3px]"
           aria-label="Đóng tra cứu lùi hàng từ nền mờ"
-          onClick={() => setExpanded(false)}
+          onClick={() => updateExpanded(false)}
         />
       ) : null}
       <aside ref={workbenchRef} className={cn("expiry-workbench", !expanded && "is-collapsed")} aria-label="Tra cứu lùi hàng">
       <UtilityPanelMeta
-        actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger", !expanded && showInitialHint && "has-entry-hint")}
+        actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger")}
         actionControls="expiry-workbench-content"
         actionExpanded={expanded}
         actionIcon={expanded ? <X /> : <CalendarDays />}
         actionLabel={expanded ? "Đóng tra cứu lùi hàng" : "Tra cứu lùi hàng"}
-        actionText={!expanded ? "Tra cứu lùi hàng" : undefined}
         className={!expanded ? "is-collapsed" : ""}
-        label={expanded ? "Tra cứu lùi hàng" : ""}
+        label={expanded ? "Hạn lùi hàng" : ""}
         onAction={toggleWorkbench}
       />
 
@@ -364,7 +367,7 @@ function LookupResult({ error, hsd, nsx, result, today }: { error: string; hsd: 
   if (!result || !nsx || !hsd) {
     return (
       <section className="expiry-result is-placeholder" aria-live="polite">
-        <div className="expiry-result-summary"><span className="expiry-result-icon" aria-hidden="true"><CalendarDays /></span><div><p>Sẵn sàng tra cứu</p><strong>Chưa nhập đủ dữ liệu</strong><small>Điền NSX và một thông tin HSD để xác định bốn mốc thời hạn.</small></div></div>
+        <div className="expiry-result-summary"><span className="expiry-result-icon" aria-hidden="true"><CalendarDays /></span><div><p>Sẵn sàng tra cứu</p><strong>Chưa nhập đủ dữ liệu</strong></div></div>
       </section>
     );
   }

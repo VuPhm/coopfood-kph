@@ -1,8 +1,30 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-09-24
+Cập nhật: 2026-10-07
 
 ## Giai đoạn
+
+Ngày 07/10/2026, owner yêu cầu review lại Figma `aEDpXtz0IiEkPiVucqjQ3Q`
+và lên kế hoạch cho GPT-6 Luna. Owner đã chọn **mobile + desktop, giữ mock**.
+Cycle `figma-mobile-implementation` chuyển sang PLANNING revision 2;
+[kế hoạch chi tiết](delivery/figma-mobile-implementation/implementation-plan-r2.md)
+và [handoff Luna 6](delivery/figma-mobile-implementation/luna-6-handoff.md)
+đã có mapping ref, scope, dependency và gates. Chưa dispatch/implement revision 2.
+Candidate mobile hiện tại còn dirty/untracked trên cùng nhánh/worktree;
+phải checkpoint đầy đủ trước bàn giao. Evidence 03/10 là lịch sử, chưa chứng minh
+parity với Figma mới hoặc scope desktop. Owner visual acceptance vẫn pending.
+
+Theo yêu cầu owner ngày 03/10/2026, giao diện mobile từ Figma `aEDpXtz0IiEkPiVucqjQ3Q`
+đã được triển khai trên working tree nhánh `store-app/figma-mobile-implementation`.
+Home, tra cứu hạn lùi, KPH và DATE chạy với fixture tổng hợp trong dev; desktop
+co giãn tạm thời khi owner tiếp tục thiết kế. Technical gate PASS 164 tests,
+build và Playwright 390×844 / 1440×1024; chưa có owner visual acceptance.
+[Implementation handoff](delivery/figma-mobile-implementation/handoff.md) ghi scope,
+icon replacements, preview và giới hạn mock/API. Writer đã dừng để review tiếp nhận. Lượt [review/sửa](delivery/figma-mobile-implementation/review.md)
+ngày 03/10/2026 đã xử lý stale date ở tra hạn lùi, count/filter KPH và vùng
+bấm/focus/spacing; `npm run verify` PASS 169 tests. Owner visual acceptance
+vẫn pending, API/desktop parity chưa được chứng minh.
+Thông tin R2-01 bên dưới là baseline lịch sử; không phải mô tả giao diện mới.
 
 `Round 2 — R2-01 Shared Store App Shell Spine đã CLOSED theo owner acceptance.`
 Candidate ứng dụng `3799a30` trên `store-app/r2-01-shell-spine` tạo shell online

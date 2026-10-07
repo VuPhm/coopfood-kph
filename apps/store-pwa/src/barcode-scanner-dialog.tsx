@@ -17,8 +17,10 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { figmaAsset } from "./figma-assets";
 
 export type BarcodeScannerDialogProps = {
+  presentation?: "dialog" | "screen";
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onScan: (barcode: string) => void;
@@ -44,7 +46,7 @@ const NATIVE_BARCODE_FORMATS = ["ean_8", "ean_13", "upc_a", "code_128", "code_39
 const SCAN_INTERVAL_MS = 100;
 const SUCCESS_FEEDBACK_MS = 450;
 
-export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScannerDialogProps) {
+export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation = "dialog" }: BarcodeScannerDialogProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const zxingReaderRef = useRef<BrowserMultiFormatReader | null>(null);
@@ -329,13 +331,14 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="barcode-scanner-dialog-content max-w-lg p-0 overflow-hidden"
+        className={`barcode-scanner-dialog-content max-w-lg p-0 overflow-hidden ${presentation === "screen" ? "store-scanner-screen" : ""}`}
         aria-describedby={descId}
         aria-labelledby={titleId}
       >
         <DialogHeader className="barcode-scanner-header">
+          {presentation === "screen" ? <button className="store-scanner-close" aria-label="Đóng quét mã" onClick={() => onOpenChange(false)}><img src={figmaAsset("279-1398", "imgFeatherX")} alt="" /></button> : null}
           <DialogTitle id={titleId} className="flex items-center gap-2 text-base font-bold text-white">
-            <ScanLine size={20} aria-hidden="true" className="text-emerald-400" />
+            {presentation !== "screen" ? <ScanLine size={20} aria-hidden="true" className="text-emerald-400" /> : null}
             <span>Quét mã SKU / UPC</span>
           </DialogTitle>
           <DialogDescription id={descId} className="text-xs text-white/70">
@@ -344,6 +347,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
         </DialogHeader>
 
         <div className="barcode-scanner-view-container relative bg-black aspect-[4/3] w-full overflow-hidden flex items-center justify-center">
+          {presentation === "screen" ? <img className="store-scan-guide" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /> : null}
           {/* Video preview */}
           <video
             ref={videoRef}

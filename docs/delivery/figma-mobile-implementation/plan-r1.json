@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "id": "figma-mobile-implementation",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Implement the assigned Figma mobile screens directly in Store PWA with memory-only mocks until API wiring; hand off to UI review.",
+  "inScope": [
+    "Home, shelf-life, KPH browse/create/review/scanner/evidence states and DATE fixture interactions",
+    "Mobile-first implementation with responsive desktop fallback",
+    "Replace placeholder icons with existing outline icons per owner follow-up",
+    "Targeted regression/browser checks and review handoff"
+  ],
+  "outOfScope": [
+    "Figma edits or further UI DNA prototypes",
+    "Backend/OpenAPI/schema/authorization changes",
+    "Production API wiring, DATE domain contract, real operational data",
+    "Desktop Figma parity, merge, deploy and Pages cutover"
+  ],
+  "baseSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+  "candidateSha": "",
+  "integrationOwner": "root — sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "apps/store-pwa/vite.config.ts",
+    "apps/store-pwa/public/figma/**",
+    "e2e/scripts/check-figma-mobile.cjs",
+    "docs/delivery/figma-mobile-implementation/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "workspace-check-tests-build",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "",
+      "evidence": "docs/delivery/figma-mobile-implementation/handoff.md"
+    },
+    {
+      "id": "mobile-desktop-playwright",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "",
+      "evidence": "docs/delivery/figma-mobile-implementation/handoff.md"
+    },
+    {
+      "id": "owner-visual-review",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1,
+      "sha": "",
+      "evidence": "docs/delivery/figma-mobile-implementation/handoff.md"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Writer stops; UI review chat inspects the existing working tree and mobile preview. Owner visual acceptance remains pending.",
+  "workingTreeCandidate": {
+    "baseSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+    "path": "/Users/vup/Documents/coopfood-kph",
+    "note": "Uncommitted candidate; base SHA alone does not represent implemented code. Pre-existing dirty changes were preserved."
+  }
+}

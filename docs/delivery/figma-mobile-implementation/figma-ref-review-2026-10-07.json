@@ -1,0 +1,1055 @@
+{
+  "fileKey": "aEDpXtz0IiEkPiVucqjQ3Q",
+  "reviewedAt": "2026-10-07",
+  "method": "Figma MCP page inventory, get_design_context with screenshot, read-only use_figma; no design edits",
+  "inventories": [
+    {
+      "pageId": "18:97",
+      "page": "01 Components",
+      "nodes": [
+        {
+          "id": "19:2",
+          "name": "Component Canvas",
+          "type": "FRAME",
+          "width": 1200,
+          "height": 3597,
+          "children": [
+            {
+              "id": "19:3",
+              "name": "CoopFood Components",
+              "type": "TEXT",
+              "width": 321,
+              "height": 34
+            },
+            {
+              "id": "19:4",
+              "name": "Built from local tokens. All workflow screens should compose these instead of drawing one-off controls.",
+              "type": "TEXT",
+              "width": 735,
+              "height": 18
+            },
+            {
+              "id": "25:13",
+              "name": "Section / Icon Registry",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 88
+            },
+            {
+              "id": "48:42",
+              "name": "Section / Icon Holders",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 108
+            },
+            {
+              "id": "54:2",
+              "name": "Section / Primitives",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 139
+            },
+            {
+              "id": "55:2",
+              "name": "Section / Shelf Life Components",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 589
+            },
+            {
+              "id": "19:5",
+              "name": "Section / KPH Components",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 83
+            },
+            {
+              "id": "19:11",
+              "name": "Section / Controls & Forms",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 1438
+            },
+            {
+              "id": "19:25",
+              "name": "Section / Navigation",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 151
+            },
+            {
+              "id": "19:47",
+              "name": "Section / Data & Feedback",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 583
+            }
+          ]
+        },
+        {
+          "id": "248:146",
+          "name": "QA / Form Controls",
+          "type": "FRAME",
+          "width": 430,
+          "height": 848,
+          "children": [
+            {
+              "id": "248:147",
+              "name": "Title",
+              "type": "TEXT",
+              "width": 161,
+              "height": 22
+            },
+            {
+              "id": "248:148",
+              "name": "Note",
+              "type": "TEXT",
+              "width": 251,
+              "height": 13
+            },
+            {
+              "id": "248:149",
+              "name": "Choice",
+              "type": "FRAME",
+              "width": 388,
+              "height": 67
+            },
+            {
+              "id": "248:176",
+              "name": "Field",
+              "type": "FRAME",
+              "width": 388,
+              "height": 375
+            },
+            {
+              "id": "248:204",
+              "name": "Unit",
+              "type": "FRAME",
+              "width": 388,
+              "height": 67
+            },
+            {
+              "id": "248:211",
+              "name": "Photo actions",
+              "type": "FRAME",
+              "width": 388,
+              "height": 71
+            },
+            {
+              "id": "248:227",
+              "name": "Buttons",
+              "type": "FRAME",
+              "width": 388,
+              "height": 71
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "18:98",
+      "page": "02 Patterns",
+      "nodes": [
+        {
+          "id": "20:47",
+          "name": "Pattern Canvas",
+          "type": "FRAME",
+          "width": 1200,
+          "height": 2816,
+          "children": [
+            {
+              "id": "20:48",
+              "name": "CoopFood Patterns",
+              "type": "TEXT",
+              "width": 262,
+              "height": 34
+            },
+            {
+              "id": "20:49",
+              "name": "Patterns compose components and carry layout behavior. Module screens should start here.",
+              "type": "TEXT",
+              "width": 655,
+              "height": 18
+            },
+            {
+              "id": "20:50",
+              "name": "Section / App header",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 107
+            },
+            {
+              "id": "20:57",
+              "name": "Section / Module launcher",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 279
+            },
+            {
+              "id": "20:78",
+              "name": "Section / DATE browse",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 329
+            },
+            {
+              "id": "20:96",
+              "name": "Section / Operational list",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 305
+            },
+            {
+              "id": "20:123",
+              "name": "Section / Loading list",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 302
+            },
+            {
+              "id": "74:327",
+              "name": "Section / Shelf Life result states",
+              "type": "FRAME",
+              "width": 1104,
+              "height": 290
+            },
+            {
+              "id": "103:430",
+              "name": "Section / Shelf Life utility",
+              "type": "FRAME",
+              "width": 1240,
+              "height": 720
+            }
+          ]
+        },
+        {
+          "id": "298:2150",
+          "name": "Pattern/KPH Create Actions",
+          "type": "COMPONENT",
+          "width": 390,
+          "height": 48,
+          "children": [
+            {
+              "id": "298:2152",
+              "name": "CTA Row",
+              "type": "FRAME",
+              "width": 358,
+              "height": 48
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "334:1797",
+      "page": "04 Desktop",
+      "nodes": [
+        {
+          "id": "384:368",
+          "name": "Desktop · Home",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "384:369",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "384:513",
+          "name": "Desktop · Tra cứu",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "384:514",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "384:682",
+          "name": "Desktop · KPH · TP khô & khác",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "384:683",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "384:896",
+          "name": "Desktop · DATE",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "384:897",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "384:1071",
+          "name": "Desktop · KPH · Tạo phiếu · TP khô & khác",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "384:1072",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "384:1415",
+          "name": "Desktop · KPH · Xem lại · TP khô & khác",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "384:1416",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "515:3507",
+          "name": "Desktop · KPH · Quick Shelf Life",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "515:3508",
+              "name": "Screen / KPH · Quick Shelf Life",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "540:1468",
+          "name": "Desktop · KPH · TP tươi sống",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "540:1469",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "540:1684",
+          "name": "Desktop · KPH · Tạo phiếu · TP tươi sống",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "540:1685",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        },
+        {
+          "id": "540:2090",
+          "name": "Desktop · KPH · Xem lại · TP tươi sống",
+          "type": "SECTION",
+          "width": 1500,
+          "height": 960,
+          "children": [
+            {
+              "id": "540:2091",
+              "name": "Screen",
+              "type": "FRAME",
+              "width": 1440,
+              "height": 900
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "18:99",
+      "page": "03 Screens",
+      "nodes": [
+        {
+          "id": "27:374",
+          "name": "Home · Landmark",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1180,
+          "children": [
+            {
+              "id": "21:3",
+              "name": "Landmark/Home",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "27:375",
+          "name": "Tra cứu lùi hàng · Landmark",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1180,
+          "children": [
+            {
+              "id": "21:56",
+              "name": "Landmark/Shelf Life",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "27:376",
+          "name": "KPH · Landmark",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1180,
+          "children": [
+            {
+              "id": "21:91",
+              "name": "Landmark/KPH",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "27:377",
+          "name": "Quản lý DATE · Landmark",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1180,
+          "children": [
+            {
+              "id": "21:144",
+              "name": "Landmark/Date Manager",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "124:383",
+          "name": "KPH · Browse · Filter",
+          "type": "SECTION",
+          "width": 430,
+          "height": 940,
+          "children": [
+            {
+              "id": "124:384",
+              "name": "Landmark/KPH · Filter open",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "124:444",
+          "name": "KPH · Browse · Export confirm",
+          "type": "SECTION",
+          "width": 430,
+          "height": 940,
+          "children": [
+            {
+              "id": "124:445",
+              "name": "Landmark/KPH · Export confirm",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "128:493",
+          "name": "KPH · Browse · Selection",
+          "type": "SECTION",
+          "width": 430,
+          "height": 940,
+          "children": [
+            {
+              "id": "128:494",
+              "name": "Landmark/KPH · Selection mode",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "141:640",
+          "name": "KPH · Browse · Long list",
+          "type": "SECTION",
+          "width": 430,
+          "height": 940,
+          "children": [
+            {
+              "id": "141:641",
+              "name": "Landmark/KPH · Long list pagination",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "199:701",
+          "name": "KPH · Create · TP khô & khác",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1583,
+          "children": [
+            {
+              "id": "203:701",
+              "name": "KPH Create / TP khô & khác",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1471
+            }
+          ]
+        },
+        {
+          "id": "199:702",
+          "name": "KPH · Create · TP tươi sống",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1531,
+          "children": [
+            {
+              "id": "203:847",
+              "name": "KPH Create / TP tươi sống",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1419
+            }
+          ]
+        },
+        {
+          "id": "209:894",
+          "name": "KPH · Create · TP tươi sống · Đã có ảnh",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1620,
+          "children": [
+            {
+              "id": "209:895",
+              "name": "KPH Create / TP tươi sống · Đã có ảnh",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1509
+            }
+          ]
+        },
+        {
+          "id": "215:1146",
+          "name": "KPH · Create · Xem ảnh",
+          "type": "SECTION",
+          "width": 430,
+          "height": 940,
+          "children": [
+            {
+              "id": "215:1147",
+              "name": "KPH Create / Evidence Viewer",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "279:1298",
+          "name": "KPH · Review · TP tươi sống",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1220,
+          "children": [
+            {
+              "id": "279:1299",
+              "name": "KPH Review / TP tươi sống",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1067
+            }
+          ]
+        },
+        {
+          "id": "279:1397",
+          "name": "KPH · Create · Quét mã",
+          "type": "SECTION",
+          "width": 430,
+          "height": 940,
+          "children": [
+            {
+              "id": "279:1398",
+              "name": "KPH Create / Barcode Scanner",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "280:1376",
+          "name": "KPH · Create · NOT_FOUND",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1602,
+          "children": [
+            {
+              "id": "280:1377",
+              "name": "KPH Create / NOT_FOUND",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1490
+            }
+          ]
+        },
+        {
+          "id": "280:1570",
+          "name": "KPH · Create · CATALOG_UNAVAILABLE",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1602,
+          "children": [
+            {
+              "id": "280:1571",
+              "name": "KPH Create / CATALOG_UNAVAILABLE",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1490
+            }
+          ]
+        },
+        {
+          "id": "280:1772",
+          "name": "KPH · Create · Khác",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1639,
+          "children": [
+            {
+              "id": "280:1773",
+              "name": "KPH Create / Khác",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1527
+            }
+          ]
+        },
+        {
+          "id": "280:1914",
+          "name": "KPH · Review · Gửi lỗi",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1220,
+          "children": [
+            {
+              "id": "280:1915",
+              "name": "KPH Review / Gửi lỗi",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1078
+            }
+          ]
+        },
+        {
+          "id": "422:1796",
+          "name": "KPH · Detail · Phiếu đã duyệt",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1360,
+          "children": [
+            {
+              "id": "422:1797",
+              "name": "KPH Detail / KPH-260815-017",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1128
+            }
+          ]
+        },
+        {
+          "id": "510:2093",
+          "name": "KPH · Quick Shelf Life Bottom Panel",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1180,
+          "children": [
+            {
+              "id": "510:2094",
+              "name": "Landmark/KPH · Quick Shelf Life Bottom Panel",
+              "type": "FRAME",
+              "width": 390,
+              "height": 844
+            }
+          ]
+        },
+        {
+          "id": "531:2323",
+          "name": "KPH · Detail · TP khô & khác",
+          "type": "SECTION",
+          "width": 430,
+          "height": 1420,
+          "children": [
+            {
+              "id": "531:2324",
+              "name": "KPH Detail / KPH-260815-018",
+              "type": "FRAME",
+              "width": 390,
+              "height": 1144
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "contexts": [
+    {
+      "nodeId": "537:2",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=537-2",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 4193,
+      "sparse": false
+    },
+    {
+      "nodeId": "384:369",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=384-369",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 27724,
+      "sparse": false
+    },
+    {
+      "nodeId": "384:683",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=384-683",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 49801,
+      "sparse": false
+    },
+    {
+      "nodeId": "384:1072",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=384-1072",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 87895,
+      "sparse": false
+    },
+    {
+      "nodeId": "540:1685",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=540-1685",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 87867,
+      "sparse": false
+    },
+    {
+      "nodeId": "510:2094",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=510-2094",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 34636,
+      "sparse": false
+    },
+    {
+      "nodeId": "21:3",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=21-3",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 7830,
+      "sparse": false
+    },
+    {
+      "nodeId": "21:56",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=21-56",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 23576,
+      "sparse": false
+    },
+    {
+      "nodeId": "21:91",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=21-91",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 17291,
+      "sparse": false
+    },
+    {
+      "nodeId": "21:144",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=21-144",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 17237,
+      "sparse": false
+    },
+    {
+      "nodeId": "203:701",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=203-701",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 40487,
+      "sparse": false
+    },
+    {
+      "nodeId": "203:847",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=203-847",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 37882,
+      "sparse": false
+    },
+    {
+      "nodeId": "279:1299",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=279-1299",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 22492,
+      "sparse": false
+    },
+    {
+      "nodeId": "422:1797",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=422-1797",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 22464,
+      "sparse": false
+    },
+    {
+      "nodeId": "531:2324",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=531-2324",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 23049,
+      "sparse": false
+    },
+    {
+      "nodeId": "384:514",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=384-514",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 37629,
+      "sparse": false
+    },
+    {
+      "nodeId": "384:897",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=384-897",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 40004,
+      "sparse": false
+    },
+    {
+      "nodeId": "384:1416",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=384-1416",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 70736,
+      "sparse": false
+    },
+    {
+      "nodeId": "540:1469",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=540-1469",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 49976,
+      "sparse": false
+    },
+    {
+      "nodeId": "540:2091",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=540-2091",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 70708,
+      "sparse": false
+    },
+    {
+      "nodeId": "515:3508",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=515-3508",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 65599,
+      "sparse": false
+    },
+    {
+      "nodeId": "124:384",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=124-384",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 26266,
+      "sparse": false
+    },
+    {
+      "nodeId": "124:445",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=124-445",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 26456,
+      "sparse": false
+    },
+    {
+      "nodeId": "128:494",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=128-494",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 19844,
+      "sparse": false
+    },
+    {
+      "nodeId": "141:641",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=141-641",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 27667,
+      "sparse": false
+    },
+    {
+      "nodeId": "209:895",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=209-895",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 41914,
+      "sparse": false
+    },
+    {
+      "nodeId": "215:1147",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=215-1147",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 49174,
+      "sparse": false
+    },
+    {
+      "nodeId": "279:1398",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=279-1398",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 4359,
+      "sparse": false
+    },
+    {
+      "nodeId": "280:1377",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=280-1377",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 40622,
+      "sparse": false
+    },
+    {
+      "nodeId": "280:1571",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=280-1571",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 40638,
+      "sparse": false
+    },
+    {
+      "nodeId": "280:1773",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=280-1773",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 38946,
+      "sparse": false
+    },
+    {
+      "nodeId": "280:1915",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=280-1915",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 22420,
+      "sparse": false
+    },
+    {
+      "nodeId": "202:111",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=202-111",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 9954,
+      "sparse": false
+    },
+    {
+      "nodeId": "202:147",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=202-147",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 14506,
+      "sparse": false
+    },
+    {
+      "nodeId": "469:327",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=469-327",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 2531,
+      "sparse": false
+    },
+    {
+      "nodeId": "73:82",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=73-82",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 8146,
+      "sparse": false
+    },
+    {
+      "nodeId": "57:344",
+      "url": "https://www.figma.com/design/aEDpXtz0IiEkPiVucqjQ3Q?node-id=57-344",
+      "contextRead": true,
+      "screenshotReturned": true,
+      "codeCharacters": 0,
+      "sparse": false
+    }
+  ],
+  "limitations": [
+    "Master 57:344 screenshot was visually blank; screen 21:56 and quick panel 510:2094 provide the observed toggle target. Re-read leaf variant before implementation.",
+    "Inventory metadata without nodeId initially exposed only Foundations; read-only root inventory confirmed all five pages.",
+    "Not an owner acceptance record. Screens can change; re-read assigned nodes before each implementation slice."
+  ]
+}

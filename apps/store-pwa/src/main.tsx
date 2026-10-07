@@ -2,8 +2,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { App } from "./app";
 import "./styles.css";
+import { App } from "./app";
+import { StoreApp } from "./store-app";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, staleTime: 30_000 } },
@@ -20,8 +21,10 @@ document.addEventListener("pointerdown", () => {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    {import.meta.env.VITE_STORE_APP_MOCK === "true" ? <StoreApp /> : (
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    )}
   </StrictMode>,
 );

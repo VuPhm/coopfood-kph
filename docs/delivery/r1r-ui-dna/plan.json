@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "r1r-ui-dna",
+  "revision": 2,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Reboot the Figma file from its current visual style into a reusable mobile-first design foundation and UI starter frames for Home, pilot KPH and reverse expiry lookup; no additional application prototype.",
+  "inScope": [
+    "Replace all old Figma UI pages and unused legacy tokens with a clean foundation.",
+    "Create primitive/semantic/dimension tokens, reusable component families, patterns and editable UI starter frames.",
+    "Preserve current Co.op Food visual character and documented pilot UX; improve text contrast without changing business rules.",
+    "Record Figma node links, token contract and structural/visual verification."
+  ],
+  "outOfScope": [
+    "Application implementation or additional prototype; pre-existing code changes are preserved.",
+    "Backend, OpenAPI, authorization, database or business rule changes.",
+    "Protected Pages branch changes, deployments, cutover, data migration or future modules.",
+    "Detailed product state screens, interactive prototype and library publishing."
+  ],
+  "baseSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+  "candidateSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+  "integrationOwner": "root — sole writer on store-app/r1r-ui-dna",
+  "sharedPaths": [
+    "docs/delivery/r1r-ui-dna/**",
+    "packages/ui/DESIGN_SYSTEM.md"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "figma-foundation-audit",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+      "evidence": "docs/delivery/r1r-ui-dna/figma-foundation-handoff.md"
+    },
+    {
+      "id": "figma-visual-review",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 2,
+      "sha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+      "evidence": "docs/delivery/r1r-ui-dna/figma-foundation-handoff.md"
+    },
+    {
+      "id": "owner-review",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": "docs/delivery/r1r-ui-dna/figma-foundation-handoff.md"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Owner clarified: nền tảng, khung ui trước; figma trước; không prototype thừa.",
+      "source": "User message in this chat on 2026-09-29, followed by tiếp.",
+      "impact": "Supersedes application/prototype implementation gates with Figma foundation and UI frame verification.",
+      "decision": "Preserve pre-existing code; rebuild Figma foundations and frames only; old screen pages and unused collections removed after reference checks."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner reviews Figma foundations and UI frames. Open a separate bounded flow-design or implementation slice only after owner direction.",
+  "externalCandidate": {
+    "kind": "figma",
+    "fileKey": "55DDRKrysV4PJXYGyRQdoC",
+    "entryNode": "439:2",
+    "contract": "docs/delivery/r1r-ui-dna/figma-foundation-contract.json",
+    "note": "Git SHA identifies the source reference only. Figma is the candidate; no code implementation was validated."
+  },
+  "initialRequest": {
+    "revision": 1,
+    "request": "Owner requested a full UI reboot from tokens/components, keeping the existing Figma visual style and only the pilot Home, KPH, and reverse expiry lookup UX; owner explicitly authorized rebuilding Figma frames and supplied file link.",
+    "source": "User messages in this task on 2026-09-29",
+    "impact": "Replaces the active flow screen scope; no API or domain behavior changes.",
+    "decision": "Reuse the existing Figma token/component foundations, align code to them, and rebuild only the specified pilot flows. Preserve the pre-existing dirty worktree checkpoint."
+  }
+}

@@ -79,6 +79,21 @@ và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
 - Không commit dữ liệu vận hành thật, workbook thật hoặc ảnh thật.
 - Không tắt test/bảo mật để làm CI xanh.
 
+## Figma và kiểm tra UI Round 1R
+
+- Với UI theo Figma, dùng đúng URL frame/node được giao; đọc structured context
+  và lấy screenshot qua Figma MCP trước khi sửa code. Contract, authorization,
+  API và test trong repo quyết định semantics; Figma quyết định hình ảnh và tương tác.
+- Trước khi sửa, kiểm tra Store PWA, `packages/ui`, component, token và dependency
+  hiện có; tái sử dụng phần phù hợp, giữ mobile-first và semantics đã xác nhận.
+- Dùng Playwright mặc định cho tương tác và kiểm tra UI, chạy headless ở
+  `390×844` và `1440×1024`; kiểm tra có mục tiêu bằng DOM, interaction và screenshot.
+  Chưa dùng snapshot pixel rộng trong Round 1R.
+- Chỉ dùng Computer Use khi Playwright không thể kiểm tra hành vi cần thiết
+  (như quyền OS/browser, phần cứng hoặc thiết bị thật); nêu lý do trước khi dùng.
+- Không ghi đè frame Figma đã được chấp nhận. Sau khi xác minh bằng Playwright,
+  đặt đề xuất phát sinh từ implementation vào khu candidate riêng để owner duyệt.
+
 ## Bàn giao
 
 Với milestone nhiều bước hoặc yêu cầu điều phối team, dùng

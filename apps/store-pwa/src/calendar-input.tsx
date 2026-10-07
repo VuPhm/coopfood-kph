@@ -5,6 +5,11 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type 
 import { createPortal } from "react-dom";
 
 function formatDateEntry(value: string) {
+  // Editing a separated date must not pull month/year digits into a shorter day.
+  // Preserve incomplete segments for the existing domain validator on submit.
+  if (value.split("/").length === 3) {
+    return value.split("/").map((part, index) => part.replace(/\D/g, "").slice(0, index === 2 ? 4 : 2)).join("/");
+  }
   const digits = value.replace(/\D/g, "").slice(0, 8);
   if (digits.length <= 2) return digits;
   if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
@@ -61,11 +66,12 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
       setOpen(false);
     }
     document.addEventListener("pointerdown", closeOnOutsidePointer);
-    document.addEventListener("keydown", closeOnEscape, true);
+    // Consume Escape before the parent dialog's document listener sees it.
+    window.addEventListener("keydown", closeOnEscape, true);
     window.addEventListener("resize", closeOnResize);
     return () => {
       document.removeEventListener("pointerdown", closeOnOutsidePointer);
-      document.removeEventListener("keydown", closeOnEscape, true);
+      window.removeEventListener("keydown", closeOnEscape, true);
       window.removeEventListener("resize", closeOnResize);
     };
   }, [id, open]);
@@ -100,6 +106,7 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
   }, [open]);
 
   function toggleCalendar() {
+    if (readOnly) return;
     if (!open) {
       setMonth(firstDayOfMonth(tryParseDate(value) ?? initialMonth));
       setPosition(null);
@@ -110,6 +117,7 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
   function selectDate(selected: LocalDate) {
     onValueChange(formatDisplayDate(selected));
     setOpen(false);
+    triggerRef.current?.focus();
   }
 
   return (
@@ -132,6 +140,7 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
         type="button"
         className="field-input-action expiry-calendar-trigger"
         aria-label={`Chọn ${label.toLowerCase()}`}
+        aria-haspopup="dialog"
         aria-expanded={open}
         onClick={toggleCalendar}
         disabled={readOnly}

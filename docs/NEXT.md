@@ -1,6 +1,31 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-09-24
+Cập nhật: 2026-10-07
+
+## Figma implementation — kế hoạch revision 2 cho Luna 6
+
+Owner chọn **mobile + desktop, giữ mock** ngày 07/10/2026. Đã review structured
+context/screenshot của mobile, desktop và component/theme trong Figma
+`aEDpXtz0IiEkPiVucqjQ3Q`. Tiếp tục cycle hiện có ở PLANNING revision 2 theo
+[kế hoạch](delivery/figma-mobile-implementation/implementation-plan-r2.md),
+không mở cycle song song. Chưa khởi chạy Luna hoặc sửa implementation.
+
+Bước nhỏ khi owner yêu cầu implement: checkpoint code dirty/untracked hiện tại,
+ghi actual base SHA/worktree và giao [handoff Luna 6](delivery/figma-mobile-implementation/luna-6-handoff.md).
+Thứ tự: foundation/theme → shell → KPH browse/create/review → shelf quick utility
+→ lookup/DATE mock → verification/owner acceptance. API wiring tiếp tục ngoài scope.
+
+## Figma mobile implementation — evidence revision 1
+
+Owner đã yêu cầu implement trực tiếp mobile, cho phép mock tạm; không tiếp tục
+UI DNA prototype. Working tree trên `store-app/figma-mobile-implementation` đã
+pass TypeScript, 164 tests, build, contract/docs checks và browser gate ở
+390×844 / 1440×1024. [Bàn giao](delivery/figma-mobile-implementation/handoff.md)
+có preview, file scope và icon placeholder replacements. Lượt [review/sửa](delivery/figma-mobile-implementation/review.md) đã hoàn tất
+các lỗi ngày, count/filter và tương tác trong scope, `npm run verify` PASS
+169 tests. Bước nhỏ kế tiếp: owner xem preview mobile và luồng tạo → xem lại
+→ gửi; technical PASS không thay cho visual acceptance. Desktop
+Figma và API wiring còn là công việc tiếp theo, chưa suy ra quyền deploy.
 
 ## Store App pivot — R2-01 đã đóng
 

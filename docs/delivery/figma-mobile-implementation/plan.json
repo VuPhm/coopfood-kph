@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "id": "figma-mobile-implementation",
+  "revision": 2,
+  "status": "PLANNING",
+  "objective": "Cập nhật Store App mobile và triển khai desktop theo Figma aEDpXtz0IiEkPiVucqjQ3Q; giữ memory-only mocks, contract và workflow accepted; chuẩn bị nghiệm thu cho owner.",
+  "inScope": [
+    "Foundation token/component/density và KPH type presentation theme",
+    "Mobile Home, KPH browse/create/review/detail/scanner/evidence/edge states",
+    "Desktop shell/Home, KPH table và create/review modal dry/fresh",
+    "Shelf utility và quick panel mobile/desktop; product lookup và DATE fixture workspace",
+    "Targeted regression, responsive Playwright, asset geometry và owner review preview"
+  ],
+  "outOfScope": [
+    "Backend/OpenAPI/generated API/schema/migration/authorization changes",
+    "Production API wiring, DATE production workflow, real data, persistence/offline/sync",
+    "Figma writes hoặc chỉnh accepted frames; UI DNA prototype",
+    "Admin redesign, unrelated online/Pilot refactor, new infrastructure",
+    "Merge/push/deploy hoặc protected Pages cutover; DATE thêm theo dõi workflow chưa có design"
+  ],
+  "baseSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+  "candidateSha": "",
+  "integrationOwner": "root lập kế hoạch; Luna 6 sole writer dự kiến sau checkpoint/handoff",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-app.tsx",
+    "apps/store-pwa/src/store-app.css",
+    "apps/store-pwa/src/store-app-mock.ts",
+    "apps/store-pwa/src/store-shell.tsx",
+    "apps/store-pwa/src/profile-identity.tsx",
+    "apps/store-pwa/src/store-kph-workspace.tsx",
+    "apps/store-pwa/src/store-kph-workspace.test.tsx",
+    "apps/store-pwa/src/store-shelf-life.tsx",
+    "apps/store-pwa/src/store-shelf-life.test.tsx",
+    "apps/store-pwa/src/store-date-workspace.tsx",
+    "apps/store-pwa/src/store-date-workspace.test.tsx",
+    "apps/store-pwa/src/store-lookup-workspace.tsx",
+    "apps/store-pwa/src/store-lookup-workspace.test.tsx",
+    "apps/store-pwa/src/store-shell.test.tsx",
+    "apps/store-pwa/src/store-app.test.tsx",
+    "apps/store-pwa/src/store-create-review.test.tsx",
+    "apps/store-pwa/src/create-record-dialog.tsx",
+    "apps/store-pwa/src/create-record-dialog.test.tsx",
+    "apps/store-pwa/src/barcode-scanner-dialog.tsx",
+    "apps/store-pwa/src/barcode-scanner-dialog.test.tsx",
+    "apps/store-pwa/src/image-viewer.tsx",
+    "apps/store-pwa/src/image-viewer.test.tsx",
+    "apps/store-pwa/src/calendar-input.tsx",
+    "apps/store-pwa/src/calendar-input.test.tsx",
+    "apps/store-pwa/src/figma-assets.ts",
+    "apps/store-pwa/src/kph-presentation/**",
+    "apps/store-pwa/src/shelf-presentation/**",
+    "apps/store-pwa/public/figma/**",
+    "packages/ui/src/**",
+    "packages/ui/DESIGN_SYSTEM.md",
+    "e2e/scripts/check-figma-mobile.cjs",
+    "e2e/scripts/check-figma-responsive.cjs",
+    "docs/delivery/figma-mobile-implementation/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "workspace-integrity",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "workflow-semantics",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "mobile-desktop-visual-interaction",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "responsive-assets",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
+    },
+    {
+      "id": "owner-mobile-desktop-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Review Figma hiện tại và lên kế hoạch chi tiết để sau đó cho Luna 6 implement; owner chọn mobile + desktop, giữ mock.",
+      "source": "User request and explicit scope reply in current chat, 2026-10-07",
+      "impact": "Thêm desktop-native composition, mobile theme/detail/quick utility và mock Lookup; toàn bộ gate UI revision 1 trở thành historical evidence.",
+      "decision": "Chỉ lập kế hoạch/handoff ở lượt này; giữ existing code, chuẩn bị checkpoint trước dispatch, không API wiring."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Khi owner yêu cầu implementation: checkpoint đủ candidate tracked/untracked, cập nhật actual base SHA/worktree/ownership và giao Luna 6 bắt đầu S0–S1 theo implementation-plan-r2.md.",
+  "workingTreeCandidate": {
+    "baseSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+    "path": "/Users/vup/Documents/coopfood-kph",
+    "note": "Candidate mobile revision 1 vẫn chưa commit; baseSha là HEAD lịch sử, không phải reviewed implementation checkpoint cho dispatch revision 2."
+  },
+  "conditionalIntegratorPaths": [
+    "packages/ui/package.json",
+    "apps/store-pwa/src/main.tsx",
+    "apps/store-pwa/src/styles.css",
+    "apps/store-pwa/vite.config.ts"
+  ],
+  "executor": {
+    "model": "gpt-6-luna",
+    "status": "planned-not-dispatched",
+    "agentId": null,
+    "reasoningEffort": "inherit configured setting; no explicit effort requested",
+    "ownership": "single writer, sequential slices"
+  },
+  "readiness": {
+    "planningComplete": true,
+    "dispatchReady": false,
+    "requiredBeforeDispatch": [
+      "Review/checkpoint full existing tracked and untracked code",
+      "Set actual reviewed checkpoint baseSha and executor worktree/identity",
+      "Confirm previous writer stopped and run dispatch check after checkpoint"
+    ]
+  },
+  "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r2.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/luna-6-handoff.md"
+}

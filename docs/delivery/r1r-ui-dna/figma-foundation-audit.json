@@ -1,0 +1,192 @@
+{
+  "followupFieldCheck": [{"state":"State=Default","width":358,"height":104,"actionState":"State=Default"},{"state":"State=Focus","width":358,"height":104,"actionState":"State=Default"},{"state":"State=Error","width":358,"height":104,"actionState":"State=Default"},{"state":"State=Disabled","width":358,"height":104,"actionState":"State=Disabled"},{"state":"State=ReadOnly","width":358,"height":104,"actionState":"State=Disabled"}],
+  "counts": [
+    {
+      "id": "439:2",
+      "name": "00 — Start here",
+      "nodes": 23
+    },
+    {
+      "id": "439:3",
+      "name": "01 — Foundations",
+      "nodes": 299
+    },
+    {
+      "id": "439:4",
+      "name": "10 — Icons",
+      "nodes": 46
+    },
+    {
+      "id": "439:5",
+      "name": "11 — Button",
+      "nodes": 49
+    },
+    {
+      "id": "439:6",
+      "name": "12 — Field",
+      "nodes": 34
+    },
+    {
+      "id": "439:7",
+      "name": "13 — Choice",
+      "nodes": 13
+    },
+    {
+      "id": "439:8",
+      "name": "14 — Status",
+      "nodes": 14
+    },
+    {
+      "id": "439:9",
+      "name": "15 — Card",
+      "nodes": 13
+    },
+    {
+      "id": "439:10",
+      "name": "16 — Navigation",
+      "nodes": 20
+    },
+    {
+      "id": "439:11",
+      "name": "17 — Evidence",
+      "nodes": 16
+    },
+    {
+      "id": "439:12",
+      "name": "20 — Patterns",
+      "nodes": 40
+    },
+    {
+      "id": "439:13",
+      "name": "30 — Home / UI frame",
+      "nodes": 17
+    },
+    {
+      "id": "439:14",
+      "name": "31 — KPH / UI frame",
+      "nodes": 29
+    },
+    {
+      "id": "439:15",
+      "name": "32 — Tra hạn lùi / UI frame",
+      "nodes": 20
+    },
+    {
+      "id": "439:16",
+      "name": "90 — Candidates",
+      "nodes": 5
+    }
+  ],
+  "totalNodes": 638,
+  "instances": 73,
+  "components": 59,
+  "sets": 9,
+  "reactions": 0,
+  "issues": [],
+  "mismatches": [],
+  "contrast": [
+    {
+      "fg": "color/on-color",
+      "bg": "color/brand",
+      "ratio": 7.12
+    },
+    {
+      "fg": "color/text",
+      "bg": "color/surface",
+      "ratio": 15.63
+    },
+    {
+      "fg": "color/text-muted",
+      "bg": "color/canvas",
+      "ratio": 5
+    },
+    {
+      "fg": "color/text-muted",
+      "bg": "color/surface-strong",
+      "ratio": 4.66
+    },
+    {
+      "fg": "color/warning-text",
+      "bg": "color/amber-soft",
+      "ratio": 5.97
+    },
+    {
+      "fg": "color/danger-text",
+      "bg": "color/danger-soft",
+      "ratio": 6.21
+    },
+    {
+      "fg": "color/info",
+      "bg": "color/info-soft",
+      "ratio": 5.12
+    },
+    {
+      "fg": "color/brand",
+      "bg": "color/brand-soft",
+      "ratio": 6.36
+    }
+  ],
+  "variables": 122,
+  "variableErrors": [],
+  "collections": [
+    {
+      "id": "VariableCollectionId:438:2",
+      "name": "CF / Primitives",
+      "count": 61
+    },
+    {
+      "id": "VariableCollectionId:438:3",
+      "name": "CF / Semantic",
+      "count": 26
+    },
+    {
+      "id": "VariableCollectionId:438:4",
+      "name": "CF / Dimensions",
+      "count": 35
+    }
+  ],
+  "styles": [
+    {
+      "id": "S:b21a7cc31d9e7625404220592f37bdf34ec0ab14,",
+      "name": "type/title"
+    },
+    {
+      "id": "S:54a74a5ec9a7544d477fc9093747b2d1d62f9259,",
+      "name": "type/display"
+    },
+    {
+      "id": "S:0d0ecf5c30d32baa5424e1ec36db0c6fa904bea8,",
+      "name": "type/section"
+    },
+    {
+      "id": "S:caceb004c55c1e509138ca1caeacbe2e80b29704,",
+      "name": "type/body"
+    },
+    {
+      "id": "S:c90599a665749ee370f1f2b88a1d0679506a490c,",
+      "name": "type/body-strong"
+    },
+    {
+      "id": "S:8b22832ee88be7234e6143f2d5c2213c7d149cb9,",
+      "name": "type/label"
+    },
+    {
+      "id": "S:ecc721c51a480f53aa062e34bcb481ff2852ee77,",
+      "name": "type/caption"
+    },
+    {
+      "id": "S:82dea67dc4baaadf445707c8f53ec538b64c51b4,",
+      "name": "type/input"
+    }
+  ],
+  "effectStyles": [
+    {
+      "id": "S:c95eb387df55e4eed493db065abbd3684621b346,",
+      "name": "elevation/card"
+    },
+    {
+      "id": "S:93c97fc0beef236c3b88e9238a592084ec229921,",
+      "name": "elevation/focal"
+    }
+  ]
+}
