@@ -118,7 +118,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Root records actual Luna agent ID, commits dispatch record, sends START and stops without waiting. Luna executes S0–S7 and leaves owner acceptance pending.",
+  "nextAction": "Luna /root/luna_figma_r2 starts S0–S7 after START; root stops without waiting. Owner visual acceptance pending.",
   "workingTreeCandidate": {
     "baseSha": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe",
     "path": "/Users/vup/Documents/coopfood-kph",
@@ -132,8 +132,8 @@
   ],
   "executor": {
     "model": "gpt-6-luna",
-    "status": "starting",
-    "agentId": null,
+    "status": "dispatched-awaiting-start",
+    "agentId": "/root/luna_figma_r2",
     "reasoningEffort": "inherit configured setting; no explicit effort requested",
     "ownership": "single writer, sequential slices",
     "worktree": "/Users/vup/Documents/coopfood-kph",
