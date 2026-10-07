@@ -2,18 +2,18 @@
 
 Cập nhật: 2026-10-07
 
-## Figma implementation — kế hoạch revision 2 cho Luna 6
+## Figma implementation — revision 2 chờ nghiệm thu
 
 Owner chọn **mobile + desktop, giữ mock** ngày 07/10/2026. Đã review structured
 context/screenshot của mobile, desktop và component/theme trong Figma
-`aEDpXtz0IiEkPiVucqjQ3Q`. Tiếp tục cycle hiện có ở PLANNING revision 2 theo
+`aEDpXtz0IiEkPiVucqjQ3Q`. Cycle hiện có đang AWAITING_ACCEPTANCE revision 2 theo
 [kế hoạch](delivery/figma-mobile-implementation/implementation-plan-r2.md),
-không mở cycle song song. Chưa khởi chạy Luna hoặc sửa implementation.
+không mở cycle song song. Luna là sole writer; technical gates PASS, owner acceptance
+đang pending.
 
-Bước nhỏ khi owner yêu cầu implement: checkpoint code dirty/untracked hiện tại,
-ghi actual base SHA/worktree và giao [handoff Luna 6](delivery/figma-mobile-implementation/luna-6-handoff.md).
-Thứ tự: foundation/theme → shell → KPH browse/create/review → shelf quick utility
-→ lookup/DATE mock → verification/owner acceptance. API wiring tiếp tục ngoài scope.
+Bước nhỏ tiếp theo: owner kiểm tra preview/scenarios trong acceptance handoff và
+đưa ra quyết định visual/workflow. Technical PASS không tự đóng cycle. API wiring
+tiếp tục ngoài scope.
 
 ## Figma mobile implementation — evidence revision 1
 

@@ -45,7 +45,7 @@ describe("Shelf life input corrections", () => {
     render(<ShelfLifeScreen />);
     change("Ngày sản xuất", "01/10/2026");
     change("Hạn sử dụng (HSD)", "10/10/2026");
-    fireEvent.click(screen.getByRole("radio", { name: /Chưa biết NSX/ }));
+    fireEvent.click(screen.getByRole("switch", { name: "Đã biết ngày sản xuất" }));
     change("HSD (Số ngày)", "");
     lookup();
     expect(screen.getByRole("alert")).toHaveTextContent("Nhập thời hạn");

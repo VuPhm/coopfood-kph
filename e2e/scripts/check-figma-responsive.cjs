@@ -1,0 +1,101 @@
+// Responsive contract checks for the R2 Store App. Screenshots are review evidence, not pixel snapshots.
+const { chromium } = require('@playwright/test');
+const fs = require('node:fs');
+fs.mkdirSync('.local/figma-mobile', {recursive:true});
+const manifest = JSON.parse(fs.readFileSync('docs/delivery/figma-mobile-implementation/assets-r2.json', 'utf8'));
+const viewports = [
+  {width:390,height:844}, {width:599,height:900}, {width:600,height:900}, {width:899,height:900},
+  {width:900,height:900}, {width:1440,height:900}, {width:1440,height:1024},
+];
+async function capture(page, name) {
+  await page.waitForFunction(() => [...document.images].filter(i => i.getBoundingClientRect().width && i.getBoundingClientRect().height).every(i => i.complete && i.naturalWidth > 0));
+  const errors = await page.evaluate(expected => {
+    const images = [...document.querySelectorAll('img[data-figma-asset-slot]')];
+    return images.flatMap(img => {
+      const slot = img.dataset.figmaAssetSlot;
+      const record = expected.find(item => item.slot === slot);
+      const rect = img.getBoundingClientRect();
+      if (!record) return [{slot, reason:'missing manifest'}];
+      if (!rect.width || !rect.height) return [];
+      if (Math.abs(rect.width - record.render.width) > .5 || Math.abs(rect.height - record.render.height) > .5) return [{slot, actual:[rect.width,rect.height], expected:[record.render.width,record.render.height]}];
+      return [];
+    });
+  }, manifest.assets);
+  if (errors.length) throw new Error(`Figma asset geometry: ${JSON.stringify(errors)}`);
+  const dimensions = await page.evaluate(() => ({width:innerWidth, scroll:document.documentElement.scrollWidth, height:innerHeight}));
+  if (dimensions.scroll > dimensions.width) throw new Error(`Horizontal overflow at ${name}: ${JSON.stringify(dimensions)}`);
+  await page.screenshot({path:`.local/figma-mobile/${name}.png`, fullPage:true});
+}
+async function homeNavigate(page, viewport, label) {
+  const launcher = viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile';
+  await page.locator(launcher).getByRole('button', {name:label, exact:true}).click();
+}
+async function checkScreen(page, viewport) {
+  const tag = `${viewport.width}x${viewport.height}`;
+  const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+  await page.goto(process.env.STORE_APP_URL || 'http://127.0.0.1:5175');
+  await page.locator(viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile').waitFor();
+  if (viewport.width >= 900) {
+    const desktopShell = await page.evaluate(() => {
+      const app = document.querySelector('.store-app').getBoundingClientRect();
+      const rail = document.querySelector('.store-desktop-rail').getBoundingClientRect();
+      const profile = getComputedStyle(document.querySelector('.store-profile-meta strong')).color;
+      return {appLeft:app.left,appWidth:app.width,railLeft:rail.left,railWidth:rail.width,profile};
+    });
+    if (desktopShell.appLeft !== 0 || desktopShell.appWidth !== viewport.width || desktopShell.railLeft !== 0 || Math.abs(desktopShell.railWidth - 224) > 1 || desktopShell.profile === 'rgb(255, 255, 255)') throw new Error(`Desktop shell geometry/identity contrast at ${tag}: ${JSON.stringify(desktopShell)}`);
+  }
+  await capture(page,`home-${tag}`);
+  await homeNavigate(page,viewport,'KPH');
+  await page.getByRole('heading',{name:'Phiếu khai báo'}).waitFor();
+  const tableVisible = await page.locator('.store-kph-table-wrap').evaluate(el => getComputedStyle(el).display !== 'none');
+  if (tableVisible !== (viewport.width >= 900)) throw new Error(`KPH composition breakpoint mismatch at ${tag}`);
+  await capture(page,`kph-${tag}`);
+  const firstRecord = page.locator(viewport.width >= 900 ? '.store-kph-row-open' : '.store-ticket-open').first();
+  if (viewport.width >= 900) { await firstRecord.focus(); await page.keyboard.press('Space'); }
+  else await firstRecord.click();
+  await page.getByRole('heading',{name:'Chi tiết phiếu KPH'}).waitFor();
+  await capture(page,`kph-detail-${tag}`);
+  await page.keyboard.press('Escape');
+  await page.getByRole('button',{name:'Lọc phiếu KPH'}).click();
+  await page.getByRole('button',{name:'Chờ duyệt', exact:true}).click();
+  await page.getByRole('button',{name:'Đóng', exact:true}).click();
+  const visibleTickets = await page.locator(viewport.width >= 900 ? '.store-kph-table tbody tr' : '.store-ticket').count();
+  if (!visibleTickets) throw new Error(`Pending KPH filter returned no rows at ${tag}`);
+  await page.getByRole('button',{name:'Lọc phiếu KPH'}).click();
+  await page.getByRole('button',{name:'Đặt lại bộ lọc'}).click();
+  await page.getByRole('button',{name:'Đóng',exact:true}).click();
+  await page.getByRole('button',{name:'Về trang chủ'}).click();
+  if (viewport.width >= 900) {
+    await homeNavigate(page,viewport,'Tra cứu');
+    await page.getByRole('textbox',{name:'Mã hàng, tên hàng hoặc lô'}).fill('0008421');
+    await page.locator('#store-content').getByRole('button',{name:'Tra cứu',exact:true}).click();
+    await page.getByRole('heading',{name:'Bánh quy bơ hộp 300 g'}).waitFor();
+    await capture(page,`lookup-${tag}`);
+    await page.getByRole('button',{name:'Về trang chủ'}).click();
+    await page.locator('.store-desktop-rail').getByRole('button',{name:'DATE',exact:true}).click();
+  } else {
+    await homeNavigate(page,viewport,'Quản lý DATE');
+  }
+  await page.getByRole('button',{name:'Mở tiện ích tra cứu lùi hàng'}).click();
+  await page.getByRole('dialog',{name:'Tra cứu lùi hàng nhanh'}).waitFor();
+  await capture(page,`quick-${tag}`);
+  await page.keyboard.press('Escape');
+  const focusRestored = await page.getByRole('button',{name:'Mở tiện ích tra cứu lùi hàng'}).evaluate(el => document.activeElement === el);
+  if (!focusRestored) throw new Error(`Quick-panel focus did not return at ${tag}`);
+  await capture(page,`date-${tag}`);
+  await page.getByRole('button',{name:'Về trang chủ'}).click();
+  if (viewport.width >= 900) await page.getByRole('button',{name:'Tra hạn lùi hàng',exact:true}).click();
+  else await homeNavigate(page,viewport,'Tra cứu lùi hàng');
+  await page.getByRole('textbox',{name:'Ngày sản xuất'}).fill('18/01/2026');
+  await page.getByRole('textbox',{name:'Hạn sử dụng (HSD)'}).fill('18/10/2026');
+  await page.locator('#store-content').getByRole('button',{name:'Tra cứu',exact:true}).click();
+  await page.getByText('24/08/2026',{exact:true}).waitFor();
+  await capture(page,`shelf-${tag}`);
+  if(errors.length) throw new Error(`Browser errors at ${tag}: ${errors.join('; ')}`);
+  console.log(`PASS ${tag}: responsive shell, KPH filter/layout, lookup/DATE route, quick-panel keyboard, shelf calculation, icon geometry, no overflow`);
+}
+(async()=>{
+  const browser=await chromium.launch({headless:true});
+  try { for (const viewport of viewports) { const page=await browser.newPage({viewport}); page.setDefaultTimeout(7000); await checkScreen(page,viewport); await page.close(); } }
+  finally { await browser.close(); }
+})().catch(error=>{console.error(error);process.exit(1);});

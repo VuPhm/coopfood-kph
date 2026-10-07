@@ -20,6 +20,11 @@ const assets = {
   "main-3": {
     "imgFeatherFilter": "figma/5171d3ec-385c-4850-b308-cf2fc5482db4.svg"
   },
+  "r2": {
+    "imgFeatherSliders": "figma/r2-sliders.svg",
+    "imgFeatherClock": "figma/r2-shelf-clock.svg",
+    "imgFeatherX": "figma/r2-close.svg"
+  },
   "203-701": {
     "imgFeatherCamera": "figma/41022345-8fa2-43d2-9eb9-f213dfc440f4.svg",
     "imgFeatherImage": "figma/020a9e71-9da7-41d0-bb16-bf18e64c1073.svg",

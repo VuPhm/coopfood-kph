@@ -11,7 +11,7 @@ import { formatBusinessDate } from "./business-date";
 import { EvidenceImageViewer } from "./image-viewer";
 
 const labels: Record<KphKind, string> = { TPCN: "TP khô & khác", TPTS: "TP tươi sống" };
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 25;
 export function KphWorkspace({ records, onRecordsChange, onNotice }: {
   records: RecordView[]; onRecordsChange: (records: RecordView[]) => void; onNotice: (message: string) => void;
 }) {
@@ -24,6 +24,7 @@ export function KphWorkspace({ records, onRecordsChange, onNotice }: {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [sort, setSort] = useState("newest");
+  const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [active, setActive] = useState<RecordView | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
@@ -32,15 +33,15 @@ export function KphWorkspace({ records, onRecordsChange, onNotice }: {
   const [image, setImage] = useState<{ src: string; alt: string } | null>(null);
   // Record URLs outlive workspace navigation. StoreApp owns the records in memory.
   const latestRecords = useRef(records); latestRecords.current = records;
-  useEffect(() => { setSelection([]); setPage(1); setActive(null); }, [kind, approval, from, to, sort]);
+  useEffect(() => { setSelection([]); setPage(1); setActive(null); }, [kind, approval, from, to, sort, query]);
   function iso(value: string) { try { return parseDisplayDate(value); } catch { return null; } }
   const fromIso = from ? iso(from) : null, toIso = to ? iso(to) : null;
   const filterError = (from && !fromIso) || (to && !toIso) ? "Nhập ngày hợp lệ theo dd/mm/yyyy" : fromIso && toIso && fromIso > toIso ? "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc" : "";
   const dateFiltered = filterError ? [] : records.filter(r => (!fromIso || (iso(r.detectedDate) ?? "") >= fromIso) && (!toIso || (iso(r.detectedDate) ?? "") <= toIso));
-  const filtered = dateFiltered.filter(r => r.kind === kind && (approval === "ALL" || r.approvalStatus === approval)).sort((a, b) => {
-    if (sort === "name") return a.productName.localeCompare(b.productName, "vi");
+  const filtered = dateFiltered.filter(r => r.kind === kind && (approval === "ALL" || r.approvalStatus === approval) && `${r.productName} ${r.sku} ${r.supplier}`.toLocaleLowerCase("vi").includes(query.toLocaleLowerCase("vi"))).sort((a, b) => {
+    if (sort === "name") return a.productName.localeCompare(b.productName, "vi") || a.id.localeCompare(b.id);
     const delta = (iso(b.detectedDate) ?? "").localeCompare(iso(a.detectedDate) ?? "");
-    return sort === "oldest" ? -delta : delta;
+    return (sort === "oldest" ? -delta : delta) || a.id.localeCompare(b.id);
   });
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -82,18 +83,26 @@ export function KphWorkspace({ records, onRecordsChange, onNotice }: {
   }
 
   return <div className="store-kph">
-    <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <button key={k} onClick={() => setCreateKind(k)}><span><img src={figmaAsset("main-2", k === "TPCN" ? "imgFeatherPackage" : "imgFeatherShoppingBag")} alt="" /></span><strong>{labels[k]}</strong></button>)}</div></section>
+    <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <button key={k} className={`create-${k.toLowerCase()}`} onClick={() => setCreateKind(k)}><span><img data-figma-render-width="15" data-figma-render-height="15" src={figmaAsset("main-2", k === "TPCN" ? "imgFeatherPackage" : "imgFeatherShoppingBag")} alt="" /></span><strong><span className="store-create-desktop">Tạo · </span>{labels[k]}</strong></button>)}</div></section>
     <section className="store-ticket-list" aria-label="Phiếu khai báo">
-      <div className="store-list-heading"><h2>Phiếu khai báo</h2><div><button className="store-compact" onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}>{selectionMode ? "Xong" : "Chọn"}</button><button className="store-filter" aria-label="Lọc phiếu KPH" onClick={() => setFilterOpen(true)}><img src={figmaAsset("main-2", "imgFeatherFilter")} alt="" /></button></div></div>
+      <div className="store-list-heading"><h2>Phiếu khai báo</h2><div><button className="store-compact" onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}>{selectionMode ? "Xong" : "Chọn"}</button><button className="store-filter" aria-label="Lọc phiếu KPH" onClick={() => setFilterOpen(true)}><img data-figma-asset-slot="kph-filter" src={figmaAsset("r2", "imgFeatherSliders")} alt="" /></button></div></div>
       <div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{dateFiltered.filter(r => r.kind === k).length}</small></button>)}</div>
-      {selectionMode ? <div className="store-batch"><label><input type="checkbox" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => setSelection(e.target.checked ? visible.map(r => r.id) : [])} />Chọn tất cả</label><span>{selection.length} đã chọn</span><Button className="store-export" disabled={!selection.length} onClick={() => { setError(""); setExportOpen(true); }}><img src={figmaAsset("124-445", "imgFileDown")} alt="" />Xuất Excel</Button></div> : null}
+      <div className="store-kph-toolbar"><label className="store-kph-search"><img className="store-kph-search-icon" data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-1", "imgFeatherSearch")} alt="" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onClick={() => setCreateKind(kind)}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("203-701", "imgFeatherMaximize")} alt="" /></button><select aria-label="Sắp xếp phiếu" value={sort} onChange={e => setSort(e.target.value)}><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option><option value="name">Tên hàng</option></select><span className="store-result-count">{filtered.length} phiếu</span></div>
+      {selectionMode ? <div className="store-batch"><label><input type="checkbox" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
+        const visibleIds = new Set(visible.map(r => r.id));
+        setSelection(e.target.checked ? [...new Set([...selection, ...visibleIds])] : selection.filter(id => !visibleIds.has(id)));
+      }} />Chọn tất cả</label><span>{selection.length} đã chọn</span><Button className="store-export" disabled={!selection.length} onClick={() => { setError(""); setExportOpen(true); }}><img src={figmaAsset("124-445", "imgFileDown")} alt="" />Xuất Excel</Button></div> : null}
       {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
+      <div className="store-kph-table-wrap"><table className="store-kph-table"><thead><tr>{selectionMode ? <th><input type="checkbox" aria-label="Chọn tất cả" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
+        const visibleIds = new Set(visible.map(r => r.id));
+        setSelection(e.target.checked ? [...new Set([...selection, ...visibleIds])] : selection.filter(id => !visibleIds.has(id)));
+      }} /></th> : null}<th>Hàng hóa</th><th>SKU</th><th>Ngày phát hiện</th><th>SL</th><th>Tình trạng</th><th>Xử lý</th><th>Trạng thái</th></tr></thead><tbody>{visible.map(record => <tr key={`table-${record.id}`}>{selectionMode ? <td><input type="checkbox" aria-label={`Chọn ${record.productName}`} checked={selection.includes(record.id)} onChange={e => setSelection(e.target.checked ? [...selection, record.id] : selection.filter(id => id !== record.id))} /></td> : null}<td><button className="store-kph-row-open" aria-label={`Mở phiếu ${record.productName}`} onClick={() => setActive(record)}>{record.productName}</button></td><td>{record.sku || "—"}</td><td>{record.detectedDate}</td><td>{record.quantity}</td><td>{record.condition}</td><td>{record.resolution}</td><td><span className={`store-chip chip-${record.approvalStatus === "APPROVED" ? "safe" : record.approvalStatus === "PENDING" ? "warning" : "neutral"}`}>{approvalLabels[record.approvalStatus]}</span></td></tr>)}</tbody></table></div>
       <div className="store-tickets">{visible.map(record => <div key={record.id} className="store-ticket">
         {selectionMode ? <label className="store-ticket-selector"><input className="store-ticket-check" type="checkbox" aria-label={`Chọn ${record.productName}`} checked={selection.includes(record.id)} onChange={e => setSelection(e.target.checked ? [...selection, record.id] : selection.filter(id => id !== record.id))} /></label> : null}
         <button className="store-ticket-open" onClick={() => setActive(record)}><strong>{record.productName}</strong><span className="store-ticket-sku">{record.sku || "Nhập tay"}</span><span className="store-ticket-meta">{record.detectedDate} · {record.quantity}</span><span className="store-ticket-tags"><span className={`store-chip chip-${getConditionTone(record.condition)}`}>{record.condition}</span><span className={`store-chip chip-${getResolutionTone(record.resolution)}`}>{record.resolution}</span><span className={`store-chip chip-${record.approvalStatus === "APPROVED" ? "safe" : record.approvalStatus === "PENDING" ? "warning" : "neutral"}`}>{approvalLabels[record.approvalStatus]}</span></span><img className="store-ticket-chevron" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button>
       </div>)}</div>
       {!visible.length ? <p className="store-muted store-empty">Không có phiếu phù hợp bộ lọc.</p> : null}
-      {totalPages > 1 ? <div className="store-pagination"><span>{currentPage}/{totalPages} trang</span><button disabled={currentPage <= 1} onClick={() => changePage(currentPage - 1)} aria-label="Trang trước">‹</button><button disabled={currentPage >= totalPages} onClick={() => changePage(currentPage + 1)} aria-label="Trang sau">›</button></div> : null}
+      {totalPages > 1 ? <div className="store-pagination"><span>{(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)} / {filtered.length}</span><button disabled={currentPage <= 1} onClick={() => changePage(currentPage - 1)} aria-label="Trang trước"><img data-figma-render-width="18" data-figma-render-height="18" className="is-previous" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button><button disabled={currentPage >= totalPages} onClick={() => changePage(currentPage + 1)} aria-label="Trang sau"><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button></div> : null}
     </section>
     <CreateRecordDialog kind={createKind} open={createKind !== null} onOpenChange={open => { if (!open) setCreateKind(null); }} onSaved={save} onBarcodeLookup={mockBarcodeLookup} profile={mockProfile} actorReadOnly onlineMode presentation="screen" />
     <StoreSheet open={filterOpen} onOpenChange={setFilterOpen} title="Lọc & sắp xếp" description="Bộ lọc phiếu áp dụng ngay khi thay đổi">
@@ -108,8 +117,8 @@ export function KphWorkspace({ records, onRecordsChange, onNotice }: {
       <p className="store-muted">Chỉ phiếu đã gửi và đã duyệt được đưa vào file. File này dùng dữ liệu mẫu.</p>{error ? <p className="store-error" role="alert">{error}</p> : null}
       <div className="store-sheet-actions"><Button variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button><Button className="store-button" disabled={!eligible.length || exporting} onClick={() => void download()}>{exporting ? "Đang xuất…" : "Tải xuống"}</Button></div>
     </StoreSheet>
-    <StoreSheet open={active !== null} onOpenChange={open => { if (!open) setActive(null); }} title="Chi tiết phiếu KPH" description="Nội dung và trạng thái phiếu trong dữ liệu mẫu">
-      {active ? <><Summary rows={[["Tên hàng hóa", active.productName], ["Mã SKU / UPC", active.sku || "—"], ["Ngày phát hiện", active.detectedDate], ["Số lượng", active.quantity], ["Nhà cung cấp", active.supplier || "—"], ["Tình trạng", active.condition], ["Biện pháp", active.resolution], ["Người phát hiện", active.detectedBy], ["Trạng thái", approvalLabels[active.approvalStatus]], ["Ghi chú", active.note || "Không có"]]} /><div className="store-review-photos">{active.photos.map(p => <button key={p.id} onClick={() => setImage(p)}><img src={p.src} alt={p.alt} /></button>)}</div>{!active.photos.length ? <p className="store-muted">Phiếu mẫu chưa có ảnh minh chứng.</p> : null}<div className="store-sheet-actions"><Button variant="ghost" onClick={() => review("REJECTED")}>Không duyệt</Button><Button className="store-button" onClick={() => review("APPROVED")}>Duyệt phiếu</Button></div></> : null}
+    <StoreSheet className="store-kph-detail" open={active !== null} onOpenChange={open => { if (!open) setActive(null); }} title="Chi tiết phiếu KPH" description="Nội dung và trạng thái phiếu trong dữ liệu mẫu">
+      {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "Thực phẩm khô & khác" : "Thực phẩm tươi sống"} · {active.id}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["Mã SKU / UPC", active.sku || "—"], ["Nhà cung cấp", active.supplier || "—"], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Biện pháp", active.resolution], ["Trạng thái duyệt", approvalLabels[active.approvalStatus]]]} /></section><section><h3>Ghi nhận</h3><Summary rows={[["Ghi chú", active.note || "Không có"]]} /><div className="store-review-photos">{active.photos.map(p => <button key={p.id} onClick={() => setImage(p)}><img src={p.src} alt={p.alt} /></button>)}</div>{!active.photos.length ? <p className="store-muted">Phiếu mẫu chưa có ảnh minh chứng.</p> : null}</section><div className="store-sheet-actions"><Button variant="ghost" onClick={() => review("REJECTED")}>Không duyệt</Button><Button className="store-button" onClick={() => review("APPROVED")}>Duyệt phiếu</Button></div></> : null}
     </StoreSheet>
     <EvidenceImageViewer image={image} open={image !== null} onOpenChange={open => { if (!open) setImage(null); }} />
   </div>;

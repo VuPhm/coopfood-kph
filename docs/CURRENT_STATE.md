@@ -6,13 +6,13 @@ Cập nhật: 2026-10-07
 
 Ngày 07/10/2026, owner yêu cầu review lại Figma `aEDpXtz0IiEkPiVucqjQ3Q`
 và lên kế hoạch cho GPT-6 Luna. Owner đã chọn **mobile + desktop, giữ mock**.
-Cycle `figma-mobile-implementation` chuyển sang PLANNING revision 2;
+Cycle `figma-mobile-implementation` đang **AWAITING_ACCEPTANCE revision 2** trên nhánh
+`store-app/figma-mobile-implementation`, sole writer `/root/luna_figma_r2`.
 [kế hoạch chi tiết](delivery/figma-mobile-implementation/implementation-plan-r2.md)
 và [handoff Luna 6](delivery/figma-mobile-implementation/luna-6-handoff.md)
-đã có mapping ref, scope, dependency và gates. Chưa dispatch/implement revision 2.
-Candidate mobile hiện tại còn dirty/untracked trên cùng nhánh/worktree;
-phải checkpoint đầy đủ trước bàn giao. Evidence 03/10 là lịch sử, chưa chứng minh
-parity với Figma mới hoặc scope desktop. Owner visual acceptance vẫn pending.
+theo dõi scope/gates. S0–S7 đã triển khai và technical gates PASS trên candidate
+r2; full verify, workflow/export và responsive Playwright đều đạt. Owner visual
+acceptance vẫn pending. Evidence 03/10 là lịch sử, không dùng thay cho kết quả r2.
 
 Theo yêu cầu owner ngày 03/10/2026, giao diện mobile từ Figma `aEDpXtz0IiEkPiVucqjQ3Q`
 đã được triển khai trên working tree nhánh `store-app/figma-mobile-implementation`.

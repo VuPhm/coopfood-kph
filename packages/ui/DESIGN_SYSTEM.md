@@ -1,5 +1,11 @@
 # Store App UI foundation
 
+The Figma R2 Store App presentation roles are exposed as `--cf-kph-dry`,
+`--cf-kph-dry-soft`, `--cf-kph-fresh`, `--cf-kph-fresh-soft`,
+`--cf-home-lookup`, and `--cf-home-date`. They do not replace business states;
+error, warning, success, choice and focus semantics retain precedence. Typography
+tokens align with the assigned Figma scales while compatibility aliases remain.
+
 The current design candidate is [CoopFood — Store UI foundation](https://www.figma.com/design/55DDRKrysV4PJXYGyRQdoC?node-id=439-2). The owner chose Figma-first foundations and UI frames on 29/09/2026, without another application prototype. Foundations are on `01 — Foundations`, component families on `10`–`17`, patterns on `20`, and Home/KPH/expiry starter frames on `30`–`32`. See the [reboot handoff](../../docs/delivery/r1r-ui-dna/figma-foundation-handoff.md).
 
 ## Tokens

@@ -54,10 +54,7 @@ export function ShelfLifeScreen() {
       }
       catch (e) { setError(e instanceof Error ? e.message : "Kiểm tra ngày đã nhập"); setResult(null); }
     }}>
-      <fieldset className="store-mode"><legend className="sr-only">Cách nhập ngày sản xuất</legend>{[true, false].map(value => <label key={String(value)} className={known === value ? "is-selected" : ""}>
-        <input type="radio" name="shelf-mode" checked={known === value} onChange={() => { setKnown(value); setResult(null); setError(""); }} />
-        <span><strong>{value ? "Biết NSX" : "Chưa biết NSX"}</strong><small>{value ? "Nhập trực tiếp" : "Tự tính từ HSD"}</small></span>
-      </label>)}</fieldset>
+      <div className="store-known-toggle"><strong>{known ? "Đã biết ngày sản xuất" : "Chưa biết ngày sản xuất"}</strong><button type="button" role="switch" aria-label="Đã biết ngày sản xuất" aria-checked={known} onClick={() => { setKnown(!known); setResult(null); setError(""); }}><span /></button></div>
       {known ? <div className="store-field"><label htmlFor="shelf-nsx">Ngày sản xuất</label><CalendarInput id="shelf-nsx" initialMonth={today} label="Ngày sản xuất" value={nsx} onValueChange={v => dates(v, hsd)} /></div> : null}
       <div className="store-field"><label htmlFor="shelf-hsd">Hạn sử dụng (HSD)</label><CalendarInput id="shelf-hsd" initialMonth={today} label="Hạn sử dụng" value={hsd} onValueChange={expiry} /></div>
       <div className="store-two-col">{(["days", "months"] as const).map(unit => <div className="store-field" key={unit}><label htmlFor={`shelf-${unit}`}>HSD (Số {unit === "days" ? "ngày" : "tháng"})</label><div className="store-duration"><Input id={`shelf-${unit}`} inputMode="numeric" value={unit === "days" ? days : months} onChange={e => duration(e.target.value, unit)} placeholder="—" /><span>{unit === "days" ? "ngày" : "tháng"}</span></div></div>)}</div>
@@ -65,7 +62,7 @@ export function ShelfLifeScreen() {
     </form>
     {error ? <p className="store-error" role="alert">{error}</p> : null}
     {result ? <section className="store-shelf-result" aria-live="polite">
-      <span className={`store-chip chip-${state}`}>{result.value.status === "EXPIRED" ? "Đã hết hạn sử dụng" : result.value.status === "WARNING" ? "Cảnh báo lùi hàng" : "Ngày lùi hàng"}</span>
+      <span className={`store-chip chip-${state}`}>{result.value.status === "EXPIRED" ? "Đã hết hạn sử dụng" : result.value.status === "WARNING" ? "Sắp đến hạn lùi" : result.value.status === "SAFE" ? "An toàn" : "Ngày lùi hàng"}</span>
       <strong className="store-result-date">{formatDisplayDate(result.value.status === "EXPIRED" ? result.hsd : result.value.withdrawalDate)}</strong>
       <div className="store-result-facts"><div><small>{daysBetween(today, result.value.withdrawalDate) < 0 ? "Qua hạn lùi" : "Đến hạn lùi"}</small><strong>{Math.abs(daysBetween(today, result.value.withdrawalDate))} ngày</strong></div><div><small>{daysBetween(today, result.hsd) < 0 ? "Qua HSD" : "HSD còn"}</small><strong>{Math.abs(daysBetween(today, result.hsd))} ngày</strong></div></div>
       <ShelfLifeTimeline nsx={result.nsx} hsd={result.hsd} today={today} result={result.value} />

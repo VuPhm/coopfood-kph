@@ -1,8 +1,9 @@
 # Kế hoạch implementation Figma — revision 2
 
-Ngày lập: 07/10/2026. Trạng thái: **PLANNING**.
+Ngày lập: 07/10/2026. Trạng thái: **AWAITING_ACCEPTANCE**.
 Owner đã chọn **mobile + desktop, giữ mock** trong chat này.
-Executor dự kiến: **GPT-6 Luna** (`gpt-6-luna`); chưa dispatch.
+Executor: **GPT-6 Luna** (`gpt-6-luna`), actual agent `/root/luna_figma_r2`;
+đã START và đang triển khai tuần tự.
 Đây là phần tiếp tục của cycle `figma-mobile-implementation`, không mở một cycle song song.
 
 ## Outcome và ranh giới
@@ -26,8 +27,9 @@ Dữ liệu tổng hợp chỉ ở memory; production entry mặc định vẫn 
 
 - Branch/worktree thực tế: `store-app/figma-mobile-implementation`,
   `/Users/vup/Documents/coopfood-kph`.
-- HEAD: `4fab6889f6cc6a7b66d25806262329cbf88ea024`.
-  Đây là base commit, **không chứa candidate mobile chưa commit**.
+- Code checkpoint: `f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe`;
+  actual handoff HEAD: `4f0e8c66c2116023705f6f61e6ce82d3177f0422`.
+  Implementation preserves the candidate on the same task branch/worktree.
 - Code dirty/untracked gồm implementation và thay đổi có trước. Không reset,
   checkout đè, stash rồi bỏ, hoặc dùng riêng HEAD để bắt đầu.
 - Rà local refs ngày 07/10; chưa fetch remote. Không suy remote freshness từ local ref.
@@ -310,15 +312,12 @@ yêu cầu dependency mới phải chứng minh thiếu component thật.
 Không sửa `app.tsx`/online-kph/controller cũ, packages/kph-rules, backend/contracts
 để làm screenshot khớp. Không sửa AGENTS.md.
 
-Risks: baseline dirty chưa checkpoint; tokens CSS chia sẻ Admin/Pilot nên cần scope;
-asset variants/icon placeholder ở library chưa hoàn chỉnh; incomplete desktop ref;
-DATE/Lookup chỉ presentation mock; camera OS/iPhone/HEIC chưa kiểm. Các lỗi ở
-ref đã liệt kê được giải bằng contract hoặc leaf; bất kỳ mâu thuẫn nghiệp vụ mới
-không giải được an toàn phải ghi node + rule và dừng đúng phần đó.
+Risks: DATE/Lookup vẫn chỉ là presentation mock; camera OS/iPhone/HEIC chưa kiểm.
+Tokens CSS chia sẻ consumer nên override phải scoped. Technical gates đã đạt; owner
+acceptance vẫn pending.
 
-Bước nhỏ tiếp theo khi owner yêu cầu implement: integrator checkpoint candidate,
-chốt actual SHA/worktree, chuyển giao [luna-6-handoff.md](luna-6-handoff.md);
-Luna bắt đầu S0–S1, rồi đi tuần tự theo dependency.
+Bước nhỏ tiếp theo: owner xem preview thật và đưa ra quyết định visual/workflow.
+Technical PASS không được tính là owner acceptance.
 
 ## Danh mục screen refs giao Luna
 

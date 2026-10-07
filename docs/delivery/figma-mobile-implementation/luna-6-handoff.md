@@ -3,7 +3,10 @@
 Cycle: `figma-mobile-implementation`, revision **2**, scope **mobile + desktop, giữ mock**.
 Kế hoạch: [implementation-plan-r2.md](implementation-plan-r2.md).
 Model được owner chỉ định: `gpt-6-luna`. Không áp reasoning override khi chưa được yêu cầu.
-**Chưa dispatch; agent ID và actual checkpoint SHA chưa có.**
+Executor started 07/10/2026: `/root/luna_figma_r2`; actual handoff HEAD
+`4f0e8c66c2116023705f6f61e6ce82d3177f0422`, code checkpoint
+`f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe`. Sole writer on the current
+worktree/branch; no parallel writers.
 
 ## Trước khi giao thực thi
 
@@ -61,6 +64,6 @@ tiếp tục phần độc lập. Không giả định owner đã duyệt Figma 
 Review giới hạn 2 vòng; đề xuất sau implementation đặt backlog/candidate riêng khi
 được yêu cầu, không ghi đè Figma accepted.
 
-Lượt lập kế hoạch chỉ review refs/source và tạo hồ sơ. Không có implementation,
-fresh application test pass, preview mới hoặc owner visual acceptance được suy ra.
-
+Hồ sơ này ban đầu được soạn trước dispatch; START đã nhận. Luna triển khai S0–S7
+trên checkpoint đã ghi ở trên. Kết quả kiểm thử, preview, candidate SHA và owner
+acceptance sẽ được ghi vào technical-evidence-r2.md / acceptance-handoff-r2.md.

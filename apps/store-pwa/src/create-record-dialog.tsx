@@ -147,6 +147,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   const [savingRecord, setSavingRecord] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const screenPresentation = presentation === "screen";
+  const createFormRef = useRef<HTMLFormElement>(null);
+  const wasReviewingRef = useRef(false);
   const assetScreen = activeKind === "TPCN" ? "203-701" : "203-847";
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -218,6 +220,16 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     });
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  useEffect(() => {
+    if (wasReviewingRef.current && !reviewing && screenPresentation) {
+      window.requestAnimationFrame(() => {
+        if (createFormRef.current) createFormRef.current.scrollTop = 0;
+        setFocus("barcode");
+      });
+    }
+    wasReviewingRef.current = reviewing;
+  }, [reviewing, screenPresentation, setFocus]);
 
   useEffect(() => () => {
     for (const photo of photoRef.current) {
@@ -408,7 +420,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
+        <DialogContent data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
           <DialogHeader className="create-dialog-header">
             {screenPresentation ? <button type="button" className="store-form-back" aria-label={reviewing ? "Chỉnh sửa phiếu" : "Về danh sách KPH"} onClick={() => { if (reviewing) setReviewing(false); else onOpenChange(false); }}><img src={figmaAsset(assetScreen, "imgFeatherArrowLeft")} alt="" /></button> : null}
             <DialogTitle className="create-dialog-title">{screenPresentation ? <>{reviewing ? "Xem lại phiếu KPH" : "Tạo phiếu KPH"}<small>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</small></> : <>Tạo phiếu KPH · {kindLabels[kind]}</>}</DialogTitle>
@@ -421,11 +433,12 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
             <p className={cn("store-review-notice", photoError && "is-error")} role={photoError ? "alert" : "status"}><img src={figmaAsset(photoError ? "280-1915" : "279-1299", photoError ? "imgFeatherWifiOff" : "imgFeatherAlertCircle")} alt="" /><span><strong>{photoError ? "Chưa gửi được phiếu" : "Chưa gửi"}</strong><small>{photoError || "Phiếu chỉ được tạo sau khi bạn bấm “Gửi phiếu”."}</small></span></p>
             <ReviewSection title="Hàng hóa" rows={[["Cửa hàng", profile.storeName], ["Ngày phát hiện", getValues("detectedDate")], ["Mã SKU / UPC", getValues("barcode") || "—"], ["Tên hàng hóa", getValues("productName") || "—"], ["Nhà cung cấp", getValues("supplier") || "—"], ["Số lượng", `${getValues("quantity")} ${getValues("unit")}`]]} />
             <ReviewSection title="Xử lý" rows={[["Tình trạng", resolveChoiceLabel(options.conditions.find(c => c.value === getValues("condition"))!, getValues("conditionDetail"))], ["Biện pháp", resolveChoiceLabel(options.resolutions.find(c => c.value === getValues("resolution"))!, getValues("resolutionDetail"))], ["Ngày xử lý", getValues("treatmentDate") || "Chưa có"]]} />
-            <ReviewSection title="Ghi nhận" rows={[["Người phát hiện", getValues("detectedBy")], ["Ghi chú", getValues("note") || "Không có"]]} />
-            <div className="store-form-evidence"><strong>Ảnh · {photos.length}/3</strong><div>{photos.map((p, i) => <button key={p.id} type="button" onClick={() => setActivePhoto(p)} aria-label={`Xem ảnh minh chứng ${i + 1}`}><img src={p.url} alt="" /><span>{i + 1}</span></button>)}</div></div>
+            <ReviewSection title="Ghi nhận" rows={[["Người phát hiện", getValues("detectedBy")], ["Ghi chú", getValues("note") || "Không có"]]}>
+              <div className="store-form-evidence"><strong>Ảnh · {photos.length}/3</strong><div>{photos.map((p, i) => <button key={p.id} type="button" onClick={() => setActivePhoto(p)} aria-label={`Xem ảnh minh chứng ${i + 1}`}><img src={p.url} alt="" /><span>{i + 1}</span></button>)}</div></div>
+            </ReviewSection>
             <footer className="create-dialog-footer"><Button variant="ghost" disabled={savingRecord} onClick={() => { setReviewing(false); setPhotoError(""); }}>Chỉnh sửa</Button><Button disabled={savingRecord} onClick={() => void submit()}>{savingRecord ? "Đang gửi…" : "Gửi phiếu"}</Button></footer>
           </div> : null}
-          <form className="create-dialog-form" hidden={screenPresentation && reviewing} onSubmit={submit}>
+          <form ref={createFormRef} className="create-dialog-form" hidden={screenPresentation && reviewing} onSubmit={submit}>
             <FormSection number="1" title={screenPresentation ? "Hàng hóa" : "Thông tin phát hiện"}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
@@ -489,8 +502,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
                 <p className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img src={figmaAsset(assetScreen, "imgFeatherCamera")} alt="" /> : <Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
-                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img src={figmaAsset(assetScreen, "imgFeatherImage")} alt="" /> : <Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
+                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, "imgFeatherCamera")} alt="" /> : <Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
+                  <PhotoPicker accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, "imgFeatherImage")} alt="" /> : <Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
                 </div>
                 {photos.length ? <div className="photo-previews" aria-label="Ảnh đã chọn">{photos.map((photo, index) => <figure key={photo.id} className="photo-preview"><button type="button" className="photo-preview-open" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1}`} title={`Xem ${photo.fileName}`}>{photo.url ? <img src={photo.url} alt="" /> : <ImageIcon aria-hidden="true" />}</button><figcaption>{index + 1}</figcaption><button type="button" className="photo-preview-remove" onClick={() => removePhoto(photo.id)} aria-label={`Xóa ảnh ${index + 1}`} title={photo.fileName}><Trash2 size={15} aria-hidden="true" /></button></figure>)}</div> : null}
                 <p className={cn("mt-2 text-xs font-semibold", photoError ? "text-danger" : "text-ink-muted")} role={photoError ? "alert" : "status"}>
@@ -547,7 +560,7 @@ function ChoiceGroup({ choices, legend, name, register, assetScreen }: ChoiceGro
         {choices.map((choice) => (
           <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`)}>
             <input className="sr-only" type="radio" value={choice.value} {...register(name)} />
-            <span className="choice-icon">{assetScreen ? <img src={figmaAsset(assetScreen, choiceAsset(choice.value))} alt="" /> : choiceIcon(choice.value)}</span>
+            <span className="choice-icon">{assetScreen ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, choiceAsset(choice.value))} alt="" /> : choiceIcon(choice.value)}</span>
             <span>{choice.label}</span>
           </label>
         ))}
@@ -569,8 +582,8 @@ function choiceAsset(value: string) {
   return "imgFeatherMoreHorizontal";
 }
 
-function ReviewSection({ title, rows }: { title: string; rows: readonly (readonly [string, string])[] }) {
-  return <section className="store-review-section"><h3>{title}</h3><dl className="store-summary">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section>;
+function ReviewSection({ title, rows, children }: { title: string; rows: readonly (readonly [string, string])[]; children?: ReactNode }) {
+  return <section className="store-review-section"><h3>{title}</h3><dl className="store-summary">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>{children}</section>;
 }
 
 function choiceIcon(value: string) {
