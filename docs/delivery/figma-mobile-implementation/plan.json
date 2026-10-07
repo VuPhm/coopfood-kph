@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 2,
-  "status": "PLANNING",
+  "status": "EXECUTING",
   "objective": "Cập nhật Store App mobile và triển khai desktop theo Figma aEDpXtz0IiEkPiVucqjQ3Q; giữ memory-only mocks, contract và workflow accepted; chuẩn bị nghiệm thu cho owner.",
   "inScope": [
     "Foundation token/component/density và KPH type presentation theme",
@@ -18,9 +18,9 @@
     "Admin redesign, unrelated online/Pilot refactor, new infrastructure",
     "Merge/push/deploy hoặc protected Pages cutover; DATE thêm theo dõi workflow chưa có design"
   ],
-  "baseSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+  "baseSha": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe",
   "candidateSha": "",
-  "integrationOwner": "root lập kế hoạch; Luna 6 sole writer dự kiến sau checkpoint/handoff",
+  "integrationOwner": "GPT-6 Luna — sole implementation/integration writer after START handoff; root stops",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
     "apps/store-pwa/src/store-app.css",
@@ -118,11 +118,11 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Khi owner yêu cầu implementation: checkpoint đủ candidate tracked/untracked, cập nhật actual base SHA/worktree/ownership và giao Luna 6 bắt đầu S0–S1 theo implementation-plan-r2.md.",
+  "nextAction": "Root records actual Luna agent ID, commits dispatch record, sends START and stops without waiting. Luna executes S0–S7 and leaves owner acceptance pending.",
   "workingTreeCandidate": {
-    "baseSha": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+    "baseSha": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Candidate mobile revision 1 vẫn chưa commit; baseSha là HEAD lịch sử, không phải reviewed implementation checkpoint cho dispatch revision 2."
+    "note": "Reviewed candidate including prior tracked/untracked changes preserved in local checkpoint; no fresh technical PASS inferred."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -132,21 +132,25 @@
   ],
   "executor": {
     "model": "gpt-6-luna",
-    "status": "planned-not-dispatched",
+    "status": "starting",
     "agentId": null,
     "reasoningEffort": "inherit configured setting; no explicit effort requested",
-    "ownership": "single writer, sequential slices"
+    "ownership": "single writer, sequential slices",
+    "worktree": "/Users/vup/Documents/coopfood-kph",
+    "branch": "store-app/figma-mobile-implementation"
   },
   "readiness": {
     "planningComplete": true,
-    "dispatchReady": false,
-    "requiredBeforeDispatch": [
-      "Review/checkpoint full existing tracked and untracked code",
-      "Set actual reviewed checkpoint baseSha and executor worktree/identity",
-      "Confirm previous writer stopped and run dispatch check after checkpoint"
-    ]
+    "dispatchReady": true,
+    "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
   "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r2.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/luna-6-handoff.md"
+  "handoff": "docs/delivery/figma-mobile-implementation/luna-6-handoff.md",
+  "executionAuthorization": {
+    "date": "2026-10-07",
+    "source": "Owner in current chat: gọi (các) luna rồi ra nghỉ, không ngồi chờ",
+    "mode": "single-writer handoff on existing task branch/worktree; no parallel writers, no parent wait",
+    "checkpoint": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe"
+  }
 }
