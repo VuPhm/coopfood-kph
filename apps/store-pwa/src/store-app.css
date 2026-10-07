@@ -157,10 +157,11 @@
 .store-date { display: grid; gap: 12px; }
 .store-date-search { height: 48px; border: 1px solid var(--cf-color-border); border-radius: 14px; font-size: 15px; }
 .store-date-search-wrap { position: relative; }
-.store-date-search-wrap input { padding-left: 48px; padding-right: 48px; }
-.store-date-search-icon { position: absolute; z-index: 1; top: 12px; left: 16px; color: var(--cf-color-ink-muted); pointer-events: none; }
-.store-date-search-wrap > button { position: absolute; top: 2px; right: 6px; display: grid; width: 44px; height: 44px; place-items: center; }
-.store-date-search-wrap > button span { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 12px; background: var(--cf-color-brand-soft); color: var(--cf-color-brand); }
+.store-date-search-wrap input { padding-left: 38px; padding-right: 48px; }
+.store-date-search-icon { position: absolute; z-index: 1; top: 15px; left: 12px; width: 18px; height: 18px; pointer-events: none; }
+.store-date-search-wrap > button { position: absolute; top: 2px; right: 4px; display: grid; width: 44px; height: 44px; place-items: center; }
+.store-date-search-wrap > button span { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 12px; background: var(--cf-color-brand-soft); }
+.store-date-scan-icon { display: block; width: 20px; height: 20px; }
 .store-date .store-tabs, .store-date .store-list-heading { margin: 0; }
 .store-date .store-list-heading > div { display: block; }
 .store-date .store-list-heading p { font-size: 11px; margin-top: 2px; }

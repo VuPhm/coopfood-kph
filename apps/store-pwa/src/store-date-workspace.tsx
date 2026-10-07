@@ -5,7 +5,6 @@ import { figmaAsset } from "./figma-assets";
 import { daysBetween } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
-import { Search, ScanLine } from "lucide-react";
 import { mockDateLots } from "./store-app-mock";
 const statuses = { open: "Mở", acknowledged: "Đã ghi nhận", resolved: "Đã xử lý" };
 export function DateWorkspace() {
@@ -29,7 +28,7 @@ export function DateWorkspace() {
   }, []);
   useEffect(() => { if (activeId && !visible.some(l => l.id === activeId)) setActiveId(""); }, [activeId, visible]);
   return <div className="store-date">
-    <div className="store-date-search-wrap"><Search className="store-date-search-icon" size={24} strokeWidth={2} aria-hidden="true" /><Input className="store-date-search" aria-label="Tìm mã hàng hoặc lô" placeholder="Mã hàng, lô hoặc quét" value={query} onChange={e => setQuery(e.target.value)} /><button aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><span><ScanLine size={20} strokeWidth={2} aria-hidden="true" /></span></button></div>
+    <div className="store-date-search-wrap"><img className="store-date-search-icon" data-figma-asset-slot="date-search" src={figmaAsset("date", "imgFeatherSearch")} alt="" /><Input className="store-date-search" aria-label="Tìm mã hàng hoặc lô" placeholder="Mã hàng, lô hoặc quét" value={query} onChange={e => setQuery(e.target.value)} /><button aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><span><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></span></button></div>
     <div className="store-tabs" role="group" aria-label="Quản lý DATE">{[["alerts", "Cảnh báo", lots.filter(l => l.status !== "resolved").length], ["tracking", "Theo dõi DATE", lots.length]].map(([key, label, n]) => <button key={key} aria-pressed={tab === key} className={tab === key ? "is-active" : ""} onClick={() => setTab(String(key))}>{label}<small>{n}</small></button>)}</div>
     <div className="store-list-heading"><div><h2>{tab === "alerts" ? "Cần xử lý" : "Theo dõi DATE"}</h2><p className="store-muted">{tab === "alerts" ? `${count("open")} cảnh báo đang mở` : `${lots.length} lô trong dữ liệu mẫu`}</p></div><div className="store-date-head-actions"><button className="store-filter" aria-label="Lọc DATE" onClick={() => setFilterOpen(true)}><img data-figma-asset-slot="date-filter" src={figmaAsset("r2", "imgFeatherSliders")} alt="" /></button><button className="store-date-add" disabled title="Chức năng chưa sẵn sàng trong bản dùng thử" aria-describedby="store-date-add-help"><img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" />Thêm theo dõi</button></div></div>
     <span className="sr-only" id="store-date-add-help">Chức năng chưa sẵn sàng trong bản dùng thử</span>

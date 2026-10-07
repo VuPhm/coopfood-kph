@@ -11,6 +11,9 @@ const assets = {
     "imgFeatherSearch": "figma/a1c5d2ed-7500-42d8-adf7-d3177be24f6c.svg",
     "imgChoiceMarkStateSelected": "figma/90de5c6a-d14d-4e2d-b2bf-785838582828.svg"
   },
+  "date": {
+    "imgFeatherSearch": "figma/0d9947bc-6df8-489b-b0f1-4d3264da3d36.svg"
+  },
   "main-2": {
     "imgFeatherChevronRight": "figma/221021d8-c77e-444e-83e9-b53258bec1be.svg",
     "imgFeatherFilter": "figma/a81e708b-88e2-4e30-9d8d-daccc29e7dd1.svg",

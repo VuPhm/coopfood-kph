@@ -2,20 +2,20 @@
 
 Cập nhật: 2026-10-08
 
-## Figma implementation — revision 2 chờ nghiệm thu
+## Figma implementation — revision 3 chờ nghiệm thu
 
 Owner chọn **mobile + desktop, giữ mock** ngày 07/10/2026. Đã review structured
 context/screenshot của mobile, desktop và component/theme trong Figma
-`aEDpXtz0IiEkPiVucqjQ3Q`. Cycle hiện có đang AWAITING_ACCEPTANCE revision 2 theo
+`aEDpXtz0IiEkPiVucqjQ3Q`. Cycle hiện có đang AWAITING_ACCEPTANCE revision 3 theo
 [kế hoạch](delivery/figma-mobile-implementation/implementation-plan-r2.md),
 không mở cycle song song. Luna là sole writer; technical gates PASS, owner acceptance
 đang pending.
 
-Bước nhỏ tiếp theo theo owner ngày 08/10: review icon Feather React bằng sub mới
-read-only, gom mismatch xác nhận và feedback preview thành phạm vi sửa nhỏ nếu
-cần. Owner vẫn chưa đưa ra quyết định visual/workflow. Technical PASS không tự
-đóng cycle. API wiring tiếp tục ngoài scope. Xem
-[follow-up](delivery/figma-mobile-implementation/owner-followup-2026-10-08.md).
+Bước nhỏ tiếp theo: owner xem preview memory-only và xác nhận visual/workflow
+hoặc gửi finding cụ thể. DATE Search/Maximize khớp Feather React masters;
+scanner manual fallback và labels được giữ nguyên. Technical PASS không tự đóng
+cycle. API wiring tiếp tục ngoài scope. Xem
+[handoff revision 3](delivery/figma-mobile-implementation/acceptance-handoff-r3.md).
 
 ## Figma mobile implementation — evidence revision 1
 

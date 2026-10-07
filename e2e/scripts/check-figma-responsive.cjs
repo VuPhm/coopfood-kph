@@ -2,7 +2,7 @@
 const { chromium } = require('@playwright/test');
 const fs = require('node:fs');
 fs.mkdirSync('.local/figma-mobile', {recursive:true});
-const manifest = JSON.parse(fs.readFileSync('docs/delivery/figma-mobile-implementation/assets-r2.json', 'utf8'));
+const manifest = JSON.parse(fs.readFileSync('docs/delivery/figma-mobile-implementation/assets-r3.json', 'utf8'));
 const viewports = [
   {width:390,height:844}, {width:599,height:900}, {width:600,height:900}, {width:899,height:900},
   {width:900,height:900}, {width:1440,height:900}, {width:1440,height:1024},
@@ -83,6 +83,27 @@ async function checkScreen(page, viewport) {
   const focusRestored = await page.getByRole('button',{name:'Mở tiện ích tra cứu lùi hàng'}).evaluate(el => document.activeElement === el);
   if (!focusRestored) throw new Error(`Quick-panel focus did not return at ${tag}`);
   await capture(page,`date-${tag}`);
+  const dateIconGeometry = await page.evaluate(() => {
+    const field = document.querySelector('.store-date-search-wrap').getBoundingClientRect();
+    const search = document.querySelector('[data-figma-asset-slot="date-search"]');
+    const scan = document.querySelector('[data-figma-asset-slot="date-scan"]');
+    const holder = scan.parentElement.getBoundingClientRect();
+    const searchRect = search.getBoundingClientRect();
+    const scanRect = scan.getBoundingClientRect();
+    return {
+      searchSource: new URL(search.src).pathname.split('/').pop(), search: [searchRect.width, searchRect.height, searchRect.left - field.left, searchRect.top - field.top],
+      scanSource: new URL(scan.src).pathname.split('/').pop(), scan: [scanRect.width, scanRect.height], holder: [holder.width, holder.height],
+      scanButton: document.querySelector('button[aria-label="Quét mã để tìm lô DATE"]')?.getAttribute('aria-label')
+    };
+  });
+  if (JSON.stringify(dateIconGeometry.search) !== JSON.stringify([18,18,12,15]) || dateIconGeometry.searchSource !== '0d9947bc-6df8-489b-b0f1-4d3264da3d36.svg' || JSON.stringify(dateIconGeometry.scan) !== JSON.stringify([20,20]) || JSON.stringify(dateIconGeometry.holder) !== JSON.stringify([36,36]) || dateIconGeometry.scanSource !== '29585ac6-4af7-4f2f-a308-2b24ab118b3e.svg' || dateIconGeometry.scanButton !== 'Quét mã để tìm lô DATE') throw new Error(`DATE icon source/geometry mismatch at ${tag}: ${JSON.stringify(dateIconGeometry)}`);
+  await page.getByRole('button',{name:'Quét mã để tìm lô DATE'}).click();
+  await page.getByRole('dialog').getByText('Quét mã SKU / UPC').waitFor();
+  await page.getByRole('button',{name:'Nhập mã thủ công'}).click();
+  const dateSearch = page.getByRole('textbox',{name:'Tìm mã hàng hoặc lô'});
+  await dateSearch.fill('089332');
+  if (await dateSearch.inputValue() !== '089332') throw new Error(`DATE scanner manual fallback did not populate the search field at ${tag}`);
+  await dateSearch.fill('');
   await page.getByRole('button',{name:'Về trang chủ'}).click();
   if (viewport.width >= 900) await page.getByRole('button',{name:'Tra hạn lùi hàng',exact:true}).click();
   else await homeNavigate(page,viewport,'Tra cứu lùi hàng');
@@ -92,7 +113,7 @@ async function checkScreen(page, viewport) {
   await page.getByText('24/08/2026',{exact:true}).waitFor();
   await capture(page,`shelf-${tag}`);
   if(errors.length) throw new Error(`Browser errors at ${tag}: ${errors.join('; ')}`);
-  console.log(`PASS ${tag}: responsive shell, KPH filter/layout, lookup/DATE route, quick-panel keyboard, shelf calculation, icon geometry, no overflow`);
+  console.log(`PASS ${tag}: responsive shell, KPH filter/layout, lookup/DATE route, DATE Feather icon geometry and scanner manual fallback ${JSON.stringify(dateIconGeometry)}, quick-panel keyboard, shelf calculation, no overflow`);
 }
 (async()=>{
   const browser=await chromium.launch({headless:true});

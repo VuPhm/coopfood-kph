@@ -22,8 +22,9 @@ whole-repository audit or begin API wiring.
 Actual reviewer: `/root/luna_icon_review_fresh`, GPT-6 Luna, fresh context and
 read-only scope. Root remains the only writer for this docs-only follow-up.
 
-Root records the owner's preview feedback and consolidates one review list.
-If repair is needed, hand a fresh writer the candidate SHA, exact allowed paths,
-findings and verification commands, preserving the task branch/worktree. Code
-changes invalidate affected technical gates. Owner acceptance remains pending
-until an explicit decision is received.
+Fresh writer `/root/luna_date_icon_repair` repaired the two DATE icon callsites
+on the same branch/worktree. Exact Feather Search and Maximize SVGs match the
+Figma master geometry and `#1C261C` stroke; responsive geometry/scanner fallback
+and full workspace verification pass on revision 3. See
+[technical evidence](technical-evidence-r3.md). Owner acceptance remains pending
+until an explicit decision is received; see [handoff](acceptance-handoff-r3.md).

@@ -6,18 +6,21 @@ Cập nhật: 2026-10-08
 
 Ngày 07/10/2026, owner yêu cầu review lại Figma `aEDpXtz0IiEkPiVucqjQ3Q`
 và lên kế hoạch cho GPT-6 Luna. Owner đã chọn **mobile + desktop, giữ mock**.
-Cycle `figma-mobile-implementation` đang **AWAITING_ACCEPTANCE revision 2** trên nhánh
-`store-app/figma-mobile-implementation`, sole writer `/root/luna_figma_r2`.
+Cycle `figma-mobile-implementation` đang **AWAITING_ACCEPTANCE revision 3** trên nhánh
+`store-app/figma-mobile-implementation`, current repair writer `/root/luna_date_icon_repair`.
 [kế hoạch chi tiết](delivery/figma-mobile-implementation/implementation-plan-r2.md)
 và [handoff Luna 6](delivery/figma-mobile-implementation/luna-6-handoff.md)
-theo dõi scope/gates. S0–S7 đã triển khai và technical gates PASS trên candidate
-r2; full verify, workflow/export và responsive Playwright đều đạt. Owner visual
-acceptance vẫn pending. Evidence 03/10 là lịch sử, không dùng thay cho kết quả r2.
+theo dõi scope/gates. S0–S7 đã triển khai; revision 3 repairs the DATE Feather React
+icons, and full verify plus responsive Playwright pass. Owner visual acceptance
+remains pending. Evidence 03/10 is historical.
 
 Ngày 08/10, owner xác nhận bộ icon **Feather React** và yêu cầu tiếp tục loop,
-cho phép dùng sub mới. Root đang điều phối một review icon có phạm vi nhỏ bằng
-sub mới read-only; code candidate và technical evidence chưa đổi. Xem
-[owner follow-up](delivery/figma-mobile-implementation/owner-followup-2026-10-08.md).
+cho phép dùng sub mới. Fresh review found two DATE icon mismatches; revision 3
+uses exact local Figma Feather exports with `#1C261C` strokes, preserving mock
+interaction and accessibility labels. `npm run verify` and responsive Playwright
+at seven viewports pass. Owner acceptance remains pending. See
+[revision 3 evidence](delivery/figma-mobile-implementation/technical-evidence-r3.md)
+and [preview handoff](delivery/figma-mobile-implementation/acceptance-handoff-r3.md).
 
 Theo yêu cầu owner ngày 03/10/2026, giao diện mobile từ Figma `aEDpXtz0IiEkPiVucqjQ3Q`
 đã được triển khai trên working tree nhánh `store-app/figma-mobile-implementation`.
