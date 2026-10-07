@@ -1,15 +1,14 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Cập nhật Store App mobile và triển khai desktop theo Figma aEDpXtz0IiEkPiVucqjQ3Q; giữ memory-only mocks, contract và workflow accepted; chuẩn bị nghiệm thu cho owner.",
+  "revision": 3,
+  "status": "EXECUTING",
+  "objective": "Complete the bounded Feather React DATE icon repair in the existing Figma mobile implementation cycle; keep memory-only mock semantics and owner acceptance pending.",
   "inScope": [
-    "Foundation token/component/density và KPH type presentation theme",
-    "Mobile Home, KPH browse/create/review/detail/scanner/evidence/edge states",
-    "Desktop shell/Home, KPH table và create/review modal dry/fresh",
-    "Shelf utility và quick panel mobile/desktop; product lookup và DATE fixture workspace",
-    "Targeted regression, responsive Playwright, asset geometry và owner review preview"
+    "DATE search icon uses the exact Feather React Search asset in an 18×18 slot",
+    "DATE scanner icon uses the exact Feather React Maximize asset at 20×20 centered in the 36×36 holder",
+    "Responsive Playwright assertions for DATE icon source, rendered geometry, accessible scanner behavior and manual fallback",
+    "npm run verify and the responsive browser suite; fresh revision 3 evidence and owner handoff"
   ],
   "outOfScope": [
     "Backend/OpenAPI/generated API/schema/migration/authorization changes",
@@ -18,8 +17,8 @@
     "Admin redesign, unrelated online/Pilot refactor, new infrastructure",
     "Merge/push/deploy hoặc protected Pages cutover; DATE thêm theo dõi workflow chưa có design"
   ],
-  "baseSha": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe",
-  "candidateSha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
+  "baseSha": "f7f60bc3778bf307d15671666551fa10864b79fd",
+  "candidateSha": "f7f60bc3778bf307d15671666551fa10864b79fd",
   "integrationOwner": "GPT-6 Luna — sole implementation/integration writer after START; root standby for review/coordination",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -58,52 +57,52 @@
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md"
   ],
-  "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewLimit": 1,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
+      "status": "pending",
+      "revision": 3,
+      "sha": "",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
+      "status": "pending",
+      "revision": 3,
+      "sha": "",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
+      "status": "pending",
+      "revision": 3,
+      "sha": "",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "31fc41a64e8430fceddbd4041f85f77fb87e7ec0",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r2.md"
+      "status": "pending",
+      "revision": 3,
+      "sha": "",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 2,
+      "revision": 3,
       "sha": "",
       "evidence": ""
     }
@@ -115,14 +114,21 @@
       "source": "User request and explicit scope reply in current chat, 2026-10-07",
       "impact": "Thêm desktop-native composition, mobile theme/detail/quick utility và mock Lookup; toàn bộ gate UI revision 1 trở thành historical evidence.",
       "decision": "Chỉ lập kế hoạch/handoff ở lượt này; giữ existing code, chuẩn bị checkpoint trước dispatch, không API wiring."
+    },
+    {
+      "revision": 3,
+      "request": "Repair the two DATE icons identified in fresh icon review, using the owner-confirmed Feather React set.",
+      "source": "Owner follow-up dated 2026-10-08 and consolidated read-only review finding; exact target re-read from Figma aEDpXtz0IiEkPiVucqjQ3Q node 21:144.",
+      "impact": "Invalidates revision 2 workspace-integrity, responsive-assets, and mobile-desktop-visual-interaction gates for source/geometry re-verification. Workflow semantics are unchanged because the existing input, scanner action and labels remain intact; all technical gates will be re-recorded against the revision 3 candidate. Owner gate remains pending.",
+      "decision": "Keep same branch and worktree with one writer. Change only DATE search/scan icon callsites, scoped CSS, asset manifest/responsive assertions, and cycle evidence. Reuse the exact existing local Feather Search and Maximize exports after checking matching Figma master geometry; do not add dependencies or modify other Lucide consumers."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner reviews the local preview and acceptance scenarios, then records a visual/workflow decision. Technical PASS is not owner acceptance.",
+  "nextAction": "Finish the two DATE icon corrections, run npm run verify and the responsive browser checks at 390×844 and 1440×1024, then prepare preview handoff; owner acceptance remains pending.",
   "workingTreeCandidate": {
-    "baseSha": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe",
+    "baseSha": "f7f60bc3778bf307d15671666551fa10864b79fd",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Reviewed candidate including prior tracked/untracked changes preserved in local checkpoint; no fresh technical PASS inferred."
+    "note": "Clean actual writer checkpoint inspected before revision 3; revision 2 code remains at f7f60bc until the bounded repair commit."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -132,10 +138,10 @@
   ],
   "executor": {
     "model": "gpt-6-luna",
-    "status": "completed",
-    "agentId": "/root/luna_figma_r2",
+    "status": "in_progress",
+    "agentId": "/root/luna_date_icon_repair",
     "reasoningEffort": "inherit configured setting; no explicit effort requested",
-    "ownership": "single writer, sequential slices",
+    "ownership": "single writer, bounded DATE icon repair",
     "worktree": "/Users/vup/Documents/coopfood-kph",
     "branch": "store-app/figma-mobile-implementation"
   },
