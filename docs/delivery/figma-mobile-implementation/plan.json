@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 3,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Complete the bounded Feather React DATE icon repair in the existing Figma mobile implementation cycle; keep memory-only mock semantics and owner acceptance pending.",
   "inScope": [
     "DATE search icon uses the exact Feather React Search asset in an 18×18 slot",
@@ -18,7 +18,7 @@
     "Merge/push/deploy hoặc protected Pages cutover; DATE thêm theo dõi workflow chưa có design"
   ],
   "baseSha": "f7f60bc3778bf307d15671666551fa10864b79fd",
-  "candidateSha": "f7f60bc3778bf307d15671666551fa10864b79fd",
+  "candidateSha": "caaea23e6a2bf86f0b8388f3887684db1ee59c9e",
   "integrationOwner": "GPT-6 Luna — sole implementation/integration writer after START; root standby for review/coordination",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -65,36 +65,36 @@
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 3,
-      "sha": "",
+      "sha": "caaea23e6a2bf86f0b8388f3887684db1ee59c9e",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 3,
-      "sha": "",
+      "sha": "caaea23e6a2bf86f0b8388f3887684db1ee59c9e",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 3,
-      "sha": "",
+      "sha": "caaea23e6a2bf86f0b8388f3887684db1ee59c9e",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 3,
-      "sha": "",
+      "sha": "caaea23e6a2bf86f0b8388f3887684db1ee59c9e",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r3.md"
     },
     {
@@ -124,7 +124,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Finish the two DATE icon corrections, run npm run verify and the responsive browser checks at 390×844 and 1440×1024, then prepare preview handoff; owner acceptance remains pending.",
+  "nextAction": "Owner reviews the running mock preview and DATE icon scenarios in acceptance-handoff-r3.md, then records a visual/workflow decision.",
   "workingTreeCandidate": {
     "baseSha": "f7f60bc3778bf307d15671666551fa10864b79fd",
     "path": "/Users/vup/Documents/coopfood-kph",
@@ -138,7 +138,7 @@
   ],
   "executor": {
     "model": "gpt-6-luna",
-    "status": "in_progress",
+    "status": "completed",
     "agentId": "/root/luna_date_icon_repair",
     "reasoningEffort": "inherit configured setting; no explicit effort requested",
     "ownership": "single writer, bounded DATE icon repair",
@@ -151,7 +151,7 @@
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r2.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r3.md",
   "handoff": "docs/delivery/figma-mobile-implementation/luna-6-handoff.md",
   "executionAuthorization": {
     "date": "2026-10-07",
