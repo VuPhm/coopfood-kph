@@ -2,7 +2,7 @@
 
 09/10/2026. Branch `store-app/qa-20261009-sheet-focus`, worktree
 `/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`.
-Candidate in [plan](plan.json). Preview: [Tra hạn lùi](http://127.0.0.1:5177/#shelf).
+Candidate `3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a` in [plan](plan.json). Preview: [Tra hạn lùi](http://127.0.0.1:5177/#shelf).
 All r7 UI repairs and the r8 result card remain integrated.
 
 ## Changes to inspect

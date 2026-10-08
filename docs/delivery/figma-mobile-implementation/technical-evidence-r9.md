@@ -3,7 +3,7 @@
 09/10/2026. Owner “tiếp” continues the authorized QA/repair after the r8 integration.
 Same cycle/branch `store-app/qa-20261009-sheet-focus`, worktree
 `/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`, sole writer /root.
-Base `8a3942d9130440a0f26e0386fec343b7feb2887b`; candidate is in [plan](plan.json).
+Base `8a3942d9130440a0f26e0386fec343b7feb2887b`; candidate `3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a` is in [plan](plan.json).
 Prior acceptance record is preserved in `plan-r8.json`; owner acceptance remains pending.
 
 ## Reproduction and repair

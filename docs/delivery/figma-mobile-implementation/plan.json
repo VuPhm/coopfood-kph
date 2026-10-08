@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 9,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Repair three reproduced shelf form defects: duration/anchor coherence, silent numeric mutation and accessible field validation; preserve the integrated r8 result/UI.",
   "inScope": [
     "Keep explicit day/month duration when entering or editing its anchor, across known/unknown NSX mode",
@@ -18,7 +18,7 @@
     "New UI redesign or unrelated interaction audit; shared CalendarInput/Pilot behavior changes"
   ],
   "baseSha": "8a3942d9130440a0f26e0386fec343b7feb2887b",
-  "candidateSha": "",
+  "candidateSha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
   "integrationOwner": "/root — sole writer integrating the source snapshot into the isolated UI worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-shelf-life.tsx",
@@ -36,55 +36,55 @@
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 9,
-      "sha": "",
-      "evidence": ""
+      "sha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r9.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 9,
-      "sha": "",
-      "evidence": ""
+      "sha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r9.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 9,
-      "sha": "",
-      "evidence": ""
+      "sha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r9.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 9,
-      "sha": "",
-      "evidence": ""
+      "sha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r9.md"
     },
     {
       "id": "shelf-result-reference",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 9,
-      "sha": "",
-      "evidence": ""
+      "sha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r9.md"
     },
     {
       "id": "shelf-input-coherence",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 9,
-      "sha": "",
-      "evidence": ""
+      "sha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r9.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
@@ -92,8 +92,8 @@
       "required": true,
       "status": "pending",
       "revision": 9,
-      "sha": "",
-      "evidence": ""
+      "sha": "3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a",
+      "evidence": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r9.md"
     }
   ],
   "changes": [
@@ -159,12 +159,12 @@
   "workingTreeCandidate": {
     "baseSha": "8a3942d9130440a0f26e0386fec343b7feb2887b",
     "path": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
-    "note": "r9 shelf input repair working tree; candidate to record after checks."
+    "note": "r9 candidate 3e6f763cf88a4b5bc19ae90c204f2d8441e85b9a; later commits only finalize cycle ledger."
   },
   "conditionalIntegratorPaths": [],
   "executor": {
     "agentId": "/root",
-    "status": "technical review complete; preparing r9 candidate",
+    "status": "r9 technical verification complete; owner acceptance pending",
     "ownership": "sole writer; combined UI/shelf scope",
     "worktree": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
     "branch": "store-app/qa-20261009-sheet-focus"
