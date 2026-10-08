@@ -59,3 +59,11 @@ build. No backend/security/hardware claim, no owner sign-off, merge/push/deploy 
 Pages cutover. Original worktree belongs to another task; no writes were made there.
 The shelf result draft remains that task's responsibility. Integration of shared CSS
 across branches needs owner review. See [owner handoff](acceptance-handoff-r7.md).
+
+## Delivery record check
+
+At documentation checkpoint `3a829b7`,
+`node tooling/skills/delivery-cycle/scripts/cycle.mjs check --repo /Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph --plan docs/delivery/figma-mobile-implementation/plan.json --phase acceptance`
+returned exit 0: `PASS acceptance: figma-mobile-implementation revision 7.`
+This checks clean candidate/evidence consistency; it is not owner sign-off.
+Application code is unchanged from `0a9b933` after that checkpoint.
