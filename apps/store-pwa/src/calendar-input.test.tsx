@@ -44,10 +44,33 @@ describe("CalendarInput", () => {
     expect(trigger).toHaveFocus();
   });
 
+  it("keeps the default Lucide trigger for consumers without a presentation icon", () => {
+    render(<CalendarInputHarness />);
+    expect(screen.getByRole("button", { name: "Chọn ngày xử lý" }).querySelector(".lucide-calendar-days")).not.toBeNull();
+  });
+
   it("keeps business dates read-only", () => {
     render(<CalendarInput id="detected" initialMonth="2026-10-06" label="Ngày phát hiện" value="06/10/2026" readOnly onValueChange={vi.fn()} />);
     expect(screen.getByRole("textbox")).toHaveAttribute("readonly");
     expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeDisabled();
+  });
+
+  it("renders an optional presentation icon without changing the disabled read-only trigger", () => {
+    render(<CalendarInput id="detected" initialMonth="2026-10-06" label="Ngày phát hiện" value="06/10/2026" readOnly icon={<img data-kph-calendar-icon="detected" src="/figma/53ca5deb-573f-4e33-b1ac-9da7f1bdb528.svg" alt="" />} onValueChange={vi.fn()} />);
+    const trigger = screen.getByRole("button", { name: "Chọn ngày phát hiện" });
+    expect(trigger).toBeDisabled();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger.querySelector('img[data-kph-calendar-icon="detected"]')).toHaveAttribute("src", "/figma/53ca5deb-573f-4e33-b1ac-9da7f1bdb528.svg");
+  });
+
+  it("closes the picker on Escape and restores focus to the trigger", () => {
+    render(<CalendarInputHarness />);
+    const trigger = screen.getByRole("button", { name: "Chọn ngày xử lý" });
+    fireEvent.click(trigger);
+    expect(screen.getByRole("dialog", { name: "Lịch chọn ngày" })).toBeInTheDocument();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Lịch chọn ngày" })).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
   });
   it("portals above clipped forms and follows its anchor while the form scrolls", async () => {
     render(<CalendarInputHarness />);

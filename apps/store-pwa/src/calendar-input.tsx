@@ -1,7 +1,7 @@
 import { addDays, addMonths, formatDisplayDate, parseDisplayDate, type LocalDate } from "@coopfood-kph/kph-rules";
 import { DismissableLayerBranch, Input, cn } from "@coopfood-kph/ui";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 
 function formatDateEntry(value: string) {
@@ -30,6 +30,7 @@ function firstDayOfMonth(value: LocalDate): LocalDate {
 
 type CalendarInputProps = {
   ariaDescribedBy?: string;
+  icon?: ReactNode;
   id: string;
   initialMonth: LocalDate;
   invalid?: boolean;
@@ -42,7 +43,7 @@ type CalendarInputProps = {
 
 type CalendarPosition = Pick<CSSProperties, "left" | "top">;
 
-export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, label, onValueChange, placeholder = "dd/mm/yyyy", readOnly, value }: CalendarInputProps) {
+export function CalendarInput({ ariaDescribedBy, icon, id, initialMonth, invalid, label, onValueChange, placeholder = "dd/mm/yyyy", readOnly, value }: CalendarInputProps) {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<LocalDate>(firstDayOfMonth(initialMonth));
   const [position, setPosition] = useState<CalendarPosition | null>(null);
@@ -145,7 +146,7 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
         onClick={toggleCalendar}
         disabled={readOnly}
       >
-        <CalendarDays size={18} aria-hidden="true" />
+        {icon ?? <CalendarDays size={18} aria-hidden="true" />}
       </button>
       {open && typeof document !== "undefined"
         ? createPortal(

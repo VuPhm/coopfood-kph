@@ -197,6 +197,8 @@
 .store-create-screen input[readonly] { background: var(--cf-color-surface-muted) !important; }
 .store-create-screen .field-input-action { color: var(--cf-color-brand); }
 .store-create-screen .field-input-action img { display: block; }
+.store-create-screen .expiry-calendar-trigger > img[data-kph-calendar-icon] { width: 20px; height: 20px; }
+.store-create-screen .expiry-calendar-trigger:disabled:has([data-kph-calendar-icon="detected"]) { opacity: 1; }
 .store-create-screen textarea { min-height: 96px; }
 .store-create-screen .unit-options { height: 44px; gap: 4px; border: 0; border-radius: 14px; padding: 4px; background: var(--cf-color-surface-muted); }
 .store-create-screen .unit-options label { min-width: 64px; }

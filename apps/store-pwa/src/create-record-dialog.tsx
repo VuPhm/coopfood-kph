@@ -442,7 +442,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
             <FormSection number="1" title={screenPresentation ? "Hàng hóa" : "Thông tin phát hiện"}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
-                  <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} readOnly onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
+                  <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} readOnly icon={screenPresentation ? <img data-kph-calendar-icon="detected" src={figmaAsset(assetScreen, "imgFeatherCalendar")} alt="" /> : undefined} onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
@@ -490,7 +490,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
               <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} assetScreen={screenPresentation ? assetScreen : undefined} />
               {selectedResolution === "OTHER" ? <Field className="mt-3" label="Nội dung biện pháp khác" htmlFor="resolution-detail" error={errors.resolutionDetail?.message}><Input id="resolution-detail" placeholder="Để trống sẽ giữ nhãn “KHÁC”" {...register("resolutionDetail")} /></Field> : null}
               <Field className="mt-3" label="Ngày xử lý (nếu có)" htmlFor="treatment-date" error={errors.treatmentDate?.message}>
-                <CalendarInput id="treatment-date" initialMonth={initialMonth} label="Ngày xử lý (nếu có)" value={treatmentDate} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
+                <CalendarInput id="treatment-date" initialMonth={initialMonth} label="Ngày xử lý (nếu có)" value={treatmentDate} icon={screenPresentation ? <img data-kph-calendar-icon="treatment" src={figmaAsset(assetScreen, "imgFeatherCalendar1")} alt="" /> : undefined} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
               </Field>
             </FormSection>
 
