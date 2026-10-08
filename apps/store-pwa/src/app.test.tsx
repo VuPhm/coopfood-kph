@@ -21,6 +21,26 @@ describe("Store workspace", () => {
     expect(screen.getByRole("button", { name: /Tạo phiếu TP tươi sống/i })).toBeVisible();
   });
 
+  it("keeps the create draft on reopen and resets the options when changing food kind", () => {
+    render(<App />);
+    const openDry = () => fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i }));
+    const close = () => fireEvent.click(screen.getByRole("button", { name: "Đóng" }));
+
+    openDry();
+    fireEvent.change(screen.getByLabelText("Nhà cung cấp"), { target: { value: "NCC thử nghiệm" } });
+    close();
+    openDry();
+    expect(screen.getByLabelText("Nhà cung cấp")).toHaveValue("NCC thử nghiệm");
+    expect(screen.getByRole("radio", { name: "Cận date" })).toBeChecked();
+
+    close();
+    fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP tươi sống/i }));
+    expect(screen.getByLabelText("Nhà cung cấp")).toHaveValue("");
+    expect(screen.getByRole("radio", { name: "Dập úng" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "kg" })).not.toBeChecked();
+    expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+  });
+
   it("opens the store context and saves the required store settings", async () => {
     render(<App />);
     const trigger = screen.getByRole("button", { name: /Thiết lập cửa hàng: Chưa thiết lập cửa hàng/i });
@@ -59,6 +79,9 @@ describe("Store workspace", () => {
     const updated = screen.getByRole("button", { name: /Thiết lập cửa hàng: Co\.op Food Cống Quỳnh · 0123/i });
     expect(within(updated).getByText("Trần An · Nhân viên · NV-08")).toBeVisible();
     expect(within(updated).getByText("Co.op Food Cống Quỳnh · 0123")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: /Tạo phiếu TP khô & khác/i }));
+    expect(await screen.findByRole("textbox", { name: /Tên người nhập/i })).toHaveValue("Trần An");
   });
 
 

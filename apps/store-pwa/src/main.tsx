@@ -12,12 +12,14 @@ const queryClient = new QueryClient({
 });
 
 document.addEventListener("keydown", (event) => {
-  if (!event.altKey && !event.ctrlKey && !event.metaKey) {
+  if (!event.altKey && !event.ctrlKey && !event.metaKey && document.documentElement.dataset.focusModality !== "keyboard") {
     document.documentElement.dataset.focusModality = "keyboard";
   }
 }, true);
 document.addEventListener("pointerdown", () => {
-  delete document.documentElement.dataset.focusModality;
+  if (document.documentElement.dataset.focusModality !== undefined) {
+    delete document.documentElement.dataset.focusModality;
+  }
 }, true);
 
 createRoot(document.getElementById("root")!).render(

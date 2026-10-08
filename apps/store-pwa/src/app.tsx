@@ -119,11 +119,33 @@ function sortValue(record: DemoRecord, key: RecordSortKey, approvalStatus: DemoA
   }
 }
 
+// Keep dialog interaction updates from rendering the history workspace again.
+function KphCreateActions({ disabled, profile, onSaved }: {
+  disabled: boolean;
+  profile: StoreProfile;
+  onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
+}) {
+  const [kind, setKind] = useState<KphKind | null>(null);
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
+        {kphKinds.map((nextKind) => (
+          <button key={nextKind} type="button" disabled={disabled} className={cn("workspace-create", nextKind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => { setKind(nextKind); setOpen(true); }}>
+            {nextKind === "TPCN" ? <PackagePlus aria-hidden="true" /> : <Salad aria-hidden="true" />}
+            <span><small>Tạo phiếu</small>{kindCopy[nextKind].action}</span>
+          </button>
+        ))}
+      </div>
+      <CreateRecordDialog kind={kind} open={open} profile={profile} onOpenChange={setOpen} onSaved={onSaved} />
+    </>
+  );
+}
+
 export function App() {
   const [records, setRecords] = useState<readonly DemoRecord[]>(initialRecords);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
-  const [createKind, setCreateKind] = useState<KphKind | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [expandedMobileRecords, setExpandedMobileRecords] = useState<ReadonlySet<string>>(new Set());
   const [approvalByRecord, setApprovalByRecord] = useState<Record<string, DemoApprovalStatus>>(() => initialApproval);
@@ -213,11 +235,6 @@ export function App() {
       window.removeEventListener("kph-storage-terminated", handleStorageFailure);
     };
   }, []);
-
-  function openCreate(kind: KphKind) {
-    setCreateKind(kind);
-    setDialogOpen(true);
-  }
 
   async function saveStoreSettings(profile: StoreProfile) {
     try {
@@ -487,14 +504,7 @@ export function App() {
               <p id="workspace-title">Phiếu theo dõi hàng không phù hợp</p>
             </div>
 
-            <div className="workspace-actions" aria-label="Tạo phiếu theo loại thực phẩm">
-              {kphKinds.map((kind) => (
-                <button key={kind} type="button" disabled={!storageReady} className={cn("workspace-create", kind === "TPCN" ? "workspace-create-tpcn" : "workspace-create-tpts")} onClick={() => openCreate(kind)}>
-                  {kind === "TPCN" ? <PackagePlus aria-hidden="true" /> : <Salad aria-hidden="true" />}
-                  <span><small>Tạo phiếu</small>{kindCopy[kind].action}</span>
-                </button>
-              ))}
-            </div>
+            <KphCreateActions disabled={!storageReady} profile={storeProfile} onSaved={saveCreatedRecord} />
 
             <button
               type="button"
@@ -624,7 +634,6 @@ export function App() {
         </div>
       </main>
 
-      <CreateRecordDialog kind={createKind} open={dialogOpen} profile={storeProfile} onOpenChange={setDialogOpen} onSaved={saveCreatedRecord} />
       <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} />
 
       <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>
