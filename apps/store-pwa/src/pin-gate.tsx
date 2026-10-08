@@ -107,6 +107,8 @@ export function PinGate({ children }: PinGateProps) {
         <img
           className="pin-lock-logo"
           src={assetUrl("/brand/logo-coopfood-light.webp")}
+          fetchPriority="high"
+          loading="eager"
           alt="Co.op Food — an toàn, tiện lợi, tươi ngon"
           width={640}
           height={314}
