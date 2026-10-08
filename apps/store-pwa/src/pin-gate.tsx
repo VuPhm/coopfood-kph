@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import { assetUrl } from "./asset-url";
 import { effectivePilotPin, loadPilotPinState, recoverPilotPinWithPreviousPin } from "./pin-state";
 import { loadPilotStoreProfile } from "./store-profile";
+import { startStoreUsageTracking } from "./usage-telemetry";
 
 type PinGateProps = { children: ReactNode };
 type PinScreen = "login" | "recovery";
@@ -35,6 +36,7 @@ export function PinGate({ children }: PinGateProps) {
       if (candidatePin === effectivePilotPin(pinState, profile.storeCode)) {
         setPin("");
         setUnlocked(true);
+        startStoreUsageTracking(profile.storeCode);
         didUnlock = true;
         return;
       }
