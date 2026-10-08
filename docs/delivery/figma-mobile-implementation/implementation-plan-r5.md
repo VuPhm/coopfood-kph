@@ -1,6 +1,6 @@
 # QA repair plan — revision 5
 
-Owner request on 2026-10-08: “dùng kết quả này cho 1 round sửa”. Resume the existing cycle on `store-app/figma-mobile-implementation`, worktree `/Users/vup/Documents/coopfood-kph`, reviewed base `ecebee861a32d91ce113727d92cb20fbb9a06a83`. Sole writer `/root`, no delegated agents. One bounded implementation/review round. Revision 4 remains historical in `plan-r4.json` and its original evidence; affected gates are pending for revision 5.
+Owner request on 2026-10-08: “dùng kết quả này cho 1 round sửa”. Resume the existing cycle on `store-app/figma-mobile-implementation`, worktree `/Users/vup/Documents/coopfood-kph`, reviewed base `ecebee861a32d91ce113727d92cb20fbb9a06a83`. Sole writer `/root`, no delegated agents. One bounded implementation/review round. Revision 4 remains historical in `plan-r4.json` and its original evidence; affected gates were invalidated before implementation and are now re-recorded against the revision 5 candidate.
 
 Repair the five P2 findings from the preceding QA: duplicate mock IDs, DATE state/count lost across navigation, mobile DATE backwards transition, quick utility leaking routes/duplicate IDs, and scanned barcode mislabeled as SKU. Also repair two bounded P3 findings: fixture-specific product metadata and expanded hit areas. Synchronize the aggregate browser gate with exact render geometry in r3/r4 manifests, retaining its workflow assertions.
 

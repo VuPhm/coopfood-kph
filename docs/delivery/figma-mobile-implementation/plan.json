@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 5,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Repair the findings from the 2026-10-08 UI QA round on the existing memory-only Store App preview; preserve business/API boundaries and prepare owner acceptance.",
   "inScope": [
     "Unique KPH mock record IDs; isolated selection/review/export",
@@ -21,7 +21,7 @@
     "Merge/push/deploy or protected Pages cutover; DATE add-following workflow without design"
   ],
   "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
-  "candidateSha": "",
+  "candidateSha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
   "integrationOwner": "/root — sole writer for the owner-authorized QA repair round",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -47,44 +47,44 @@
     "docs/NEXT.md"
   ],
   "reviewLimit": 1,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
@@ -92,8 +92,8 @@
       "required": true,
       "status": "pending",
       "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r5.md"
     }
   ],
   "changes": [
@@ -127,11 +127,11 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Implement the bounded QA repairs and rerun focused regressions plus integrated technical gates.",
+  "nextAction": "Owner reviews the revision 5 preview scenarios and records visual/workflow acceptance or a concrete finding; stop this bounded repair round.",
   "workingTreeCandidate": {
     "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Revision 5 working tree; candidate SHA will be recorded after the scoped implementation commit."
+    "note": "Candidate committed and verified; only this cycle record may advance for evidence/sign-off."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -141,7 +141,7 @@
   ],
   "executor": {
     "agentId": "/root",
-    "status": "executing",
+    "status": "completed",
     "ownership": "sole writer, one QA repair round",
     "worktree": "/Users/vup/Documents/coopfood-kph",
     "branch": "store-app/figma-mobile-implementation"

@@ -1,6 +1,6 @@
 # Bàn giao round sửa QA — revision 5
 
-Ngày 08/10/2026, theo yêu cầu owner “dùng kết quả này cho 1 round sửa”. Preview mock: <http://127.0.0.1:5175/>. Candidate SHA được ghi tại [plan](plan.json); [evidence](technical-evidence-r5.md) ghi kiểm chứng. Technical readiness đạt; owner acceptance vẫn pending.
+Ngày 08/10/2026, theo yêu cầu owner “dùng kết quả này cho 1 round sửa”. Preview mock: <http://127.0.0.1:5175/>. Candidate `ef80ed0cfb1a141d30e3e036483dcd0b3312897f` được ghi tại [plan](plan.json); [evidence](technical-evidence-r5.md) ghi kiểm chứng. Technical readiness đạt; owner acceptance vẫn pending.
 
 Đã sửa 5 P2 và 2 P3 trong QA, cùng lỗi CTA Tra cứu thấy khi rà screenshot cuối. Các file ứng dụng thay đổi thuộc StoreApp/mock, KPH workspace/create draft/record view, DATE workspace, shelf utility, lookup và scoped CSS; bổ sung regression tests và hai browser scripts. Không đổi API, backend, contract, dependency hoặc packages/ui.
 
