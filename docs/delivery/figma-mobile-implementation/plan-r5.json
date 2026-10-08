@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "id": "figma-mobile-implementation",
+  "revision": 5,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Repair the findings from the 2026-10-08 UI QA round on the existing memory-only Store App preview; preserve business/API boundaries and prepare owner acceptance.",
+  "inScope": [
+    "Unique KPH mock record IDs; isolated selection/review/export",
+    "DATE state retained in StoreApp for the session and shared with Home; consistent mobile/desktop transition guards",
+    "Close quick shelf utility on route changes; unique field IDs per ShelfLifeScreen instance",
+    "Preserve catalog SKU separately from scanned barcode in mock KPH records; search both identifiers",
+    "Fixture-specific lookup metadata; expanded hit areas without changing Figma visual sizes; repair the pre-existing Lookup CTA visibility defect exposed during the same scoped visual check",
+    "Refresh browser asset expectations from r3/r4; focused regressions, npm run verify and Playwright at 390×844 / 1440×1024",
+    "Revision 5 evidence and handoff; owner acceptance stays pending"
+  ],
+  "outOfScope": [
+    "Backend/OpenAPI/generated API/schema/migration/authorization changes",
+    "Production API wiring, DATE production workflow, real data, persistence/offline/sync",
+    "Figma writes or edits to accepted frames; UI DNA prototype",
+    "Admin redesign, unrelated online/Pilot refactor, new infrastructure",
+    "Merge/push/deploy or protected Pages cutover; DATE add-following workflow without design"
+  ],
+  "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
+  "candidateSha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+  "integrationOwner": "/root — sole writer for the owner-authorized QA repair round",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-app.tsx",
+    "apps/store-pwa/src/store-app.test.tsx",
+    "apps/store-pwa/src/store-app.css",
+    "apps/store-pwa/src/store-app-mock.ts",
+    "apps/store-pwa/src/store-kph-workspace.tsx",
+    "apps/store-pwa/src/store-kph-workspace.test.tsx",
+    "apps/store-pwa/src/store-shelf-life.tsx",
+    "apps/store-pwa/src/store-shelf-life.test.tsx",
+    "apps/store-pwa/src/store-date-workspace.tsx",
+    "apps/store-pwa/src/store-date-workspace.test.tsx",
+    "apps/store-pwa/src/store-lookup-workspace.tsx",
+    "apps/store-pwa/src/store-lookup-workspace.test.tsx",
+    "apps/store-pwa/src/record-view.ts",
+    "apps/store-pwa/src/create-record-dialog.tsx",
+    "apps/store-pwa/src/create-record-dialog.test.tsx",
+    "apps/store-pwa/src/store-create-review.test.tsx",
+    "e2e/scripts/check-figma-mobile.cjs",
+    "e2e/scripts/check-store-qa-repairs.cjs",
+    "docs/delivery/figma-mobile-implementation/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md"
+  ],
+  "reviewLimit": 1,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "workspace-integrity",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 5,
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
+    },
+    {
+      "id": "workflow-semantics",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 5,
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
+    },
+    {
+      "id": "mobile-desktop-visual-interaction",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 5,
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
+    },
+    {
+      "id": "responsive-assets",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 5,
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
+    },
+    {
+      "id": "owner-mobile-desktop-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 5,
+      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+      "evidence": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r5.md"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Review Figma hiện tại và lên kế hoạch chi tiết để sau đó cho Luna 6 implement; owner chọn mobile + desktop, giữ mock.",
+      "source": "User request and explicit scope reply in current chat, 2026-10-07",
+      "impact": "Thêm desktop-native composition, mobile theme/detail/quick utility và mock Lookup; toàn bộ gate UI revision 1 trở thành historical evidence.",
+      "decision": "Chỉ lập kế hoạch/handoff ở lượt này; giữ existing code, chuẩn bị checkpoint trước dispatch, không API wiring."
+    },
+    {
+      "revision": 3,
+      "request": "Repair the two DATE icons identified in fresh icon review, using the owner-confirmed Feather React set.",
+      "source": "Owner follow-up dated 2026-10-08 and consolidated read-only review finding; exact target re-read from Figma aEDpXtz0IiEkPiVucqjQ3Q node 21:144.",
+      "impact": "Invalidates revision 2 workspace-integrity, responsive-assets, and mobile-desktop-visual-interaction gates for source/geometry re-verification. Workflow semantics are unchanged because the existing input, scanner action and labels remain intact; all technical gates will be re-recorded against the revision 3 candidate. Owner gate remains pending.",
+      "decision": "Keep same branch and worktree with one writer. Change only DATE search/scan icon callsites, scoped CSS, asset manifest/responsive assertions, and cycle evidence. Reuse the exact existing local Feather Search and Maximize exports after checking matching Figma master geometry; do not add dependencies or modify other Lucide consumers."
+    },
+    {
+      "revision": 4,
+      "request": "Continue the UI loop after the Feather React clarification and repair the confirmed KPH calendar trigger mismatch.",
+      "source": "Owner says ‘tiếp tục’ on 2026-10-08; bounded fresh control-icon review; exact mobile nodes 203:701/203:847 and desktop nodes 384:1072/540:1685 re-read.",
+      "impact": "Invalidates all revision 3 technical gates until screen-specific assets, read-only behavior, picker interactions, and integrated checks are reverified on the new candidate. Revision 3 evidence/manifests remain historical and unchanged; owner acceptance remains pending.",
+      "decision": "Preserve CalendarInput default icon for all existing consumers. Add an optional icon presentation prop and pass exact KPH detected-date and treatment-date assets only for screenPresentation. No Figma writes, shared UI or dependency changes."
+    },
+    {
+      "revision": 5,
+      "request": "dùng kết quả này cho 1 round sửa",
+      "source": "Owner in current chat, 2026-10-08, following the completed UI QA report at .local/qa-ui-2026-10-08/report.md",
+      "impact": "Invalidates revision 4 technical gates: record identity, DATE/session state, identifiers, route behavior, hit areas and aggregate browser expectations change. Prior evidence remains historical; owner acceptance is pending.",
+      "decision": "One root writer on the existing branch/worktree. Repair all five P2 findings, two bounded P3 findings and stale asset expectations. No delegation, API/schema/dependency/shared UI change, Figma writes, merge/push/deploy. The same-round Lookup screenshot review also repairs the existing clipped/white-on-white submit CTA using frame 384:514."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner reviews the revision 5 preview scenarios and records visual/workflow acceptance or a concrete finding; stop this bounded repair round.",
+  "workingTreeCandidate": {
+    "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
+    "path": "/Users/vup/Documents/coopfood-kph",
+    "note": "Candidate committed and verified; only this cycle record may advance for evidence/sign-off."
+  },
+  "conditionalIntegratorPaths": [
+    "packages/ui/package.json",
+    "apps/store-pwa/src/main.tsx",
+    "apps/store-pwa/src/styles.css",
+    "apps/store-pwa/vite.config.ts"
+  ],
+  "executor": {
+    "agentId": "/root",
+    "status": "completed",
+    "ownership": "sole writer, one QA repair round",
+    "worktree": "/Users/vup/Documents/coopfood-kph",
+    "branch": "store-app/figma-mobile-implementation"
+  },
+  "readiness": {
+    "planningComplete": true,
+    "dispatchReady": true,
+    "requiredBeforeDispatch": []
+  },
+  "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r5.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r5.md",
+  "executionAuthorization": {
+    "date": "2026-10-08",
+    "source": "Owner: dùng kết quả này cho 1 round sửa",
+    "mode": "single writer on existing task branch/worktree",
+    "checkpoint": "ecebee861a32d91ce113727d92cb20fbb9a06a83"
+  }
+}
