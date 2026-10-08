@@ -330,4 +330,47 @@ describe("Create KPH record", () => {
         photos: [expect.objectContaining({ fileName: "evidence.jpg", blob: stampedBlob })],
       })));
   });
+
+  it.each([
+    ["TPTS", "0.25", 0.25, "kg"],
+    ["TPTS", "0,25", 0.25, "kg"],
+    ["TPTS", "1.234", 1.234, "kg"],
+    ["TPTS", "1,234", 1.234, "kg"],
+    ["TPTS", ",5", 0.5, "kg"],
+    ["TPCN", "0,25", 0.25, "EA"],
+  ] as const)("corrects a quantity error and saves %s input %s as number %s", async (kind, input, expected, unit) => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:decimal-photo") });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
+    vi.mocked(processEvidencePhoto).mockResolvedValue({
+      blob: new Blob(["stamped"], { type: "image/jpeg" }),
+      capturedAt: new Date(), width: 1280, height: 720,
+    });
+    const onSaved = renderDialog(kind);
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Sản phẩm kiểm thử thập phân" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Nhân viên kiểm thử" } });
+    const quantity = screen.getByRole("textbox", { name: "Số lượng" });
+    fireEvent.change(quantity, { target: { value: "0" } });
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    expect(await screen.findByText("Số lượng phải lớn hơn 0")).toBeVisible();
+
+    fireEvent.change(quantity, { target: { value: input } });
+    fireEvent.click(screen.getByRole("radio", { name: unit }));
+    const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
+    fireEvent.change(picker!, { target: { files: [new File(["original"], "decimal.jpg", { type: "image/jpeg" })] } });
+    expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
+    await waitFor(() => expect(screen.queryByText("Số lượng phải lớn hơn 0")).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ kind, quantity: expected, unit })));
+    expect(onSaved).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["0,000", "-0,25", "1,2.3", "1,2,3", "1kg", "Infinity"])("rejects invalid TPTS quantity %s without saving", async (input) => {
+    const onSaved = renderDialog("TPTS");
+    fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: input } });
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+
+    expect(await screen.findByText("Số lượng phải lớn hơn 0")).toBeVisible();
+    expect(onSaved).not.toHaveBeenCalled();
+  });
 });

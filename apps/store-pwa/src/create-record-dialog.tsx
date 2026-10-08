@@ -37,6 +37,7 @@ import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { parseFreshFoodWeightKg } from "./fresh-food-weight";
+import { parsePositiveQuantity } from "./quantity-input";
 import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 import { primeScanSuccessSound } from "./scanner-sound";
@@ -56,7 +57,14 @@ const schema = z.object({
   barcode: z.string().max(50, "SKU/UPC tối đa 50 ký tự"),
   supplier: z.string().max(150, "Nhà cung cấp tối đa 150 ký tự"),
   productName: z.string().max(200, "Tên hàng hóa tối đa 200 ký tự"),
-  quantity: z.string().refine((value) => Number(value) > 0, "Số lượng phải lớn hơn 0"),
+  quantity: z.string().transform((value, context) => {
+    const quantity = parsePositiveQuantity(value);
+    if (quantity === null) {
+      context.addIssue({ code: "custom", message: "Số lượng phải lớn hơn 0" });
+      return z.NEVER;
+    }
+    return quantity;
+  }),
   unit: z.enum(["EA", "kg"]),
   condition: z.string().min(1),
   conditionDetail: z.string().max(255, "Nội dung tối đa 255 ký tự"),
@@ -70,7 +78,7 @@ const schema = z.object({
   path: ["productName"],
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.input<typeof schema>;
 type PhotoDraft = {
   id: string;
   fileName: string;
@@ -148,7 +156,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     setFocus,
     setValue,
     watch,
-  } = useForm<FormData>({
+  } = useForm<FormData, unknown, z.output<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues(activeKind, profile),
   });
@@ -236,7 +244,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         barcode: values.barcode.trim(),
         supplier: values.supplier.trim(),
         productName: values.productName.trim(),
-        quantity: Number(values.quantity),
+        quantity: values.quantity,
         unit: values.unit,
         condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
         resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
