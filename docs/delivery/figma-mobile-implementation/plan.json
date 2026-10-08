@@ -19,7 +19,7 @@
     "Merge/push/deploy or protected Pages cutover; DATE add-following workflow without design"
   ],
   "baseSha": "4031c62b985e3679efac11a52d9ee4df31b0cc47",
-  "candidateSha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+  "candidateSha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
   "integrationOwner": "GPT-6 Luna — sole implementation/integration writer after START; root standby for review/coordination",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -68,7 +68,7 @@
       "required": true,
       "status": "pass",
       "revision": 4,
-      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
@@ -77,7 +77,7 @@
       "required": true,
       "status": "pass",
       "revision": 4,
-      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
@@ -86,7 +86,7 @@
       "required": true,
       "status": "pass",
       "revision": 4,
-      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
@@ -95,7 +95,7 @@
       "required": true,
       "status": "pass",
       "revision": 4,
-      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
       "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
@@ -136,7 +136,7 @@
   "workingTreeCandidate": {
     "baseSha": "4031c62b985e3679efac11a52d9ee4df31b0cc47",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Code candidate committed as b60141da4e6b0574e0bfe5a5f6615eca8366a34e; subsequent changes are cycle ledger/evidence only."
+    "note": "Integrated cycle candidate d3685cb contains implementation commit b60141d plus documentation-only status/handoff changes; verification covers identical application code and the updated docs check."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",

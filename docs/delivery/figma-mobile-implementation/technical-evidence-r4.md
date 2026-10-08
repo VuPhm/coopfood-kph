@@ -1,6 +1,6 @@
 # Technical evidence — revision 4
 
-Date: 2026-10-08. Code candidate SHA: `b60141da4e6b0574e0bfe5a5f6615eca8366a34e`. Branch: `store-app/figma-mobile-implementation`. Worktree: `/Users/vup/Documents/coopfood-kph`. Reviewed checkpoint: `4031c62b985e3679efac11a52d9ee4df31b0cc47`.
+Date: 2026-10-08. Implementation code commit: `b60141da4e6b0574e0bfe5a5f6615eca8366a34e`. Integrated cycle candidate: `d3685cb028a4918bd7b1d6588b5cadc87b598b46` (this tree adds only delivery evidence/handoff and CURRENT_STATE/NEXT to the tested code). Branch: `store-app/figma-mobile-implementation`. Worktree: `/Users/vup/Documents/coopfood-kph`. Reviewed checkpoint: `4031c62b985e3679efac11a52d9ee4df31b0cc47`.
 
 ## KPH calendar fields and preserved behavior
 
@@ -13,10 +13,10 @@ Figma file `aEDpXtz0IiEkPiVucqjQ3Q` was re-read at mobile nodes `203:701` and `2
 
 ## Verification
 
-- `npm run verify` — PASS on code candidate `b60141d`: docs/contract checks, generated API drift, TypeScript checks, tests and production builds. Results: Admin 14 tests, Store PWA 143 tests / 20 files, API 2, KPH rules 19, UI 7. Existing non-fatal ExcelJS dynamic-import and large-chunk warnings remain.
+- `npm run verify` — PASS on implementation code commit `b60141d`: docs/contract checks, generated API drift, TypeScript checks, tests and production builds. Results: Admin 14 tests, Store PWA 143 tests / 20 files, API 2, KPH rules 19, UI 7. Existing non-fatal ExcelJS dynamic-import and large-chunk warnings remain.
 - `npm run test --workspace @coopfood-kph/store-pwa -- src/calendar-input.test.tsx src/create-record-dialog.test.tsx` — PASS, 27 tests.
 - `STORE_APP_URL=http://127.0.0.1:5175 node e2e/scripts/check-kph-calendar-icons.cjs` — PASS, headless Chromium at 390×844 and 1440×1024. Both TPCN/TPTS cases checked exact source filenames, SVG stroke colors, 20×20 rendered geometry, read-only/disabled detected date, accessible trigger labels, expanded state, picker selection, Escape closing, and focus restoration after Escape and selection.
-- `git diff --check` — PASS. The candidate commit is clean.
+- `npm run check:docs` — PASS after the CURRENT_STATE/NEXT and delivery ledger update. Comparing implementation commit `b60141d` with integrated cycle candidate `d3685cb` shows only documentation changes; application source and browser-check script are identical. `git diff --check` — PASS.
 
 Fresh viewport screenshots (captured without full-page background rows):
 
