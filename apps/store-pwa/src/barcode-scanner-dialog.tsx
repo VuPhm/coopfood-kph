@@ -1,3 +1,4 @@
+import { useDialogReturnFocus } from "./use-dialog-return-focus";
 import {
   Button,
   Dialog,
@@ -47,6 +48,7 @@ const SCAN_INTERVAL_MS = 100;
 const SUCCESS_FEEDBACK_MS = 450;
 
 export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation = "dialog" }: BarcodeScannerDialogProps) {
+  const returnFocus = useDialogReturnFocus(presentation === "screen");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const zxingReaderRef = useRef<BrowserMultiFormatReader | null>(null);
@@ -331,6 +333,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        {...returnFocus}
         className={`barcode-scanner-dialog-content max-w-lg p-0 overflow-hidden ${presentation === "screen" ? "store-scanner-screen" : ""}`}
         aria-describedby={descId}
         aria-labelledby={titleId}

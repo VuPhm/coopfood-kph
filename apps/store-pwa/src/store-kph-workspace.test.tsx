@@ -49,7 +49,7 @@ describe("Mock KPH history contract", () => {
     const record = { ...mockRecords[0]!, barcode: "29123415005" };
     render(<KphWorkspace records={[record]} onRecordsChange={vi.fn()} onNotice={vi.fn()} />);
     const search = screen.getByRole("textbox", { name: "Tìm tên hàng hoặc SKU" });
-    for (const identifier of ["0011730", "29123415005"]) {
+    for (const identifier of ["0011730", "29123415005", " 0011730 "]) {
       fireEvent.change(search, { target: { value: identifier } });
       expect(screen.getByText("1 phiếu")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Mở phiếu Cải thìa VietGAP 500 g" })).toBeInTheDocument();

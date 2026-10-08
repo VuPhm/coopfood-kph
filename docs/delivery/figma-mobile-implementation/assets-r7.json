@@ -1,0 +1,60 @@
+{
+  "source": "r7 Figma contexts 21:91, 21:144, 384:514 and existing verified Feather masters; reuse only, no asset byte changes",
+  "assets": [
+    {
+      "slot": "kph-search",
+      "node": "21:91 / existing 25:16 master",
+      "source": "figma/0d9947bc-6df8-489b-b0f1-4d3264da3d36.svg",
+      "path": "apps/store-pwa/src/store-kph-workspace.tsx",
+      "sha1": "b7961784f801532a97444191e2fb693ebd19243c",
+      "root": {
+        "width": 24,
+        "height": 24
+      },
+      "render": {
+        "width": 18,
+        "height": 18
+      },
+      "strokeWidth": 2,
+      "roleColor": "existing dark #1C261C export"
+    },
+    {
+      "slot": "lookup-search",
+      "node": "384:514 / 25:16",
+      "source": "figma/0d9947bc-6df8-489b-b0f1-4d3264da3d36.svg",
+      "path": "apps/store-pwa/src/store-lookup-workspace.tsx",
+      "sha1": "b7961784f801532a97444191e2fb693ebd19243c",
+      "root": {
+        "width": 24,
+        "height": 24
+      },
+      "render": {
+        "width": 18,
+        "height": 18
+      },
+      "strokeWidth": 2,
+      "roleColor": "existing dark #1C261C export"
+    },
+    {
+      "slot": "lookup-product",
+      "node": "384:598 / 25:24 FileText master",
+      "source": "figma/f1cc55ce-810f-4467-98f9-d444e648a218.svg",
+      "path": "apps/store-pwa/src/store-lookup-workspace.tsx",
+      "sha1": "35416b6011bdfb34d057980656710436d8c24c46",
+      "root": {
+        "width": 24,
+        "height": 24
+      },
+      "render": {
+        "width": 18,
+        "height": 18
+      },
+      "strokeWidth": 2,
+      "roleColor": "existing white export, consumer brightness(0) at .78 opacity on brand-soft",
+      "renderDesktop": {
+        "width": 16,
+        "height": 16
+      }
+    }
+  ]
+}

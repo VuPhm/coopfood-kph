@@ -1,49 +1,33 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 7,
-  "status": "VERIFYING",
-  "objective": "Audit and repair reproducible UI defects across Store App navigation, dialogs, KPH, DATE and lookup in the isolated worktree; preserve API/business and the other task’s shelf result scope.",
+  "revision": 6,
+  "status": "PLANNING",
+  "objective": "Prepare an isolated workspace and bounded repair plan for StoreSheet focus restoration after the 2026-10-09 QA finding. Setup only; implementation has not started.",
   "inScope": [
-    "Restore controlled StoreSheet and screen dialog focus across keyboard/pointer closes and nested layers",
-    "Repair route/dialog lifetime and quick utility Escape conflicts without losing an underlying draft",
-    "Audit DATE filters/search/status copy, lookup query/result coherence and name recovery",
-    "Repair confirmed mobile visual geometry against the exact Figma contexts; exclude shelf CSS selectors",
-    "Focused component and Playwright regressions at 390×844 / 1440×1024; integrated verify and two bounded review passes"
+    "Isolated setup from the clean revision 5 checkpoint, independent dependencies and preview",
+    "Future repair: restore opener focus after StoreSheet closes via Escape, close button or overlay; connected-node fallback when route removes opener",
+    "Future meaningful regression checks for account/filter/detail/export and nested calendar focus at 390×844 and 1440×1024",
+    "Revision 6 setup evidence; technical/owner repair gates remain pending"
   ],
   "outOfScope": [
-    "Other writer’s shelf result component/tests/reference/browser script and shelf CSS selectors",
-    "Backend/OpenAPI/generated schema, authorization, domain rules, production API wiring/persistence/Pilot changes",
-    "packages/ui and root config/lockfile/dependency changes",
-    "Figma writes or overwriting accepted frames; merge/push/deploy or Pages cutover"
+    "The other task’s uncommitted shelf result component/CSS/tests/script/reference",
+    "Changes to packages/ui, CSS, root config/lockfiles or dependencies",
+    "API/backend/authorization/Pilot/persistence/domain changes",
+    "Figma writes, broad UI redesign, scanner/create-dialog focus refactor",
+    "Implementation during this setup request; delegation, merge/push/deploy"
   ],
-  "baseSha": "b180484f7a2377020e5bf4e6354705948ee6382f",
+  "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
   "candidateSha": "",
   "integrationOwner": "/root — sole writer in the isolated StoreSheet focus worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
     "apps/store-pwa/src/store-app.test.tsx",
-    "apps/store-pwa/src/use-dialog-return-focus.ts",
-    "apps/store-pwa/src/use-dialog-return-focus.test.tsx",
-    "apps/store-pwa/src/store-app.css",
-    "apps/store-pwa/src/store-date-workspace.tsx",
-    "apps/store-pwa/src/store-date-workspace.test.tsx",
-    "apps/store-pwa/src/store-lookup-workspace.tsx",
-    "apps/store-pwa/src/store-lookup-workspace.test.tsx",
-    "apps/store-pwa/src/create-record-dialog.tsx",
-    "apps/store-pwa/src/barcode-scanner-dialog.tsx",
-    "apps/store-pwa/src/image-viewer.tsx",
-    "apps/store-pwa/src/store-kph-workspace.tsx",
-    "apps/store-pwa/src/store-kph-workspace.test.tsx",
     "e2e/scripts/check-store-sheet-focus.cjs",
-    "docs/delivery/figma-mobile-implementation/**",
-    "docs/CURRENT_STATE.md",
-    "docs/NEXT.md",
-    "e2e/scripts/check-figma-mobile.cjs",
-    "e2e/scripts/check-figma-responsive.cjs"
+    "docs/delivery/figma-mobile-implementation/**"
   ],
-  "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewLimit": 1,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
@@ -51,7 +35,7 @@
       "kind": "technical",
       "required": true,
       "status": "pending",
-      "revision": 7,
+      "revision": 6,
       "sha": "",
       "evidence": ""
     },
@@ -60,7 +44,7 @@
       "kind": "technical",
       "required": true,
       "status": "pending",
-      "revision": 7,
+      "revision": 6,
       "sha": "",
       "evidence": ""
     },
@@ -69,7 +53,7 @@
       "kind": "technical",
       "required": true,
       "status": "pending",
-      "revision": 7,
+      "revision": 6,
       "sha": "",
       "evidence": ""
     },
@@ -78,7 +62,7 @@
       "kind": "technical",
       "required": true,
       "status": "pending",
-      "revision": 7,
+      "revision": 6,
       "sha": "",
       "evidence": ""
     },
@@ -87,7 +71,7 @@
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 7,
+      "revision": 6,
       "sha": "",
       "evidence": ""
     }
@@ -127,27 +111,20 @@
       "source": "Owner in current chat, 2026-10-09; prior reply confirms another task is writing in the original worktree",
       "impact": "Isolated setup reopens the existing cycle as planning; revision 5 evidence stays historical, future focus repair gates must be rerun against its candidate.",
       "decision": "Create a separate task branch/worktree at the clean r5 checkpoint. Prepare dependencies, reproduction and a repair handoff only. Do not copy the other writer’s shelf draft or start implementation."
-    },
-    {
-      "revision": 7,
-      "request": "còn rất nhiều lỗi, cứ rà và sửa",
-      "source": "Owner in current chat, 2026-10-09",
-      "impact": "Expands setup-only scope into authorized audit/repair execution in the isolated worktree. All repair gates pending; r5/r6 evidence historical.",
-      "decision": "One writer, two bounded review passes. Fix reproducible interaction/visual defects on existing screens, keep the other task’s shelf scope excluded. No new team, API, dependency or Figma write."
     }
   ],
   "blockers": [],
-  "nextAction": "Reproduce defects, repair confirmed issues, verify two bounded review passes and prepare owner handoff.",
+  "nextAction": "Implement the bounded StoreSheet focus repair in this isolated worktree when the owner requests continuation; read relevant Figma context before code changes, then verify focused and integrated gates.",
   "workingTreeCandidate": {
-    "baseSha": "b180484f7a2377020e5bf4e6354705948ee6382f",
+    "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
     "path": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
-    "note": "Revision 7 audit/repair working tree; record candidate after checks."
+    "note": "Setup checkpoint only; no application change or implementation candidate."
   },
   "conditionalIntegratorPaths": [],
   "executor": {
     "agentId": "/root",
-    "status": "executing",
-    "ownership": "sole writer, broader UI defect scope with shelf excluded",
+    "status": "prepared",
+    "ownership": "sole future writer, StoreSheet focus scope only",
     "worktree": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
     "branch": "store-app/qa-20261009-sheet-focus"
   },
@@ -157,12 +134,12 @@
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/ui-repair-plan-r7.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r7.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/focus-repair-setup-r6.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/focus-repair-setup-r6.md",
   "executionAuthorization": {
     "date": "2026-10-09",
-    "source": "Owner: còn rất nhiều lỗi, cứ rà và sửa",
-    "mode": "audit and implement repairs in isolated worktree",
-    "checkpoint": "b180484f7a2377020e5bf4e6354705948ee6382f"
+    "source": "Owner: setup để sửa tiếp",
+    "mode": "setup only in an isolated worktree; no implementation/agent dispatch",
+    "checkpoint": "b1c772f4753ad13db1a7930a484ac7933b73b383"
   }
 }

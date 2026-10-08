@@ -1,3 +1,4 @@
+import { useDialogReturnFocus } from "./use-dialog-return-focus";
 import { Dialog, DialogContent, DialogTitle } from "@coopfood-kph/ui";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type SyntheticEvent } from "react";
 import { createPortal } from "react-dom";
@@ -13,11 +14,12 @@ const VIEWER_MAX_HEIGHT_REM = 54;
 const VIEWER_VIEWPORT_WIDTH_RATIO = 0.94;
 const VIEWER_VIEWPORT_HEIGHT_RATIO = 0.9;
 
-export function EvidenceImageViewer({ image, onOpenChange, open, presentation = "dialog", index = 0, total = 1, onPrevious, onNext, onRemove }: {
+export function EvidenceImageViewer({ image, onOpenChange, open, presentation = "dialog", restoreFocus = false, index = 0, total = 1, onPrevious, onNext, onRemove }: {
   image: ViewableEvidenceImage | null; onOpenChange: (open: boolean) => void; open: boolean;
-  presentation?: "dialog" | "screen"; index?: number; total?: number;
+  presentation?: "dialog" | "screen"; restoreFocus?: boolean; index?: number; total?: number;
   onPrevious?: (() => void) | undefined; onNext?: (() => void) | undefined; onRemove?: (() => void) | undefined;
 }) {
+  const returnFocus = useDialogReturnFocus(presentation === "screen" || restoreFocus);
   const [lens, setLens] = useState<LensState>(hiddenLens);
   const [frame, setFrame] = useState<{ height: number; width: number } | null>(null);
   const naturalSize = useRef<{ height: number; width: number } | null>(null);
@@ -94,7 +96,7 @@ export function EvidenceImageViewer({ image, onOpenChange, open, presentation = 
 
   return (
     <Dialog open={open} onOpenChange={(next) => { hideLens(); onOpenChange(next); }}>
-      <DialogContent className={`evidence-viewer-content ${presentation === "screen" ? "store-evidence-screen" : ""}`} style={presentation === "screen" ? undefined : frame ?? undefined} onPointerDownOutside={hideLens}>
+      <DialogContent {...returnFocus} className={`evidence-viewer-content ${presentation === "screen" ? "store-evidence-screen" : ""}`} style={presentation === "screen" ? undefined : frame ?? undefined} onPointerDownOutside={hideLens}>
         <DialogTitle className="sr-only">Xem ảnh minh chứng</DialogTitle>
         {presentation === "screen" ? <div className="store-viewer-header"><button aria-label="Đóng ảnh minh chứng" onClick={() => onOpenChange(false)}><img src={figmaAsset("215-1147", "imgCloseIcon")} alt="" /></button><div><strong>Ảnh minh chứng</strong><small>{index + 1} / {total}</small></div>{onRemove ? <button aria-label="Xóa ảnh đang xem" onClick={onRemove}><img src={figmaAsset("215-1147", "imgDeleteIcon")} alt="" /></button> : <span />}</div> : null}
         {image ? (

@@ -1,9 +1,10 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import * as mocks from "./store-app-mock";
 import { StoreLookupWorkspace } from "./store-lookup-workspace";
 
 describe("memory-only product and lot lookup", () => {
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
 
   it("keeps leading zero identifiers and displays the matched lot fixture", async () => {
     render(<StoreLookupWorkspace />);
@@ -46,5 +47,38 @@ describe("memory-only product and lot lookup", () => {
     fireEvent.change(input, { target: { value: "0000000000000" } });
     fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Chưa thể tra cứu danh mục"));
+  });
+
+  it("resolves a unique partial product name and clears its result when editing", async () => {
+    render(<StoreLookupWorkspace />);
+    const input = screen.getByRole("textbox", { name: "Mã hàng, tên hàng hoặc lô" });
+    fireEvent.change(input, { target: { value: " bánh quy " } });
+    fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
+    await screen.findByRole("heading", { name: "Bánh quy bơ hộp 300 g" });
+    fireEvent.change(input, { target: { value: "0011730" } });
+    expect(screen.queryByRole("heading", { name: "Bánh quy bơ hộp 300 g" })).not.toBeInTheDocument();
+  });
+
+  it("ignores a delayed lookup response after the query changes", async () => {
+    let finish!: (result: Awaited<ReturnType<typeof mocks.mockBarcodeLookup>>) => void;
+    vi.spyOn(mocks, "mockBarcodeLookup").mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    render(<StoreLookupWorkspace />);
+    const input = screen.getByRole("textbox", { name: "Mã hàng, tên hàng hoặc lô" });
+    fireEvent.change(input, { target: { value: "old-code" } });
+    fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
+    fireEvent.change(input, { target: { value: "0011730" } });
+    fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
+    await screen.findByRole("heading", { name: "Cải thìa VietGAP 500 g" });
+    await act(async () => { finish({ status: "NOT_FOUND", barcode: "old-code" }); });
+    expect(screen.getByRole("heading", { name: "Cải thìa VietGAP 500 g" })).toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("asks for a precise identifier when a name matches multiple fixtures", async () => {
+    render(<StoreLookupWorkspace />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Mã hàng, tên hàng hoặc lô" }), { target: { value: "g" } });
+    fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("khớp nhiều sản phẩm"));
+    expect(document.querySelector(".store-lookup-product")).toBeNull();
   });
 });

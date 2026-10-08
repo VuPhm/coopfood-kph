@@ -1,22 +1,25 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-10-08
+Cập nhật: 2026-10-09
 
-## Figma implementation — revision 5 chờ nghiệm thu
+## UI repair — revision 7 chờ nghiệm thu
 
-Cycle `figma-mobile-implementation` đang AWAITING_ACCEPTANCE revision 5 trên
-`store-app/figma-mobile-implementation`. Đã sửa các lỗi QA về chọn/duyệt/xuất
-KPH, giữ state DATE trong phiên và guard hai viewport, panel hạn lùi theo route,
-SKU/UPC, metadata fixture và vùng bấm mobile; CTA Tra cứu hiển thị rõ theo frame.
-`npm run verify` PASS 193 tests/build và ba gate Playwright ở
-390×844 / 1440×1024 PASS. Candidate SHA nằm trong plan; owner acceptance pending.
+Cycle `figma-mobile-implementation` trên nhánh riêng
+`store-app/qa-20261009-sheet-focus` đã hoàn tất hai lượt rà/sửa. Technical PASS:
+205 tests/build, các luồng mock cũ và dialog/query/geometry mới, Playwright
+390×844 / 1440×1024 cùng 7 kích thước responsive. Candidate và gates ghi trong
+[plan](delivery/figma-mobile-implementation/plan.json); owner acceptance pending.
 
-Bước nhỏ tiếp theo: owner kiểm tra preview mock theo
-[handoff r5](delivery/figma-mobile-implementation/acceptance-handoff-r5.md),
-đặc biệt chọn một phiếu → xuất một phiếu, xử lý DATE → về Home → mở lại và
-phiếu mới giữ đúng SKU/UPC. [Evidence r5](delivery/figma-mobile-implementation/technical-evidence-r5.md)
-ghi lệnh, kết quả và giới hạn. Round sửa này kết thúc tại handoff; chưa mở
-review/scope mới, API wiring, merge, deployment hay Pages cutover.
+Bước nhỏ tiếp theo: kiểm tra [preview mock](http://127.0.0.1:5177/) theo
+[handoff r7](delivery/figma-mobile-implementation/acceptance-handoff-r7.md),
+đặc biệt Escape ở các lớp, giữ draft, đổi route, sửa query và icon/CTA mobile.
+[Evidence r7](delivery/figma-mobile-implementation/technical-evidence-r7.md)
+ghi scope/lệnh/kết quả. Kết quả Tra hạn lùi của task khác vẫn ở worktree gốc;
+khi kết hợp hai nhánh cần review shared stylesheet. Chưa merge/push/deploy,
+Pages cutover, API wiring hoặc owner acceptance.
+
+Revision 5 và setup revision 6 được giữ như evidence lịch sử, không dùng thay
+cho kiểm tra trên candidate r7.
 
 ## Figma mobile implementation — evidence revision 1
 

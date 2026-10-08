@@ -1,6 +1,28 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-10-08
+Cập nhật: 2026-10-09
+
+## UI repair — revision 7 trên worktree riêng
+
+Theo yêu cầu owner “còn rất nhiều lỗi, cứ rà và sửa” ngày 09/10/2026, cycle
+`figma-mobile-implementation` tiếp tục trên `store-app/qa-20261009-sheet-focus`,
+worktree `/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph` từ checkpoint
+`b180484`. Preview mock riêng: <http://127.0.0.1:5177/>.
+
+Đã sửa focus khi đóng dialog, Escape giữa các lớp, giữ draft tiện ích nhanh khi
+đóng Account, route lifetime/focus, tìm kiếm DATE/KPH có khoảng trắng, Lookup
+name recovery và kết quả trễ, copy DATE quá hạn, kích thước header/tab/CTA/chevron,
+icon tìm kiếm và hàng action DATE desktop. `npm run verify` PASS 205 tests/build;
+5 gate Playwright gồm hai viewport bắt buộc và 7 kích thước responsive PASS.
+Hai lượt review kỹ thuật đã khép lại; owner visual/workflow acceptance pending.
+[Evidence r7](delivery/figma-mobile-implementation/technical-evidence-r7.md),
+[handoff r7](delivery/figma-mobile-implementation/acceptance-handoff-r7.md) và
+[plan](delivery/figma-mobile-implementation/plan.json) ghi candidate và giới hạn.
+
+Task khác đang sửa kết quả Tra hạn lùi trên worktree gốc. Round này không sửa
+component/test/script kết quả hoặc CSS shelf của task đó. Cần review tích hợp
+stylesheet khi kết hợp hai nhánh. Không đổi API/backend/Pilot, không merge/push,
+deploy hoặc viết Figma; mock vẫn chỉ giữ thay đổi trong phiên.
 
 ## Giai đoạn
 

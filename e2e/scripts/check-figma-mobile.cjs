@@ -8,6 +8,10 @@ const slotDimensions = Object.fromEntries(JSON.parse(require('node:fs').readFile
 for (const asset of JSON.parse(require('node:fs').readFileSync('docs/delivery/figma-mobile-implementation/assets-r4.json', 'utf8')).assets) {
  assetDimensions[asset.source.match(/figma\/([^\s]+\.svg)/)[1]] = asset.render;
 }
+for (const asset of JSON.parse(require('node:fs').readFileSync('docs/delivery/figma-mobile-implementation/assets-r7.json', 'utf8')).assets) {
+ assetDimensions[asset.source.split('/').pop()] = asset.root;
+ slotDimensions[asset.slot] = asset.render;
+}
 async function capture(page, options) {
  await page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => a.effect.getComputedTiming().iterations !== Infinity).map(a => a.finished.catch(() => {}))); });
  await page.waitForFunction(() => [...document.images].filter(i => i.getBoundingClientRect().width && i.getBoundingClientRect().height).every(i => i.complete && i.naturalWidth > 0));

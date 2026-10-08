@@ -8,6 +8,7 @@ import { DateWorkspace } from "./store-date-workspace";
 import { StoreLookupWorkspace } from "./store-lookup-workspace";
 import { mockDateLots, mockProfile, mockRecords } from "./store-app-mock";
 import "./store-app.css";
+import { useDialogReturnFocus } from "./use-dialog-return-focus";
 
 type Screen = "home" | "kph" | "shelf" | "lookup" | "date";
 const screens = {
@@ -45,12 +46,18 @@ export function StoreApp() {
   useEffect(() => {
     if (!quickOpen) return;
     const frame = window.requestAnimationFrame(() => quickPanelRef.current?.focus());
-    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") { setQuickOpen(false); window.requestAnimationFrame(() => quickFabRef.current?.focus()); } };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      const dialog = event.target instanceof Element ? event.target.closest('[role="dialog"]') : null;
+      if (dialog && dialog !== quickPanelRef.current) return;
+      setQuickOpen(false);
+      window.requestAnimationFrame(() => quickFabRef.current?.focus());
+    };
     window.addEventListener("keydown", closeOnEscape);
     return () => { window.cancelAnimationFrame(frame); window.removeEventListener("keydown", closeOnEscape); };
   }, [quickOpen]);
   useEffect(() => {
-    const sync = () => { setScreen(readScreen()); setNotice(""); setQuickOpen(false); window.scrollTo(0, 0); };
+    const sync = () => { setScreen(readScreen()); setNotice(""); setQuickOpen(false); setAccountOpen(false); window.scrollTo(0, 0); window.requestAnimationFrame(() => document.getElementById("store-content")?.focus({ preventScroll: true })); };
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
   }, []);
@@ -111,7 +118,8 @@ export function StoreApp() {
 export function StoreSheet({ open, onOpenChange, title, description, children, className }: {
   open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; children: ReactNode; className?: string;
 }) {
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className={`store-sheet ${className ?? ""}`}>
+  const returnFocus = useDialogReturnFocus();
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent {...returnFocus} className={`store-sheet ${className ?? ""}`}>
     <span className="store-sheet-handle" aria-hidden="true" />
     <div className="store-sheet-heading"><DialogTitle>{title}</DialogTitle><button onClick={() => onOpenChange(false)}>Đóng</button></div>
     <DialogDescription className="sr-only">{description}</DialogDescription>

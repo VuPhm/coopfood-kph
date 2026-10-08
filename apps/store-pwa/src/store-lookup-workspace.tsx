@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Input } from "@coopfood-kph/ui";
 import type { components } from "@coopfood-kph/api";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -36,7 +36,15 @@ export function StoreLookupWorkspace() {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const requestId = useRef(0);
+  useEffect(() => () => { requestId.current += 1; }, []);
+  function editQuery(value: string) {
+    requestId.current += 1;
+    setQuery(value); setProduct(null); setMessage(""); setBusy(false);
+  }
+
   async function search(value = query) {
+    const request = ++requestId.current;
     const term = value.trim();
     setQuery(term);
     setProduct(null);
@@ -46,12 +54,18 @@ export function StoreLookupWorkspace() {
     try {
       const normalized = term.toLocaleLowerCase("vi");
       const localProduct = products.find(item => item.barcode === term || item.skuCode === term || item.name.toLocaleLowerCase("vi") === normalized || lots[item.id]?.some(lot => lot.id.toLocaleLowerCase("vi") === normalized)) ?? null;
-      const result = localProduct ? { status: "FOUND" as const, barcode: localProduct.barcode, product: localProduct } : await mockBarcodeLookup(term);
+      const nameMatches = !localProduct && /\p{L}/u.test(term)
+        ? products.filter(item => item.name.toLocaleLowerCase("vi").includes(normalized)) : [];
+      if (nameMatches.length > 1) { setMessage("Tên hàng khớp nhiều sản phẩm. Nhập tên đầy đủ, SKU hoặc barcode để tra cứu chính xác."); return; }
+      const matched = localProduct ?? (nameMatches.length === 1 ? nameMatches[0] : null);
+      const result = matched ? { status: "FOUND" as const, barcode: matched.barcode, product: matched } : await mockBarcodeLookup(term);
+      if (request !== requestId.current) return;
       if (result.status === "FOUND" && result.product) setProduct(result.product);
       else setMessage("Không tìm thấy mã hàng. Có thể quét lại hoặc nhập mã khác; không có sản phẩm nào được suy đoán.");
     } catch (error) {
+      if (request !== requestId.current) return;
       setMessage(error instanceof Error ? error.message : "Chưa thể tra cứu danh mục. Thử lại.");
-    } finally { setBusy(false); }
+    } finally { if (request === requestId.current) setBusy(false); }
   }
 
   const productLots = product ? lots[product.id] ?? [] : [];
@@ -59,13 +73,13 @@ export function StoreLookupWorkspace() {
   const today = formatBusinessDate(new Date()).iso;
   return <div className="store-lookup">
     <form className="store-lookup-search" onSubmit={event => { event.preventDefault(); void search(); }}>
-      <label><img data-figma-asset-slot="lookup-search" data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-1", "imgFeatherSearch")} alt="" /><span className="sr-only">Mã hàng, tên hàng hoặc lô</span><Input value={query} onChange={event => setQuery(event.target.value)} placeholder="Mã hàng, tên hàng hoặc quét" autoComplete="off" /></label>
+      <label><img data-figma-asset-slot="lookup-search" data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("date", "imgFeatherSearch")} alt="" /><span className="sr-only">Mã hàng, tên hàng hoặc lô</span><Input value={query} onChange={event => editQuery(event.target.value)} placeholder="Mã hàng, tên hàng hoặc quét" autoComplete="off" /></label>
       <button type="button" aria-label="Quét barcode để tra cứu" onClick={() => setScannerOpen(true)}><img src={figmaAsset("203-701", "imgFeatherMaximize")} alt="" /></button>
       <Button className="store-button" type="submit" disabled={busy}>{busy ? "Đang tra cứu…" : "Tra cứu"}</Button>
     </form>
     {message ? <p className="store-lookup-message" role="status">{message}</p> : null}
     {product ? <div className="store-lookup-results">
-      <section className="store-lookup-product"><span className="store-lookup-product-icon"><img src={figmaAsset("main-2", "imgFeatherPackage")} alt="" /></span><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p><span className="store-lookup-found">Đã nhận diện</span><hr /><h3>Thông tin</h3><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></section>
+      <section className="store-lookup-product"><span className="store-lookup-product-icon"><img data-figma-asset-slot="lookup-product" data-figma-render-width="18" data-figma-render-height="18" data-figma-render-width-desktop="16" data-figma-render-height-desktop="16" src={figmaAsset("main-0", "imgFeatherFileText")} alt="" /></span><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p><span className="store-lookup-found">Đã nhận diện</span><hr /><h3>Thông tin</h3><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></section>
       <section className="store-lookup-lots"><header><h2>Các lô đang theo dõi</h2><span>{productLots.length} lô</span></header><div className="store-lookup-table-wrap"><table><thead><tr><th>Số lô</th><th>Ngày sản xuất</th><th>Hạn sử dụng</th><th>Còn lại</th><th>Trạng thái</th></tr></thead><tbody>{productLots.map(lot => { const remaining = daysBetween(today, parseDisplayDate(lot.expiry)); return <tr key={lot.id}><td>{lot.id}</td><td>{lot.manufactured}</td><td>{lot.expiry}</td><td className={`is-${lot.status}`}>{remaining < 0 ? `Quá ${Math.abs(remaining)} ngày` : `${remaining} ngày`}</td><td><span className={`store-lookup-status is-${lot.status}`}>{statusText[lot.status]}</span></td></tr>; })}</tbody></table></div></section>
     </div> : null}
     <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={value => { setQuery(value); void search(value); }} presentation="screen" />

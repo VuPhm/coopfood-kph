@@ -37,3 +37,29 @@ describe("Store App session and route ownership", () => {
     expect(document.querySelector('#quick-shelf-nsx')).toBeNull();
   });
 });
+
+it("keeps quick utility inputs when dismissing the account dialog", async () => {
+  window.location.hash = "kph";
+  await new Promise(resolve => setTimeout(resolve, 0));
+  vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+  render(<StoreApp />);
+  fireEvent.click(screen.getByRole("button", { name: "Mở tiện ích tra cứu lùi hàng" }));
+  const quick = screen.getByRole("dialog", { name: "Tra cứu lùi hàng nhanh" });
+  fireEvent.change(within(quick).getByRole("textbox", { name: "Ngày sản xuất" }), { target: { value: "01/10/2026" } });
+  fireEvent.click(screen.getByRole("button", { name: "Tài khoản và cửa hàng" }));
+  fireEvent.keyDown(await screen.findByRole("dialog", { name: "Tài khoản" }), { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "Tài khoản" })).not.toBeInTheDocument());
+  expect(within(screen.getByRole("dialog", { name: "Tra cứu lùi hàng nhanh" })).getByRole("textbox", { name: "Ngày sản xuất" })).toHaveValue("01/10/2026");
+});
+
+it("dismisses the account dialog after a hash route change", async () => {
+  window.location.hash = "kph";
+  await new Promise(resolve => setTimeout(resolve, 0));
+  vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+  render(<StoreApp />);
+  fireEvent.click(screen.getByRole("button", { name: "Tài khoản và cửa hàng" }));
+  await screen.findByRole("dialog", { name: "Tài khoản" });
+  window.location.hash = "date"; fireEvent(window, new Event("hashchange"));
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "Tài khoản" })).not.toBeInTheDocument());
+  await waitFor(() => expect(document.getElementById("store-content")).toHaveFocus());
+});

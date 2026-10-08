@@ -3,6 +3,7 @@ const { chromium } = require('@playwright/test');
 const fs = require('node:fs');
 fs.mkdirSync('.local/figma-mobile', {recursive:true});
 const manifest = JSON.parse(fs.readFileSync('docs/delivery/figma-mobile-implementation/assets-r3.json', 'utf8'));
+manifest.assets = Object.values(Object.fromEntries([...manifest.assets, ...JSON.parse(fs.readFileSync('docs/delivery/figma-mobile-implementation/assets-r7.json', 'utf8')).assets].map(asset => [asset.slot, asset])));
 const viewports = [
   {width:390,height:844}, {width:599,height:900}, {width:600,height:900}, {width:899,height:900},
   {width:900,height:900}, {width:1440,height:900}, {width:1440,height:1024},
@@ -17,7 +18,8 @@ async function capture(page, name) {
       const rect = img.getBoundingClientRect();
       if (!record) return [{slot, reason:'missing manifest'}];
       if (!rect.width || !rect.height) return [];
-      if (Math.abs(rect.width - record.render.width) > .5 || Math.abs(rect.height - record.render.height) > .5) return [{slot, actual:[rect.width,rect.height], expected:[record.render.width,record.render.height]}];
+      const renderSize = innerWidth >= 900 && record.renderDesktop ? record.renderDesktop : record.render;
+      if (Math.abs(rect.width - renderSize.width) > .5 || Math.abs(rect.height - renderSize.height) > .5) return [{slot, actual:[rect.width,rect.height], expected:[renderSize.width,renderSize.height]}];
       return [];
     });
   }, manifest.assets);

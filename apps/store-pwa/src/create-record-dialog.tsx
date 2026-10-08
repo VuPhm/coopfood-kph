@@ -1,3 +1,4 @@
+import { useDialogReturnFocus } from "./use-dialog-return-focus";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { KPH_OPTIONS, parseDisplayDate, resolveChoiceLabel, type KphKind } from "@coopfood-kph/kph-rules";
 import {
@@ -148,6 +149,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   const [savingRecord, setSavingRecord] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const screenPresentation = presentation === "screen";
+  const returnFocus = useDialogReturnFocus(screenPresentation);
   const createFormRef = useRef<HTMLFormElement>(null);
   const wasReviewingRef = useRef(false);
   const assetScreen = activeKind === "TPCN" ? "203-701" : "203-847";
@@ -421,10 +423,18 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     if (activePhoto?.id === id) setActivePhoto(null);
   }
 
+  function handleScreenEscape(event: KeyboardEvent) {
+    // A child layer may still be registering when Escape arrives. Keep the draft open.
+    if (!scannerOpen && !activePhoto) return;
+    event.preventDefault();
+    if (scannerOpen) setScannerOpen(false);
+    else setActivePhoto(null);
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
+        <DialogContent {...returnFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault(), onEscapeKeyDown: handleScreenEscape } : {})}>
           <DialogHeader className="create-dialog-header">
             {screenPresentation ? <button type="button" className="store-form-back" aria-label={reviewing ? "Chỉnh sửa phiếu" : "Về danh sách KPH"} onClick={() => { if (reviewing) setReviewing(false); else onOpenChange(false); }}><img src={figmaAsset(assetScreen, "imgFeatherArrowLeft")} alt="" /></button> : null}
             <DialogTitle className="create-dialog-title">{screenPresentation ? <>{reviewing ? "Xem lại phiếu KPH" : "Tạo phiếu KPH"}<small>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</small></> : <>Tạo phiếu KPH · {kindLabels[kind]}</>}</DialogTitle>
