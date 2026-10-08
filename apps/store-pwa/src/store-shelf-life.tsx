@@ -1,9 +1,20 @@
-import { useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Button, Input } from "@coopfood-kph/ui";
 import { calculateShelfLife, daysBetween, expiryFromDays, expiryFromMonths, formatDisplayDate, manufactureFromDays, manufactureFromMonths, parseDisplayDate, type LocalDate, type ShelfLifeResult } from "@coopfood-kph/kph-rules";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { figmaAsset } from "./figma-assets";
+
+type DurationUnit = "days" | "months";
+type ShelfField = "nsx" | "hsd" | DurationUnit;
+
+function positiveDuration(value: string, unit: DurationUnit) {
+  const count = Number(value);
+  if (!/^\d+$/.test(value.trim()) || !Number.isSafeInteger(count) || count <= 0) {
+    throw new Error(`Số ${unit === "days" ? "ngày" : "tháng"} HSD phải là số nguyên lớn hơn 0`);
+  }
+  return count;
+}
 
 export function ShelfLifeScreen({ idPrefix = "shelf" }: { idPrefix?: string } = {}) {
   const today = formatBusinessDate(new Date()).iso;
@@ -12,58 +23,96 @@ export function ShelfLifeScreen({ idPrefix = "shelf" }: { idPrefix?: string } = 
   const [hsd, setHsd] = useState("");
   const [days, setDays] = useState("");
   const [months, setMonths] = useState("");
-  const [error, setError] = useState("");
+  const [source, setSource] = useState<"dates" | DurationUnit>("dates");
+  const [error, setError] = useState<{ field: ShelfField; message: string } | null>(null);
   const [result, setResult] = useState<{ nsx: LocalDate; hsd: LocalDate; value: ShelfLifeResult } | null>(null);
-  function dates(nextNsx: string, nextHsd: string) {
-    setNsx(nextNsx); setHsd(nextHsd); setMonths(""); setResult(null); setError("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const errorId = `${idPrefix}-error`;
+  const description = (field: ShelfField) => error?.field === field ? errorId : undefined;
+
+  useEffect(() => {
+    // Focus after commit so assistive technology sees the error association.
+    if (error) formRef.current?.querySelector<HTMLInputElement>(`[id="${idPrefix}-${error.field}"]`)?.focus();
+  }, [error, idPrefix]);
+
+  function clearFeedback() { setResult(null); setError(null); }
+  function measureDays(nextNsx: string, nextHsd: string) {
     try { const n = daysBetween(parseDisplayDate(nextNsx), parseDisplayDate(nextHsd)) + 1; setDays(n > 0 ? String(n) : ""); } catch { setDays(""); }
   }
-  function duration(value: string, unit: "days" | "months") {
-    const cleaned = value.replace(/\D/g, "").slice(0, 4);
-    if (unit === "days") { setDays(cleaned); setMonths(""); } else { setMonths(cleaned); setDays(""); }
-    setResult(null); setError("");
-    // A duration edit invalidates the derived date, including empty/invalid input.
-    if (known) setHsd(""); else setNsx("");
-    if (!Number(cleaned)) return;
+  function derive(anchorText: string, value: string, unit: DurationUnit, manufactureKnown: boolean) {
+    // Keep the entered duration while an anchor is empty or incomplete, but clear
+    // its derived date so it cannot describe an earlier anchor.
+    if (manufactureKnown) setHsd(""); else setNsx("");
+    if (unit === "months") setDays("");
     try {
-      const anchor = parseDisplayDate(known ? nsx : hsd);
-      const next = known ? (unit === "days" ? expiryFromDays(anchor, Number(cleaned)) : expiryFromMonths(anchor, Number(cleaned))) : (unit === "days" ? manufactureFromDays(anchor, Number(cleaned)) : manufactureFromMonths(anchor, Number(cleaned)));
-      if (known) setHsd(formatDisplayDate(next)); else setNsx(formatDisplayDate(next));
-      if (unit === "months") setDays(String(known ? daysBetween(anchor, next) + 1 : daysBetween(next, anchor) + 1));
-    } catch { /* An incomplete anchor is validated when submitting. */ }
+      const anchor = parseDisplayDate(anchorText);
+      const count = positiveDuration(value, unit);
+      const next = manufactureKnown
+        ? unit === "days" ? expiryFromDays(anchor, count) : expiryFromMonths(anchor, count)
+        : unit === "days" ? manufactureFromDays(anchor, count) : manufactureFromMonths(anchor, count);
+      const display = formatDisplayDate(next);
+      if (manufactureKnown) setHsd(display); else setNsx(display);
+      if (unit === "months") setDays(String(manufactureKnown ? daysBetween(anchor, next) + 1 : daysBetween(next, anchor) + 1));
+    } catch { /* Validate incomplete anchors and durations on submit. */ }
+  }
+  function manufacture(value: string) {
+    setNsx(value); clearFeedback();
+    if (source === "dates") measureDays(value, hsd);
+    else derive(value, source === "months" ? months : days, source, true);
+  }
+  function duration(value: string, unit: DurationUnit) {
+    // inputMode is a keyboard hint, not validation. Never turn -2 into 2,
+    // 1.5 into 15, or silently shorten a pasted five-digit duration.
+    setSource(unit);
+    if (unit === "days") { setDays(value); setMonths(""); } else { setMonths(value); setDays(""); }
+    clearFeedback();
+    derive(known ? nsx : hsd, value, unit, known);
   }
   function expiry(value: string) {
-    if (known) { dates(nsx, value); return; }
-    setHsd(value); setResult(null); setError("");
-    setNsx("");
-    try {
-      const parsed = parseDisplayDate(value);
-      if (Number(months)) setNsx(formatDisplayDate(manufactureFromMonths(parsed, Number(months))));
-      else if (Number(days)) setNsx(formatDisplayDate(manufactureFromDays(parsed, Number(days))));
-    } catch { /* Validation on submit. */ }
+    setHsd(value); clearFeedback();
+    if (known) { setSource("dates"); setMonths(""); measureDays(nsx, value); }
+    else { const unit = source === "months" ? "months" : "days"; derive(value, unit === "months" ? months : days, unit, false); }
   }
   const state = result?.value.status.toLowerCase() ?? "empty";
   const withdrawalDays = result ? daysBetween(today, result.value.withdrawalDate) : 0;
   const expiryDays = result ? daysBetween(today, result.hsd) : 0;
   return <div className={`store-shelf shelf-${state}`}>
-    <form className="store-shelf-form" onSubmit={event => {
+    <form ref={formRef} className="store-shelf-form" onSubmit={event => {
       event.preventDefault();
+      let invalidField: ShelfField = known ? "nsx" : "hsd";
       try {
-        const h = parseDisplayDate(hsd);
-        if (!known && !Number(months) && !Number(days)) throw new Error("Nhập thời hạn theo số ngày hoặc số tháng để tính NSX");
-        const n = known ? parseDisplayDate(nsx) : Number(months) ? manufactureFromMonths(h, Number(months)) : manufactureFromDays(h, Number(days));
+        const anchor = parseDisplayDate(known ? nsx : hsd);
+        let n = anchor;
+        let h = anchor;
+        if (source !== "dates" || !known) {
+          const unit = source === "months" ? "months" : "days";
+          const value = unit === "months" ? months : days;
+          invalidField = unit;
+          if (!known && !value.trim()) throw new Error("Nhập thời hạn theo số ngày hoặc số tháng để tính NSX");
+          const count = positiveDuration(value, unit);
+          if (known) h = unit === "days" ? expiryFromDays(n, count) : expiryFromMonths(n, count);
+          else n = unit === "days" ? manufactureFromDays(h, count) : manufactureFromMonths(h, count);
+        } else {
+          invalidField = "hsd";
+          h = parseDisplayDate(hsd);
+        }
+        // Also reject derived dates outside the supported dd/mm/yyyy range.
+        formatDisplayDate(n); formatDisplayDate(h);
+        invalidField = source === "dates" ? "hsd" : source;
         const lookupToday = formatBusinessDate(new Date()).iso;
-        setResult({ nsx: n, hsd: h, value: calculateShelfLife(n, h, lookupToday) }); setError("");
+        setResult({ nsx: n, hsd: h, value: calculateShelfLife(n, h, lookupToday) }); setError(null);
       }
-      catch (e) { setError(e instanceof Error ? e.message : "Kiểm tra ngày đã nhập"); setResult(null); }
+      catch (e) {
+        setError({ field: invalidField, message: e instanceof Error ? e.message : "Kiểm tra ngày đã nhập" }); setResult(null);
+      }
     }}>
-      <div className="store-known-toggle"><strong>{known ? "Đã biết ngày sản xuất" : "Chưa biết ngày sản xuất"}</strong><button type="button" role="switch" aria-label="Đã biết ngày sản xuất" aria-checked={known} onClick={() => { setKnown(!known); setResult(null); setError(""); }}><span /></button></div>
-      {known ? <div className="store-field"><label htmlFor={`${idPrefix}-nsx`}>Ngày sản xuất</label><CalendarInput id={`${idPrefix}-nsx`} initialMonth={today} label="Ngày sản xuất" value={nsx} onValueChange={v => dates(v, hsd)} /></div> : null}
-      <div className="store-field"><label htmlFor={`${idPrefix}-hsd`}>Hạn sử dụng (HSD)</label><CalendarInput id={`${idPrefix}-hsd`} initialMonth={today} label="Hạn sử dụng" value={hsd} onValueChange={expiry} /></div>
-      <div className="store-two-col">{(["days", "months"] as const).map(unit => <div className="store-field" key={unit}><label htmlFor={`${idPrefix}-${unit}`}>HSD (Số {unit === "days" ? "ngày" : "tháng"})</label><div className="store-duration"><Input id={`${idPrefix}-${unit}`} inputMode="numeric" value={unit === "days" ? days : months} onChange={e => duration(e.target.value, unit)} placeholder="—" /><span>{unit === "days" ? "ngày" : "tháng"}</span></div></div>)}</div>
-      <div className="store-shelf-actions"><Button className="store-button" type="submit"><img src={figmaAsset("main-1", "imgFeatherSearch")} alt="" />Tra cứu</Button><Button className="store-button store-secondary" variant="ghost" type="button" onClick={() => { setNsx(""); setHsd(""); setDays(""); setMonths(""); setKnown(true); setError(""); setResult(null); }}><img src={figmaAsset("main-1", "imgFeatherRotateCcw")} alt="" />Làm mới</Button></div>
+      <div className="store-known-toggle"><strong>{known ? "Đã biết ngày sản xuất" : "Chưa biết ngày sản xuất"}</strong><button type="button" role="switch" aria-label="Đã biết ngày sản xuất" aria-checked={known} onClick={() => { setKnown(!known); const unit = source === "months" ? "months" : "days"; setSource(unit); derive(known ? hsd : nsx, unit === "months" ? months : days, unit, !known); clearFeedback(); }}><span /></button></div>
+      {known ? <div className="store-field"><label htmlFor={`${idPrefix}-nsx`}>Ngày sản xuất</label><CalendarInput id={`${idPrefix}-nsx`} initialMonth={today} label="Ngày sản xuất" value={nsx} onValueChange={manufacture} {...(error?.field === "nsx" ? { invalid: true, ariaDescribedBy: errorId } : {})} /></div> : null}
+      <div className="store-field"><label htmlFor={`${idPrefix}-hsd`}>Hạn sử dụng (HSD)</label><CalendarInput id={`${idPrefix}-hsd`} initialMonth={today} label="Hạn sử dụng" value={hsd} onValueChange={expiry} {...(error?.field === "hsd" ? { invalid: true, ariaDescribedBy: errorId } : {})} /></div>
+      <div className="store-two-col">{(["days", "months"] as const).map(unit => <div className="store-field" key={unit}><label htmlFor={`${idPrefix}-${unit}`}>HSD (Số {unit === "days" ? "ngày" : "tháng"})</label><div className="store-duration"><Input id={`${idPrefix}-${unit}`} inputMode="numeric" aria-invalid={error?.field === unit || undefined} aria-describedby={description(unit)} value={unit === "days" ? days : months} onChange={e => duration(e.target.value, unit)} placeholder="—" /><span>{unit === "days" ? "ngày" : "tháng"}</span></div></div>)}</div>
+      <div className="store-shelf-actions"><Button className="store-button" type="submit"><img src={figmaAsset("main-1", "imgFeatherSearch")} alt="" />Tra cứu</Button><Button className="store-button store-secondary" variant="ghost" type="button" onClick={() => { setNsx(""); setHsd(""); setDays(""); setMonths(""); setKnown(true); setSource("dates"); clearFeedback(); }}><img src={figmaAsset("main-1", "imgFeatherRotateCcw")} alt="" />Làm mới</Button></div>
     </form>
-    {error ? <p className="store-error" role="alert">{error}</p> : null}
+    {error ? <p id={errorId} className="store-error" role="alert">{error.message}</p> : null}
     {result ? <section className="store-shelf-result" aria-label="Kết quả tra hạn lùi" aria-live="polite" data-status={result.value.status}>
       <span className={`store-chip chip-${state}`}>{result.value.status === "EXPIRED" ? "Đã hết hạn sử dụng" : result.value.status === "WARNING" ? "Sắp đến hạn lùi" : result.value.status === "SAFE" ? "An toàn" : withdrawalDays === 0 ? "Đến hạn lùi hôm nay" : "Ngày lùi hàng"}</span>
       <span className="sr-only">{result.value.status === "EXPIRED" ? "Hạn sử dụng" : "Ngày lùi hàng"}</span>

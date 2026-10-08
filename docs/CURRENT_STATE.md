@@ -2,31 +2,32 @@
 
 Cập nhật: 2026-10-09
 
-## UI + kết quả Tra hạn lùi — revision 8 trên worktree riêng
+## UI + form Tra hạn lùi — revision 9 trên worktree riêng
 
-Theo yêu cầu owner “gộp với mục này” ngày 09/10/2026, cycle
-`figma-mobile-implementation` giữ nhánh `store-app/qa-20261009-sheet-focus`, worktree
-`/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`; base r8 `bd7cd86`.
-Preview kết hợp: [Tra hạn lùi](http://127.0.0.1:5177/#shelf).
+Owner “tiếp” ngày 09/10/2026 tiếp tục cycle `figma-mobile-implementation` trên
+`store-app/qa-20261009-sheet-focus`, worktree
+`/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`; base r9 `8a3942d`.
+Preview: [Tra hạn lùi](http://127.0.0.1:5177/#shelf).
 
-Đã gộp hộp kết quả theo ảnh tham chiếu: ngày chính có semantics time, hai số ngày
-có nhãn, badge theo trạng thái, ô đã qua hạn lùi màu đỏ và timeline có nhãn Hôm nay.
-Tra lại lấy ngày nghiệp vụ tại submit. Giữ toàn bộ sửa r7 về focus/Escape/draft,
-route/query, DATE quá hạn, header/tab/CTA/chevron, icon và action row desktop.
-Shared CSS đã được so sánh chính xác để giữ cả hai phạm vi.
+Đã sửa ba lỗi form tái hiện tại mobile/desktop: thời hạn nhập trước ngày bị mất,
+số âm/thập phân/năm chữ số bị biến đổi âm thầm, và lỗi không gắn/focus vào ô cần
+sửa. Giữ duration source, tính lại ngày suy ra khi đổi mốc/chế độ, giữ raw input
+và validate số nguyên dương, gắn error ID/aria-invalid rồi focus sau DOM commit.
+Giữ chính xác markup/timeline hộp kết quả r8 và toàn bộ sửa UI r7; không đổi CSS,
+CalendarInput, rule domain/API hoặc dependencies.
 
-`npm run verify` PASS **217 tests/build**; sáu gate Playwright PASS tại 390×844 /
+`npm run verify` PASS **229 tests/build**; năm gate Playwright PASS tại 390×844 /
 1440×1024, bảy kích thước responsive và thêm quick panel 375px. Hai lượt review
 kỹ thuật khép lại; owner visual/workflow acceptance pending.
-[Evidence r8](delivery/figma-mobile-implementation/technical-evidence-r8.md),
-[handoff r8](delivery/figma-mobile-implementation/acceptance-handoff-r8.md) và
-[plan](delivery/figma-mobile-implementation/plan.json) ghi candidate/gates/provenance.
+[Evidence r9](delivery/figma-mobile-implementation/technical-evidence-r9.md),
+[handoff r9](delivery/figma-mobile-implementation/acceptance-handoff-r9.md) và
+[plan](delivery/figma-mobile-implementation/plan.json) ghi candidate/gates.
 
-Nguồn là snapshot chưa commit từ worktree gốc ở `b1c772f`, năm file có SHA-256
-trong plan; worktree task kia không bị sửa/reset/commit. Handoff nguồn giữ port
-5176 như evidence lịch sử; preview kết hợp là 5177. Không đổi rule domain/API,
-backend/Pilot/dependency/Figma; chưa merge/push/deploy. Mock memory-only, reset
-khi reload; technical PASS chưa thay nghiệm thu owner.
+[r8](delivery/figma-mobile-implementation/technical-evidence-r8.md) giữ provenance
+snapshot năm file từ worktree gốc `b1c772f`; [plan r8](delivery/figma-mobile-implementation/plan-r8.json)
+lưu checkpoint trước lượt này. Worktree gốc của task kia không bị sửa/reset/commit.
+Mock vẫn memory-only, reset khi reload. Chưa nghiệm thu owner, merge/push/deploy,
+API wiring hoặc viết Figma; technical PASS không suy ra các hành động đó.
 
 ## Lịch sử revision 5
 
