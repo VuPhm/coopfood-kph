@@ -27,7 +27,7 @@ Local Node.js v26.0.0; Playwright 1.62.0 headless Chromium revision 1234; Vite m
 - `node e2e/scripts/check-store-qa-repairs.cjs` — PASS 390×844 and 1440×1024: isolated selection/review/export, catalog SKU/UPC and new-record workbook, DATE session/count/guards, quick route/unique IDs, metadata, readable CTA, mobile expanded hit areas. No uncaught page errors or duplicate-key warnings. Raw assertions: `.local/figma-mobile/r5/qa-repairs.json`.
 - `node e2e/scripts/check-figma-mobile.cjs` — PASS 390×844 and 1440×1024: navigation/filter/selection/export workbook, lookup FOUND/miss/unavailable, scanner manual fallback, images/viewer, resize retaining draft, review/edit/send, shelf validation, DATE actions, asset geometry and no horizontal overflow.
 - `node e2e/scripts/check-kph-calendar-icons.cjs` — PASS 390×844 and 1440×1024: both KPH kinds, exact source/stroke/20px render, disabled read-only detected date, picker select/Escape/expanded state/focus restoration.
-- `npm run check:docs` — PASS (`Docs/fixtures foundation hợp lệ.`); `git diff --check` — PASS, no whitespace errors. Delivery acceptance consistency is checked after recording the candidate and clean evidence checkpoint.
+- `npm run check:docs` — PASS (`Docs/fixtures foundation hợp lệ.`); `git diff --check` — PASS, no whitespace errors. Delivery acceptance consistency passed at documentation checkpoint `731ca9a`; application/browser scripts are identical to candidate `ef80ed0`.
 
 Manual screenshot inspection covered mobile single selection/resolved DATE and desktop fresh lookup, including the repaired green CTA. The preceding QA baseline is `ecebee8`; the five P2 reproductions and two P3 assessments are preserved locally in `.local/qa-ui-2026-10-08/report.md`. The table above preserves their scope in tracked evidence without committing screenshots/workbooks.
 
@@ -45,3 +45,13 @@ PASS 1440x1024: navigation, filter, selection, Excel download, lookup found/miss
 PASS 390x844: both KPH icon sources/colors at 20x20, read-only detected date disabled, picker Escape/select/focus and accessible labels
 PASS 1440x1024: both KPH icon sources/colors at 20x20, read-only detected date disabled, picker Escape/select/focus and accessible labels
 ```
+
+## Delivery consistency
+
+`node tooling/skills/delivery-cycle/scripts/cycle.mjs check --repo /Users/vup/Documents/coopfood-kph --plan docs/delivery/figma-mobile-implementation/plan.json --phase acceptance` — exit 0 on the clean checkpoint:
+
+```text
+PASS acceptance: figma-mobile-implementation revision 5. Record checks only; verify evidence truth separately.
+```
+
+All required technical gates reference candidate `ef80ed0` via the full SHA in plan.json; the required user gate is pending. This validates ledger consistency and does not represent owner sign-off. After the candidate, commits change only this cycle's records.
