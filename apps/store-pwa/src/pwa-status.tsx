@@ -13,34 +13,47 @@ export function PwaStatus({ serviceWorkerEnabled = import.meta.env.MODE !== "tes
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const applyingUpdate = useRef(false);
   const reloadedForUpdate = useRef(false);
-  const reloadUpdateCheckStarted = useRef(false);
+  const hasInteracted = useRef(false);
+  const applyingSilently = useRef(false);
+  const pendingReload = useRef(false);
   const applyWaitingUpdateRef = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     const serviceWorker = "serviceWorker" in navigator ? navigator.serviceWorker : null;
-    const navigationEntry = window.performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-    const isReloadNavigation = navigationEntry?.type === "reload";
+    let startupCheckInProgress = true;
     const hasWaitingUpdate = () => Boolean(serviceWorker?.controller && registrationRef.current?.waiting);
-    const applyWaitingUpdate = () => {
+    const hasUpdateNotice = () => hasWaitingUpdate() && !applyingUpdate.current;
+    const reloadOnce = () => {
+      if (reloadedForUpdate.current) return;
+      reloadedForUpdate.current = true;
+      window.location.reload();
+    };
+    const applyWaitingUpdate = (silently = false) => {
+      if (pendingReload.current) {
+        reloadOnce();
+        return;
+      }
       if (applyingUpdate.current) return;
       const waiting = registrationRef.current?.waiting;
       if (!waiting || !serviceWorker?.controller) return;
       applyingUpdate.current = true;
+      applyingSilently.current = silently;
       waiting.postMessage({ type: "SKIP_WAITING" });
     };
-    applyWaitingUpdateRef.current = applyWaitingUpdate;
+    applyWaitingUpdateRef.current = () => applyWaitingUpdate();
     const checkForUpdate = () => {
-      if (hasWaitingUpdate()) setNotice("update");
+      if (registrationRef.current) startupCheckInProgress = false;
+      if (hasUpdateNotice()) setNotice("update");
       if (!navigator.onLine) return;
       void registrationRef.current?.update().catch(() => {
         // A failed background check must not interrupt the local-only app.
       });
     };
     const handleOnline = () => {
-      setNotice((current) => current === "update" || hasWaitingUpdate() ? "update" : current === "offline" ? null : current);
+      setNotice((current) => current === "update" || hasUpdateNotice() ? "update" : current === "offline" ? null : current);
       checkForUpdate();
     };
-    const handleOffline = () => setNotice((current) => current === "update" || hasWaitingUpdate() ? "update" : "offline");
+    const handleOffline = () => setNotice((current) => current === "update" || hasUpdateNotice() ? "update" : "offline");
     const handleFocus = () => checkForUpdate();
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
@@ -55,10 +68,21 @@ export function PwaStatus({ serviceWorkerEnabled = import.meta.env.MODE !== "tes
     }
 
     let cancelled = false;
+    // Only the startup check may activate silently. Once input begins, preserve
+    // the current screen/draft, including if activation is already in flight.
+    const handleInteraction = () => { hasInteracted.current = true; };
+    // update() can resolve before updatefound. Allow discovery to finish, but
+    // never treat an update arriving long after startup as a silent update.
+    const startupTimeout = window.setTimeout(() => { startupCheckInProgress = false; }, 30_000);
+    document.addEventListener("pointerdown", handleInteraction, true);
+    document.addEventListener("keydown", handleInteraction, true);
+    document.addEventListener("input", handleInteraction, true);
     const handleControllerChange = () => {
       if (applyingUpdate.current && !reloadedForUpdate.current) {
-        reloadedForUpdate.current = true;
-        window.location.reload();
+        if (applyingSilently.current && hasInteracted.current) {
+          pendingReload.current = true;
+          setNotice("update");
+        } else reloadOnce();
       }
     };
     serviceWorker.addEventListener("controllerchange", handleControllerChange);
@@ -69,39 +93,46 @@ export function PwaStatus({ serviceWorkerEnabled = import.meta.env.MODE !== "tes
     }).then((registration) => {
       if (cancelled) return;
       registrationRef.current = registration;
-      const showOrApplyWaitingUpdate = () => {
+      const showOrApplyWaitingUpdate = (silently = false) => {
+        if (cancelled || applyingUpdate.current) return;
         if (!registration.waiting || !serviceWorker.controller) return;
-        if (isReloadNavigation) applyWaitingUpdate();
+        if (silently && startupCheckInProgress && !hasInteracted.current) applyWaitingUpdate(true);
         else setNotice("update");
       };
-      showOrApplyWaitingUpdate();
-      registration.addEventListener("updatefound", () => {
+      showOrApplyWaitingUpdate(true);
+      const watchInstallingWorker = () => {
         const worker = registration.installing;
+        const startupUpdate = startupCheckInProgress;
         worker?.addEventListener("statechange", () => {
           if (cancelled || worker.state !== "installed") return;
           if (serviceWorker.controller) {
-            if (isReloadNavigation) applyWaitingUpdate();
-            else setNotice("update");
+            showOrApplyWaitingUpdate(startupUpdate);
           } else {
             setNotice("offline-ready");
           }
+          startupCheckInProgress = false;
         });
-      });
-      if (isReloadNavigation && !reloadUpdateCheckStarted.current) {
-        reloadUpdateCheckStarted.current = true;
-        void registration.update().then(showOrApplyWaitingUpdate).catch(() => {
-          // A failed update check must not interrupt a browser reload.
+      };
+      registration.addEventListener("updatefound", watchInstallingWorker);
+      watchInstallingWorker();
+      if (navigator.onLine) {
+        void registration.update().then(() => showOrApplyWaitingUpdate(true)).catch(() => {
+          // A failed startup check must not interrupt reopening the local app.
         });
-      }
+      } else startupCheckInProgress = false;
     }).catch(() => {
       // App vẫn chạy online bình thường khi service worker không đăng ký được.
     });
 
     return () => {
       cancelled = true;
+      window.clearTimeout(startupTimeout);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
       window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("pointerdown", handleInteraction, true);
+      document.removeEventListener("keydown", handleInteraction, true);
+      document.removeEventListener("input", handleInteraction, true);
       serviceWorker.removeEventListener("controllerchange", handleControllerChange);
     };
   }, [serviceWorkerEnabled]);

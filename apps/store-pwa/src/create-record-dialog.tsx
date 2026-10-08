@@ -348,7 +348,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
             </FormSection>
 
             <FormSection number="2" title="Số lượng & đơn vị">
-              <div className="grid max-w-md grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+              <div className="grid max-w-md grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                 <Field label="Số lượng" htmlFor="quantity" required error={errors.quantity?.message}>
                   <Input id="quantity" inputMode="decimal" aria-describedby={weightExtracted ? "quantity-extraction-note" : undefined} {...register("quantity", { onChange: clearWeightExtraction })} />
                 </Field>
