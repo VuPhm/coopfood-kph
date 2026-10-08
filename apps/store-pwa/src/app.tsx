@@ -14,6 +14,7 @@ import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord
 import { readStorageHealth, requestPersistentStorage, storageUsageLabel, type StorageHealth } from "./storage-health";
 import { actorIdentity, DEFAULT_STORE_PROFILE, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
 import { StoreSettingsDialog } from "./store-settings-dialog";
+import { startStoreUsageTracking } from "./usage-telemetry";
 import { UtilityPanelMeta } from "./utility-panel-meta";
 
 export { formatBusinessDate } from "./business-date";
@@ -190,6 +191,12 @@ export function App() {
   );
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
+
+  // App is mounted by PinGate only after unlock. Include store changes made
+  // in Settings so the next session is attributed to the updated store.
+  useEffect(() => {
+    if (storeProfile.storeCode) startStoreUsageTracking(storeProfile.storeCode);
+  }, [storeProfile.storeCode]);
 
   useEffect(() => () => {
     ownedPhotoUrls.current.forEach((url) => URL.revokeObjectURL(url));
