@@ -53,7 +53,11 @@ async function runViewport(browser, viewport) {
     if (state.detected.source !== item.detected || state.treatment.source !== item.treatment || !isTwenty(state.detected) || !isTwenty(state.treatment) || !state.detectedReadOnly || !state.detectedDisabled || state.treatmentDisabled || state.labels.join('|') !== 'Chọn ngày phát hiện|Chọn ngày xử lý (nếu có)') {
       throw new Error(`${item.kind} calendar source/geometry/accessibility mismatch at ${viewport.width}x${viewport.height}: ${JSON.stringify(state)}`);
     }
-    await page.screenshot({ path: `.local/figma-mobile/kph-calendar-${item.screen}-${viewport.width}x${viewport.height}.png`, fullPage: true });
+    await page.screenshot({ path: `.local/figma-mobile/kph-calendar-${item.screen}-${viewport.width}x${viewport.height}.png` });
+    if (viewport.width < 600) {
+      await treatment.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: `.local/figma-mobile/kph-calendar-${item.screen}-treatment-${viewport.width}x${viewport.height}.png` });
+    }
 
     await treatmentTrigger.click();
     if (await treatmentTrigger.getAttribute('aria-expanded') !== 'true') throw new Error(`${item.kind}: trigger did not expose expanded state`);
