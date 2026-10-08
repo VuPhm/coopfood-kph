@@ -3,7 +3,7 @@
 09/10/2026. Authorization: owner “còn rất nhiều lỗi, cứ rà và sửa”. Base
 `b180484f7a2377020e5bf4e6354705948ee6382f`; branch
 `store-app/qa-20261009-sheet-focus`; isolated worktree
-`/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`. Candidate is recorded
+`/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`. Candidate `0a9b933ce83072260dba530f77b4679959c7c51b` is recorded
 in [plan](plan.json). Root is the sole writer; no delegation.
 
 ## Findings and changes

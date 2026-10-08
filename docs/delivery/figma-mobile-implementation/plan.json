@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 7,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Audit and repair reproducible UI defects across Store App navigation, dialogs, KPH, DATE and lookup in the isolated worktree; preserve API/business and the other task’s shelf result scope.",
   "inScope": [
     "Restore controlled StoreSheet and screen dialog focus across keyboard/pointer closes and nested layers",
@@ -18,7 +18,7 @@
     "Figma writes or overwriting accepted frames; merge/push/deploy or Pages cutover"
   ],
   "baseSha": "b180484f7a2377020e5bf4e6354705948ee6382f",
-  "candidateSha": "",
+  "candidateSha": "0a9b933ce83072260dba530f77b4679959c7c51b",
   "integrationOwner": "/root — sole writer in the isolated StoreSheet focus worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -50,37 +50,37 @@
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 7,
-      "sha": "",
-      "evidence": ""
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 7,
-      "sha": "",
-      "evidence": ""
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 7,
-      "sha": "",
-      "evidence": ""
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 7,
-      "sha": "",
-      "evidence": ""
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
@@ -88,8 +88,8 @@
       "required": true,
       "status": "pending",
       "revision": 7,
-      "sha": "",
-      "evidence": ""
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r7.md"
     }
   ],
   "changes": [
@@ -137,16 +137,16 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Reproduce defects, repair confirmed issues, verify two bounded review passes and prepare owner handoff.",
+  "nextAction": "Owner inspects mock port 5177 using acceptance-handoff-r7.md and records feedback on this candidate; review shared CSS before integrating the other shelf task.",
   "workingTreeCandidate": {
     "baseSha": "b180484f7a2377020e5bf4e6354705948ee6382f",
     "path": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
-    "note": "Revision 7 audit/repair working tree; record candidate after checks."
+    "note": "Verified application candidate 0a9b933ce83072260dba530f77b4679959c7c51b; subsequent commits finalize cycle records only."
   },
   "conditionalIntegratorPaths": [],
   "executor": {
     "agentId": "/root",
-    "status": "executing",
+    "status": "verified, awaiting owner acceptance",
     "ownership": "sole writer, broader UI defect scope with shelf excluded",
     "worktree": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
     "branch": "store-app/qa-20261009-sheet-focus"

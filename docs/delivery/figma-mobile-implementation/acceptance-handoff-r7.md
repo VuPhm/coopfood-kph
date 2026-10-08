@@ -2,7 +2,7 @@
 
 09/10/2026. Isolated branch `store-app/qa-20261009-sheet-focus`, worktree
 `/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`. Preview:
-[Store App mock](http://127.0.0.1:5177/). Candidate SHA is recorded in [plan](plan.json).
+[Store App mock](http://127.0.0.1:5177/). Candidate `0a9b933ce83072260dba530f77b4679959c7c51b` is recorded in [plan](plan.json).
 This preview is separate from the other task's original worktree/port 5175.
 
 ## Changes to inspect
