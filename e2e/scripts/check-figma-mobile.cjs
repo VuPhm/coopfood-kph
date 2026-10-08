@@ -4,18 +4,22 @@ const { chromium } = require('@playwright/test');
 const ExcelJS = require('exceljs');
 require('node:fs').mkdirSync('.local/figma-mobile', {recursive:true});
 const assetDimensions = Object.fromEntries(JSON.parse(require('node:fs').readFileSync('docs/delivery/figma-mobile-implementation/assets.json', 'utf8')).map(a => [a.path.split('/').pop(), {width:Number(a.width), height:Number(a.height)}]));
+const slotDimensions = Object.fromEntries(JSON.parse(require('node:fs').readFileSync('docs/delivery/figma-mobile-implementation/assets-r3.json', 'utf8')).assets.map(a => [a.slot, a.render]));
+for (const asset of JSON.parse(require('node:fs').readFileSync('docs/delivery/figma-mobile-implementation/assets-r4.json', 'utf8')).assets) {
+ assetDimensions[asset.source.match(/figma\/([^\s]+\.svg)/)[1]] = asset.render;
+}
 async function capture(page, options) {
  await page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => a.effect.getComputedTiming().iterations !== Infinity).map(a => a.finished.catch(() => {}))); });
  await page.waitForFunction(() => [...document.images].filter(i => i.getBoundingClientRect().width && i.getBoundingClientRect().height).every(i => i.complete && i.naturalWidth > 0));
- const assetErrors = await page.evaluate(dimensions => [...document.images].flatMap(img => {
+ const assetErrors = await page.evaluate(({dimensions, slots}) => [...document.images].flatMap(img => {
   const rect = img.getBoundingClientRect();
   if (!rect.width || !rect.height || !img.src.includes('/figma/')) return [];
   const file = new URL(img.src).pathname.split('/').pop();
-  const expected = dimensions[file];
+  const expected = slots[img.dataset.figmaAssetSlot] || dimensions[file];
   const desktop = window.innerWidth >= 900;
   const render = {width:Number((desktop && img.dataset.figmaRenderWidthDesktop) || img.dataset.figmaRenderWidth || expected?.width), height:Number((desktop && img.dataset.figmaRenderHeightDesktop) || img.dataset.figmaRenderHeight || expected?.height)};
   return !expected || Math.abs(rect.width - render.width) > .5 || Math.abs(rect.height - render.height) > .5 ? [{file, width:rect.width, height:rect.height, expected:render}] : [];
- }), assetDimensions);
+ }), {dimensions:assetDimensions, slots:slotDimensions});
  if(assetErrors.length)throw Error(`Static icon geometry: ${JSON.stringify(assetErrors)}`);
  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
  if(overflow)throw Error(`Horizontal overflow: ${options.path}`);

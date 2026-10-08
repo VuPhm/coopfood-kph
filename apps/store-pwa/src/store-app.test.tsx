@@ -1,0 +1,39 @@
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { StoreApp } from "./store-app";
+
+describe("Store App session and route ownership", () => {
+  beforeEach(() => {
+    window.location.hash = "home";
+    vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+  });
+
+  it("retains DATE updates across Home navigation and updates the Home summary", async () => {
+    render(<StoreApp />);
+    const home = () => within(document.querySelector('.store-launcher-mobile') as HTMLElement);
+    fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Sản phẩm C/ }));
+    fireEvent.click(await screen.findByRole("button", { name: "Ghi nhận" }));
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "Xử lý cảnh báo DATE" })).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
+    await screen.findByText("1 cảnh báo đang mở");
+    fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
+    await screen.findByRole("heading", { name: "Cần xử lý" });
+    expect(screen.queryByRole("button", { name: /Sản phẩm C/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Đã ghi nhận 3/ }));
+    expect(screen.getByRole("button", { name: /Sản phẩm C/ })).toBeInTheDocument();
+  });
+
+  it("dismisses the quick utility when changing routes", async () => {
+    render(<StoreApp />);
+    fireEvent.click(within(document.querySelector('.store-launcher-mobile') as HTMLElement).getByRole("button", { name: "KPH" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Mở tiện ích tra cứu lùi hàng" }));
+    expect(screen.getByRole("dialog", { name: "Tra cứu lùi hàng nhanh" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Tra cứu lùi hàng nhanh" })).not.toBeInTheDocument());
+    fireEvent.click(within(document.querySelector('.store-launcher-mobile') as HTMLElement).getByRole("button", { name: "Tra cứu lùi hàng" }));
+    await screen.findByRole("textbox", { name: "Ngày sản xuất" });
+    expect(document.querySelectorAll('#shelf-nsx')).toHaveLength(1);
+    expect(document.querySelector('#quick-shelf-nsx')).toBeNull();
+  });
+});

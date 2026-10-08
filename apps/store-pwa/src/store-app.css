@@ -341,6 +341,20 @@
 .store-quick-panel .store-shelf { padding: 0 0 8px; }
 .store-quick-panel .store-shelf-form { gap: 12px; }
 .store-quick-panel .store-shelf-result { margin-top: 12px; }
+/* Expand touch hit areas without changing the accepted visual control bounds. */
+@media (max-width: 899px) {
+  .store-app :is(.store-compact, .store-filter), .store-quick-panel > header button { position: relative; }
+  .store-app :is(.store-compact, .store-filter, .store-known-toggle button, .expiry-calendar-trigger)::after,
+  .store-quick-panel > header button::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
 .store-lookup { display: grid; gap: 14px; padding: 16px; }
 .store-lookup-search { display: flex; align-items: center; gap: 8px; }
 .store-lookup-search label { position: relative; min-width: 0; flex: 1; }
@@ -348,7 +362,7 @@
 .store-lookup-search input { height: 48px; padding-left: 42px; border: 1px solid var(--cf-color-border); border-radius: 12px; font-size: 14px; }
 .store-lookup-search > button { display: grid; width: 44px; height: 44px; flex: 0 0 44px; place-items: center; border-radius: 12px; background: var(--cf-color-brand-soft); }
 .store-lookup-search > button img { width: 20px; height: 20px; }
-.store-lookup-search > .store-button { min-width: 84px; height: 44px; min-height: 44px; border-radius: 12px; font-size: 13px; }
+.store-lookup-search > .store-button { width: auto; flex: 0 0 auto; min-width: 84px; height: 44px; min-height: 44px; border: 1px solid var(--cf-color-brand); border-radius: 12px; background: var(--cf-color-brand); color: white; font-size: 13px; }
 .store-lookup-message { margin: 0; border-radius: 10px; padding: 12px; background: var(--cf-color-surface-muted); color: var(--cf-color-ink-muted); font-size: 12px; }
 .store-lookup-results { display: grid; gap: 12px; }
 .store-lookup-product, .store-lookup-lots { min-width: 0; border: 1px solid var(--cf-color-border); border-radius: 14px; padding: 14px; background: white; }
@@ -490,7 +504,7 @@
   .store-lookup-search input { height: 38px; font-size: 11px; }
   .store-lookup-search > button { height: 38px; width: 38px; flex-basis: 38px; background: white; border: 1px solid var(--cf-color-border); border-radius: 9px; }
   .store-lookup-search > button img { width: 18px; height: 18px; }
-  .store-lookup-search > .store-button { min-width: 76px; height: 38px; min-height: 38px; font-size: 11px; }
+  .store-lookup-search > .store-button { width: 112px; min-width: 112px; height: 36px; min-height: 36px; font-size: 13px; }
   .store-lookup-results { grid-template-columns: minmax(240px, .72fr) minmax(0, 1.6fr); gap: 12px; }
   .store-lookup-product, .store-lookup-lots { min-height: 440px; padding: 14px; }
   .store-lookup-lots td, .store-lookup-lots th { height: 48px; padding-inline: 8px; }

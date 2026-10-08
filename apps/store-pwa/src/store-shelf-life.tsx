@@ -5,7 +5,7 @@ import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { figmaAsset } from "./figma-assets";
 
-export function ShelfLifeScreen() {
+export function ShelfLifeScreen({ idPrefix = "shelf" }: { idPrefix?: string } = {}) {
   const today = formatBusinessDate(new Date()).iso;
   const [known, setKnown] = useState(true);
   const [nsx, setNsx] = useState("");
@@ -55,9 +55,9 @@ export function ShelfLifeScreen() {
       catch (e) { setError(e instanceof Error ? e.message : "Kiểm tra ngày đã nhập"); setResult(null); }
     }}>
       <div className="store-known-toggle"><strong>{known ? "Đã biết ngày sản xuất" : "Chưa biết ngày sản xuất"}</strong><button type="button" role="switch" aria-label="Đã biết ngày sản xuất" aria-checked={known} onClick={() => { setKnown(!known); setResult(null); setError(""); }}><span /></button></div>
-      {known ? <div className="store-field"><label htmlFor="shelf-nsx">Ngày sản xuất</label><CalendarInput id="shelf-nsx" initialMonth={today} label="Ngày sản xuất" value={nsx} onValueChange={v => dates(v, hsd)} /></div> : null}
-      <div className="store-field"><label htmlFor="shelf-hsd">Hạn sử dụng (HSD)</label><CalendarInput id="shelf-hsd" initialMonth={today} label="Hạn sử dụng" value={hsd} onValueChange={expiry} /></div>
-      <div className="store-two-col">{(["days", "months"] as const).map(unit => <div className="store-field" key={unit}><label htmlFor={`shelf-${unit}`}>HSD (Số {unit === "days" ? "ngày" : "tháng"})</label><div className="store-duration"><Input id={`shelf-${unit}`} inputMode="numeric" value={unit === "days" ? days : months} onChange={e => duration(e.target.value, unit)} placeholder="—" /><span>{unit === "days" ? "ngày" : "tháng"}</span></div></div>)}</div>
+      {known ? <div className="store-field"><label htmlFor={`${idPrefix}-nsx`}>Ngày sản xuất</label><CalendarInput id={`${idPrefix}-nsx`} initialMonth={today} label="Ngày sản xuất" value={nsx} onValueChange={v => dates(v, hsd)} /></div> : null}
+      <div className="store-field"><label htmlFor={`${idPrefix}-hsd`}>Hạn sử dụng (HSD)</label><CalendarInput id={`${idPrefix}-hsd`} initialMonth={today} label="Hạn sử dụng" value={hsd} onValueChange={expiry} /></div>
+      <div className="store-two-col">{(["days", "months"] as const).map(unit => <div className="store-field" key={unit}><label htmlFor={`${idPrefix}-${unit}`}>HSD (Số {unit === "days" ? "ngày" : "tháng"})</label><div className="store-duration"><Input id={`${idPrefix}-${unit}`} inputMode="numeric" value={unit === "days" ? days : months} onChange={e => duration(e.target.value, unit)} placeholder="—" /><span>{unit === "days" ? "ngày" : "tháng"}</span></div></div>)}</div>
       <div className="store-shelf-actions"><Button className="store-button" type="submit"><img src={figmaAsset("main-1", "imgFeatherSearch")} alt="" />Tra cứu</Button><Button className="store-button store-secondary" variant="ghost" type="button" onClick={() => { setNsx(""); setHsd(""); setDays(""); setMonths(""); setKnown(true); setError(""); setResult(null); }}><img src={figmaAsset("main-1", "imgFeatherRotateCcw")} alt="" />Làm mới</Button></div>
     </form>
     {error ? <p className="store-error" role="alert">{error}</p> : null}

@@ -29,6 +29,7 @@ export function StoreApp() {
   const quickFabRef = useRef<HTMLButtonElement>(null);
   const quickPanelRef = useRef<HTMLDivElement>(null);
   const [records, setRecords] = useState(mockRecords);
+  const [dateLots, setDateLots] = useState(mockDateLots);
   const recordRef = useRef(records); recordRef.current = records;
   const [notice, setNotice] = useState("");
   useEffect(() => {
@@ -49,7 +50,7 @@ export function StoreApp() {
     return () => { window.cancelAnimationFrame(frame); window.removeEventListener("keydown", closeOnEscape); };
   }, [quickOpen]);
   useEffect(() => {
-    const sync = () => { setScreen(readScreen()); setNotice(""); window.scrollTo(0, 0); };
+    const sync = () => { setScreen(readScreen()); setNotice(""); setQuickOpen(false); window.scrollTo(0, 0); };
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
   }, []);
@@ -89,13 +90,13 @@ export function StoreApp() {
         </button>)}
       </div><div className="store-launcher store-launcher-desktop" aria-label="Công việc cửa hàng">{([
         ["lookup", "Tra cứu", "imgFeatherFileText"], ["kph", "KPH", "imgFeatherXSquare"], ["date", "DATE", "imgFeatherCalendar"],
-        ] as const).map(([key, title, icon]) => <button key={key} className={`store-module module-${key}`} onClick={() => navigate(key)}><span className="store-module-icon"><img src={figmaAsset("main-0", icon)} alt="" /></span><strong>{title}</strong><i aria-hidden="true"><img data-figma-render-width="14" data-figma-render-height="14" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></i></button>)}</div><div className="store-home-panels"><section><h3>Cần chú ý hôm nay</h3><button onClick={() => navigate("date")}><span>DATE</span><strong>{mockDateLots.filter(lot => lot.status === "open").length} cảnh báo đang mở</strong><b>Mở</b></button><button onClick={() => navigate("kph")}><span>KPH</span><strong>{records.filter(r => r.approvalStatus === "PENDING").length} phiếu chờ duyệt</strong><b>Mở</b></button></section><section><span className="store-home-utility-icon"><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" /></span><div><strong>Tra hạn lùi hàng</strong><small>Tiện ích dùng chung</small></div><button onClick={() => navigate("shelf")}>Mở</button></section></div></> : null}
+        ] as const).map(([key, title, icon]) => <button key={key} className={`store-module module-${key}`} onClick={() => navigate(key)}><span className="store-module-icon"><img src={figmaAsset("main-0", icon)} alt="" /></span><strong>{title}</strong><i aria-hidden="true"><img data-figma-render-width="14" data-figma-render-height="14" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></i></button>)}</div><div className="store-home-panels"><section><h3>Cần chú ý hôm nay</h3><button onClick={() => navigate("date")}><span>DATE</span><strong>{dateLots.filter(lot => lot.status === "open").length} cảnh báo đang mở</strong><b>Mở</b></button><button onClick={() => navigate("kph")}><span>KPH</span><strong>{records.filter(r => r.approvalStatus === "PENDING").length} phiếu chờ duyệt</strong><b>Mở</b></button></section><section><span className="store-home-utility-icon"><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" /></span><div><strong>Tra hạn lùi hàng</strong><small>Tiện ích dùng chung</small></div><button onClick={() => navigate("shelf")}>Mở</button></section></div></> : null}
       {screen === "shelf" ? <ShelfLifeScreen /> : null}
       {screen === "kph" ? <KphWorkspace records={records} onRecordsChange={setRecords} onNotice={setNotice} /> : null}
       {screen === "lookup" ? <StoreLookupWorkspace /> : null}
-      {screen === "date" ? <DateWorkspace /> : null}
+      {screen === "date" ? <DateWorkspace lots={dateLots} onLotsChange={setDateLots} /> : null}
       {screen === "kph" || screen === "date" ? <button ref={quickFabRef} className="store-quick-fab" aria-label="Mở tiện ích tra cứu lùi hàng" aria-expanded={quickOpen} onClick={() => setQuickOpen(open => !open)}><img data-figma-asset-slot="shelf-quick-clock" src={figmaAsset("r2", "imgFeatherClock")} alt="" /></button> : null}
-      {quickOpen ? <div ref={quickPanelRef} className="store-quick-panel" role="dialog" aria-label="Tra cứu lùi hàng nhanh" tabIndex={-1}><header><strong>Tra cứu lùi hàng</strong><button aria-label="Đóng tiện ích" onClick={() => { setQuickOpen(false); window.requestAnimationFrame(() => quickFabRef.current?.focus()); }}><img data-figma-asset-slot="shelf-quick-close" src={figmaAsset("r2", "imgFeatherX")} alt="" /></button></header><ShelfLifeScreen /></div> : null}
+      {quickOpen && (screen === "kph" || screen === "date") ? <div ref={quickPanelRef} className="store-quick-panel" role="dialog" aria-label="Tra cứu lùi hàng nhanh" tabIndex={-1}><header><strong>Tra cứu lùi hàng</strong><button aria-label="Đóng tiện ích" onClick={() => { setQuickOpen(false); window.requestAnimationFrame(() => quickFabRef.current?.focus()); }}><img data-figma-asset-slot="shelf-quick-close" src={figmaAsset("r2", "imgFeatherX")} alt="" /></button></header><ShelfLifeScreen idPrefix="quick-shelf" /></div> : null}
       </main>
     </section>
     {notice ? <div className="store-toast" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Đóng thông báo">Đóng</button></div> : null}

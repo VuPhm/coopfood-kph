@@ -34,4 +34,25 @@ describe("Mock KPH history contract", () => {
     fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu TP khô & khác" }));
     expect(screen.getByText("TP khô & khác", { selector: "small" })).toBeInTheDocument();
   });
+
+  it("selects one fixture without selecting a second record or exporting it", () => {
+    render(<KphWorkspace records={mockRecords} onRecordsChange={vi.fn()} onNotice={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "Chọn" }));
+    fireEvent.click(screen.getAllByRole("checkbox", { name: "Chọn Cải thìa VietGAP 500 g" })[0]!);
+    for (const checkbox of screen.getAllByRole("checkbox", { name: "Chọn Nông sản mẫu 01" })) expect(checkbox).not.toBeChecked();
+    expect(screen.getByText("1 đã chọn")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
+    expect(screen.getByRole("dialog", { name: "Xuất Excel" })).toHaveTextContent("1 phiếu đã duyệt");
+  });
+
+  it("searches leading-zero SKU and barcode separately on a found record", () => {
+    const record = { ...mockRecords[0]!, barcode: "29123415005" };
+    render(<KphWorkspace records={[record]} onRecordsChange={vi.fn()} onNotice={vi.fn()} />);
+    const search = screen.getByRole("textbox", { name: "Tìm tên hàng hoặc SKU" });
+    for (const identifier of ["0011730", "29123415005"]) {
+      fireEvent.change(search, { target: { value: identifier } });
+      expect(screen.getByText("1 phiếu")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Mở phiếu Cải thìa VietGAP 500 g" })).toBeInTheDocument();
+    }
+  });
 });

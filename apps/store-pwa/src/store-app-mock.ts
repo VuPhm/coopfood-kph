@@ -18,7 +18,7 @@ const generatedKphRecords: RecordView[] = Array.from({ length: 56 }, (_, index) 
   const detectedDate = `${String(dayDate.getUTCDate()).padStart(2, "0")}/${String(dayDate.getUTCMonth() + 1).padStart(2, "0")}/${dayDate.getUTCFullYear()}`;
   const approvalStatus = (["APPROVED", "PENDING", "REJECTED"] as const)[(number - 1) % 3]!;
   return {
-    id: `mock-${kind.toLowerCase()}-${number}`, kind,
+    id: `mock-generated-${kind.toLowerCase()}-${number}`, kind,
     productName: `${kind === "TPCN" ? "Hàng khô" : "Nông sản"} mẫu ${String(number).padStart(2, "0")}`,
     sku: `${kind === "TPCN" ? "00" : "01"}${String(number).padStart(5, "0")}`,
     supplier: "Nhà cung cấp mẫu", detectedDate, detectedBy: mockProfile.fullName,
@@ -36,7 +36,8 @@ export const mockRecords: RecordView[] = [
 ];
 
 export type MockDateLotStatus = "open" | "acknowledged" | "resolved";
-export const mockDateLots: { id: string; name: string; sku: string; date: `${number}-${number}-${number}`; status: MockDateLotStatus }[] = [
+export type MockDateLot = { id: string; name: string; sku: string; date: `${number}-${number}-${number}`; status: MockDateLotStatus };
+export const mockDateLots: MockDateLot[] = [
   { id: "C24-118", name: "Sản phẩm C", sku: "089332", date: "2026-10-07", status: "open" },
   { id: "D24-090", name: "Sản phẩm D", sku: "071204", date: "2026-10-12", status: "open" },
   { id: "A24-008", name: "Sản phẩm A", sku: "000008", date: "2026-10-20", status: "acknowledged" },

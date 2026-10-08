@@ -84,6 +84,7 @@ export type CreatedRecordDraft = {
   kind: KphKind;
   detectedDate: string;
   barcode: string;
+  skuCode?: string;
   supplier: string;
   productName: string;
   quantity: number;
@@ -155,7 +156,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   const [barcodeLookupMessage, setBarcodeLookupMessage] = useState("");
   const [lookupRetryValue, setLookupRetryValue] = useState("");
   const lookupRequestId = useRef(0);
-  const autoFilledLookup = useRef({ barcode: "", productName: "", supplier: "" });
+  const autoFilledLookup = useRef({ barcode: "", skuCode: "", productName: "", supplier: "" });
   const idempotencyKeyRef = useRef<string | null>(null);
   const savingRecordRef = useRef(false);
   const {
@@ -248,7 +249,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
     if (current.supplier && values.supplier === current.supplier) {
       setValue("supplier", "", { shouldDirty: true });
     }
-    autoFilledLookup.current = { barcode: "", productName: "", supplier: "" };
+    autoFilledLookup.current = { barcode: "", skuCode: "", productName: "", supplier: "" };
   }
 
   async function lookupBarcode(value = barcode) {
@@ -273,6 +274,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
         setValue("supplier", result.product.primarySupplier.name, { shouldDirty: true });
         autoFilledLookup.current = {
           barcode: normalized,
+          skuCode: result.product.skuCode,
           productName: result.product.name,
           supplier: result.product.primarySupplier.name,
         };
@@ -319,6 +321,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
         kind,
         detectedDate: values.detectedDate,
         barcode: values.barcode.trim(),
+        ...(autoFilledLookup.current.barcode === values.barcode.trim() && autoFilledLookup.current.skuCode
+          ? { skuCode: autoFilledLookup.current.skuCode } : {}),
         supplier: values.supplier.trim(),
         productName: values.productName.trim(),
         quantity: Number(values.quantity),

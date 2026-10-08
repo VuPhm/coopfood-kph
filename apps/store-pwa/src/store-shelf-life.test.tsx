@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ShelfLifeScreen } from "./store-shelf-life";
 
@@ -57,5 +57,16 @@ describe("Shelf life input corrections", () => {
     lookup();
     expect(screen.getByRole("alert")).toBeInTheDocument();
     expect(document.querySelector(".store-shelf-result")).toBeNull();
+  });
+
+  it("keeps labels and calendar anchors distinct when two utilities coexist", () => {
+    render(<><section aria-label="Tiện ích chính"><ShelfLifeScreen /></section><section aria-label="Tiện ích nhanh"><ShelfLifeScreen idPrefix="quick-shelf" /></section></>);
+    const main = within(screen.getByRole("region", { name: "Tiện ích chính" }));
+    const quick = within(screen.getByRole("region", { name: "Tiện ích nhanh" }));
+    fireEvent.change(quick.getByRole("textbox", { name: "Ngày sản xuất" }), { target: { value: "08/10/2026" } });
+    expect(quick.getByRole("textbox", { name: "Ngày sản xuất" })).toHaveValue("08/10/2026");
+    expect(main.getByRole("textbox", { name: "Ngày sản xuất" })).toHaveValue("");
+    expect(document.querySelectorAll('#shelf-nsx')).toHaveLength(1);
+    expect(document.querySelectorAll('#quick-shelf-nsx')).toHaveLength(1);
   });
 });

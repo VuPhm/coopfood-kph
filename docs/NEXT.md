@@ -2,22 +2,21 @@
 
 Cập nhật: 2026-10-08
 
-## Figma implementation — revision 4 chờ nghiệm thu
+## Figma implementation — revision 5 chờ nghiệm thu
 
-Cycle `figma-mobile-implementation` đang AWAITING_ACCEPTANCE revision 4 trên
-`store-app/figma-mobile-implementation`. KPH calendar icons now match the mobile
-and desktop fields: muted 20px read-only detected-date icon and green 20px
-interactive treatment-date icon, using each screen’s exact Feather export. Other
-CalendarInput consumers retain the default icon. `npm run verify` and targeted
-Playwright at 390×844 / 1440×1024 pass. Owner visual/workflow acceptance remains
-pending; technical PASS does not close the cycle.
+Cycle `figma-mobile-implementation` đang AWAITING_ACCEPTANCE revision 5 trên
+`store-app/figma-mobile-implementation`. Đã sửa các lỗi QA về chọn/duyệt/xuất
+KPH, giữ state DATE trong phiên và guard hai viewport, panel hạn lùi theo route,
+SKU/UPC, metadata fixture và vùng bấm mobile; CTA Tra cứu hiển thị rõ theo frame.
+`npm run verify` PASS 193 tests/build và ba gate Playwright ở
+390×844 / 1440×1024 PASS. Candidate SHA nằm trong plan; owner acceptance pending.
 
-Next step: owner reviews the mock preview’s TPCN/TPTS create forms, calendar
-picker, Escape and focus behavior, then accepts or gives a concrete finding.
-API wiring, merge, deployment and Pages cutover remain outside this cycle. See
-[revision 4 handoff](delivery/figma-mobile-implementation/acceptance-handoff-r4.md),
-[technical evidence](delivery/figma-mobile-implementation/technical-evidence-r4.md)
-and [asset details](delivery/figma-mobile-implementation/assets-r4.json).
+Bước nhỏ tiếp theo: owner kiểm tra preview mock theo
+[handoff r5](delivery/figma-mobile-implementation/acceptance-handoff-r5.md),
+đặc biệt chọn một phiếu → xuất một phiếu, xử lý DATE → về Home → mở lại và
+phiếu mới giữ đúng SKU/UPC. [Evidence r5](delivery/figma-mobile-implementation/technical-evidence-r5.md)
+ghi lệnh, kết quả và giới hạn. Round sửa này kết thúc tại handoff; chưa mở
+review/scope mới, API wiring, merge, deployment hay Pages cutover.
 
 ## Figma mobile implementation — evidence revision 1
 

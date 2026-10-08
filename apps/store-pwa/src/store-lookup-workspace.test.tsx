@@ -31,6 +31,9 @@ describe("memory-only product and lot lookup", () => {
     fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
     await screen.findByRole("heading", { name: "Cải thìa VietGAP 500 g" });
     expect(screen.getByText("C24-118")).toBeInTheDocument();
+    expect(screen.getByText("Thực phẩm tươi sống")).toBeInTheDocument();
+    expect(screen.getByText("kg")).toBeInTheDocument();
+    expect(screen.queryByText("Thực phẩm khô")).not.toBeInTheDocument();
   });
 
   it("keeps a barcode miss separate from catalog recovery", async () => {

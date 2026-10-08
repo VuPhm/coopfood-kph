@@ -1,17 +1,15 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 5,
-  "status": "EXECUTING",
-  "objective": "Repair the findings from the 2026-10-08 UI QA round on the existing memory-only Store App preview; preserve business/API boundaries and prepare owner acceptance.",
+  "revision": 4,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Complete the bounded KPH calendar icon repair in the existing Figma mobile implementation cycle; keep memory-only mock semantics and owner acceptance pending.",
   "inScope": [
-    "Unique KPH mock record IDs; isolated selection/review/export",
-    "DATE state retained in StoreApp for the session and shared with Home; consistent mobile/desktop transition guards",
-    "Close quick shelf utility on route changes; unique field IDs per ShelfLifeScreen instance",
-    "Preserve catalog SKU separately from scanned barcode in mock KPH records; search both identifiers",
-    "Fixture-specific lookup metadata; expanded hit areas without changing Figma visual sizes; repair the pre-existing Lookup CTA visibility defect exposed during the same scoped visual check",
-    "Refresh browser asset expectations from r3/r4; focused regressions, npm run verify and Playwright at 390×844 / 1440×1024",
-    "Revision 5 evidence and handoff; owner acceptance stays pending"
+    "KPH screen-presentation detected-date calendar uses its exact muted Feather asset at 20×20 and remains read-only/disabled",
+    "KPH screen-presentation treatment-date trigger uses its exact screen-specific Feather asset at 20×20",
+    "CalendarInput default icon and every non-KPH-screen consumer remain unchanged",
+    "Targeted calendar/KPH tests and mobile/desktop browser assertions cover icon source, color, size, picker open/select, Escape, focus, and disabled read-only date",
+    "npm run verify; fresh revision 4 evidence and owner handoff"
   ],
   "outOfScope": [
     "Backend/OpenAPI/generated API/schema/migration/authorization changes",
@@ -20,14 +18,15 @@
     "Admin redesign, unrelated online/Pilot refactor, new infrastructure",
     "Merge/push/deploy or protected Pages cutover; DATE add-following workflow without design"
   ],
-  "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
-  "candidateSha": "",
-  "integrationOwner": "/root — sole writer for the owner-authorized QA repair round",
+  "baseSha": "4031c62b985e3679efac11a52d9ee4df31b0cc47",
+  "candidateSha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
+  "integrationOwner": "GPT-6 Luna — sole implementation/integration writer after START; root standby for review/coordination",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
-    "apps/store-pwa/src/store-app.test.tsx",
     "apps/store-pwa/src/store-app.css",
     "apps/store-pwa/src/store-app-mock.ts",
+    "apps/store-pwa/src/store-shell.tsx",
+    "apps/store-pwa/src/profile-identity.tsx",
     "apps/store-pwa/src/store-kph-workspace.tsx",
     "apps/store-pwa/src/store-kph-workspace.test.tsx",
     "apps/store-pwa/src/store-shelf-life.tsx",
@@ -36,62 +35,75 @@
     "apps/store-pwa/src/store-date-workspace.test.tsx",
     "apps/store-pwa/src/store-lookup-workspace.tsx",
     "apps/store-pwa/src/store-lookup-workspace.test.tsx",
-    "apps/store-pwa/src/record-view.ts",
+    "apps/store-pwa/src/store-shell.test.tsx",
+    "apps/store-pwa/src/store-app.test.tsx",
+    "apps/store-pwa/src/store-create-review.test.tsx",
     "apps/store-pwa/src/create-record-dialog.tsx",
     "apps/store-pwa/src/create-record-dialog.test.tsx",
-    "apps/store-pwa/src/store-create-review.test.tsx",
+    "apps/store-pwa/src/barcode-scanner-dialog.tsx",
+    "apps/store-pwa/src/barcode-scanner-dialog.test.tsx",
+    "apps/store-pwa/src/image-viewer.tsx",
+    "apps/store-pwa/src/image-viewer.test.tsx",
+    "apps/store-pwa/src/calendar-input.tsx",
+    "apps/store-pwa/src/calendar-input.test.tsx",
+    "apps/store-pwa/src/figma-assets.ts",
+    "apps/store-pwa/src/kph-presentation/**",
+    "apps/store-pwa/src/shelf-presentation/**",
+    "apps/store-pwa/public/figma/**",
+    "packages/ui/src/**",
+    "packages/ui/DESIGN_SYSTEM.md",
     "e2e/scripts/check-figma-mobile.cjs",
-    "e2e/scripts/check-store-qa-repairs.cjs",
+    "e2e/scripts/check-figma-responsive.cjs",
     "docs/delivery/figma-mobile-implementation/**",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md"
   ],
   "reviewLimit": 1,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 4,
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 4,
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 4,
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 5,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 4,
+      "sha": "d3685cb028a4918bd7b1d6588b5cadc87b598b46",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 5,
+      "revision": 4,
       "sha": "",
       "evidence": ""
     }
@@ -117,21 +129,14 @@
       "source": "Owner says ‘tiếp tục’ on 2026-10-08; bounded fresh control-icon review; exact mobile nodes 203:701/203:847 and desktop nodes 384:1072/540:1685 re-read.",
       "impact": "Invalidates all revision 3 technical gates until screen-specific assets, read-only behavior, picker interactions, and integrated checks are reverified on the new candidate. Revision 3 evidence/manifests remain historical and unchanged; owner acceptance remains pending.",
       "decision": "Preserve CalendarInput default icon for all existing consumers. Add an optional icon presentation prop and pass exact KPH detected-date and treatment-date assets only for screenPresentation. No Figma writes, shared UI or dependency changes."
-    },
-    {
-      "revision": 5,
-      "request": "dùng kết quả này cho 1 round sửa",
-      "source": "Owner in current chat, 2026-10-08, following the completed UI QA report at .local/qa-ui-2026-10-08/report.md",
-      "impact": "Invalidates revision 4 technical gates: record identity, DATE/session state, identifiers, route behavior, hit areas and aggregate browser expectations change. Prior evidence remains historical; owner acceptance is pending.",
-      "decision": "One root writer on the existing branch/worktree. Repair all five P2 findings, two bounded P3 findings and stale asset expectations. No delegation, API/schema/dependency/shared UI change, Figma writes, merge/push/deploy. The same-round Lookup screenshot review also repairs the existing clipped/white-on-white submit CTA using frame 384:514."
     }
   ],
   "blockers": [],
-  "nextAction": "Implement the bounded QA repairs and rerun focused regressions plus integrated technical gates.",
+  "nextAction": "Owner reviews the running mock preview and KPH calendar icon and picker scenarios in acceptance-handoff-r4.md, then records a visual/workflow decision.",
   "workingTreeCandidate": {
-    "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
+    "baseSha": "4031c62b985e3679efac11a52d9ee4df31b0cc47",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Revision 5 working tree; candidate SHA will be recorded after the scoped implementation commit."
+    "note": "Integrated cycle candidate d3685cb contains implementation commit b60141d plus documentation-only status/handoff changes; verification covers identical application code and the updated docs check."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -140,9 +145,11 @@
     "apps/store-pwa/vite.config.ts"
   ],
   "executor": {
-    "agentId": "/root",
-    "status": "executing",
-    "ownership": "sole writer, one QA repair round",
+    "model": "gpt-6-luna",
+    "status": "completed",
+    "agentId": "/root/luna_calendar_repair_fresh",
+    "reasoningEffort": "inherit configured setting; no explicit effort requested",
+    "ownership": "sole writer, bounded KPH calendar icon repair",
     "worktree": "/Users/vup/Documents/coopfood-kph",
     "branch": "store-app/figma-mobile-implementation"
   },
@@ -152,12 +159,12 @@
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r5.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r5.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r4.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r4.md",
   "executionAuthorization": {
-    "date": "2026-10-08",
-    "source": "Owner: dùng kết quả này cho 1 round sửa",
-    "mode": "single writer on existing task branch/worktree",
-    "checkpoint": "ecebee861a32d91ce113727d92cb20fbb9a06a83"
+    "date": "2026-10-07",
+    "source": "Owner in current chat: gọi (các) luna rồi ra nghỉ, không ngồi chờ",
+    "mode": "single-writer handoff on existing task branch/worktree; parent standby may review or coordinate follow-up, no parallel writer",
+    "checkpoint": "f3ccacc5d3ded89fad04fec546b7ddc4b1d5b8fe"
   }
 }

@@ -4,20 +4,23 @@ Cập nhật: 2026-10-08
 
 ## Giai đoạn
 
-Cycle `figma-mobile-implementation` tiếp tục ở **AWAITING_ACCEPTANCE revision 4**
-trên nhánh `store-app/figma-mobile-implementation`. Candidate code
-`b60141da4e6b0574e0bfe5a5f6615eca8366a34e` sửa riêng icon Calendar trong hai
-field KPH: ngày phát hiện read-only dùng asset muted 20px; ngày xử lý dùng asset
-green 20px tương ứng TPCN/TPTS. CalendarInput mặc định và consumer lịch sử/Pilot/
-Tra hạn lùi giữ nguyên. `npm run verify` và targeted Playwright ở 390×844 / 1440×1024
-PASS; owner visual/workflow acceptance đang pending. Xem
-[evidence r4](delivery/figma-mobile-implementation/technical-evidence-r4.md),
-[handoff r4](delivery/figma-mobile-implementation/acceptance-handoff-r4.md) và
-[plan r4](delivery/figma-mobile-implementation/implementation-plan-r4.md).
+Cycle `figma-mobile-implementation` tiếp tục ở **AWAITING_ACCEPTANCE revision 5**
+trên nhánh `store-app/figma-mobile-implementation`. Round sửa theo QA 08/10 đã
+xử lý 5 lỗi P2: ID fixture KPH trùng, DATE mất state/count khi đổi màn, mobile
+lùi trạng thái DATE đã xử lý, tiện ích hạn lùi còn nổi/ID trùng và UPC bị ghi thành
+SKU. Metadata Tra cứu theo fixture, vùng bấm mobile và CTA Tra cứu cũng đã sửa.
+Candidate được ghi trong [plan](delivery/figma-mobile-implementation/plan.json).
+`npm run verify` PASS **193 tests** và build; Playwright headless ở
+390×844 / 1440×1024 đạt gate sửa lỗi, aggregate UI và KPH calendar.
+Owner visual/workflow acceptance vẫn pending. Xem
+[evidence r5](delivery/figma-mobile-implementation/technical-evidence-r5.md),
+[handoff r5](delivery/figma-mobile-implementation/acceptance-handoff-r5.md) và
+[plan sửa r5](delivery/figma-mobile-implementation/implementation-plan-r5.md).
 
-Revision 3 DATE Search/Maximize Feather repairs remain historical evidence and
-unchanged. Figma frames were not edited; mock remains memory-only. Không suy ra
-API wiring, merge, push, deploy hoặc Pages cutover từ technical PASS.
+Revision 3/4 icon repairs và evidence được giữ làm lịch sử. Mock vẫn memory-only:
+DATE giữ cập nhật khi đổi màn trong cùng phiên, reload sẽ reset fixture. Không đổi
+API/backend/Pilot, không sửa frame Figma. Technical PASS không suy ra merge,
+push, deploy hoặc Pages cutover.
 
 Theo yêu cầu owner ngày 03/10/2026, giao diện mobile từ Figma `aEDpXtz0IiEkPiVucqjQ3Q`
 đã được triển khai trên working tree nhánh `store-app/figma-mobile-implementation`.

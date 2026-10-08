@@ -12,6 +12,11 @@ type Lot = { id: string; manufactured: string; expiry: string; status: "track" |
 const demoProduct: Product = { id: "synthetic-product-2", barcode: "8936000123456", skuCode: "0008421", name: "Bánh quy bơ hộp 300 g", primarySupplier: { code: "NCC001", name: "Công ty Thực phẩm An Việt" } };
 const produceProduct: Product = { id: "synthetic-product-1", barcode: "29123415005", skuCode: "0011730", name: "Cải thìa VietGAP 500 g", primarySupplier: { code: "NCC001", name: "Nông sản Miền Đông" } };
 const products = [demoProduct, produceProduct];
+// Presentation metadata belongs to these synthetic fixtures, not the API Product schema.
+const productMetadata: Record<string, { group: string; unit: "EA" | "kg" }> = {
+  "synthetic-product-2": { group: "Thực phẩm khô", unit: "EA" },
+  "synthetic-product-1": { group: "Thực phẩm tươi sống", unit: "kg" },
+};
 const lots: Record<string, Lot[]> = {
   "synthetic-product-2": [
     { id: "A24-301", manufactured: "01/08/2026", expiry: "15/11/2026", status: "track" },
@@ -50,16 +55,17 @@ export function StoreLookupWorkspace() {
   }
 
   const productLots = product ? lots[product.id] ?? [] : [];
+  const metadata = product ? productMetadata[product.id] : undefined;
   const today = formatBusinessDate(new Date()).iso;
   return <div className="store-lookup">
     <form className="store-lookup-search" onSubmit={event => { event.preventDefault(); void search(); }}>
       <label><img data-figma-asset-slot="lookup-search" data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-1", "imgFeatherSearch")} alt="" /><span className="sr-only">Mã hàng, tên hàng hoặc lô</span><Input value={query} onChange={event => setQuery(event.target.value)} placeholder="Mã hàng, tên hàng hoặc quét" autoComplete="off" /></label>
       <button type="button" aria-label="Quét barcode để tra cứu" onClick={() => setScannerOpen(true)}><img src={figmaAsset("203-701", "imgFeatherMaximize")} alt="" /></button>
-      <Button type="submit" disabled={busy}>{busy ? "Đang tra cứu…" : "Tra cứu"}</Button>
+      <Button className="store-button" type="submit" disabled={busy}>{busy ? "Đang tra cứu…" : "Tra cứu"}</Button>
     </form>
     {message ? <p className="store-lookup-message" role="status">{message}</p> : null}
     {product ? <div className="store-lookup-results">
-      <section className="store-lookup-product"><span className="store-lookup-product-icon"><img src={figmaAsset("main-2", "imgFeatherPackage")} alt="" /></span><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p><span className="store-lookup-found">Đã nhận diện</span><hr /><h3>Thông tin</h3><dl><div><dt>Nhóm hàng</dt><dd>Thực phẩm khô</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>EA</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></section>
+      <section className="store-lookup-product"><span className="store-lookup-product-icon"><img src={figmaAsset("main-2", "imgFeatherPackage")} alt="" /></span><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p><span className="store-lookup-found">Đã nhận diện</span><hr /><h3>Thông tin</h3><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></section>
       <section className="store-lookup-lots"><header><h2>Các lô đang theo dõi</h2><span>{productLots.length} lô</span></header><div className="store-lookup-table-wrap"><table><thead><tr><th>Số lô</th><th>Ngày sản xuất</th><th>Hạn sử dụng</th><th>Còn lại</th><th>Trạng thái</th></tr></thead><tbody>{productLots.map(lot => { const remaining = daysBetween(today, parseDisplayDate(lot.expiry)); return <tr key={lot.id}><td>{lot.id}</td><td>{lot.manufactured}</td><td>{lot.expiry}</td><td className={`is-${lot.status}`}>{remaining < 0 ? `Quá ${Math.abs(remaining)} ngày` : `${remaining} ngày`}</td><td><span className={`store-lookup-status is-${lot.status}`}>{statusText[lot.status]}</span></td></tr>; })}</tbody></table></div></section>
     </div> : null}
     <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={value => { setQuery(value); void search(value); }} presentation="screen" />
