@@ -30,6 +30,6 @@ Checks cho lượt sửa: Escape, nút Đóng, overlay click trả focus đúng;
 - `npm test --workspace @coopfood-kph/store-pwa -- src/store-app.test.tsx` — PASS 2 tests / 1 file.
 - `node .local/qa-ui-2026-10-09/focus-check.cjs` — hoàn tất exit0 ở hai viewport; ghi 8 case `restored:false`, BODY → Tab → Đến nội dung; no pageerror. Đây là reproduction baseline, không phải PASS của repair. Artifact local trong worktree này: `focus-results.json`, screenshot `filter-after-close-{390,1440}.png`, `account-after-close-{390,1440}.png`.
 - `git diff --exit-code b1c772f -- apps packages e2e package.json package-lock.json` — PASS: toàn bộ code/config/dependency tracked còn nguyên so với base.
-- `npm run check:docs`, `git diff --check` và cycle dispatch consistency sẽ được chạy sau khi lưu checkpoint tài liệu. Dispatch checker chỉ kiểm tra tính nhất quán setup, không khởi chạy agent hoặc implementation.
+- `npm run check:docs` — PASS; `git diff --check` — PASS. Cycle dispatch consistency tại checkpoint `b43d82e` — exit0: `PASS dispatch: figma-mobile-implementation revision 6. Record checks only; verify evidence truth separately.` Checker chỉ kiểm tra tính nhất quán setup, không khởi chạy agent hoặc implementation. Sau checkpoint chỉ thêm dòng evidence này trong cùng cycle directory.
 
 Preview vẫn là mock memory-only; scope này không chứng minh production API/persistence/security hoặc thiết bị thật. **Bước nhỏ tiếp theo:** bắt đầu sửa focus trong worktree trên khi owner yêu cầu tiếp tục triển khai; giữ một round bounded và nghiệm thu owner pending.
