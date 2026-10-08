@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 8,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Integrate the owner-authorized shelf result reference snapshot into the verified r7 UI branch, preserve shared CSS changes and validate the combined candidate.",
   "inScope": [
     "Import reviewed shelf result component/tests/browser gate and source handoff snapshot from the original worktree",
@@ -17,7 +17,7 @@
     "Figma writes, merging into main, push/deploy or Pages cutover"
   ],
   "baseSha": "bd7cd865e1b4fda14b647101570cb4556c5ee9bc",
-  "candidateSha": "",
+  "candidateSha": "081c7117d814a53207134fddda4c9009a043f9f1",
   "integrationOwner": "/root — sole writer integrating the source snapshot into the isolated UI worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -52,46 +52,46 @@
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "sha": "081c7117d814a53207134fddda4c9009a043f9f1",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r8.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "sha": "081c7117d814a53207134fddda4c9009a043f9f1",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r8.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "sha": "081c7117d814a53207134fddda4c9009a043f9f1",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r8.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "sha": "081c7117d814a53207134fddda4c9009a043f9f1",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r8.md"
     },
     {
       "id": "shelf-result-reference",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "sha": "081c7117d814a53207134fddda4c9009a043f9f1",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r8.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
@@ -99,8 +99,8 @@
       "required": true,
       "status": "pending",
       "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "sha": "081c7117d814a53207134fddda4c9009a043f9f1",
+      "evidence": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r8.md"
     }
   ],
   "changes": [
@@ -159,12 +159,12 @@
   "workingTreeCandidate": {
     "baseSha": "bd7cd865e1b4fda14b647101570cb4556c5ee9bc",
     "path": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
-    "note": "Revision 8 combined integration working tree; record candidate after checks."
+    "note": "Combined candidate committed at 081c7117d814a53207134fddda4c9009a043f9f1; later commits only finalize cycle ledger."
   },
   "conditionalIntegratorPaths": [],
   "executor": {
     "agentId": "/root",
-    "status": "combined implementation verified; preparing candidate",
+    "status": "technical verification complete; owner acceptance pending",
     "ownership": "sole writer; combined UI/shelf scope",
     "worktree": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
     "branch": "store-app/qa-20261009-sheet-focus"

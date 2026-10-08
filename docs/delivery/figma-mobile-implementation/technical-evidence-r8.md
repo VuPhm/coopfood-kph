@@ -3,7 +3,7 @@
 09/10/2026. Owner authorization: “gộp với mục này”, with the shelf result follow-up.
 Same cycle, sole writer /root, branch `store-app/qa-20261009-sheet-focus`, worktree
 `/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`. Target base
-`bd7cd865e1b4fda14b647101570cb4556c5ee9bc`; candidate is recorded in [plan](plan.json).
+`bd7cd865e1b4fda14b647101570cb4556c5ee9bc`; candidate `081c7117d814a53207134fddda4c9009a043f9f1` is recorded in [plan](plan.json).
 Revision 7 evidence remains historical; all technical gates are rerun on the combined tree.
 
 ## Integration and provenance

@@ -2,7 +2,7 @@
 
 09/10/2026. Branch `store-app/qa-20261009-sheet-focus`; worktree
 `/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`. Combined candidate
-is recorded in [plan](plan.json). Preview: [Tra hạn lùi](http://127.0.0.1:5177/#shelf).
+`081c7117d814a53207134fddda4c9009a043f9f1` is recorded in [plan](plan.json). Preview: [Tra hạn lùi](http://127.0.0.1:5177/#shelf).
 
 The owner-authorized shelf result snapshot is now integrated with all r7 UI repairs.
 The original worktree remains unchanged. The exact five source hashes/base are in
