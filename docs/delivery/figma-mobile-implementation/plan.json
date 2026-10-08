@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 4,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Complete the bounded KPH calendar icon repair in the existing Figma mobile implementation cycle; keep memory-only mock semantics and owner acceptance pending.",
   "inScope": [
     "KPH screen-presentation detected-date calendar uses its exact muted Feather asset at 20×20 and remains read-only/disabled",
@@ -19,7 +19,7 @@
     "Merge/push/deploy or protected Pages cutover; DATE add-following workflow without design"
   ],
   "baseSha": "4031c62b985e3679efac11a52d9ee4df31b0cc47",
-  "candidateSha": "",
+  "candidateSha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
   "integrationOwner": "GPT-6 Luna — sole implementation/integration writer after START; root standby for review/coordination",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -66,37 +66,37 @@
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 4,
-      "sha": "",
-      "evidence": ""
+      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 4,
-      "sha": "",
-      "evidence": ""
+      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 4,
-      "sha": "",
-      "evidence": ""
+      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 4,
-      "sha": "",
-      "evidence": ""
+      "sha": "b60141da4e6b0574e0bfe5a5f6615eca8366a34e",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r4.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
@@ -136,7 +136,7 @@
   "workingTreeCandidate": {
     "baseSha": "4031c62b985e3679efac11a52d9ee4df31b0cc47",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Clean actual writer checkpoint at docs review commit 4031c62; r4 implementation and evidence will be committed separately."
+    "note": "Code candidate committed as b60141da4e6b0574e0bfe5a5f6615eca8366a34e; subsequent changes are cycle ledger/evidence only."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -146,7 +146,7 @@
   ],
   "executor": {
     "model": "gpt-6-luna",
-    "status": "in progress",
+    "status": "completed",
     "agentId": "/root/luna_calendar_repair_fresh",
     "reasoningEffort": "inherit configured setting; no explicit effort requested",
     "ownership": "sole writer, bounded KPH calendar icon repair",

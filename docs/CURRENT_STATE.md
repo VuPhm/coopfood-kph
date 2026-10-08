@@ -4,23 +4,20 @@ Cập nhật: 2026-10-08
 
 ## Giai đoạn
 
-Ngày 07/10/2026, owner yêu cầu review lại Figma `aEDpXtz0IiEkPiVucqjQ3Q`
-và lên kế hoạch cho GPT-6 Luna. Owner đã chọn **mobile + desktop, giữ mock**.
-Cycle `figma-mobile-implementation` đang **AWAITING_ACCEPTANCE revision 3** trên nhánh
-`store-app/figma-mobile-implementation`, current repair writer `/root/luna_date_icon_repair`.
-[kế hoạch chi tiết](delivery/figma-mobile-implementation/implementation-plan-r2.md)
-và [handoff Luna 6](delivery/figma-mobile-implementation/luna-6-handoff.md)
-theo dõi scope/gates. S0–S7 đã triển khai; revision 3 repairs the DATE Feather React
-icons, and full verify plus responsive Playwright pass. Owner visual acceptance
-remains pending. Evidence 03/10 is historical.
+Cycle `figma-mobile-implementation` tiếp tục ở **AWAITING_ACCEPTANCE revision 4**
+trên nhánh `store-app/figma-mobile-implementation`. Candidate code
+`b60141da4e6b0574e0bfe5a5f6615eca8366a34e` sửa riêng icon Calendar trong hai
+field KPH: ngày phát hiện read-only dùng asset muted 20px; ngày xử lý dùng asset
+green 20px tương ứng TPCN/TPTS. CalendarInput mặc định và consumer lịch sử/Pilot/
+Tra hạn lùi giữ nguyên. `npm run verify` và targeted Playwright ở 390×844 / 1440×1024
+PASS; owner visual/workflow acceptance đang pending. Xem
+[evidence r4](delivery/figma-mobile-implementation/technical-evidence-r4.md),
+[handoff r4](delivery/figma-mobile-implementation/acceptance-handoff-r4.md) và
+[plan r4](delivery/figma-mobile-implementation/implementation-plan-r4.md).
 
-Ngày 08/10, owner xác nhận bộ icon **Feather React** và yêu cầu tiếp tục loop,
-cho phép dùng sub mới. Fresh review found two DATE icon mismatches; revision 3
-uses exact local Figma Feather exports with `#1C261C` strokes, preserving mock
-interaction and accessibility labels. `npm run verify` and responsive Playwright
-at seven viewports pass. Owner acceptance remains pending. See
-[revision 3 evidence](delivery/figma-mobile-implementation/technical-evidence-r3.md)
-and [preview handoff](delivery/figma-mobile-implementation/acceptance-handoff-r3.md).
+Revision 3 DATE Search/Maximize Feather repairs remain historical evidence and
+unchanged. Figma frames were not edited; mock remains memory-only. Không suy ra
+API wiring, merge, push, deploy hoặc Pages cutover từ technical PASS.
 
 Theo yêu cầu owner ngày 03/10/2026, giao diện mobile từ Figma `aEDpXtz0IiEkPiVucqjQ3Q`
 đã được triển khai trên working tree nhánh `store-app/figma-mobile-implementation`.
@@ -28,27 +25,11 @@ Home, tra cứu hạn lùi, KPH và DATE chạy với fixture tổng hợp trong
 co giãn tạm thời khi owner tiếp tục thiết kế. Technical gate PASS 164 tests,
 build và Playwright 390×844 / 1440×1024; chưa có owner visual acceptance.
 [Implementation handoff](delivery/figma-mobile-implementation/handoff.md) ghi scope,
-icon replacements, preview và giới hạn mock/API. Writer đã dừng để review tiếp nhận. Lượt [review/sửa](delivery/figma-mobile-implementation/review.md)
+icon replacements, preview và giới hạn mock/API. Lượt [review/sửa](delivery/figma-mobile-implementation/review.md)
 ngày 03/10/2026 đã xử lý stale date ở tra hạn lùi, count/filter KPH và vùng
 bấm/focus/spacing; `npm run verify` PASS 169 tests. Owner visual acceptance
 vẫn pending, API/desktop parity chưa được chứng minh.
 Thông tin R2-01 bên dưới là baseline lịch sử; không phải mô tả giao diện mới.
-
-`Round 2 — R2-01 Shared Store App Shell Spine đã CLOSED theo owner acceptance.`
-Candidate ứng dụng `3799a30` trên `store-app/r2-01-shell-spine` tạo shell online
-nhỏ với lối vào trực tiếp TPCN, TPTS và History, dùng account/store context từ
-session. Technical gate và close checker PASS; [acceptance handoff](delivery/r2-01-shell-spine/acceptance-handoff.md)
-ghi owner “pass” ngày 2026-09-24. UI visual refinement được hoãn; đây chưa phải
-final design system. Chưa merge, deploy hoặc cutover Pages. Hướng UI DNA và ranh
-giới slice nằm ở [Store App UI DNA](product/STORE_APP_UI_DNA.md) và
-[Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md).
-D01 history paging đã CLOSED và được owner chấp nhận trước R2-01; Store App pivot
-không thay đổi nghiệm thu D01. Xem [baseline](STORE_APP_BASELINE.md) và
-[contract index](product/STORE_APP_CONTRACTS.md).
-
-Repository hiện tiến hóa thành Co.op Food Store Operations App. Hai repository cũ
-`coopfood-kph-platform` và `tool-kph` chỉ là provenance read-only; không tiếp
-tục phát triển sản phẩm hoặc ghi dữ liệu vận hành vào đó.
 
 ## Baseline đã chấp nhận
 

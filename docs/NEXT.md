@@ -2,20 +2,22 @@
 
 Cập nhật: 2026-10-08
 
-## Figma implementation — revision 3 chờ nghiệm thu
+## Figma implementation — revision 4 chờ nghiệm thu
 
-Owner chọn **mobile + desktop, giữ mock** ngày 07/10/2026. Đã review structured
-context/screenshot của mobile, desktop và component/theme trong Figma
-`aEDpXtz0IiEkPiVucqjQ3Q`. Cycle hiện có đang AWAITING_ACCEPTANCE revision 3 theo
-[kế hoạch](delivery/figma-mobile-implementation/implementation-plan-r2.md),
-không mở cycle song song. Luna là sole writer; technical gates PASS, owner acceptance
-đang pending.
+Cycle `figma-mobile-implementation` đang AWAITING_ACCEPTANCE revision 4 trên
+`store-app/figma-mobile-implementation`. KPH calendar icons now match the mobile
+and desktop fields: muted 20px read-only detected-date icon and green 20px
+interactive treatment-date icon, using each screen’s exact Feather export. Other
+CalendarInput consumers retain the default icon. `npm run verify` and targeted
+Playwright at 390×844 / 1440×1024 pass. Owner visual/workflow acceptance remains
+pending; technical PASS does not close the cycle.
 
-Bước nhỏ tiếp theo: owner xem preview memory-only và xác nhận visual/workflow
-hoặc gửi finding cụ thể. DATE Search/Maximize khớp Feather React masters;
-scanner manual fallback và labels được giữ nguyên. Technical PASS không tự đóng
-cycle. API wiring tiếp tục ngoài scope. Xem
-[handoff revision 3](delivery/figma-mobile-implementation/acceptance-handoff-r3.md).
+Next step: owner reviews the mock preview’s TPCN/TPTS create forms, calendar
+picker, Escape and focus behavior, then accepts or gives a concrete finding.
+API wiring, merge, deployment and Pages cutover remain outside this cycle. See
+[revision 4 handoff](delivery/figma-mobile-implementation/acceptance-handoff-r4.md),
+[technical evidence](delivery/figma-mobile-implementation/technical-evidence-r4.md)
+and [asset details](delivery/figma-mobile-implementation/assets-r4.json).
 
 ## Figma mobile implementation — evidence revision 1
 
