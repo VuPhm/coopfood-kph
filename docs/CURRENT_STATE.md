@@ -2,36 +2,40 @@
 
 Cập nhật: 2026-10-09
 
-## UI repair — revision 7 trên worktree riêng
+## UI + kết quả Tra hạn lùi — revision 8 trên worktree riêng
 
-Theo yêu cầu owner “còn rất nhiều lỗi, cứ rà và sửa” ngày 09/10/2026, cycle
-`figma-mobile-implementation` tiếp tục trên `store-app/qa-20261009-sheet-focus`,
-worktree `/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph` từ checkpoint
-`b180484`. Preview mock riêng: <http://127.0.0.1:5177/>.
+Theo yêu cầu owner “gộp với mục này” ngày 09/10/2026, cycle
+`figma-mobile-implementation` giữ nhánh `store-app/qa-20261009-sheet-focus`, worktree
+`/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph`; base r8 `bd7cd86`.
+Preview kết hợp: [Tra hạn lùi](http://127.0.0.1:5177/#shelf).
 
-Đã sửa focus khi đóng dialog, Escape giữa các lớp, giữ draft tiện ích nhanh khi
-đóng Account, route lifetime/focus, tìm kiếm DATE/KPH có khoảng trắng, Lookup
-name recovery và kết quả trễ, copy DATE quá hạn, kích thước header/tab/CTA/chevron,
-icon tìm kiếm và hàng action DATE desktop. `npm run verify` PASS 205 tests/build;
-5 gate Playwright gồm hai viewport bắt buộc và 7 kích thước responsive PASS.
-Hai lượt review kỹ thuật đã khép lại; owner visual/workflow acceptance pending.
-[Evidence r7](delivery/figma-mobile-implementation/technical-evidence-r7.md),
-[handoff r7](delivery/figma-mobile-implementation/acceptance-handoff-r7.md) và
-[plan](delivery/figma-mobile-implementation/plan.json) ghi candidate và giới hạn.
+Đã gộp hộp kết quả theo ảnh tham chiếu: ngày chính có semantics time, hai số ngày
+có nhãn, badge theo trạng thái, ô đã qua hạn lùi màu đỏ và timeline có nhãn Hôm nay.
+Tra lại lấy ngày nghiệp vụ tại submit. Giữ toàn bộ sửa r7 về focus/Escape/draft,
+route/query, DATE quá hạn, header/tab/CTA/chevron, icon và action row desktop.
+Shared CSS đã được so sánh chính xác để giữ cả hai phạm vi.
 
-Task khác đang sửa kết quả Tra hạn lùi trên worktree gốc. Round này không sửa
-component/test/script kết quả hoặc CSS shelf của task đó. Cần review tích hợp
-stylesheet khi kết hợp hai nhánh. Không đổi API/backend/Pilot, không merge/push,
-deploy hoặc viết Figma; mock vẫn chỉ giữ thay đổi trong phiên.
+`npm run verify` PASS **217 tests/build**; sáu gate Playwright PASS tại 390×844 /
+1440×1024, bảy kích thước responsive và thêm quick panel 375px. Hai lượt review
+kỹ thuật khép lại; owner visual/workflow acceptance pending.
+[Evidence r8](delivery/figma-mobile-implementation/technical-evidence-r8.md),
+[handoff r8](delivery/figma-mobile-implementation/acceptance-handoff-r8.md) và
+[plan](delivery/figma-mobile-implementation/plan.json) ghi candidate/gates/provenance.
 
-## Giai đoạn
+Nguồn là snapshot chưa commit từ worktree gốc ở `b1c772f`, năm file có SHA-256
+trong plan; worktree task kia không bị sửa/reset/commit. Handoff nguồn giữ port
+5176 như evidence lịch sử; preview kết hợp là 5177. Không đổi rule domain/API,
+backend/Pilot/dependency/Figma; chưa merge/push/deploy. Mock memory-only, reset
+khi reload; technical PASS chưa thay nghiệm thu owner.
 
-Cycle `figma-mobile-implementation` tiếp tục ở **AWAITING_ACCEPTANCE revision 5**
+## Lịch sử revision 5
+
+Cycle `figma-mobile-implementation` từng ở **AWAITING_ACCEPTANCE revision 5**
 trên nhánh `store-app/figma-mobile-implementation`. Round sửa theo QA 08/10 đã
 xử lý 5 lỗi P2: ID fixture KPH trùng, DATE mất state/count khi đổi màn, mobile
 lùi trạng thái DATE đã xử lý, tiện ích hạn lùi còn nổi/ID trùng và UPC bị ghi thành
 SKU. Metadata Tra cứu theo fixture, vùng bấm mobile và CTA Tra cứu cũng đã sửa.
-Candidate được ghi trong [plan](delivery/figma-mobile-implementation/plan.json).
+Candidate lịch sử được ghi trong [plan r5](delivery/figma-mobile-implementation/plan-r5.json).
 `npm run verify` PASS **193 tests** và build; Playwright headless ở
 390×844 / 1440×1024 đạt gate sửa lỗi, aggregate UI và KPH calendar.
 Owner visual/workflow acceptance vẫn pending. Xem

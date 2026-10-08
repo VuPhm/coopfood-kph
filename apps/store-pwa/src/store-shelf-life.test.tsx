@@ -8,6 +8,89 @@ const lookup = () => fireEvent.click(screen.getByRole("button", { name: "Tra c�
 describe("Shelf life input corrections", () => {
   afterEach(() => vi.useRealTimers());
 
+  it.each([
+    ["2026-10-05", "SAFE", "An toàn", "Đến hạn lùi", "3 ngày", "HSD còn", "5 ngày", "08/10/2026"],
+    ["2026-10-06", "WARNING", "Sắp đến hạn lùi", "Đến hạn lùi", "2 ngày", "HSD còn", "4 ngày", "08/10/2026"],
+    ["2026-10-08", "DANGER", "Đến hạn lùi hôm nay", "Hạn lùi hôm nay", "0 ngày", "HSD còn", "2 ngày", "08/10/2026"],
+    ["2026-10-09", "DANGER", "Ngày lùi hàng", "Đã qua hạn lùi", "1 ngày", "HSD còn", "1 ngày", "08/10/2026"],
+    ["2026-10-10", "DANGER", "Ngày lùi hàng", "Đã qua hạn lùi", "2 ngày", "HSD hôm nay", "0 ngày", "08/10/2026"],
+    ["2026-10-11", "EXPIRED", "Đã hết hạn sử dụng", "Đã qua hạn lùi", "3 ngày", "Qua HSD", "1 ngày", "10/10/2026"],
+  ])("shows %s with status, labeled day counts and the correct primary date", (today, status, badge, withdrawalLabel, withdrawalValue, expiryLabel, expiryValue, mainDate) => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(`${today}T00:00:00+07:00`));
+    render(<ShelfLifeScreen />);
+    change("Ngày sản xuất", "01/10/2026");
+    change("Hạn sử dụng (HSD)", "10/10/2026");
+    lookup();
+    const result = screen.getByRole("region", { name: "Kết quả tra hạn lùi" });
+    expect(result).toHaveAttribute("data-status", status);
+    expect(result.querySelector(".store-chip")).toHaveTextContent(badge);
+    expect(result.querySelector(".store-result-date")).toHaveTextContent(mainDate);
+    const facts = result.querySelectorAll(".store-result-facts > div");
+    expect(facts[0]).toHaveTextContent(`${withdrawalLabel}${withdrawalValue}`);
+    expect(facts[1]).toHaveTextContent(`${expiryLabel}${expiryValue}`);
+    expect(within(result).getByRole("img", { name: `Hôm nay${status === "EXPIRED" ? " · Qua HSD" : ""} ${today.split("-").reverse().join("/")}` })).toBeInTheDocument();
+  });
+
+  it("matches the reference dates and keeps reset/edit results from going stale", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-30T00:00:00+07:00"));
+    render(<ShelfLifeScreen />);
+    expect(screen.getByText("Nhập ngày để tra cứu hạn lùi hàng.")).toBeInTheDocument();
+    change("Ngày sản xuất", "18/01/2026");
+    change("Hạn sử dụng (HSD)", "18/10/2026");
+    lookup();
+    const result = screen.getByRole("region", { name: "Kết quả tra hạn lùi" });
+    expect(result.querySelector(".store-result-date")).toHaveTextContent("24/08/2026");
+    expect(result).toHaveTextContent("Đã qua hạn lùi37 ngàyHSD còn18 ngày");
+    expect(result.querySelector('time[datetime="2026-06-30"]')).toHaveTextContent("30/06");
+    change("Hạn sử dụng (HSD)", "19/10/2026");
+    expect(screen.queryByRole("region", { name: "Kết quả tra hạn lùi" })).not.toBeInTheDocument();
+    lookup();
+    fireEvent.click(screen.getByRole("button", { name: "Làm mới" }));
+    expect(screen.queryByRole("region", { name: "Kết quả tra hạn lùi" })).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Ngày sản xuất" })).toHaveValue("");
+  });
+
+  it.each(["2026-10-06", "2026-10-10", "2026-10-11"])("combines the withdrawal/expiry endpoint below 10 days on %s", today => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(`${today}T00:00:00+07:00`));
+    render(<ShelfLifeScreen />);
+    change("Ngày sản xuất", "02/10/2026");
+    change("Hạn sử dụng (HSD)", "10/10/2026");
+    lookup();
+    const result = screen.getByRole("region", { name: "Kết quả tra hạn lùi" });
+    expect(result.querySelectorAll(".store-timeline-milestone")).toHaveLength(2);
+    expect(within(result).getByText("Hạn lùi / HSD")).toBeInTheDocument();
+    expect(within(result).queryByText("Cảnh báo")).not.toBeInTheDocument();
+    expect(result.querySelector(".store-result-date")).toHaveTextContent("10/10/2026");
+  });
+
+  it("labels today before manufacture without implying it lies inside the shelf life", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-30T00:00:00+07:00"));
+    render(<ShelfLifeScreen />);
+    change("Ngày sản xuất", "01/10/2026");
+    change("Hạn sử dụng (HSD)", "10/10/2026");
+    lookup();
+    expect(screen.getByRole("img", { name: "Hôm nay · Trước NSX 30/09/2026" })).toHaveAttribute("data-outside", "before");
+  });
+
+  it("rechecks the business date when submitting unchanged inputs after midnight", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-05T23:59:00+07:00"));
+    render(<ShelfLifeScreen />);
+    change("Ngày sản xuất", "01/10/2026");
+    change("Hạn sử dụng (HSD)", "10/10/2026");
+    lookup();
+    expect(screen.getByRole("region", { name: "Kết quả tra hạn lùi" })).toHaveAttribute("data-status", "SAFE");
+    vi.setSystemTime(new Date("2026-10-06T00:01:00+07:00"));
+    lookup();
+    const result = screen.getByRole("region", { name: "Kết quả tra hạn lùi" });
+    expect(result).toHaveAttribute("data-status", "WARNING");
+    expect(result.querySelector(".store-result-facts > div:first-child")).toHaveTextContent("Đến hạn lùi2 ngày");
+  });
+
   it("validates partial edits and recalculates the inclusive 9/10-day boundary without changing the year", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-06T00:00:00+07:00"));

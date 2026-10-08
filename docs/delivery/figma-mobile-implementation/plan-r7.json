@@ -1,24 +1,25 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 8,
-  "status": "VERIFYING",
-  "objective": "Integrate the owner-authorized shelf result reference snapshot into the verified r7 UI branch, preserve shared CSS changes and validate the combined candidate.",
+  "revision": 7,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Audit and repair reproducible UI defects across Store App navigation, dialogs, KPH, DATE and lookup in the isolated worktree; preserve API/business and the other task’s shelf result scope.",
   "inScope": [
-    "Import reviewed shelf result component/tests/browser gate and source handoff snapshot from the original worktree",
-    "Three-way integrate shelf result/timeline CSS with r7 header/tabs/icons/action row; retain both implementations",
-    "Reverify result states, boundary/midnight semantics, quick panel and r7 focus/lifecycle/workflows on combined mock preview 5177",
-    "Record provenance, verified candidate and owner handoff in the same cycle"
+    "Restore controlled StoreSheet and screen dialog focus across keyboard/pointer closes and nested layers",
+    "Repair route/dialog lifetime and quick utility Escape conflicts without losing an underlying draft",
+    "Audit DATE filters/search/status copy, lookup query/result coherence and name recovery",
+    "Repair confirmed mobile visual geometry against the exact Figma contexts; exclude shelf CSS selectors",
+    "Focused component and Playwright regressions at 390×844 / 1440×1024; integrated verify and two bounded review passes"
   ],
   "outOfScope": [
-    "Writing, committing or resetting the source worktree owned by the other task",
+    "Other writer’s shelf result component/tests/reference/browser script and shelf CSS selectors",
     "Backend/OpenAPI/generated schema, authorization, domain rules, production API wiring/persistence/Pilot changes",
     "packages/ui and root config/lockfile/dependency changes",
-    "Figma writes, merging into main, push/deploy or Pages cutover"
+    "Figma writes or overwriting accepted frames; merge/push/deploy or Pages cutover"
   ],
-  "baseSha": "bd7cd865e1b4fda14b647101570cb4556c5ee9bc",
-  "candidateSha": "",
-  "integrationOwner": "/root — sole writer integrating the source snapshot into the isolated UI worktree",
+  "baseSha": "b180484f7a2377020e5bf4e6354705948ee6382f",
+  "candidateSha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+  "integrationOwner": "/root — sole writer in the isolated StoreSheet focus worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
     "apps/store-pwa/src/store-app.test.tsx",
@@ -39,10 +40,7 @@
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "e2e/scripts/check-figma-mobile.cjs",
-    "e2e/scripts/check-figma-responsive.cjs",
-    "apps/store-pwa/src/store-shelf-life.tsx",
-    "apps/store-pwa/src/store-shelf-life.test.tsx",
-    "e2e/scripts/check-shelf-result.cjs"
+    "e2e/scripts/check-figma-responsive.cjs"
   ],
   "reviewLimit": 2,
   "reviewRound": 2,
@@ -52,55 +50,46 @@
       "id": "workspace-integrity",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 7,
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "workflow-semantics",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 7,
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "mobile-desktop-visual-interaction",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 7,
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "responsive-assets",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 8,
-      "sha": "",
-      "evidence": ""
-    },
-    {
-      "id": "shelf-result-reference",
-      "kind": "technical",
-      "required": true,
-      "status": "pending",
-      "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "status": "pass",
+      "revision": 7,
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r7.md"
     },
     {
       "id": "owner-mobile-desktop-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 8,
-      "sha": "",
-      "evidence": ""
+      "revision": 7,
+      "sha": "0a9b933ce83072260dba530f77b4679959c7c51b",
+      "evidence": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r7.md"
     }
   ],
   "changes": [
@@ -145,27 +134,20 @@
       "source": "Owner in current chat, 2026-10-09",
       "impact": "Expands setup-only scope into authorized audit/repair execution in the isolated worktree. All repair gates pending; r5/r6 evidence historical.",
       "decision": "One writer, two bounded review passes. Fix reproducible interaction/visual defects on existing screens, keep the other task’s shelf scope excluded. No new team, API, dependency or Figma write."
-    },
-    {
-      "revision": 8,
-      "request": "gộp với mục này — Hộp kết quả tra hạn lùi theo ảnh tham chiếu",
-      "source": "Owner in current chat, 2026-10-09; supplied source branch/worktree/base and implementation summary",
-      "impact": "Authorize shelf scope integration and invalidate r7 technical gates until the combined candidate is verified; prior owner acceptance remains pending.",
-      "decision": "Keep target branch/worktree and sole writer. Capture five source files with hashes, apply the tracked patch using three-way merge and copy untracked gate/handoff. Original worktree stays untouched. No delegation, API, dependencies, Figma writes, main merge or deployment."
     }
   ],
   "blockers": [],
-  "nextAction": "Record combined candidate and technical gates; owner reviews shelf/quick and retained UI repairs on port 5177.",
+  "nextAction": "Owner inspects mock port 5177 using acceptance-handoff-r7.md and records feedback on this candidate; review shared CSS before integrating the other shelf task.",
   "workingTreeCandidate": {
-    "baseSha": "bd7cd865e1b4fda14b647101570cb4556c5ee9bc",
+    "baseSha": "b180484f7a2377020e5bf4e6354705948ee6382f",
     "path": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
-    "note": "Revision 8 combined integration working tree; record candidate after checks."
+    "note": "Verified application candidate 0a9b933ce83072260dba530f77b4679959c7c51b; subsequent commits finalize cycle records only."
   },
   "conditionalIntegratorPaths": [],
   "executor": {
     "agentId": "/root",
-    "status": "combined implementation verified; preparing candidate",
-    "ownership": "sole writer; combined UI/shelf scope",
+    "status": "verified, awaiting owner acceptance",
+    "ownership": "sole writer, broader UI defect scope with shelf excluded",
     "worktree": "/Users/vup/.codex/worktrees/store-sheet-focus/coopfood-kph",
     "branch": "store-app/qa-20261009-sheet-focus"
   },
@@ -175,26 +157,12 @@
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/integration-plan-r8.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r8.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/ui-repair-plan-r7.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r7.md",
   "executionAuthorization": {
     "date": "2026-10-09",
-    "source": "Owner: gộp với mục này, with the shelf result implementation summary",
-    "mode": "integrate reviewed source snapshot into current task branch",
-    "checkpoint": "bd7cd865e1b4fda14b647101570cb4556c5ee9bc"
-  },
-  "sourceIntegration": {
-    "sourceWorktree": "/Users/vup/Documents/coopfood-kph",
-    "sourceBranch": "store-app/figma-mobile-implementation",
-    "sourceBaseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
-    "targetBaseSha": "bd7cd865e1b4fda14b647101570cb4556c5ee9bc",
-    "patchSha256": "5589c16f52e48b3aea1700e42d32d6f0aa7c31a7443ec663d0e54383d9261864",
-    "files": {
-      "apps/store-pwa/src/store-app.css": "744bd7e3b05fdb4b194a0b7aa889c6907420f2aa0804383eb8f8bff691f9173f",
-      "apps/store-pwa/src/store-shelf-life.tsx": "6a62e3d55234c261b1e55917af71ff71270ae5a3197b9f6bbd5d139101b200ce",
-      "apps/store-pwa/src/store-shelf-life.test.tsx": "3a90684f6a2a1826703d000c85b4aa3a706796a92b3fb4ce9d09c1f27a883d12",
-      "e2e/scripts/check-shelf-result.cjs": "a349a46db2608246a602d378147e80776727985e09b2acf1628e0d2d730bd3aa",
-      "docs/delivery/figma-mobile-implementation/shelf-result-reference.md": "dfa8eed78ee90693dee3084a5572baa7a6e879d064f32000eb5b0616e23d68cd"
-    }
+    "source": "Owner: còn rất nhiều lỗi, cứ rà và sửa",
+    "mode": "audit and implement repairs in isolated worktree",
+    "checkpoint": "b180484f7a2377020e5bf4e6354705948ee6382f"
   }
 }

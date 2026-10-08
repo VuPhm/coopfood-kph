@@ -2,24 +2,23 @@
 
 Cập nhật: 2026-10-09
 
-## UI repair — revision 7 chờ nghiệm thu
+## UI + kết quả Tra hạn lùi — revision 8 chờ nghiệm thu
 
-Cycle `figma-mobile-implementation` trên nhánh riêng
-`store-app/qa-20261009-sheet-focus` đã hoàn tất hai lượt rà/sửa. Technical PASS:
-205 tests/build, các luồng mock cũ và dialog/query/geometry mới, Playwright
-390×844 / 1440×1024 cùng 7 kích thước responsive. Candidate và gates ghi trong
+Cycle `figma-mobile-implementation` giữ nhánh riêng
+`store-app/qa-20261009-sheet-focus`. Đã tích hợp snapshot hộp kết quả Tra hạn lùi
+với sửa UI r7, review shared CSS và chạy lại toàn bộ gate trên bản kết hợp.
+Technical PASS: **217 tests/build**, sáu gate Playwright tại 390×844 / 1440×1024,
+bảy kích thước responsive và quick panel 375px. Candidate/gates/provenance trong
 [plan](delivery/figma-mobile-implementation/plan.json); owner acceptance pending.
 
-Bước nhỏ tiếp theo: kiểm tra [preview mock](http://127.0.0.1:5177/) theo
-[handoff r7](delivery/figma-mobile-implementation/acceptance-handoff-r7.md),
-đặc biệt Escape ở các lớp, giữ draft, đổi route, sửa query và icon/CTA mobile.
-[Evidence r7](delivery/figma-mobile-implementation/technical-evidence-r7.md)
-ghi scope/lệnh/kết quả. Kết quả Tra hạn lùi của task khác vẫn ở worktree gốc;
-khi kết hợp hai nhánh cần review shared stylesheet. Chưa merge/push/deploy,
-Pages cutover, API wiring hoặc owner acceptance.
+Bước nhỏ tiếp theo: xem [preview kết hợp](http://127.0.0.1:5177/#shelf) theo
+[handoff r8](delivery/figma-mobile-implementation/acceptance-handoff-r8.md),
+kiểm tra hộp kết quả/timeline và tiện ích nhanh cùng Escape/draft/focus của r7.
+[Evidence r8](delivery/figma-mobile-implementation/technical-evidence-r8.md) ghi
+file/lệnh/kết quả. Worktree gốc của task kia không bị sửa; nguồn snapshot đã có
+hash. Chưa main merge/push/deploy, Pages cutover, API wiring hoặc owner acceptance.
 
-Revision 5 và setup revision 6 được giữ như evidence lịch sử, không dùng thay
-cho kiểm tra trên candidate r7.
+Revision 5–7 và handoff nguồn là evidence lịch sử, không thay kiểm tra r8.
 
 ## Figma mobile implementation — evidence revision 1
 
