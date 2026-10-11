@@ -95,7 +95,10 @@ describe("Store App session and route ownership", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog", { name: "Lịch chọn ngày" })).not.toBeInTheDocument();
     expect(quick).toBeInTheDocument();
-    fireEvent.click(document.querySelector('[data-slot="dialog-overlay"]') as Element);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const overlay = document.querySelector('[data-slot="dialog-overlay"]') as Element;
+    fireEvent.pointerDown(overlay);
+    fireEvent.click(overlay);
     expect(screen.queryByRole("dialog", { name: "Tra cứu lùi hàng nhanh" })).not.toBeInTheDocument();
     await waitFor(() => expect(trigger).toHaveFocus());
   });

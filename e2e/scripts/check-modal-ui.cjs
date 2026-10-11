@@ -106,6 +106,12 @@ const output = '.local/modal-unification'; fs.mkdirSync(output, { recursive: tru
         // The lazy form replaces its loading dialog; inspect the ready form.
         if (scenario.name === 'create') await expect(dialog.locator('.create-dialog-form')).toBeVisible();
         await chrome(dialog, scenario.name, scenario.fullScreen);
+        if (scenario.name === 'create' && !scenario.fullScreen) {
+          await dialog.locator('#product-name').fill('Phiếu chưa lưu');
+          await page.mouse.click(2, 2);
+          await expect(dialog).toBeVisible();
+          await expect(dialog.locator('#product-name')).toHaveValue('Phiếu chưa lưu');
+        }
         await closeWithEscape(dialog, opener);
       }
       await page.evaluate(() => location.hash = 'date');
