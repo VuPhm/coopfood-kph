@@ -1,5 +1,13 @@
 # Trạng thái hiện tại
 
+**DATE hợp nhất + Co.op Fresh r14** theo yêu cầu owner 11/10/2026: bỏ Tra cứu
+riêng, một thanh tìm/quét SKU/barcode/tên/lô và metadata trong DATE. Home/rail
+bỏ Tra cứu, mobile còn 3 mục; `#lookup` chuyển về DATE. Fixture lô/catalog
+thống nhất, giữ xử lý và state phiên. Technical PASS 230 tests/build, browser
+3 viewport và contrast 24 trạng thái; nghiệm thu owner còn pending.
+[Bàn giao r14](delivery/figma-mobile-implementation/date-coop-fresh.md),
+preview mock <http://127.0.0.1:4202/#date>. KPH r13 acceptance bên dưới giữ riêng.
+
 **KPH Co.op Fresh r13 đã được owner duyệt ngày 11/10/2026** qua “duyệt, checkpoint”.
 Phạm vi: giao diện danh sách/form/sheets, hai CTA cam/xanh và tab tương phản rõ
 trên preview 4201. Technical PASS: build, contrast 66 trạng thái, Fresh 3 viewport

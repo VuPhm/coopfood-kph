@@ -12,7 +12,7 @@ function DateWorkspace() {
 describe("memory-only DATE workspace", () => {
   it("clears a detail selection when acknowledging hides its lot under the active filter", async () => {
     render(<DateWorkspace />);
-    fireEvent.click(screen.getByRole("button", { name: /Sản phẩm C/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
     await screen.findByRole("heading", { name: "Xử lý cảnh báo DATE" });
     fireEvent.click(screen.getByRole("button", { name: "Ghi nhận" }));
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Xử lý cảnh báo DATE" })).not.toBeInTheDocument());
@@ -28,10 +28,10 @@ describe("memory-only DATE workspace", () => {
   it("prevents acknowledging an already resolved lot on mobile", async () => {
     render(<DateWorkspace />);
     fireEvent.click(screen.getByRole("button", { name: /Theo dõi DATE/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Sản phẩm C/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Đã xử lý" }));
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Xử lý cảnh báo DATE" })).not.toBeInTheDocument());
-    fireEvent.click(screen.getByRole("button", { name: /Sản phẩm C/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
     const dialog = await screen.findByRole("dialog", { name: "Xử lý cảnh báo DATE" });
     expect(dialog).toHaveTextContent("Đã xử lý");
     expect(screen.getByRole("button", { name: "Ghi nhận" })).toBeDisabled();

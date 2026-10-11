@@ -32,24 +32,30 @@ export const mockRecords: RecordView[] = [
   ...generatedKphRecords,
 ];
 
+export type MockCatalogProduct = components["schemas"]["BarcodeFound"]["product"];
+export const mockCatalogProducts: MockCatalogProduct[] = [
+  { id: "synthetic-product-2", barcode: "8936000123456", skuCode: "0008421", name: "Bánh quy bơ hộp 300 g", primarySupplier: { code: "NCC001", name: "Công ty Thực phẩm An Việt" } },
+  { id: "synthetic-product-1", barcode: "29123415005", skuCode: "0011730", name: "Cải thìa VietGAP 500 g", primarySupplier: { code: "NCC001", name: "Nông sản Miền Đông" } },
+];
+// Presentation metadata belongs to synthetic fixtures, not the public Product schema.
+export const mockProductMetadata: Record<string, { group: string; unit: "EA" | "kg" }> = {
+  "synthetic-product-2": { group: "Thực phẩm khô", unit: "EA" },
+  "synthetic-product-1": { group: "Thực phẩm tươi sống", unit: "kg" },
+};
 export type MockDateLotStatus = "open" | "acknowledged" | "resolved";
-export type MockDateLot = { id: string; name: string; sku: string; date: `${number}-${number}-${number}`; status: MockDateLotStatus };
+export type MockDateLot = { id: string; name: string; sku: string; date: `${number}-${number}-${number}`; manufactured?: string; status: MockDateLotStatus };
 export const mockDateLots: MockDateLot[] = [
-  { id: "C24-118", name: "Sản phẩm C", sku: "089332", date: "2026-10-07", status: "open" },
+  { id: "C24-118", name: "Cải thìa VietGAP 500 g", sku: "0011730", manufactured: "01/09/2026", date: "2026-10-07", status: "open" },
   { id: "D24-090", name: "Sản phẩm D", sku: "071204", date: "2026-10-12", status: "open" },
   { id: "A24-008", name: "Sản phẩm A", sku: "000008", date: "2026-10-20", status: "acknowledged" },
   { id: "B24-011", name: "Sản phẩm B", sku: "000011", date: "2026-10-25", status: "acknowledged" },
+  { id: "A24-301", name: "Bánh quy bơ hộp 300 g", sku: "0008421", manufactured: "01/08/2026", date: "2026-11-15", status: "acknowledged" },
+  { id: "A24-255", name: "Bánh quy bơ hộp 300 g", sku: "0008421", manufactured: "15/07/2026", date: "2026-10-18", status: "open" },
+  { id: "A24-198", name: "Bánh quy bơ hộp 300 g", sku: "0008421", manufactured: "28/06/2026", date: "2026-10-07", status: "open" },
 ];
 
 export async function mockBarcodeLookup(barcode: string): Promise<components["schemas"]["BarcodeLookupResponse"]> {
   if (barcode === "0000000000000") throw new Error("Chưa thể tra cứu danh mục. Thử lại hoặc nhập tay; mã đã quét được giữ lại.");
-  if (barcode === "8936000123456") return {
-    status: "FOUND", barcode,
-    product: { id: "synthetic-product-2", barcode, skuCode: "0008421", name: "Bánh quy bơ hộp 300 g", primarySupplier: { code: "NCC001", name: "Công ty Thực phẩm An Việt" } },
-  };
-  if (barcode !== "29123415005") return { status: "NOT_FOUND", barcode };
-  return {
-    status: "FOUND", barcode,
-    product: { id: "synthetic-product-1", barcode, skuCode: "0011730", name: "Cải thìa VietGAP 500 g", primarySupplier: { code: "NCC001", name: "Nông sản Miền Đông" } },
-  };
+  const product = mockCatalogProducts.find(item => item.barcode === barcode);
+  return product ? { status: "FOUND", barcode, product } : { status: "NOT_FOUND", barcode };
 }

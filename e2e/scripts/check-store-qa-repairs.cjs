@@ -18,7 +18,7 @@ async function capture(page, name) {
 
 async function route(page, screen) {
  await page.evaluate(screen => { window.location.hash = screen; }, screen);
- await page.locator(`.store-screen-${screen}`).waitFor();
+ await page.locator(`.store-screen-${screen === "lookup" ? "date" : screen}`).waitFor();
 }
 
 async function downloadRows(page) {
@@ -117,23 +117,23 @@ async function clickExpandedArea(page, control, dx, dy) {
    // DATE state survives route changes; guards stay consistent by viewport.
    await route(page, 'date');
    await page.getByRole('button', {name:/^Theo dõi DATE/}).click();
-   await page.getByRole('button').filter({hasText:'Sản phẩm C'}).click();
+   await page.getByRole('button').filter({hasText:'Cải thìa'}).click();
    const actions = viewport.width < 900 ? page.getByRole('dialog', {name:'Xử lý cảnh báo DATE'}) : page.locator('.store-date-detail');
    await actions.getByRole('button', {name:'Đã xử lý',exact:true}).click();
    if (viewport.width < 900) {
     await actions.waitFor({state:'hidden'});
-    await page.getByRole('button').filter({hasText:'Sản phẩm C'}).click();
+    await page.getByRole('button').filter({hasText:'Cải thìa'}).click();
    }
    await expect(actions.getByRole('button', {name:'Ghi nhận',exact:true})).toBeDisabled();
    await expect(actions.getByRole('button', {name:'Đã xử lý',exact:true})).toBeDisabled();
    await capture(page, `date-resolved-${viewport.width}`);
    if (viewport.width < 900) await actions.getByRole('button', {name:'Đóng',exact:true}).click();
    await route(page, 'home');
-   await expect(page.locator('.store-home-panels')).toContainText('1 cảnh báo đang mở');
+   await expect(page.locator('.store-home-panels')).toContainText('3 cảnh báo đang mở');
    await route(page, 'date');
-   await expect(page.getByRole('button').filter({hasText:'Sản phẩm C'})).toHaveCount(0);
-   await page.getByRole('button', {name:'Đã xử lý',exact:true}).click();
-   await page.getByRole('button').filter({hasText:'Sản phẩm C'}).click();
+   await expect(page.getByRole('button').filter({hasText:'Cải thìa'})).toHaveCount(0);
+   await page.getByRole('button', {name:/^Đã xử lý/}).click();
+   await page.getByRole('button').filter({hasText:'Cải thìa'}).click();
    await expect(actions).toContainText('Đã xử lý');
    await expect(actions.getByRole('button', {name:'Ghi nhận',exact:true})).toBeDisabled();
    if (viewport.width < 900) await actions.getByRole('button', {name:'Đóng',exact:true}).click();
@@ -180,24 +180,24 @@ async function clickExpandedArea(page, control, dx, dy) {
 
    // Lookup fixture metadata changes with product identity.
    await route(page, 'lookup');
-   const lookupButton = page.locator('.store-lookup-search').getByRole('button', {name:'Tra cứu',exact:true});
+   const lookupButton = page.locator('.store-date-search-form').getByRole('button', {name:'Tìm mã hàng',exact:true});
    const buttonPresentation = await lookupButton.evaluate(button => {
     const style = getComputedStyle(button);
     return {color:style.color, background:style.backgroundColor, clipped:button.scrollWidth > button.clientWidth};
    });
    expect(buttonPresentation.color).not.toEqual(buttonPresentation.background);
    expect(buttonPresentation.clipped).toBe(false);
-   const input = page.getByRole('textbox', {name:'Mã hàng, tên hàng hoặc lô'});
+   const input = page.getByRole('textbox', {name:'Tìm SKU, barcode, tên hàng hoặc lô'});
    await input.fill('0011730');
-   await page.locator('.store-lookup-search').getByRole('button', {name:'Tra cứu',exact:true}).click();
-   await expect(page.locator('.store-lookup-product')).toContainText('Thực phẩm tươi sống');
-   await expect(page.locator('.store-lookup-product dl')).toContainText('kg');
-   await expect(page.locator('.store-lookup-product')).not.toContainText('Thực phẩm khô');
+   await page.locator('.store-date-search-form').getByRole('button', {name:'Tìm mã hàng',exact:true}).click();
+   await expect(page.locator('.store-date-product')).toContainText('Thực phẩm tươi sống');
+   await expect(page.locator('.store-date-product dl')).toContainText('kg');
+   await expect(page.locator('.store-date-product')).not.toContainText('Thực phẩm khô');
    await capture(page, `lookup-fresh-${viewport.width}`);
    await input.fill('0008421');
-   await page.locator('.store-lookup-search').getByRole('button', {name:'Tra cứu',exact:true}).click();
-   await expect(page.locator('.store-lookup-product')).toContainText('Thực phẩm khô');
-   await expect(page.locator('.store-lookup-product dl')).toContainText('EA');
+   await page.locator('.store-date-search-form').getByRole('button', {name:'Tìm mã hàng',exact:true}).click();
+   await expect(page.locator('.store-date-product')).toContainText('Thực phẩm khô');
+   await expect(page.locator('.store-date-product dl')).toContainText('EA');
    expect(runtimeErrors).toEqual([]);
    results.push({viewport,selectedExportRows:1,sku:'0011730',barcode:'29123415005',dateStateRetained:true,routeDismissal:true,duplicateIds:duplicates,runtimeErrors,touchHitAreas:viewport.width<900?'pass':'mobile-only'});
    await page.close();

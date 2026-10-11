@@ -1,60 +1,61 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 13,
-  "status": "CLOSED",
-  "objective": "Refine KPH Co.op Fresh color roles, orange/green creation CTAs and measured contrast after owner feedback.",
+  "revision": 14,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Consolidate product/SKU/barcode lookup into DATE, remove the standalone destination, and apply Co.op Fresh.",
   "inScope": [
-    "Scoped Fresh tokens and KPH list/mobile cards/desktop table and loading frame",
-    "Store App KPH form and matching skeleton, detail/filter/export sheets",
-    "Workflow, loading/offline and Home/header/modal regression; preview and owner acceptance"
+    "DATE unified catalog/lot search and processing from canonical synthetic fixtures",
+    "Co.op Fresh DATE search, product facts, tabs, lot cards, detail and sheets",
+    "Home/rail/mobile navigation removal and legacy lookup deep-link redirect",
+    "Technical verification and runnable owner preview"
   ],
   "outOfScope": [
     "Other feature reskins, Admin/Pilot presentation changes",
-    "Backend/API/auth/business rule/data authority/dependency changes",
+    "Backend/API/auth/business rule/dependency or online DATE wiring",
     "Merge/push/deploy or Pages cutover"
   ],
-  "baseSha": "c8365e664b7b0fe7ca01930b4a556f56ba172d38",
-  "candidateSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
-  "integrationOwner": "/root — sole writer for KPH Fresh implementation",
+  "baseSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
+  "candidateSha": null,
+  "integrationOwner": "/root — sole writer for DATE consolidation",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-home.tsx",
     "apps/store-pwa/src/store-app.css",
+    "apps/store-pwa/src/store-app-mock.ts",
+    "apps/store-pwa/src/store-app.test.tsx",
+    "e2e/scripts/check-date-fresh.cjs",
     "e2e/scripts/check-mobile-toolbar.cjs",
-    "docs/product/STORE_APP_VISUAL_DNA.md",
+    "e2e/scripts/check-store-qa-repairs.cjs",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
+    "docs/product/STORE_APP_VISUAL_DNA.md",
     "docs/delivery/figma-mobile-implementation/**",
-    "apps/store-pwa/src/store-app-frame.tsx",
-    "apps/store-pwa/src/store-kph-fresh.css",
-    "apps/store-pwa/src/store-kph-list.tsx",
-    "apps/store-pwa/src/store-kph-workspace.tsx",
-    "e2e/scripts/check-kph-fresh.cjs",
-    "e2e/scripts/check-kph-colors.cjs"
+    "apps/store-pwa/src/store-date-workspace.tsx",
+    "apps/store-pwa/src/store-date-workspace.test.tsx",
+    "apps/store-pwa/src/store-date-lookup.test.tsx",
+    "apps/store-pwa/src/store-date-fresh.css",
+    "apps/store-pwa/src/store-lookup-workspace.tsx",
+    "apps/store-pwa/src/store-lookup-workspace.test.tsx"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
-      "id": "kph-fresh-technical",
+      "id": "date-consolidation-technical",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
-      "revision": 13,
-      "sha": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
+      "status": "pending",
+      "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md"
     },
     {
-      "id": "owner-kph-fresh-visual-workflow",
+      "id": "owner-date-fresh-visual-workflow",
       "kind": "user",
       "required": true,
-      "status": "pass",
-      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
-      "revision": 13,
-      "sha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
-      "acceptedBy": "owner",
-      "decisionRef": "User message in current chat on 2026-10-11: duyệt, checkpoint"
+      "status": "pending",
+      "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md"
     }
   ],
   "changes": [
@@ -142,15 +143,21 @@
       "impact": "Invalidates r12 color and screenshot evidence; workflow semantics and shared tokens remain unchanged. Reverify scoped contrast, interaction, loading geometry and relevant modal regression.",
       "decision": "Filled orange TPCN and green TPTS; neutral resolution, green selection, warm condition/pending and reserved error/expired red. One writer; no API, global token or deployment changes.",
       "followup": "Owner: tab thiếu tương phản. Same r13 targeted repair: dark selected surface, white label/badge and underline; verify both types, hover and focus including selected-vs-track contrast."
+    },
+    {
+      "revision": 14,
+      "request": "bỏ tra cứu, trong date có tra cứu sku rồi, sau hợp nhất thì áp giao diện mới vào",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Standalone route/navigation removed; product lookup and lot fixtures consolidated into DATE. DATE/navigation evidence must be refreshed; prior KPH acceptance remains limited to r13.",
+      "decision": "One writer in current branch/worktree from accepted KPH checkpoint d9845c7. Shared search with exact catalog metadata, live lot filtering, rescan/miss/recovery and legacy route redirect; canonical synthetic lots only. Co.op Fresh scoped DATE CSS; no Figma frame writes or API changes."
     }
   ],
   "blockers": [],
-  "nextAction": "Stop: accepted KPH Fresh r13 checkpoint saved locally. Await a new owner request; other feature rollout and historical acceptance gates remain separate.",
+  "nextAction": "Owner review DATE r14 at http://127.0.0.1:4202/#date; technical readiness is separate from visual/workflow acceptance. Stop until feedback.",
   "workingTreeCandidate": {
-    "baseSha": "b6247044740157e86f10ddf9a4cfe9c3cf166c38",
+    "baseSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Verified source committed locally; subsequent advancement is closure documentation only in this cycle directory.",
-    "candidateSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
+    "note": "DATE r14 source verified; stable mock preview 4202. Code checkpoint will bind source manifest to candidate. Prior HEAD advancement 09411e8 changed KPH closure docs only."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -161,7 +168,7 @@
   "executor": {
     "agentId": "/root",
     "status": "completed",
-    "ownership": "KPH Fresh color refinement",
+    "ownership": "DATE consolidation and Co.op Fresh",
     "worktree": "/Users/vup/Documents/coopfood-kph",
     "branch": "store-app/figma-mobile-implementation"
   },
@@ -171,12 +178,12 @@
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-plan.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
   "executionAuthorization": {
     "date": "2026-10-11",
-    "source": "Owner: xem lại màu/tương phản/CTA, hai CTA có thể dùng cam và xanh",
-    "mode": "single KPH color writer, same branch/worktree",
+    "source": "Owner requested consolidation then new UI",
+    "mode": "single DATE writer, same branch/worktree",
     "checkpoint": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
   },
   "historicalRevision5": {
@@ -194,10 +201,9 @@
   },
   "workingTreeVerification": {
     "result": "pass",
-    "revision": 13,
-    "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
-    "note": "7 candidate source files match verified r13/tab manifests byte-for-byte. Existing relevant build/66-state contrast/Fresh/progressive checks reused because source is identical; owner accepted on 2026-10-11.",
-    "sha": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
+    "revision": 14,
+    "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
+    "note": "230 tests/default-online and mock builds PASS; unified DATE build/offline gate 3 viewport, 24 contrast states and KPH/navigation/workbook regressions PASS. Owner visual gate pending."
   },
   "historicalRevision6": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
@@ -263,5 +269,16 @@
     "decisionRef": "Current chat: duyệt, checkpoint",
     "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
     "remoteActions": "none; local checkpoint only"
+  },
+  "historicalRevision13": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r13.json",
+    "candidateSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
+    "scope": "Accepted KPH Co.op Fresh source checkpoint; original r13 evidence retained, fresh shared navigation regression required.",
+    "closureSha": "09411e8c644396f4b1a6271f7d53982112fcfb3c"
+  },
+  "preview": {
+    "url": "http://127.0.0.1:4202/#date",
+    "mode": "synthetic memory-only mock build",
+    "serverSessionId": 95585
   }
 }

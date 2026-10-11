@@ -16,16 +16,30 @@ describe("Store App session and route ownership", () => {
     render(<StoreApp />);
     const home = () => within(document.querySelector('.store-launcher-mobile') as HTMLElement);
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
-    fireEvent.click(await screen.findByRole("button", { name: /Sản phẩm C/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Cải thìa/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Ghi nhận" }));
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Xử lý cảnh báo DATE" })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
-    await screen.findByText("1 cảnh báo đang mở");
+    await screen.findByText("3 cảnh báo đang mở");
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
     await screen.findByRole("heading", { name: "Cần xử lý" });
-    expect(screen.queryByRole("button", { name: /Sản phẩm C/ })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Đã ghi nhận 3/ }));
-    expect(screen.getByRole("button", { name: /Sản phẩm C/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Cải thìa/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Đã ghi nhận 4/ }));
+    expect(screen.getByRole("button", { name: /Cải thìa/ })).toBeInTheDocument();
+  });
+
+  it("opens legacy lookup links in DATE with a single navigation destination", async () => {
+    window.history.replaceState(null, "", "#lookup");
+    render(<StoreApp />);
+    await screen.findByRole("heading", { name: "Mã hàng & lô DATE" });
+    expect(window.location.hash).toBe("#date");
+    expect(screen.queryByRole("button", { name: "Tra cứu" })).not.toBeInTheDocument();
+    const nav = within(screen.getByRole("navigation", { name: "Điều hướng chính trên mobile" }));
+    expect(nav.getAllByRole("link")).toHaveLength(3);
+    expect(nav.getByRole("link", { name: "DATE" })).toHaveAttribute("aria-current", "page");
+    fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
+    await screen.findByRole("button", { name: "Co.op Food — Trang chủ" });
+    expect(document.querySelector('[href="#lookup"]')).not.toBeInTheDocument();
   });
 
   it("retains quick lookup mode, dates, duration and result across panel unmount and route changes", async () => {

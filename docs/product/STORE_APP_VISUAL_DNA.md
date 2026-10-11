@@ -21,6 +21,21 @@ Reference: Home cho palette/tính cách, tài khoản/login cho hero và form,
 modal hiện hành cho primitive/focus. Màn nghiệp vụ giảm trang trí; không tự
 mang cơ chế header sticky/lớp cuộn của Home sang KPH khi chưa kiểm bố cục.
 
+## DATE hợp nhất — r14, 11/10/2026
+
+Owner yêu cầu bỏ Tra cứu riêng, gom tra SKU vào DATE rồi áp giao diện mới.
+Implementation r14 dùng Co.op Fresh ở DATE: compact header xanh đậm, surface
+trắng, nhóm mint; một thanh tìm/quét, metadata sản phẩm exact match, tab selected
+xanh/chữ trắng/gạch chỉ báo; thẻ lô và detail/sheets đọc rõ. SKU/UPC giữ riêng,
+status xử lý và số ngày không dùng màu module để suy ra trạng thái an toàn.
+Đỏ dành cho quá HSD, ngày HSD hôm nay dùng cảnh báo kèm nhãn. DATE tái sử dụng
+các vai trò Fresh có sẵn; style sheets có scope riêng để giữ KPH/Home accepted.
+
+Technical PASS 24 runtime contrast states ở 390×844, 1440×1024 và 320×844;
+chữ ≥4,5:1, input boundary/focus/selection ≥3:1. **Owner visual/workflow r14
+còn pending**, không coi đây là nghiệm thu màn DATE. Xem
+[bàn giao hợp nhất DATE](../delivery/figma-mobile-implementation/date-coop-fresh.md).
+
 ## Phạm vi đã được chấp nhận
 
 Status: **owner accepted cho Home và hướng thị giác dùng tiếp** ngày 11/10/2026.

@@ -1,25 +1,24 @@
 import type { ReactNode } from "react";
-import { ArrowLeft, CalendarDays, FileWarning, History, House, Package, Search } from "lucide-react";
+import { ArrowLeft, CalendarDays, FileWarning, History, House, Package } from "lucide-react";
 import { figmaAsset } from "./figma-assets";
 import { assetUrl } from "./asset-url";
 import type { StoreProfile } from "./store-profile";
 import "./store-app.css";
 import "./store-header.css";
 import "./store-kph-fresh.css";
+import "./store-date-fresh.css";
 
-export type Screen = "home" | "kph" | "shelf" | "lookup" | "date" | "login";
+export type Screen = "home" | "kph" | "shelf" | "date" | "login";
 const screens = {
   login: { title: "Đăng nhập", subtitle: "Tài khoản cửa hàng" },
   home: { title: "Trang chủ", subtitle: "Cửa hàng hiện tại" },
   kph: { title: "KPH", subtitle: "Hàng không phù hợp" },
   shelf: { title: "Tra cứu lùi hàng", subtitle: "NSX · HSD · hạn lùi" },
-  lookup: { title: "Tra cứu", subtitle: "Sản phẩm và lô hàng" },
-  date: { title: "DATE", subtitle: "Theo dõi DATE" },
+  date: { title: "DATE", subtitle: "Tra mã hàng · Theo dõi lô" },
 };
-const homeModuleIcons = { kph: FileWarning, shelf: History, date: Package, lookup: Search };
+const homeModuleIcons = { kph: FileWarning, shelf: History, date: Package };
 const mobileDestinations = [
   { screen: "home", label: "Trang chủ", icon: House },
-  { screen: "lookup", label: "Tra cứu", icon: Search },
   { screen: "kph", label: "KPH", icon: FileWarning },
   { screen: "date", label: "DATE", icon: CalendarDays },
 ] as const;
@@ -30,6 +29,7 @@ export function HomeModuleIcon({ screen }: { screen: keyof typeof homeModuleIcon
 
 export function readStoreScreen(): Screen {
   const key = window.location.hash.slice(1);
+  if (key === "lookup") return "date";
   return key in screens ? key as Screen : "home";
 }
 
@@ -43,7 +43,6 @@ export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account,
     <aside className="store-desktop-rail" aria-label="Điều hướng cửa hàng">
       <p className="store-rail-label">NGHIỆP VỤ</p>
       <nav>
-        <button className={screen === "lookup" ? "is-active" : ""} onClick={() => navigate("lookup")}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherFileText")} alt="" />Tra cứu</button>
         <button className={screen === "kph" ? "is-active" : ""} onPointerEnter={onKphIntent} onFocus={onKphIntent} onClick={() => navigate("kph")}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherXSquare")} alt="" />KPH</button>
         <button className={screen === "date" ? "is-active" : ""} onClick={() => navigate("date")}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" />DATE</button>
       </nav>

@@ -1,5 +1,12 @@
 # Công việc kế tiếp
 
+**DATE hợp nhất/Fresh r14 đang chờ owner nghiệm thu giao diện.**
+Xem <http://127.0.0.1:4202/#date>: tìm SKU `0008421`, barcode `29123415005`,
+lô `C24-118`; Ghi nhận/Đã xử lý → Home → mở DATE lại để xem state phiên.
+Technical PASS 230 tests/build, DATE 3 viewport, 24 contrast states và regression
+KPH/navigation/workflow. [Bàn giao và giới hạn](delivery/figma-mobile-implementation/date-coop-fresh.md).
+Bước nhỏ tiếp: owner xem DATE mới; chưa coi technical PASS là nghiệm thu.
+
 **KPH Fresh r13 đã duyệt và được lưu checkpoint local** theo “duyệt, checkpoint”.
 Đóng slice giao diện KPH hiện tại; giữ Co.op Fresh làm DNA mặc định cho lượt nâng
 UI tiếp theo. Chờ yêu cầu màn/phạm vi mới, không tự khởi chạy rollout.

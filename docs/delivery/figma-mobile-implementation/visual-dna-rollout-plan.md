@@ -1,6 +1,13 @@
 # Chuẩn bị áp dụng Visual DNA cho các màn còn lại — revision 6
 
-Ngày 11/10/2026. Status: PLANNING, preparation complete; chưa triển khai reskin.
+Ngày 11/10/2026. Kế hoạch chuẩn bị r6 được giữ làm lịch sử; trạng thái triển khai
+hiện tại nằm trong plan.json và các follow-up bên dưới.
+
+Revision 14 theo owner: bỏ Tra cứu riêng, hợp nhất bước 2 + 3 vào **DATE**,
+rồi áp Co.op Fresh. Một thanh tìm/quét và metadata catalog đi cùng các lô có
+thể xử lý; điều hướng còn Home/KPH/DATE, link cũ chuyển về DATE.
+[Bàn giao DATE](date-coop-fresh.md) ghi kiểm chứng và gate nghiệm thu riêng.
+Không triển khai thêm Tra hạn lùi hoặc nền UI toàn app ở lượt này.
 
 Bổ sung revision 11 trong lúc nghiệm thu: tên mặc định thiết kế là **Co.op Fresh**
 (`coop-fresh-v1`); [kế hoạch KPH](kph-coop-fresh-plan.md) chi tiết bước 4 thành
