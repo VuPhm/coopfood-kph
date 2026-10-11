@@ -1,6 +1,32 @@
 # Trạng thái hiện tại
 
+**KPH Co.op Fresh r13 đã được owner duyệt ngày 11/10/2026** qua “duyệt, checkpoint”.
+Phạm vi: giao diện danh sách/form/sheets, hai CTA cam/xanh và tab tương phản rõ
+trên preview 4201. Technical PASS: build, contrast 66 trạng thái, Fresh 3 viewport
+và progressive layout; workflow/mock regression có bằng chứng riêng. Lưu checkpoint
+local trên `store-app/figma-mobile-implementation`; không push/merge/deploy.
+[Bàn giao và nghiệm thu](delivery/figma-mobile-implementation/kph-coop-fresh-colors.md).
+
+Các trạng thái pending ở mục r12 trở xuống là lịch sử hoặc gate khác (backend,
+thiết bị thật, cycle trước), không phải nghiệm thu giao diện KPH r13 hiện tại.
+
 Cập nhật: 2026-10-11
+
+Owner yêu cầu “làm” kế hoạch KPH Fresh: r12 triển khai F1–F3 trong working tree
+trên base `c8365e6`. Danh sách/thẻ/bảng, form và skeleton, detail/filter/export
+cùng Co.op Fresh; tìm/sắp xếp hiện trên mobile. Evidence và preview riêng ở
+[bàn giao KPH Fresh](delivery/figma-mobile-implementation/kph-coop-fresh-handoff.md).
+Technical PASS: `npm run verify` 228 tests/build, mock/online build và 9 gate
+Playwright; geometry skeleton ≤1px, không shift, workflow/workbook/offline PASS.
+Owner visual/workflow acceptance cho bản này pending; lịch sử chuẩn bị bên dưới
+không còn là trạng thái runtime hiện hành. Không suy ra merge/deploy từ lượt này.
+
+Trong lúc nghiệm thu, owner yêu cầu lập kế hoạch nâng KPH và đặt tên phong cách.
+**Co.op Fresh** (`coop-fresh-v1`) được ghi là mặc định thiết kế cho các nâng cấp
+Store PWA tiếp theo trong [Visual DNA](product/STORE_APP_VISUAL_DNA.md).
+[Kế hoạch KPH r11](delivery/figma-mobile-implementation/kph-coop-fresh-plan.md)
+chi tiết rollout r6: danh sách → tạo phiếu → chi tiết/duyệt/xuất. Chỉ cập nhật
+docs trên checkpoint `91f0c70`; chưa reskin, gate nghiệm thu hiện tại giữ nguyên.
 
 Git checkpoint 11/10 theo yêu cầu owner: lưu toàn bộ các follow-up UI và tối ưu
 hiện tại trên nhánh `store-app/figma-mobile-implementation` bằng commit local.

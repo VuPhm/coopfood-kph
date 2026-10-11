@@ -1,6 +1,16 @@
 # Chuẩn bị áp dụng Visual DNA cho các màn còn lại — revision 6
 
 Ngày 11/10/2026. Status: PLANNING, preparation complete; chưa triển khai reskin.
+
+Bổ sung revision 11 trong lúc nghiệm thu: tên mặc định thiết kế là **Co.op Fresh**
+(`coop-fresh-v1`); [kế hoạch KPH](kph-coop-fresh-plan.md) chi tiết bước 4 thành
+F1 danh sách → F2 tạo phiếu → F3 chi tiết/duyệt/xuất. Không tự đổi thứ tự rollout
+hoặc triển khai. Checkpoint local mới `91f0c70` đã chứa các follow-up UI/loading;
+ghi chú uncommitted/readiness bên dưới là lịch sử của lượt chuẩn bị r6.
+
+Owner đã yêu cầu “làm” kế hoạch KPH: r12 ưu tiên bước 4/F1–F3 trước các màn còn
+lại, bổ sung token Fresh tối thiểu trong KPH. Các bước Tra cứu/DATE/Tra hạn vẫn
+hoãn; [bàn giao KPH](kph-coop-fresh-handoff.md) ghi evidence/preview riêng.
 Owner đã nghiệm thu Home bằng “quá đẹp” và yêu cầu tích hợp DNA, chuẩn bị các
 trang còn lại. Authority cho lượt này: tài liệu DNA, kế hoạch, trạng thái và
 nghiệm thu Home. Không suy ra yêu cầu chạy toàn bộ implementation từ “chuẩn bị”.

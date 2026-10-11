@@ -5,6 +5,7 @@ import { assetUrl } from "./asset-url";
 import type { StoreProfile } from "./store-profile";
 import "./store-app.css";
 import "./store-header.css";
+import "./store-kph-fresh.css";
 
 export type Screen = "home" | "kph" | "shelf" | "lookup" | "date" | "login";
 const screens = {

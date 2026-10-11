@@ -5,7 +5,10 @@ records the Store App principles carried through the R1-D01 audit, R1-D02
 comparison, and accepted R1-D03 convergence. The owner-accepted Home visual
 extension dated 2026-10-11 is defined in
 [Store App Visual DNA](STORE_APP_VISUAL_DNA.md); its palette, geometry and usage
-rules guide subsequent Store PWA screens. This principle document does not itself
+rules guide subsequent Store PWA screens. Its name is **Co.op Fresh**
+(`coop-fresh-v1`), the default design direction for future Store PWA UI upgrades
+as recorded on 2026-10-11; individual screens retain their own acceptance gates.
+This principle document does not itself
 authorize implementation of a new delivery slice. Accepted business behavior
 remains governed by the
 [Store App contract index](STORE_APP_CONTRACTS.md) and its linked contracts.

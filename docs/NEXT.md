@@ -1,6 +1,27 @@
 # Công việc kế tiếp
 
+**KPH Fresh r13 đã duyệt và được lưu checkpoint local** theo “duyệt, checkpoint”.
+Đóng slice giao diện KPH hiện tại; giữ Co.op Fresh làm DNA mặc định cho lượt nâng
+UI tiếp theo. Chờ yêu cầu màn/phạm vi mới, không tự khởi chạy rollout.
+[Bàn giao/giới hạn](delivery/figma-mobile-implementation/kph-coop-fresh-colors.md).
+
+Các bước nghiệm thu r12 và chuẩn bị r11 phía dưới là lịch sử; những gate backend,
+thiết bị thật và cycle khác không được đóng bởi nghiệm thu giao diện này.
+
 Cập nhật: 2026-10-11
+
+KPH **Co.op Fresh r12** đã triển khai theo “làm”; bước nhỏ tiếp theo là owner
+xem [preview KPH](http://127.0.0.1:4201/#kph) và thử tạo → duyệt → chọn/xuất.
+[Bàn giao](delivery/figma-mobile-implementation/kph-coop-fresh-handoff.md) ghi
+scope, kiểm chứng và giới hạn mock. Chưa có nghiệm thu bản reskin; các mục
+chuẩn bị r11 bên dưới là lịch sử, các màn rollout khác tiếp tục hoãn.
+
+Kế hoạch KPH **Co.op Fresh** (`coop-fresh-v1`) đã chuẩn bị trong lúc nghiệm thu;
+đây là mặc định thiết kế mới của Store PWA, xem
+[kế hoạch r11](delivery/figma-mobile-implementation/kph-coop-fresh-plan.md).
+Tiếp tục nghiệm thu checkpoint hiện tại; khi triển khai KPH, cập nhật feedback
+đã xác nhận rồi làm F1 danh sách + token scoped → F2 tạo phiếu → F3 chi tiết/
+duyệt/xuất. Rollout r6 của các màn khác giữ nguyên; chưa thực hiện reskin.
 
 Owner yêu cầu Git checkpoint 11/10: các thay đổi hiện tại được lưu bằng commit
 local trên nhánh task. Tiếp tục từ mốc này; các mục cần checkpoint bên dưới là

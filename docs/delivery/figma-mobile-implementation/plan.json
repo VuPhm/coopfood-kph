@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 10,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Implement mobile bottom navigation and refine the floating quick shelf-life utility without changing business workflows.",
+  "revision": 13,
+  "status": "AWAITING_CHECKPOINT",
+  "objective": "Refine KPH Co.op Fresh color roles, orange/green creation CTAs and measured contrast after owner feedback.",
   "inScope": [
-    "Mobile bottom navigation for existing Home/Lookup/KPH/DATE routes",
-    "Quick utility capsule, mobile layering/clearance, existing state/focus/route behavior",
-    "Targeted and Store PWA verification, DNA and handoff"
+    "Scoped Fresh tokens and KPH list/mobile cards/desktop table and loading frame",
+    "Store App KPH form and matching skeleton, detail/filter/export sheets",
+    "Workflow, loading/offline and Home/header/modal regression; preview and owner acceptance"
   ],
   "outOfScope": [
-    "Other screen reskin, placeholder features or online shell rewrite",
-    "Backend/API/auth/business rule changes",
-    "Commit/merge/push/deploy or Pages cutover"
+    "Other feature reskins, Admin/Pilot presentation changes",
+    "Backend/API/auth/business rule/data authority/dependency changes",
+    "Merge/push/deploy or Pages cutover"
   ],
-  "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
+  "baseSha": "c8365e664b7b0fe7ca01930b4a556f56ba172d38",
   "candidateSha": null,
-  "integrationOwner": "/root — writer for mobile toolbar and quick utility callsite",
+  "integrationOwner": "/root — sole writer for KPH Fresh implementation",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
     "apps/store-pwa/src/store-app.css",
@@ -24,25 +24,31 @@
     "docs/product/STORE_APP_VISUAL_DNA.md",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
-    "docs/delivery/figma-mobile-implementation/**"
+    "docs/delivery/figma-mobile-implementation/**",
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-kph-fresh.css",
+    "apps/store-pwa/src/store-kph-list.tsx",
+    "apps/store-pwa/src/store-kph-workspace.tsx",
+    "e2e/scripts/check-kph-fresh.cjs",
+    "e2e/scripts/check-kph-colors.cjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
-      "id": "mobile-toolbar-technical",
+      "id": "kph-fresh-technical",
       "kind": "technical",
       "required": true,
       "status": "pending",
-      "evidence": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md"
+      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md"
     },
     {
-      "id": "owner-mobile-toolbar-visual",
+      "id": "owner-kph-fresh-visual-workflow",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "evidence": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md"
+      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md"
     }
   ],
   "changes": [
@@ -108,14 +114,36 @@
       "source": "Owner in current chat, 2026-10-11",
       "impact": "Navigation and mobile bottom clearance change across preview Store App. Existing business/auth contracts retained; independent visual follow-up.",
       "decision": "Four real destinations, visible labels/current state, peach named utility capsule and non-modal quick panel above navbar. Same branch/worktree, no delegation."
+    },
+    {
+      "revision": 11,
+      "request": "trong lúc đang nghiệm thu, lên kế hoạch để nâng cấp giao diện KPH sang phong cách mới, đặt cho nó 1 cái tên gọi để sau dễ gọi, hoặc đặt nó làm mặc định mới",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Documentation-only follow-up. Existing runtime and pending owner gates are unchanged; earlier runtime evidence retains its original scope/SHA. No KPH reskin evidence or acceptance is claimed.",
+      "decision": "Name the accepted Home visual direction Co.op Fresh (coop-fresh-v1), use it as the default design direction for future Store PWA upgrades, and detail the existing r6 KPH step as F1 list, F2 create, F3 detail/review/export. Keep one writer in the current task, no delegation or runtime launch."
+    },
+    {
+      "revision": 12,
+      "request": "làm",
+      "source": "Owner in current chat, 2026-10-11, after KPH Co.op Fresh plan handoff",
+      "impact": "KPH visual/composition and skeleton geometry change; all KPH technical and visual gates require fresh verification. Historical Home/account acceptance retained, with targeted regression to check shared CSS imports.",
+      "decision": "Execute F1-F3 sequentially with one writer in the existing task/worktree. Reuse latest dialog fixes at current checkpoint. No agents, contract changes or deployment."
+    },
+    {
+      "revision": 13,
+      "request": "màu chưa ổn, không dùng bừa bãi, đặc biệt màu đỏ; xem lại chuẩn tương phản màu-nền; CTA bị chìm, hai CTA có thể dùng cam/xanh",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Invalidates r12 color and screenshot evidence; workflow semantics and shared tokens remain unchanged. Reverify scoped contrast, interaction, loading geometry and relevant modal regression.",
+      "decision": "Filled orange TPCN and green TPTS; neutral resolution, green selection, warm condition/pending and reserved error/expired red. One writer; no API, global token or deployment changes.",
+      "followup": "Owner: tab thiếu tương phản. Same r13 targeted repair: dark selected surface, white label/badge and underline; verify both types, hover and focus including selected-vs-track contrast."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner checks mobile navbar and Tra hạn lùi at #kph. Other workflow acceptance remains separate.",
+  "nextAction": "Create local checkpoint and bind existing verified source/acceptance to its candidate SHA; close this KPH UI slice, then stop.",
   "workingTreeCandidate": {
-    "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
+    "baseSha": "b6247044740157e86f10ddf9a4cfe9c3cf166c38",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Toolbar and previous Home/login/shelf changes remain dirty/untracked; no committed candidate SHA."
+    "note": "r13 KPH color refinement verified in working tree; mock preview 4201. Candidate-SHA and owner gates pending."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -126,7 +154,7 @@
   "executor": {
     "agentId": "/root",
     "status": "completed",
-    "ownership": "mobile toolbar and quick utility presentation",
+    "ownership": "KPH Fresh color refinement",
     "worktree": "/Users/vup/Documents/coopfood-kph",
     "branch": "store-app/figma-mobile-implementation"
   },
@@ -136,12 +164,12 @@
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-plan.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md",
   "executionAuthorization": {
     "date": "2026-10-11",
-    "source": "Owner: xây dựng thanh công cụ dưới cho mobile; nhân tiện tối ưu nút tra date nổi",
-    "mode": "single toolbar writer, existing preview Store App; same branch/worktree",
+    "source": "Owner: xem lại màu/tương phản/CTA, hai CTA có thể dùng cam và xanh",
+    "mode": "single KPH color writer, same branch/worktree",
     "checkpoint": null
   },
   "historicalRevision5": {
@@ -159,8 +187,9 @@
   },
   "workingTreeVerification": {
     "result": "pass",
-    "evidence": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md",
-    "note": "174 Store PWA tests with 2 workers, type/build and targeted Playwright pass. One default-worker run timed out; no test disabled/timeout increased. SHA-bound gate pending without commit."
+    "revision": 13,
+    "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md",
+    "note": "Mock TypeScript/build and 66 contrast states PASS, including selected tab surface versus track >=3; Fresh 3 viewports PASS. Earlier r13 workflow/modal/progressive gates preserved. Owner visual acceptance recorded: duyệt, checkpoint. Tab follow-up progressive Home/KPH PASS with no shifts."
   },
   "historicalRevision6": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
@@ -182,5 +211,40 @@
   "historicalRevision9": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r9.json",
     "scope": "Shared login scrolling; its verification and visual review kept separately"
+  },
+  "historicalRevision10": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r10.json",
+    "scope": "Preserved original mobile toolbar acceptance ledger; runtime and user gates unchanged by revision 11 preparation."
+  },
+  "planningFollowup": {
+    "id": "kph-coop-fresh",
+    "revision": 11,
+    "status": "IMPLEMENTED_ACCEPTED",
+    "authority": "planning-and-design-default-only",
+    "styleName": "Co.op Fresh",
+    "styleId": "coop-fresh-v1",
+    "document": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-plan.md",
+    "checkpointSha": "91f0c70c58d982842736c62f9cd2a22fe9e9d219",
+    "runtimeImplementation": "F1-F3 and r13 color/tab refinements implemented and owner accepted",
+    "ownerKphVisualAcceptance": "accepted r13 — owner: duyệt, checkpoint",
+    "nextAction": "Local checkpoint, close this KPH UI slice, then stop.",
+    "latestObservedHead": "b6247044740157e86f10ddf9a4cfe9c3cf166c38",
+    "checkpointNote": "Original planning checkpoint and all shared dialog fixes retained; latest HEAD advancement is an unrelated E2E selector/integration record change."
+  },
+  "historicalRevision11": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r11.json",
+    "scope": "Naming and preparation completed; previous runtime acceptance/evidence remain separate."
+  },
+  "historicalRevision12": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r12.json",
+    "evidence": ".local/kph-fresh-r12",
+    "scope": "Original r12 working-tree checks preserved; color/visual evidence superseded by r13."
+  },
+  "ownerKphVisualAcceptance": {
+    "date": "2026-10-11",
+    "acceptedBy": "owner",
+    "decisionRef": "User message in current chat: duyệt, checkpoint",
+    "scope": "KPH Co.op Fresh r13 preview presentation, CTA colors and tab states; excludes real backend/device and historical r5 acceptance",
+    "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md"
   }
 }
