@@ -1,5 +1,6 @@
 import {
   Button,
+  CloseButton,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -331,12 +332,13 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        closeTone="inverse"
         className={`barcode-scanner-dialog-content max-w-lg p-0 overflow-hidden ${presentation === "screen" ? "store-scanner-screen" : ""}`}
         aria-describedby={descId}
         aria-labelledby={titleId}
       >
         <DialogHeader className="barcode-scanner-header">
-          {presentation === "screen" ? <button className="store-scanner-close" aria-label="Đóng quét mã" onClick={() => onOpenChange(false)}><img src={figmaAsset("279-1398", "imgFeatherX")} alt="" /></button> : null}
+          {presentation === "screen" ? <CloseButton className="store-scanner-close" tone="inverse" aria-label="Đóng quét mã" onClick={() => onOpenChange(false)} /> : null}
           <DialogTitle id={titleId} className="flex items-center gap-2 text-base font-bold text-white">
             {presentation !== "screen" ? <ScanLine size={20} aria-hidden="true" className="text-emerald-400" /> : null}
             <span>Quét mã SKU / UPC</span>

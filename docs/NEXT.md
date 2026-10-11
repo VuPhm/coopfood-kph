@@ -1,10 +1,108 @@
 # Công việc kế tiếp
 
-Cập nhật: 2026-10-08
+Cập nhật: 2026-10-11
 
-## Figma implementation — revision 5 chờ nghiệm thu
+Owner yêu cầu Git checkpoint 11/10: các thay đổi hiện tại được lưu bằng commit
+local trên nhánh task. Tiếp tục từ mốc này; các mục cần checkpoint bên dưới là
+lịch sử trước mốc mới. Owner acceptance còn pending, chưa push/merge/deploy.
 
-Cycle `figma-mobile-implementation` đang AWAITING_ACCEPTANCE revision 5 trên
+Progressive loading KPH → Home đã triển khai: khung đúng tỷ lệ, ảnh responsive,
+giữ scroll form và offline. [Bằng chứng](delivery/figma-mobile-implementation/progressive-loading.md).
+Bước nhỏ tiếp theo: owner tải lại 4197, xem Home/KPH/tạo phiếu trên mạng chậm;
+chấp nhận update nếu đang dùng cache cũ, rồi thử offline sau cài cache.
+
+Offline follow-up trên bản hiện tại: technical PASS cache shell/lazy chunks,
+offline reload/tra hạn lùi/form/export hai viewport; 180 Store PWA tests.
+[Phạm vi](delivery/figma-mobile-implementation/kph-offline.md).
+Bước nhỏ tiếp theo: owner mở build 4197 trên điện thoại, chờ cài cache rồi
+thử chế độ máy bay. Phiếu dùng thử giữ trong phiên; không thêm outbox hoặc
+offline persistence cho phiếu máy chủ. Prototype 6 shell ngoài phạm vi.
+
+KPH loading follow-up 11/10: technical PASS lazy loading/skeleton/recovery,
+prefetch trang online đúng scope, một layout và memo hóa; 178 Store PWA + 12 UI
+tests, build mock/online và Playwright hai viewport. JS Home giảm 29,9%, DOM KPH
+giảm 45–47%; cold navigation thêm 24–56 ms để tải chunk, có skeleton.
+[Bằng chứng](delivery/figma-mobile-implementation/kph-loading.md).
+Bước nhỏ tiếp theo: owner thử build `http://127.0.0.1:4197/#kph`, mở tạo phiếu
+và đo lại trên browser/thiết bị đã thấy >600 ms. Chưa field INP/real-backend.
+
+Modal theo tài khoản follow-up 11/10: technical PASS header xanh/chữ trắng/X sáng,
+body trắng/lề 24px, 206 Store/UI/Admin tests và Playwright mobile/desktop.
+Bước nhỏ tiếp theo: owner xem popup tra và lọc tại `http://127.0.0.1:5175/#kph`;
+visual acceptance và thiết bị thật còn pending. [Bàn giao](delivery/figma-mobile-implementation/modal-account-reference.md).
+
+Modal chung follow-up 11/10: popup tra dùng Radix modal/backdrop tối 55% không
+blur, khóa cuộn/focus và giữ state phiên. Shared chrome/motion/X; sheet mobile
+sát đáy, desktop centered. Store 177 + UI 12 + Admin 14 tests/build PASS;
+Playwright modal 5, close controls Store/Admin/PWA và workflow/header gates PASS.
+Build CPU 6× popup median mobile/desktop 96/88 ms, max 128/152 ms; đây là lab,
+lần đầu tài khoản desktop còn 504 ms. Visual acceptance/thiết bị thật pending.
+[Bàn giao](delivery/figma-mobile-implementation/modal-unification.md).
+Bước nhỏ tiếp theo: owner thử backdrop/X tại `http://127.0.0.1:5175/#kph`.
+
+Modal INP follow-up 11/10: sửa backdrop/render, technical PASS 174 Store PWA +
+12 UI tests và Playwright mobile/desktop. Build CPU 6× trung vị mobile
+tài khoản/lọc/tạo 56/64/128 ms; lần mở đầu lớn nhất 280 ms.
+[Bằng chứng](delivery/figma-mobile-implementation/modal-inp.md).
+Bước nhỏ tiếp theo: owner đo lại trên browser/thiết bị đã thấy >600 ms;
+preview build `http://127.0.0.1:4187/#kph`, dev vẫn `http://127.0.0.1:5176/#kph`.
+
+Mobile toolbar follow-up 11/10: thanh dưới 4 mục Trang chủ/Tra cứu/KPH/DATE,
+active xanh/mint và safe-area; nút nổi “Tra hạn lùi” dạng capsule peach trên thanh.
+Popup giữ phía trên navigation, state/focus/route semantics cũ. Playwright toolbar,
+Home scroll và Home regression 5 viewport PASS; TypeScript/build và 174 Store PWA tests PASS (2 workers).
+[Bằng chứng](delivery/figma-mobile-implementation/mobile-toolbar.md).
+Bước nhỏ tiếp theo: owner thử thanh dưới/nút nổi tại `http://127.0.0.1:5176/#kph`.
+
+Đăng nhập follow-up 11/10: áp dụng lớp form trắng cuộn trên nền xanh sticky,
+mobile một cột và desktop giữ hai cột. Technical PASS 14 tests, TypeScript/build,
+Playwright scroll/identity 5 viewport và online API fixture 2 viewport.
+[Bằng chứng](delivery/figma-mobile-implementation/login-scroll-layer.md).
+Bước nhỏ tiếp theo: owner cuộn `http://127.0.0.1:5176/#login` để xem hình ảnh.
+
+Home follow-up 11/10: khối nội dung trắng là lớp trên, cuộn tự nhiên lên che
+header xanh giữ vị trí; chỉ áp dụng Home. Technical PASS Playwright 5 viewport,
+TypeScript, 6 targeted tests và build. [Bằng chứng](delivery/figma-mobile-implementation/home-scroll-layer.md).
+Owner đã chấp nhận tài khoản/login bằng “ổn”; cơ chế cuộn Home mới chờ xem hình ảnh.
+Bước nhỏ tiếp theo: cuộn Home tại `http://127.0.0.1:5176/#home`.
+
+Tài khoản + đăng nhập theo DNA đã triển khai theo yêu cầu owner ngày 11/10/2026;
+revision 7 được owner visual acceptance bằng “ổn”; technical PASS trên working tree:
+`npm run verify` 216 tests/build, Playwright account/login 5 viewport, online API
+fixture 2 viewport và Home regression PASS. [Bàn giao](delivery/figma-mobile-implementation/account-login-refinement.md).
+Preview: avatar ở `http://127.0.0.1:5176/#home`; đăng nhập ở
+`http://127.0.0.1:5176/#login`. Login UI được dùng lại cho online gateway hiện có;
+bản dev có lối vào dữ liệu mẫu riêng, không tạo session giả. Chưa real-backend/
+thiết bị thật, chưa commit/merge/deploy.
+Các trang còn lại giữ kế hoạch r6 hoãn; owner yêu cầu cuộn Home trước.
+
+## Kế hoạch Visual DNA rollout — revision 6, hoãn sau tài khoản/login
+
+Owner đã chấp nhận Home và yêu cầu tích hợp DNA/chuẩn bị các màn còn lại ngày
+11/10/2026. [Visual DNA](product/STORE_APP_VISUAL_DNA.md) khóa hướng xanh/trắng,
+pastel, icon tròn và quy tắc trang trí Home. [Kế hoạch áp dụng](delivery/figma-mobile-implementation/visual-dna-rollout-plan.md)
+xác định thứ tự **nền UI chung → Tra cứu → DATE → KPH → Tra hạn lùi**, cùng
+semantics, allowed scope và kiểm tra cần giữ.
+
+R6 đã chuẩn bị, bảo tồn ở plan-r6; r7 ưu tiên tài khoản/login theo owner.
+Rollout các màn còn lại chưa dispatch/chưa reskin. Bước nhỏ tiếp
+khi triển khai: review/checkpoint các thay đổi Home/shelf còn dirty và untracked,
+sau đó nền UI chung + Tra cứu. Tái sử dụng primitive/token hiện có, bổ sung palette
+scoped Store App; giữ Home accepted và tương tác shelf đã nghiệm thu. Không cần
+mở thêm cycle hoặc thay thế kế hoạch cũ khi resume. R5 workflow và lịch sử shelf
+còn chờ acceptance trong phạm vi riêng; không gộp với nghiệm thu Home.
+
+Follow-up Tra lùi hàng đã nghiệm thu và thu dọn ngày 10/10/2026; xem
+[bàn giao cuối](delivery/figma-mobile-implementation/shelf-empty-state.md).
+Yêu cầu mới bổ sung lịch sử 20 lần tra chỉ ở màn chính, lưu trong phiên đã
+technical PASS 214 tests/build và Playwright mobile/desktop. Bước nhỏ tiếp theo:
+owner xem bố cục desktop và thao tác Tra lại tại `http://127.0.0.1:5175/#shelf`;
+xem [bàn giao lịch sử](delivery/figma-mobile-implementation/shelf-history.md).
+Chưa tự merge/deploy. Các mục cycle bên dưới giữ phạm vi nghiệm thu riêng.
+
+## Lịch sử Figma implementation — revision 5 chờ nghiệm thu
+
+Trước scope chuẩn bị r6, cycle `figma-mobile-implementation` ở AWAITING_ACCEPTANCE revision 5 trên
 `store-app/figma-mobile-implementation`. Đã sửa các lỗi QA về chọn/duyệt/xuất
 KPH, giữ state DATE trong phiên và guard hai viewport, panel hạn lùi theo route,
 SKU/UPC, metadata fixture và vùng bấm mobile; CTA Tra cứu hiển thị rõ theo frame.

@@ -72,6 +72,16 @@ describe("CalendarInput", () => {
     expect(screen.queryByRole("dialog", { name: "Lịch chọn ngày" })).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
   });
+  it("keeps the calendar in a short viewport when neither side of its input has enough room", async () => {
+    render(<CalendarInputHarness />);
+    const anchor = document.querySelector('[data-calendar-input="treatment-date"]') as HTMLElement;
+    vi.spyOn(window, "innerHeight", "get").mockReturnValue(390);
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(300);
+    vi.spyOn(anchor, "getBoundingClientRect").mockReturnValue({ top: 250, bottom: 294, left: 100, right: 300, width: 200, height: 44, x: 100, y: 250, toJSON: () => undefined });
+    fireEvent.click(screen.getByRole("button", { name: "Chọn ngày xử lý" }));
+    await waitFor(() => expect(screen.getByRole("dialog", { name: "Lịch chọn ngày" })).toHaveStyle({ top: "74px" }));
+  });
+
   it("portals above clipped forms and follows its anchor while the form scrolls", async () => {
     render(<CalendarInputHarness />);
     const anchor = document.querySelector('[data-calendar-input="treatment-date"]');

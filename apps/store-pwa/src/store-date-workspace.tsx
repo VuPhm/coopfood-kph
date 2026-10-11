@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Input } from "@coopfood-kph/ui";
-import { StoreSheet, Summary } from "./store-app";
+import { StoreSheet, Summary } from "./store-sheet";
 import { figmaAsset } from "./figma-assets";
 import { daysBetween } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";

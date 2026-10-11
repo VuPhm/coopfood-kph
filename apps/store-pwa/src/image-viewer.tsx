@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from "@coopfood-kph/ui";
+import { CloseButton, Dialog, DialogContent, DialogTitle } from "@coopfood-kph/ui";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type SyntheticEvent } from "react";
 import { createPortal } from "react-dom";
 import { figmaAsset } from "./figma-assets";
@@ -94,9 +94,9 @@ export function EvidenceImageViewer({ image, onOpenChange, open, presentation = 
 
   return (
     <Dialog open={open} onOpenChange={(next) => { hideLens(); onOpenChange(next); }}>
-      <DialogContent className={`evidence-viewer-content ${presentation === "screen" ? "store-evidence-screen" : ""}`} style={presentation === "screen" ? undefined : frame ?? undefined} onPointerDownOutside={hideLens}>
+      <DialogContent closeTone="neutral" className={`evidence-viewer-content ${presentation === "screen" ? "store-evidence-screen" : ""}`} style={presentation === "screen" ? undefined : frame ?? undefined} onPointerDownOutside={hideLens}>
         <DialogTitle className="sr-only">Xem ảnh minh chứng</DialogTitle>
-        {presentation === "screen" ? <div className="store-viewer-header"><button aria-label="Đóng ảnh minh chứng" onClick={() => onOpenChange(false)}><img src={figmaAsset("215-1147", "imgCloseIcon")} alt="" /></button><div><strong>Ảnh minh chứng</strong><small>{index + 1} / {total}</small></div>{onRemove ? <button aria-label="Xóa ảnh đang xem" onClick={onRemove}><img src={figmaAsset("215-1147", "imgDeleteIcon")} alt="" /></button> : <span />}</div> : null}
+        {presentation === "screen" ? <div className="store-viewer-header"><CloseButton tone="inverse" aria-label="Đóng ảnh minh chứng" onClick={() => onOpenChange(false)} /><div><strong>Ảnh minh chứng</strong><small>{index + 1} / {total}</small></div>{onRemove ? <button aria-label="Xóa ảnh đang xem" onClick={onRemove}><img src={figmaAsset("215-1147", "imgDeleteIcon")} alt="" /></button> : <span />}</div> : null}
         {image ? (
           <figure className="evidence-viewer-stage">
             <img

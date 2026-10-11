@@ -35,7 +35,7 @@ type CalendarInputProps = {
   initialMonth: LocalDate;
   invalid?: boolean;
   label: string;
-  onValueChange: (value: string) => void;
+  onValueChange: (value: string, source?: "picker") => void;
   placeholder?: string;
   readOnly?: boolean;
   value: string;
@@ -93,7 +93,8 @@ export function CalendarInput({ ariaDescribedBy, icon, id, initialMonth, invalid
       const left = Math.min(window.innerWidth - viewportInset - width, Math.max(viewportInset, anchorRect.right - width));
       const below = anchorRect.bottom + gap;
       const above = anchorRect.top - gap - height;
-      const top = below + height <= window.innerHeight - viewportInset || above < viewportInset ? below : above;
+      const preferredTop = below + height <= window.innerHeight - viewportInset || above < viewportInset ? below : above;
+      const top = Math.max(viewportInset, Math.min(preferredTop, window.innerHeight - viewportInset - height));
       setPosition({ left: Math.round(left), top: Math.round(top) });
     }
 
@@ -116,7 +117,7 @@ export function CalendarInput({ ariaDescribedBy, icon, id, initialMonth, invalid
   }
 
   function selectDate(selected: LocalDate) {
-    onValueChange(formatDisplayDate(selected));
+    onValueChange(formatDisplayDate(selected), "picker");
     setOpen(false);
     triggerRef.current?.focus();
   }

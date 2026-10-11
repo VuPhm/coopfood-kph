@@ -1,12 +1,9 @@
 import type { components } from "@coopfood-kph/api";
 import type { RecordView } from "./record-view";
-import type { StoreProfile } from "./store-profile";
 
 // Synthetic, memory-only fixtures. Never used by the online application.
-export const mockProfile: StoreProfile = {
-  storeCode: "0001", storeName: "Cửa hàng mẫu", fullName: "Nguyễn Minh An",
-  employeeCode: "DEMO-001", role: "STORE_MANAGER",
-};
+export { mockProfile } from "./store-demo-profile";
+import { mockProfile } from "./store-demo-profile";
 
 const generatedKphRecords: RecordView[] = Array.from({ length: 56 }, (_, index) => {
   const kind = index % 2 === 0 ? "TPCN" : "TPTS";

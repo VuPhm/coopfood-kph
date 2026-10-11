@@ -1,0 +1,42 @@
+/* Shared modal paint/motion. Solid scrim avoids a full-viewport blur pass. */
+:root {
+  --cf-modal-backdrop: rgb(28 38 28 / 55%);
+  --cf-modal-radius: 24px;
+  --cf-modal-header: linear-gradient(115deg, #008655 0% 65%, #00a777 100%);
+}
+[data-slot="dialog-overlay"] {
+  background: var(--cf-modal-backdrop);
+  backdrop-filter: none;
+}
+[data-slot="dialog-content"] {
+  --cf-modal-inset: 24px;
+  --cf-color-brand: #008655;
+  --cf-color-brand-hover: #00724e;
+  --cf-color-brand-active: #006846;
+  --cf-color-brand-soft: #e6f7f2;
+  --cf-color-ink: #20344a;
+  --cf-color-ink-muted: #596b7d;
+  border-radius: var(--cf-modal-radius);
+  box-shadow: var(--cf-shadow-overlay);
+  font-family: var(--cf-font-family);
+  color: var(--cf-color-ink);
+}
+[data-slot="dialog-header"] {
+  margin: calc(-1 * var(--cf-modal-inset)) calc(-1 * var(--cf-modal-inset)) 0;
+  border-radius: var(--cf-modal-radius) var(--cf-modal-radius) 0 0;
+  padding: 24px 68px 24px 24px;
+  background: var(--cf-modal-header);
+  color: white;
+}
+[data-slot="dialog-header"] [data-slot="dialog-title"],
+[data-slot="dialog-header"] [data-slot="dialog-description"] { color: white; }
+[data-slot="dialog-overlay"][data-state="open"] { animation: cf-modal-fade 150ms ease-out both; }
+[data-slot="dialog-overlay"][data-state="closed"] { animation: cf-modal-fade 120ms ease-in reverse both; }
+[data-slot="dialog-content"][data-state="open"] { animation: cf-modal-pop 180ms cubic-bezier(.22, 1, .36, 1) both; }
+[data-slot="dialog-content"][data-state="closed"] { animation: cf-modal-pop 120ms ease-in reverse both; }
+@keyframes cf-modal-fade { from { opacity: 0; } to { opacity: 1; } }
+/* Individual scale preserves the transform used to center desktop dialogs. */
+@keyframes cf-modal-pop { from { opacity: 0; scale: .985; } to { opacity: 1; scale: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="dialog-overlay"], [data-slot="dialog-content"] { animation: none !important; }
+}

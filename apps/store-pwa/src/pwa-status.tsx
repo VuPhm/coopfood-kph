@@ -1,14 +1,15 @@
-import { Button } from "@coopfood-kph/ui";
-import { CloudOff, DownloadCloud, RefreshCw, X } from "lucide-react";
+import { Button, CloseButton } from "@coopfood-kph/ui";
+import { CloudOff, DownloadCloud, RefreshCw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type ServiceWorkerNotice = "offline-ready" | "offline" | "update" | null;
 
 export type PwaStatusProps = {
   enableServiceWorker?: boolean;
+  offlineMode?: "device" | "session" | "online";
 };
 
-export function PwaStatus({ enableServiceWorker = import.meta.env.MODE !== "test" }: PwaStatusProps = {}) {
+export function PwaStatus({ enableServiceWorker = import.meta.env.PROD, offlineMode = "device" }: PwaStatusProps = {}) {
   const [notice, setNotice] = useState<ServiceWorkerNotice>(() => navigator.onLine ? null : "offline");
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const applyingUpdate = useRef(false);
@@ -57,8 +58,13 @@ export function PwaStatus({ enableServiceWorker = import.meta.env.MODE !== "test
 
   if (!notice) return null;
 
+  const offlineDetail = offlineMode === "session"
+    ? "Bạn vẫn có thể tra hạn lùi. Phiếu dùng thử chỉ giữ trong phiên, tải lại sẽ mất thay đổi."
+    : offlineMode === "online"
+      ? "Cần kết nối mạng để tải và gửi phiếu lên máy chủ."
+      : "Phiếu vẫn được lưu và xuất Excel trên thiết bị này.";
   const copy = notice === "offline"
-    ? { icon: <CloudOff aria-hidden="true" />, title: "Đang ngoại tuyến", detail: "Phiếu vẫn được lưu và xuất Excel trên thiết bị này." }
+    ? { icon: <CloudOff aria-hidden="true" />, title: "Đang ngoại tuyến", detail: offlineDetail }
     : notice === "update"
       ? { icon: <RefreshCw aria-hidden="true" />, title: "Có phiên bản mới", detail: "Cập nhật sau khi đã lưu xong phiếu đang nhập." }
       : { icon: <DownloadCloud aria-hidden="true" />, title: "Đã sẵn sàng ngoại tuyến", detail: "Bạn có thể mở lại app khi không có mạng." };
@@ -75,7 +81,7 @@ export function PwaStatus({ enableServiceWorker = import.meta.env.MODE !== "test
       <span className="pwa-status-icon">{copy.icon}</span>
       <span className="pwa-status-copy"><strong>{copy.title}</strong><small>{copy.detail}</small></span>
       {notice === "update" ? <Button type="button" onClick={applyUpdate}>Cập nhật</Button> : null}
-      <button type="button" className="pwa-status-dismiss" aria-label="Đóng thông báo PWA" onClick={() => setNotice(null)}><X aria-hidden="true" /></button>
+      <CloseButton className="pwa-status-dismiss" aria-label="Đóng thông báo PWA" onClick={() => setNotice(null)} />
     </aside>
   );
 }

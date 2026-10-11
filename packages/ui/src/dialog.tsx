@@ -1,32 +1,46 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { DismissableLayerBranch } from "@radix-ui/react-dismissable-layer";
-import { X } from "lucide-react";
-import type { ComponentProps } from "react";
+import { useRef, type ComponentProps } from "react";
 
 import { cn } from "./cn";
+import { CloseButton, type CloseButtonProps } from "./close-button";
+import "./dialog.css";
 
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 export { DismissableLayerBranch };
 
-export function DialogContent({ children, className, ...props }: ComponentProps<typeof DialogPrimitive.Content>) {
+export function DialogContent({ children, className, closeTone, closeLabel = "Đóng", onOpenAutoFocus, onCloseAutoFocus, ...props }: ComponentProps<typeof DialogPrimitive.Content> & { closeTone?: CloseButtonProps["tone"]; closeLabel?: string }) {
+  const openedFrom = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Close asChild>
-        <DialogPrimitive.Overlay data-slot="dialog-overlay" className="fixed inset-0 z-50 bg-ink/55 backdrop-blur-[3px]" />
+        <DialogPrimitive.Overlay data-slot="dialog-overlay" className="fixed inset-0 z-50" />
       </DialogPrimitive.Close>
       <DialogPrimitive.Content
+        data-slot="dialog-content"
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[min(42rem,calc(100%-2rem))] -translate-x-1/2 -translate-y-1/2 gap-6 overflow-y-auto overscroll-contain rounded-3xl border border-surface-strong bg-white p-5 shadow-2xl focus:outline-none sm:p-6",
+          "fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[min(42rem,calc(100%-2rem))] transform-[translate(-50%,-50%)] gap-4 overflow-y-auto overscroll-contain rounded-3xl border border-surface-strong bg-white p-6 focus:outline-none",
           className,
         )}
         {...props}
+        onOpenAutoFocus={event => {
+          openedFrom.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
+          onOpenAutoFocus?.(event);
+        }}
+        onCloseAutoFocus={event => {
+          onCloseAutoFocus?.(event);
+          // Controlled dialogs often open from ordinary buttons without a Radix Trigger.
+          if (!event.defaultPrevented && openedFrom.current?.isConnected) {
+            event.preventDefault();
+            // Preserve a caller's explicit focus move (for example after a successful scan).
+            if (document.activeElement === document.body) openedFrom.current.focus();
+          }
+        }}
       >
-        <DialogPrimitive.Close data-slot="dialog-close" className="dialog-close-hit-area group absolute right-0 top-0 grid size-11 place-items-center rounded-xl bg-transparent text-ink-muted outline-none" aria-label="Đóng">
-          <span className="dialog-close-visual grid size-7 place-items-center rounded-lg transition-colors group-hover:bg-surface-strong group-hover:text-ink" aria-hidden="true">
-            <X size={16} />
-          </span>
+        <DialogPrimitive.Close asChild>
+          <CloseButton data-slot="dialog-close" aria-label={closeLabel} className="dialog-close-hit-area absolute right-3 top-3" tone={closeTone ?? "inverse"} />
         </DialogPrimitive.Close>
         {children}
       </DialogPrimitive.Content>
@@ -35,13 +49,13 @@ export function DialogContent({ children, className, ...props }: ComponentProps<
 }
 
 export function DialogHeader({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("grid gap-2 pr-12", className)} {...props} />;
+  return <div data-slot="dialog-header" className={cn("grid gap-2", className)} {...props} />;
 }
 
 export function DialogTitle({ className, ...props }: ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title className={cn("text-xl font-black text-ink", className)} {...props} />;
+  return <DialogPrimitive.Title data-slot="dialog-title" className={cn("text-base font-semibold text-ink", className)} {...props} />;
 }
 
 export function DialogDescription({ className, ...props }: ComponentProps<typeof DialogPrimitive.Description>) {
-  return <DialogPrimitive.Description className={cn("text-sm leading-6 text-ink-muted", className)} {...props} />;
+  return <DialogPrimitive.Description data-slot="dialog-description" className={cn("text-sm leading-6 text-ink-muted", className)} {...props} />;
 }

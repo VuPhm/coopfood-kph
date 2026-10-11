@@ -29,11 +29,12 @@ import {
   Truck,
   Wind,
 } from "lucide-react";
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { memo, useCallback, useEffect, useRef, useState, type ChangeEvent, type ComponentProps, type ReactNode } from "react";
 import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 import type { components } from "@coopfood-kph/api";
 
+import { choiceAsset } from "./store-kph-form-assets";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -103,6 +104,9 @@ export type CreatedRecordDraft = {
 };
 
 type CreateRecordDialogProps = {
+  initialScrollTop?: number;
+  onOpenAutoFocus?: ComponentProps<typeof DialogContent>["onOpenAutoFocus"];
+  onCloseAutoFocus?: ComponentProps<typeof DialogContent>["onCloseAutoFocus"];
   presentation?: "dialog" | "screen";
   kind: KphKind | null;
   open: boolean;
@@ -138,7 +142,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog" }: CreateRecordDialogProps) {
+export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog" }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -149,6 +153,11 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   const [reviewing, setReviewing] = useState(false);
   const screenPresentation = presentation === "screen";
   const createFormRef = useRef<HTMLFormElement>(null);
+  const attachCreateForm = useCallback((form: HTMLFormElement | null) => {
+    createFormRef.current = form;
+    // Restore before the first paint; passive focus restoration alone can flash the top.
+    if (form && initialScrollTop > 0) form.scrollTop = initialScrollTop;
+  }, [initialScrollTop]);
   const wasReviewingRef = useRef(false);
   const assetScreen = activeKind === "TPCN" ? "203-701" : "203-847";
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
@@ -424,7 +433,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
+        <DialogContent onOpenAutoFocus={onOpenAutoFocus} onCloseAutoFocus={onCloseAutoFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
           <DialogHeader className="create-dialog-header">
             {screenPresentation ? <button type="button" className="store-form-back" aria-label={reviewing ? "Chỉnh sửa phiếu" : "Về danh sách KPH"} onClick={() => { if (reviewing) setReviewing(false); else onOpenChange(false); }}><img src={figmaAsset(assetScreen, "imgFeatherArrowLeft")} alt="" /></button> : null}
             <DialogTitle className="create-dialog-title">{screenPresentation ? <>{reviewing ? "Xem lại phiếu KPH" : "Tạo phiếu KPH"}<small>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</small></> : <>Tạo phiếu KPH · {kindLabels[kind]}</>}</DialogTitle>
@@ -442,7 +451,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
             </ReviewSection>
             <footer className="create-dialog-footer"><Button variant="ghost" disabled={savingRecord} onClick={() => { setReviewing(false); setPhotoError(""); }}>Chỉnh sửa</Button><Button disabled={savingRecord} onClick={() => void submit()}>{savingRecord ? "Đang gửi…" : "Gửi phiếu"}</Button></footer>
           </div> : null}
-          <form ref={createFormRef} className="create-dialog-form" hidden={screenPresentation && reviewing} onSubmit={submit}>
+          <form ref={attachCreateForm} className="create-dialog-form" hidden={screenPresentation && reviewing} onSubmit={submit}>
             <FormSection number="1" title={screenPresentation ? "Hàng hóa" : "Thông tin phát hiện"}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Ngày phát hiện" htmlFor="detected-date" required error={errors.detectedDate?.message}>
@@ -542,7 +551,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLooku
       />
     </>
   );
-}
+});
 
 function FormSection({ children, number, title }: { children: ReactNode; number: string; title: string }) {
   return <section className="form-section" aria-labelledby={`section-${number}`}><h3 id={`section-${number}`}><span>{number}.</span> {title}</h3>{children}</section>;
@@ -573,18 +582,6 @@ function ChoiceGroup({ choices, legend, name, register, assetScreen }: ChoiceGro
   );
 }
 
-function choiceAsset(value: string) {
-  if (value === "NEAR_EXPIRY") return "imgFeatherClock";
-  if (value === "EXPIRED") return "imgFeatherCalendar";
-  if (value === "TORN_PACKAGING") return "imgFeatherPackage";
-  if (value === "VACUUM_LEAK") return "imgFeatherPackage";
-  if (value === "BRUISED_WATERLOGGED") return "imgFeatherAlertTriangle";
-  if (value === "ROTTEN_MOLDY") return "imgFeatherAlertTriangle1";
-  if (value === "CANCEL") return "imgFeatherTrash2";
-  if (value === "EXCHANGE") return "imgFeatherRepeat";
-  if (value === "RETURN") return "imgFeatherCornerUpLeft";
-  return "imgFeatherMoreHorizontal";
-}
 
 function ReviewSection({ title, rows, children }: { title: string; rows: readonly (readonly [string, string])[]; children?: ReactNode }) {
   return <section className="store-review-section"><h3>{title}</h3><dl className="store-summary">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>{children}</section>;

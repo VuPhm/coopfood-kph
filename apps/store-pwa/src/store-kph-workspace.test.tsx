@@ -28,11 +28,12 @@ describe("Mock KPH history contract", () => {
     expect(screen.getByText("2 đã chọn")).toBeInTheDocument();
   });
 
-  it("creates the currently selected type from the toolbar action", () => {
+  it("creates the currently selected type from the toolbar action", async () => {
     render(<KphWorkspace records={mockRecords} onRecordsChange={vi.fn()} onNotice={vi.fn()} />);
     fireEvent.click(screen.getByRole("group", { name: "Loại phiếu" }).querySelector("button")!);
     fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu TP khô & khác" }));
-    expect(screen.getByText("TP khô & khác", { selector: "small" })).toBeInTheDocument();
+    await screen.findByRole("textbox", { name: "Tên hàng hóa" });
+    expect(await screen.findByText("TP khô & khác", { selector: "small" })).toBeInTheDocument();
   });
 
   it("selects one fixture without selecting a second record or exporting it", () => {

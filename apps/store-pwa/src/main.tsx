@@ -1,14 +1,40 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode } from "react";
+import { StrictMode, useEffect, useState, type ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 
 import "./styles.css";
-import { App } from "./app";
-import { StoreApp } from "./store-app";
+import { FeatureLoadBoundary, FeatureLoadError, KphLoadingSkeleton } from "./feature-loading";
 
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { refetchOnWindowFocus: false, staleTime: 30_000 } },
-});
+// Load only the configured entry point; the other app and its dependencies stay off startup.
+const entryModule = import.meta.env.VITE_STORE_APP_MOCK === "true"
+  ? import("./store-app").then(module => ({ default: module.StoreApp }))
+  : import("./app").then(module => ({ default: module.App }));
+const frameModule = import.meta.env.VITE_STORE_APP_MOCK === "true"
+  ? import("./store-loading-frame") : null;
+
+// A direct KPH link already expresses intent: fetch alongside the shell, avoiding
+// an entry → shell → workspace request waterfall on cold startup.
+if (import.meta.env.VITE_STORE_APP_MOCK === "true" && window.location.hash === "#kph") {
+  void import("./store-kph-workspace").catch(() => {});
+}
+
+function AppBootstrap() {
+  const [EntryPoint, setEntryPoint] = useState<ComponentType | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [LoadingFrame, setLoadingFrame] = useState<ComponentType | null>(null);
+  useEffect(() => {
+    let current = true;
+    entryModule.then(module => { if (current) setEntryPoint(() => module.default); })
+      .catch(() => { if (current) setFailed(true); });
+    frameModule?.then(module => { if (current) setLoadingFrame(() => module.StoreLoadingFrame); }).catch(() => {});
+    return () => { current = false; };
+  }, []);
+  if (failed) return <FeatureLoadError />;
+  if (EntryPoint) return <EntryPoint />;
+  if (LoadingFrame) return <LoadingFrame />;
+  return import.meta.env.VITE_STORE_APP_MOCK === "true"
+    ? <div className="store-bootstrap-canvas" data-home={window.location.hash === "#home" || !window.location.hash} aria-busy="true"><p className="sr-only" role="status">Đang tải ứng dụng…</p></div>
+    : <KphLoadingSkeleton label="Đang tải ứng dụng" />;
+}
 
 document.addEventListener("keydown", (event) => {
   if (!event.altKey && !event.ctrlKey && !event.metaKey) {
@@ -21,10 +47,6 @@ document.addEventListener("pointerdown", () => {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {import.meta.env.VITE_STORE_APP_MOCK === "true" ? <StoreApp /> : (
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    )}
+    <FeatureLoadBoundary><AppBootstrap /></FeatureLoadBoundary>
   </StrictMode>,
 );

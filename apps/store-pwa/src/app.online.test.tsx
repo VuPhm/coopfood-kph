@@ -213,6 +213,59 @@ describe("Online workspace boundary", () => {
     }, expect.anything());
   });
 
+  it("prefetches an intended page in the same scope without replacing the active page or selection", async () => {
+    const current = workspace("STORE_MANAGER");
+    const second = { ...current.records[0]!, id: "prefetched-page-2", productName: "Phiếu tải trước" };
+    mocks.getSession.mockResolvedValue(current.session);
+    mocks.loadHistory.mockImplementation((_storeId: string, filter: { page: number }) => Promise.resolve({
+      records: filter.page === 2 ? [second] : current.records,
+      page: filter.page, pageSize: 25, totalItems: 26, totalPages: 2,
+      typeTotals: { TPCN: 26, TPTS: 0 },
+    }));
+    render(<App />);
+    await screen.findAllByText("Sản phẩm từ máy chủ");
+    fireEvent.click(screen.getAllByRole("checkbox", { name: "Chọn phiếu online-record-1" })[0]!);
+    fireEvent.pointerEnter(screen.getByRole("button", { name: "Trang sau" }));
+    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledTimes(2));
+    expect(mocks.loadHistory).toHaveBeenLastCalledWith(current.store.id, { type: "TPCN", page: 2, pageSize: 25 }, expect.anything());
+    expect(screen.getByText("Trang 1 / 2")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Duyệt 1 phiếu" })).toBeVisible();
+    expect(screen.queryByText("Phiếu tải trước")).not.toBeInTheDocument();
+    await act(async () => {});
+    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    await screen.findAllByText("Phiếu tải trước");
+    expect(screen.getByText("Trang 2 / 2")).toBeVisible();
+    expect(screen.getByText("Đã chọn", { exact: false })).toHaveTextContent("Đã chọn 0");
+    expect(mocks.loadHistory).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not show a late prefetched page after switching stores", async () => {
+    const current = workspace("STORE_MANAGER");
+    const otherStore = { ...current.store, id: "prefetch-store-b", code: "0002", name: "Cửa hàng B" };
+    const otherRecord = { ...current.records[0]!, id: "record-at-b", productName: "Phiếu cửa hàng B" };
+    let releasePage!: (value: unknown) => void;
+    const pendingPage = new Promise(resolve => { releasePage = resolve; });
+    const page = (records: typeof current.records, index: number, pages: number) => ({
+      records, page: index, pageSize: 25, totalItems: pages === 2 ? 26 : 1,
+      totalPages: pages, typeTotals: { TPCN: pages === 2 ? 26 : 1, TPTS: 0 },
+    });
+    mocks.getSession.mockResolvedValue({ ...current.session, user: { ...current.session.user, stores: [current.store, otherStore] } });
+    mocks.loadHistory.mockImplementation((storeId: string, filter: { page: number }) => storeId === otherStore.id
+      ? Promise.resolve(page([otherRecord], 1, 1))
+      : filter.page === 2 ? pendingPage : Promise.resolve(page(current.records, 1, 2)));
+    render(<App />);
+    await screen.findAllByText("Sản phẩm từ máy chủ");
+    fireEvent.pointerEnter(screen.getByRole("button", { name: "Trang sau" }));
+    await waitFor(() => expect(mocks.loadHistory).toHaveBeenCalledTimes(2));
+    fireEvent.change(screen.getByRole("combobox", { name: "Chọn cửa hàng" }), { target: { value: otherStore.id } });
+    await screen.findAllByText("Phiếu cửa hàng B");
+    await act(async () => releasePage(page([{ ...current.records[0]!, productName: "Phiếu tải muộn ở A" }], 2, 2)));
+    expect(screen.queryByText("Phiếu tải muộn ở A")).not.toBeInTheDocument();
+    expect(screen.queryByText("Sản phẩm từ máy chủ")).not.toBeInTheDocument();
+    expect(screen.getByText("Trang 1 / 1")).toBeVisible();
+    expect(mocks.loadHistory).toHaveBeenLastCalledWith(otherStore.id, { type: "TPCN", page: 1, pageSize: 25 }, expect.anything());
+  });
+
   it("lets an online STORE_MANAGER review and export an approved server snapshot without delete", async () => {
     const managerWorkspace = workspace("STORE_MANAGER");
     const approved = { ...managerWorkspace.records[0]!, approvalStatus: "APPROVED" as const, reviewedBy: managerWorkspace.session.user.displayName };

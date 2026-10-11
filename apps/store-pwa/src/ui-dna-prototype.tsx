@@ -1,12 +1,11 @@
 import { useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
 import {
   ArrowLeft, ArrowRight, Barcode, CalendarDays, Check, ChevronRight,
   CircleAlert, Clock3, Home, Image, Package, PackageOpen, Search,
-  Salad, ShieldCheck, Store, Truck, Wind, X,
+  Salad, ShieldCheck, Store, Truck, Wind,
 } from "lucide-react";
 
-import { BottomNavigation, Button, Card, SectionTitle } from "@coopfood-kph/ui";
+import { BottomNavigation, Button, Card, CloseButton, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, SectionTitle } from "@coopfood-kph/ui";
 import { KPH_OPTIONS, type ConditionCode, type KphKind, type ResolutionCode } from "@coopfood-kph/kph-rules";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import "./ui-dna-prototype.css";
@@ -60,7 +59,7 @@ export function UiDnaPrototype() {
         </div>
       </div>
 
-      {notice ? <div className="dna-toast" role="status"><Check size={17} aria-hidden="true" />{notice}<button type="button" aria-label="Đóng thông báo" onClick={() => setNotice("")}><X size={16} aria-hidden="true" /></button></div> : null}
+      {notice ? <div className="dna-toast" role="status"><Check size={17} aria-hidden="true" />{notice}<CloseButton aria-label="Đóng thông báo" onClick={() => setNotice("")} /></div> : null}
       {screen === "home" ? <HomeScreen assigned={assigned} onOpenKph={() => setScreen("kph")} onOpenExpiry={() => setExpiryOpen(true)} records={records} /> : null}
       {screen === "kph" ? <KphScreen
         records={records}
@@ -170,13 +169,13 @@ function KphScreen({ records, onBack, onSubmit }: {
     <Card className="dna-create-card"><SectionTitle title="Tạo phiếu mới" description="Chọn loại hàng không phù hợp." />
       <div className="dna-create-actions"><Button onClick={() => startCompose("TPCN")}><PackageOpen size={17} aria-hidden="true" /> Tạo TPCN</Button><Button variant="secondary" onClick={() => startCompose("TPTS")}><Salad size={17} aria-hidden="true" /> Tạo TPTS</Button></div>
     </Card>
-    {filterOpen ? createPortal(<div className="dna-sheet-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setFilterOpen(false); }}>
-      <section className="dna-filter-sheet" role="dialog" aria-modal="true" aria-labelledby="dna-filter-title">
-        <div className="dna-sheet-handle" /><div className="dna-sheet-heading"><div><p className="dna-eyebrow">KPH</p><h2 id="dna-filter-title">Lọc phiếu</h2></div><button type="button" aria-label="Đóng bộ lọc" onClick={() => setFilterOpen(false)}><X size={19} aria-hidden="true" /></button></div>
-        <p>Chọn trạng thái để thu gọn lịch sử.</p><div className="dna-filter-sheet-options" role="group" aria-label="Trạng thái phiếu">{([{ key: "ALL", label: "Tất cả" }, { key: "PENDING", label: "Chờ duyệt" }, { key: "APPROVED", label: "Đã duyệt" }, { key: "REJECTED", label: "Không duyệt" }] as const).map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} className={filter === item.key ? "is-selected" : ""} onClick={() => setFilter(item.key)}>{item.label}{filter === item.key ? <Check size={17} aria-hidden="true" /> : null}</button>)}</div>
-        <Button className="dna-filter-apply" onClick={() => setFilterOpen(false)}>Xem {visibleRecords.length} phiếu</Button>
-      </section>
-    </div>, document.body) : null}
+    <Dialog open={filterOpen} onOpenChange={setFilterOpen}>
+      <DialogContent className="dna-filter-sheet" closeLabel="Đóng bộ lọc">
+        <DialogHeader><DialogTitle>Lọc phiếu</DialogTitle></DialogHeader>
+        <div className="dna-modal-body"><DialogDescription>Chọn trạng thái để thu gọn lịch sử.</DialogDescription><div className="dna-filter-sheet-options" role="group" aria-label="Trạng thái phiếu">{([{ key: "ALL", label: "Tất cả" }, { key: "PENDING", label: "Chờ duyệt" }, { key: "APPROVED", label: "Đã duyệt" }, { key: "REJECTED", label: "Không duyệt" }] as const).map((item) => <button key={item.key} type="button" aria-pressed={filter === item.key} className={filter === item.key ? "is-selected" : ""} onClick={() => setFilter(item.key)}>{item.label}{filter === item.key ? <Check size={17} aria-hidden="true" /> : null}</button>)}</div>
+        <Button className="dna-filter-apply" onClick={() => setFilterOpen(false)}>Xem {visibleRecords.length} phiếu</Button></div>
+      </DialogContent>
+    </Dialog>
   </div>;
 
   if (view === "compose") return <div className="dna-screen dna-kph-screen dna-kph-compose">

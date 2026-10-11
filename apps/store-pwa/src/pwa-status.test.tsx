@@ -24,6 +24,20 @@ describe("PWA status", () => {
     expect(screen.getByText("Phiếu vẫn được lưu và xuất Excel trên thiết bị này.")).toBeVisible();
   });
 
+  it.each([
+    ["session", "Bạn vẫn có thể tra hạn lùi. Phiếu dùng thử chỉ giữ trong phiên, tải lại sẽ mất thay đổi."],
+    ["online", "Cần kết nối mạng để tải và gửi phiếu lên máy chủ."],
+  ] as const)("describes %s offline capabilities without claiming durable local records", (offlineMode, detail) => {
+    Object.defineProperty(Navigator.prototype, "onLine", { configurable: true, get: () => false });
+    render(<PwaStatus enableServiceWorker={false} offlineMode={offlineMode} />);
+    expect(screen.getByText(detail)).toBeVisible();
+    expect(screen.queryByText("Phiếu vẫn được lưu và xuất Excel trên thiết bị này.")).not.toBeInTheDocument();
+    fireEvent(window, new Event("online"));
+    expect(screen.queryByText("Đang ngoại tuyến")).not.toBeInTheDocument();
+    fireEvent(window, new Event("offline"));
+    expect(screen.getByText("Đang ngoại tuyến")).toBeVisible();
+  });
+
   it("registers the production worker and applies an already waiting update", async () => {
     Object.defineProperty(Navigator.prototype, "onLine", { configurable: true, get: () => true });
     const postMessage = vi.fn();
@@ -44,6 +58,8 @@ describe("PWA status", () => {
 
     await waitFor(() => expect(screen.getByText("Có phiên bản mới")).toBeVisible());
     expect(serviceWorker.register).toHaveBeenCalledWith("/sw.js", { scope: "/" });
+    // Discovering an update must leave the active version and unfinished form alone.
+    expect(postMessage).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Cập nhật" }));
     expect(postMessage).toHaveBeenCalledWith({ type: "SKIP_WAITING" });
   });

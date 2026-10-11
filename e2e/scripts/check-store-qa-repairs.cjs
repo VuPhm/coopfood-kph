@@ -53,6 +53,10 @@ async function clickExpandedArea(page, control, dx, dy) {
    page.on('console', message => { if (/Encountered two children with the same key/.test(message.text())) runtimeErrors.push(message.text()); });
    await page.goto(base);
    await page.locator('.store-screen-home').waitFor();
+   if (process.env.PWA_FIRST_INSTALL === 'true') {
+    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+    await page.getByRole('button', {name:'Đóng thông báo PWA',exact:true}).click();
+   }
 
    // One fixture selection must mean exactly one selected and exported ticket.
    await route(page, 'kph');
@@ -85,7 +89,8 @@ async function clickExpandedArea(page, control, dx, dy) {
    await page.getByRole('button', {name:'Xem ảnh minh chứng 1',exact:true}).waitFor();
    await page.getByRole('button', {name:'Xem lại',exact:true}).click();
    await page.getByRole('button', {name:'Gửi phiếu',exact:true}).click();
-   const currentTicket = page.locator(viewport.width < 900 ? '.store-ticket' : '.store-kph-table tbody tr').filter({hasText:'Chờ duyệt'}).filter({hasText:'Cải thìa VietGAP 500 g'});
+   // Follow the visible composition as the viewport switches between cards and table.
+   const currentTicket = page.locator('.store-ticket:visible, .store-kph-table tbody tr:visible').filter({hasText:'Chờ duyệt'}).filter({hasText:'Cải thìa VietGAP 500 g'});
    await expect(currentTicket).toHaveCount(1);
    await expect(currentTicket).toContainText('0011730');
    // Search is part of the desktop composition; resizing must retain the session record.

@@ -1,10 +1,123 @@
 # Trạng thái hiện tại
 
-Cập nhật: 2026-10-08
+Cập nhật: 2026-10-11
+
+Git checkpoint 11/10 theo yêu cầu owner: lưu toàn bộ các follow-up UI và tối ưu
+hiện tại trên nhánh `store-app/figma-mobile-implementation` bằng commit local.
+Các ghi chú “chưa commit” bên dưới là trạng thái lịch sử trước checkpoint này.
+Checkpoint không thay owner acceptance còn pending; chưa push/merge/deploy.
+
+Progressive loading follow-up 11/10: KPH/form và Home dùng khung đúng geometry,
+khung nhẹ tải song song entry; giữ scroll form, ảnh Home WebP responsive.
+Technical PASS 180 tests, build mock/online, layout ≤1px/0 shift trong lab hai
+viewport, lazy/focus/recovery, workflow và offline gồm ảnh mới.
+[Bàn giao](delivery/figma-mobile-implementation/progressive-loading.md).
+Owner visual acceptance/điện thoại còn pending; preview 4197, không deploy.
+
+Offline follow-up 11/10 theo clarification owner: chỉ bản Store App hiện tại,
+bỏ hướng prototype 6 shell. Đăng ký worker ở entry này, giữ precache lazy
+chunks, copy đúng dữ liệu phiên/online và toast không che toolbar mobile.
+Technical PASS 180 Store PWA tests, build mock/online, Playwright offline reload/
+form/export/tra hạn lùi hai viewport. [Bằng chứng](delivery/figma-mobile-implementation/kph-offline.md).
+
+KPH loading follow-up 11/10: tách entry/workspace/form/Excel theo thời điểm dùng,
+skeleton + recovery, prefetch trang online đúng scope, memo hóa và chỉ mount một
+layout danh sách. Technical PASS 178 Store PWA + 12 UI tests, build mock/online,
+Playwright loading/error/focus/paging và toàn luồng tạo/duyệt/xuất hai viewport.
+Build CPU 6×: JS Home giảm 29,9%, DOM KPH giảm 45–47%; cold navigation thêm
+24–56 ms, có skeleton; prefetch theo ý định cải thiện thời gian sau click.
+[Bằng chứng](delivery/figma-mobile-implementation/kph-loading.md).
+Bước nhỏ tiếp theo: owner thử build `http://127.0.0.1:4197/#kph` trên thiết bị
+đã thấy >600 ms; chưa field INP/real-backend/owner acceptance.
+
+Modal theo tài khoản follow-up 11/10: áp dụng đúng header gradient xanh, chữ trắng,
+X inverse và body trắng/lề 24px; giữ bố cục thao tác tạo/quét/xem ảnh.
+Technical PASS 180 Store + 12 UI + 14 Admin tests, check/build; Playwright modal
+5 viewport trên dev/build, X Store/Admin/PWA, motion 2, header 6 và workflow 2 PASS.
+Owner visual acceptance còn pending, bước nhỏ tiếp theo: xem popup tra và lọc tại
+`http://127.0.0.1:5175/#kph`. [Bàn giao](delivery/figma-mobile-implementation/modal-account-reference.md).
+
+Modal chung follow-up 11/10: popup tra dùng Radix modal/backdrop tối 55% không
+blur, khóa cuộn/focus và giữ state phiên. Shared chrome/motion/X; sheet mobile
+sát đáy, desktop centered. Store 177 + UI 12 + Admin 14 tests/build PASS;
+Playwright modal 5, close controls Store/Admin/PWA và workflow/header gates PASS.
+Build CPU 6× popup median mobile/desktop 96/88 ms, max 128/152 ms; đây là lab,
+lần đầu tài khoản desktop còn 504 ms. Visual acceptance/thiết bị thật pending.
+[Bàn giao](delivery/figma-mobile-implementation/modal-unification.md).
+Bước nhỏ tiếp theo: owner thử backdrop/X tại `http://127.0.0.1:5175/#kph`.
 
 ## Giai đoạn
 
-Cycle `figma-mobile-implementation` tiếp tục ở **AWAITING_ACCEPTANCE revision 5**
+Modal INP follow-up 11/10: bỏ blur backdrop chung, tách state mở tài khoản/lọc/
+tạo phiếu khỏi workspace và giảm render form; giữ Radix/focus/workflow.
+174 Store PWA + 12 UI tests, TypeScript/build và Playwright PASS.
+Build CPU 6×: trung vị mobile tài khoản/lọc/tạo 56/64/128 ms; lần mở đầu
+lớn nhất 280 ms. Đây là lab latency, owner còn cần đo trên thiết bị đã thấy
+>600 ms. [Bằng chứng](delivery/figma-mobile-implementation/modal-inp.md).
+Bước nhỏ tiếp theo: thử build tại `http://127.0.0.1:4187/#kph`.
+
+Mobile toolbar follow-up 11/10: thanh dưới 4 mục Trang chủ/Tra cứu/KPH/DATE,
+active xanh/mint và safe-area; nút nổi “Tra hạn lùi” dạng capsule peach trên thanh.
+Popup giữ phía trên navigation, state/focus/route semantics cũ. Playwright toolbar,
+Home scroll và Home regression 5 viewport PASS; TypeScript/build và 174 Store PWA tests PASS (2 workers).
+[Bằng chứng](delivery/figma-mobile-implementation/mobile-toolbar.md).
+Bước nhỏ tiếp theo: owner thử thanh dưới/nút nổi tại `http://127.0.0.1:5176/#kph`.
+
+Đăng nhập follow-up 11/10: áp dụng lớp form trắng cuộn trên nền xanh sticky,
+mobile một cột và desktop giữ hai cột. Technical PASS 14 tests, TypeScript/build,
+Playwright scroll/identity 5 viewport và online API fixture 2 viewport.
+[Bằng chứng](delivery/figma-mobile-implementation/login-scroll-layer.md).
+Bước nhỏ tiếp theo: owner cuộn `http://127.0.0.1:5176/#login` để xem hình ảnh.
+
+Home follow-up 11/10: khối nội dung trắng là lớp trên, cuộn tự nhiên lên che
+header xanh giữ vị trí; chỉ áp dụng Home. Technical PASS Playwright 5 viewport,
+TypeScript, 6 targeted tests và build. [Bằng chứng](delivery/figma-mobile-implementation/home-scroll-layer.md).
+Owner đã chấp nhận tài khoản/login bằng “ổn”; cơ chế cuộn Home mới chờ xem hình ảnh.
+Bước nhỏ tiếp theo: cuộn Home tại `http://127.0.0.1:5176/#home`.
+
+Tài khoản + đăng nhập theo DNA đã triển khai theo yêu cầu owner ngày 11/10/2026;
+revision 7 được owner visual acceptance bằng “ổn”; technical PASS trên working tree:
+`npm run verify` 216 tests/build, Playwright account/login 5 viewport, online API
+fixture 2 viewport và Home regression PASS. [Bàn giao](delivery/figma-mobile-implementation/account-login-refinement.md).
+Preview: avatar ở `http://127.0.0.1:5176/#home`; đăng nhập ở
+`http://127.0.0.1:5176/#login`. Login UI được dùng lại cho online gateway hiện có;
+bản dev có lối vào dữ liệu mẫu riêng, không tạo session giả. Chưa real-backend/
+thiết bị thật, chưa commit/merge/deploy.
+Các trang còn lại giữ kế hoạch r6 hoãn; owner yêu cầu cuộn Home trước.
+
+Home đã được owner nghiệm thu hình ảnh ngày **11/10/2026** bằng “quá đẹp,
+tích hợp vào dna, chuẩn bị điều chỉnh các trang còn lại theo”. Header xanh,
+logo nhỏ Home-only, thẻ pastel/icon tròn, giỏ thực phẩm và sóng mint đã được ghi
+vào [Visual DNA](product/STORE_APP_VISUAL_DNA.md), liên kết từ
+[Store App UI DNA](product/STORE_APP_UI_DNA.md). Check/build, 4 session tests và
+Playwright 5 viewport PASS; [Home evidence](delivery/figma-mobile-implementation/home-brand-refinement.md).
+Acceptance này chỉ cho Home/hướng thị giác, không đóng workflow gate r5 hoặc
+lịch sử shelf. Code/asset vẫn ở working tree, chưa commit/merge/deploy.
+
+Trước yêu cầu tài khoản/login, cycle ở **PLANNING revision 6** để chuẩn bị áp dụng DNA:
+nền UI chung → Tra cứu → DATE → KPH → Tra hạn lùi. Chuẩn bị tài liệu hoàn tất,
+chưa triển khai reskin các màn còn lại. [Kế hoạch](delivery/figma-mobile-implementation/visual-dna-rollout-plan.md)
+ghi scope, gate và checkpoint cần có. R5 giữ lịch sử nghiệm thu riêng ở
+[plan-r5](delivery/figma-mobile-implementation/plan-r5.json); gate rollout r6 pending.
+
+Follow-up 11/10: dời mốc Cảnh báo/Hạn lùi gần tỷ lệ ngày (khoảng 56%/78%),
+bù khoảng nhãn; Hôm nay vẫn khớp các mốc. Test liên quan 28 PASS, build và
+Playwright main/popup mobile/desktop PASS; xem
+[evidence timeline](delivery/figma-mobile-implementation/shelf-result-reference.md).
+
+Follow-up mới: lịch sử 20 lần tra hợp lệ gần nhất **chỉ ở màn chính, trong phiên**,
+theo lựa chọn owner ngày 10/10/2026. Desktop form/result cạnh nhau và lịch sử bên
+dưới; mobile dùng thẻ. `npm run verify` PASS 214 tests/build và bốn gate Playwright
+Tra lùi hàng PASS. Owner visual acceptance cho lịch sử còn pending; xem
+[bàn giao lịch sử](delivery/figma-mobile-implementation/shelf-history.md).
+
+Follow-up tiện ích Tra lùi hàng đã được owner xác nhận “đạt, thu dọn” ngày
+10/10/2026. Holder/state/tự tra và glow/motion đã chốt, test mobile/desktop PASS;
+xem [nghiệm thu và cleanup](delivery/figma-mobile-implementation/shelf-empty-state.md).
+Phạm vi holder/state/glow trước đó đã đóng, chưa commit/merge/deploy. Nghiệm thu này không thay
+gate owner cho toàn cycle revision 5 bên dưới.
+
+Lịch sử revision 5: `figma-mobile-implementation` ở **AWAITING_ACCEPTANCE**
 trên nhánh `store-app/figma-mobile-implementation`. Round sửa theo QA 08/10 đã
 xử lý 5 lỗi P2: ID fixture KPH trùng, DATE mất state/count khi đổi màn, mobile
 lùi trạng thái DATE đã xử lý, tiện ích hạn lùi còn nổi/ID trùng và UPC bị ghi thành

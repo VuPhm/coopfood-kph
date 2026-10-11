@@ -1,99 +1,48 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 5,
+  "revision": 10,
   "status": "AWAITING_ACCEPTANCE",
-  "objective": "Repair the findings from the 2026-10-08 UI QA round on the existing memory-only Store App preview; preserve business/API boundaries and prepare owner acceptance.",
+  "objective": "Implement mobile bottom navigation and refine the floating quick shelf-life utility without changing business workflows.",
   "inScope": [
-    "Unique KPH mock record IDs; isolated selection/review/export",
-    "DATE state retained in StoreApp for the session and shared with Home; consistent mobile/desktop transition guards",
-    "Close quick shelf utility on route changes; unique field IDs per ShelfLifeScreen instance",
-    "Preserve catalog SKU separately from scanned barcode in mock KPH records; search both identifiers",
-    "Fixture-specific lookup metadata; expanded hit areas without changing Figma visual sizes; repair the pre-existing Lookup CTA visibility defect exposed during the same scoped visual check",
-    "Refresh browser asset expectations from r3/r4; focused regressions, npm run verify and Playwright at 390×844 / 1440×1024",
-    "Revision 5 evidence and handoff; owner acceptance stays pending"
+    "Mobile bottom navigation for existing Home/Lookup/KPH/DATE routes",
+    "Quick utility capsule, mobile layering/clearance, existing state/focus/route behavior",
+    "Targeted and Store PWA verification, DNA and handoff"
   ],
   "outOfScope": [
-    "Backend/OpenAPI/generated API/schema/migration/authorization changes",
-    "Production API wiring, DATE production workflow, real data, persistence/offline/sync",
-    "Figma writes or edits to accepted frames; UI DNA prototype",
-    "Admin redesign, unrelated online/Pilot refactor, new infrastructure",
-    "Merge/push/deploy or protected Pages cutover; DATE add-following workflow without design"
+    "Other screen reskin, placeholder features or online shell rewrite",
+    "Backend/API/auth/business rule changes",
+    "Commit/merge/push/deploy or Pages cutover"
   ],
-  "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
-  "candidateSha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
-  "integrationOwner": "/root — sole writer for the owner-authorized QA repair round",
+  "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
+  "candidateSha": null,
+  "integrationOwner": "/root — writer for mobile toolbar and quick utility callsite",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
-    "apps/store-pwa/src/store-app.test.tsx",
     "apps/store-pwa/src/store-app.css",
-    "apps/store-pwa/src/store-app-mock.ts",
-    "apps/store-pwa/src/store-kph-workspace.tsx",
-    "apps/store-pwa/src/store-kph-workspace.test.tsx",
-    "apps/store-pwa/src/store-shelf-life.tsx",
-    "apps/store-pwa/src/store-shelf-life.test.tsx",
-    "apps/store-pwa/src/store-date-workspace.tsx",
-    "apps/store-pwa/src/store-date-workspace.test.tsx",
-    "apps/store-pwa/src/store-lookup-workspace.tsx",
-    "apps/store-pwa/src/store-lookup-workspace.test.tsx",
-    "apps/store-pwa/src/record-view.ts",
-    "apps/store-pwa/src/create-record-dialog.tsx",
-    "apps/store-pwa/src/create-record-dialog.test.tsx",
-    "apps/store-pwa/src/store-create-review.test.tsx",
-    "e2e/scripts/check-figma-mobile.cjs",
-    "e2e/scripts/check-store-qa-repairs.cjs",
-    "docs/delivery/figma-mobile-implementation/**",
+    "e2e/scripts/check-mobile-toolbar.cjs",
+    "docs/product/STORE_APP_VISUAL_DNA.md",
     "docs/CURRENT_STATE.md",
-    "docs/NEXT.md"
+    "docs/NEXT.md",
+    "docs/delivery/figma-mobile-implementation/**"
   ],
-  "reviewLimit": 1,
-  "reviewRound": 1,
+  "reviewLimit": 2,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
-      "id": "workspace-integrity",
+      "id": "mobile-toolbar-technical",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
+      "status": "pending",
+      "evidence": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md"
     },
     {
-      "id": "workflow-semantics",
-      "kind": "technical",
-      "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
-    },
-    {
-      "id": "mobile-desktop-visual-interaction",
-      "kind": "technical",
-      "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
-    },
-    {
-      "id": "responsive-assets",
-      "kind": "technical",
-      "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
-      "evidence": "docs/delivery/figma-mobile-implementation/technical-evidence-r5.md"
-    },
-    {
-      "id": "owner-mobile-desktop-acceptance",
+      "id": "owner-mobile-toolbar-visual",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 5,
-      "sha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
-      "evidence": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r5.md"
+      "evidence": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md"
     }
   ],
   "changes": [
@@ -124,14 +73,49 @@
       "source": "Owner in current chat, 2026-10-08, following the completed UI QA report at .local/qa-ui-2026-10-08/report.md",
       "impact": "Invalidates revision 4 technical gates: record identity, DATE/session state, identifiers, route behavior, hit areas and aggregate browser expectations change. Prior evidence remains historical; owner acceptance is pending.",
       "decision": "One root writer on the existing branch/worktree. Repair all five P2 findings, two bounded P3 findings and stale asset expectations. No delegation, API/schema/dependency/shared UI change, Figma writes, merge/push/deploy. The same-round Lookup screenshot review also repairs the existing clipped/white-on-white submit CTA using frame 384:514."
+    },
+    {
+      "revision": 6,
+      "request": "quá đẹp, tích hợp vào dna, chuẩn bị điều chỉnh các trang còn lại theo",
+      "source": "Owner in current chat, 2026-10-11, after viewing the updated Home based on the supplied reference",
+      "impact": "Home visual direction accepted in the dirty working tree; remaining screen rollout is preparation only. Revision 5 gates and workflow acceptance remain historical at their original SHA and are not treated as current rollout coverage. All rollout gates pending until implementation.",
+      "decision": "Preserve r5 plan/evidence, add canonical Visual DNA linked from Store App UI DNA, record scoped Home acceptance, prepare sequential rollout and readiness without runtime edits or delegation."
+    },
+    {
+      "revision": 7,
+      "request": "sửa trình bày của xem tài khoản, rồi sau đó làm trang đăng nhập",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Prioritizes account/login over prepared rollout order. Account and login evidence recorded independently; Home acceptance retained with targeted regression. No acceptance inferred for other screens or r5 workflows.",
+      "decision": "One writer updates account first, then shared login presentation in preview and online; retain auth gateway and business session semantics. Browser fixture verification and full verify, then owner visual handoff. Remaining rollout deferred."
+    },
+    {
+      "revision": 8,
+      "request": "ổn, xây dụng cơ chế này, làm với home trước: hộp trắng nằm ở lớp bên trên và trượt trên nền xanh khi cuộn trang",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Account/login visual accepted; new Home scroll behavior has independent technical and owner gates. Other rollout remains deferred.",
+      "decision": "Reuse existing Home composition with sticky background header and higher native scrolling content; one writer, no delegation."
+    },
+    {
+      "revision": 9,
+      "request": "ap dụng hiệu ứng trượt này cho trang đăng nhập",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Shared preview/online login composition receives native layered scroll; auth semantics unchanged. New visual gate remains independent of prior Home/account acceptance.",
+      "decision": "CSS-only login implementation, keep desktop two columns, one-column short viewports; same writer/branch/worktree, no delegation."
+    },
+    {
+      "revision": 10,
+      "request": "xây dựng thanh công cụ dưới cho mobile; nhân tiện tối ưu nút tra date nổi",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Navigation and mobile bottom clearance change across preview Store App. Existing business/auth contracts retained; independent visual follow-up.",
+      "decision": "Four real destinations, visible labels/current state, peach named utility capsule and non-modal quick panel above navbar. Same branch/worktree, no delegation."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner reviews the revision 5 preview scenarios and records visual/workflow acceptance or a concrete finding; stop this bounded repair round.",
+  "nextAction": "Owner checks mobile navbar and Tra hạn lùi at #kph. Other workflow acceptance remains separate.",
   "workingTreeCandidate": {
-    "baseSha": "ecebee861a32d91ce113727d92cb20fbb9a06a83",
+    "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Candidate committed and verified; only this cycle record may advance for evidence/sign-off."
+    "note": "Toolbar and previous Home/login/shelf changes remain dirty/untracked; no committed candidate SHA."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -142,22 +126,61 @@
   "executor": {
     "agentId": "/root",
     "status": "completed",
-    "ownership": "sole writer, one QA repair round",
+    "ownership": "mobile toolbar and quick utility presentation",
     "worktree": "/Users/vup/Documents/coopfood-kph",
     "branch": "store-app/figma-mobile-implementation"
   },
   "readiness": {
     "planningComplete": true,
-    "dispatchReady": true,
+    "dispatchReady": false,
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/implementation-plan-r5.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/acceptance-handoff-r5.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md",
   "executionAuthorization": {
-    "date": "2026-10-08",
-    "source": "Owner: dùng kết quả này cho 1 round sửa",
-    "mode": "single writer on existing task branch/worktree",
-    "checkpoint": "ecebee861a32d91ce113727d92cb20fbb9a06a83"
+    "date": "2026-10-11",
+    "source": "Owner: xây dựng thanh công cụ dưới cho mobile; nhân tiện tối ưu nút tra date nổi",
+    "mode": "single toolbar writer, existing preview Store App; same branch/worktree",
+    "checkpoint": null
+  },
+  "historicalRevision5": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r5.json",
+    "candidateSha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+    "ownerWorkflowAcceptance": "pending; Home-only acceptance does not close this gate",
+    "coverage": "r5 technical evidence applies to its recorded candidate only; no current reskin gate claims reuse"
+  },
+  "homeVisualAcceptance": {
+    "date": "2026-10-11",
+    "acceptedBy": "owner",
+    "decisionRef": "Owner message in current chat: quá đẹp, tích hợp vào dna, chuẩn bị điều chỉnh các trang còn lại theo",
+    "evidence": "docs/delivery/figma-mobile-implementation/home-brand-refinement.md",
+    "scope": "Home visual presentation and direction for UI DNA; dirty working tree, no committed candidateSha"
+  },
+  "workingTreeVerification": {
+    "result": "pass",
+    "evidence": "docs/delivery/figma-mobile-implementation/mobile-toolbar.md",
+    "note": "174 Store PWA tests with 2 workers, type/build and targeted Playwright pass. One default-worker run timed out; no test disabled/timeout increased. SHA-bound gate pending without commit."
+  },
+  "historicalRevision6": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
+    "scope": "Preparation only; visual rollout plan remains reusable for future authorized slices"
+  },
+  "accountLoginVisualAcceptance": {
+    "date": "2026-10-11",
+    "source": "Owner: ổn, xây dụng cơ chế này, làm với home trước",
+    "scope": "Account/login visual; not r5 workflow or real backend"
+  },
+  "historicalRevision7": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r7.json",
+    "scope": "Account/login visual accepted; technical evidence applies to that working tree"
+  },
+  "historicalRevision8": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r8.json",
+    "scope": "Home scrolling, verification and pending visual review kept separately"
+  },
+  "historicalRevision9": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r9.json",
+    "scope": "Shared login scrolling; its verification and visual review kept separately"
   }
 }

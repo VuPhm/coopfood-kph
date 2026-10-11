@@ -23,7 +23,6 @@ import {
   RotateCcw,
   Search,
   ShieldCheck,
-  X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 
@@ -81,6 +80,7 @@ export function ExpiryWorkbench({ today, open: controlledOpen, onOpenChange }: E
   const updateExpanded = useCallback((next: boolean) => {
     if (controlledOpen === undefined) setInternalExpanded(next);
     onOpenChange?.(next);
+    if (!next) window.requestAnimationFrame(() => workbenchRef.current?.querySelector<HTMLButtonElement>(".expiry-workbench-toggle")?.focus());
   }, [controlledOpen, onOpenChange]);
 
   useEffect(() => {
@@ -91,7 +91,6 @@ export function ExpiryWorkbench({ today, open: controlledOpen, onOpenChange }: E
       if (event.key !== "Escape") return;
       if (workbenchRef.current?.querySelector('[role="dialog"][aria-label="Lịch chọn ngày"]')) return;
       updateExpanded(false);
-      window.setTimeout(() => workbenchRef.current?.querySelector<HTMLButtonElement>(".expiry-workbench-toggle")?.focus(), 0);
     }
 
     document.addEventListener("keydown", closeOnEscape);
@@ -259,7 +258,7 @@ export function ExpiryWorkbench({ today, open: controlledOpen, onOpenChange }: E
       {expanded ? (
         <button
           type="button"
-          className="expiry-workbench-overlay fixed inset-0 bg-ink/55 backdrop-blur-[3px]"
+          className="expiry-workbench-overlay fixed inset-0"
           aria-label="Đóng tra cứu lùi hàng từ nền mờ"
           onClick={() => updateExpanded(false)}
         />
@@ -269,7 +268,7 @@ export function ExpiryWorkbench({ today, open: controlledOpen, onOpenChange }: E
         actionClassName={cn("expiry-workbench-toggle", expanded ? "is-close" : "is-trigger")}
         actionControls="expiry-workbench-content"
         actionExpanded={expanded}
-        actionIcon={expanded ? <X /> : <CalendarDays />}
+        actionIcon={expanded ? undefined : <CalendarDays />}
         actionLabel={expanded ? "Đóng tra cứu lùi hàng" : "Tra cứu lùi hàng"}
         className={!expanded ? "is-collapsed" : ""}
         label={expanded ? "Hạn lùi hàng" : ""}

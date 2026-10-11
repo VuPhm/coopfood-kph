@@ -19,7 +19,9 @@ export default defineConfig(({ command, mode }) => ({
       workbox: {
         cleanupOutdatedCaches: true,
         globIgnores: ["demo/**"],
-        globPatterns: ["**/*.{css,html,js,png,svg,webmanifest}"],
+        // Include lazy chunks: first use of a form/export must also work offline
+        // once installation completes. Cache static assets only, never API/record/photo data.
+        globPatterns: ["**/*.{css,html,js,png,webp,svg,webmanifest}"],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: "index.html",
       },
