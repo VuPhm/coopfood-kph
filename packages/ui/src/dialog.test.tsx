@@ -16,6 +16,18 @@ function OpenDialog() {
 }
 
 describe("Dialog", () => {
+  it("respects a form's outside-dismiss prevention", async () => {
+    function ProtectedForm() {
+      const [open, setOpen] = useState(true);
+      return <Dialog open={open} onOpenChange={setOpen}><DialogContent onInteractOutside={event => event.preventDefault()}><DialogTitle>Phiếu đang nhập</DialogTitle></DialogContent></Dialog>;
+    }
+    render(<ProtectedForm />);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const overlay = document.querySelector('[data-slot="dialog-overlay"]') as Element;
+    fireEvent.pointerDown(overlay);
+    fireEvent.click(overlay);
+    expect(screen.getByRole("dialog", { name: "Phiếu đang nhập" })).toBeInTheDocument();
+  });
   it("returns focus to an ordinary opener when a controlled dialog closes", async () => {
     function ControlledDialog() {
       const [open, setOpen] = useState(false);
@@ -53,13 +65,15 @@ describe("Dialog", () => {
     expect(screen.queryByRole("dialog", { name: "Hộp thoại kiểm tra" })).not.toBeInTheDocument();
   });
 
-  it("closes from an outside click while keeping a 44px close hit area", () => {
+  it("closes from an outside click while keeping a 44px close hit area", async () => {
     render(<OpenDialog />);
     const closeButton = screen.getByRole("button", { name: "Đóng" });
     expect(closeButton).toHaveClass("size-11", "right-3", "top-3");
 
     const overlay = document.querySelector('[data-slot="dialog-overlay"]');
     expect(overlay).not.toBeNull();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    fireEvent.pointerDown(overlay as Element);
     fireEvent.click(overlay as Element);
     expect(screen.queryByRole("dialog", { name: "Hộp thoại kiểm tra" })).not.toBeInTheDocument();
   });

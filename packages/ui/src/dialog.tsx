@@ -15,9 +15,7 @@ export function DialogContent({ children, className, closeTone, closeLabel = "Đ
   const openedFrom = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Close asChild>
-        <DialogPrimitive.Overlay data-slot="dialog-overlay" className="fixed inset-0 z-50" />
-      </DialogPrimitive.Close>
+      <DialogPrimitive.Overlay data-slot="dialog-overlay" className="fixed inset-0 z-50" />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
