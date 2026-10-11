@@ -97,3 +97,8 @@ sheets, CTA cam/xanh, semantic color và tab. Nghiệm thu này không đóng c�
 backend/thiết bị thật hoặc r5 trước đó. Các câu pending ở trên giữ lịch sử kiểm
 thử trước quyết định này. Lưu source và tài liệu bằng commit local; commit SHA
 và kiểm hồ sơ được ghi trong bước closeout tiếp theo. Không push/merge/deploy.
+
+Checkpoint source `d9845c721c30055ed4424dfcbc851a55fd13f61d` đã lưu local;
+owner gate đã accepted và slice r13 CLOSED. Source giống manifest đã kiểm tra.
+Xem [checkpoint và closeout](kph-coop-fresh-checkpoint.md); các câu pending ở
+phần lịch sử phía trên không còn là trạng thái r13 hiện hành.

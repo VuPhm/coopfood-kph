@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
   "revision": 13,
-  "status": "AWAITING_CHECKPOINT",
+  "status": "CLOSED",
   "objective": "Refine KPH Co.op Fresh color roles, orange/green creation CTAs and measured contrast after owner feedback.",
   "inScope": [
     "Scoped Fresh tokens and KPH list/mobile cards/desktop table and loading frame",
@@ -15,7 +15,7 @@
     "Merge/push/deploy or Pages cutover"
   ],
   "baseSha": "c8365e664b7b0fe7ca01930b4a556f56ba172d38",
-  "candidateSha": null,
+  "candidateSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
   "integrationOwner": "/root — sole writer for KPH Fresh implementation",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -40,15 +40,21 @@
       "id": "kph-fresh-technical",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md"
+      "status": "pass",
+      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
+      "revision": 13,
+      "sha": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
     },
     {
       "id": "owner-kph-fresh-visual-workflow",
       "kind": "user",
       "required": true,
-      "status": "pending",
-      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md"
+      "status": "pass",
+      "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
+      "revision": 13,
+      "sha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
+      "acceptedBy": "owner",
+      "decisionRef": "User message in current chat on 2026-10-11: duyệt, checkpoint"
     }
   ],
   "changes": [
@@ -139,11 +145,12 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Create local checkpoint and bind existing verified source/acceptance to its candidate SHA; close this KPH UI slice, then stop.",
+  "nextAction": "Stop: accepted KPH Fresh r13 checkpoint saved locally. Await a new owner request; other feature rollout and historical acceptance gates remain separate.",
   "workingTreeCandidate": {
     "baseSha": "b6247044740157e86f10ddf9a4cfe9c3cf166c38",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "r13 KPH color refinement verified in working tree; mock preview 4201. Candidate-SHA and owner gates pending."
+    "note": "Verified source committed locally; subsequent advancement is closure documentation only in this cycle directory.",
+    "candidateSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -170,7 +177,7 @@
     "date": "2026-10-11",
     "source": "Owner: xem lại màu/tương phản/CTA, hai CTA có thể dùng cam và xanh",
     "mode": "single KPH color writer, same branch/worktree",
-    "checkpoint": null
+    "checkpoint": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
   },
   "historicalRevision5": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r5.json",
@@ -188,8 +195,9 @@
   "workingTreeVerification": {
     "result": "pass",
     "revision": 13,
-    "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md",
-    "note": "Mock TypeScript/build and 66 contrast states PASS, including selected tab surface versus track >=3; Fresh 3 viewports PASS. Earlier r13 workflow/modal/progressive gates preserved. Owner visual acceptance recorded: duyệt, checkpoint. Tab follow-up progressive Home/KPH PASS with no shifts."
+    "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
+    "note": "7 candidate source files match verified r13/tab manifests byte-for-byte. Existing relevant build/66-state contrast/Fresh/progressive checks reused because source is identical; owner accepted on 2026-10-11.",
+    "sha": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
   },
   "historicalRevision6": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
@@ -224,12 +232,12 @@
     "styleName": "Co.op Fresh",
     "styleId": "coop-fresh-v1",
     "document": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-plan.md",
-    "checkpointSha": "91f0c70c58d982842736c62f9cd2a22fe9e9d219",
+    "checkpointSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
     "runtimeImplementation": "F1-F3 and r13 color/tab refinements implemented and owner accepted",
     "ownerKphVisualAcceptance": "accepted r13 — owner: duyệt, checkpoint",
-    "nextAction": "Local checkpoint, close this KPH UI slice, then stop.",
-    "latestObservedHead": "b6247044740157e86f10ddf9a4cfe9c3cf166c38",
-    "checkpointNote": "Original planning checkpoint and all shared dialog fixes retained; latest HEAD advancement is an unrelated E2E selector/integration record change."
+    "nextAction": "Stop: accepted KPH Fresh r13 checkpoint saved locally. Await a new owner request; other feature rollout and historical acceptance gates remain separate.",
+    "latestObservedHead": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
+    "checkpointNote": "Accepted KPH runtime and DNA saved in local candidate; reviewed dialog fixes retained."
   },
   "historicalRevision11": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r11.json",
@@ -246,5 +254,14 @@
     "decisionRef": "User message in current chat: duyệt, checkpoint",
     "scope": "KPH Co.op Fresh r13 preview presentation, CTA colors and tab states; excludes real backend/device and historical r5 acceptance",
     "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md"
+  },
+  "closure": {
+    "date": "2026-10-11",
+    "scope": "KPH Co.op Fresh r13 UI preview",
+    "candidateSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
+    "acceptedBy": "owner",
+    "decisionRef": "Current chat: duyệt, checkpoint",
+    "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
+    "remoteActions": "none; local checkpoint only"
   }
 }
