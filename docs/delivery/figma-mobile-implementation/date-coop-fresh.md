@@ -1,5 +1,8 @@
 # DATE hợp nhất — Co.op Fresh r14
 
+Code candidate: **`59f2174d95684ebba9c58b73353a0c8e7971b3b2`** trên `store-app/figma-mobile-implementation`.
+Checkpoint local; owner r14 visual/workflow pending, không push/merge/deploy.
+
 Owner yêu cầu ngày 11/10/2026: “bỏ tra cứu, trong date có tra cứu sku rồi, sau
 hợp nhất thì áp giao diện mới vào”. Tiếp tục task/nhánh/worktree hiện có với
 một writer `/root`, base checkpoint KPH accepted `d9845c7`. Remote chưa fetch;
@@ -85,3 +88,14 @@ Owner visual/workflow r14 pending. Preview mock ở
 <http://127.0.0.1:4202/#date>; base KPH acceptance r13 giữ phạm vi riêng.
 Thử SKU `0008421`, barcode `29123415005`, lô `C24-118`; xử lý một lô → Home
 → mở DATE lại để kiểm state. Không nhập dữ liệu vận hành thật.
+
+Gate record:
+
+```sh
+node tooling/skills/delivery-cycle/scripts/cycle.mjs check --repo /Users/vup/Documents/coopfood-kph --plan docs/delivery/figma-mobile-implementation/plan.json --phase acceptance
+```
+
+Source bytes trong candidate đã đối chiếu SHA-256 với manifest của bản kiểm:
+15 source paths (cả 2 file retire) trùng khớp. Follow-up commit chỉ đổi ledger
+trong directory cycle; acceptance checker kiểm tính nhất quán, không thay nghiệm
+thu owner. Chưa chạy close vì gate người dùng còn pending.

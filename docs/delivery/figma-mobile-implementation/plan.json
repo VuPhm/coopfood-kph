@@ -16,7 +16,7 @@
     "Merge/push/deploy or Pages cutover"
   ],
   "baseSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
-  "candidateSha": null,
+  "candidateSha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2",
   "integrationOwner": "/root — sole writer for DATE consolidation",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -47,8 +47,10 @@
       "id": "date-consolidation-technical",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md"
+      "status": "pass",
+      "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
+      "revision": 14,
+      "sha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2"
     },
     {
       "id": "owner-date-fresh-visual-workflow",
@@ -157,7 +159,8 @@
   "workingTreeCandidate": {
     "baseSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "DATE r14 source verified; stable mock preview 4202. Code checkpoint will bind source manifest to candidate. Prior HEAD advancement 09411e8 changed KPH closure docs only."
+    "note": "Committed DATE r14 candidate matches all verified source paths, including retirement. Subsequent ledger changes only; stable mock preview 4202, owner gate pending.",
+    "candidateSha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2"
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -203,7 +206,8 @@
     "result": "pass",
     "revision": 14,
     "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
-    "note": "230 tests/default-online and mock builds PASS; unified DATE build/offline gate 3 viewport, 24 contrast states and KPH/navigation/workbook regressions PASS. Owner visual gate pending."
+    "note": "230 tests/default-online and mock builds PASS; unified DATE build/offline gate 3 viewport, 24 contrast states and KPH/navigation/workbook regressions PASS. Owner visual gate pending.",
+    "sha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2"
   },
   "historicalRevision6": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
