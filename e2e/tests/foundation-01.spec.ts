@@ -140,7 +140,9 @@ async function expectNoVisible(locator: Locator) {
 }
 
 async function waitForWorkspace(page: Page) {
-  await expect(page.locator("#workspace-title").or(page.getByText(/phiếu theo dõi hàng không phù hợp/i)).first()).toBeVisible();
+  const workspace = page.getByRole("region", { name: "Store App", exact: true });
+  await expect(workspace).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Hàng không phù hợp", exact: true })).toBeVisible();
 }
 
 async function loginViaUi(page: Page, credentials: Credentials, store: Store = STORES.primary) {

@@ -32,6 +32,15 @@ Regression unit test fail trước fix, pass sau fix. Browser regression desktop
 được scope vào form để không nhầm status toast PWA. Không còn blocker được
 xác nhận trong vòng review có mục tiêu này.
 
+**P3 — readiness selector E2E online đã cũ.** Run cuối ở `c8365e6`
+(https://github.com/VuPhm/coopfood-kph/actions/runs/38117302640) đạt frontend và
+backend nhưng 10 test browser dừng ở helper tìm `#workspace-title`/tiêu đề Pilot.
+Online shell hiện có vùng `Store App` và heading `Hàng không phù hợp`, cả trên
+base `main`. Fixture login 390×844/1440×1024 xác nhận POST đăng nhập thành công,
+shell hiển thị và selector cũ khớp 0 phần tử. Đã sửa helper để assert vùng
+authenticated và đúng heading; không bỏ test, đổi timeout hoặc giảm kiểm tra
+store scope/photos/idempotency/authorization. CI real API được chạy lại toàn bộ.
+
 ## Verification local
 
 Runtime: Node 26.0.0, npm 11.12.1, Playwright 1.62.0, headless Chromium.
