@@ -2,8 +2,12 @@
 
 Status: Round 1 direction accepted by the owner in R1-D04. This document
 records the Store App principles carried through the R1-D01 audit, R1-D02
-comparison, and accepted R1-D03 convergence. It is not a token specification or
-permission to begin Round 2. Accepted business behavior remains governed by the
+comparison, and accepted R1-D03 convergence. The owner-accepted Home visual
+extension dated 2026-10-11 is defined in
+[Store App Visual DNA](STORE_APP_VISUAL_DNA.md); its palette, geometry and usage
+rules guide subsequent Store PWA screens. This principle document does not itself
+authorize implementation of a new delivery slice. Accepted business behavior
+remains governed by the
 [Store App contract index](STORE_APP_CONTRACTS.md) and its linked contracts.
 The older [UI_DNA](UI_DNA.md) is Tool KPH extraction and migration evidence, not
 the authority for this Store App direction.
@@ -81,17 +85,23 @@ while expressing the same semantics.
 one-hand use across keyboard, camera, and photo inspection. Interruptions and
 returns to the task should have a clear recovery path. Desktop may show more
 comparison density. Both retain the same business states and scope. The Co.op
-Food character should feel calm, restrained, legible, and operational.
+Food character should feel fresh, welcoming, legible, and operational. The
+owner accepted the green header, white content, pastel task cards, round icons
+and food decoration on Home on 2026-10-11. Task screens inherit the visual
+language with less ornament and a compact header.
 
-**Implementation freedom.** Current assets, colors, and CSS are design evidence,
-not final brand rules. Exact palette, typography, asset usage, spacing, radii,
-component APIs, and motion remain open until approved brand guidance and usage
-evidence support them. Brand color must not substitute for semantic labels.
+**Implementation freedom.** Use the accepted Home palette and usage rules in
+[Visual DNA](STORE_APP_VISUAL_DNA.md) for Store PWA presentation; preserve
+business status colors and labels. The food basket and handwritten slogan belong
+to Home, while forms, tables and dialogs favor readable operational content.
+Component APIs and task-specific composition remain designable. This acceptance
+establishes an app visual direction, not an official corporate brand manual.
 
 **Open dependencies.** Approved brand/logo guidance, representative operator
-feedback, and real-device observations are still needed before settling visual
-rules or changing familiar task steps. Existing assets and synthetic comparisons
-do not establish those outcomes.
+feedback, and real-device observations are still needed before settling
+corporate brand rules or changing familiar task steps. Home now has explicit
+owner visual acceptance; other screens, real-device behavior and production
+workflow need their own evidence.
 
 Source trail: [R1-D01 audit](../evidence/r1-d01-ui-dna-audit.md),
 [R1-D02 comparison](../evidence/r1-d02-evaluation-and-directions.md), and

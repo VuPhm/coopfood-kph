@@ -1,6 +1,6 @@
 import { parseDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
+import { Button, cn, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@coopfood-kph/ui";
 import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Trash2 } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
@@ -9,9 +9,9 @@ import { formatBusinessDate } from "./business-date";
 import { CalendarInput } from "./calendar-input";
 import { ChangePasswordDialog } from "./change-password-dialog";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
+import { KphLoadingSkeleton } from "./feature-loading";
 import { DEMO_RECORDS } from "./demo-records";
 import { approvalLabels, type ApprovalStatus, type EvidencePhotoView, type RecordView } from "./record-view";
-import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import { RecordRow, RecordCard, type RecordActions } from "./history-records";
 import { PwaStatus } from "./pwa-status";
@@ -19,6 +19,7 @@ import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord
 import { readStorageHealth, requestPersistentStorage, storageHealthWarning, storageUsageLabel, type StorageHealth } from "./storage-health";
 import { actorIdentity, DEFAULT_STORE_PROFILE, isStoreProfileConfigured, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
 import { StoreContext } from "./store-context";
+import { StoreLogin } from "./store-login";
 import { StoreAppShell } from "./store-app-shell";
 import { StoreSettingsDialog } from "./store-settings-dialog";
 import { UtilityPanelMeta } from "./utility-panel-meta";
@@ -268,6 +269,18 @@ function WorkspaceApp() {
     retry: false,
   });
   const onlineHistory = onlineHistoryQuery.data;
+  function prefetchHistoryPage(page: number) {
+    if (!onlineGateway || !onlineSession || !onlineStoreId || onlineAuthRequired
+      || !onlineHistory || onlineHistoryQuery.isFetching || page < 1 || page > onlineHistory.totalPages) return;
+    // Reuse exactly the current user/store/filter key, changing only the page.
+    const queryKey = [...onlineHistoryKey.slice(0, -2), page, onlineHistoryPageSize];
+    void queryClient.prefetchQuery({
+      queryKey,
+      queryFn: ({ signal }) => onlineGateway.loadHistory(onlineStoreId, { ...onlineHistoryFilter, page }, signal),
+      staleTime: 30_000,
+      retry: false,
+    });
+  }
   const records = onlinePersistenceEnabled ? (onlineHistory?.records ?? []) : localRecords;
   const onlineLoading = onlinePersistenceEnabled && !onlineAuthRequired
     && (sessionQuery.isPending || Boolean(onlineSession && onlineStoreId && onlineHistoryQuery.isPending));
@@ -986,6 +999,7 @@ function WorkspaceApp() {
           storeName: exportBundle.store.name,
         };
       }
+      const { downloadKphWorkbook } = await import("./excel-export");
       const fileName = await downloadKphWorkbook(activeKind, exportRecords, exportStore);
       if (pilotPersistenceEnabled) await recordPilotExport(activeKind, selectedRecords, fileName);
       setExportOpen(false);
@@ -1029,7 +1043,7 @@ function WorkspaceApp() {
 
   return (
     <div className="min-h-dvh bg-canvas text-ink">
-      <header className="app-header sticky top-0 z-30 bg-brand text-white shadow-md safe-top">
+      {!(onlineLoginAvailable && !onlineSession) ? <header className="app-header sticky top-0 z-30 bg-brand text-white shadow-md safe-top">
         <div className="app-header-inner">
           <img
             className="app-brand-logo"
@@ -1038,7 +1052,7 @@ function WorkspaceApp() {
           />
           <TodayDate />
         </div>
-      </header>
+      </header> : null}
 
       {onlineLoginAvailable && !onlineSession ? (
         onlineLoading ? (
@@ -1046,7 +1060,7 @@ function WorkspaceApp() {
             <p className="online-login-copy" role="status">Đang mở cửa hàng của bạn…</p>
           </main>
         ) : (
-          <OnlineLoginPanel
+          <StoreLogin
             busy={loginMutation.isPending}
             error={storageError}
             onSubmit={(username, password) => loginMutation.mutate({ username, password })}
@@ -1211,6 +1225,7 @@ function WorkspaceApp() {
             </div>
           </header>
 
+          {onlineLoading && !onlineHistory ? <KphLoadingSkeleton label="Đang tải lịch sử từ máy chủ" /> : <>
           <div className="overflow-x-auto desktop-history">
             <table className="w-full min-w-[1160px] text-left text-sm">
               <thead className="text-xs uppercase tracking-wide text-ink-muted">
@@ -1239,6 +1254,7 @@ function WorkspaceApp() {
               ? visibleRecords.map((record) => <RecordCard key={record.id} actions={recordActions} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} selectionDisabled={onlineHistoryActionsBlocked} trashMode={trashMode} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
               : <p className="empty-history-card">{emptyHistoryMessage}</p>}
           </div>
+          </>}
           {onlinePersistenceEnabled && onlineHistory ? <HistoryPagination
             busy={onlineHistoryQuery.isFetching}
             page={historyPage}
@@ -1246,6 +1262,7 @@ function WorkspaceApp() {
             totalItems={onlineHistory.totalItems}
             totalPages={onlineHistory.totalPages}
             onPageChange={changeHistoryPage}
+            onPageIntent={prefetchHistoryPage}
           /> : null}
         </section>
 
@@ -1280,11 +1297,13 @@ function WorkspaceApp() {
       {!onlinePersistenceEnabled ?
         <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>
           <DialogContent className="action-dialog" aria-describedby="delete-description">
+            <DialogHeader>
             <div className="action-dialog-icon is-danger"><AlertTriangle aria-hidden="true" /></div>
             <DialogTitle>Chuyển {deleteIds.length} phiếu sang trạng thái đã xoá?</DialogTitle>
             <DialogDescription id="delete-description">
               Dữ liệu phiếu vẫn được giữ nguyên để phần thùng rác có thể khôi phục sau đó; không có thao tác xoá vĩnh viễn.
             </DialogDescription>
+            </DialogHeader>
             <div className="action-dialog-actions">
               <Button type="button" variant="ghost" onClick={() => setDeleteIds([])}>Hủy</Button>
               <Button type="button" className="action-danger-button" onClick={confirmDelete}><Trash2 size={17} aria-hidden="true" />Xóa phiếu</Button>
@@ -1295,11 +1314,13 @@ function WorkspaceApp() {
       {!onlinePersistenceEnabled || canManageOnline ?
         <Dialog open={exportOpen} onOpenChange={(open) => { if (!exporting) { setExportOpen(open); if (!open) setExportError(""); } }}>
           <DialogContent className="action-dialog export-dialog" aria-describedby="export-description">
+            <DialogHeader>
             <div className="action-dialog-icon is-export"><FileSpreadsheet aria-hidden="true" /></div>
             <DialogTitle>Xuất phiếu ra Excel</DialogTitle>
             <DialogDescription id="export-description">
               File BM-331.CF được dàn ngang, khóa định dạng và giữ tối đa ba ảnh minh chứng theo đúng thứ tự.
             </DialogDescription>
+            </DialogHeader>
             <dl className="export-summary">
               <div><dt>Loại phiếu</dt><dd>{kindCopy[activeKind].short}</dd></div>
               <div><dt>Số phiếu</dt><dd>{selectedRecords.length}</dd></div>
@@ -1317,14 +1338,15 @@ function WorkspaceApp() {
         </Dialog>
       : null}
       {notice ? <button type="button" className="notice-toast fixed bottom-20 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-xl" onClick={() => setNotice("")}>{notice}</button> : null}
-      <PwaStatus />
+      <PwaStatus offlineMode={onlinePersistenceEnabled ? "online" : "device"} />
     </div>
   );
 }
 
-function HistoryPagination({ busy, onPageChange, page, pageSize, totalItems, totalPages }: {
+function HistoryPagination({ busy, onPageChange, onPageIntent, page, pageSize, totalItems, totalPages }: {
   busy: boolean;
   onPageChange: (page: number) => void;
+  onPageIntent: (page: number) => void;
   page: number;
   pageSize: number;
   totalItems: number;
@@ -1335,7 +1357,7 @@ function HistoryPagination({ busy, onPageChange, page, pageSize, totalItems, tot
   const lastItem = totalItems === 0 ? 0 : Math.min(page * pageSize, totalItems);
 
   return <nav className="history-pagination" aria-label="Phân trang lịch sử phiếu" aria-busy={busy}>
-    <button type="button" aria-label="Trang trước" disabled={busy || page <= 1} onClick={() => onPageChange(page - 1)}>
+    <button type="button" aria-label="Trang trước" disabled={busy || page <= 1} onPointerEnter={() => onPageIntent(page - 1)} onFocus={() => onPageIntent(page - 1)} onClick={() => onPageChange(page - 1)}>
       <ChevronLeft aria-hidden="true" />
     </button>
     <p className="history-pagination-status" role="status" aria-live="polite">
@@ -1343,44 +1365,10 @@ function HistoryPagination({ busy, onPageChange, page, pageSize, totalItems, tot
       <span>{firstItem}–{lastItem} trên {totalItems} phiếu</span>
       {busy ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
     </p>
-    <button type="button" aria-label="Trang sau" disabled={busy || totalPages === 0 || page >= totalPages} onClick={() => onPageChange(page + 1)}>
+    <button type="button" aria-label="Trang sau" disabled={busy || totalPages === 0 || page >= totalPages} onPointerEnter={() => onPageIntent(page + 1)} onFocus={() => onPageIntent(page + 1)} onClick={() => onPageChange(page + 1)}>
       <ChevronRight aria-hidden="true" />
     </button>
   </nav>;
-}
-
-type OnlineLoginPanelProps = {
-  busy: boolean;
-  error: string;
-  onSubmit: (username: string, password: string) => void;
-};
-
-function OnlineLoginPanel({ busy, error, onSubmit }: OnlineLoginPanelProps) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  return <main className="online-login-panel" aria-labelledby="online-login-title">
-    <div className="online-login-card">
-      <div className="online-login-heading"><span className="online-login-eyebrow">QUẢN LÝ PHIẾU KPH</span><h1 id="online-login-title">Đăng nhập Store PWA</h1></div>
-      <p className="online-login-copy">Sử dụng tài khoản được cấp để khai báo hàng không phù hợp và xem phiếu của cửa hàng.</p>
-      {error ? <p className="online-login-error" role="status">{error}</p> : null}
-      <form className="online-login-form" onSubmit={(event) => {
-        event.preventDefault();
-        if (!username.trim() || !password || busy) return;
-        onSubmit(username.trim(), password);
-      }}>
-        <label>
-          <span>Tên đăng nhập</span>
-          <input type="text" autoComplete="username" value={username} disabled={busy} onChange={(event) => setUsername(event.target.value)} />
-        </label>
-        <label>
-          <span>Mật khẩu</span>
-          <input type="password" autoComplete="current-password" value={password} disabled={busy} onChange={(event) => setPassword(event.target.value)} />
-        </label>
-        <Button type="submit" disabled={busy || !username.trim() || !password}>{busy ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />Đang đăng nhập…</> : "Đăng nhập"}</Button>
-      </form>
-    </div>
-  </main>;
 }
 
 function isAbortError(error: unknown) {
@@ -1502,13 +1490,13 @@ function MobileHistoryControls({ dateFilterActive, dateFilterError, dateFromInpu
       <HistoryControlsTrigger active={active} className="history-controls-mobile" label="Mở lọc và sắp xếp trên mobile" />
     </DialogTrigger>
     <DialogContent className="mobile-history-dialog" aria-describedby="mobile-history-dialog-description">
-      <header className="mobile-history-dialog-header">
+      <DialogHeader className="mobile-history-dialog-header">
         <span className="mobile-history-dialog-icon" aria-hidden="true"><ListFilter /></span>
         <div>
           <DialogTitle className="mobile-history-dialog-title">Lọc &amp; sắp xếp</DialogTitle>
           <DialogDescription id="mobile-history-dialog-description" className="mobile-history-dialog-description">Ngày và các lựa chọn áp dụng ngay</DialogDescription>
         </div>
-      </header>
+      </DialogHeader>
 
       <div className="mobile-history-dialog-body">
         <section className="mobile-history-section" aria-labelledby="mobile-date-filter-title">

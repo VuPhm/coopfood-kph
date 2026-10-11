@@ -1,10 +1,15 @@
 import { addDays, addMonths, formatDisplayDate, parseDisplayDate, type LocalDate } from "@coopfood-kph/kph-rules";
 import { DismissableLayerBranch, Input, cn } from "@coopfood-kph/ui";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 
 function formatDateEntry(value: string) {
+  // Editing a separated date must not pull month/year digits into a shorter day.
+  // Preserve incomplete segments for the existing domain validator on submit.
+  if (value.split("/").length === 3) {
+    return value.split("/").map((part, index) => part.replace(/\D/g, "").slice(0, index === 2 ? 4 : 2)).join("/");
+  }
   const digits = value.replace(/\D/g, "").slice(0, 8);
   if (digits.length <= 2) return digits;
   if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
@@ -25,11 +30,12 @@ function firstDayOfMonth(value: LocalDate): LocalDate {
 
 type CalendarInputProps = {
   ariaDescribedBy?: string;
+  icon?: ReactNode;
   id: string;
   initialMonth: LocalDate;
   invalid?: boolean;
   label: string;
-  onValueChange: (value: string) => void;
+  onValueChange: (value: string, source?: "picker") => void;
   placeholder?: string;
   readOnly?: boolean;
   value: string;
@@ -37,7 +43,7 @@ type CalendarInputProps = {
 
 type CalendarPosition = Pick<CSSProperties, "left" | "top">;
 
-export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, label, onValueChange, placeholder = "dd/mm/yyyy", readOnly, value }: CalendarInputProps) {
+export function CalendarInput({ ariaDescribedBy, icon, id, initialMonth, invalid, label, onValueChange, placeholder = "dd/mm/yyyy", readOnly, value }: CalendarInputProps) {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<LocalDate>(firstDayOfMonth(initialMonth));
   const [position, setPosition] = useState<CalendarPosition | null>(null);
@@ -61,11 +67,12 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
       setOpen(false);
     }
     document.addEventListener("pointerdown", closeOnOutsidePointer);
-    document.addEventListener("keydown", closeOnEscape, true);
+    // Consume Escape before the parent dialog's document listener sees it.
+    window.addEventListener("keydown", closeOnEscape, true);
     window.addEventListener("resize", closeOnResize);
     return () => {
       document.removeEventListener("pointerdown", closeOnOutsidePointer);
-      document.removeEventListener("keydown", closeOnEscape, true);
+      window.removeEventListener("keydown", closeOnEscape, true);
       window.removeEventListener("resize", closeOnResize);
     };
   }, [id, open]);
@@ -86,7 +93,8 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
       const left = Math.min(window.innerWidth - viewportInset - width, Math.max(viewportInset, anchorRect.right - width));
       const below = anchorRect.bottom + gap;
       const above = anchorRect.top - gap - height;
-      const top = below + height <= window.innerHeight - viewportInset || above < viewportInset ? below : above;
+      const preferredTop = below + height <= window.innerHeight - viewportInset || above < viewportInset ? below : above;
+      const top = Math.max(viewportInset, Math.min(preferredTop, window.innerHeight - viewportInset - height));
       setPosition({ left: Math.round(left), top: Math.round(top) });
     }
 
@@ -100,6 +108,7 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
   }, [open]);
 
   function toggleCalendar() {
+    if (readOnly) return;
     if (!open) {
       setMonth(firstDayOfMonth(tryParseDate(value) ?? initialMonth));
       setPosition(null);
@@ -108,8 +117,9 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
   }
 
   function selectDate(selected: LocalDate) {
-    onValueChange(formatDisplayDate(selected));
+    onValueChange(formatDisplayDate(selected), "picker");
     setOpen(false);
+    triggerRef.current?.focus();
   }
 
   return (
@@ -132,11 +142,12 @@ export function CalendarInput({ ariaDescribedBy, id, initialMonth, invalid, labe
         type="button"
         className="field-input-action expiry-calendar-trigger"
         aria-label={`Chọn ${label.toLowerCase()}`}
+        aria-haspopup="dialog"
         aria-expanded={open}
         onClick={toggleCalendar}
         disabled={readOnly}
       >
-        <CalendarDays size={18} aria-hidden="true" />
+        {icon ?? <CalendarDays size={18} aria-hidden="true" />}
       </button>
       {open && typeof document !== "undefined"
         ? createPortal(

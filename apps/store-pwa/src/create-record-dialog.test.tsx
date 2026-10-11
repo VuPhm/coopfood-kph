@@ -252,6 +252,19 @@ describe("Create KPH record", () => {
   });
 
   it.each([
+    { kind: "TPCN" as const, detected: "53ca5deb-573f-4e33-b1ac-9da7f1bdb528.svg", treatment: "53722948-17f5-40e6-858b-6bc0d9739927.svg" },
+    { kind: "TPTS" as const, detected: "b684c0dc-e5ca-4302-a906-df25869aa1cd.svg", treatment: "47be953a-ede7-41de-8645-348d0d0bfb15.svg" },
+  ])("uses the screen-specific $kind calendar assets while keeping detected date read-only", ({ kind, detected, treatment }) => {
+    render(<CreateRecordDialog kind={kind} open onOpenChange={vi.fn()} onSaved={vi.fn()} presentation="screen" />);
+    const detectedTrigger = screen.getByRole("button", { name: "Chọn ngày phát hiện" });
+    const treatmentTrigger = screen.getByRole("button", { name: "Chọn ngày xử lý (nếu có)" });
+    expect(detectedTrigger).toBeDisabled();
+    expect(detectedTrigger.querySelector('[data-kph-calendar-icon="detected"]')).toHaveAttribute("src", expect.stringContaining(detected));
+    expect(treatmentTrigger).toBeEnabled();
+    expect(treatmentTrigger.querySelector('[data-kph-calendar-icon="treatment"]')).toHaveAttribute("src", expect.stringContaining(treatment));
+  });
+
+  it.each([
     { kind: "TPCN" as const, condition: "Rách bao bì" },
     { kind: "TPCN" as const, condition: "Xì chân không" },
     { kind: "TPTS" as const, condition: "Dập úng" },

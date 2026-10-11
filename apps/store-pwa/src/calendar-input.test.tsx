@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CalendarInput } from "./calendar-input";
 
@@ -10,6 +10,78 @@ function CalendarInputHarness() {
 }
 
 describe("CalendarInput", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("preserves month/year when a day or month is temporarily incomplete", () => {
+    render(<CalendarInputHarness />);
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "12/10/2026" } });
+    fireEvent.change(input, { target: { value: "1/10/2026" } });
+    expect(input).toHaveValue("1/10/2026");
+    fireEvent.change(input, { target: { value: "15/10/2026" } });
+    fireEvent.change(input, { target: { value: "15/1/2026" } });
+    expect(input).toHaveValue("15/1/2026");
+    fireEvent.change(input, { target: { value: "15//2026" } });
+    expect(input).toHaveValue("15//2026");
+    fireEvent.change(input, { target: { value: "15/11/2026" } });
+    expect(input).toHaveValue("15/11/2026");
+  });
+
+  it("opens the themed calendar only from its button and selects a date", () => {
+    render(<CalendarInputHarness />);
+    const input = screen.getByRole("textbox");
+    fireEvent.focus(input);
+    fireEvent.click(input);
+    fireEvent.change(input, { target: { value: "15082026" } });
+    expect(input).toHaveValue("15/08/2026");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const trigger = screen.getByRole("button", { name: "Chọn ngày xử lý" });
+    fireEvent.click(trigger);
+    expect(screen.getByRole("dialog", { name: "Lịch chọn ngày" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "16 tháng 8, 2026" }));
+    expect(input).toHaveValue("16/08/2026");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("keeps the default Lucide trigger for consumers without a presentation icon", () => {
+    render(<CalendarInputHarness />);
+    expect(screen.getByRole("button", { name: "Chọn ngày xử lý" }).querySelector(".lucide-calendar-days")).not.toBeNull();
+  });
+
+  it("keeps business dates read-only", () => {
+    render(<CalendarInput id="detected" initialMonth="2026-10-06" label="Ngày phát hiện" value="06/10/2026" readOnly onValueChange={vi.fn()} />);
+    expect(screen.getByRole("textbox")).toHaveAttribute("readonly");
+    expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeDisabled();
+  });
+
+  it("renders an optional presentation icon without changing the disabled read-only trigger", () => {
+    render(<CalendarInput id="detected" initialMonth="2026-10-06" label="Ngày phát hiện" value="06/10/2026" readOnly icon={<img data-kph-calendar-icon="detected" src="/figma/53ca5deb-573f-4e33-b1ac-9da7f1bdb528.svg" alt="" />} onValueChange={vi.fn()} />);
+    const trigger = screen.getByRole("button", { name: "Chọn ngày phát hiện" });
+    expect(trigger).toBeDisabled();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger.querySelector('img[data-kph-calendar-icon="detected"]')).toHaveAttribute("src", "/figma/53ca5deb-573f-4e33-b1ac-9da7f1bdb528.svg");
+  });
+
+  it("closes the picker on Escape and restores focus to the trigger", () => {
+    render(<CalendarInputHarness />);
+    const trigger = screen.getByRole("button", { name: "Chọn ngày xử lý" });
+    fireEvent.click(trigger);
+    expect(screen.getByRole("dialog", { name: "Lịch chọn ngày" })).toBeInTheDocument();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Lịch chọn ngày" })).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+  it("keeps the calendar in a short viewport when neither side of its input has enough room", async () => {
+    render(<CalendarInputHarness />);
+    const anchor = document.querySelector('[data-calendar-input="treatment-date"]') as HTMLElement;
+    vi.spyOn(window, "innerHeight", "get").mockReturnValue(390);
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(300);
+    vi.spyOn(anchor, "getBoundingClientRect").mockReturnValue({ top: 250, bottom: 294, left: 100, right: 300, width: 200, height: 44, x: 100, y: 250, toJSON: () => undefined });
+    fireEvent.click(screen.getByRole("button", { name: "Chọn ngày xử lý" }));
+    await waitFor(() => expect(screen.getByRole("dialog", { name: "Lịch chọn ngày" })).toHaveStyle({ top: "74px" }));
+  });
+
   it("portals above clipped forms and follows its anchor while the form scrolls", async () => {
     render(<CalendarInputHarness />);
     const anchor = document.querySelector('[data-calendar-input="treatment-date"]');

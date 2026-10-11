@@ -8,6 +8,7 @@ export type RecordView = {
   detectedDate: string;
   detectedBy: string;
   sku: string;
+  barcode?: string;
   productName: string;
   supplier: string;
   quantity: string;

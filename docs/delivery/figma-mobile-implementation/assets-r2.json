@@ -1,0 +1,10 @@
+{
+  "source": "Figma file aEDpXtz0IiEkPiVucqjQ3Q; exact nodes re-read with screenshots before implementation slices",
+  "assets": [
+    {"slot":"kph-filter","node":"21:91","source":"r2-sliders.svg","path":"apps/store-pwa/src/store-kph-workspace.tsx","root":{"width":18,"height":18},"render":{"width":18,"height":18}},
+    {"slot":"date-filter","node":"21:144","source":"r2-sliders.svg","path":"apps/store-pwa/src/store-date-workspace.tsx","root":{"width":18,"height":18},"render":{"width":18,"height":18}},
+    {"slot":"shelf-quick-clock","node":"510:2094","source":"r2-shelf-clock.svg","path":"apps/store-pwa/src/store-app.tsx","root":{"width":24,"height":24},"render":{"width":24,"height":24}},
+    {"slot":"shelf-quick-close","node":"510:2094","source":"r2-close.svg","path":"apps/store-pwa/src/store-app.tsx","root":{"width":24,"height":24},"render":{"width":24,"height":24}},
+    {"slot":"lookup-search","node":"384:514","source":"main-1/imgFeatherSearch (a1c5d2ed-7500-42d8-adf7-d3177be24f6c.svg)","path":"apps/store-pwa/src/store-lookup-workspace.tsx","root":{"width":24,"height":24},"render":{"width":18,"height":18}}
+  ]
+}

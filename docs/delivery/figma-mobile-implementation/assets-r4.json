@@ -1,0 +1,49 @@
+{
+  "source": "Figma file aEDpXtz0IiEkPiVucqjQ3Q; revision 4 KPH calendar fields re-read from mobile and desktop",
+  "assets": [
+    {
+      "slot": "KPH detected date / TPCN",
+      "node": "203:701 / 384:1072",
+      "source": "figma/53ca5deb-573f-4e33-b1ac-9da7f1bdb528.svg via 203-701/imgFeatherCalendar",
+      "path": "apps/store-pwa/src/create-record-dialog.tsx → detected-date CalendarInput icon",
+      "root": { "width": 20, "height": 20 },
+      "render": { "width": 20, "height": 20 },
+      "stroke": "#667366",
+      "strokeWidth": 1.66667,
+      "state": "read-only input; disabled trigger"
+    },
+    {
+      "slot": "KPH detected date / TPTS",
+      "node": "203:847 / 540:1685",
+      "source": "figma/b684c0dc-e5ca-4302-a906-df25869aa1cd.svg via 203-847/imgFeatherCalendar",
+      "path": "apps/store-pwa/src/create-record-dialog.tsx → detected-date CalendarInput icon",
+      "root": { "width": 20, "height": 20 },
+      "render": { "width": 20, "height": 20 },
+      "stroke": "#667366",
+      "strokeWidth": 1.66667,
+      "state": "read-only input; disabled trigger"
+    },
+    {
+      "slot": "KPH treatment date / TPCN",
+      "node": "203:701 / 384:1072",
+      "source": "figma/53722948-17f5-40e6-858b-6bc0d9739927.svg via 203-701/imgFeatherCalendar1",
+      "path": "apps/store-pwa/src/create-record-dialog.tsx → treatment-date CalendarInput icon",
+      "root": { "width": 24, "height": 24 },
+      "render": { "width": 20, "height": 20 },
+      "stroke": "#006633",
+      "strokeWidth": 2,
+      "state": "interactive; opens existing date picker"
+    },
+    {
+      "slot": "KPH treatment date / TPTS",
+      "node": "203:847 / 540:1685",
+      "source": "figma/47be953a-ede7-41de-8645-348d0d0bfb15.svg via 203-847/imgFeatherCalendar1",
+      "path": "apps/store-pwa/src/create-record-dialog.tsx → treatment-date CalendarInput icon",
+      "root": { "width": 24, "height": 24 },
+      "render": { "width": 20, "height": 20 },
+      "stroke": "#006633",
+      "strokeWidth": 2,
+      "state": "interactive; opens existing date picker"
+    }
+  ]
+}

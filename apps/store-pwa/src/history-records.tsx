@@ -134,7 +134,7 @@ function RecordPhotoGallery({ photos, recordId, variant }: { photos: readonly Ev
       <div className={cn("record-photo-gallery", variant === "table" ? "is-table" : "is-card")} aria-label={`${photos.length} ảnh minh chứng của phiếu ${recordId}`}>
         {photos.map((photo, index) => (
           <button key={photo.id} type="button" className="record-photo-button" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1} của phiếu ${recordId}`}>
-            <img src={photo.src} alt="" />
+            <img src={photo.src} alt="" loading="lazy" decoding="async" />
             {variant === "card" ? <span>{index + 1}</span> : null}
           </button>
         ))}

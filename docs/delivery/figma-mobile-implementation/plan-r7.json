@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "id": "figma-mobile-implementation",
+  "revision": 7,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Refine the Store App account presentation, then implement the shared branded login presentation for preview and the existing online authentication flow.",
+  "inScope": [
+    "Account dialog/profile/store presentation, close and focus return",
+    "Shared StoreLogin UI, password reveal/autocomplete, existing online auth integration",
+    "Explicit login preview route and separate entry to the mock Home; preserve accepted Home and session workflow",
+    "Targeted and integrated verification, Playwright mobile/desktop, owner handoff"
+  ],
+  "outOfScope": [
+    "Reskin Lookup/DATE/KPH/shelf in this account/login slice",
+    "Backend/OpenAPI/schema/migration/auth policy/API wiring changes",
+    "Forgot-password, remember-me, fake login/session, production auth replacement",
+    "Shared global token/primitive changes, Admin/Pilot redesign",
+    "Figma writes, commit/merge/push/deploy, Pages cutover"
+  ],
+  "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
+  "candidateSha": null,
+  "integrationOwner": "/root — sole writer for account/login implementation",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-account-sheet.tsx",
+    "apps/store-pwa/src/store-login.tsx",
+    "apps/store-pwa/src/store-login.css",
+    "apps/store-pwa/src/store-login.test.tsx",
+    "apps/store-pwa/src/store-app.tsx",
+    "apps/store-pwa/src/store-app.css",
+    "apps/store-pwa/src/app.tsx",
+    "apps/store-pwa/src/app.online.identity.test.tsx",
+    "e2e/scripts/check-store-identity.cjs",
+    "docs/product/STORE_APP_VISUAL_DNA.md",
+    "docs/delivery/figma-mobile-implementation/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "account-login-technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "evidence": "docs/delivery/figma-mobile-implementation/account-login-refinement.md"
+    },
+    {
+      "id": "owner-account-login-visual",
+      "kind": "user",
+      "required": true,
+      "status": "pass",
+      "evidence": "docs/delivery/figma-mobile-implementation/account-login-refinement.md"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Review Figma hiện tại và lên kế hoạch chi tiết để sau đó cho Luna 6 implement; owner chọn mobile + desktop, giữ mock.",
+      "source": "User request and explicit scope reply in current chat, 2026-10-07",
+      "impact": "Thêm desktop-native composition, mobile theme/detail/quick utility và mock Lookup; toàn bộ gate UI revision 1 trở thành historical evidence.",
+      "decision": "Chỉ lập kế hoạch/handoff ở lượt này; giữ existing code, chuẩn bị checkpoint trước dispatch, không API wiring."
+    },
+    {
+      "revision": 3,
+      "request": "Repair the two DATE icons identified in fresh icon review, using the owner-confirmed Feather React set.",
+      "source": "Owner follow-up dated 2026-10-08 and consolidated read-only review finding; exact target re-read from Figma aEDpXtz0IiEkPiVucqjQ3Q node 21:144.",
+      "impact": "Invalidates revision 2 workspace-integrity, responsive-assets, and mobile-desktop-visual-interaction gates for source/geometry re-verification. Workflow semantics are unchanged because the existing input, scanner action and labels remain intact; all technical gates will be re-recorded against the revision 3 candidate. Owner gate remains pending.",
+      "decision": "Keep same branch and worktree with one writer. Change only DATE search/scan icon callsites, scoped CSS, asset manifest/responsive assertions, and cycle evidence. Reuse the exact existing local Feather Search and Maximize exports after checking matching Figma master geometry; do not add dependencies or modify other Lucide consumers."
+    },
+    {
+      "revision": 4,
+      "request": "Continue the UI loop after the Feather React clarification and repair the confirmed KPH calendar trigger mismatch.",
+      "source": "Owner says ‘tiếp tục’ on 2026-10-08; bounded fresh control-icon review; exact mobile nodes 203:701/203:847 and desktop nodes 384:1072/540:1685 re-read.",
+      "impact": "Invalidates all revision 3 technical gates until screen-specific assets, read-only behavior, picker interactions, and integrated checks are reverified on the new candidate. Revision 3 evidence/manifests remain historical and unchanged; owner acceptance remains pending.",
+      "decision": "Preserve CalendarInput default icon for all existing consumers. Add an optional icon presentation prop and pass exact KPH detected-date and treatment-date assets only for screenPresentation. No Figma writes, shared UI or dependency changes."
+    },
+    {
+      "revision": 5,
+      "request": "dùng kết quả này cho 1 round sửa",
+      "source": "Owner in current chat, 2026-10-08, following the completed UI QA report at .local/qa-ui-2026-10-08/report.md",
+      "impact": "Invalidates revision 4 technical gates: record identity, DATE/session state, identifiers, route behavior, hit areas and aggregate browser expectations change. Prior evidence remains historical; owner acceptance is pending.",
+      "decision": "One root writer on the existing branch/worktree. Repair all five P2 findings, two bounded P3 findings and stale asset expectations. No delegation, API/schema/dependency/shared UI change, Figma writes, merge/push/deploy. The same-round Lookup screenshot review also repairs the existing clipped/white-on-white submit CTA using frame 384:514."
+    },
+    {
+      "revision": 6,
+      "request": "quá đẹp, tích hợp vào dna, chuẩn bị điều chỉnh các trang còn lại theo",
+      "source": "Owner in current chat, 2026-10-11, after viewing the updated Home based on the supplied reference",
+      "impact": "Home visual direction accepted in the dirty working tree; remaining screen rollout is preparation only. Revision 5 gates and workflow acceptance remain historical at their original SHA and are not treated as current rollout coverage. All rollout gates pending until implementation.",
+      "decision": "Preserve r5 plan/evidence, add canonical Visual DNA linked from Store App UI DNA, record scoped Home acceptance, prepare sequential rollout and readiness without runtime edits or delegation."
+    },
+    {
+      "revision": 7,
+      "request": "sửa trình bày của xem tài khoản, rồi sau đó làm trang đăng nhập",
+      "source": "Owner in current chat, 2026-10-11",
+      "impact": "Prioritizes account/login over prepared rollout order. Account and login evidence recorded independently; Home acceptance retained with targeted regression. No acceptance inferred for other screens or r5 workflows.",
+      "decision": "One writer updates account first, then shared login presentation in preview and online; retain auth gateway and business session semantics. Browser fixture verification and full verify, then owner visual handoff. Remaining rollout deferred."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner reviews account from Home avatar and the #login preview. Remaining visual rollout stays deferred; no automatic next slice.",
+  "workingTreeCandidate": {
+    "baseSha": "b1c772f4753ad13db1a7930a484ac7933b73b383",
+    "path": "/Users/vup/Documents/coopfood-kph",
+    "note": "Account/login and previous Home/shelf changes are dirty/untracked. Technical verification passes on this working tree; no integrated commit SHA exists."
+  },
+  "conditionalIntegratorPaths": [
+    "packages/ui/package.json",
+    "apps/store-pwa/src/main.tsx",
+    "apps/store-pwa/src/styles.css",
+    "apps/store-pwa/vite.config.ts"
+  ],
+  "executor": {
+    "agentId": "/root",
+    "status": "completed",
+    "ownership": "sole writer, account/login",
+    "worktree": "/Users/vup/Documents/coopfood-kph",
+    "branch": "store-app/figma-mobile-implementation"
+  },
+  "readiness": {
+    "planningComplete": true,
+    "dispatchReady": false,
+    "requiredBeforeDispatch": []
+  },
+  "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/account-login-refinement.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/account-login-refinement.md",
+  "executionAuthorization": {
+    "date": "2026-10-11",
+    "source": "Owner: sửa trình bày của xem tài khoản, rồi sau đó làm trang đăng nhập",
+    "mode": "single writer, account then login; existing branch/worktree",
+    "checkpoint": null
+  },
+  "historicalRevision5": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r5.json",
+    "candidateSha": "ef80ed0cfb1a141d30e3e036483dcd0b3312897f",
+    "ownerWorkflowAcceptance": "pending; Home-only acceptance does not close this gate",
+    "coverage": "r5 technical evidence applies to its recorded candidate only; no current reskin gate claims reuse"
+  },
+  "homeVisualAcceptance": {
+    "date": "2026-10-11",
+    "acceptedBy": "owner",
+    "decisionRef": "Owner message in current chat: quá đẹp, tích hợp vào dna, chuẩn bị điều chỉnh các trang còn lại theo",
+    "evidence": "docs/delivery/figma-mobile-implementation/home-brand-refinement.md",
+    "scope": "Home visual presentation and direction for UI DNA; dirty working tree, no committed candidateSha"
+  },
+  "workingTreeVerification": {
+    "result": "pass",
+    "evidence": "docs/delivery/figma-mobile-implementation/account-login-refinement.md",
+    "note": "216 tests/build/Playwright PASS. SHA-bound checker gate stays pending until a committed candidate is recorded; no claim that HEAD contains these changes."
+  },
+  "historicalRevision6": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
+    "scope": "Preparation only; visual rollout plan remains reusable for future authorized slices"
+  },
+  "accountLoginVisualAcceptance": {
+    "date": "2026-10-11",
+    "source": "Owner: ổn, xây dụng cơ chế này, làm với home trước",
+    "scope": "Account/login visual; not r5 workflow or real backend"
+  }
+}

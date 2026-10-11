@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { EvidenceImageViewer } from "./image-viewer";
 
 describe("evidence image viewer", () => {
-  it("requests close from Escape and an outside click", () => {
+  it("requests close from Escape and an outside click", async () => {
     const onOpenChange = vi.fn();
     const { rerender } = render(<EvidenceImageViewer image={{ src: "/demo/evidence-cookie-front.svg", alt: "Ảnh kiểm tra" }} open onOpenChange={onOpenChange} />);
 
@@ -15,6 +15,8 @@ describe("evidence image viewer", () => {
     rerender(<EvidenceImageViewer image={{ src: "/demo/evidence-cookie-front.svg", alt: "Ảnh kiểm tra" }} open onOpenChange={onOpenChange} />);
     const overlay = document.querySelector('[data-slot="dialog-overlay"]');
     expect(overlay).not.toBeNull();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    fireEvent.pointerDown(overlay as Element);
     fireEvent.click(overlay as Element);
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });

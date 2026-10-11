@@ -1,0 +1,493 @@
+{
+  "recordedAt": "2026-10-07",
+  "branch": "store-app/figma-mobile-implementation",
+  "head": "4fab6889f6cc6a7b66d25806262329cbf88ea024",
+  "note": "Hashes of pre-existing dirty/untracked non-doc inputs at planning time; no implementation edits performed. This is not a dispatch checkpoint. Documentation changes omitted.",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 6210,
+      "sha256": "ab855f345bd5336f646bb795a5561f47a1676418e920c7f9744490559f28bdd6"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/020a9e71-9da7-41d0-bb16-bf18e64c1073.svg",
+      "bytes": 986,
+      "sha256": "55c40fc6f40094d6d43f08795e5e5d6ebc247f3ff0880d4967eac5d959863ce8"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/07032e06-0efb-4f81-aef0-1380425c892d.svg",
+      "bytes": 254,
+      "sha256": "2e45dda4c96b4549f9191d5b9d519f138289c3ebb3ea2734d4b2024944b858e5"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/08f2179f-8ded-4454-925a-4c4508ae20d4.svg",
+      "bytes": 972,
+      "sha256": "451927ef01dc4f42ecdf76d452fe1585ceb7d8dcef50153ca03662ee8a682397"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/10fd6bdc-d2fc-4d47-a41a-67803006f552.svg",
+      "bytes": 1192,
+      "sha256": "192d40bf7b23c414cec087279241fa27f0ec2b261b792126635ceab1f2d52889"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/18fb059a-d101-456d-81d2-c170cfac6013.svg",
+      "bytes": 481,
+      "sha256": "26b4e1ccc172bd3bd697954f458060aeaf34ca78b2a0555931035fb9056eabcf"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/1e321dba-958d-4e30-9c5e-b672d0c154b7.svg",
+      "bytes": 392,
+      "sha256": "cd28a745ab218d45fb33890c14eaa0bf32e25f10cb5ff65527179176bc1139f9"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/221021d8-c77e-444e-83e9-b53258bec1be.svg",
+      "bytes": 331,
+      "sha256": "2f71408773fb83718504053b4dbb46fc64c4d4519a1b4a0c6778f8e32217a759"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/27069a12-515b-44a1-b326-2eb2f7461540.svg",
+      "bytes": 335,
+      "sha256": "bad1f5d8a8344e2c7e10c2ae60b866a5021b12af18c5ef848a8b15e03b3a0ceb"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/28bf766f-3e77-41f0-88fe-c297be0077cd.svg",
+      "bytes": 1192,
+      "sha256": "53c148ab44a61ffd3abab6ae24cf37f1dabc8a86798bec7b38d8793d922b5bb1"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/29585ac6-4af7-4f2f-a308-2b24ab118b3e.svg",
+      "bytes": 972,
+      "sha256": "354e6f8f057c9b1baa3829a5caa84e2f84f1afe213aaeaa134084b5f5ee15ca3"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/2d129d38-8f7a-4a2b-9522-9b14fae2f3f3.svg",
+      "bytes": 1356,
+      "sha256": "7d2536e167b6afcb9d152834e2cd6d96785e71269b98e4791b0a51542296f928"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/376fdf75-293a-4f82-a661-69b87c34871a.svg",
+      "bytes": 777,
+      "sha256": "a2965794ef4cda247682403a609829adb0a7e95fcbc8e6fb203609704a6277c0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/3b16ac6d-15fb-4ab0-a558-f901250e4e9f.svg",
+      "bytes": 576,
+      "sha256": "befbf721299ca31e0645de816c34d6a2a4650a2f30cde7bed94b6cd3c5aa2a2e"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/3b26872b-576b-4f52-b659-ba84c5410cc1.svg",
+      "bytes": 766,
+      "sha256": "820229345946144f9f02ba39d04fcb58b7346c09c4fc6db2b9a697440fc9310f"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/3b9bd49d-678d-4405-b055-e95bcfd609c6.svg",
+      "bytes": 884,
+      "sha256": "f18085dac23a7991f66fd9f191d09a2f053d471d3b9bf5ed7c11316a287f5329"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/3bf48cbf-6c4c-4110-b22f-da21afce6e64.svg",
+      "bytes": 1258,
+      "sha256": "4decb897db96aba5ce729aee2d8252757c2b4c8f299e516a87cc9012fcef7549"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/3c2218be-5990-4898-b153-6da3634f777b.svg",
+      "bytes": 1356,
+      "sha256": "7d2536e167b6afcb9d152834e2cd6d96785e71269b98e4791b0a51542296f928"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/3daa083a-76fa-4fcd-9107-22a09d6af181.svg",
+      "bytes": 986,
+      "sha256": "55c40fc6f40094d6d43f08795e5e5d6ebc247f3ff0880d4967eac5d959863ce8"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/40b35cf2-9212-4c17-bc6d-8fe395f555ed.svg",
+      "bytes": 1364,
+      "sha256": "6bb50a8805ec0657644c753484d6f4397c7c6f5726913001c03b4d29c30fa416"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/41022345-8fa2-43d2-9eb9-f213dfc440f4.svg",
+      "bytes": 1036,
+      "sha256": "0ff51029a348647ec49f0dfd971321aed76c8f63acc9bb0049f5dfcfc7f95f00"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/42fa2b4d-2931-4c34-9af9-50e35aab58cc.svg",
+      "bytes": 985,
+      "sha256": "b97253975933f66846e31a8913bf98cd7ab8f6facf8aa72b0750dd904c363ddb"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/47be953a-ede7-41de-8645-348d0d0bfb15.svg",
+      "bytes": 777,
+      "sha256": "a2965794ef4cda247682403a609829adb0a7e95fcbc8e6fb203609704a6277c0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/49b3c989-6b7e-4137-a34b-cc4f6e2685e6.svg",
+      "bytes": 780,
+      "sha256": "96bca9d97a0d65ef8aca1b7bbe91755ffcfe4f01930cbe1f6fc50afeea8fb188"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/4d8832d9-df5c-47dc-b9f9-d760b0152bcc.svg",
+      "bytes": 347,
+      "sha256": "96d72d38fbd24723e178a8cd62fb3a044656136b12359ac953d581656571d7d8"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/5171d3ec-385c-4850-b308-cf2fc5482db4.svg",
+      "bytes": 347,
+      "sha256": "96d72d38fbd24723e178a8cd62fb3a044656136b12359ac953d581656571d7d8"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/53722948-17f5-40e6-858b-6bc0d9739927.svg",
+      "bytes": 777,
+      "sha256": "a2965794ef4cda247682403a609829adb0a7e95fcbc8e6fb203609704a6277c0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/53ca5deb-573f-4e33-b1ac-9da7f1bdb528.svg",
+      "bytes": 921,
+      "sha256": "91bae456781af3b57950d80f91879804b990d562f9f09e06aa325eeab96dddb0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/590e7b15-bfa8-404f-9a42-52d9e0478d65.svg",
+      "bytes": 667,
+      "sha256": "c95a1e157bccf51fd8c158e1289b906d8e0fd5a3fba68eaa17b3dc67f87fc831"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/61b83328-dd67-4742-941d-3a4189eacd21.svg",
+      "bytes": 780,
+      "sha256": "9bcd029b2318b4b5b092c8d7815a11dd9bcadbb304898a28d9000f40733dfa83"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/63f9c2b0-78c9-43eb-a9e6-03ab501b3617.svg",
+      "bytes": 1002,
+      "sha256": "7fc68c5384b77c95fa2f478c94fba86577157b5c97a86d784de504c8e3070426"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/654fd03a-05b9-4ca4-a219-5bb64db65091.svg",
+      "bytes": 986,
+      "sha256": "55c40fc6f40094d6d43f08795e5e5d6ebc247f3ff0880d4967eac5d959863ce8"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/6865c1a5-9826-4981-be10-e8931bf4c0c1.svg",
+      "bytes": 766,
+      "sha256": "68ba50e4a88ffa815ff9aaf9b60d133e0f5b9ea0f9d69cd59840e8048162e80a"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/71feba02-f6a1-48c4-a3f0-59f8118ae141.svg",
+      "bytes": 328,
+      "sha256": "42d692896f3ad679d5407dd1976fae83e650c7eaf6f8691a53ae4ceb084e68be"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/736c4d81-9be8-4c73-a00e-6ea1dc2cbb8e.svg",
+      "bytes": 1099,
+      "sha256": "733ae6ef770655130823afdb018f1e1e429e274d47040b50d753642f307efbd0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/776547d4-f947-42d1-ab74-c3c6dbe8e1c3.svg",
+      "bytes": 331,
+      "sha256": "2f71408773fb83718504053b4dbb46fc64c4d4519a1b4a0c6778f8e32217a759"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/784b2181-1edf-417f-bb55-766b95e1db98.svg",
+      "bytes": 816,
+      "sha256": "c62d574869bfc5535849cad6e94e740f449b79b06828fa895ebdbbf9f3c444d9"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/7f618d21-fac5-40b4-8bcf-c561c3fb0128.svg",
+      "bytes": 1099,
+      "sha256": "733ae6ef770655130823afdb018f1e1e429e274d47040b50d753642f307efbd0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/8405cec3-675b-45de-a547-1a917d0f8eac.svg",
+      "bytes": 921,
+      "sha256": "91bae456781af3b57950d80f91879804b990d562f9f09e06aa325eeab96dddb0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/89077080-9ddc-40a9-8c49-e1d02f2c07a2.svg",
+      "bytes": 818,
+      "sha256": "9e75496523a870fa9c236232f8d7ac73c22583f5099d42e3818ebe00f2268a84"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/8c5174d6-f488-449f-9dd1-094c38adbd56.svg",
+      "bytes": 1192,
+      "sha256": "192d40bf7b23c414cec087279241fa27f0ec2b261b792126635ceab1f2d52889"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/90de5c6a-d14d-4e2d-b2bf-785838582828.svg",
+      "bytes": 368,
+      "sha256": "10b65650138aedc0d85e7ba255bc26ada29a2a91f7649232a8bdea7bb70e30cf"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/99210311-8efc-40b0-90d3-678c683d536d.svg",
+      "bytes": 1002,
+      "sha256": "7fc68c5384b77c95fa2f478c94fba86577157b5c97a86d784de504c8e3070426"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/a1ba582c-1acd-4eb7-9c07-7690f13ffe77.svg",
+      "bytes": 433,
+      "sha256": "11be5fbb7e45ec3a0fffd220b40565a9e42e0eb0f682b36eeccab0283fa90ee2"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/a1c5d2ed-7500-42d8-adf7-d3177be24f6c.svg",
+      "bytes": 545,
+      "sha256": "0fb92dd00c47a7b2f4d59b745537b4cf437b86cd6c30a08c71bc4e0048c82a29"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/a4b8edff-abd0-475a-8aba-10d1b24b96ee.svg",
+      "bytes": 481,
+      "sha256": "26b4e1ccc172bd3bd697954f458060aeaf34ca78b2a0555931035fb9056eabcf"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/a81e708b-88e2-4e30-9d8d-daccc29e7dd1.svg",
+      "bytes": 347,
+      "sha256": "96d72d38fbd24723e178a8cd62fb3a044656136b12359ac953d581656571d7d8"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/aacec322-1369-446c-9efb-fac358a71f05.svg",
+      "bytes": 1258,
+      "sha256": "40c84859bc691af2a125936fc6fae0b2a6e3b3e2b9a1ce40ec781e823a01c33d"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/ad4d1e8c-e626-4861-a6b7-a0371dd06a4a.svg",
+      "bytes": 481,
+      "sha256": "26b4e1ccc172bd3bd697954f458060aeaf34ca78b2a0555931035fb9056eabcf"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/ada3900a-62f6-482d-9613-58c13515c53e.svg",
+      "bytes": 481,
+      "sha256": "26b4e1ccc172bd3bd697954f458060aeaf34ca78b2a0555931035fb9056eabcf"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/b684c0dc-e5ca-4302-a906-df25869aa1cd.svg",
+      "bytes": 921,
+      "sha256": "91bae456781af3b57950d80f91879804b990d562f9f09e06aa325eeab96dddb0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/c6190560-4ae7-4874-aa1e-0edf2d642d40.svg",
+      "bytes": 481,
+      "sha256": "26b4e1ccc172bd3bd697954f458060aeaf34ca78b2a0555931035fb9056eabcf"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/c70103f4-5a84-4dbe-a041-9bf687cd8e5e.svg",
+      "bytes": 1258,
+      "sha256": "40c84859bc691af2a125936fc6fae0b2a6e3b3e2b9a1ce40ec781e823a01c33d"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/ca8b8d5f-5005-4f2e-bde0-59e1926986a2.svg",
+      "bytes": 972,
+      "sha256": "451927ef01dc4f42ecdf76d452fe1585ceb7d8dcef50153ca03662ee8a682397"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/d02c5cc5-e997-4144-8784-122484396ac6.svg",
+      "bytes": 766,
+      "sha256": "aaa5fc4a704a86a118feb856804e01da3abe16cd06e0081dbbe19c63b2ff7073"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/d21eabcd-7238-4274-b2e4-c74157954d61.svg",
+      "bytes": 1036,
+      "sha256": "0ff51029a348647ec49f0dfd971321aed76c8f63acc9bb0049f5dfcfc7f95f00"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/d7dc5686-11f4-412e-9cde-c7c61944663a.svg",
+      "bytes": 972,
+      "sha256": "451927ef01dc4f42ecdf76d452fe1585ceb7d8dcef50153ca03662ee8a682397"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/dbfc63fb-23c4-48bd-96a6-fada50e48e31.svg",
+      "bytes": 592,
+      "sha256": "b2b2927e3ed8e6e567700fb038489731e9c23ee3bf08595128d8adb022701ba6"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/dc493ed8-da70-4c1a-a769-fc11389c7c83.svg",
+      "bytes": 1099,
+      "sha256": "733ae6ef770655130823afdb018f1e1e429e274d47040b50d753642f307efbd0"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/ddb4cb22-4551-4d3b-9e44-a5a7a760bf30.svg",
+      "bytes": 1513,
+      "sha256": "c3c8ea3bf3692850e11836adf995db44a900ec195a72d7d5bc0f026431834fd9"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/e0cd73ff-7224-47c4-8cf1-40becb327875.svg",
+      "bytes": 985,
+      "sha256": "b97253975933f66846e31a8913bf98cd7ab8f6facf8aa72b0750dd904c363ddb"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/e8e1d12f-f86b-4801-a63b-0ca50b509dc4.svg",
+      "bytes": 967,
+      "sha256": "05d7d019c2c31516eae62afb8454192edc2642f93920806ac8d2ff785cdc98b7"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/e90d400c-09f3-424c-9c79-669114cde678.svg",
+      "bytes": 254,
+      "sha256": "2e45dda4c96b4549f9191d5b9d519f138289c3ebb3ea2734d4b2024944b858e5"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/e9bcc8ea-c22f-43cc-ba8f-376ee57f27be.svg",
+      "bytes": 1036,
+      "sha256": "0ff51029a348647ec49f0dfd971321aed76c8f63acc9bb0049f5dfcfc7f95f00"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/f1cc55ce-810f-4467-98f9-d444e648a218.svg",
+      "bytes": 1022,
+      "sha256": "ac6ea98766cdcaffbcae39ababf8aba06a7e1e88991fb212ab0a9cc46ae5defc"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/f4ce1e8e-07be-4fa5-a96b-faafc227cb2f.svg",
+      "bytes": 777,
+      "sha256": "214a387aabf6b33155011fb6b0f14d98ad320b4e46a0552dcf0f56925321c512"
+    },
+    {
+      "path": "apps/store-pwa/public/figma/f937ce31-bc3a-4a02-9658-b4460d9f433f.svg",
+      "bytes": 333,
+      "sha256": "97bdf6528d45410767fa2cbdbd5f4a741272f9af5b61c3d25b9980ff6570824b"
+    },
+    {
+      "path": "apps/store-pwa/src/barcode-scanner-dialog.tsx",
+      "bytes": 18471,
+      "sha256": "9ea989493c2092878099ddda3727efb2d4ed0e7488a784c8c2115743a0fde22d"
+    },
+    {
+      "path": "apps/store-pwa/src/calendar-input.test.tsx",
+      "bytes": 3425,
+      "sha256": "5b9986413c47aa21f8d42875f5845f345a98408d019639ebdc16b0a881e21278"
+    },
+    {
+      "path": "apps/store-pwa/src/calendar-input.tsx",
+      "bytes": 8233,
+      "sha256": "47712c9243ca9127bd13d9caa006484a2eabeb5ddbc0ce7dbdc017006fe6d2f5"
+    },
+    {
+      "path": "apps/store-pwa/src/create-record-dialog.tsx",
+      "bytes": 32614,
+      "sha256": "9f0d830ecefe0ea759d2905167cd654423d2cba1b96bb5475326202b9ef3de6d"
+    },
+    {
+      "path": "apps/store-pwa/src/expiry-dialog.test.tsx",
+      "bytes": 7201,
+      "sha256": "eb3922d1b9115fde2eb6ad4248a3c92ccc59b6b4c3a3e0c4d0755d411efbf5a4"
+    },
+    {
+      "path": "apps/store-pwa/src/expiry-dialog.tsx",
+      "bytes": 16509,
+      "sha256": "b36331239f6aefefd34c69bb063e0ba219654fb79a0ce22b80e110845c587e43"
+    },
+    {
+      "path": "apps/store-pwa/src/figma-assets.ts",
+      "bytes": 5489,
+      "sha256": "5b6d1558272df81e1a00aa8548831b78924acf8a8ed3aff2244e8cc2210f03e9"
+    },
+    {
+      "path": "apps/store-pwa/src/image-viewer.tsx",
+      "bytes": 6469,
+      "sha256": "14e0d8b81071774ebbe9d514375e1f5192e7e1e381b80be2da3ba86d880da7c1"
+    },
+    {
+      "path": "apps/store-pwa/src/main.tsx",
+      "bytes": 942,
+      "sha256": "8c6c33ae4d85524a1bc7e175d0c298a4d2e80388b3de6696af5c831f86c26126"
+    },
+    {
+      "path": "apps/store-pwa/src/store-app-mock.ts",
+      "bytes": 1781,
+      "sha256": "7b55e3d6690dc9504b8fc2a8ccbfde106d7a543885310b6bf48c4fb3dacf002f"
+    },
+    {
+      "path": "apps/store-pwa/src/store-app.css",
+      "bytes": 30181,
+      "sha256": "2bea9732fad38a68b98a6d9387aabf3abe68e1d1c3cd4e70f556d7a27a81ed47"
+    },
+    {
+      "path": "apps/store-pwa/src/store-app.tsx",
+      "bytes": 5235,
+      "sha256": "cc52c13b41b8cd87cde162574e2eb82a4412b2dc0e420f215b55eb0b32e63510"
+    },
+    {
+      "path": "apps/store-pwa/src/store-create-review.test.tsx",
+      "bytes": 2568,
+      "sha256": "a6383804ef3e308e96c57264ed786097faba6c85788b9be7dc32b7646a48af34"
+    },
+    {
+      "path": "apps/store-pwa/src/store-date-workspace.tsx",
+      "bytes": 5509,
+      "sha256": "b5ffc51ed034dad9ac4a655aa33a68e4df24ca31c5cbef4b485ac19dea5f68e2"
+    },
+    {
+      "path": "apps/store-pwa/src/store-kph-workspace.test.tsx",
+      "bytes": 2127,
+      "sha256": "0481c215374b7cd9d5919315d652bbdc17eb58123970788ed1e5014e31af36ef"
+    },
+    {
+      "path": "apps/store-pwa/src/store-kph-workspace.tsx",
+      "bytes": 13517,
+      "sha256": "70a407925394b517d8d67af81f20817faf2fa75ba22488e2f268d2da49fffe8c"
+    },
+    {
+      "path": "apps/store-pwa/src/store-shelf-life.test.tsx",
+      "bytes": 3064,
+      "sha256": "25af06e687f1577dac28b9e68d22e46c0019398602cf54154b84b4da4c4450d7"
+    },
+    {
+      "path": "apps/store-pwa/src/store-shelf-life.tsx",
+      "bytes": 8335,
+      "sha256": "7ad0c19581bad4e3507997551bc0c3f6764025e85374e349c040575a9ade5062"
+    },
+    {
+      "path": "apps/store-pwa/src/styles.css",
+      "bytes": 87704,
+      "sha256": "ef35bd985d2a8464eddc95f2d3802d5cc489415a9dc158f736d5c603ee85e6ce"
+    },
+    {
+      "path": "apps/store-pwa/src/ui-dna-prototype.css",
+      "bytes": 34489,
+      "sha256": "e3c84b4496eba02e00db3c73dad4e1295b5cc4635072446d6195fcd1f8c06338"
+    },
+    {
+      "path": "apps/store-pwa/src/ui-dna-prototype.tsx",
+      "bytes": 24803,
+      "sha256": "45ce2d93c2be4d591a48b1a7b292a9c5a54bb45ca541609b44dbe146724ba809"
+    },
+    {
+      "path": "apps/store-pwa/vite.config.ts",
+      "bytes": 1117,
+      "sha256": "6aa8111bace81546640e5f35f0f7c03b25947565d3a1f8fd57ca537f4e441dc8"
+    },
+    {
+      "path": "e2e/scripts/check-date-picker.cjs",
+      "bytes": 3345,
+      "sha256": "6dfd0e469f145dc877f627a70c808e3daf610747ad97395befbb28378c6e136c"
+    },
+    {
+      "path": "e2e/scripts/check-figma-mobile.cjs",
+      "bytes": 8938,
+      "sha256": "cfefad4bd73cfac070122fd3e2d6992820e64469d1a80759498fe214e4128b0f"
+    },
+    {
+      "path": "e2e/scripts/check-shelf-timeline.cjs",
+      "bytes": 2858,
+      "sha256": "c045211005855fa1e4ae88f136b1d8d82ce1d4e050a2ebaa51adf4db3b69b34f"
+    },
+    {
+      "path": "packages/ui/DESIGN_SYSTEM.md",
+      "bytes": 3068,
+      "sha256": "d4396ac6bb034d146f4a763ed09c3f3a27111098cdf3fb8f7816bbccc91afaec"
+    },
+    {
+      "path": "packages/ui/package.json",
+      "bytes": 922,
+      "sha256": "dc39a4c01ee5d20e302f58b751a1f322693abc33e491c7cf04849880df617b94"
+    },
+    {
+      "path": "packages/ui/src/card.tsx",
+      "bytes": 2208,
+      "sha256": "cf43e63644625545318e7d33f57035915a0b65998e8fd6ffa51dbfe61c23d92c"
+    },
+    {
+      "path": "packages/ui/src/index.ts",
+      "bytes": 171,
+      "sha256": "42047fe8cbcab94de6a386f1442d770ac4d39571516b805f9859c9a6d97cba1b"
+    },
+    {
+      "path": "packages/ui/src/tokens.css",
+      "bytes": 7592,
+      "sha256": "195760006df27e6af84cbde71613c40573ca4aed4f099c85a3f2a0ad1d98baf6"
+    }
+  ]
+}

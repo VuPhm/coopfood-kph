@@ -151,7 +151,7 @@ describe("online identity and scoped query state", () => {
     mocks.getSession.mockRejectedValueOnce(expired);
     render(<App />);
 
-    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Đăng nhập" })).toBeVisible();
     expect(screen.queryByRole("button", { name: /Tạo phiếu.*TP khô/i })).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox", { name: "Tên đăng nhập" }), { target: { value: "demo" } });
     fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "password" } });
@@ -162,7 +162,7 @@ describe("online identity and scoped query state", () => {
     expect(screen.getByRole("group", { name: /Cửa hàng hiện tại/ })).toHaveTextContent("Nguyễn Kiệm");
     fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
     await waitFor(() => expect(mocks.logout).toHaveBeenCalledOnce());
-    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Đăng nhập" })).toBeVisible();
   });
 
   it("keeps logout retry available when the server response fails", async () => {
@@ -175,9 +175,9 @@ describe("online identity and scoped query state", () => {
     finishHistory([record(storeA.id, "Phiếu đến sau lỗi đăng xuất")]);
     await screen.findAllByText("Phiếu đến sau lỗi đăng xuất");
     expect(screen.getByText("Chưa xác nhận được đăng xuất. Hãy thử đăng xuất lại.")).toBeVisible();
-    expect(screen.queryByText("Đăng nhập Store PWA")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Đăng nhập" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
-    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Đăng nhập" })).toBeVisible();
     expect(mocks.logout).toHaveBeenCalledTimes(2);
   });
 
@@ -194,7 +194,7 @@ describe("online identity and scoped query state", () => {
       "correct-password",
       "Một mật khẩu rất riêng 2026!",
     ));
-    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Đăng nhập" })).toBeVisible();
     expect(screen.getByRole("status")).toHaveTextContent("Đã đổi mật khẩu. Hãy đăng nhập lại bằng mật khẩu mới.");
   });
 
@@ -247,7 +247,7 @@ describe("online identity and scoped query state", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
     fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
-    expect(await screen.findByText("Đăng nhập Store PWA")).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Đăng nhập" })).toBeVisible();
     fireEvent.change(screen.getByRole("textbox", { name: "Tên đăng nhập" }), { target: { value: "demo" } });
     fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "password" } });
     fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));

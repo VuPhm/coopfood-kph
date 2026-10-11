@@ -1,9 +1,7 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 import { ExpiryWorkbench } from "./expiry-dialog";
-
-afterEach(() => vi.useRealTimers());
 
 function openWorkbench() {
   fireEvent.click(screen.getByRole("button", { name: "Tra cứu lùi hàng" }));
@@ -126,38 +124,19 @@ describe("Expiry lookup", () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: previousWidth });
   });
 
-  it("gives the collapsed trigger a temporary visible hint and keeps the shared meta row when expanded", () => {
+  it("keeps the floating utility trigger icon-only with an accessible name", () => {
     render(<ExpiryWorkbench />);
 
     const trigger = screen.getByRole("button", { name: "Tra cứu lùi hàng" });
-    expect(trigger).toHaveTextContent("Tra cứu lùi hàng");
-    expect(trigger.querySelector(".utility-panel-action-text")).not.toBeNull();
     expect(trigger).toHaveAttribute("aria-label", "Tra cứu lùi hàng");
+    expect(trigger).toHaveAttribute("title", "Tra cứu lùi hàng");
+    expect(trigger.querySelector(".utility-panel-action-text")).toBeNull();
     expect(trigger.closest(".utility-panel-meta")).toHaveClass("is-collapsed");
 
     fireEvent.click(trigger);
     const workbench = screen.getByRole("complementary", { name: "Tra cứu lùi hàng" });
     expect(workbench.querySelector(".utility-panel-meta")).not.toBeNull();
-    expect(screen.getByText("Tra cứu lùi hàng")).toBeVisible();
+    expect(screen.getByText("Hạn lùi hàng")).toBeVisible();
     expect(screen.getByRole("button", { name: "Đóng tra cứu lùi hàng" }).closest(".utility-panel-meta")).not.toBeNull();
-  });
-
-  it("only animates the lookup hint once while keeping its desktop label mounted", () => {
-    vi.useFakeTimers();
-    render(<ExpiryWorkbench />);
-
-    const initialTrigger = screen.getByRole("button", { name: "Tra cứu lùi hàng" });
-    expect(initialTrigger).toHaveClass("has-entry-hint");
-    expect(initialTrigger).toHaveTextContent("Tra cứu lùi hàng");
-
-    act(() => vi.advanceTimersByTime(2_800));
-    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).not.toHaveClass("has-entry-hint");
-    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveTextContent("Tra cứu lùi hàng");
-
-    fireEvent.click(screen.getByRole("button", { name: "Tra cứu lùi hàng" }));
-    fireEvent.click(screen.getByRole("button", { name: "Đóng tra cứu lùi hàng" }));
-
-    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).not.toHaveClass("has-entry-hint");
-    expect(screen.getByRole("button", { name: "Tra cứu lùi hàng" })).toHaveTextContent("Tra cứu lùi hàng");
   });
 });

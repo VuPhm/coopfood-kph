@@ -1,5 +1,4 @@
-import { DialogClose, cn } from "@coopfood-kph/ui";
-import { X } from "lucide-react";
+import { CloseButton, DialogClose, cn } from "@coopfood-kph/ui";
 import type { ReactNode } from "react";
 
 type UtilityPanelMetaProps = {
@@ -27,7 +26,14 @@ export function UtilityPanelMeta({
   label,
   onAction,
 }: UtilityPanelMetaProps) {
-  const action = (
+  const action = !actionIcon && !actionText ? <CloseButton
+    className={actionClassName}
+    aria-controls={actionControls}
+    aria-expanded={actionExpanded}
+    aria-label={actionLabel}
+    title={actionLabel}
+    onClick={onAction}
+  /> : (
     <button
       type="button"
       className={cn("utility-panel-action", actionClassName)}
@@ -37,7 +43,7 @@ export function UtilityPanelMeta({
       title={actionLabel}
       onClick={onAction}
     >
-      <span className="utility-panel-action-visual" aria-hidden="true">{actionIcon ?? <X />}</span>
+      <span className="utility-panel-action-visual" aria-hidden="true">{actionIcon}</span>
       {actionText ? <span className="utility-panel-action-text" aria-hidden="true">{actionText}</span> : null}
     </button>
   );
