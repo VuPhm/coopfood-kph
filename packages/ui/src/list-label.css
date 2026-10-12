@@ -1,0 +1,39 @@
+/* Scoped presentation palette shared by labels, item markers and choice cards. */
+.ui-label-palette[data-tone] {
+  --cf-label-surface: #f2f4f7;
+  --cf-label-ink: #475467;
+  --cf-label-border: #d0d5dd;
+  --cf-label-accent: #667085;
+}
+.ui-list-label[data-tone] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 26px;
+  border: 1px solid var(--cf-label-border);
+  border-radius: var(--cf-radius-pill, 999px);
+  padding: 3px 8px;
+  background: var(--cf-label-surface);
+  color: var(--cf-label-ink);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+  white-space: normal;
+  vertical-align: middle;
+}
+.ui-label-palette[data-tone="info"] { --cf-label-surface: #eff8ff; --cf-label-ink: #175cd3; --cf-label-border: #b2ddff; --cf-label-accent: #2970ff; }
+.ui-label-palette[data-tone="process"] { --cf-label-surface: #f4f3ff; --cf-label-ink: #6941c6; --cf-label-border: #d9d6fe; --cf-label-accent: #7f56d9; }
+.ui-label-palette[data-tone="warning"] { --cf-label-surface: #fff0e6; --cf-label-ink: #884312; --cf-label-border: #f4c8a7; --cf-label-accent: #c65f14; }
+.ui-label-palette[data-tone="danger"] { --cf-label-surface: #fef3f2; --cf-label-ink: #b42318; --cf-label-border: #fecdca; --cf-label-accent: #d92d20; }
+.ui-label-palette[data-tone="success"] { --cf-label-surface: #e6f7f2; --cf-label-ink: #00724e; --cf-label-border: #99d4bc; --cf-label-accent: #079669; }
+.ui-list-label-icon { display: inline-flex; flex-shrink: 0; }
+.ui-list-label-icon > svg { width: 14px; height: 14px; stroke-width: 1.8; }
+.ui-list-label-text { min-width: 0; overflow-wrap: anywhere; }
+.ui-list-label-category { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.ui-list-item-marker { display: inline-grid; place-items: center; flex: 0 0 18px; width: 18px; height: 18px; border-radius: 50%; background: var(--cf-label-surface); }
+.ui-list-item-marker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--cf-label-ink); }
+.ui-list-item-marker[data-variant="bar"] { display: block; flex: 0 0 4px; width: 4px; height: 40px; border-radius: 999px; background: var(--cf-label-accent); }
+.ui-list-item-marker[data-variant="bar"]::before { content: none; }

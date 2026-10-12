@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from "react";
+import { memo, useCallback, useEffect, useImperativeHandle, useId, useMemo, useRef, useState, type Ref } from "react";
 import { Button, Dialog, DialogContent, DialogDescription, DialogTitle } from "@coopfood-kph/ui";
 import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
 import type { CreateRecordDialog, CreatedRecordDraft } from "./create-record-dialog";
@@ -10,6 +10,8 @@ import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { EvidenceImageViewer } from "./image-viewer";
 import { StoreKphList } from "./store-kph-list";
+import { KphQuickSort, KPH_SORT_OPTIONS } from "./store-kph-sort";
+import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, Maximize, Search, SlidersHorizontal } from "lucide-react";
 import { KphFormSkeleton } from "./store-kph-loading";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 
@@ -105,7 +107,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
     <section className="store-ticket-list" aria-label="Phiếu khai báo">
       <div className="store-list-heading"><h2>Phiếu khai báo</h2><div><button className="store-compact" onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}>{selectionMode ? "Xong" : "Chọn"}</button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} /></div></div>
       <div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div>
-      <div className="store-kph-toolbar"><label className="store-kph-search"><img className="store-kph-search-icon" data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-1", "imgFeatherSearch")} alt="" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(kind)}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("203-701", "imgFeatherMaximize")} alt="" /></button><select aria-label="Sắp xếp phiếu" value={sort} onChange={e => setSort(e.target.value)}><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option><option value="name">Tên hàng</option></select><span className="store-result-count">{filtered.length} phiếu</span></div>
+      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(kind)}><Maximize size={20} aria-hidden="true" /></button><KphQuickSort sort={sort} onChange={setSort} /><span className="store-result-count">{filtered.length} phiếu</span></div>
       {selectionMode ? <div className="store-batch"><label><input type="checkbox" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
         const visibleIds = new Set(visible.map(r => r.id));
         setSelection(e.target.checked ? [...new Set([...selection, ...visibleIds])] : selection.filter(id => !visibleIds.has(id)));
@@ -137,14 +139,20 @@ const KphFilterControl = memo(function KphFilterControl({ from, onFromChange, to
   sort: string; onSortChange: (value: string) => void; filterError: string;
 }) {
   const [open, setOpen] = useState(false);
+  const summaryId = useId();
+  const activeCount = Number(Boolean(from)) + Number(Boolean(to)) + Number(approval !== "ALL") + Number(sort !== "newest");
   return <>
-    <button className="store-filter" aria-label="Lọc phiếu KPH" onClick={() => setOpen(true)}><img data-figma-asset-slot="kph-filter" src={figmaAsset("r2", "imgFeatherSliders")} alt="" /></button>
+    <button className={`store-filter ${activeCount ? "is-filtered" : ""}`} aria-label="Lọc phiếu KPH" aria-describedby={summaryId} onClick={() => setOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeCount ? <span className="store-filter-count" aria-hidden="true">{activeCount}</span> : null}</button>
+    <span id={summaryId} className="sr-only">{activeCount ? `${activeCount} tiêu chí lọc hoặc sắp xếp đang dùng` : "Chưa có bộ lọc"}</span>
     <StoreSheet open={open} onOpenChange={setOpen} className="store-kph-sheet store-kph-filter" title="Lọc & sắp xếp" description="Bộ lọc phiếu áp dụng ngay khi thay đổi">
-      <h3>Ngày phát hiện hàng KPH</h3><div className="store-date-range"><div className="store-field"><label htmlFor="filter-from">Từ ngày</label><CalendarInput id="filter-from" label="Từ ngày" initialMonth={formatBusinessDate(new Date()).iso} value={from} onValueChange={onFromChange} /></div><span>→</span><div className="store-field"><label htmlFor="filter-to">Đến ngày</label><CalendarInput id="filter-to" label="Đến ngày" initialMonth={formatBusinessDate(new Date()).iso} value={to} onValueChange={onToChange} /></div></div>
-      {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
-      <h3>Trạng thái duyệt</h3><div className="store-choices">{([ ["ALL", "Tất cả"], ["PENDING", "Chờ duyệt"], ["APPROVED", "Đã duyệt"], ["REJECTED", "Không duyệt"] ] as const).map(([key, label]) => <button key={key} aria-pressed={approval === key} className={approval === key ? "is-selected" : ""} onClick={() => onApprovalChange(key)}>{label}</button>)}</div>
-      <h3>Sắp xếp</h3><div className="store-choices">{[["newest", "Mới nhất"], ["oldest", "Cũ nhất"], ["name", "Tên hàng"]].map(([key, label]) => <button key={key} aria-pressed={sort === key} className={sort === key ? "is-selected" : ""} onClick={() => onSortChange(key!)}>{label}</button>)}</div>
-      <p className="store-muted">Bộ lọc áp dụng ngay. Lựa chọn phiếu được đặt lại khi đổi bộ lọc hoặc trang.</p><button className="store-reset-filter" onClick={() => { onFromChange(""); onToChange(""); onApprovalChange("ALL"); onSortChange("newest"); }}>Đặt lại bộ lọc</button>
+      <section className="store-kph-filter-section" aria-labelledby="kph-filter-dates"><h3 id="kph-filter-dates"><CalendarDays size={18} aria-hidden="true" />Ngày phát hiện hàng KPH</h3>
+        <div className="store-date-range"><div className="store-field"><label htmlFor="filter-from">Từ ngày</label><CalendarInput id="filter-from" label="Từ ngày" initialMonth={formatBusinessDate(new Date()).iso} value={from} onValueChange={onFromChange} /></div><span aria-hidden="true">→</span><div className="store-field"><label htmlFor="filter-to">Đến ngày</label><CalendarInput id="filter-to" label="Đến ngày" initialMonth={formatBusinessDate(new Date()).iso} value={to} onValueChange={onToChange} /></div></div>
+        {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
+      </section>
+      <section className="store-kph-filter-section" aria-labelledby="kph-filter-status"><h3 id="kph-filter-status"><CircleCheck size={18} aria-hidden="true" />Trạng thái duyệt</h3><div className="store-choices" role="group" aria-label="Trạng thái duyệt">{([ ["ALL", "Tất cả"], ["PENDING", "Chờ duyệt"], ["APPROVED", "Đã duyệt"], ["REJECTED", "Không duyệt"] ] as const).map(([key, label]) => <button key={key} aria-pressed={approval === key} className={approval === key ? "is-selected" : ""} onClick={() => onApprovalChange(key)}><span>{label}</span><Check size={16} aria-hidden="true" className={approval === key ? "" : "is-hidden"} /></button>)}</div></section>
+      <section className="store-kph-filter-section" aria-labelledby="kph-filter-sort"><h3 id="kph-filter-sort"><ArrowDownWideNarrow size={18} aria-hidden="true" />Sắp xếp</h3><div className="store-choices store-kph-filter-sort" role="group" aria-label="Thứ tự phiếu">{KPH_SORT_OPTIONS.map(({value, label}) => <button key={value} aria-pressed={sort === value} className={sort === value ? "is-selected" : ""} onClick={() => onSortChange(value)}><span>{label}</span><Check size={16} aria-hidden="true" className={sort === value ? "" : "is-hidden"} /></button>)}</div></section>
+      <p className="store-muted">Thay đổi áp dụng ngay. Lựa chọn phiếu được đặt lại khi đổi bộ lọc hoặc trang.</p>
+      <div className="store-kph-filter-footer"><button className="store-reset-filter" onClick={() => { onFromChange(""); onToChange(""); onApprovalChange("ALL"); onSortChange("newest"); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setOpen(false)}>Xong</Button></div>
     </StoreSheet>
   </>;
 });

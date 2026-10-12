@@ -7,7 +7,26 @@ const output = process.env.STORE_KPH_COLORS_OUTPUT || '.local/kph-fresh-colors';
 fs.mkdirSync(output, { recursive: true });
 async function audit(page, selector, state) {
   const result = await page.locator(selector).evaluateAll((roots) => {
-    const rgba = value => { const n = value.match(/[\d.]+/g)?.map(Number); return n?.length >= 3 ? [...n.slice(0, 3), n[3] ?? 1] : [0, 0, 0, 0]; };
+    const colorCache = new Map();
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    const rgba = value => {
+      const n = value.match(/[-+]?(?:\d*\.?\d+)(?:e[-+]?\d+)?/gi)?.map(Number);
+      // Chromium returns color(srgb ...) for Tailwind color-mix hover backgrounds.
+      if (value.startsWith('color(srgb ')) return [...n.slice(0, 3).map(v => v * 255), n[3] ?? 1];
+      if (value.startsWith('rgb')) return [...n.slice(0, 3), n[3] ?? 1];
+      if (colorCache.has(value)) return colorCache.get(value);
+      if (!context || !CSS.supports('color', value)) throw new Error(`Unsupported color: ${value}`);
+      // Resolve modern CSS colors (including oklab color-mix) with the same browser renderer.
+      context.clearRect(0, 0, 1, 1);
+      context.fillStyle = value;
+      context.fillRect(0, 0, 1, 1);
+      const pixel = context.getImageData(0, 0, 1, 1).data;
+      const color = [...pixel.slice(0, 3), pixel[3] / 255];
+      colorCache.set(value, color);
+      return color;
+    };
     const blend = (a, b) => a.slice(0, 3).map((v, i) => v * a[3] + b[i] * (1 - a[3]));
     const lum = rgb => rgb.slice(0, 3).map(v => v / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
     const ratio = (a, b) => (Math.max(lum(a), lum(b)) + .05) / (Math.min(lum(a), lum(b)) + .05);
@@ -55,12 +74,12 @@ async function audit(page, selector, state) {
         borders.push({ name: input.id || input.getAttribute('aria-label'), ratio: ratio(rgba(style.borderTopColor), background(input.parentElement, point)) });
       }
     }
-    for (const root of roots) for (const el of root.querySelectorAll(':focus-visible, .choice-card:has(input:checked), .store-choices .is-selected, .store-tabs [aria-pressed="true"]')) {
+    for (const root of roots) for (const el of root.querySelectorAll(':focus-visible, .choice-card:has(input:checked), .store-choices .is-selected, .store-tabs [aria-pressed="true"], .store-quick-sort-options [aria-pressed="true"], .store-date-statuses [aria-pressed="true"]')) {
       const rect = el.getBoundingClientRect(); if (!rect.width || el.matches('.sr-only')) continue;
       const style = getComputedStyle(el), point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
       const focus = el.matches(':focus-visible');
-      if (el.matches('.store-tabs [aria-pressed="true"]')) {
-        indicators.push({ name: el.textContent.trim(), kind: 'selected-tab-surface', ratio: ratio(background(el, point), background(el.parentElement, point)) });
+      if (el.matches('.store-tabs [aria-pressed="true"], .store-quick-sort-options [aria-pressed="true"], .store-date-statuses [aria-pressed="true"]')) {
+        indicators.push({ name: el.textContent.trim(), kind: el.closest('.store-tabs') ? 'selected-tab-surface' : el.closest('.store-date-statuses') ? 'selected-status-surface' : 'selected-sort-surface', ratio: ratio(background(el, point), background(el.parentElement, point)) });
         if (!focus) continue;
       }
       indicators.push({ name: el.textContent.trim().slice(0, 50) || el.id, kind: focus ? 'focus' : 'selected', ratio: ratio(rgba(focus ? style.outlineColor : style.borderTopColor), background(el.parentElement, point)) });
@@ -77,7 +96,8 @@ async function audit(page, selector, state) {
   expect(indicatorFailures, `${state} focus/selection indicators >=3:1`).toEqual([]);
   return { state, samples: result.samples.length, minimumText: Math.min(...result.samples.map(s => s.ratio)), minimumBorder: result.borders.length ? Math.min(...result.borders.map(s => s.ratio)) : null };
 }
-(async () => {
+module.exports = { audit };
+if (require.main === module) (async () => {
   const browser = await chromium.launch(); const results = [];
   try {
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1024 }]) {

@@ -34,7 +34,7 @@ import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 import type { components } from "@coopfood-kph/api";
 
-import { choiceAsset } from "./store-kph-form-assets";
+import { getKphChoicePresentation, KphChoiceContent } from "./store-kph-choice";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -495,12 +495,12 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
             </FormSection>
 
             <FormSection number="3" title={screenPresentation ? "Tình trạng" : "Tình trạng hàng"}>
-              <ChoiceGroup legend="Tình trạng" name="condition" register={register} choices={options.conditions} assetScreen={screenPresentation ? assetScreen : undefined} />
+              <ChoiceGroup legend="Tình trạng" name="condition" register={register} choices={options.conditions} freshPresentation={screenPresentation} />
               {selectedCondition === "OTHER" ? <Field className="mt-3" label="Nội dung tình trạng khác" htmlFor="condition-detail" error={errors.conditionDetail?.message}><Input id="condition-detail" placeholder="Để trống sẽ giữ nhãn “Khác”" {...register("conditionDetail")} /></Field> : null}
             </FormSection>
 
             <FormSection number="4" title={screenPresentation ? "Xử lý" : "Biện pháp xử lý"}>
-              <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} assetScreen={screenPresentation ? assetScreen : undefined} />
+              <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} freshPresentation={screenPresentation} />
               {selectedResolution === "OTHER" ? <Field className="mt-3" label="Nội dung biện pháp khác" htmlFor="resolution-detail" error={errors.resolutionDetail?.message}><Input id="resolution-detail" placeholder="Để trống sẽ giữ nhãn “KHÁC”" {...register("resolutionDetail")} /></Field> : null}
               <Field className="mt-3" label="Ngày xử lý (nếu có)" htmlFor="treatment-date" error={errors.treatmentDate?.message}>
                 <CalendarInput id="treatment-date" initialMonth={initialMonth} label="Ngày xử lý (nếu có)" value={treatmentDate} icon={screenPresentation ? <img data-kph-calendar-icon="treatment" src={figmaAsset(assetScreen, "imgFeatherCalendar1")} alt="" /> : undefined} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
@@ -558,23 +558,23 @@ function FormSection({ children, number, title }: { children: ReactNode; number:
 }
 
 type ChoiceGroupProps = {
-  assetScreen?: "203-701" | "203-847" | undefined;
+  freshPresentation?: boolean | undefined;
   legend: string;
   name: "condition" | "resolution";
   register: UseFormRegister<FormData>;
   choices: readonly { value: string; label: string; tone: string }[];
 };
 
-function ChoiceGroup({ choices, legend, name, register, assetScreen }: ChoiceGroupProps) {
+function ChoiceGroup({ choices, legend, name, register, freshPresentation }: ChoiceGroupProps) {
   return (
     <fieldset>
       <legend className="sr-only">{legend}</legend>
       <div className={cn("choice-grid", choices.length === 2 && "choice-grid-two", choices.length === 5 && "choice-grid-five")}>
         {choices.map((choice) => (
-          <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`)}>
+          <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`, freshPresentation && "ui-label-palette")}
+            data-tone={freshPresentation ? getKphChoicePresentation(name, choice.value).tone : undefined} data-choice-value={choice.value}>
             <input className="sr-only" type="radio" value={choice.value} {...register(name)} />
-            <span className="choice-icon">{assetScreen ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, choiceAsset(choice.value))} alt="" /> : choiceIcon(choice.value)}</span>
-            <span>{choice.label}</span>
+            {freshPresentation ? <KphChoiceContent kind={name} value={choice.value} label={choice.label} /> : <><span className="choice-icon">{choiceIcon(choice.value)}</span><span>{choice.label}</span></>}
           </label>
         ))}
       </div>
