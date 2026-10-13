@@ -1,15 +1,10 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { App } from "./app";
 import { PinGate } from "./pin-gate";
 import { PwaStatus } from "./pwa-status";
+import { WorkspaceLoader } from "./workspace-loader";
 import "./styles.css";
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { refetchOnWindowFocus: false, staleTime: 30_000 } },
-});
 
 document.addEventListener("keydown", (event) => {
   if (!event.altKey && !event.ctrlKey && !event.metaKey && document.documentElement.dataset.focusModality !== "keyboard") {
@@ -24,9 +19,7 @@ document.addEventListener("pointerdown", () => {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <PwaStatus />
-      <PinGate><App /></PinGate>
-    </QueryClientProvider>
+    <PwaStatus />
+    <PinGate><WorkspaceLoader /></PinGate>
   </StrictMode>,
 );

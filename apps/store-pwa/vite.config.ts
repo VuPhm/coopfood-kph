@@ -14,7 +14,7 @@ export default defineConfig({
       workbox: {
         cleanupOutdatedCaches: true,
         globIgnores: ["demo/**"],
-        globPatterns: ["**/*.{css,html,js,png,svg,webmanifest}"],
+        globPatterns: ["**/*.{css,html,js,png,webp,svg,webmanifest}"],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: "index.html",
       },
