@@ -74,6 +74,18 @@ describe("KPH Excel export", () => {
     expect(escapeFormulaText("Sản phẩm A")).toBe("Sản phẩm A");
   });
 
+  it.each(["TPCN", "TPTS"] as const)("exports editable %s sheets after XLSX round-trip", async (kind) => {
+    const workbook = await buildKphWorkbook(kind, [{ ...DEMO_RECORDS[0]!, kind, photos: [] }]);
+    const reloaded = new ExcelJS.Workbook();
+    await reloaded.xlsx.load(await workbook.xlsx.writeBuffer());
+    const worksheet = reloaded.worksheets[0]!;
+    expect((worksheet.model as unknown as { sheetProtection?: unknown }).sheetProtection).toBeFalsy();
+    worksheet.getCell("D9").value = "Nội dung đã chỉnh sửa";
+    expect(worksheet.getCell("D9").value).toBe("Nội dung đã chỉnh sửa");
+    expect(worksheet.pageSetup.orientation).toBe("landscape");
+    expect(worksheet.getCell("R9").value).toBe("");
+  });
+
   it("builds the accepted BM-331.CF structure and leaves approver blank", async () => {
     const record = { ...DEMO_RECORDS[0]!, productName: "=2+2", photos: [] };
     const workbook = await buildKphWorkbook("TPCN", [record], { storeCode: "0123", storeName: "Cống Quỳnh" });
@@ -113,7 +125,6 @@ describe("KPH Excel export", () => {
     expect(worksheet.pageSetup.orientation).toBe("landscape");
     expect(worksheet.pageSetup.fitToWidth).toBe(1);
     expect(worksheet.headerFooter.oddFooter).toContain("BM-331.CF");
-    const protection = (worksheet.model as unknown as { sheetProtection?: { objects?: boolean; scenarios?: boolean; sheet?: boolean; spinCount?: number } }).sheetProtection;
-    expect(protection).toMatchObject({ sheet: true, spinCount: 100_000, objects: false, scenarios: false });
+    expect((worksheet.model as unknown as { sheetProtection?: unknown }).sheetProtection).toBeFalsy();
   });
 });

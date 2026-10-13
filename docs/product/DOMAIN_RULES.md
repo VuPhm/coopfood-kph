@@ -68,6 +68,9 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
   thành O:Q, người duyệt ở R, tối đa ba ảnh stamped giữ tỷ lệ/thứ tự.
 - Giữ thông tin Co.op Food/Store, footer `BM-331.CF`/lần ban hành/trang, Times
   New Roman và sheet protection theo outcome legacy.
+- Ngoại lệ pilot Pages được yêu cầu ngày 13/10/2026: file Excel TPCN/TPTS xuất
+  từ Store PWA không khóa sheet hoặc đặt mật khẩu, để người nhận chỉnh sửa.
+  Giữ layout, ảnh theo thứ tự, ô người duyệt trống và chống formula injection.
 - Mẫu Excel và logo approved dùng repository legacy read-only làm provenance;
   chỉ canonical fixture tổng hợp hoặc asset đã được duyệt mới được đưa vào repo mới.
 - Hệ thống mới chỉ được coi là tương thích khi vượt qua golden

@@ -203,25 +203,6 @@ export async function buildKphWorkbook(kind: KphKind, records: readonly DemoReco
     }
   }
 
-  await worksheet.protect(globalThis.crypto?.randomUUID?.() ?? `kph-${Date.now()}`, {
-    spinCount: 100_000,
-    selectLockedCells: true,
-    selectUnlockedCells: true,
-    formatCells: false,
-    formatColumns: false,
-    formatRows: false,
-    insertColumns: false,
-    insertRows: false,
-    insertHyperlinks: false,
-    deleteColumns: false,
-    deleteRows: false,
-    sort: false,
-    autoFilter: false,
-    pivotTables: false,
-    objects: false,
-    scenarios: false,
-  });
-
   return workbook;
 }
 
