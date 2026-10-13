@@ -1,11 +1,13 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { BrowserMultiFormatReader, type Result } from "@zxing/library";
+import { BarcodeFormat, BrowserMultiFormatReader, DecodeHintType, MultiFormatReader, type Result } from "@zxing/library";
 import { useState } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { getPilotSetting, setPilotSetting } from "./record-store";
 import { playScanSuccessSound } from "./scanner-sound";
+
+const nativeFormats = ["ean_8", "ean_13", "upc_a", "code_128", "code_39"];
 
 vi.mock("./record-store", () => ({
   getPilotSetting: vi.fn(),
@@ -16,11 +18,11 @@ vi.mock("./scanner-sound", () => ({
   playScanSuccessSound: vi.fn(),
 }));
 
-function ScannerHarness() {
+function ScannerHarness({ onScan = vi.fn() }: { onScan?: (code: string) => void }) {
   const [open, setOpen] = useState(true);
   return <>
     <button type="button" onClick={() => setOpen(true)}>Mở lại máy quét</button>
-    <BarcodeScannerDialog open={open} onOpenChange={setOpen} onScan={vi.fn()} />
+    <BarcodeScannerDialog open={open} onOpenChange={setOpen} onScan={onScan} />
   </>;
 }
 
@@ -251,6 +253,134 @@ describe("BarcodeScannerDialog", () => {
     await waitFor(() => expect(BrowserMultiFormatReader.prototype.decodeContinuously).toHaveBeenCalled());
   });
 
+  it("switches from repeatedly failing native detection to ZXing on the same video", async () => {
+    const frames: FrameRequestCallback[] = [];
+    const detect = vi.fn().mockRejectedValue(new Error("Cannot detect this video frame"));
+    class FailingDetector {
+      static getSupportedFormats = vi.fn().mockResolvedValue(nativeFormats);
+      detect = detect;
+    }
+    vi.stubGlobal("BarcodeDetector", FailingDetector);
+    vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockReturnValue(HTMLMediaElement.HAVE_CURRENT_DATA);
+    vi.stubGlobal("requestAnimationFrame", vi.fn((callback: FrameRequestCallback) => frames.push(callback)));
+    vi.stubGlobal("cancelAnimationFrame", vi.fn());
+    const onScan = vi.fn();
+    const decode = vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously);
+    decode.mockImplementation((_video, callback) => callback({ getText: () => "2912345612345" } as Result, undefined));
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={onScan} />);
+    await waitFor(() => expect(frames).toHaveLength(1));
+    for (const time of [100, 200, 300]) {
+      await act(async () => { await frames.shift()?.(time); });
+    }
+    await waitFor(() => expect(decode).toHaveBeenCalledTimes(1));
+    expect(decode).toHaveBeenCalledWith(screen.getByLabelText("Camera preview"), expect.any(Function));
+    expect(frames).toHaveLength(0);
+    expect(detect).toHaveBeenCalledTimes(3);
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onScan).toHaveBeenCalledWith("2912345612345"), { timeout: 1_500 });
+    expect(onScan).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps native decoding after ordinary misses and isolated frame errors", async () => {
+    const frames: FrameRequestCallback[] = [];
+    const detect = vi.fn()
+      .mockRejectedValueOnce(new Error("frame"))
+      .mockRejectedValueOnce(new Error("frame"))
+      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error("frame"))
+      .mockRejectedValueOnce(new Error("frame"));
+    class IntermittentDetector {
+      static getSupportedFormats = vi.fn().mockResolvedValue(nativeFormats);
+      detect = detect;
+    }
+    vi.stubGlobal("BarcodeDetector", IntermittentDetector);
+    vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockReturnValue(HTMLMediaElement.HAVE_CURRENT_DATA);
+    vi.stubGlobal("requestAnimationFrame", vi.fn((callback: FrameRequestCallback) => frames.push(callback)));
+    vi.stubGlobal("cancelAnimationFrame", vi.fn());
+    const onScan = vi.fn();
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={onScan} />);
+    await waitFor(() => expect(frames).toHaveLength(1));
+    for (const time of [100, 200, 300, 400, 500]) {
+      await act(async () => { await frames.shift()?.(time); });
+    }
+    expect(detect).toHaveBeenCalledTimes(5);
+    expect(frames).toHaveLength(1);
+    expect(BrowserMultiFormatReader.prototype.decodeContinuously).not.toHaveBeenCalled();
+    expect(onScan).not.toHaveBeenCalled();
+  });
+
+  it("offers manual entry if both native detection and the fallback fail", async () => {
+    class UnsupportedDetector {
+      static getSupportedFormats = vi.fn().mockResolvedValue(["qr_code"]);
+    }
+    vi.stubGlobal("BarcodeDetector", UnsupportedDetector);
+    vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously).mockImplementation(() => { throw new Error("decoder startup"); });
+    const onScan = vi.fn();
+    const onOpenChange = vi.fn();
+    render(<BarcodeScannerDialog open onOpenChange={onOpenChange} onScan={onScan} />);
+    expect(await screen.findByText("Không thể dùng máy ảnh")).toBeVisible();
+    expect(mockTrack.stop).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Nhập mã thủ công" }));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(onScan).not.toHaveBeenCalled();
+  });
+
+  it("uses the full ZXing format set when native support is incomplete", async () => {
+    class PartialDetector {
+      static getSupportedFormats = vi.fn().mockResolvedValue(["ean_13", "ean_8", "upc_a"]);
+      detect = vi.fn();
+    }
+    vi.stubGlobal("BarcodeDetector", PartialDetector);
+    const setHints = vi.spyOn(MultiFormatReader.prototype, "setHints");
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    await waitFor(() => expect(BrowserMultiFormatReader.prototype.decodeContinuously).toHaveBeenCalledTimes(1));
+    const hints = setHints.mock.calls[0]![0]!;
+    expect(hints.get(DecodeHintType.POSSIBLE_FORMATS)).toEqual([BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.CODE_128, BarcodeFormat.CODE_39]);
+    expect(hints.get(DecodeHintType.TRY_HARDER)).toBe(true);
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+  });
+
+  it("handles 20 consecutive scans with one callback per code and ignores old sessions", async () => {
+    const onScan = vi.fn();
+    const feedback: Array<() => void> = [];
+    const originalSetTimeout = window.setTimeout.bind(window);
+    vi.spyOn(window, "setTimeout").mockImplementation(((handler: TimerHandler, timeout?: number) => {
+      if (timeout === 450 && typeof handler === "function") {
+        feedback.push(() => handler());
+        return 999;
+      }
+      return originalSetTimeout(handler, timeout);
+    }) as typeof window.setTimeout);
+    const decode = vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously);
+    const view = render(<ScannerHarness onScan={onScan} />);
+    await waitFor(() => expect(decode).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("switch", { name: /Giữ camera trong phiên/i }));
+    for (let index = 0; index < 20; index++) {
+      if (index > 0) {
+        fireEvent.click(screen.getByRole("button", { name: "Mở lại máy quét" }));
+        await waitFor(() => expect(decode).toHaveBeenCalledTimes(index + 1));
+        act(() => decode.mock.calls[index - 1]![1]({ getText: () => "STALE" } as Result, undefined));
+        expect(feedback).toHaveLength(0);
+      }
+      const result = { getText: () => `000${index}` } as Result;
+      act(() => {
+        decode.mock.calls[index]![1](result, undefined);
+        decode.mock.calls[index]![1](result, undefined);
+      });
+      expect(feedback).toHaveLength(1);
+      act(() => feedback.shift()?.());
+      expect(onScan).toHaveBeenNthCalledWith(index + 1, `000${index}`);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(mockTrack.enabled).toBe(false);
+    }
+    expect(onScan).toHaveBeenCalledTimes(20);
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+    expect(mockTrack.stop).not.toHaveBeenCalled();
+    view.unmount();
+    expect(mockTrack.stop).toHaveBeenCalledTimes(1);
+  });
+
   it("does not publish a queued result after the scan dialog has closed", async () => {
     const handleScan = vi.fn();
     const frameCallbacks: FrameRequestCallback[] = [];
@@ -264,7 +394,7 @@ describe("BarcodeScannerDialog", () => {
       return originalSetTimeout(handler, timeout);
     }) as typeof window.setTimeout);
     class TestBarcodeDetector {
-      static getSupportedFormats = vi.fn().mockResolvedValue(["ean_13"]);
+      static getSupportedFormats = vi.fn().mockResolvedValue(nativeFormats);
       detect = vi.fn().mockResolvedValue([{ rawValue: "OLD-0001" }]);
     }
     vi.stubGlobal("BarcodeDetector", TestBarcodeDetector);
@@ -300,7 +430,7 @@ describe("BarcodeScannerDialog", () => {
     });
     let detectorIndex = 0;
     class TestBarcodeDetector {
-      static getSupportedFormats = vi.fn().mockResolvedValue(["ean_13"]);
+      static getSupportedFormats = vi.fn().mockResolvedValue(nativeFormats);
       private readonly index = detectorIndex++;
       detect = vi.fn(() => this.index === 0
         ? oldDetection

@@ -49,6 +49,7 @@ interface BarcodeDetectorConstructor {
 const NATIVE_BARCODE_FORMATS = ["ean_8", "ean_13", "upc_a", "code_128", "code_39"] as const;
 const SCAN_INTERVAL_MS = 100;
 const SUCCESS_FEEDBACK_MS = 450;
+const NATIVE_FAILURE_LIMIT = 3;
 const SCANNER_PREFERENCES_KEY = "scanner-preferences";
 
 type ScannerPreferences = {
@@ -252,6 +253,39 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       return;
     }
 
+    function failScan(err: unknown) {
+      if (scanSession !== scanSessionRef.current) return;
+      stopStream();
+      setStatus("error");
+      const name = err instanceof Error ? err.name : "";
+      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+        setErrorMessage("Quyền truy cập máy ảnh bị từ chối. Vui lòng cho phép quyền Camera trong cài đặt trình duyệt hoặc nhập mã thủ công.");
+      } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+        setErrorMessage("Không tìm thấy máy ảnh trên thiết bị này. Vui lòng nhập mã thủ công.");
+      } else if (name === "NotReadableError" || name === "TrackStartError") {
+        setErrorMessage("Máy ảnh đang được ứng dụng khác sử dụng hoặc không sẵn sàng.");
+      } else {
+        setErrorMessage("Không thể khởi động máy ảnh. Vui lòng thử lại hoặc nhập mã thủ công.");
+      }
+    }
+
+    async function startFallback() {
+      const { BarcodeFormat, BrowserMultiFormatReader: Reader, DecodeHintType } = await import("@zxing/library");
+      if (scanSession !== scanSessionRef.current || !isScanningRef.current || !videoRef.current) return;
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.CODE_128, BarcodeFormat.CODE_39]);
+      hints.set(DecodeHintType.TRY_HARDER, true);
+      const reader = new Reader(hints, SCAN_INTERVAL_MS);
+      // Constructor delay paces successes only; misses otherwise retry at 0 ms.
+      reader.timeBetweenDecodingAttempts = SCAN_INTERVAL_MS;
+      zxingReaderRef.current = reader;
+      // Reuse the already-playing inline video; WebKit may not emit a second
+      // `playing` event if decodeFromVideoElementContinuously reinitializes it.
+      reader.decodeContinuously(videoRef.current, (result: Result | null | undefined, _err: Exception | null | undefined) => {
+        if (result && isScanningRef.current) handleScanSuccess(result.getText(), scanSession);
+      });
+    }
+
     try {
       const constraints: MediaStreamConstraints = {
         audio: false,
@@ -274,14 +308,11 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       // Camera enumeration is optional; never hold playback/decoding behind it.
       try {
         void navigator.mediaDevices.enumerateDevices?.().then((devices) => {
-        if (scanSession !== scanSessionRef.current) return;
-        const videoDevices = devices
-          .filter((d) => d.kind === "videoinput")
-          .map((d, index) => ({
-            deviceId: d.deviceId,
-            label: d.label || `Camera ${index + 1}`,
-          }));
-        setCameras(videoDevices);
+          if (scanSession !== scanSessionRef.current) return;
+          const videoDevices = devices
+            .filter((d) => d.kind === "videoinput")
+            .map((d, index) => ({ deviceId: d.deviceId, label: d.label || `Camera ${index + 1}` }));
+          setCameras(videoDevices);
         }).catch(() => undefined);
       } catch { /* Optional enumeration must not prevent scanning. */ }
       if (scanSession !== scanSessionRef.current) return;
@@ -313,10 +344,13 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
           const supportedFormats = await detectorClass.getSupportedFormats();
           if (scanSession !== scanSessionRef.current) return;
           const targetFormats = NATIVE_BARCODE_FORMATS.filter((format) => supportedFormats.includes(format));
-          if (!targetFormats.length) throw new Error("Native barcode formats are unsupported");
+          // A partial native engine would silently miss the other accepted
+          // formats forever. ZXing supports the full set on the same video.
+          if (targetFormats.length !== NATIVE_BARCODE_FORMATS.length) throw new Error("Native barcode formats are incomplete");
           const detector = new detectorClass({ formats: [...targetFormats] });
 
           let lastDetectTime = 0;
+          let consecutiveFailures = 0;
           const detectLoop = async (time: number) => {
             if (scanSession !== scanSessionRef.current || !isScanningRef.current || !videoRef.current) return;
 
@@ -325,12 +359,19 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
               try {
                 const barcodes = await detector.detect(videoRef.current);
                 if (scanSession !== scanSessionRef.current) return;
+                consecutiveFailures = 0;
                 if (barcodes && barcodes.length > 0 && barcodes[0]?.rawValue) {
                   handleScanSuccess(barcodes[0].rawValue, scanSession);
                   return;
                 }
               } catch {
-                // Ignore detection frame error
+                if (scanSession !== scanSessionRef.current || !isScanningRef.current) return;
+                if (++consecutiveFailures >= NATIVE_FAILURE_LIMIT) {
+                  // A native engine can initialize successfully yet reject every
+                  // video frame. Switch once, reusing the same camera session.
+                  try { await startFallback(); } catch (error) { failScan(error); }
+                  return;
+                }
               }
             }
 
@@ -347,60 +388,9 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       }
       if (scanSession !== scanSessionRef.current) return;
 
-      // ZXing fallback engine
-      const {
-        BarcodeFormat,
-        BrowserMultiFormatReader: BrowserMultiFormatReaderConstructor,
-        DecodeHintType,
-      } = await import("@zxing/library");
-      if (scanSession !== scanSessionRef.current) return;
-      const hints = new Map();
-      const formats = [
-        BarcodeFormat.EAN_13,
-        BarcodeFormat.EAN_8,
-        BarcodeFormat.UPC_A,
-        BarcodeFormat.CODE_128,
-        BarcodeFormat.CODE_39,
-      ];
-      hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
-      hints.set(DecodeHintType.TRY_HARDER, true);
-
-      const zxingReader = new BrowserMultiFormatReaderConstructor(hints, SCAN_INTERVAL_MS);
-      // The constructor delay only paces successes; misses otherwise retry at 0 ms.
-      zxingReader.timeBetweenDecodingAttempts = SCAN_INTERVAL_MS;
-      zxingReaderRef.current = zxingReader;
-
-      if (videoRef.current) {
-        // The preview is already attached and playing. Calling
-        // decodeFromVideoElementContinuously here re-initializes the video and
-        // waits for another `playing` event, which WebKit may not emit.
-        zxingReader.decodeContinuously(
-          videoRef.current,
-          (result: Result | null | undefined, err: Exception | null | undefined) => {
-            if (result && isScanningRef.current) {
-              handleScanSuccess(result.getText(), scanSession);
-            }
-            if (err && !(err.name === "NotFoundException")) {
-              // Non-fatal frame scan errors can be ignored
-            }
-          }
-        );
-      }
+      await startFallback();
     } catch (err: unknown) {
-      if (scanSession !== scanSessionRef.current) return;
-      stopStream();
-      setStatus("error");
-
-      const error = err as Error;
-      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-        setErrorMessage("Quyền truy cập máy ảnh bị từ chối. Vui lòng cho phép quyền Camera trong cài đặt trình duyệt hoặc nhập mã thủ công.");
-      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
-        setErrorMessage("Không tìm thấy máy ảnh trên thiết bị này. Vui lòng nhập mã thủ công.");
-      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
-        setErrorMessage("Máy ảnh đang được ứng dụng khác sử dụng hoặc không sẵn sàng.");
-      } else {
-        setErrorMessage("Không thể khởi động máy ảnh. Vui lòng thử lại hoặc nhập mã thủ công.");
-      }
+      failScan(err);
     }
   }, [handleScanSuccess, stopDetection, stopStream]);
 

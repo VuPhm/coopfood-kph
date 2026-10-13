@@ -51,6 +51,7 @@ const recordCollator = new Intl.Collator("vi", { numeric: true, sensitivity: "ba
 const pilotPersistenceEnabled = import.meta.env.MODE !== "test";
 const initialRecords = pilotPersistenceEnabled ? [] : DEMO_RECORDS;
 const initialApproval = Object.fromEntries(initialRecords.map(({ approvalStatus, id }) => [id, approvalStatus]));
+const HISTORY_BATCH_SIZE = 50;
 
 function hydrationPhotoUrl(photo: PilotRecord["photos"][number], ownedUrls: Set<string>): DemoPhoto {
   const src = URL.createObjectURL(photo.blob);
@@ -164,6 +165,7 @@ export function App() {
   const [storageHealth, setStorageHealth] = useState<StorageHealth>({ persistent: false, quota: null, usage: null });
   const [storageReady, setStorageReady] = useState(!pilotPersistenceEnabled);
   const [storageError, setStorageError] = useState("");
+  const [historyWindow, setHistoryWindow] = useState({ view: "", limit: HISTORY_BATCH_SIZE });
   const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
     const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
@@ -185,6 +187,10 @@ export function App() {
       return recordSort.direction === "ascending" ? comparison : -comparison;
     });
   }, [activeKind, approvalByRecord, approvalFilter, deletedIds, recordSort, records, trashMode]);
+  const historyView = `${activeKind}|${trashMode}|${approvalFilter}|${recordSort?.key ?? ""}|${recordSort?.direction ?? ""}`;
+  const historyLimit = historyWindow.view === historyView ? historyWindow.limit : HISTORY_BATCH_SIZE;
+  const renderedRecords = useMemo(() => visibleRecords.slice(0, historyLimit), [visibleRecords, historyLimit]);
+  useEffect(() => { setHistoryWindow({ view: historyView, limit: HISTORY_BATCH_SIZE }); }, [historyView]);
   const selectedRecords = useMemo(
     () => records.filter(({ id, kind }) => kind === activeKind && (trashMode ? deletedIds.has(id) : !deletedIds.has(id)) && selected.has(id)),
     [activeKind, deletedIds, records, selected, trashMode],
@@ -343,7 +349,7 @@ export function App() {
       selected.forEach((recordId) => { next[recordId] = "APPROVED"; });
       return next;
     });
-    setRecords((current) => current.map((record) => recordIds.includes(record.id) ? { ...record, approvalStatus: "APPROVED" } : record));
+    setRecords((current) => current.map((record) => selected.has(record.id) ? { ...record, approvalStatus: "APPROVED" } : record));
     setNotice(`Đã duyệt ${recordIds.length} phiếu ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
     setSelected(new Set());
   }
@@ -625,7 +631,7 @@ export function App() {
                 </tr>
               </thead>
               <tbody>{visibleRecords.length > 0
-                ? visibleRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)
+                ? renderedRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)
                 : <tr><td className="empty-history-cell" colSpan={10}>{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</td></tr>}
               </tbody>
             </table>
@@ -633,9 +639,15 @@ export function App() {
 
           <div className="grid gap-3 mobile-history">
             {visibleRecords.length > 0
-              ? visibleRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
+              ? renderedRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
               : <p className="empty-history-card">{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</p>}
           </div>
+          {visibleRecords.length > HISTORY_BATCH_SIZE ? <div className="history-load-more">
+            <p role="status">Đang hiển thị {renderedRecords.length}/{visibleRecords.length} phiếu</p>
+            {renderedRecords.length < visibleRecords.length ? <Button variant="secondary" onClick={() => setHistoryWindow({ view: historyView, limit: Math.min(historyLimit + HISTORY_BATCH_SIZE, visibleRecords.length) })}>
+              Hiển thị thêm {Math.min(HISTORY_BATCH_SIZE, visibleRecords.length - renderedRecords.length)} phiếu
+            </Button> : null}
+          </div> : null}
         </section>
 
         <div className="workspace-side-stack">
@@ -664,7 +676,7 @@ export function App() {
           <div className="action-dialog-icon is-export"><FileSpreadsheet aria-hidden="true" /></div>
           <DialogTitle>Xuất phiếu ra Excel</DialogTitle>
           <DialogDescription id="export-description">
-            File BM-331.CF được dàn ngang, khóa định dạng và giữ tối đa ba ảnh minh chứng theo đúng thứ tự.
+            File BM-331.CF được dàn ngang, có thể chỉnh sửa và giữ tối đa ba ảnh minh chứng theo đúng thứ tự.
           </DialogDescription>
           <dl className="export-summary">
             <div><dt>Loại phiếu</dt><dd>{kindCopy[activeKind].short}</dd></div>
