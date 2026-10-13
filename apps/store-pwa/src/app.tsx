@@ -1,7 +1,7 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
 import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronRight, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, Store, Trash2, UserRound } from "lucide-react";
-import { type KeyboardEvent, type MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, type MouseEvent, memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { assetUrl } from "./asset-url";
 import { formatBusinessDate } from "./business-date";
@@ -10,6 +10,7 @@ import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord 
 import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
 import { EvidenceImageViewer } from "./image-viewer";
+import { useEvidencePhotoUrls } from "./evidence-photo-urls";
 import { loadPilotRecords, patchPilotRecords, recordPilotExport, savePilotRecord, type PilotRecord } from "./record-store";
 import { readStorageHealth, requestPersistentStorage, storageUsageLabel, type StorageHealth } from "./storage-health";
 import { actorIdentity, DEFAULT_STORE_PROFILE, loadPilotStoreProfile, savePilotStoreProfile, storeIdentity, type StoreProfile } from "./store-profile";
@@ -53,13 +54,7 @@ const initialRecords = pilotPersistenceEnabled ? [] : DEMO_RECORDS;
 const initialApproval = Object.fromEntries(initialRecords.map(({ approvalStatus, id }) => [id, approvalStatus]));
 const HISTORY_BATCH_SIZE = 50;
 
-function hydrationPhotoUrl(photo: PilotRecord["photos"][number], ownedUrls: Set<string>): DemoPhoto {
-  const src = URL.createObjectURL(photo.blob);
-  ownedUrls.add(src);
-  return { id: photo.id, src, alt: photo.alt, blob: photo.blob, fileName: photo.fileName };
-}
-
-function hydratePilotRecord(record: PilotRecord, ownedUrls: Set<string>): DemoRecord {
+function hydratePilotRecord(record: PilotRecord): DemoRecord {
   return {
     id: record.id,
     kind: record.kind,
@@ -75,7 +70,7 @@ function hydratePilotRecord(record: PilotRecord, ownedUrls: Set<string>): DemoRe
     resolution: record.resolution,
     treatmentDate: record.treatmentDate,
     approvalStatus: record.approvalStatus,
-    photos: record.photos.map((photo) => hydrationPhotoUrl(photo, ownedUrls)),
+    photos: record.photos.map((photo) => ({ id: photo.id, src: "", alt: photo.alt, blob: photo.blob, fileName: photo.fileName })),
     note: record.note,
     createdAt: record.createdAt,
     lastExportedAt: record.lastExportedAt,
@@ -166,7 +161,6 @@ export function App() {
   const [storageReady, setStorageReady] = useState(!pilotPersistenceEnabled);
   const [storageError, setStorageError] = useState("");
   const [historyWindow, setHistoryWindow] = useState({ view: "", limit: HISTORY_BATCH_SIZE });
-  const ownedPhotoUrls = useRef(new Set<string>());
   const visibleRecords = useMemo(() => {
     const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
       const currentApproval = approvalByRecord[id] ?? approvalStatus;
@@ -204,11 +198,6 @@ export function App() {
     if (storeProfile.storeCode) startStoreUsageTracking(storeProfile.storeCode);
   }, [storeProfile.storeCode]);
 
-  useEffect(() => () => {
-    ownedPhotoUrls.current.forEach((url) => URL.revokeObjectURL(url));
-    ownedPhotoUrls.current.clear();
-  }, []);
-
   useEffect(() => {
     if (!notice) return;
     const timeoutId = window.setTimeout(() => setNotice(""), 15_000);
@@ -223,7 +212,7 @@ export function App() {
       try {
         const [storedRecords, storedProfile] = await Promise.all([loadPilotRecords(), loadPilotStoreProfile()]);
         if (cancelled) return;
-        const hydrated = storedRecords.map((record) => hydratePilotRecord(record, ownedPhotoUrls.current));
+        const hydrated = storedRecords.map(hydratePilotRecord);
         setRecords(hydrated);
         setApprovalByRecord(Object.fromEntries(storedRecords.map(({ approvalStatus, id }) => [id, approvalStatus])));
         setDeletedIds(new Set(storedRecords.filter(({ trashState }) => trashState === "trash").map(({ id }) => id)));
@@ -420,11 +409,9 @@ export function App() {
     const dateDigits = draft.detectedDate.split("/").reverse().join("").slice(2);
     const uuid = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
     const id = `KPH-${dateDigits}-${uuid.replaceAll("-", "").slice(0, 6).toUpperCase()}`;
-    const photos = draft.photos.map(({ id: photoId, fileName, blob }) => {
-      const src = URL.createObjectURL(blob);
-      ownedPhotoUrls.current.add(src);
-      return { id: photoId, src, alt: `Ảnh minh chứng ${fileName} đã đóng tem`, blob, fileName };
-    });
+    const photos = draft.photos.map(({ id: photoId, fileName, blob }) => ({
+      id: photoId, src: "", alt: `Ảnh minh chứng ${fileName} đã đóng tem`, blob, fileName,
+    }));
     const record: DemoRecord = {
       id,
       kind: draft.kind,
@@ -450,10 +437,6 @@ export function App() {
         await savePilotRecord(record);
       }
     } catch (error) {
-      photos.forEach(({ src }) => {
-        URL.revokeObjectURL(src);
-        ownedPhotoUrls.current.delete(src);
-      });
       throw error instanceof Error ? error : new Error("Không thể lưu phiếu trên thiết bị");
     }
     setRecords((current) => [record, ...current]);
@@ -924,12 +907,13 @@ function RecordHistoryActionButton({ onDelete, onRestore, recordId, trashMode }:
 
 function RecordPhotoGallery({ photos, recordId, variant }: { photos: readonly DemoPhoto[]; recordId: string; variant: "table" | "card" }) {
   const [activePhoto, setActivePhoto] = useState<DemoPhoto | null>(null);
+  const displayPhotos = useEvidencePhotoUrls(photos);
   return (
     <>
       <div className={cn("record-photo-gallery", variant === "table" ? "is-table" : "is-card")} aria-label={`${photos.length} ảnh minh chứng của phiếu ${recordId}`}>
-        {photos.map((photo, index) => (
-          <button key={photo.id} type="button" className="record-photo-button" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1} của phiếu ${recordId}`}>
-            <img src={photo.src} alt="" loading="lazy" decoding="async" />
+        {displayPhotos.map((photo, index) => (
+          <button key={photo.id} type="button" className="record-photo-button" disabled={!photo.src} onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1} của phiếu ${recordId}`}>
+            {photo.src ? <img src={photo.src} alt="" loading="lazy" decoding="async" /> : null}
             {variant === "card" ? <span>{index + 1}</span> : null}
           </button>
         ))}

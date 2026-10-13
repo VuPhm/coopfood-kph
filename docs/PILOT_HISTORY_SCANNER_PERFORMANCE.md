@@ -67,4 +67,5 @@ Không reset dữ liệu hoặc đổi DB version, API, backend, dependency hay 
 Ảnh của toàn bộ lịch sử vẫn hydrate vào bộ nhớ; giảm DOM và lazy thumbnail chưa
 giải quyết toàn bộ áp lực bộ nhớ khi lịch sử có rất nhiều ảnh. Bước kiểm tiếp theo:
 thử mã thực bị báo lỗi trên điện thoại đó và đo phiên thêm/quét liên tục với ảnh.
-Hai round chỉ commit local, chưa push/deploy.
+Hai round ban đầu chỉ commit local. Ngày 13/10/2026 người dùng cho phép ship
+cùng [round 3 kiểm ảnh](PILOT_PHOTO_PERFORMANCE_ROUND3.md) sau khi verification pass.

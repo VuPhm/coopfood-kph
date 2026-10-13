@@ -62,7 +62,11 @@ async function loadDrawable(file: File): Promise<DrawableImage> {
       source: image,
       width: image.naturalWidth,
       height: image.naturalHeight,
-      dispose: () => URL.revokeObjectURL(url),
+      dispose: () => {
+        image.onload = image.onerror = null;
+        image.removeAttribute("src");
+        URL.revokeObjectURL(url);
+      },
     });
     image.onerror = () => {
       URL.revokeObjectURL(url);
@@ -99,21 +103,34 @@ function canvasBlob(canvas: HTMLCanvasElement, quality: number) {
 
 async function compress(canvas: HTMLCanvasElement) {
   let workingCanvas = canvas;
-  let blob = await canvasBlob(workingCanvas, 0.8);
-  for (let pass = 0; pass < 4; pass += 1) {
-    for (const quality of [0.72, 0.64, 0.56]) {
-      if (blob.size <= EVIDENCE_TARGET_BYTES) return { blob, canvas: workingCanvas };
-      blob = await canvasBlob(workingCanvas, quality);
+  const output = (blob: Blob) => ({ blob, width: workingCanvas.width, height: workingCanvas.height });
+  try {
+    let blob = await canvasBlob(workingCanvas, 0.8);
+    for (let pass = 0; pass < 4; pass += 1) {
+      for (const quality of [0.72, 0.64, 0.56]) {
+        if (blob.size <= EVIDENCE_TARGET_BYTES) return output(blob);
+        blob = await canvasBlob(workingCanvas, quality);
+      }
+      if (blob.size <= EVIDENCE_TARGET_BYTES || Math.max(workingCanvas.width, workingCanvas.height) <= 720) break;
+      const resized = document.createElement("canvas");
+      resized.width = Math.max(1, Math.round(workingCanvas.width * 0.8));
+      resized.height = Math.max(1, Math.round(workingCanvas.height * 0.8));
+      try {
+        const context = resized.getContext("2d");
+        if (!context) throw new Error("Thiết bị không hỗ trợ xử lý ảnh minh chứng.");
+        context.drawImage(workingCanvas, 0, 0, resized.width, resized.height);
+      } catch (error) {
+        resized.width = resized.height = 0;
+        throw error;
+      }
+      workingCanvas.width = workingCanvas.height = 0;
+      workingCanvas = resized;
+      blob = await canvasBlob(workingCanvas, 0.8);
     }
-    if (blob.size <= EVIDENCE_TARGET_BYTES || Math.max(workingCanvas.width, workingCanvas.height) <= 720) break;
-    const resized = document.createElement("canvas");
-    resized.width = Math.max(1, Math.round(workingCanvas.width * 0.8));
-    resized.height = Math.max(1, Math.round(workingCanvas.height * 0.8));
-    resized.getContext("2d")?.drawImage(workingCanvas, 0, 0, resized.width, resized.height);
-    workingCanvas = resized;
-    blob = await canvasBlob(workingCanvas, 0.8);
+    return output(blob);
+  } finally {
+    if (workingCanvas !== canvas) workingCanvas.width = workingCanvas.height = 0;
   }
-  return { blob, canvas: workingCanvas };
 }
 
 function dateParts(date: Date) {
@@ -201,23 +218,29 @@ function drawStamp(context: CanvasRenderingContext2D, source: CanvasImageSource,
 
 export async function processEvidencePhoto(file: File, store: StoreStamp, controlledNow = new Date()): Promise<ProcessedEvidencePhoto> {
   const [drawable, capturedAt] = await Promise.all([loadDrawable(file), captureDate(file, controlledNow)]);
+  const canvas = document.createElement("canvas");
   try {
-    if (!drawable.width || !drawable.height) throw new Error("Ảnh minh chứng không có kích thước hợp lệ.");
-    const dimensions = evidenceDimensions(drawable.width, drawable.height);
-    const canvas = document.createElement("canvas");
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("Thiết bị không hỗ trợ xử lý ảnh minh chứng.");
-    context.fillStyle = "#fff";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = "high";
-    context.drawImage(drawable.source, 0, 0, canvas.width, canvas.height);
-    drawStamp(context, drawable.source, canvas.width, canvas.height, capturedAt, store);
+    try {
+      if (!drawable.width || !drawable.height) throw new Error("Ảnh minh chứng không có kích thước hợp lệ.");
+      const dimensions = evidenceDimensions(drawable.width, drawable.height);
+      canvas.width = dimensions.width;
+      canvas.height = dimensions.height;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Thiết bị không hỗ trợ xử lý ảnh minh chứng.");
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high";
+      context.drawImage(drawable.source, 0, 0, canvas.width, canvas.height);
+      drawStamp(context, drawable.source, canvas.width, canvas.height, capturedAt, store);
+    } finally {
+      // JPEG compression only needs the stamped, resized canvas, not a full
+      // camera bitmap (or Safari's decoded <img>) held across every encode pass.
+      drawable.dispose();
+    }
     const compressed = await compress(canvas);
-    return { blob: compressed.blob, capturedAt, width: compressed.canvas.width, height: compressed.canvas.height };
+    return { ...compressed, capturedAt };
   } finally {
-    drawable.dispose();
+    canvas.width = canvas.height = 0;
   }
 }
