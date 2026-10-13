@@ -62,6 +62,30 @@ describe("Create KPH record", () => {
     expect(within(resolution).queryByRole("radio", { name: "ĐỔI" })).not.toBeInTheDocument();
   });
 
+  it("keeps the draft and stamped photo after a storage failure, allowing a save retry", async () => {
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:retry-photo") });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
+    const stampedBlob = new Blob(["stamped"], { type: "image/jpeg" });
+    vi.mocked(processEvidencePhoto).mockResolvedValue({ blob: stampedBlob, capturedAt: new Date(), width: 1280, height: 720 });
+    const onSaved = vi.fn<(draft: CreatedRecordDraft) => void>().mockImplementationOnce(() => {
+      throw new Error("Error preparing Blob/File data to be stored in object store");
+    });
+    renderDialog("TPCN", onSaved);
+    fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Nhân viên thử nghiệm" } });
+    const picker = screen.getByText("Chọn ảnh").closest("label")!.querySelector("input")!;
+    fireEvent.change(picker, { target: { files: [new File(["original"], "test.jpg", { type: "image/jpeg" })] } });
+    await screen.findByText(/Đã xử lý 1\/3 ảnh/);
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Error preparing Blob/File data");
+    expect(screen.getByRole("textbox", { name: "Mã SKU / UPC" })).toHaveValue("000123");
+    expect(screen.getByRole("button", { name: "Xem ảnh minh chứng 1" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(2));
+    expect(onSaved.mock.calls[1]![0].photos[0]!.blob).toBe(stampedBlob);
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Xem ảnh minh chứng 1" })).not.toBeInTheDocument());
+  });
+
   it.each([
     ["2912345612345", "1.234"],
     ["2912345602505", "0.25"],

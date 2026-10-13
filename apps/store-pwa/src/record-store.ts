@@ -53,10 +53,15 @@ type PilotSetting = {
   updatedAt: string;
 };
 
+// The storage codec accepts legacy Blobs, but writes bytes to avoid WebKit's
+// Blob/File temporary-file failure. Public/UI records still expose Blobs.
+type StoredPhoto = Omit<PilotPhoto, "blob"> & { blob: Blob | ArrayBuffer };
+type StoredRecord = Omit<PilotRecord, "photos"> & { photos: StoredPhoto[] };
+
 interface PilotDatabase extends DBSchema {
   records: {
     key: string;
-    value: PilotRecord;
+    value: StoredRecord;
     indexes: {
       "by-detected-date": string;
       "by-kind": KphKind;
@@ -117,7 +122,7 @@ function persistablePhoto(recordId: string, photo: DemoRecord["photos"][number],
   };
 }
 
-export function toPilotRecord(record: DemoRecord, trashState: "active" | "trash", previous?: PilotRecord): PilotRecord {
+export function toPilotRecord(record: DemoRecord, trashState: "active" | "trash", previous?: StoredRecord): PilotRecord {
   const now = new Date().toISOString();
   return {
     id: record.id,
@@ -144,9 +149,69 @@ export function toPilotRecord(record: DemoRecord, trashState: "active" | "trash"
   };
 }
 
+function photoBytes(blob: Blob): Promise<ArrayBuffer> {
+  if (typeof blob.arrayBuffer === "function") return blob.arrayBuffer();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.onerror = () => reject(reader.error ?? new Error("Không thể đọc dữ liệu ảnh để lưu"));
+    reader.onabort = () => reject(new Error("Đọc dữ liệu ảnh bị gián đoạn"));
+    reader.readAsArrayBuffer(blob);
+  });
+}
+
+async function storedPhotos(photos: readonly StoredPhoto[]): Promise<StoredPhoto[]> {
+  return Promise.all(photos.map(async (photo) => {
+    const blob = photo.blob instanceof Blob ? await photoBytes(photo.blob) : photo.blob;
+    if (blob.byteLength !== photo.size) throw new Error("Không thể đọc đầy đủ dữ liệu ảnh để lưu");
+    return { ...photo, blob };
+  }));
+}
+
+function readableRecord(record: StoredRecord): PilotRecord {
+  return {
+    ...record,
+    photos: record.photos.map((photo) => ({
+      ...photo,
+      blob: photo.blob instanceof Blob ? photo.blob : new Blob([photo.blob], { type: photo.mimeType }),
+    })),
+  };
+}
+
+async function preparePhotoWrites(recordIds: readonly string[]) {
+  const db = await database();
+  const prepared = new Map<string, StoredPhoto[]>();
+  // File reads must finish before starting a write transaction (Safari can
+  // auto-close transactions while non-IDB asynchronous work is pending).
+  for (const id of recordIds) {
+    const record = await db.get("records", id);
+    if (record) prepared.set(id, await storedPhotos(record.photos));
+  }
+  return prepared;
+}
+
+function photosForWrite(current: StoredRecord, prepared: ReadonlyMap<string, StoredPhoto[]>): StoredPhoto[] {
+  if (current.photos.every(({ blob }) => !(blob instanceof Blob))) return current.photos;
+  const photos = prepared.get(current.id);
+  if (!photos || photos.length !== current.photos.length || photos.some((photo, index) => {
+    const latest = current.photos[index];
+    return !latest || photo.id !== latest.id || photo.size !== latest.size || photo.mimeType !== latest.mimeType;
+  })) {
+    throw new Error("Ảnh của phiếu vừa thay đổi. Vui lòng thử lại thao tác.");
+  }
+  return current.photos.map((photo, index) => ({ ...photo, blob: photos[index]!.blob }));
+}
+
 export async function loadPilotRecords() {
   const db = await database();
-  const records = await db.getAll("records");
+  const records: PilotRecord[] = [];
+  // Decode one record at a time instead of retaining every raw image buffer
+  // alongside its restored Blob while hydrating a large history.
+  let cursor = await db.transaction("records").store.openCursor();
+  while (cursor) {
+    records.push(readableRecord(cursor.value));
+    cursor = await cursor.continue();
+  }
   return records.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 }
 
@@ -154,7 +219,8 @@ export async function savePilotRecord(record: DemoRecord, trashState: "active" |
   const db = await database();
   const previous = await db.get("records", record.id);
   const stored = toPilotRecord(record, trashState, previous);
-  await db.put("records", stored);
+  const photos = await storedPhotos(stored.photos);
+  await db.put("records", { ...stored, photos });
   return stored;
 }
 
@@ -163,19 +229,29 @@ export async function patchPilotRecords(
   patch: Partial<Pick<PilotRecord, "approvalStatus" | "deletedAt" | "lastExportedAt" | "trashState">>,
 ) {
   const db = await database();
+  const photos = await preparePhotoWrites(recordIds);
   const transaction = db.transaction("records", "readwrite");
+  void transaction.done.catch(() => {});
   const now = new Date().toISOString();
-  for (const recordId of recordIds) {
-    const current = await transaction.store.get(recordId);
-    if (!current) continue;
-    await transaction.store.put({ ...current, ...patch, updatedAt: now });
+  try {
+    for (const recordId of recordIds) {
+      const current = await transaction.store.get(recordId);
+      if (!current) continue;
+      await transaction.store.put({ ...current, ...patch, photos: photosForWrite(current, photos), updatedAt: now });
+    }
+    await transaction.done;
+  } catch (error) {
+    try { transaction.abort(); } catch { /* Already aborted/finished. */ }
+    await transaction.done.catch(() => {});
+    throw error;
   }
-  await transaction.done;
 }
 
 export async function recordPilotExport(kind: KphKind, records: readonly DemoRecord[], fileName: string) {
   const db = await database();
+  const photos = await preparePhotoWrites(records.map(({ id }) => id));
   const transaction = db.transaction(["export_runs", "records"], "readwrite");
+  void transaction.done.catch(() => {});
   const createdAt = new Date().toISOString();
   const run: PilotExportRun = {
     id: globalThis.crypto?.randomUUID?.() ?? `export-${Date.now()}`,
@@ -185,12 +261,18 @@ export async function recordPilotExport(kind: KphKind, records: readonly DemoRec
     createdAt,
     templateVersion: "BM-331.CF-01",
   };
-  await transaction.objectStore("export_runs").put(run);
-  for (const record of records) {
-    const current = await transaction.objectStore("records").get(record.id);
-    if (current) await transaction.objectStore("records").put({ ...current, lastExportedAt: createdAt, updatedAt: createdAt });
+  try {
+    await transaction.objectStore("export_runs").put(run);
+    for (const record of records) {
+      const current = await transaction.objectStore("records").get(record.id);
+      if (current) await transaction.objectStore("records").put({ ...current, photos: photosForWrite(current, photos), lastExportedAt: createdAt, updatedAt: createdAt });
+    }
+    await transaction.done;
+  } catch (error) {
+    try { transaction.abort(); } catch { /* Already aborted/finished. */ }
+    await transaction.done.catch(() => {});
+    throw error;
   }
-  await transaction.done;
   return run;
 }
 
