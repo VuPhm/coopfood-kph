@@ -217,6 +217,40 @@ describe("BarcodeScannerDialog", () => {
     expect(video.getAttribute("webkit-playsinline")).toBe("true");
   });
 
+  it("paces unsuccessful ZXing attempts and stops decoding as soon as a code is accepted", async () => {
+    const decode = vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously);
+    const stop = vi.spyOn(BrowserMultiFormatReader.prototype, "stopContinuousDecode");
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    await waitFor(() => expect(decode).toHaveBeenCalled());
+    const reader = decode.mock.contexts[0] as BrowserMultiFormatReader;
+    expect(reader.timeBetweenDecodingAttempts).toBe(100);
+    act(() => decode.mock.calls[0]![1]({ getText: () => "0012345678901" } as Result, undefined));
+    expect(stop).toHaveBeenCalled();
+  });
+
+  it("keeps an active scan through parent rerenders and publishes through the latest callbacks", async () => {
+    const decode = vi.mocked(BrowserMultiFormatReader.prototype.decodeContinuously);
+    const oldScan = vi.fn();
+    const latestScan = vi.fn();
+    const latestClose = vi.fn();
+    const view = render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={oldScan} />);
+    await waitFor(() => expect(decode).toHaveBeenCalledTimes(1));
+    view.rerender(<BarcodeScannerDialog open onOpenChange={latestClose} onScan={latestScan} />);
+    await act(async () => {});
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+    expect(decode).toHaveBeenCalledTimes(1);
+    act(() => decode.mock.calls[0]![1]({ getText: () => "00012345" } as Result, undefined));
+    await waitFor(() => expect(latestScan).toHaveBeenCalledWith("00012345"), { timeout: 1_500 });
+    expect(oldScan).not.toHaveBeenCalled();
+    expect(latestClose).toHaveBeenCalledWith(false);
+  });
+
+  it("does not wait for camera enumeration before decoding", async () => {
+    navigator.mediaDevices.enumerateDevices = vi.fn(() => new Promise<MediaDeviceInfo[]>(() => {}));
+    render(<BarcodeScannerDialog open onOpenChange={vi.fn()} onScan={vi.fn()} />);
+    await waitFor(() => expect(BrowserMultiFormatReader.prototype.decodeContinuously).toHaveBeenCalled());
+  });
+
   it("does not publish a queued result after the scan dialog has closed", async () => {
     const handleScan = vi.fn();
     const frameCallbacks: FrameRequestCallback[] = [];

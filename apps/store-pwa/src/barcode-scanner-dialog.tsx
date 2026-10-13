@@ -19,7 +19,7 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 import { getPilotSetting, setPilotSetting } from "./record-store";
 import { playScanSuccessSound } from "./scanner-sound";
@@ -84,6 +84,11 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
   const soundEnabledRef = useRef(DEFAULT_SCANNER_PREFERENCES.soundEnabled);
   const preferencesTouchedRef = useRef(false);
   const currentDeviceIdRef = useRef("");
+  const callbacksRef = useRef({ onOpenChange, onScan });
+
+  useLayoutEffect(() => {
+    callbacksRef.current = { onOpenChange, onScan };
+  }, [onOpenChange, onScan]);
 
   const [status, setStatus] = useState<ScannerStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -189,6 +194,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
     const trimmed = code.trim();
     if (!trimmed || scanSession !== scanSessionRef.current || !isScanningRef.current) return;
     isScanningRef.current = false;
+    zxingReaderRef.current?.stopContinuousDecode();
 
     setScannedCode(trimmed);
     setStatus("success");
@@ -209,10 +215,10 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       if (scanSession !== scanSessionRef.current) return;
       if (keepCameraReadyRef.current) parkStream();
       else stopStream();
-      onScan(trimmed);
-      onOpenChange(false);
+      callbacksRef.current.onScan(trimmed);
+      callbacksRef.current.onOpenChange(false);
     }, SUCCESS_FEEDBACK_MS);
-  }, [onOpenChange, onScan, parkStream, stopStream]);
+  }, [parkStream, stopStream]);
 
   const startScanning = useCallback(async (deviceId?: string) => {
     const currentStream = streamRef.current;
@@ -249,13 +255,11 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
     try {
       const constraints: MediaStreamConstraints = {
         audio: false,
-        video: deviceId
-          ? { deviceId: { exact: deviceId } }
-          : {
-              facingMode: { ideal: "environment" },
-              width: { ideal: 1280 },
-              height: { ideal: 720 },
-            },
+        video: {
+          ...(deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } }),
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
       };
 
       const stream = canReuseStream
@@ -267,9 +271,10 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       }
       streamRef.current = stream;
 
-      // Check camera devices
+      // Camera enumeration is optional; never hold playback/decoding behind it.
       try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
+        void navigator.mediaDevices.enumerateDevices?.().then((devices) => {
+        if (scanSession !== scanSessionRef.current) return;
         const videoDevices = devices
           .filter((d) => d.kind === "videoinput")
           .map((d, index) => ({
@@ -277,9 +282,8 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
             label: d.label || `Camera ${index + 1}`,
           }));
         setCameras(videoDevices);
-      } catch {
-        // Enumerate devices not critical
-      }
+        }).catch(() => undefined);
+      } catch { /* Optional enumeration must not prevent scanning. */ }
       if (scanSession !== scanSessionRef.current) return;
 
       // Check torch capability
@@ -362,6 +366,8 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
       hints.set(DecodeHintType.TRY_HARDER, true);
 
       const zxingReader = new BrowserMultiFormatReaderConstructor(hints, SCAN_INTERVAL_MS);
+      // The constructor delay only paces successes; misses otherwise retry at 0 ms.
+      zxingReader.timeBetweenDecodingAttempts = SCAN_INTERVAL_MS;
       zxingReaderRef.current = zxingReader;
 
       if (videoRef.current) {
@@ -454,7 +460,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
             <span>Quét mã SKU / UPC</span>
           </DialogTitle>
           <DialogDescription id={descId} className="text-xs text-white/70">
-            Căn chỉnh mã vạch vào giữa khung quét để tự động nhận dạng.
+            Căn chỉnh mã vạch vào giữa khung quét. Mã sẽ điền vào SKU/UPC; tên hàng hóa và NCC cần nhập tay.
           </DialogDescription>
         </DialogHeader>
 

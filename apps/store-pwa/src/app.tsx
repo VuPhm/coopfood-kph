@@ -1,7 +1,7 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
 import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronRight, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, Store, Trash2, UserRound } from "lucide-react";
-import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, type MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { assetUrl } from "./asset-url";
 import { formatBusinessDate } from "./business-date";
@@ -215,14 +215,13 @@ export function App() {
 
     async function hydrate() {
       try {
-        const [storedRecords, health, storedProfile] = await Promise.all([loadPilotRecords(), readStorageHealth(), loadPilotStoreProfile()]);
+        const [storedRecords, storedProfile] = await Promise.all([loadPilotRecords(), loadPilotStoreProfile()]);
         if (cancelled) return;
         const hydrated = storedRecords.map((record) => hydratePilotRecord(record, ownedPhotoUrls.current));
         setRecords(hydrated);
         setApprovalByRecord(Object.fromEntries(storedRecords.map(({ approvalStatus, id }) => [id, approvalStatus])));
         setDeletedIds(new Set(storedRecords.filter(({ trashState }) => trashState === "trash").map(({ id }) => id)));
         setStoreProfile(storedProfile);
-        setStorageHealth(health);
       } catch (error) {
         if (!cancelled) setStorageError(error instanceof Error ? error.message : "Không thể mở dữ liệu pilot trên thiết bị");
       } finally {
@@ -231,6 +230,7 @@ export function App() {
     }
 
     void hydrate();
+    void readStorageHealth().then((health) => { if (!cancelled) setStorageHealth(health); }).catch(() => undefined);
     const handleStorageFailure = () => setStorageError("Dữ liệu pilot vừa bị gián đoạn. Hãy đóng các cửa sổ app khác rồi tải lại.");
     window.addEventListener("kph-storage-blocked", handleStorageFailure);
     window.addEventListener("kph-storage-version-change", handleStorageFailure);
@@ -256,27 +256,27 @@ export function App() {
     setNotice(`Đã cập nhật ${storeIdentity(profile)}.`);
   }
 
-  function toggleSelection(id: string) {
+  const toggleSelection = useCallback((id: string) => {
     setSelected((current) => {
       const next = new Set(current);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }
+  }, []);
 
   function toggleAllVisible() {
     setSelected(allVisibleSelected ? new Set() : new Set(visibleRecords.map(({ id }) => id)));
   }
 
-  function setMobileRecordExpanded(recordId: string, expanded: boolean) {
+  const setMobileRecordExpanded = useCallback((recordId: string, expanded: boolean) => {
     setExpandedMobileRecords((current) => {
       const next = new Set(current);
       if (expanded) next.add(recordId);
       else next.delete(recordId);
       return next;
     });
-  }
+  }, []);
 
   function toggleAllVisibleExpansion() {
     setExpandedMobileRecords((current) => {
@@ -313,7 +313,7 @@ export function App() {
     });
   }
 
-  async function updateApproval(recordId: string, status: DemoApprovalStatus) {
+  const updateApproval = useCallback(async (recordId: string, status: DemoApprovalStatus) => {
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords([recordId], { approvalStatus: status });
     } catch (error) {
@@ -328,7 +328,7 @@ export function App() {
     });
     setRecords((current) => current.map((record) => record.id === recordId ? { ...record, approvalStatus: status } : record));
     setNotice(`Đã chuyển phiếu ${recordId} sang “${approvalLabels[status]}” ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
-  }
+  }, []);
 
   async function approveSelected() {
     const recordIds = [...selected];
@@ -356,9 +356,9 @@ export function App() {
     setRecordSort(null);
   }
 
-  function requestDelete(recordId: string) {
+  const requestDelete = useCallback((recordId: string) => {
     setDeleteIds([recordId]);
-  }
+  }, []);
 
   function requestDeleteSelected() {
     setDeleteIds(selectedRecords.map(({ id }) => id));
@@ -379,7 +379,7 @@ export function App() {
     setNotice(`Đã chuyển ${targetIds.size} phiếu sang trạng thái đã xoá ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
   }
 
-  async function restoreRecord(recordId: string) {
+  const restoreRecord = useCallback(async (recordId: string) => {
     try {
       if (pilotPersistenceEnabled) await patchPilotRecords([recordId], { trashState: "active", deletedAt: null });
     } catch (error) {
@@ -394,7 +394,7 @@ export function App() {
     setSelected((current) => new Set([...current].filter((id) => id !== recordId)));
     setExpandedMobileRecords((current) => new Set([...current].filter((id) => id !== recordId)));
     setNotice(`Đã khôi phục phiếu ${recordId} ${pilotPersistenceEnabled ? "trên thiết bị này" : "trong dữ liệu demo"}.`);
-  }
+  }, []);
 
   async function restoreSelected() {
     const targetIds = new Set(selectedRecords.map(({ id }) => id));
@@ -442,7 +442,6 @@ export function App() {
     try {
       if (pilotPersistenceEnabled) {
         await savePilotRecord(record);
-        setStorageHealth(await requestPersistentStorage());
       }
     } catch (error) {
       photos.forEach(({ src }) => {
@@ -456,6 +455,9 @@ export function App() {
     setActiveKind(draft.kind);
     setSelected(new Set([id]));
     setNotice(`Đã tạo phiếu ${id} và lưu trên thiết bị này.`);
+    // Storage telemetry must not delay saving or turn an already committed
+    // record into a failed form submission when the browser's quota API is slow.
+    if (pilotPersistenceEnabled) void requestPersistentStorage().then(setStorageHealth).catch(() => undefined);
   }
 
   async function exportSelected() {
@@ -806,7 +808,7 @@ type RecordProps = {
   onToggle: (id: string) => void;
 };
 
-function RecordRow({ approvalStatus, onApprovalChange, onDelete, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
+const RecordRow = memo(function RecordRow({ approvalStatus, onApprovalChange, onDelete, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
     <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
@@ -819,9 +821,9 @@ function RecordRow({ approvalStatus, onApprovalChange, onDelete, onRestore, onTo
     <td className="p-3"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></td>
     <td className="p-3 text-center"><RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} /></td>
   </tr>;
-}
+});
 
-function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDelete, onExpansionChange, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
+const RecordCard = memo(function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDelete, onExpansionChange, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
   function isInteractiveTarget(event: MouseEvent<HTMLElement>) {
     return event.target instanceof HTMLElement && event.target.closest("button, input, select, label") !== null;
   }
@@ -873,7 +875,7 @@ function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDele
       <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} />
     </footer>
   </article>;
-}
+});
 
 function RecordCardStatuses({ approvalStatus, compact = false, onApprovalChange, record }: { approvalStatus: DemoApprovalStatus; compact?: boolean; onApprovalChange: RecordProps["onApprovalChange"]; record: DemoRecord }) {
   return <div className={cn("record-card-statuses", compact && "record-card-compact-outcomes")} aria-label="Tình trạng, biện pháp và duyệt">
@@ -915,7 +917,7 @@ function RecordPhotoGallery({ photos, recordId, variant }: { photos: readonly De
       <div className={cn("record-photo-gallery", variant === "table" ? "is-table" : "is-card")} aria-label={`${photos.length} ảnh minh chứng của phiếu ${recordId}`}>
         {photos.map((photo, index) => (
           <button key={photo.id} type="button" className="record-photo-button" onClick={() => setActivePhoto(photo)} aria-label={`Xem ảnh minh chứng ${index + 1} của phiếu ${recordId}`}>
-            <img src={photo.src} alt="" />
+            <img src={photo.src} alt="" loading="lazy" decoding="async" />
             {variant === "card" ? <span>{index + 1}</span> : null}
           </button>
         ))}
