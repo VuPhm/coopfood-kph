@@ -29,7 +29,7 @@ import {
   Truck,
   Wind,
 } from "lucide-react";
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
@@ -147,6 +147,12 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const [scannerOpen, setScannerOpen] = useState(false);
   const [weightExtracted, setWeightExtracted] = useState(false);
   const weightTimeoutRef = useRef<number | null>(null);
+  const focusTimeoutRef = useRef<number | null>(null);
+  const sessionRef = useRef(0);
+  const mountedRef = useRef(false);
+  const photoJobRef = useRef<{ session: number; additions: PhotoDraft[] } | null>(null);
+  const submitBusyRef = useRef(false);
+  const [formDefaults] = useState(() => defaultValues(activeKind, profile));
   const {
     formState: { errors },
     handleSubmit,
@@ -157,14 +163,36 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     watch,
   } = useForm<FormData, unknown, z.output<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues(activeKind, profile),
+    defaultValues: formDefaults,
   });
 
   const selectedCondition = watch("condition");
   const selectedResolution = watch("resolution");
   const detectedDate = watch("detectedDate");
   const treatmentDate = watch("treatmentDate");
-  const initialMonth = formatBusinessDate(new Date()).iso;
+  const initialMonth = useMemo(() => parseDisplayDate(detectedDate), [detectedDate]);
+
+  function isCurrentSession(session: number) {
+    return mountedRef.current && session === sessionRef.current;
+  }
+
+  function releasePendingPhotoUrls() {
+    for (const photo of photoJobRef.current?.additions.splice(0) ?? []) URL.revokeObjectURL(photo.url);
+  }
+
+  useLayoutEffect(() => {
+    mountedRef.current = true;
+    setScannerOpen(false);
+    setActivePhoto(null);
+    return () => {
+      mountedRef.current = false;
+      sessionRef.current += 1;
+      cancelPendingWeightExtraction();
+      if (focusTimeoutRef.current !== null) window.clearTimeout(focusTimeoutRef.current);
+      focusTimeoutRef.current = null;
+      releasePendingPhotoUrls();
+    };
+  }, [kind, open, profile]);
 
   function cancelPendingWeightExtraction() {
     if (weightTimeoutRef.current !== null) window.clearTimeout(weightTimeoutRef.current);
@@ -223,61 +251,80 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
 
   if (!kind) return null;
 
-  const submit = handleSubmit(async (values) => {
-    if (processingPhotos) {
-      setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    // Lock before the async resolver, so Enter/double-submit cannot save twice.
+    if (submitBusyRef.current) {
+      event.preventDefault();
       return;
     }
-    if (photos.length < 1) {
-      setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
-      return;
-    }
-    const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
-    const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
-    setSavingRecord(true);
-    setPhotoError("");
+    submitBusyRef.current = true;
+    const session = sessionRef.current;
     try {
-      await onSaved({
-        kind,
-        detectedDate: values.detectedDate,
-        barcode: values.barcode.trim(),
-        supplier: values.supplier.trim(),
-        productName: values.productName.trim(),
-        quantity: values.quantity,
-        unit: values.unit,
-        condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
-        resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
-        treatmentDate: values.treatmentDate.trim(),
-        detectedBy: values.detectedBy.trim(),
-        note: values.note.trim(),
-        photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
-      });
-      reset(defaultValues(kind, profile));
-      clearWeightExtraction();
-      clearPhotos();
-      onOpenChange(false);
-    } catch (error) {
-      setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
+      await handleSubmit(async (values) => {
+        if (!open || !isCurrentSession(session)) return;
+        if (photoJobRef.current) {
+          setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
+          return;
+        }
+        if (photos.length < 1) {
+          setPhotoError("Cần chọn ít nhất 1 ảnh minh chứng");
+          return;
+        }
+        const conditionChoice = options.conditions.find(({ value }) => value === values.condition) ?? options.conditions[0]!;
+        const resolutionChoice = options.resolutions.find(({ value }) => value === values.resolution) ?? options.resolutions[0]!;
+        setSavingRecord(true);
+        setPhotoError("");
+        try {
+          await onSaved({
+            kind,
+            detectedDate: values.detectedDate,
+            barcode: values.barcode.trim(),
+            supplier: values.supplier.trim(),
+            productName: values.productName.trim(),
+            quantity: values.quantity,
+            unit: values.unit,
+            condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
+            resolution: resolveChoiceLabel(resolutionChoice, values.resolutionDetail),
+            treatmentDate: values.treatmentDate.trim(),
+            detectedBy: values.detectedBy.trim(),
+            note: values.note.trim(),
+            photos: photos.map(({ id, fileName, stampedBlob }) => ({ id, fileName, blob: stampedBlob })),
+          });
+          if (!isCurrentSession(session)) return;
+          reset(defaultValues(kind, profile));
+          clearWeightExtraction();
+          clearPhotos();
+          onOpenChange(false);
+        } catch (error) {
+          if (isCurrentSession(session)) setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
+        } finally {
+          if (mountedRef.current) setSavingRecord(false);
+        }
+      })(event);
     } finally {
-      setSavingRecord(false);
+      submitBusyRef.current = false;
     }
-  });
+  };
 
   async function selectPhotos(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
     if (!files.length) return;
+    if (!open || photoJobRef.current || submitBusyRef.current) return;
     if (photoRef.current.length + files.length > 3) {
       setPhotoError("Mỗi phiếu chỉ được tối đa 3 ảnh");
       return;
     }
     setProcessingPhotos(true);
     setPhotoError("");
-    const additions: PhotoDraft[] = [];
+    const job = { session: sessionRef.current, additions: [] as PhotoDraft[] };
+    photoJobRef.current = job;
     try {
       for (const [index, file] of files.entries()) {
         const processed = await processEvidencePhoto(file, { storeCode: profile.storeCode, storeName: profile.storeName });
-        additions.push({
+        // A decode already in progress can finish, but cancelled batches stop here.
+        if (!isCurrentSession(job.session)) return;
+        job.additions.push({
           id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
           fileName: file.name,
           stampedBlob: processed.blob,
@@ -285,14 +332,16 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
           url: URL.createObjectURL(processed.blob),
         });
       }
-      const next = [...photoRef.current, ...additions];
+      const next = [...photoRef.current, ...job.additions];
       photoRef.current = next;
       setPhotos(next);
+      job.additions = [];
     } catch (error) {
-      additions.forEach((photo) => URL.revokeObjectURL(photo.url));
-      setPhotoError(error instanceof Error ? error.message : "Không thể tối ưu và đóng tem ảnh minh chứng");
+      if (isCurrentSession(job.session)) setPhotoError(error instanceof Error ? error.message : "Không thể tối ưu và đóng tem ảnh minh chứng");
     } finally {
-      setProcessingPhotos(false);
+      job.additions.forEach((photo) => URL.revokeObjectURL(photo.url));
+      photoJobRef.current = null;
+      if (mountedRef.current) setProcessingPhotos(false);
     }
   }
 
@@ -402,15 +451,20 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         </DialogContent>
       </Dialog>
 
-      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
+      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={open && activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} />
 
       <BarcodeScannerDialog
-        open={scannerOpen}
+        open={open && scannerOpen}
         onOpenChange={setScannerOpen}
         onScan={(scannedBarcode) => {
+          if (!open) return;
           setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
           applyFreshFoodWeight(scannedBarcode);
-          window.setTimeout(() => setFocus("barcode"), 0);
+          const session = sessionRef.current;
+          focusTimeoutRef.current = window.setTimeout(() => {
+            focusTimeoutRef.current = null;
+            if (isCurrentSession(session)) setFocus("barcode");
+          }, 0);
         }}
       />
     </>
@@ -428,7 +482,7 @@ type ChoiceGroupProps = {
   choices: readonly { value: string; label: string; tone: string }[];
 };
 
-function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
+const ChoiceGroup = memo(function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
   return (
     <fieldset>
       <legend className="sr-only">{legend}</legend>
@@ -443,7 +497,7 @@ function ChoiceGroup({ choices, legend, name, register }: ChoiceGroupProps) {
       </div>
     </fieldset>
   );
-}
+});
 
 function choiceIcon(value: string) {
   if (value === "NEAR_EXPIRY") return <CalendarClock aria-hidden="true" />;
