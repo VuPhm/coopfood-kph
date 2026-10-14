@@ -118,7 +118,7 @@ async function clickExpandedArea(page, control, dx, dy) {
    await route(page, 'date');
    await page.getByRole('button', {name:/^Theo dõi DATE/}).click();
    await page.getByRole('button').filter({hasText:'Cải thìa'}).click();
-   const actions = viewport.width < 900 ? page.getByRole('dialog', {name:'Xử lý cảnh báo DATE'}) : page.locator('.store-date-detail');
+   const actions = viewport.width < 900 ? page.getByRole('dialog', {name:'Chi tiết lô DATE'}) : page.locator('.store-date-detail');
    await actions.getByRole('button', {name:'Đã xử lý',exact:true}).click();
    if (viewport.width < 900) {
     await actions.waitFor({state:'hidden'});

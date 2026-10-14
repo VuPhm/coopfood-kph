@@ -23,7 +23,7 @@ fs.mkdirSync(output, { recursive: true });
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
         const issues = await history.evaluate(section => {
           const box = section.getBoundingClientRect();
-          return [...section.querySelectorAll('dd, time, button, .store-chip')].filter(el => {
+          return [...section.querySelectorAll('dd, time, button, .ui-list-label')].filter(el => {
             const rect = el.getBoundingClientRect();
             return rect.left < box.left || rect.right > box.right || el.scrollWidth > el.clientWidth + 1;
           }).map(el => el.textContent);
@@ -61,7 +61,7 @@ fs.mkdirSync(output, { recursive: true });
       if (viewport.width < 1200) await history.scrollIntoViewIfNeeded();
       await page.screenshot({ path: `${output}/history-${viewport.width}.png` });
       // Restore an older record and recalculate against today's clock, preserving its historical badge.
-      const historical = await rows.nth(1).locator('.store-chip').textContent();
+      const historical = await rows.nth(1).locator('.ui-list-label').textContent();
       await page.clock.setFixedTime(new Date('2026-12-01T12:00:00+07:00'));
       await form.getByRole('button', { name: 'Làm mới', exact: true }).click();
       await expect(result).toHaveAttribute('data-status', 'EMPTY');
@@ -70,7 +70,7 @@ fs.mkdirSync(output, { recursive: true });
       await expect(nsx).toHaveValue('01/10/2026');
       await expect(hsd).toHaveValue('21/11/2026');
       await expect(result).toHaveAttribute('data-status', 'EXPIRED');
-      await expect(rows.nth(2).locator('.store-chip')).toHaveText(historical);
+      await expect(rows.nth(2).locator('.ui-list-label')).toHaveText(historical);
       // Unknown-NSX mode and month input are restored too.
       await form.getByRole('switch').click();
       await form.getByRole('textbox', { name: 'HSD (Số tháng)', exact: true }).fill('2');

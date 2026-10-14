@@ -2,7 +2,7 @@
 const { chromium, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const base = process.env.STORE_PREVIEW_URL || 'http://127.0.0.1:5178';
-const output = '.local/date-fresh-r14';
+const output = process.env.STORE_DATE_OUTPUT || '.local/date-fresh-r14';
 fs.mkdirSync(output, { recursive: true });
 async function audit(page, selector, state) {
   const result = await page.locator(selector).evaluateAll((roots) => {
@@ -116,18 +116,23 @@ async function audit(page, selector, state) {
       await input.fill('8936000123456'); await input.press('Enter');
       await expect(page.getByRole('region',{name:'Thông tin mã hàng'})).toContainText('SKU 0008421 · UPC 8936000123456');
       await expect(page.locator('.store-date-lot')).toHaveCount(3);
-      await expect(page.locator('.store-date-product')).toContainText('Thực phẩm khô');
+      await page.locator('.store-date-product summary').click();
+      await expect(page.locator('.store-date-product').getByText('Thực phẩm khô', { exact: true })).toBeVisible();
+      await page.locator('.store-date-product summary').click();
       await shot('barcode');
       await input.fill('A24-198');
       await expect(page.locator('.store-date-lot')).toHaveCount(1);
       await input.fill('0008421');
       await expect(page.locator('.store-date-lot')).toHaveCount(3);
       await input.fill('C24-118');
-      await expect(page.locator('.store-date-product')).toContainText('Nông sản Miền Đông');
+      await page.locator('.store-date-product summary').click();
+      await expect(page.locator('.store-date-product').getByText(/Nông sản Miền Đông/)).toBeVisible();
+      await expect(page.locator('.store-date-product').getByText('kg', { exact: true })).toBeVisible();
+      await page.locator('.store-date-product summary').click();
       await expect(page.locator('.store-date-product')).toContainText('kg');
       await expect(page.locator('.store-date-product')).not.toContainText('Thực phẩm khô');
       const lot=page.locator('.store-date-lot'); await lot.click();
-      const detail = desktop ? page.getByRole('region',{name:'Chi tiết lô DATE'}) : page.getByRole('dialog',{name:'Xử lý cảnh báo DATE'});
+      const detail = desktop ? page.getByRole('region',{name:'Chi tiết lô DATE'}) : page.getByRole('dialog',{name:'Chi tiết lô DATE'});
       await expect(detail).toContainText('0011730');
       if (!desktop) { const box = await detail.boundingBox(); expect(box.y).toBeGreaterThanOrEqual(24); expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 1); }
       await shot('detail');
@@ -187,12 +192,12 @@ async function audit(page, selector, state) {
       await page.reload();
       await page.waitForFunction(() => !!navigator.serviceWorker.controller);
       await page.context().setOffline(true); await page.reload();
-      await expect(page.getByRole('heading',{name:'Mã hàng & lô DATE'})).toBeVisible();
+      await expect(page.getByRole('region',{name:'Tra mã hàng',exact:true})).toBeVisible();
       const input = page.getByRole('textbox',{name:'Tìm SKU, barcode, tên hàng hoặc lô'});
       await input.fill('29123415005'); await input.press('Enter');
       await expect(page.locator('.store-date-product')).toContainText('0011730');
       await page.locator('.store-date-lot').click();
-      const detail = page.getByRole('dialog',{name:'Xử lý cảnh báo DATE'});
+      const detail = page.getByRole('dialog',{name:'Chi tiết lô DATE'});
       await detail.getByRole('button',{name:'Ghi nhận',exact:true}).click();
       await expect(detail).toBeHidden();
       await page.getByRole('button',{name:'Về trang chủ'}).click();

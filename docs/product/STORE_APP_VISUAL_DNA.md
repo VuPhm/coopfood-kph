@@ -1,5 +1,30 @@
 # Store App Visual DNA — Co.op Fresh
 
+## Tạo phiếu KPH — follow-up 13/10/2026
+
+CTA cam/xanh giữ loại phiếu, icon PackagePlus/Leaf 22 px + chevron, nhãn Tạo
+phiếu rõ ở mọi viewport; hover/press/focus không dịch bounds. Một control dùng
+chung live/skeleton. Tạo phiếu dùng bottom panel dưới 900 px, centered modal
+max 880×840 trên desktop, header xanh/X inverse/body trắng theo chrome chung.
+Header min 72 px có reflow, CTA footer 48 px; form/review cuộn trong body.
+Không thay portal khi loading/review đổi; một motion identity khi resize,
+khung nhẹ paint trước/form sau entrance. Technical PASS, owner/device gate
+pending; [bàn giao](../delivery/figma-mobile-implementation/kph-create-panel.md).
+
+## Nhãn màu danh sách — follow-up 12/10/2026
+
+Theo yêu cầu owner, [cơ chế nhãn màu](LIST_LABEL_SYSTEM.md) dùng chữ/icon/nền
+nhẹ theo sáu vai trò neutral/info/process/warning/danger/success. Triển khai
+trước ở danh sách KPH Fresh mobile/desktop và skeleton; tình trạng/biện pháp/
+duyệt là ba chiều riêng. HỦY và Không duyệt giữ trung tính, Hết HSD đỏ,
+ĐỔI xanh dương, XUẤT TRẢ tím; không đổi enum hoặc điều kiện duyệt/xuất.
+Owner đã duyệt nhãn/choice/thanh KPH ngày 12/10, checkpoint `5fdfa3e`.
+Theo “Toàn bộ nhãn màu và thanh nhãn”, nhân rộng DATE, Tra hạn history, KPH
+online/Pilot và Admin identity/lifecycle/catalog bằng primitive/adapter chung.
+Thanh rộng 3px, inset 12px, gutter 28px, dài 36px mobile/24px desktop; cell
+bảng căn giữa. Card vẫn nền nhẹ, selection riêng; nghiệm thu rollout pending.
+[Bàn giao](../delivery/list-label-rollout/handoff.md).
+
 ## Tên gọi và mặc định thiết kế — 11/10/2026
 
 **Co.op Fresh** (gọi ngắn: **Fresh**, mã tài liệu: `coop-fresh-v1`) là tên gọi
@@ -22,6 +47,47 @@ modal hiện hành cho primitive/focus. Màn nghiệp vụ giảm trang trí; kh
 mang cơ chế header sticky/lớp cuộn của Home sang KPH khi chưa kiểm bố cục.
 
 ## DATE hợp nhất — r14, 11/10/2026
+
+Theo hướng mới ngày 12/10, DATE bỏ progress bar/% ở danh sách và dùng nhãn chữ/icon
+cho tình trạng theo mốc Tra hạn; trạng thái xử lý là chiều riêng. Chi tiết lô
+reuse timeline Tra hạn, ngày đầy đủ NSX/cảnh báo/hạn lùi/HSD ở bảng hai cột 13 px/600–650,
+SKU/lô và CTA hiện hữu. Tình trạng trước cảnh báo xanh, cảnh báo/đến hạn lùi
+cam, hết HSD đỏ; thiếu NSX/lỗi dữ liệu có nội dung rõ và không timeline giả.
+Dùng chung ListLabel với KPH. Follow-up nhân rộng thêm bar cạnh trái trang trí
+theo nhãn DATE, không vẽ tiến độ và không đổi theo xử lý. Theo dõi ngày thực liên tục/thông báo/thống kê
+chưa triển khai. Technical và owner gate riêng; xem
+[hướng product](DATE_MILESTONE_MODEL.md),
+[bàn giao hiện tại](../delivery/figma-mobile-implementation/date-milestones.md).
+Follow-up giảm cuộn: product summary đóng gọn, metadata mở khi cần; chi tiết
+chỉ giữ hai hàng tên/SKU/lô, nhãn và HSD còn/quá, rail/tên mốc và ngày đầy đủ.
+Bỏ bảng summary, ngày lớn lặp và ghi chú xử lý; pad mobile 16 px, card mốc
+12 px, gap 12 px, CTA 48 px. [Bàn giao mới](../delivery/figma-mobile-implementation/date-compact-detail.md).
+Các bản [inline](../delivery/figma-mobile-implementation/date-inline-bar.md) và
+[thin bar đầu](../delivery/figma-mobile-implementation/date-thinbar.md) giữ lịch
+sử đã thay thế, không còn mô tả giao diện hiện tại.
+
+Follow-up 12/10: khung trên dùng trọng số như KPH — tiêu đề 17 px/650,
+số lượng 13 px/400 cùng hàng; tên sản phẩm nhận diện 16 px/650. Bỏ intro/help
+và nhãn nhận diện lặp; ô tìm, quét và Tìm cùng hàng 48 px, gap 8 px;
+vùng tìm cách tab 16 px. Nhãn trợ năng vẫn nêu SKU/barcode/tên/lô.
+Technical PASS ở 390/1440/320, **owner đã nghiệm thu khung trên ngày 12/10/2026**; xem
+[bàn giao khung trên DATE](../delivery/figma-mobile-implementation/date-top-refinement.md).
+
+Follow-up bố cục mới sau phản hồi lệch space: gom DATE thành hai vùng tìm/quét
+và quản lý lô; vùng quản lý cùng lề, nhịp gap 8/12/16/24 px. Mobile một cột,
+desktop danh sách/chi tiết cạnh nhau và căn đầu; bỏ khung trống kéo cao 440 px.
+Thẻ lô dành một hàng riêng cho NSX/HSD; follow-up mật độ dùng nhãn-ngày cùng
+dòng khi đủ chỗ, pad thẻ 12/gap 8 để hiện nhiều mục và giữ cỡ chữ. CTA cam/xanh
+chia đều, cùng cao 48 px.
+Technical PASS geometry/reflow/contrast, **owner acceptance pending**; xem
+[bàn giao dựng lại DATE](../delivery/figma-mobile-implementation/date-recomposition.md).
+
+Follow-up 11/10 theo xác nhận “Dùng mẫu KPH vừa chỉnh”: DATE và KPH dùng cùng
+popup sắp xếp; hộp lọc DATE chia nhóm, selected xanh/chữ trắng/dấu ✓ và footer
+Đặt lại/Xong. CTA Ghi nhận cam/Đã xử lý xanh theo vai trò action Fresh. Tab DATE
+về 44 px như KPH, badge giữ geometry để chiều cao không thay khi chọn. Đây là
+implementation đang chờ nghiệm thu riêng; xem
+[DATE theo mẫu KPH](../delivery/figma-mobile-implementation/date-kph-reference.md).
 
 Owner yêu cầu bỏ Tra cứu riêng, gom tra SKU vào DATE rồi áp giao diện mới.
 Implementation r14 dùng Co.op Fresh ở DATE: compact header xanh đậm, surface
@@ -97,8 +163,13 @@ và contrast dưới đây. Runtime hiện áp dụng trong KPH, form và sheets
 | Viền control | `#718578` / trắng | 3,94:1 | Phân biệt ô nhập với nền; line trang trí vẫn nhẹ |
 | Focus | `#20344a` / `#f6faf8` | 12,08:1 | Outline 3px, offset 3px; trên nút back xanh dùng trắng |
 
-Các lựa chọn tình trạng/biện pháp trong form mặc định trung tính; selected dùng
-mint/xanh, viền kép và chữ đậm. “HỦY” là giá trị ghi nhận biện pháp, không phải
+Choice Fresh hiện dùng lưới hai cột, icon và selected theo palette option;
+selected có viền kép và dấu tích riêng. Tình trạng “Khác” chiếm hàng cuối.
+Palette choice được phát triển lại từ tone trong KPH_OPTIONS (cam/đỏ/xám,
+HỦY đỏ/ĐỔI xanh lá/XUẤT TRẢ xanh dương), khác nhãn trạng thái record.
+Danh sách dùng thanh màu cạnh trái 3px bo tròn theo tình trạng, giữ nền trắng.
+Thanh có rãnh riêng: inset 12px/gap tối thiểu 12px; dài 36px mobile theo
+khối tên/SKU và 24px desktop căn giữa dòng, heading/body cùng lề. “HỦY” là giá trị ghi nhận biện pháp, không phải
 nút xóa phiếu; chip biện pháp dùng trung tính. Không đổi enum, label, giá trị mặc
 định hay logic xử lý. Giữ tone functions cũ cho consumer khác. Approval dùng
 xanh khi đã duyệt, cam khi chờ, trung tính khi không duyệt, kèm nhãn chữ.
@@ -106,8 +177,8 @@ xanh khi đã duyệt, cam khi chờ, trung tính khi không duyệt, kèm nhãn
 Header KPH dùng gradient `#00724e → #008655` để chữ trắng đủ tương phản trên
 cả dải. Form/sheets giữ gradient chung đã đối chiếu modal; chữ nhỏ trắng nằm
 trong vùng xanh đậm, được kiểm tại vị trí render thực. Không dùng đầu gradient
-sáng `#00a777` làm nền CTA có chữ trắng nhỏ. Icon lựa chọn KPH được trung tính
-bằng CSS scoped, không sửa SVG provenance hoặc icon lịch đã accepted.
+sáng `#00a777` làm nền CTA có chữ trắng nhỏ. Choice Fresh dùng icon Lucide đặc trưng từng option; không sửa SVG provenance
+hoặc icon lịch đã accepted.
 
 Đối chiếu [WCAG 2.2 SC 1.4.3](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
 với chữ thường ≥4,5:1; [SC 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html)

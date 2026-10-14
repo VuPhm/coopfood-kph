@@ -1,5 +1,136 @@
 # Công việc kế tiếp
 
+**KPH: xem CTA trắng, nhãn màu và cấu trúc mới tại 4215.** Tải lại
+<http://127.0.0.1:4215/#kph>, xem hai CTA cùng hàng/icon/nhãn và thử cả hai
+loại. Technical PASS build/11 tests/geometry/contrast/150% chữ/loading/workflow;
+owner/device gate pending. [Bàn giao/rollback](delivery/figma-mobile-implementation/kph-white-cta.md).
+
+**KPH: xem tìm trước CTA và solid sáng tại 4215.** Tải lại
+<http://127.0.0.1:4215/#kph>, xem spacing 8 px và hai CTA cam nhạt/mint trên
+nền xanh; thử tìm, tạo phiếu, cuộn nắp. Technical PASS build/11 tests/contrast/
+keyboard/loading/workflow; owner/device gate pending.
+[Follow-up và checks](delivery/figma-mobile-implementation/kph-sliding-cover.md).
+
+**KPH: xem nền xanh liền dưới nắp tại 4215.** Tải lại
+<http://127.0.0.1:4215/#kph>, xem header → CTA/tìm kiếm cùng nền xanh và cuộn
+nắp trắng lên/xuống. Contrast/focus/loading/scroll technical PASS; owner/device
+gate pending. [Follow-up/checks](delivery/figma-mobile-implementation/kph-sliding-cover.md).
+
+**KPH: xem nắp trượt từ tab xuống tại 4215.** Tải lại
+<http://127.0.0.1:4215/#kph>, cuộn để nắp trắng phủ CTA/tìm kiếm rồi cuộn
+về đầu; thử Chọn/Lọc và focus bàn phím. Technical PASS năm viewport/loading/
+workflow; owner/device gate pending. Bản compact trước giữ ở build riêng.
+[Bàn giao/rollback](delivery/figma-mobile-implementation/kph-sliding-cover.md).
+
+**KPH: xem thử compact khu chức năng tại 4215.** Mở
+<http://127.0.0.1:4215/#kph>, so với bản trước 4213: CTA/tab/khoảng đệm gọn
+hơn, nội dung phiếu giữ nguyên. Thử tạo phiếu, đổi loại, Chọn và Lọc.
+Technical PASS build/11 tests/Playwright bốn viewport và loading; owner/device
+gate pending. [Bàn giao/rollback](delivery/figma-mobile-implementation/kph-compact-controls.md).
+
+**KPH: xem khu chức năng đồng bộ DATE tại 4213.** Tải lại
+<http://127.0.0.1:4213/#kph>: tab → tiêu đề/số phiếu → Sắp xếp / Chọn / Lọc;
+tìm/quét nằm riêng phía trên. Kiểm tra đổi loại, sắp xếp, chọn và lọc; bản này
+cũng có CTA/panel mới của lượt trước. Technical PASS, owner/device gate pending.
+[Bố cục và kiểm chứng](delivery/figma-mobile-implementation/kph-date-controls.md).
+
+**KPH: nghiệm thu CTA và panel tạo mới.** Tải lại
+<http://127.0.0.1:4201/#kph>, mở TPCN/TPTS, cuộn → xem lại → chỉnh sửa →
+đóng/mở lại. Một portal/animation xuyên loading/review/resize, form gắn sau
+entrance để khung phản hồi sớm. Technical PASS build/tests/Playwright
+390/1440/320, normal/reduced motion/CPU 6× và nested popup; owner thử thêm
+thiết bị đã thấy giật. [Bàn giao/phạm vi/giới hạn](delivery/figma-mobile-implementation/kph-create-panel.md).
+
+**Nhãn màu + thanh cạnh trái — rollout 12/10/2026:** owner đã chốt KPH
+bằng “đạt, checkp, nhân bản”, checkpoint local `5fdfa3e`; xác nhận nhân rộng
+“Toàn bộ nhãn màu và thanh nhãn”. Đã áp dụng DATE, lịch sử Tra hạn, KPH
+online/Pilot và Admin identity/lifecycle/catalog; cùng palette/gutter, adapter
+giữ nghĩa trạng thái từng feature. DATE thêm bar trang trí theo tình trạng,
+không thêm tiến độ/%; lịch sử giữ snapshot. Technical/browser mock-fixture PASS
+390×844 và 1440×1024; phần nhân rộng chờ owner xem ở 4213.
+[Bàn giao/phạm vi/checks](delivery/list-label-rollout/handoff.md).
+Các ghi chú “chờ chốt KPH” / “không bar DATE” bên dưới là mốc trước yêu cầu này.
+
+**KPH: xem spacing thanh nhãn đã tối ưu.** Tải lại
+<http://127.0.0.1:4213/#kph>, xem bar 3px tại rãnh riêng, dài 36px mobile/
+24px desktop; bật Chọn để kiểm khoảng cách checkbox/chữ. Build/typecheck,
+Playwright 390/1440/320 và skeleton no shift PASS; chờ owner chốt spacing.
+[Bàn giao/checks](delivery/figma-mobile-implementation/kph-marker-spacing.md).
+
+**DATE thu gọn summary/chi tiết, follow-up 12/10/2026:** thông tin mã hàng
+đóng gọn, mở thêm metadata khi cần. Chi tiết bỏ summary năm hàng, ngày phóng
+lớn và ghi chú xử lý; giữ tên/SKU/lô, nhãn, timeline và ngày đầy đủ, CTA 48 px.
+Mã hàng còn 62 px; detail giảm 39–52%, CTA không cần cuộn ở 390/1440/320
+và detail 150% chữ. Technical PASS 32 tests/build/PWA, compact/mốc/workflow
+Playwright ba viewport, contrast và metadata keyboard/reflow. Source working
+tree, chờ owner nghiệm thu. Preview <http://127.0.0.1:4201/#date>;
+[bàn giao/checks](delivery/figma-mobile-implementation/date-compact-detail.md).
+
+**KPH: xem palette choice được phát triển lại và thanh cạnh trái.** Tải lại
+<http://127.0.0.1:4213/#kph>, mở hai form và xem list ở mobile/desktop/chế độ
+Chọn. Choice dùng bộ màu cũ từ KPH_OPTIONS, bar 4px theo tình trạng record;
+ba nhãn v1 giữ nguyên. Mock build/typecheck, 44 targeted tests và Playwright
+390/1440/320 (contrast/reflow/workflow/loading) PASS. Bản dấu tròn/choice dùng
+chung màu nhãn đã được thay.
+[Bàn giao/checks](delivery/figma-mobile-implementation/kph-choice-bars.md).
+
+**DATE quản lý theo mốc Tra hạn, follow-up 12/10/2026:** danh sách dùng
+nhãn tình trạng DATE và nhãn xử lý độc lập, không còn bar/%. Chi tiết lô dùng
+chung timeline NSX/cảnh báo/hạn lùi/HSD với Tra hạn, kèm SKU/lô; thêm bộ lọc
+DATE. Thiếu NSX/ngày lỗi không suy mốc. Khung trên đã accepted giữ nguyên.
+Theo dõi ngày thực liên tục, thông báo và thống kê ghi hướng mở rộng, chưa
+triển khai. Preview <http://127.0.0.1:4201/#date>; owner nghiệm thu phần mới
+riêng. Technical PASS Store 204 tests, kiểm tra lại DATE 32 tests, build/PWA,
+Playwright 390/1440/320 (nhãn/mốc/filter/workflow/contrast, tăng chữ 150%)
+và hồi quy Tra hạn. [Hướng product](product/DATE_MILESTONE_MODEL.md),
+[bàn giao/checks](delivery/figma-mobile-implementation/date-milestones.md).
+
+**KPH: xem phần mở rộng choice/item tại preview 4213.** Tải lại
+<http://127.0.0.1:4213/#kph>, xem dấu màu cạnh tên hàng ở mobile/desktop rồi
+mở tạo phiếu hai loại: choice hai cột, màu theo nhãn, dấu tích selected và
+condition Khác ở cuối. Palette v1 đã được owner xác nhận thích; phần mới
+cần nghiệm thu riêng. Mock build, typecheck, 200 Store/UI tests và
+Playwright ba viewport/contrast/reflow/workflow/loading PASS. [Bàn giao](delivery/figma-mobile-implementation/kph-choice-items.md).
+
+**KPH nhãn màu v1 được owner xác nhận thích; phần choice/item mới chờ xem.** Mở
+<http://127.0.0.1:4213/#kph>, đổi TP khô/TP tươi để so sánh nhãn tình trạng,
+biện pháp và duyệt; desktop dùng cùng nhãn trong ba cột. Technical PASS
+253 tests/build, mock build, Playwright 3 viewport/reflow/contrast/workflow và
+loading geometry. [Cơ chế toàn list](product/LIST_LABEL_SYSTEM.md),
+[bàn giao](delivery/figma-mobile-implementation/kph-list-labels.md).
+Admin/history có mapping đề xuất; DATE triển khai theo lượt riêng bên trên.
+
+**DATE bar danh sách đã bỏ theo hướng mới ngày 12/10/2026.** Các bản thin bar
+hàng riêng/inline trước đây chỉ giữ lịch sử, đã thay thế bằng nhãn theo mốc
+Tra hạn. [Hướng product](product/DATE_MILESTONE_MODEL.md),
+[bàn giao hiện tại](delivery/figma-mobile-implementation/date-milestones.md).
+
+**DATE đã gọn khung trên theo KPH.** Tải lại <http://127.0.0.1:4201/#date>
+để xem hàng nhập/quét/Tìm, tiêu đề/số lượng và khoảng trống trước danh sách.
+Build, 14 tests và Playwright 390/1440/320 (tăng chữ 150%, workflow, contrast)
+PASS; owner đã nghiệm thu khung trên ngày 12/10/2026 qua “đạt”. [Bàn giao](delivery/figma-mobile-implementation/date-top-refinement.md).
+
+**DATE đã dựng lại phần trình bày theo yêu cầu bỏ bố cục cũ.** Owner tải lại
+<http://127.0.0.1:4201/#date>, xem khoảng cách/căn lề, thẻ NSX/HSD và chi tiết
+lô với CTA cam/xanh cùng hàng. Danh sách đã làm gọn theo follow-up, cao giảm
+25–31% và giữ cỡ chữ. Technical PASS ở 390/1440/320, tăng chữ 150%,
+tìm/quét/lọc/xử lý; chờ nghiệm thu owner. [Bàn giao](delivery/figma-mobile-implementation/date-recomposition.md).
+
+**DATE theo mẫu KPH đã sửa và chờ owner xem lại.** Tải lại
+<http://127.0.0.1:4201/#date>: tab đều 44 px, thử HSD gần nhất/Tên hàng,
+Lọc DATE → Đặt lại/Xong và hai CTA cam/xanh trong detail lô mẫu.
+[Bàn giao/checks](delivery/figma-mobile-implementation/date-kph-reference.md).
+Giữ acceptance KPH/DATE riêng; r14/4202 bên dưới là candidate trước follow-up.
+
+**KPH dropdown/hộp lọc follow-up đang chờ owner xem lại.**
+Mở <http://127.0.0.1:4201/#kph>, đổi Mới nhất/Cũ nhất/Tên hàng rồi vào hộp lọc,
+thử trạng thái/ngày và Đặt lại/Xong. Icon lọc đã đồng bộ với DATE, cùng cỡ/nét
+và căn tâm; geometry/contrast 3 viewport và skeleton không shift PASS.
+Technical PASS 182 Store tests/build,
+Playwright mobile/desktop/320, contrast và modal/progressive regression.
+[Bàn giao](delivery/figma-mobile-implementation/kph-filter-sort.md).
+Đây là lượt mới sau KPH r13; giữ gate DATE r14 bên dưới độc lập.
+
 **DATE hợp nhất/Fresh r14 đang chờ owner nghiệm thu giao diện.**
 Xem <http://127.0.0.1:4202/#date>: tìm SKU `0008421`, barcode `29123415005`,
 lô `C24-118`; Ghi nhận/Đã xử lý → Home → mở DATE lại để xem state phiên.

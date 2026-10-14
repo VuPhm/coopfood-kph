@@ -101,7 +101,7 @@ async function capture(page, options) {
     const review = document.querySelector('.store-form-review');
     return {sections,scrollTop:review.scrollTop,footerBottom:document.querySelector('.store-form-review .create-dialog-footer').getBoundingClientRect().bottom,headerHeight:document.querySelector('.store-create-screen .create-dialog-header').getBoundingClientRect().height,modal:document.querySelector('.store-create-screen').getBoundingClientRect().toJSON()};
    });
-   if(reviewLayout.sections.length!==3 || Math.max(...reviewLayout.sections.map(r=>r.top))-Math.min(...reviewLayout.sections.map(r=>r.top))>2 || reviewLayout.scrollTop!==0 || reviewLayout.modal.height>565 || reviewLayout.modal.height<563 || Math.abs(reviewLayout.headerHeight-68)>1) throw Error(`Review columns/initial scroll geometry failed: ${JSON.stringify(reviewLayout)}`);
+   if(reviewLayout.sections.length!==3 || Math.abs(reviewLayout.sections[0].top-reviewLayout.sections[1].top)>2 || reviewLayout.sections[2].top<=reviewLayout.sections[0].top || reviewLayout.scrollTop!==0 || reviewLayout.modal.height>viewport.height-47 || Math.abs(reviewLayout.headerHeight-72)>1 || reviewLayout.footerBottom>reviewLayout.modal.bottom+1) throw Error(`Review columns/initial scroll geometry failed: ${JSON.stringify(reviewLayout)}`);
   }
   await capture(page, {path:`.local/figma-mobile/review-${viewport.width}.png`});
   await page.getByRole('button',{name:'Chỉnh sửa',exact:true}).click();
@@ -124,8 +124,8 @@ async function capture(page, options) {
   await page.getByRole('button',{name:'Xem lại',exact:true}).click();
   await page.getByRole('heading',{name:'Xem lại phiếu KPH'}).waitFor();
   await capture(page,{path:`.local/figma-mobile/review-tpcn-${viewport.width}.png`});
-  await page.getByRole('button',{name:'Chỉnh sửa phiếu',exact:true}).click();
-  await page.getByRole('button',{name:'Về danh sách KPH',exact:true}).click();
+  await page.getByRole('button',{name:'Chỉnh sửa',exact:true}).click();
+  await page.locator('.store-create-screen').getByRole('button',{name:'Đóng',exact:true}).click();
   await page.getByRole('button',{name:'Về trang chủ'}).click();
   if(viewport.width >= 900) await page.locator('.store-desktop-rail').getByRole('button',{name:'Tra hạn lùi hàng',exact:true}).click();
   else await page.locator('.store-launcher-mobile').getByRole('button',{name:'Tra cứu lùi hàng',exact:true}).click();

@@ -18,7 +18,7 @@ describe("Store App session and route ownership", () => {
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
     fireEvent.click(await screen.findByRole("button", { name: /Cải thìa/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Ghi nhận" }));
-    await waitFor(() => expect(screen.queryByRole("heading", { name: "Xử lý cảnh báo DATE" })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "Chi tiết lô DATE" })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
     await screen.findByText("3 cảnh báo đang mở");
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
@@ -31,7 +31,7 @@ describe("Store App session and route ownership", () => {
   it("opens legacy lookup links in DATE with a single navigation destination", async () => {
     window.history.replaceState(null, "", "#lookup");
     render(<StoreApp />);
-    await screen.findByRole("heading", { name: "Mã hàng & lô DATE" });
+    await screen.findByRole("region", { name: "Tra mã hàng" });
     expect(window.location.hash).toBe("#date");
     expect(screen.queryByRole("button", { name: "Tra cứu" })).not.toBeInTheDocument();
     const nav = within(screen.getByRole("navigation", { name: "Điều hướng chính trên mobile" }));

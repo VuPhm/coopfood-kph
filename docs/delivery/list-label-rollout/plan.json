@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "list-label-rollout",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Nhân bản nhãn chữ/icon và thanh cạnh trái đã duyệt từ KPH sang các list nghiệp vụ hiện có.",
+  "inScope": [
+    "Store Fresh DATE và lịch sử Tra hạn",
+    "KPH online/Pilot history",
+    "Admin identity/lifecycle/catalog batches và rows",
+    "Shared marker geometry, feature mappings, targeted browser checks"
+  ],
+  "outOfScope": [
+    "Choice redesign ngoài KPH",
+    "API/auth/domain/paging/storage changes",
+    "Timeline tiến độ DATE trong list",
+    "Push/merge/Pages deploy",
+    "WIP DATE trước lượt này không thuộc nghiệm thu rollout"
+  ],
+  "baseSha": "5fdfa3ecfcd54b92aaca5a98c140b56421d094df",
+  "candidateSha": "",
+  "integrationOwner": "/root tại worktree hiện tại",
+  "sharedPaths": [
+    "packages/ui/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-rollout",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "đạt, checkp, nhân bản; Toàn bộ nhãn màu và thanh nhãn",
+      "source": "User chat 12/10/2026 + async answer",
+      "impact": "KPH accepted; mở rộng cả hai lớp trình bày sang list còn lại",
+      "decision": "Checkpoint 5fdfa3e, thực hiện solo; mapping feature riêng, DATE không thêm progress/% vào list"
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner xem rollout ở preview 4213 DATE/history và screenshot Admin/online. Khi chốt candidate chung với WIP DATE, bind lại commit/evidence trước formal acceptance/close gate.",
+  "workingTreeReadiness": {
+    "status": "pass",
+    "evidence": "docs/delivery/list-label-rollout/handoff.md",
+    "sourceManifest": "docs/delivery/list-label-rollout/source-manifest.json",
+    "tests": 257,
+    "browserScenarios": 14,
+    "binding": "Working tree verified; formal gates pending commit binding/user review, not passed with the older KPH SHA."
+  }
+}

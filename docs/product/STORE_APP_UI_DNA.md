@@ -1,5 +1,10 @@
 # Store App UI DNA
 
+Implemented components, their consumers and variants, and the proposed extension
+priorities are indexed in the [component catalog](STORE_APP_COMPONENT_CATALOG.md)
+(reviewed 2026-10-12). Use it before introducing another control or Store pattern;
+its proposals do not change the acceptance gates or business contracts below.
+
 Status: Round 1 direction accepted by the owner in R1-D04. This document
 records the Store App principles carried through the R1-D01 audit, R1-D02
 comparison, and accepted R1-D03 convergence. The owner-accepted Home visual

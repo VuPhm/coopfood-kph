@@ -37,3 +37,19 @@
 .ui-list-item-marker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--cf-label-ink); }
 .ui-list-item-marker[data-variant="bar"] { display: block; flex: 0 0 4px; width: 4px; height: 40px; border-radius: 999px; background: var(--cf-label-accent); }
 .ui-list-item-marker[data-variant="bar"]::before { content: none; }
+
+/* A reserved leading gutter keeps decorative bars clear of text and controls.
+   Card consumers retain their own vertical/end padding and layout. */
+.ui-list-marker-card { position: relative; min-width: 0; padding-left: 28px; }
+.ui-list-marker-card > .ui-list-item-marker[data-variant="bar"] {
+  position: absolute; left: 12px; top: var(--ui-list-marker-top, 20px);
+  width: 3px; height: 36px; pointer-events: none;
+}
+.ui-list-marker-cell { position: relative; padding-left: 28px; }
+.ui-list-marker-cell > .ui-list-item-marker[data-variant="bar"] {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 24px; pointer-events: none;
+}
+@media (min-width: 900px) {
+  .ui-list-marker-card > .ui-list-item-marker[data-variant="bar"] { height: 24px; }
+}

@@ -104,6 +104,9 @@ export type CreatedRecordDraft = {
 };
 
 type CreateRecordDialogProps = {
+  /** The Store host owns the portal, chrome and focus lifecycle in this mode. */
+  embedded?: boolean;
+  onReviewingChange?: (reviewing: boolean) => void;
   initialScrollTop?: number;
   onOpenAutoFocus?: ComponentProps<typeof DialogContent>["onOpenAutoFocus"];
   onCloseAutoFocus?: ComponentProps<typeof DialogContent>["onCloseAutoFocus"];
@@ -142,7 +145,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   };
 }
 
-export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog" }: CreateRecordDialogProps) {
+export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog", embedded = false, onReviewingChange }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -158,6 +161,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     // Restore before the first paint; passive focus restoration alone can flash the top.
     if (form && initialScrollTop > 0) form.scrollTop = initialScrollTop;
   }, [initialScrollTop]);
+  useEffect(() => { onReviewingChange?.(reviewing); }, [reviewing, onReviewingChange]);
   const wasReviewingRef = useRef(false);
   const assetScreen = activeKind === "TPCN" ? "203-701" : "203-847";
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
@@ -430,17 +434,13 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     if (activePhoto?.id === id) setActivePhoto(null);
   }
 
-  return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent onOpenAutoFocus={onOpenAutoFocus} onCloseAutoFocus={onCloseAutoFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
-          <DialogHeader className="create-dialog-header">
-            {screenPresentation ? <button type="button" className="store-form-back" aria-label={reviewing ? "Chỉnh sửa phiếu" : "Về danh sách KPH"} onClick={() => { if (reviewing) setReviewing(false); else onOpenChange(false); }}><img src={figmaAsset(assetScreen, "imgFeatherArrowLeft")} alt="" /></button> : null}
+  const content = <>
+    {!embedded ? <DialogHeader className="create-dialog-header">
             <DialogTitle className="create-dialog-title">{screenPresentation ? <>{reviewing ? "Xem lại phiếu KPH" : "Tạo phiếu KPH"}<small>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</small></> : <>Tạo phiếu KPH · {kindLabels[kind]}</>}</DialogTitle>
             <DialogDescription id="create-description" className="sr-only">
               Tạo phiếu hàng không phù hợp; trường có dấu sao là bắt buộc.
             </DialogDescription>
-          </DialogHeader>
+          </DialogHeader> : null}
 
           {screenPresentation && reviewing ? <div className="store-form-review">
             <p className={cn("store-review-notice", photoError && "is-error")} role={photoError ? "alert" : "status"}><img src={figmaAsset(photoError ? "280-1915" : "279-1299", photoError ? "imgFeatherWifiOff" : "imgFeatherAlertCircle")} alt="" /><span><strong>{photoError ? "Chưa gửi được phiếu" : "Chưa gửi"}</strong><small>{photoError || "Phiếu chỉ được tạo sau khi bạn bấm “Gửi phiếu”."}</small></span></p>
@@ -533,9 +533,11 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
               <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : screenPresentation ? "Xem lại" : "Lưu phiếu"}</Button>
             </footer>
           </form>
-        </DialogContent>
-      </Dialog>
-
+  </>;
+  return <>
+    {embedded ? content : <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent onOpenAutoFocus={onOpenAutoFocus} onCloseAutoFocus={onCloseAutoFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>{content}</DialogContent>
+    </Dialog>}
       <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName}${onlineMode ? "" : " đã đóng tem"}` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} presentation={presentation} index={Math.max(0, photos.findIndex(p => p.id === activePhoto?.id))} total={photos.length} onPrevious={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i > 0) setActivePhoto(photos[i - 1]!); }} onNext={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i < photos.length - 1) setActivePhoto(photos[i + 1]!); }} onRemove={screenPresentation && !reviewing && activePhoto ? () => removePhoto(activePhoto.id) : undefined} />
 
       <BarcodeScannerDialog
@@ -549,8 +551,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
             window.setTimeout(() => setFocus("barcode"), 0);
         }}
       />
-    </>
-  );
+    </>;
 });
 
 function FormSection({ children, number, title }: { children: ReactNode; number: string; title: string }) {

@@ -43,7 +43,7 @@ function stable(before, after) {
         const chrome = ['.store-header', '.store-account', '#store-content', viewport.width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail'];
         const selectors = screen === 'home'
           ? [...chrome, viewport.width < 900 ? '.store-launcher-mobile' : '.store-launcher-desktop', '.store-home-decoration', '.store-home-art', '.store-header-brand img']
-          : [...chrome, '.store-create-actions', '.store-list-heading', '.store-tabs', '.store-kph-list', '.store-pagination', viewport.width < 900 ? '.store-ticket' : '.store-kph-table'];
+          : [...chrome, '.store-create-actions', '.store-kph-toolbar', '.store-list-heading', '.store-kph-list-controls', '.store-kph-list-toolbar', '.store-tabs', '.store-kph-list', '.store-pagination', viewport.width < 900 ? '.store-ticket' : '.store-kph-table'];
         const before = await boxes(page, selectors);
         await page.screenshot({ path: `${output}/${screen}-frame-${viewport.width}.png` });
         // Delay exceeds the 500ms input grace period: reveal shifts are counted.
@@ -74,7 +74,7 @@ function stable(before, after) {
           await expect(page.locator('.store-form-skeleton')).toBeVisible();
           if (viewport.width < 900) await page.locator('.store-form-skeleton').evaluate(form => { form.scrollTop = 120; });
           if (viewport.width < 900) await expect.poll(() => page.locator('.store-form-skeleton').evaluate(form => form.scrollTop)).toBe(120);
-          const formSelectors = ['.create-dialog-header', '.create-dialog-title', '.store-form-back', ...[1, 2, 3, 4, 5].map(number => `.form-section:nth-of-type(${number})`), '.create-dialog-footer'];
+          const formSelectors = ['.create-dialog-header', '.create-dialog-title', '.store-create-screen > [data-slot="dialog-close"]', ...[1, 2, 3, 4, 5].map(number => `.form-section:nth-of-type(${number})`), '.create-dialog-footer'];
           const formBefore = await boxes(page, formSelectors);
           await page.screenshot({ path: `${output}/form-frame-${viewport.width}.png` });
           await page.waitForTimeout(700);

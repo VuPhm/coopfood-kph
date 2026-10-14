@@ -1,7 +1,7 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, render, renderHook, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { calculateShelfLife, type LocalDate } from "@coopfood-kph/kph-rules";
-import { useShelfLookupHistory, type ShelfLookupSnapshot } from "./store-shelf-history";
+import { ShelfLookupHistory, useShelfLookupHistory, type ShelfLookupSnapshot } from "./store-shelf-history";
 
 function snapshot(day: number): ShelfLookupSnapshot {
   const nsx = "2026-10-01" as LocalDate;
@@ -11,6 +11,14 @@ function snapshot(day: number): ShelfLookupSnapshot {
 }
 
 describe("Shelf lookup session history", () => {
+  it("presents the saved calculation rather than reevaluating an old expiry date", () => {
+    const saved = snapshot(1);
+    render(<ShelfLookupHistory history={[{ ...saved, id: 1, recordedAt: 0 }]} onRecall={() => {}} />);
+    const label = screen.getByTitle("Trạng thái lúc tra: An toàn");
+    expect(label).toHaveAttribute("data-tone", "success");
+    expect(document.querySelector(".ui-list-item-marker")).toHaveAttribute("data-tone", "success");
+    expect(screen.getByRole("button", { name: /^Tra lại/ })).toBeEnabled();
+  });
   it("keeps the newest 20 in lookup order, with unique IDs even in the same millisecond", () => {
     const { result } = renderHook(useShelfLookupHistory);
     act(() => { for (let day = 1; day <= 22; day++) result.current.remember(snapshot(day)); });

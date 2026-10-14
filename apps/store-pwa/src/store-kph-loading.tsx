@@ -1,8 +1,9 @@
 import { KPH_OPTIONS, type KphKind } from "@coopfood-kph/kph-rules";
 import { getKphChoicePresentation, KphChoiceContent } from "./store-kph-choice";
 import { useMemo } from "react";
-import { Maximize, Search, SlidersHorizontal } from "lucide-react";
+import { ListChecks, Maximize, Search, SlidersHorizontal } from "lucide-react";
 import { KphSortButton } from "./store-kph-sort";
+import { KphCreateButton } from "./store-kph-create-button";
 import type { RecordView } from "./record-view";
 import { figmaAsset } from "./figma-assets";
 import { StoreKphList } from "./store-kph-list";
@@ -17,11 +18,16 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
   const total = records.filter(record => record.kind === "TPTS").length;
   return <div className="store-kph kph-loading-frame" aria-busy="true" aria-label="Đang tải KPH">
     <p className="sr-only" role="status">Đang tải KPH…</p>
-    <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <button key={kind} disabled className={`create-${kind.toLowerCase()}`}><span><img data-figma-render-width="15" data-figma-render-height="15" src={figmaAsset("main-2", kind === "TPCN" ? "imgFeatherPackage" : "imgFeatherShoppingBag")} alt="" /></span><strong><span className="store-create-desktop">Tạo · </span>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</strong></button>)}</div></section>
+    <div className="store-kph-underlay">
+      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input disabled aria-label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" /></label><button disabled className="store-scan-trigger" aria-label="Tạo phiếu TP tươi sống"><Maximize size={20} aria-hidden="true" /></button></div>
+    <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled />)}</div></section>
+    </div>
     <section className="store-ticket-list" aria-label="Phiếu khai báo">
-      <div className="store-list-heading"><h2>Phiếu khai báo</h2><div><button disabled className="store-compact">Chọn</button><button disabled className="store-filter" aria-label="Lọc phiếu KPH"><SlidersHorizontal size={20} aria-hidden="true" /></button></div></div>
       <div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(kind => <button key={kind} disabled aria-pressed={kind === "TPTS"} className={kind === "TPTS" ? "is-active" : ""}>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}<small>{records.filter(record => record.kind === kind).length}</small></button>)}</div>
-      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input disabled aria-label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" /></label><button disabled className="store-scan-trigger" aria-label="Tạo phiếu TP tươi sống"><Maximize size={20} aria-hidden="true" /></button><KphSortButton disabled sort="newest" /><span className="store-result-count">{total} phiếu</span></div>
+      <div className="store-kph-list-controls">
+        <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{total} phiếu</span></div>
+        <div className="store-kph-list-toolbar"><KphSortButton disabled sort="newest" /><button disabled className="store-compact" aria-pressed="false"><ListChecks size={20} aria-hidden="true" /><span>Chọn</span></button><button disabled className="store-filter" aria-label="Lọc phiếu KPH"><SlidersHorizontal size={20} aria-hidden="true" /></button></div>
+      </div>
       <StoreKphList desktop={desktop} visible={visible} loading />
       {total > 25 ? <div className="store-pagination"><span>1–25 / {total}</span>{["Trang trước", "Trang sau"].map((label, index) => <button key={label} disabled aria-label={label}><img className={index === 0 ? "is-previous" : ""} src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button>)}</div> : null}
     </section>

@@ -914,3 +914,12 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
 
 [data-slot="dialog-content"]:is(.create-dialog-content, .settings-dialog-content, .mobile-history-dialog, .barcode-scanner-dialog-content, .evidence-viewer-content) { --cf-modal-inset: 0px; }
 .mobile-history-dialog-header[data-slot="dialog-header"] { margin: 0; padding: 24px 68px 24px 24px; background: var(--cf-modal-header); }
+
+/* Shared list labels in the online/Pilot history, independent of action state. */
+.record-card.ui-list-marker-card { padding-left: 28px; }
+.desktop-history .record-row td.ui-list-marker-cell { padding-left: 28px; }
+.history-row-select { display: grid; place-items: center; min-width: 44px; min-height: 44px; }
+.record-card-outcomes { flex-wrap: wrap; }
+.record-card-statuses { display: flex; flex-wrap: wrap; }
+.record-card-statuses > .record-card-approval { flex: 1 0 100%; }
+.approval-select.ui-label-palette { border-color: var(--cf-label-border); background: var(--cf-label-surface); color: var(--cf-label-ink); }

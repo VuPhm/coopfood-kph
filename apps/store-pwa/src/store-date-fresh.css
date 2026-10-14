@@ -1,10 +1,14 @@
 /* Co.op Fresh DATE. Shared roles come from the accepted Fresh frame stylesheet. */
 .store-date-sheet {
   --store-brand-action: #00724e;
+  --store-action-orange: #c24e00;
+  --store-action-orange-hover: #a63f00;
   --store-surface: #fff;
   --store-canvas: #f6faf8;
   --store-ink: #20344a;
   --store-ink-muted: #596b7d;
+  --store-warning-ink: #884312;
+  --store-error-ink: #b42318;
   --store-line: #dce9e3;
   --store-module-mint: #e6f7f2;
   --store-control-line: #718578;
@@ -18,98 +22,144 @@
 .store-date h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 650; }
 .store-date h3, .store-date-sheet h3 { margin: 0; font-size: 15px; line-height: 22px; font-weight: 650; }
 .store-date p { margin: 0; }
-.store-date-intro { display: flex; gap: 12px; align-items: center; padding: 16px; border-radius: 18px; background: var(--store-module-mint); }
-.store-date-intro p { margin-top: 4px; font-size: 13px; line-height: 20px; color: var(--store-ink-muted); }
-.store-date-module-icon { display: grid; flex-shrink: 0; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: var(--store-brand-action); color: white; }
-.store-date-search-form { display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: 10px; }
+.store-date-search-panel { display: grid; gap: 12px; min-width: 0; }
+.store-date-search-form { display: grid; grid-template-columns: minmax(0, 1fr) 44px auto; gap: 8px; }
 .store-date-search-wrap { position: relative; min-width: 0; }
 .store-date-search-icon { position: absolute; z-index: 1; top: 15px; left: 14px; color: var(--store-ink-muted); pointer-events: none; }
 .store-date-search { width: 100%; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; padding: 0 12px 0 42px; background: var(--store-canvas); font-size: 16px; color: var(--store-ink); }
 .store-date-search::placeholder { color: var(--store-ink-muted); opacity: 1; }
-.store-date-scan { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; background: var(--store-module-mint); }
+.store-date-scan { display: grid; place-items: center; width: 44px; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; background: var(--store-module-mint); }
 .store-date-scan-icon { width: 20px; height: 20px; }
-.store-date-search-form > .store-button { grid-column: 1 / -1; }
 :is(.store-date, .store-date-sheet) .store-button { min-height: 44px; border: 0; border-radius: 12px; background: var(--store-brand-action); color: white; font-size: 14px; }
+.store-date .store-date-search-form > .store-button { min-width: 56px; height: 48px; padding-inline: 12px; font-size: 13px; line-height: 20px; font-weight: 600; }
 :is(.store-date, .store-date-sheet) .store-button:hover { background: #005e40; }
-.store-date .store-date-search-help { margin-top: -6px; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
 .store-date-message { padding: 14px 16px; border: 1px solid var(--store-line); border-radius: 14px; background: var(--store-canvas); font-size: 14px; line-height: 21px; }
-.store-date-product { min-width: 0; border: 1px solid var(--store-line); border-radius: 18px; padding: 16px; background: var(--store-surface); }
-.store-date-product-heading { display: flex; align-items: center; gap: 12px; }
+.store-date-product { min-width: 0; border: 1px solid var(--store-line); border-radius: 14px; background: var(--store-surface); }
+.store-date-product-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 60px; border-radius: 14px; padding: 8px 12px; cursor: pointer; list-style: none; }
+.store-date-product-heading::-webkit-details-marker { display: none; }
 .store-date-product-heading > div { min-width: 0; }
-.store-date-eyebrow { color: var(--store-brand-action); font-size: 12px; font-weight: 600; }
-.store-date-product h2 { margin-top: 2px; overflow-wrap: anywhere; }
-.store-date-product p { margin-top: 4px; color: var(--store-ink-muted); font-size: 13px; line-height: 20px; overflow-wrap: anywhere; }
-.store-date-product dl { display: grid; gap: 10px; margin: 14px 0 0; border-top: 1px solid var(--store-line); padding-top: 14px; }
+.store-date-product-heading > svg { flex-shrink: 0; color: var(--store-brand-action); }
+.store-date-product details[open] .store-date-product-heading > svg { transform: rotate(180deg); }
+.store-date-product-heading:focus-visible { outline: 3px solid var(--store-focus); outline-offset: 3px; }
+.store-date-product h2 { font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.store-date-product p { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.store-date-product dl { display: grid; gap: 8px; margin: 0 12px 12px; border-top: 1px solid var(--store-line); padding-top: 12px; }
 .store-date-product dl > div { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 12px; font-size: 13px; line-height: 20px; }
 .store-date-product dt { color: var(--store-ink-muted); }
 .store-date-product dd { margin: 0; overflow-wrap: anywhere; }
 .store-date .store-tabs { margin: 0; padding: 4px; gap: 6px; background: var(--store-canvas); }
-.store-date .store-tabs button { position: relative; min-height: 48px; color: var(--store-ink); font-size: 13px; }
+.store-date .store-tabs button { position: relative; min-height: 44px; line-height: 18px; color: var(--store-ink); font-size: 13px; }
 .store-date .store-tabs button.is-active { background: var(--store-brand-action); color: white; box-shadow: none; font-weight: 700; }
 .store-date .store-tabs button.is-active::after { content: ""; position: absolute; bottom: 3px; left: 50%; width: 24px; height: 3px; transform: translateX(-50%); border-radius: 2px; background: white; }
 .store-date .store-tabs small { color: var(--store-ink-muted); font-size: 12px; }
 .store-date .store-tabs .is-active small { background: white; color: var(--store-brand-action); }
-.store-date .store-list-heading { margin: 0; min-height: 44px; }
-.store-date .store-list-heading > div { display: block; }
-.store-date .store-list-heading p { margin-top: 4px; font-size: 13px; line-height: 20px; }
-.store-date .store-list-heading > .store-date-head-actions { display: flex; gap: 8px; }
-.store-date .store-filter { display: grid; place-items: center; width: 44px; height: 44px; border-color: var(--store-control-line); color: var(--store-ink); }
+.store-date-browser { display: grid; align-content: start; gap: 16px; min-width: 0; }
+.store-date-list-controls { display: grid; gap: 12px; min-width: 0; }
+.store-date-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.store-date-list-heading > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-width: 0; }
+.store-date-list-heading .store-date-result-count { color: var(--store-ink-muted); font-size: 13px; line-height: 20px; font-weight: 400; }
+.store-date .store-filter { display: grid; flex-shrink: 0; place-items: center; width: 44px; height: 44px; border-color: var(--store-control-line); color: var(--store-ink); }
+.store-date .store-filter.is-filtered { position: relative; border-color: var(--store-brand-action); background: var(--store-brand-action); color: white; }
+.store-date-toolbar { display: flex; align-items: center; gap: 8px; }
+.store-date-toolbar .store-quick-sort-trigger { width: 100%; }
+.store-date-toolbar > :first-child { flex: 1; min-width: 0; }
 .store-date-add { display: none; }
 .store-date-statuses { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.store-date-statuses button { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; min-height: 48px; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 6px; background: var(--store-surface); color: var(--store-ink); font-size: 12px; line-height: 18px; }
-.store-date-statuses small { font-size: 12px; }
-.store-date-statuses .is-selected { border-color: var(--store-brand-action); box-shadow: inset 0 0 0 1px var(--store-brand-action); background: var(--store-module-mint); color: var(--store-brand-action); font-weight: 700; }
-.store-date-workspace { display: grid; gap: 16px; }
-.store-date-lots { display: grid; grid-template-columns: 1fr; align-content: start; gap: 12px; min-width: 0; }
-.store-date-lot { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; border: 1px solid var(--store-line); border-radius: 18px; padding: 16px; background: var(--store-surface); color: var(--store-ink); text-align: left; }
+.store-date-statuses button { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; min-height: 44px; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 3px 6px; background: var(--store-surface); color: var(--store-ink); font-size: 12px; font-weight: 600; line-height: 16px; }
+.store-date-statuses button > span { min-width: 0; }
+.store-date-statuses small { display: grid; place-items: center; min-width: 21px; height: 20px; border: 1px solid var(--store-line); border-radius: 999px; padding-inline: 5px; background: white; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; font-weight: 400; }
+.store-date-statuses .is-selected { border-color: var(--store-brand-action); background: var(--store-brand-action); color: white; }
+.store-date-statuses .is-selected small { border-radius: 999px; padding-inline: 5px; background: white; color: var(--store-brand-action); }
+.store-date-workspace { display: grid; gap: 24px; min-width: 0; }
+.store-date-lots { display: grid; grid-template-columns: 1fr; align-content: start; gap: 8px; min-width: 0; }
+.store-date-lot { --ui-list-marker-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; min-width: 0; border: 1px solid var(--store-line); border-radius: 16px; padding: 12px 12px 12px 28px; background: var(--store-surface); color: var(--store-ink); text-align: left; }
 .store-date-lot:hover { background: var(--store-canvas); }
 .store-date-lot.is-active { border-color: var(--store-brand-action); box-shadow: inset 0 0 0 1px var(--store-brand-action); background: var(--store-canvas); }
-.store-date-lot-main { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; gap: 6px; }
-.store-date-lot-main > strong { font-size: 16px; font-weight: 650; line-height: 23px; overflow-wrap: anywhere; }
+.store-date-lot-main, .store-date-lot-end { display: contents; }
+.store-date-lot-main > strong { grid-column: 1; grid-row: 1; font-size: 16px; font-weight: 650; line-height: 23px; overflow-wrap: anywhere; }
 .store-date-lot small { font-size: 12px; line-height: 18px; color: var(--store-ink-muted); overflow-wrap: anywhere; }
-.store-date-lot-end { display: flex; max-width: 100px; flex-shrink: 0; flex-direction: column; align-items: flex-end; gap: 12px; text-align: right; }
-.store-date-lot-end strong { font-size: 13px; font-weight: 600; line-height: 20px; }
+.store-date-lot-main > small:first-of-type { grid-column: 1 / -1; grid-row: 2; min-width: 0; align-self: center; }
+.store-date-lot-identifiers > span { white-space: nowrap; }
+.store-date-lot-labels { display: flex; grid-column: 1 / -1; grid-row: 4; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; padding-right: 64px; }
+.store-date-lot-main > .store-date-lot-dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; grid-column: 1 / -1; grid-row: 3; padding: 8px; border-radius: 12px; background: var(--store-canvas); }
+.store-date-lot-dates > span { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; row-gap: 2px; }
+.store-date-lot-dates b { color: var(--store-ink); font-size: 13px; line-height: 20px; font-weight: 600; }
+.store-date-lot-end > strong { grid-column: 2; grid-row: 1; max-width: 96px; font-size: 13px; font-weight: 600; line-height: 20px; text-align: right; }
 .store-date-lot-end .is-danger { color: var(--store-error-ink); }
 .store-date-lot-end .is-warning { color: var(--store-warning-ink); }
-.store-date-lot-action { display: inline-flex; align-items: center; gap: 2px; color: var(--store-brand-action); font-size: 12px; line-height: 18px; font-weight: 650; }
-.store-date-status { display: inline-flex; align-items: center; min-height: 24px; border-radius: 999px; padding: 3px 9px; background: var(--store-canvas); color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
-.store-date-status.is-open { background: var(--store-module-orange); color: var(--store-warning-ink); }
-.store-date-status.is-resolved { background: var(--store-module-mint); color: var(--store-brand-action); }
+.store-date-lot-action { display: inline-flex; grid-column: 2; grid-row: 4; align-items: center; justify-self: end; gap: 4px; color: var(--store-brand-action); font-size: 12px; line-height: 18px; font-weight: 650; }
+.store-date-lot-heading { display: grid; gap: 4px; min-width: 0; }
+:is(.store-date, .store-date-sheet) .store-date-lot-heading h3 { color: var(--store-ink); font-size: 16px; line-height: 23px; overflow-wrap: anywhere; }
+.store-date-lot-heading p { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-date-lot-heading p > span { overflow-wrap: anywhere; }
+.store-date-milestones { display: grid; gap: 12px; min-width: 0; container-type: inline-size; border: 1px solid var(--store-line); border-radius: 14px; padding: 12px; background: var(--store-canvas); }
+.store-date-detail-state { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.store-date-milestone-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.store-date-remaining { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px; margin: 0; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-date-remaining strong { color: var(--store-ink); font-weight: 600; }
+.store-date-remaining.is-expired strong { color: var(--store-error-ink); }
+.store-date-milestones .store-timeline { --cf-color-brand: var(--store-brand-action); --cf-color-amber: var(--store-warning-ink); --cf-color-danger: var(--store-error-ink); border: 0; padding: 4px 12px 0; }
+.store-date-milestones .store-timeline-track { height: calc(52px + 2em); }
+.store-date-milestones .store-timeline-milestone time { display: none; }
+.store-date-milestones .store-timeline small { max-width: 20cqw; white-space: normal; text-align: center; }
+.store-date-milestone-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; margin: 0; }
+.store-date-milestone-facts > div { display: grid; gap: 2px; min-width: 0; }
+.store-date-milestone-facts dt { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-date-milestone-facts dd { margin: 0; color: var(--store-ink); font-size: 13px; line-height: 20px; font-weight: 600; overflow-wrap: anywhere; }
+.store-date-milestone-facts .is-primary dd { color: var(--store-brand-action); font-weight: 650; }
+.store-date-milestone-facts .is-expired dd { color: var(--store-error-ink); font-weight: 650; }
+.store-date-missing-dates { display: grid; gap: 8px; }
+.store-date-missing-dates p { margin: 0; color: var(--store-ink-muted); font-size: 13px; line-height: 20px; }
+.store-date-lot-sheet .store-modal-body { gap: 12px; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
 .store-date-empty, .store-date-detail-placeholder { display: grid; justify-items: center; align-content: center; gap: 12px; padding: 28px 20px; border: 1px dashed var(--store-control-line); border-radius: 18px; background: var(--store-canvas); text-align: center; color: var(--store-ink-muted); }
 .store-date-empty h3, .store-date-detail-placeholder h2 { color: var(--store-ink); }
 .store-date-empty p, .store-date-detail-placeholder p { font-size: 14px; line-height: 21px; }
 .store-date-empty button { min-height: 44px; color: var(--store-brand-action); }
 .store-date .store-muted, .store-date-sheet .store-muted { color: var(--store-ink-muted); font-size: 14px; line-height: 21px; }
-.store-date-detail { display: grid; align-content: start; gap: 14px; min-height: 440px; min-width: 0; border: 1px solid var(--store-line); border-radius: 18px; padding: 20px; background: var(--store-surface); }
+.store-date-detail { display: grid; align-content: start; gap: 12px; min-width: 0; border: 1px solid var(--store-line); border-radius: 18px; padding: 20px; background: var(--store-surface); }
 .store-date-detail:has(.store-date-detail-placeholder) { border: 0; padding: 0; }
-.store-date-detail-placeholder { height: 100%; }
+.store-date-detail-placeholder { min-height: 260px; }
 .store-date-detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.store-date-detail-note { border-radius: 12px; padding: 12px 14px; background: var(--store-canvas); color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
-:is(.store-date, .store-date-sheet) .store-summary { background: var(--store-canvas); border: 1px solid var(--store-line); }
-:is(.store-date, .store-date-sheet) .store-summary > div { min-width: 0; padding: 12px 14px; border-color: var(--store-line); font-size: 14px; line-height: 21px; }
-:is(.store-date, .store-date-sheet) .store-summary dt { color: var(--store-ink-muted); }
-:is(.store-date, .store-date-sheet) .store-summary dd { overflow-wrap: anywhere; }
 .store-date-sheet .store-modal-body { color: var(--store-ink); }
 .store-date-sheet .store-choices button { color: var(--store-ink); border-color: var(--store-control-line); }
 .store-date-sheet .store-choices .is-selected { border-color: var(--store-brand-action); box-shadow: inset 0 0 0 1px var(--store-brand-action); background: var(--store-module-mint); color: var(--store-brand-action); font-weight: 700; }
 :is(.store-date, .store-date-sheet) :is(button, input):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 3px; }
-.store-date .store-sheet-actions button, .store-date-sheet .store-sheet-actions button { min-height: 44px; font-size: 14px; }
+:is(.store-date, .store-date-sheet) .store-sheet-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+:is(.store-date, .store-date-sheet) .store-sheet-actions button { min-height: 48px; font-size: 14px; }
+/* KPH reference: grouped controls, strong selected state and a visible action footer. */
+.store-date-filter[data-slot="dialog-content"] { grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+.store-date-filter .store-modal-body { min-height: 0; overflow-y: auto; gap: 16px; padding-bottom: 0; }
+.store-date-filter-section { display: grid; gap: 12px; border: 1px solid var(--store-line); border-radius: 16px; padding: 16px; background: var(--store-canvas); }
+.store-date-filter .store-date-filter-section h3 { display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 22px; }
+.store-date-filter h3 svg { flex-shrink: 0; color: var(--store-brand-action); stroke-width: 1.8; }
+.store-date-filter .store-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.store-date-filter .store-date-filter-sort { grid-template-columns: 1fr; }
+.store-date-filter .store-choices button { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; border-color: var(--store-line); padding: 10px 12px; background: white; font-size: 13px; }
+.store-date-filter .store-choices svg { flex-shrink: 0; }
+.store-date-filter .is-hidden { visibility: hidden; }
+.store-date-filter .store-choices .is-selected { background: var(--store-brand-action); color: white; border-color: var(--store-brand-action); box-shadow: none; font-weight: 600; }
+.store-date-filter-footer { position: sticky; bottom: 0; z-index: 1; display: flex; justify-content: space-between; gap: 12px; margin: 0 -24px; border-top: 1px solid var(--store-line); padding: 12px 24px calc(12px + env(safe-area-inset-bottom)); background: white; }
+.store-date-filter .store-date-reset-filter { min-height: 48px; border: 1px solid var(--store-control-line); padding: 0 12px; color: var(--store-ink); font-weight: 600; }
+.store-date-filter-footer .store-button { min-width: 96px; }
+@media (min-width: 760px) {
+  .store-date-filter .store-date-filter-sort { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .store-date-filter .store-date-filter-sort button { gap: 4px; padding-inline: 8px; }
+}
 @media (max-width: 359px) {
-  .store-date { padding-inline: 14px; }
-  .store-date-intro { padding: 12px; }
-  .store-date-lot { padding: 12px; gap: 8px; }
-  .store-date-lot-end { max-width: 76px; }
+  .store-date { padding-inline: 16px; }
+  .store-date-filter .store-modal-body { padding-inline: 16px; }
+  .store-date-filter-section { padding: 12px; }
+  .store-date-filter-footer { margin-inline: -16px; padding-inline: 16px; }
 }
 @media (min-width: 600px) {
   .store-date { padding-inline: 24px; }
-  .store-date-search-form { grid-template-columns: minmax(0, 1fr) 48px auto; }
-  .store-date-search-form > .store-button { grid-column: auto; min-width: 130px; height: 48px; }
   .store-date-product dl { grid-template-columns: 1fr 1fr; column-gap: 24px; }
 }
 @media (min-width: 900px) {
-  .store-date { max-width: 1440px; margin-inline: auto; padding: 28px 36px; }
-  .store-date .store-tabs { width: fit-content; min-width: 380px; }
-  .store-date-statuses { max-width: 480px; }
-  .store-date-workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+  .store-date { max-width: 1184px; margin-inline: auto; padding: 28px 32px 32px; }
+  .store-date-workspace { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
   .store-date-add { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 0 14px; background: var(--store-canvas); color: var(--store-ink-muted); font-size: 13px; }
 }
+
+:is(.store-date, .store-date-sheet) .store-date-acknowledge { background: var(--store-action-orange); color: white; }
+:is(.store-date, .store-date-sheet) .store-date-acknowledge:hover:not(:disabled) { background: var(--store-action-orange-hover); }

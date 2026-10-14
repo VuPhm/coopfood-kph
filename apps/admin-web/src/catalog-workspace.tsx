@@ -1,4 +1,5 @@
-import { Button, Field, Tag } from "@coopfood-kph/ui";
+import { AdminListLabel, batchPresentation, rowPresentation } from "./list-labels";
+import { Button, Field, ListItemMarker } from "@coopfood-kph/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, FileSearch, KeyRound, Leaf, ListChecks, LogOut, RefreshCw, Upload } from "lucide-react";
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from "react";
@@ -125,27 +126,23 @@ export function CatalogWorkspace({ gateway, session, onLogout, logoutBusy, onCha
 }
 
 function BatchButton({ batch, selected, onClick }: { batch: CatalogImportBatch; selected: boolean; onClick(): void }) {
-  return <button type="button" onClick={onClick} aria-pressed={selected} className={`min-h-24 rounded-2xl border-2 p-4 text-left transition-colors ${selected ? "border-brand bg-brand-soft" : "border-surface-strong bg-surface-muted hover:border-brand/40"}`}><span className="flex items-start justify-between gap-3"><strong className="min-w-0 break-all text-sm">{batch.originalFilename}</strong><StatusTag status={batch.status} /></span><span className="mt-3 block text-xs text-ink-muted">{batch.rowCount} dòng · {batch.errorRowCount} lỗi · {formatDateTime(batch.createdAt)}</span></button>;
+  return <button type="button" onClick={onClick} aria-pressed={selected} className={`ui-list-marker-card min-h-24 rounded-2xl border-2 p-4 text-left transition-colors ${selected ? "border-brand bg-brand-soft" : "border-surface-strong bg-surface-muted hover:border-brand/40"}`}><ListItemMarker variant="bar" tone={batchPresentation(batch.status).tone} /><span className="flex items-start justify-between gap-3"><strong className="min-w-0 break-all text-sm">{batch.originalFilename}</strong><StatusTag status={batch.status} /></span><span className="mt-3 block text-xs text-ink-muted">{batch.rowCount} dòng · {batch.errorRowCount} lỗi · {formatDateTime(batch.createdAt)}</span></button>;
 }
 
 function RowsTable({ rows }: { rows: Awaited<ReturnType<LifecycleAdminGateway["getCatalogImport"]>>["rows"] }) {
   if (rows.length === 0) return <p className="mt-6 rounded-2xl bg-brand-soft p-5 text-sm font-semibold text-brand">Batch không có dòng dữ liệu.</p>;
   return <>
-    <div className="mt-6 hidden overflow-x-auto md:block"><table className="w-full min-w-[760px] border-separate border-spacing-y-2 text-left text-sm"><thead><tr className="text-xs uppercase tracking-wide text-ink-muted"><th className="px-3 py-2">Dòng</th><th className="px-3 py-2">UPC / SKU</th><th className="px-3 py-2">Sản phẩm / NCC</th><th className="px-3 py-2">Kết quả</th></tr></thead><tbody>{rows.map((row) => <tr key={row.rowNumber} className="bg-surface-muted align-top"><td className="rounded-l-xl px-3 py-3 font-black">{row.rowNumber}</td><td className="px-3 py-3"><code className="block">{row.normalized.barcode || "—"}</code><code className="mt-1 block text-ink-muted">{row.normalized.skuCode || "—"}</code></td><td className="px-3 py-3"><strong>{row.normalized.productName || "—"}</strong><span className="mt-1 block text-ink-muted">{row.normalized.supplierCode || "—"} · {row.normalized.supplierName || "—"}</span></td><td className="rounded-r-xl px-3 py-3"><RowResult row={row} /></td></tr>)}</tbody></table></div>
-    <div className="mt-6 grid gap-3 md:hidden">{rows.map((row) => <article key={row.rowNumber} className="rounded-2xl border border-surface-strong bg-surface-muted p-4"><div className="flex items-start justify-between gap-3"><strong>Dòng {row.rowNumber}</strong><Tag tone={row.status === "ERROR" ? "red" : "green"}>{row.status === "ERROR" ? "Có lỗi" : "Hợp lệ"}</Tag></div><p className="mt-3 break-words text-sm font-bold">{row.normalized.productName || "Chưa có tên sản phẩm"}</p><p className="mt-1 break-all text-xs text-ink-muted">UPC {row.normalized.barcode || "—"} · SKU {row.normalized.skuCode || "—"}</p><div className="mt-3"><RowResult row={row} /></div></article>)}</div>
+    <div className="mt-6 hidden overflow-x-auto md:block"><table className="w-full min-w-[760px] border-separate border-spacing-y-2 text-left text-sm"><thead><tr className="text-xs uppercase tracking-wide text-ink-muted"><th className="py-2 pr-3 pl-7">Dòng</th><th className="px-3 py-2">UPC / SKU</th><th className="px-3 py-2">Sản phẩm / NCC</th><th className="px-3 py-2">Kết quả</th></tr></thead><tbody>{rows.map((row) => <tr key={row.rowNumber} className="bg-surface-muted align-top"><td className="ui-list-marker-cell rounded-l-xl px-3 py-3 font-black"><ListItemMarker variant="bar" tone={rowPresentation(row.status).tone} />{row.rowNumber}</td><td className="px-3 py-3"><code className="block">{row.normalized.barcode || "—"}</code><code className="mt-1 block text-ink-muted">{row.normalized.skuCode || "—"}</code></td><td className="px-3 py-3"><strong>{row.normalized.productName || "—"}</strong><span className="mt-1 block text-ink-muted">{row.normalized.supplierCode || "—"} · {row.normalized.supplierName || "—"}</span></td><td className="rounded-r-xl px-3 py-3"><RowResult row={row} /></td></tr>)}</tbody></table></div>
+    <div className="mt-6 grid gap-3 md:hidden">{rows.map((row) => <article key={row.rowNumber} className="ui-list-marker-card rounded-2xl border border-surface-strong bg-surface-muted p-4"><ListItemMarker variant="bar" tone={rowPresentation(row.status).tone} /><div className="flex items-start justify-between gap-3"><strong>Dòng {row.rowNumber}</strong><AdminListLabel category="Dòng catalog" presentation={rowPresentation(row.status)} /></div><p className="mt-3 break-words text-sm font-bold">{row.normalized.productName || "Chưa có tên sản phẩm"}</p><p className="mt-1 break-all text-xs text-ink-muted">UPC {row.normalized.barcode || "—"} · SKU {row.normalized.skuCode || "—"}</p><div className="mt-3"><RowResult row={row} showLabel={false} /></div></article>)}</div>
   </>;
 }
 
-function RowResult({ row }: { row: Awaited<ReturnType<LifecycleAdminGateway["getCatalogImport"]>>["rows"][number] }) {
-  if (row.validationMessages.length === 0) return <span className="inline-flex items-center gap-2 font-semibold text-brand"><CheckCircle2 aria-hidden="true" size={17} />Hợp lệ</span>;
-  return <ul className="grid gap-2 text-danger">{row.validationMessages.map((message, index) => <li key={`${message.code}-${index}`} className="flex items-start gap-2"><AlertTriangle className="mt-0.5 shrink-0" aria-hidden="true" size={16} /><span><strong className="block">{message.field}</strong>{message.message}</span></li>)}</ul>;
+function RowResult({ row, showLabel = true }: { row: Awaited<ReturnType<LifecycleAdminGateway["getCatalogImport"]>>["rows"][number]; showLabel?: boolean }) {
+  return <div className="grid gap-2">{showLabel ? <AdminListLabel category="Kết quả kiểm tra" presentation={rowPresentation(row.status)} /> : null}{row.validationMessages.length ? <ul className="grid gap-2 text-danger">{row.validationMessages.map((message, index) => <li key={`${message.code}-${index}`} className="flex items-start gap-2"><AlertTriangle className="mt-0.5 shrink-0" aria-hidden="true" size={16} /><span><strong className="block">{message.field}</strong>{message.message}</span></li>)}</ul> : null}</div>;
 }
 
 function StatusTag({ status }: { status: CatalogImportBatch["status"] }) {
-  if (status === "VALIDATED") return <Tag tone="green">Hợp lệ</Tag>;
-  if (status === "REJECTED") return <Tag tone="red">Có lỗi</Tag>;
-  if (status === "PUBLISHED") return <Tag tone="blue">Đã publish</Tag>;
-  return <Tag tone="orange">Đang xử lý</Tag>;
+  return <AdminListLabel category="Batch catalog" presentation={batchPresentation(status)} />;
 }
 
 function shortId(id: string) { return id.slice(0, 8); }

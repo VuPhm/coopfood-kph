@@ -1,8 +1,9 @@
-import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Tag } from "@coopfood-kph/ui";
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, ListItemMarker } from "@coopfood-kph/ui";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2, KeyRound, Leaf, LogOut, RefreshCw, ShieldCheck, UserRound, UserRoundX } from "lucide-react";
 import { useState } from "react";
 
+import { AdminListLabel, userPresentation, rolePresentation } from "./list-labels";
 import type { AdminSession, AdminUser, LifecycleAdminGateway } from "./lifecycle-admin";
 
 export function IdentityWorkspace({ gateway, session, users, loading, loadError, onRefresh, onLogout, logoutBusy, onChangePassword, onError, onOpenLifecycle, onOpenCatalog }: {
@@ -44,10 +45,11 @@ export function IdentityWorkspace({ gateway, session, users, loading, loadError,
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {users.map((user) => {
             const current = user.id === session.user.id;
-            return <article key={user.id} className="flex min-h-56 flex-col rounded-2xl border border-surface-strong bg-surface-muted/55 p-4 sm:p-5">
-              <div className="flex items-start justify-between gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-brand"><UserRound aria-hidden="true" size={20} /></span><Tag tone={user.active ? "green" : "gray"}>{user.active ? "Đang hoạt động" : "Đã vô hiệu hóa"}</Tag></div>
+            return <article key={user.id} className="ui-list-marker-card flex min-h-56 flex-col rounded-2xl border border-surface-strong bg-surface-muted/55 p-4 sm:p-5">
+              <ListItemMarker variant="bar" tone={userPresentation(user.active).tone} />
+              <div className="flex items-start justify-between gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-brand"><UserRound aria-hidden="true" size={20} /></span><AdminListLabel category="Tài khoản" presentation={userPresentation(user.active)} /></div>
               <h2 className="mt-4 break-words text-lg font-black">{user.displayName}</h2><p className="break-all text-sm text-ink-muted">{user.username}</p>
-              <div className="mt-3 flex min-h-7 flex-wrap gap-2">{user.globalRoles.length ? user.globalRoles.map((role) => <Tag key={role} tone="blue">{role === "CHAIN_ADMIN" ? "Quản trị chuỗi" : "Quản trị catalog"}</Tag>) : <span className="text-xs text-ink-muted">Không có quyền global</span>}</div>
+              <div className="mt-3 flex min-h-7 flex-wrap gap-2">{user.globalRoles.length ? user.globalRoles.map((role) => <AdminListLabel key={role} category="Quyền global" presentation={rolePresentation(role)} />) : <span className="text-xs text-ink-muted">Không có quyền global</span>}</div>
               <div className="mt-auto pt-5">{current ? <p className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-ink-muted">Tài khoản đang đăng nhập</p> : <Button className="w-full" disabled={!user.active} onClick={() => { setNotice(null); setSelected(user); }} variant="danger"><UserRoundX aria-hidden="true" size={17} />{user.active ? "Vô hiệu hóa" : "Đã vô hiệu hóa"}</Button>}</div>
             </article>;
           })}

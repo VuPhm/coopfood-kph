@@ -1,5 +1,26 @@
 # Store App UI foundation
 
+## Current inventory — 2026-10-12
+
+`ListLabel` composes `Tag` for read-only list labels with text, decorative icon,
+category and six scoped tones. `ListItemMarker` adds a decorative item cue,
+`dot` or rounded `bar` variant, always paired with a visible semantic label; both share `ui-label-palette`. See the [label system](../../docs/product/LIST_LABEL_SYSTEM.md).
+KPH Fresh is the accepted first consumer (checkpoint `5fdfa3e`). The rollout
+also covers DATE, lookup history, online/Pilot KPH and Admin identity/lifecycle/
+catalog lists; feature adapters retain their own status authority. The existing
+Tag API/palette remains available. `ui-list-marker-card` and `ui-list-marker-cell`
+reserve a 28px leading gutter: bar 3px wide, inset 12px, 36px mobile / 24px
+desktop. Cards retain vertical/end padding; tables center the bar in the cell.
+See the [rollout handoff](../../docs/delivery/list-label-rollout/handoff.md).
+
+Use the [Store App component catalog](../../docs/product/STORE_APP_COMPONENT_CATALOG.md)
+to find implemented primitives, Store patterns, consumers, variants, verification
+and proposed improvements. Current Store PWA presentation follows
+[Co.op Fresh](../../docs/product/STORE_APP_VISUAL_DNA.md); shared UI also serves
+Admin Web. The Figma foundation/reboot scope below records its historical slice,
+not the current DATE scope or Fresh acceptance state. Tokens remain a draft;
+the stylesheet header does not establish verified Figma parity.
+
 The Figma R2 Store App presentation roles are exposed as `--cf-kph-dry`,
 `--cf-kph-dry-soft`, `--cf-kph-fresh`, `--cf-kph-fresh-soft`,
 `--cf-home-lookup`, and `--cf-home-date`. They do not replace business states;
