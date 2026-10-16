@@ -12,10 +12,10 @@ function DateWorkspace() {
 describe("memory-only DATE workspace", () => {
   it("clears a detail selection when acknowledging hides its lot under the active filter", async () => {
     render(<DateWorkspace />);
-    fireEvent.click(screen.getByRole("button", { name: /Sản phẩm C/ }));
-    await screen.findByRole("heading", { name: "Xử lý cảnh báo DATE" });
+    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
+    await screen.findByRole("heading", { name: "Chi tiết lô DATE" });
     fireEvent.click(screen.getByRole("button", { name: "Ghi nhận" }));
-    await waitFor(() => expect(screen.queryByRole("heading", { name: "Xử lý cảnh báo DATE" })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "Chi tiết lô DATE" })).not.toBeInTheDocument());
     expect(screen.getAllByRole("button", { name: /Sản phẩm/ })).toHaveLength(1);
   });
 
@@ -28,11 +28,11 @@ describe("memory-only DATE workspace", () => {
   it("prevents acknowledging an already resolved lot on mobile", async () => {
     render(<DateWorkspace />);
     fireEvent.click(screen.getByRole("button", { name: /Theo dõi DATE/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Sản phẩm C/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Đã xử lý" }));
-    await waitFor(() => expect(screen.queryByRole("heading", { name: "Xử lý cảnh báo DATE" })).not.toBeInTheDocument());
-    fireEvent.click(screen.getByRole("button", { name: /Sản phẩm C/ }));
-    const dialog = await screen.findByRole("dialog", { name: "Xử lý cảnh báo DATE" });
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "Chi tiết lô DATE" })).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
+    const dialog = await screen.findByRole("dialog", { name: "Chi tiết lô DATE" });
     expect(dialog).toHaveTextContent("Đã xử lý");
     expect(screen.getByRole("button", { name: "Ghi nhận" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Đã xử lý" })).toBeDisabled();

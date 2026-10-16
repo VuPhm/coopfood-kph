@@ -1,8 +1,8 @@
-import { getConditionTone, getResolutionTone } from "@coopfood-kph/kph-rules";
-import { Button, cn, Tag } from "@coopfood-kph/ui";
+import { Button, cn, ListItemMarker } from "@coopfood-kph/ui";
 import { Building2, CalendarDays, ChevronDown, ChevronUp, RotateCcw, Scale, Trash2, UserRound } from "lucide-react";
 import { useState, type MouseEvent } from "react";
 
+import { getKphLabelPresentation, KphListLabel } from "./store-kph-label";
 import { EvidenceImageViewer } from "./image-viewer";
 import { approvalLabels, type ApprovalStatus, type EvidencePhotoView, type RecordView } from "./record-view";
 
@@ -26,13 +26,13 @@ type RecordProps = {
 
 export function RecordRow({ actions, onToggle, record, selected, selectionDisabled = false, trashMode }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
-    <td className="p-3 text-center"><input type="checkbox" checked={selected} disabled={selectionDisabled} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
+    <td className="p-3 text-center ui-list-marker-cell"><ListItemMarker variant="bar" tone={getKphLabelPresentation("condition", record.condition).tone} /><label className="history-row-select"><input type="checkbox" checked={selected} disabled={selectionDisabled} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></label></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
     <td className="p-3"><span className="font-mono text-xs font-bold text-brand">{record.sku}</span><br /><strong>{record.productName}</strong></td>
     <td className="max-w-56 p-3 text-ink-muted">{record.supplier}</td>
     <td className="p-3 font-bold">{record.quantity}</td>
-    <td className="p-3"><Tag className="status-badge" tone={getConditionTone(record.condition)}>{record.condition}</Tag></td>
-    <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
+    <td className="p-3"><KphListLabel kind="condition" value={record.condition} /></td>
+    <td className="p-3"><KphListLabel kind="resolution" value={record.resolution} /></td>
     <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
     <td className="p-3"><ApprovalControl busy={actions?.busyIds?.has(record.id)} recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></td>
     <td className="p-3 text-center">{actions?.remove && actions.restore ? <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={actions.remove!} onRestore={actions.restore!} /> : null}</td>
@@ -52,7 +52,8 @@ export function RecordCard({ actions, expanded = false, onExpansionChange, onTog
     if (expanded && !isInteractiveTarget(event)) onExpansionChange?.(record.id, false);
   }
 
-  return <article className={cn("record-card", !expanded && "is-compact", selected && "is-selected")} onClick={expandFromCard}>
+  return <article className={cn("record-card", "ui-list-marker-card", !expanded && "is-compact", selected && "is-selected")} onClick={expandFromCard}>
+    <ListItemMarker variant="bar" tone={getKphLabelPresentation("condition", record.condition).tone} />
     <header className="record-card-header" onClick={collapseFromHeader}>
       <div className="record-card-product"><p className="font-mono text-xs font-bold text-brand">{record.sku}</p><h3 className="font-black">{record.productName}</h3></div>
       <div className="record-card-controls" onClick={(event) => event.stopPropagation()}>
@@ -73,8 +74,8 @@ export function RecordCard({ actions, expanded = false, onExpansionChange, onTog
         <span className="record-card-meta-item is-supplier" aria-label={`Nhà cung cấp ${record.supplier}`} title="Nhà cung cấp"><Building2 aria-hidden="true" /><span>{record.supplier}</span></span>
       </div>
       <div className="record-card-outcomes" aria-label="Tình trạng và biện pháp">
-        <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
-        <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
+        <KphListLabel kind="condition" value={record.condition} />
+        <KphListLabel kind="resolution" value={record.resolution} />
       </div>
       <RecordPhotoGallery photos={record.photos} recordId={record.id} variant="card" />
       <div className="record-card-note" aria-label={`Ghi chú: ${record.note || "Không có ghi chú"}`}>
@@ -95,18 +96,18 @@ export function RecordCard({ actions, expanded = false, onExpansionChange, onTog
 
 function RecordCardStatuses({ compact = false, actions, record }: { compact?: boolean; actions?: RecordActions | undefined; record: RecordView }) {
   return <div className={cn("record-card-statuses", compact && "record-card-compact-outcomes")} aria-label="Tình trạng, biện pháp và duyệt">
-    <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
-    <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
+    <KphListLabel kind="condition" value={record.condition} />
+    <KphListLabel kind="resolution" value={record.resolution} />
     <div className="record-card-approval"><ApprovalControl busy={actions?.busyIds?.has(record.id)} recordId={record.id} status={record.approvalStatus} onChange={actions?.approve} /></div>
   </div>;
 }
 
 function ApprovalControl({ busy = false, onChange, recordId, status }: { busy?: boolean | undefined; onChange?: ((id: string, status: ApprovalStatus) => void | Promise<void>) | undefined; recordId: string; status: ApprovalStatus }) {
-  if (!onChange) return <span>{approvalLabels[status]}</span>;
+  if (!onChange) return <KphListLabel kind="approval" value={approvalLabels[status]} />;
   return <label className="approval-control">
     <span className="sr-only">Duyệt</span>
     <span className="approval-select-shell">
-      <select className={cn("approval-select", `is-${status.toLowerCase()}`)} aria-label={`Trạng thái duyệt phiếu ${recordId}`} aria-busy={busy} disabled={busy} value={status} onChange={(event) => void onChange(recordId, event.target.value as ApprovalStatus)}>
+      <select className={cn("approval-select", `is-${status.toLowerCase()}`, "ui-label-palette")} data-tone={getKphLabelPresentation("approval", status).tone} aria-label={`Trạng thái duyệt phiếu ${recordId}`} aria-busy={busy} disabled={busy} value={status} onChange={(event) => void onChange(recordId, event.target.value as ApprovalStatus)}>
         {(Object.keys(approvalLabels) as ApprovalStatus[]).map((value) => <option key={value} value={value}>{approvalLabels[value]}</option>)}
       </select>
       <ChevronDown className="approval-select-icon" size={13} strokeWidth={2.5} aria-hidden="true" />

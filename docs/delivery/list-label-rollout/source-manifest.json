@@ -1,0 +1,26 @@
+{
+  "checkpoint": "5fdfa3ecfcd54b92aaca5a98c140b56421d094df",
+  "candidate": "working-tree; DATE dependencies include preexisting WIP",
+  "files": {
+    "packages/ui/src/list-label.css": "28fd326bf424c810da8040b8954f7a0b3a58a8061a7b55d3945fb3e541b66c6f",
+    "apps/store-pwa/src/store-date-label.tsx": "a229d0335c1d4df7b3023d8da25d034429deffd884869aeefd74285700a0d35c",
+    "apps/store-pwa/src/store-date-workspace.tsx": "a3642c3b7f0c0900fc3029220d5054558d847ff5abe04f9b2128a14057426f76",
+    "apps/store-pwa/src/store-date-fresh.css": "85dd62520b61de61fe5facd082c76bc4cc992d35465889009441117b89c40a25",
+    "apps/store-pwa/src/store-date-assessment.ts": "494aac6ef04fa02d5f95a6cfb9f04a58227f0b39d59e72a291012cfa8a028542",
+    "apps/store-pwa/src/store-shelf-timeline.tsx": "0a3704d9db3f6f0ba33d494221ae9feaba71c48a719279270ece43b6798ab7d0",
+    "apps/store-pwa/src/store-shelf-label.tsx": "aec45cb82d4fad569107e879922807121fbf6fd5591a7f4008cd68b50a9252dc",
+    "apps/store-pwa/src/store-shelf-history.tsx": "d8f38b3efcbf949a78bdd44a5258cbe5b8da474a27ae50fe86ec686de345ab90",
+    "apps/store-pwa/src/store-shelf-history.test.tsx": "6069f54a7ac9b97cb0a0fef8639623ef38d5aeeedd7cc2e3d3c5090040bc743c",
+    "apps/store-pwa/src/store-app.css": "d2c20dce2584f840278fd7a31fd55cc638e15385b2cb89c2227f7f554814a834",
+    "apps/store-pwa/src/history-records.tsx": "f5811980751dd7264a8dd302e2f46114d7d772e245722ddb312f889bc17caaf4",
+    "apps/store-pwa/src/styles.css": "2b254d516e568543706b5f609c817789f1a6f100b50a0273b72a0626e3563d08",
+    "apps/store-pwa/src/app.tsx": "2e35d0c24d3899026315feb7f71cf79184ab4470ee263f4c53632dc60e182abd",
+    "apps/admin-web/src/list-labels.tsx": "2d5a7fadbb5cd6b01950b9818321f1ca1de4402acd59a1f2fb2964deecc71463",
+    "apps/admin-web/src/list-labels.test.tsx": "6673d97dea8654ed5970abff26913cbd94134aab342aa91655387b9cdec7da15",
+    "apps/admin-web/src/app.tsx": "a493ca3359b25d6860e7f17d18e46a3fbbad4b2351d6ea211ac9d754719aa7d2",
+    "apps/admin-web/src/identity-workspace.tsx": "373a95f8d2e854f5666c39c144895169dafb1c63cb9c241ac283931aeedde591",
+    "apps/admin-web/src/catalog-workspace.tsx": "44136573b1485ddd7c7b3c52b3aba6b985878dc266c5b57e7c121a6a4d8f936b",
+    "e2e/scripts/check-list-label-rollout.cjs": "6f210ecee152b400bd3c67af687f557a898855162fa8817fc990c2e9169b1a4b",
+    "e2e/scripts/check-shelf-history.cjs": "fa62918fffd96c3541a2e2aa53efaaa914bb87c8934e7f8595abab98c16d4d00"
+  }
+}

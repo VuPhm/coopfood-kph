@@ -1,11 +1,19 @@
 # Store App UI DNA
 
+Implemented components, their consumers and variants, and the proposed extension
+priorities are indexed in the [component catalog](STORE_APP_COMPONENT_CATALOG.md)
+(reviewed 2026-10-12). Use it before introducing another control or Store pattern;
+its proposals do not change the acceptance gates or business contracts below.
+
 Status: Round 1 direction accepted by the owner in R1-D04. This document
 records the Store App principles carried through the R1-D01 audit, R1-D02
 comparison, and accepted R1-D03 convergence. The owner-accepted Home visual
 extension dated 2026-10-11 is defined in
 [Store App Visual DNA](STORE_APP_VISUAL_DNA.md); its palette, geometry and usage
-rules guide subsequent Store PWA screens. This principle document does not itself
+rules guide subsequent Store PWA screens. Its name is **Co.op Fresh**
+(`coop-fresh-v1`), the default design direction for future Store PWA UI upgrades
+as recorded on 2026-10-11; individual screens retain their own acceptance gates.
+This principle document does not itself
 authorize implementation of a new delivery slice. Accepted business behavior
 remains governed by the
 [Store App contract index](STORE_APP_CONTRACTS.md) and its linked contracts.

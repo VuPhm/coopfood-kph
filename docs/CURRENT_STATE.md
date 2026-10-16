@@ -1,6 +1,246 @@
 # Trạng thái hiện tại
 
+**Owner chấp nhận KPH/DATE và yêu cầu merge, 16/10/2026:** phản hồi trực tiếp
+“pass, merge” sau preview 4215. Phạm vi gồm KPH CTA trắng/nhãn màu/controls
+compact, DATE nền xanh/nắp trắng và tab hai màn neo trên đỉnh khi cuộn tiếp.
+Các dòng pending bên dưới giữ lịch sử trước quyết định này. Scope UI CLOSED;
+`npm run verify` PASS 257 tests/build và close checker r15 PASS. Tích hợp
+`store-app/figma-mobile-implementation` vào `main` qua
+[PR #12](https://github.com/VuPhm/coopfood-kph/pull/12), nơi ghi CI/merge SHA;
+không mở scope mới. Backend DATE, thiết bị thật và Pages cutover giữ phạm vi
+riêng. [Nghiệm thu và tích hợp](delivery/figma-mobile-implementation/merge-2026-10-16.md).
+
+**KPH + DATE neo tab khi cuộn tiếp, 15/10/2026:** nắp trắng đi lên như trước;
+đến đỉnh thì thanh tab neo theo safe-area, cuộn về đầu trả lại vị trí ban đầu.
+Dùng chung StoreStickyTabs cho hai màn và loading KPH; DATE desktop chỉ neo
+cột danh sách. Focus dưới tab được hiện rõ, popup vẫn ở trên. Technical PASS
+build/37 tests, Playwright hai màn × năm viewport/chữ 150%/focus/sort và
+progressive no shift. Preview 4215 cập nhật; thay đổi mới chưa commit,
+owner/device acceptance pending.
+[Files/checks](delivery/figma-mobile-implementation/sticky-tabs.md).
+
+**Checkpoint và DATE theo KPH, 14/10/2026:** theo “tạm commit, tiếp với date”,
+lưu checkpoint UI local `216c17c` (74 files, `npm run verify` PASS 257 tests/build).
+DATE mới working tree: tìm/quét trên xanh, nắp trắng chứa metadata/tab/list/
+detail, controls compact và focus reveal; giữ workflow/nội dung. Lô đầu lên
+28 px mobile / 84 px desktop. Technical PASS 32 tests/build, Playwright năm
+viewport/150% chữ/focus/empty list và bốn gate DATE; Home/KPH progressive giữ
+no shift. Preview <http://127.0.0.1:4215/#date>, owner/device acceptance pending.
+[Files/checks/giới hạn](delivery/figma-mobile-implementation/date-sliding-cover.md).
+
+**KPH CTA trắng + nhãn màu, 14/10/2026:** owner yêu cầu sửa hai CTA lệch.
+Một cấu trúc chung mobile/desktop: header icon/Tạo phiếu/chevron, nhãn loại
+phiếu cam/xanh ở hàng dưới. CTA nền trắng, min 72 px; bỏ display:contents,
+chevron absolute và override layout cũ. Tìm trước CTA/nắp trượt giữ nguyên.
+Technical PASS build/11 tests, geometry/contrast/chữ 150% ba viewport, Fresh,
+cover năm viewport và progressive no shift. Preview 4215 đã cập nhật,
+owner/device acceptance pending.
+[Bàn giao/files/checks](delivery/figma-mobile-implementation/kph-white-cta.md).
+
+**KPH tìm trước CTA, solid sáng, 14/10/2026:** tìm/quét trước hai CTA ở DOM
+và skeleton; pad trên 12 px mobile/16 px desktop, gap tìm → CTA → nắp 8 px.
+CTA cam nhạt/mint đặc, chữ/icon đậm, hover/pressed/focus rõ trên nền xanh.
+Giữ nội dung và nắp trượt. Build/11 tests, Playwright palette/contrast/order/
+workflow ba viewport, cover năm viewport/150% chữ và progressive no shift PASS.
+Preview 4215 đã cập nhật; owner/device acceptance pending.
+[Follow-up/checks](delivery/figma-mobile-implementation/kph-sliding-cover.md).
+
+**KPH lớp dưới toàn bộ nền xanh, 14/10/2026:** header/app/main/underlay nối
+liền xanh `#00724e`, nắp từ tab xuống vẫn trắng; tăng viền CTA/ô tìm và dùng
+focus trắng trên xanh. Giữ nội dung/geometry/cuộn. Build/Playwright contrast
+ba viewport, cover năm viewport và progressive no shift PASS. Preview 4215
+đã cập nhật; bản nắp trước giữ riêng, owner/device gate pending.
+[Follow-up và checks](delivery/figma-mobile-implementation/kph-sliding-cover.md).
+
+**KPH nắp trượt từ tab trở xuống, 14/10/2026:** tab/thanh thao tác/danh sách
+trong nắp trắng bo góc cuộn lên che CTA/tìm kiếm ở lớp sticky bên dưới. Cuộn
+trang tự nhiên, skeleton đồng bộ, focus upper controls đưa về đầu để hiện rõ;
+nội dung/compact giữ nguyên, thêm 8 px tránh che focus ring. Technical PASS
+build/11 tests, Playwright năm viewport/chữ 150%/empty list/focus, Fresh/
+filter-sort và progressive no shift. Preview 4215 đã cập nhật, build compact
+trước giữ riêng. Owner/device acceptance pending.
+[Bàn giao/checks/rollback](delivery/figma-mobile-implementation/kph-sliding-cover.md).
+
+**KPH thử compact khu chức năng, 14/10/2026:** owner chọn KPH trước, giữ nội
+dung. CTA/spacing/tab gọn hơn, tiêu đề và thanh thao tác cùng hàng khi đủ rộng;
+giữ cỡ chữ, touch 44 px, tìm/quét 48 px và thẻ/dòng phiếu. Phiếu đầu lên cao
+hơn 58 px mobile 390 / 84 px desktop. Technical PASS 11 tests/build,
+Playwright bốn viewport/150% chữ, Fresh/filter-sort và progressive no shift;
+Home/DATE không đổi. Preview thử <http://127.0.0.1:4215/#kph>, bản trước 4213
+giữ riêng. Owner/device acceptance pending, chưa checkpoint/deploy/nhân rộng.
+[Bố cục/checks/rollback](delivery/figma-mobile-implementation/kph-compact-controls.md).
+
+**KPH khu chức năng theo DATE, 13/10/2026:** tìm/quét ở hàng riêng trên tab;
+trong danh sách là tab → tiêu đề + số phiếu → Sắp xếp / Chọn / Lọc.
+Typography 17/13 px, gap controls 12 px và nút 8 px theo DATE, vùng chạm 44 px;
+Chọn có ListChecks và pressed state, badge lọc tự reflow. Live/skeleton đồng bộ.
+Technical PASS 11 tests/build, Playwright bốn viewport/150% chữ/keyboard,
+Fresh và filter-sort ba viewport, progressive Home/KPH hai viewport ≤1 px,
+không layout shift. Preview mới <http://127.0.0.1:4213/#kph> gồm CTA/panel lượt
+trước; build cũ 4213 được giữ nguyên. Owner acceptance pending, không checkpoint
+hoặc deploy; [bàn giao](delivery/figma-mobile-implementation/kph-date-controls.md).
+
+**KPH CTA + panel tạo phiếu, 13/10/2026:** hai CTA cam/xanh dùng icon
+PackagePlus/Leaf, nhãn Tạo phiếu và chevron; live/skeleton chung một control.
+Mobile bottom panel/desktop centered modal, chrome header/X/body như các mục
+khác. Giữ một portal xuyên loading/review, không lặp animation khi tải/resize;
+khung nhẹ paint trước, form gắn sau entrance. Technical PASS 206 tests/build,
+28 targeted cuối, Playwright 390/1440/320 normal/reduce CPU 6×, workflow/zoom/
+contrast/nested popup và skeleton no shift. Lab trung vị mở form 240→120 ms
+mobile, 208→144 ms desktop (CPU 6×); lần đầu vẫn có cost module.
+Owner/device acceptance pending; source working tree base `5fdfa3e`, preview
+<http://127.0.0.1:4201/#kph>, [bàn giao/checks](delivery/figma-mobile-implementation/kph-create-panel.md).
+Các follow-up DATE/rollout có sẵn bên dưới được giữ nguyên; không deploy.
+
+**Nhãn màu + thanh cạnh trái — rollout 12/10/2026:** owner đã chốt KPH
+bằng “đạt, checkp, nhân bản”, checkpoint local `5fdfa3e`; xác nhận nhân rộng
+“Toàn bộ nhãn màu và thanh nhãn”. Đã áp dụng DATE, lịch sử Tra hạn, KPH
+online/Pilot và Admin identity/lifecycle/catalog; cùng palette/gutter, adapter
+giữ nghĩa trạng thái từng feature. DATE thêm bar trang trí theo tình trạng,
+không thêm tiến độ/%; lịch sử giữ snapshot. Technical/browser mock-fixture PASS
+390×844 và 1440×1024; phần nhân rộng chờ owner xem ở 4213.
+[Bàn giao/phạm vi/checks](delivery/list-label-rollout/handoff.md).
+Các ghi chú “chờ chốt KPH” / “không bar DATE” bên dưới là mốc trước yêu cầu này.
+
+**KPH tối ưu thanh nhãn, follow-up 12/10/2026:** bar 3px, dài cố định
+36px mobile/24px desktop; inset/rãnh 12px, cách chữ/control tối thiểu 12px.
+Mobile dùng grid có cột marker và checkbox 44px khi Chọn; desktop căn giữa
+bar, heading/body cùng lề. Technical PASS mock build/typecheck, Playwright
+390/1440/320 về geometry/selection/tên dài 150%/focus và skeleton no shift.
+Thông số 4px/64px/40px bên dưới là mốc trước. Owner xem phần spacing mới tại
+<http://127.0.0.1:4213/#kph>;
+[bàn giao](delivery/figma-mobile-implementation/kph-marker-spacing.md).
+
+**DATE thu gọn summary/chi tiết, follow-up 12/10/2026:** thông tin mã hàng
+đóng gọn, mở thêm metadata khi cần. Chi tiết bỏ summary năm hàng, ngày phóng
+lớn và ghi chú xử lý; giữ tên/SKU/lô, nhãn, timeline và ngày đầy đủ, CTA 48 px.
+Mã hàng còn 62 px; detail giảm 39–52%, CTA không cần cuộn ở 390/1440/320
+và detail 150% chữ. Technical PASS 32 tests/build/PWA, compact/mốc/workflow
+Playwright ba viewport, contrast và metadata keyboard/reflow. Source working
+tree, chờ owner nghiệm thu. Preview <http://127.0.0.1:4201/#date>;
+[bàn giao/checks](delivery/figma-mobile-implementation/date-compact-detail.md).
+
+**KPH palette choice cũ và thanh cạnh trái, follow-up 12/10/2026:** theo
+phản hồi owner, choice Fresh lấy lại bộ cam/đỏ/xám và HỦY đỏ/ĐỔI xanh lá/
+XUẤT TRẢ xanh dương từ KPH_OPTIONS, dùng nền pastel/check riêng và icon đặc
+trưng. Thay dấu tròn cạnh tên bằng bar 4px bo tròn ở cạnh trái mỗi thẻ/dòng,
+accent rõ, không lấn checkbox. Bar vẫn theo tình trạng record; ba nhãn v1 giữ
+nguyên. Technical PASS mock build/typecheck, 44 targeted Store/UI tests,
+Playwright 390/1440/320 về palette/bar/contrast/reflow/workflow; skeleton no
+shift. Bản choice/item trước bên dưới được thay thế, nghiệm thu phần mới pending.
+Preview <http://127.0.0.1:4213/#kph>;
+[bàn giao](delivery/figma-mobile-implementation/kph-choice-bars.md).
+
+**DATE quản lý theo mốc Tra hạn, follow-up 12/10/2026:** danh sách dùng
+nhãn tình trạng DATE và nhãn xử lý độc lập, không còn bar/%. Chi tiết lô dùng
+chung timeline NSX/cảnh báo/hạn lùi/HSD với Tra hạn, kèm SKU/lô; thêm bộ lọc
+DATE. Thiếu NSX/ngày lỗi không suy mốc. Khung trên đã accepted giữ nguyên.
+Theo dõi ngày thực liên tục, thông báo và thống kê ghi hướng mở rộng, chưa
+triển khai. Preview <http://127.0.0.1:4201/#date>; owner nghiệm thu phần mới
+riêng. Technical PASS Store 204 tests, kiểm tra lại DATE 32 tests, build/PWA,
+Playwright 390/1440/320 (nhãn/mốc/filter/workflow/contrast, tăng chữ 150%)
+và hồi quy Tra hạn. [Hướng product](product/DATE_MILESTONE_MODEL.md),
+[bàn giao/checks](delivery/figma-mobile-implementation/date-milestones.md).
+
+**KPH choice và nhãn màu từng item, follow-up 12/10/2026:** owner đã xác
+nhận thích phong cách nhãn v1. Form Fresh chuyển choice thành lưới hai cột,
+condition Khác chiếm hàng cuối; icon/nền/viền theo cùng palette nhãn, có dấu
+tích riêng và native radio. List mobile/desktop thêm dấu tròn cạnh tên hàng,
+màu theo tình trạng; approval không đổi màu dấu này. Technical PASS typecheck,
+200 Store/UI tests, mock build, Playwright choice/list/Fresh 390/1440/320 và
+loading geometry. Chờ owner xem phần mới;
+không thay default/enum/OTHER/workflow hoặc acceptance DATE/KPH r13.
+Preview <http://127.0.0.1:4213/#kph>;
+[bàn giao](delivery/figma-mobile-implementation/kph-choice-items.md).
+
+**KPH nhãn màu danh sách, follow-up 12/10/2026:** đã thiết kế
+[cơ chế nhãn v1](product/LIST_LABEL_SYSTEM.md) cho các list, triển khai trước
+Store Fresh KPH. Nhãn chữ/icon/nền nhẹ cho tình trạng, biện pháp và duyệt; sáu
+tone dùng chung, HỦY trung tính, ĐỔI xanh dương, XUẤT TRẢ tím, Hết HSD đỏ.
+Technical PASS `npm run verify` 253 tests/build, mock build và Playwright
+390/1440/320 về contrast/reflow/interaction; skeleton geometry/no shift PASS.
+Owner đã xác nhận thích phong cách nhãn v1; giữ KPH r13 và DATE gate riêng. Preview build
+<http://127.0.0.1:4213/#kph>; [bàn giao](delivery/figma-mobile-implementation/kph-list-labels.md).
+
+**DATE bar danh sách đã bỏ theo hướng mới ngày 12/10/2026.** Các bản thin bar
+hàng riêng/inline trước đây chỉ giữ lịch sử, đã thay thế bằng nhãn theo mốc
+Tra hạn. [Hướng product](product/DATE_MILESTONE_MODEL.md),
+[bàn giao hiện tại](delivery/figma-mobile-implementation/date-milestones.md).
+
+**DATE khung trên gọn theo KPH, follow-up 12/10/2026:** bỏ tiêu đề/hướng dẫn
+lặp và nhãn nhận diện thừa; nhập/quét/Tìm cùng hàng 48 px. Tiêu đề danh sách
+17 px/650, số lượng 13 px/400 cùng hàng, giữ toàn bộ tìm/lọc/xử lý lô.
+Lô đầu lên sớm 200 px ở 390 và 220 px ở 320. Technical PASS build, 14 tests,
+Playwright 390/1440/320, reflow 150% và contrast; owner nghiệm thu khung trên
+ngày 12/10/2026 qua “đạt”.
+Preview mock <http://127.0.0.1:4201/#date>, source đang working tree.
+[Bàn giao mới nhất](delivery/figma-mobile-implementation/date-top-refinement.md).
+
+**DATE dựng lại bố cục, follow-up 11/10/2026:** owner cho phép bỏ trình bày
+cũ sau phản hồi lệch space. Gom tìm/quét thành một vùng; tab, lọc/sắp xếp và
+thẻ lô thành một vùng thống nhất lề. Mobile một cột, desktop danh sách cạnh
+chi tiết; NSX/HSD dùng hàng riêng, CTA cam/xanh cùng kích thước. Follow-up
+owner muốn hiện nhiều mục: thẻ pad 12/gap 8, nhãn-ngày cùng dòng; chiều cao
+danh sách giảm 25% ở 390/1440 và 31% ở 320, không giảm cỡ chữ. Technical PASS
+build, 14 tests, Playwright 390/1440/320 về geometry/reflow 150%, workflow và
+contrast. Owner acceptance pending, preview <http://127.0.0.1:4201/#date>.
+[Bàn giao hiện hành](delivery/figma-mobile-implementation/date-recomposition.md).
+Các mốc DATE bên dưới giữ lịch sử; bố cục follow-up KPH trước đó đã được thay.
+
+**DATE theo mẫu KPH, follow-up 11/10/2026:** owner xác nhận dùng KPH vừa chỉnh.
+Popup sắp xếp dùng chung, hộp lọc chia nhóm/badge/reset, CTA cam/xanh và tab
+44 px ổn định ở 390/1440/320; giữ tìm/quét và workflow DATE. Technical PASS
+182 Store tests/build, DATE/KPH targeted browser, contrast và modal/progressive.
+Owner acceptance còn pending; bản mới đang working tree trên base `c6d9fa5`,
+preview <http://127.0.0.1:4201/#date>. Candidate/plan r14 và 4202 bên dưới là mốc
+đã commit trước follow-up. [Bàn giao](delivery/figma-mobile-implementation/date-kph-reference.md).
+
+**KPH dropdown/hộp lọc follow-up 11/10/2026** theo “1 round nữa”: popup sắp xếp
+bám nút, lựa chọn rõ; hộp lọc chia nhóm, badge tiêu chí và footer luôn nhìn thấy.
+Giữ áp dụng ngay/state nghiệp vụ. Follow-up icon: KPH/DATE dùng cùng
+SlidersHorizontal 20 px/nét 1,8, icon điều khiển căn tâm; tìm/quét chuyển
+Lucide cùng skeleton. Build/geometry/contrast 3 viewport và progressive
+không shift PASS; owner acceptance pending. Technical PASS Store 182 tests/build,
+Playwright 390/1440/320, contrast scoped và modal/progressive regression.
+Owner acceptance lượt này pending; KPH r13 đã duyệt và DATE r14 pending giữ riêng.
+[Bàn giao](delivery/figma-mobile-implementation/kph-filter-sort.md),
+preview mock <http://127.0.0.1:4201/#kph>.
+
+**DATE hợp nhất + Co.op Fresh r14** theo yêu cầu owner 11/10/2026: bỏ Tra cứu
+riêng, một thanh tìm/quét SKU/barcode/tên/lô và metadata trong DATE. Home/rail
+bỏ Tra cứu, mobile còn 3 mục; `#lookup` chuyển về DATE. Fixture lô/catalog
+thống nhất, giữ xử lý và state phiên. Technical PASS 230 tests/build, browser
+3 viewport và contrast 24 trạng thái; nghiệm thu owner còn pending.
+[Bàn giao r14](delivery/figma-mobile-implementation/date-coop-fresh.md),
+preview mock <http://127.0.0.1:4202/#date>. KPH r13 acceptance bên dưới giữ riêng.
+
+**KPH Co.op Fresh r13 đã được owner duyệt ngày 11/10/2026** qua “duyệt, checkpoint”.
+Phạm vi: giao diện danh sách/form/sheets, hai CTA cam/xanh và tab tương phản rõ
+trên preview 4201. Technical PASS: build, contrast 66 trạng thái, Fresh 3 viewport
+và progressive layout; workflow/mock regression có bằng chứng riêng. Lưu checkpoint
+local trên `store-app/figma-mobile-implementation`; không push/merge/deploy.
+[Bàn giao và nghiệm thu](delivery/figma-mobile-implementation/kph-coop-fresh-colors.md).
+
+Các trạng thái pending ở mục r12 trở xuống là lịch sử hoặc gate khác (backend,
+thiết bị thật, cycle trước), không phải nghiệm thu giao diện KPH r13 hiện tại.
+
 Cập nhật: 2026-10-11
+
+Owner yêu cầu “làm” kế hoạch KPH Fresh: r12 triển khai F1–F3 trong working tree
+trên base `c8365e6`. Danh sách/thẻ/bảng, form và skeleton, detail/filter/export
+cùng Co.op Fresh; tìm/sắp xếp hiện trên mobile. Evidence và preview riêng ở
+[bàn giao KPH Fresh](delivery/figma-mobile-implementation/kph-coop-fresh-handoff.md).
+Technical PASS: `npm run verify` 228 tests/build, mock/online build và 9 gate
+Playwright; geometry skeleton ≤1px, không shift, workflow/workbook/offline PASS.
+Owner visual/workflow acceptance cho bản này pending; lịch sử chuẩn bị bên dưới
+không còn là trạng thái runtime hiện hành. Không suy ra merge/deploy từ lượt này.
+
+Trong lúc nghiệm thu, owner yêu cầu lập kế hoạch nâng KPH và đặt tên phong cách.
+**Co.op Fresh** (`coop-fresh-v1`) được ghi là mặc định thiết kế cho các nâng cấp
+Store PWA tiếp theo trong [Visual DNA](product/STORE_APP_VISUAL_DNA.md).
+[Kế hoạch KPH r11](delivery/figma-mobile-implementation/kph-coop-fresh-plan.md)
+chi tiết rollout r6: danh sách → tạo phiếu → chi tiết/duyệt/xuất. Chỉ cập nhật
+docs trên checkpoint `91f0c70`; chưa reskin, gate nghiệm thu hiện tại giữ nguyên.
 
 Git checkpoint 11/10 theo yêu cầu owner: lưu toàn bộ các follow-up UI và tối ưu
 hiện tại trên nhánh `store-app/figma-mobile-implementation` bằng commit local.

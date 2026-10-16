@@ -35,7 +35,7 @@ fs.mkdirSync(output, { recursive: true });
         { id: 'filter', route: 'kph', opener: () => page.getByRole('button', { name: 'Lọc phiếu KPH', exact: true }), title: 'Lọc & sắp xếp' },
         { id: 'create', route: 'kph', opener: () => page.locator('.store-create-actions .create-tpts'), title: /phiếu/i },
         { id: 'quick', route: 'kph', opener: () => page.locator('.store-quick-fab'), title: 'Tra cứu lùi hàng nhanh' },
-      ]) {
+      ].filter(scenario => !process.env.INP_SCENARIO || scenario.id === process.env.INP_SCENARIO)) {
         await page.goto(`${baseUrl}/#${scenario.route}`);
         if (process.env.PWA_FIRST_INSTALL === 'true' && scenario.id === 'account') {
           await page.evaluate(async () => { await navigator.serviceWorker.ready; });

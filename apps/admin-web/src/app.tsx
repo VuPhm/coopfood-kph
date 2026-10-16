@@ -1,4 +1,5 @@
-import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Input, Tag } from "@coopfood-kph/ui";
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Input, ListItemMarker } from "@coopfood-kph/ui";
+import { AdminListLabel, schedulePresentation } from "./list-labels";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, CheckCircle2, Clock3, KeyRound, Leaf, LogOut, MapPinned, RefreshCw, ShieldCheck, Store, XCircle } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -245,10 +246,11 @@ function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loa
 function ScheduleCard({ schedule, onAction }: { schedule: LifecycleSchedule; onAction(type: ScheduleAction): void }) {
   const scheduled = schedule.status === "SCHEDULED";
   const due = businessTodayIso() >= schedule.effectiveDate;
-  const status = statusPresentation(schedule.status);
+  const status = schedulePresentation(schedule.status, due);
   const TargetIcon = schedule.target.type === "REGION" ? MapPinned : Store;
-  return <article className="rounded-2xl border border-surface-strong bg-surface-muted/55 p-4 sm:p-5">
-    <div className="flex flex-wrap items-start justify-between gap-3"><div className="flex min-w-0 items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-brand"><TargetIcon aria-hidden="true" size={20} /></span><div className="min-w-0"><p className="font-black">{schedule.target.code} · {schedule.target.name}</p><p className="mt-1 text-xs text-ink-muted">{schedule.target.type === "REGION" ? "Vùng" : `Cửa hàng · ${schedule.target.regionName}`}</p></div></div><Tag tone={status.tone}>{status.label}</Tag></div>
+  return <article className="ui-list-marker-card rounded-2xl border border-surface-strong bg-surface-muted/55 p-4 sm:p-5">
+    <ListItemMarker variant="bar" tone={status.tone} />
+    <div className="flex flex-wrap items-start justify-between gap-3"><div className="flex min-w-0 items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-brand"><TargetIcon aria-hidden="true" size={20} /></span><div className="min-w-0"><p className="font-black">{schedule.target.code} · {schedule.target.name}</p><p className="mt-1 text-xs text-ink-muted">{schedule.target.type === "REGION" ? "Vùng" : `Cửa hàng · ${schedule.target.regionName}`}</p></div></div><AdminListLabel category="Lịch ngừng hoạt động" presentation={status} /></div>
     <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2"><div><dt className="text-xs font-bold uppercase tracking-wide text-ink-muted">Ngày hiệu lực</dt><dd className="mt-1 font-black">{toDisplayDate(schedule.effectiveDate)}</dd></div><div><dt className="text-xs font-bold uppercase tracking-wide text-ink-muted">Cập nhật bởi</dt><dd className="mt-1 font-semibold">{schedule.updatedBy.displayName}</dd></div></dl>
     <p className="mt-4 rounded-xl bg-white px-3 py-3 text-sm leading-6 text-ink-muted">{schedule.reason}</p>
     {scheduled ? <div className="mt-4 flex flex-wrap gap-2"><Button onClick={() => onAction("reschedule")} variant="secondary">Đổi lịch</Button><Button onClick={() => onAction("cancel")} variant="ghost">Hủy lịch</Button><Button disabled={!due} onClick={() => onAction("execute")} variant="danger"><ShieldCheck aria-hidden="true" size={17} />{due ? "Thực thi" : `Chờ đến ${toDisplayDate(schedule.effectiveDate)}`}</Button></div> : null}
@@ -290,12 +292,6 @@ function LoginScreen({ busy, error, notice, onLogin }: { busy: boolean; error: s
 
 function LoadingScreen() { return <main className="grid min-h-dvh place-items-center bg-canvas text-ink"><p className="flex items-center gap-3 font-bold" role="status"><RefreshCw className="animate-spin motion-reduce:animate-none text-brand" aria-hidden="true" />Đang mở Admin Web…</p></main>; }
 function LoadFailure({ message, onRetry }: { message: string; onRetry(): void }) { return <main className="grid min-h-dvh place-items-center bg-canvas px-4 text-ink"><section className="max-w-md rounded-3xl border border-surface-strong bg-white p-6 text-center shadow-panel"><XCircle className="mx-auto text-danger" aria-hidden="true" /><h1 className="mt-4 text-xl font-black">Chưa thể mở Admin Web</h1><p className="mt-2 text-sm text-ink-muted">{message}</p><Button className="mt-5" onClick={onRetry}>Thử lại</Button></section></main>; }
-
-function statusPresentation(status: LifecycleSchedule["status"]): { label: string; tone: "orange" | "green" | "gray" } {
-  if (status === "SCHEDULED") return { label: "Đang chờ", tone: "orange" };
-  if (status === "EXECUTED") return { label: "Đã thực thi", tone: "green" };
-  return { label: "Đã hủy", tone: "gray" };
-}
 
 function actionCopy(type: ScheduleAction | undefined) {
   if (type === "reschedule") return { title: "Đổi ngày hiệu lực", description: "Ngày mới phải cách ngày hiện tại ít nhất 30 ngày.", submit: "Lưu ngày mới" };

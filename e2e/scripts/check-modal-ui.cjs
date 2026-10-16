@@ -22,7 +22,7 @@ const output = '.local/modal-unification'; fs.mkdirSync(output, { recursive: tru
         await expect(dialog).toHaveCSS('animation-name', 'none');
         const header = dialog.locator(name === 'account' ? '.store-account-hero' : '[data-slot="dialog-header"]');
         await expect(header).toHaveCSS('background-image', accountReference.background);
-        // The full task form keeps its compact back-button header geometry.
+        // Create uses the same sheet header gutter.
         if (name !== 'create') await expect(header).toHaveCSS('padding-left', accountReference.padding);
         const title = header.locator('[data-slot="dialog-title"]');
         await expect(title).toHaveCSS('color', accountReference.color);
@@ -99,11 +99,11 @@ const output = '.local/modal-unification'; fs.mkdirSync(output, { recursive: tru
         { name: 'account', title: 'Tài khoản', opener: () => page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true }) },
         { name: 'filter', title: 'Lọc & sắp xếp', opener: () => page.getByRole('button', { name: 'Lọc phiếu KPH', exact: true }) },
         { name: 'detail', title: 'Chi tiết phiếu KPH', opener: () => page.locator(viewport.width < 900 ? '.store-ticket-open' : '.store-kph-table tbody button').first() },
-        { name: 'create', title: /phiếu/i, opener: () => page.locator('.store-create-actions .create-tpts'), fullScreen: viewport.width < 900 },
+        { name: 'create', title: /phiếu/i, opener: () => page.locator('.store-create-actions .create-tpts') },
       ]) {
         const opener = scenario.opener(); await opener.click();
         const dialog = page.getByRole('dialog', { name: scenario.title });
-        // The lazy form replaces its loading dialog; inspect the ready form.
+        // Wait for the body to become interactive inside the persistent dialog.
         if (scenario.name === 'create') await expect(dialog.locator('.create-dialog-form')).toBeVisible();
         await chrome(dialog, scenario.name, scenario.fullScreen);
         if (scenario.name === 'create' && !scenario.fullScreen) {

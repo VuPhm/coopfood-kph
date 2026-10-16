@@ -31,8 +31,9 @@ describe("Mock KPH history contract", () => {
   it("creates the currently selected type from the toolbar action", async () => {
     render(<KphWorkspace records={mockRecords} onRecordsChange={vi.fn()} onNotice={vi.fn()} />);
     fireEvent.click(screen.getByRole("group", { name: "Loại phiếu" }).querySelector("button")!);
-    fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu TP khô & khác" }));
-    await screen.findByRole("textbox", { name: "Tên hàng hóa" });
+    fireEvent.click(within(document.querySelector(".store-kph-toolbar") as HTMLElement).getByRole("button", { name: "Tạo phiếu TP khô & khác" }));
+    // The first lazy form import also compiles its dependencies in a cold suite.
+    await screen.findByRole("textbox", { name: "Tên hàng hóa" }, { timeout: 5000 });
     expect(await screen.findByText("TP khô & khác", { selector: "small" })).toBeInTheDocument();
   });
 

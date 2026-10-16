@@ -85,7 +85,7 @@ fs.mkdirSync(output, { recursive: true });
       await page.locator('.store-create-actions .create-tpts').click();
       await expect(page.getByRole('textbox', { name: 'Mã SKU / UPC', exact: true })).toBeVisible();
       await page.screenshot({ path: `${output}/form-${viewport.width}.png` });
-      await page.getByRole('button', { name: 'Về danh sách KPH', exact: true }).click();
+      await page.locator('.store-create-screen').getByRole('button', { name: 'Đóng', exact: true }).click();
       for (const chunk of ['store-kph-workspace-', 'create-record-dialog-', 'excel-export-']) {
         expect(chunkResponses.some(response => response.url.includes(chunk) && response.worker)).toBe(true);
       }

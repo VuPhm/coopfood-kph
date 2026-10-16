@@ -20,7 +20,7 @@ fs.mkdirSync(output, { recursive: true });
         await expect(nav).toBeHidden();
       } else {
         await expect(nav).toBeVisible();
-        await expect(nav.getByRole('link')).toHaveCount(4);
+        await expect(nav.getByRole('link')).toHaveCount(3);
         await expect(nav.getByRole('link', { name: 'KPH', exact: true })).toHaveAttribute('aria-current', 'page');
         const navBox = await nav.boundingBox();
         const fabBox = await fab.boundingBox();
@@ -81,7 +81,7 @@ fs.mkdirSync(output, { recursive: true });
         await expect(quick.getByRole('textbox', { name: 'HSD (Số ngày)', exact: true })).toHaveValue('10');
         await quick.getByRole('button', { name: 'Đóng tiện ích', exact: true }).click();
         await expect(fab).toBeFocused();
-        for (const [label, route] of [['Tra cứu', 'lookup'], ['Trang chủ', 'home'], ['KPH', 'kph']]) {
+        for (const [label, route] of [['Trang chủ', 'home'], ['KPH', 'kph']]) {
           const link = nav.getByRole('link', { name: label, exact: true });
           await link.focus();
           await page.keyboard.press('Enter');

@@ -1,5 +1,6 @@
-import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from "react";
-import { Button, Dialog, DialogContent, DialogDescription, DialogTitle } from "@coopfood-kph/ui";
+import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
+import { memo, useCallback, useEffect, useImperativeHandle, useId, useMemo, useRef, useState, useLayoutEffect, type Ref } from "react";
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
 import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
 import type { CreateRecordDialog, CreatedRecordDraft } from "./create-record-dialog";
 import { approvalLabels, type ApprovalStatus, type RecordView } from "./record-view";
@@ -10,7 +11,10 @@ import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { EvidenceImageViewer } from "./image-viewer";
 import { StoreKphList } from "./store-kph-list";
+import { KphQuickSort, KPH_SORT_OPTIONS } from "./store-kph-sort";
+import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, Maximize, Search, SlidersHorizontal } from "lucide-react";
 import { KphFormSkeleton } from "./store-kph-loading";
+import { KphCreateButton } from "./store-kph-create-button";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 
 const loadCreateForm = () => import("./create-record-dialog");
@@ -101,11 +105,16 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
   }
 
   return <div className="store-kph">
-    <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <button key={k} className={`create-${k.toLowerCase()}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)}><span><img data-figma-render-width="15" data-figma-render-height="15" src={figmaAsset("main-2", k === "TPCN" ? "imgFeatherPackage" : "imgFeatherShoppingBag")} alt="" /></span><strong><span className="store-create-desktop">Tạo · </span>{labels[k]}</strong></button>)}</div></section>
-    <section className="store-ticket-list" aria-label="Phiếu khai báo">
-      <div className="store-list-heading"><h2>Phiếu khai báo</h2><div><button className="store-compact" onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}>{selectionMode ? "Xong" : "Chọn"}</button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} /></div></div>
-      <div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div>
-      <div className="store-kph-toolbar"><label className="store-kph-search"><img className="store-kph-search-icon" data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-1", "imgFeatherSearch")} alt="" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(kind)}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("203-701", "imgFeatherMaximize")} alt="" /></button><select aria-label="Sắp xếp phiếu" value={sort} onChange={e => setSort(e.target.value)}><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option><option value="name">Tên hàng</option></select><span className="store-result-count">{filtered.length} phiếu</span></div>
+    <div className="store-kph-underlay" onFocusCapture={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(kind)}><Maximize size={20} aria-hidden="true" /></button></div>
+    <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <KphCreateButton key={k} kind={k} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)} />)}</div></section>
+    </div>
+    <section className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
+      <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div></StoreStickyTabs>
+      <div className="store-kph-list-controls">
+        <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{filtered.length} phiếu</span></div>
+        <div className="store-kph-list-toolbar"><KphQuickSort sort={sort} onChange={setSort} /><button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} /></div>
+      </div>
       {selectionMode ? <div className="store-batch"><label><input type="checkbox" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
         const visibleIds = new Set(visible.map(r => r.id));
         setSelection(e.target.checked ? [...new Set([...selection, ...visibleIds])] : selection.filter(id => !visibleIds.has(id)));
@@ -117,13 +126,13 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
     </section>
     <KphCreateControl ref={createDialogRef} onSaved={save} />
 
-    <StoreSheet open={exportOpen} onOpenChange={open => { if (!exporting) setExportOpen(open); }} title="Xuất Excel" description="Xác nhận xuất các phiếu đủ điều kiện">
+    <StoreSheet open={exportOpen} onOpenChange={open => { if (!exporting) setExportOpen(open); }} className="store-kph-sheet store-kph-export" title="Xuất Excel" description="Xác nhận xuất các phiếu đủ điều kiện">
       <Summary rows={[["Cửa hàng", mockProfile.storeName], ["Loại phiếu", labels[kind]], ["Đủ điều kiện", `${eligible.length} phiếu đã duyệt`], ["Không đưa vào file", `${selection.length - eligible.length} phiếu`]]} />
       <p className="store-muted">Chỉ phiếu đã gửi và đã duyệt được đưa vào file. File này dùng dữ liệu mẫu.</p>{error ? <p className="store-error" role="alert">{error}</p> : null}
       <div className="store-sheet-actions"><Button variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button><Button className="store-button" disabled={!eligible.length || exporting} onClick={() => void download()}>{exporting ? "Đang xuất…" : "Tải xuống"}</Button></div>
     </StoreSheet>
-    <StoreSheet className="store-kph-detail" open={active !== null} onOpenChange={open => { if (!open) setActive(null); }} title="Chi tiết phiếu KPH" description="Nội dung và trạng thái phiếu trong dữ liệu mẫu">
-      {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "Thực phẩm khô & khác" : "Thực phẩm tươi sống"} · {active.id}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["SKU", active.sku || "—"], ["UPC", active.barcode || "—"], ["Nhà cung cấp", active.supplier || "—"], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Biện pháp", active.resolution], ["Trạng thái duyệt", approvalLabels[active.approvalStatus]]]} /></section><section><h3>Ghi nhận</h3><Summary rows={[["Ghi chú", active.note || "Không có"]]} /><div className="store-review-photos">{active.photos.map(p => <button key={p.id} onClick={() => setImage(p)}><img src={p.src} alt={p.alt} /></button>)}</div>{!active.photos.length ? <p className="store-muted">Phiếu mẫu chưa có ảnh minh chứng.</p> : null}</section><div className="store-sheet-actions"><Button variant="ghost" onClick={() => review("REJECTED")}>Không duyệt</Button><Button className="store-button" onClick={() => review("APPROVED")}>Duyệt phiếu</Button></div></> : null}
+    <StoreSheet className="store-kph-sheet store-kph-detail" open={active !== null} onOpenChange={open => { if (!open) setActive(null); }} title="Chi tiết phiếu KPH" description="Nội dung và trạng thái phiếu trong dữ liệu mẫu">
+      {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "Thực phẩm khô & khác" : "Thực phẩm tươi sống"} · {active.id}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["SKU", active.sku || "—"], ["UPC", active.barcode || "—"], ["Nhà cung cấp", active.supplier || "—"], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Biện pháp", active.resolution], ["Trạng thái duyệt", approvalLabels[active.approvalStatus]]]} /></section><section><h3>Ghi nhận</h3><Summary rows={[["Ghi chú", active.note || "Không có"]]} /><p className="store-evidence-count">Ảnh minh chứng · {active.photos.length}/3</p><div className="store-review-photos">{active.photos.map((p, index) => <button key={p.id} aria-label={`Xem ảnh minh chứng ${index + 1}`} onClick={() => setImage(p)}><img src={p.src} alt={p.alt} /><span>{index + 1}</span></button>)}</div>{!active.photos.length ? <p className="store-muted">Phiếu mẫu chưa có ảnh minh chứng.</p> : null}</section><div className="store-sheet-actions"><Button variant="ghost" onClick={() => review("REJECTED")}>Không duyệt</Button><Button className="store-button" onClick={() => review("APPROVED")}>Duyệt phiếu</Button></div></> : null}
     </StoreSheet>
     <EvidenceImageViewer image={image} open={image !== null} onOpenChange={open => { if (!open) setImage(null); }} />
   </div>;
@@ -137,14 +146,20 @@ const KphFilterControl = memo(function KphFilterControl({ from, onFromChange, to
   sort: string; onSortChange: (value: string) => void; filterError: string;
 }) {
   const [open, setOpen] = useState(false);
+  const summaryId = useId();
+  const activeCount = Number(Boolean(from)) + Number(Boolean(to)) + Number(approval !== "ALL") + Number(sort !== "newest");
   return <>
-    <button className="store-filter" aria-label="Lọc phiếu KPH" onClick={() => setOpen(true)}><img data-figma-asset-slot="kph-filter" src={figmaAsset("r2", "imgFeatherSliders")} alt="" /></button>
-    <StoreSheet open={open} onOpenChange={setOpen} title="Lọc & sắp xếp" description="Bộ lọc phiếu áp dụng ngay khi thay đổi">
-      <h3>Ngày phát hiện hàng KPH</h3><div className="store-date-range"><div className="store-field"><label htmlFor="filter-from">Từ ngày</label><CalendarInput id="filter-from" label="Từ ngày" initialMonth={formatBusinessDate(new Date()).iso} value={from} onValueChange={onFromChange} /></div><span>→</span><div className="store-field"><label htmlFor="filter-to">Đến ngày</label><CalendarInput id="filter-to" label="Đến ngày" initialMonth={formatBusinessDate(new Date()).iso} value={to} onValueChange={onToChange} /></div></div>
-      {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
-      <h3>Trạng thái duyệt</h3><div className="store-choices">{([ ["ALL", "Tất cả"], ["PENDING", "Chờ duyệt"], ["APPROVED", "Đã duyệt"], ["REJECTED", "Không duyệt"] ] as const).map(([key, label]) => <button key={key} aria-pressed={approval === key} className={approval === key ? "is-selected" : ""} onClick={() => onApprovalChange(key)}>{label}</button>)}</div>
-      <h3>Sắp xếp</h3><div className="store-choices">{[["newest", "Mới nhất"], ["oldest", "Cũ nhất"], ["name", "Tên hàng"]].map(([key, label]) => <button key={key} aria-pressed={sort === key} className={sort === key ? "is-selected" : ""} onClick={() => onSortChange(key!)}>{label}</button>)}</div>
-      <p className="store-muted">Bộ lọc áp dụng ngay. Lựa chọn phiếu được đặt lại khi đổi bộ lọc hoặc trang.</p><button className="store-reset-filter" onClick={() => { onFromChange(""); onToChange(""); onApprovalChange("ALL"); onSortChange("newest"); }}>Đặt lại bộ lọc</button>
+    <button className={`store-filter ${activeCount ? "is-filtered" : ""}`} aria-label="Lọc phiếu KPH" aria-describedby={summaryId} onClick={() => setOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeCount ? <span className="store-filter-count" aria-hidden="true">{activeCount}</span> : null}</button>
+    <span id={summaryId} className="sr-only">{activeCount ? `${activeCount} tiêu chí lọc hoặc sắp xếp đang dùng` : "Chưa có bộ lọc"}</span>
+    <StoreSheet open={open} onOpenChange={setOpen} className="store-kph-sheet store-kph-filter" title="Lọc & sắp xếp" description="Bộ lọc phiếu áp dụng ngay khi thay đổi">
+      <section className="store-kph-filter-section" aria-labelledby="kph-filter-dates"><h3 id="kph-filter-dates"><CalendarDays size={18} aria-hidden="true" />Ngày phát hiện hàng KPH</h3>
+        <div className="store-date-range"><div className="store-field"><label htmlFor="filter-from">Từ ngày</label><CalendarInput id="filter-from" label="Từ ngày" initialMonth={formatBusinessDate(new Date()).iso} value={from} onValueChange={onFromChange} /></div><span aria-hidden="true">→</span><div className="store-field"><label htmlFor="filter-to">Đến ngày</label><CalendarInput id="filter-to" label="Đến ngày" initialMonth={formatBusinessDate(new Date()).iso} value={to} onValueChange={onToChange} /></div></div>
+        {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
+      </section>
+      <section className="store-kph-filter-section" aria-labelledby="kph-filter-status"><h3 id="kph-filter-status"><CircleCheck size={18} aria-hidden="true" />Trạng thái duyệt</h3><div className="store-choices" role="group" aria-label="Trạng thái duyệt">{([ ["ALL", "Tất cả"], ["PENDING", "Chờ duyệt"], ["APPROVED", "Đã duyệt"], ["REJECTED", "Không duyệt"] ] as const).map(([key, label]) => <button key={key} aria-pressed={approval === key} className={approval === key ? "is-selected" : ""} onClick={() => onApprovalChange(key)}><span>{label}</span><Check size={16} aria-hidden="true" className={approval === key ? "" : "is-hidden"} /></button>)}</div></section>
+      <section className="store-kph-filter-section" aria-labelledby="kph-filter-sort"><h3 id="kph-filter-sort"><ArrowDownWideNarrow size={18} aria-hidden="true" />Sắp xếp</h3><div className="store-choices store-kph-filter-sort" role="group" aria-label="Thứ tự phiếu">{KPH_SORT_OPTIONS.map(({value, label}) => <button key={value} aria-pressed={sort === value} className={sort === value ? "is-selected" : ""} onClick={() => onSortChange(value)}><span>{label}</span><Check size={16} aria-hidden="true" className={sort === value ? "" : "is-hidden"} /></button>)}</div></section>
+      <p className="store-muted">Thay đổi áp dụng ngay. Lựa chọn phiếu được đặt lại khi đổi bộ lọc hoặc trang.</p>
+      <div className="store-kph-filter-footer"><button className="store-reset-filter" onClick={() => { onFromChange(""); onToChange(""); onApprovalChange("ALL"); onSortChange("newest"); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setOpen(false)}>Xong</Button></div>
     </StoreSheet>
   </>;
 });
@@ -154,41 +169,75 @@ type KphCreateHandle = { open: (kind: KphKind) => void };
 const KphCreateControl = memo(function KphCreateControl({ ref, onSaved }: {
   ref: Ref<KphCreateHandle>; onSaved: (draft: CreatedRecordDraft) => Promise<void>;
 }) {
-  const [kind, setKind] = useState<KphKind | null>(null);
+  const [kind, setKind] = useState<KphKind>("TPTS");
+  const [open, setOpen] = useState(false);
+  const [session, setSession] = useState(0);
+  const [entranceReady, setEntranceReady] = useState(false);
+  const [readySession, setReadySession] = useState<number | null>(null);
+  const [reviewing, setReviewing] = useState(false);
   const [Form, setForm] = useState<typeof CreateRecordDialog | null>(null);
   const [failed, setFailed] = useState(false);
   const opener = useRef<HTMLElement | null>(null);
+  const dialog = useRef<HTMLDivElement | null>(null);
   const pendingScroll = useRef(0);
-  const currentKind = useRef(kind); currentKind.current = kind;
+  const initialScroll = useRef(0);
   useImperativeHandle(ref, () => ({ open: value => {
     opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     pendingScroll.current = 0;
+    initialScroll.current = 0;
+    setReviewing(false);
+    setEntranceReady(false);
+    setReadySession(null);
+    setSession(value => value + 1);
     setKind(value);
+    setOpen(true);
   } }), []);
   useEffect(() => {
-    if (!kind || Form) return;
+    if (!open || Form) return;
     let current = true;
-    loadCreateForm().then(module => { if (current) setForm(() => module.CreateRecordDialog); })
-      .catch(() => { if (current) setFailed(true); });
+    loadCreateForm().then(module => {
+      if (!current) return;
+      setForm(() => module.CreateRecordDialog);
+    }).catch(() => { if (current) setFailed(true); });
     return () => { current = false; };
-  }, [kind, Form]);
-  const changeOpen = useCallback((open: boolean) => { if (!open) setKind(null); }, []);
-  const restoreFocus = useCallback((event: Event) => { event.preventDefault(); opener.current?.focus(); }, []);
-  if (Form) return <Form initialScrollTop={pendingScroll.current} kind={kind} open={kind !== null} onOpenChange={changeOpen} onCloseAutoFocus={restoreFocus} onOpenAutoFocus={event => {
-    if (!pendingScroll.current || !(event.target instanceof HTMLElement)) return;
-    event.preventDefault();
-    event.target.querySelector<HTMLElement>(".store-form-back")?.focus({ preventScroll: true });
-    const form = event.target.querySelector<HTMLElement>(".create-dialog-form");
-    if (form) form.scrollTop = pendingScroll.current;
-  }} onSaved={onSaved} onBarcodeLookup={mockBarcodeLookup} profile={mockProfile} actorReadOnly onlineMode presentation="screen" />;
-  return <Dialog open={kind !== null} onOpenChange={changeOpen}><DialogContent data-kind={kind?.toLowerCase()} className="store-create-screen create-dialog-content store-create-loading p-0 sm:p-0" onScrollCapture={event => {
+  }, [open, Form]);
+  useEffect(() => {
+    if (!open) return;
+    let current = true;
+    let secondFrame = 0;
+    // Paint the light surface first. Do not mount the full form during its entrance.
+    const firstFrame = window.requestAnimationFrame(() => {
+      const animations = dialog.current?.getAnimations?.() ?? [];
+      void Promise.all(animations.map(animation => animation.finished.catch(() => {}))).then(() => {
+        if (!current) return;
+        secondFrame = window.requestAnimationFrame(() => { if (current) setEntranceReady(true); });
+      });
+    });
+    return () => { current = false; window.cancelAnimationFrame(firstFrame); window.cancelAnimationFrame(secondFrame); };
+  }, [open, session]);
+  useEffect(() => {
+    if (!open || !Form || !entranceReady || readySession === session) return;
+    initialScroll.current = pendingScroll.current;
+    setReadySession(session);
+  }, [open, Form, entranceReady, readySession, session]);
+  useLayoutEffect(() => {
+    // A focused loading-only control may disappear; keep focus inside the same surface.
+    if (open && readySession === session && document.activeElement === document.body) dialog.current?.querySelector<HTMLElement>('[data-slot="dialog-close"]')?.focus({ preventScroll: true });
+  }, [open, readySession, session]);
+  const changeOpen = useCallback((next: boolean) => setOpen(next), []);
+  const restoreFocus = useCallback((event: Event) => { event.preventDefault(); opener.current?.focus({ preventScroll: true }); }, []);
+  return <Dialog open={open} onOpenChange={changeOpen}><DialogContent ref={dialog} data-kind={kind.toLowerCase()} data-reviewing={reviewing ? "true" : "false"} aria-busy={readySession !== session && !failed} className="store-create-screen create-dialog-content p-0 sm:p-0" aria-describedby="kph-create-description" onScrollCapture={event => {
     if (event.target instanceof HTMLElement && event.target.classList.contains("create-dialog-form")) pendingScroll.current = event.target.scrollTop;
-  }} onInteractOutside={event => event.preventDefault()} onCloseAutoFocus={event => {
-    // Replacing the loading dialog must not move focus outside the real form.
-    if (currentKind.current) event.preventDefault(); else restoreFocus(event);
+  }} onInteractOutside={event => event.preventDefault()} onCloseAutoFocus={restoreFocus} onOpenAutoFocus={event => {
+    event.preventDefault();
+    dialog.current?.querySelector<HTMLElement>('[data-slot="dialog-close"]')?.focus({ preventScroll: true });
   }}>
-    <div className="create-dialog-header"><button type="button" className="store-form-back" aria-label="Về danh sách KPH" onClick={() => changeOpen(false)}><img src={figmaAsset("215-1147", "imgFeatherArrowLeft")} alt="" /></button><DialogTitle className="create-dialog-title">Tạo phiếu KPH<small>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</small></DialogTitle></div>
-    <DialogDescription className="sr-only" role={failed ? "alert" : "status"}>{failed ? "Chưa tải được biểu mẫu. Kiểm tra kết nối rồi tải lại ứng dụng." : "Đang tải biểu mẫu tạo phiếu…"}</DialogDescription>
-    {failed ? <div className="store-create-loading-body"><button type="button" className="store-button" onClick={() => window.location.reload()}>Tải lại ứng dụng</button><button type="button" onClick={() => changeOpen(false)}>Hủy mở phiếu</button></div> : <KphFormSkeleton kind={kind ?? "TPTS"} onCancel={() => changeOpen(false)} />}
+    <DialogHeader className="create-dialog-header"><DialogTitle className="create-dialog-title">{reviewing ? "Xem lại phiếu KPH" : "Tạo phiếu KPH"}<small>{labels[kind]}</small></DialogTitle></DialogHeader>
+    <DialogDescription id="kph-create-description" className="sr-only">Tạo phiếu hàng không phù hợp; trường có dấu sao là bắt buộc.</DialogDescription>
+    {readySession !== session && !failed ? <p className="sr-only" role="status">Đang tải biểu mẫu tạo phiếu…</p> : null}
+    {/* Keep the body intact through the close animation; each open starts a new draft. */}
+    {Form && readySession === session ? <Form key={session} embedded onReviewingChange={setReviewing} initialScrollTop={initialScroll.current} kind={kind} open onOpenChange={changeOpen} onSaved={onSaved} onBarcodeLookup={mockBarcodeLookup} profile={mockProfile} actorReadOnly onlineMode presentation="screen" />
+      : failed ? <div className="store-create-loading-body"><p role="alert">Chưa tải được biểu mẫu. Kiểm tra kết nối rồi tải lại ứng dụng.</p><button type="button" className="store-button" onClick={() => window.location.reload()}>Tải lại ứng dụng</button><button type="button" onClick={() => changeOpen(false)}>Hủy mở phiếu</button></div>
+      : <KphFormSkeleton kind={kind} onCancel={() => changeOpen(false)} />}
   </DialogContent></Dialog>;
 });

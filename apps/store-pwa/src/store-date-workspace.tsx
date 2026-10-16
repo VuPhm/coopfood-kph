@@ -1,26 +1,90 @@
-import { useEffect, useState } from "react";
-import { Button, Input } from "@coopfood-kph/ui";
-import { StoreSheet, Summary } from "./store-sheet";
+import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Button, Input, ListItemMarker } from "@coopfood-kph/ui";
+import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, Search, SlidersHorizontal } from "lucide-react";
+import { StoreSheet } from "./store-sheet";
 import { figmaAsset } from "./figma-assets";
-import { daysBetween } from "@coopfood-kph/kph-rules";
+import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
-import type { MockDateLot, MockDateLotStatus } from "./store-app-mock";
-const statuses = { open: "Mở", acknowledged: "Đã ghi nhận", resolved: "Đã xử lý" };
+import { StoreQuickSort } from "./store-quick-sort";
+import { assessDateLot, DATE_PHASE_LABELS, needsDateAttention, type DatePhase } from "./store-date-assessment";
+import { DateConditionLabel, DateProcessingLabel, getDatePhaseTone } from "./store-date-label";
+import { ShelfLifeTimeline } from "./store-shelf-timeline";
+import { mockBarcodeLookup, mockCatalogProducts, mockProductMetadata, mockProfile, type MockDateLot, type MockDateLotStatus } from "./store-app-mock";
+
+const statuses: Record<MockDateLotStatus, string> = { open: "Mở", acknowledged: "Đã ghi nhận", resolved: "Đã xử lý" };
+const DATE_SORT_OPTIONS = [
+  { value: "default", label: "Mặc định", description: "Giữ thứ tự danh sách ban đầu" },
+  { value: "expiry", label: "HSD gần nhất", description: "Lô có hạn sử dụng gần nhất trước" },
+  { value: "name", label: "Tên hàng", description: "Theo tên hàng từ A đến Z" },
+] as const;
+type DateSort = typeof DATE_SORT_OPTIONS[number]["value"];
+const displayDate = (date: string) => date.split("-").reverse().join("/");
+const normalize = (value: string) => value.trim().toLocaleLowerCase("vi");
+function findProduct(query: string, lots: MockDateLot[]) {
+  const term = normalize(query);
+  if (!term) return undefined;
+  const lot = lots.find(item => normalize(item.id) === term);
+  return mockCatalogProducts.find(item => item.barcode === term || item.skuCode === term || normalize(item.name) === term || item.skuCode === lot?.sku);
+}
+function remainingText(remaining: number | null) {
+  if (remaining === null) return "Kiểm tra HSD";
+  return remaining < 0 ? `Quá ${Math.abs(remaining)} ngày` : remaining === 0 ? "HSD hôm nay" : `Còn ${remaining} ngày`;
+}
+
 export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onLotsChange: (lots: MockDateLot[]) => void }) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("alerts");
-  const [status, setStatus] = useState("open");
+  const [status, setStatus] = useState<MockDateLotStatus>("open");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [sort, setSort] = useState<DateSort>("default");
+  const [phaseFilter, setPhaseFilter] = useState<DatePhase | "all">("all");
+  const filterSummaryId = useId();
+  const activeFilterCount = Number(tab === "alerts" && status !== "open") + Number(sort !== "default") + Number(phaseFilter !== "all");
   const [activeId, setActiveId] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const requestId = useRef(0);
   const [desktop, setDesktop] = useState(() => typeof window !== "undefined" && !!window.matchMedia?.("(min-width: 900px)").matches);
-  const active = lots.find(l => l.id === activeId);
-  const count = (s: string) => lots.filter(l => l.status === s).length;
-  const visible = lots.filter(l => (tab === "tracking" || l.status === status) && `${l.name} ${l.sku} ${l.id}`.toLocaleLowerCase("vi").includes(query.toLocaleLowerCase("vi")));
+  const product = findProduct(query, lots);
+  const metadata = product ? mockProductMetadata[product.id] : undefined;
+  const active = lots.find(lot => lot.id === activeId);
+  const today = formatBusinessDate(new Date()).iso;
+  const assessments = useMemo(() => new Map(lots.map(lot => [lot.id, assessDateLot(lot, today)])), [lots, today]);
+  const attentionLots = lots.filter(lot => needsDateAttention(assessments.get(lot.id)!) && lot.status !== "resolved");
+  const count = (value: MockDateLotStatus) => lots.filter(lot => lot.status === value && needsDateAttention(assessments.get(lot.id)!)).length;
+  const needle = normalize(query);
+  const visible = lots.filter(lot => (tab === "tracking" || (lot.status === status && needsDateAttention(assessments.get(lot.id)!))) &&
+    (phaseFilter === "all" || assessments.get(lot.id)!.phase === phaseFilter) &&
+    (!needle || `${lot.name} ${lot.sku} ${lot.id}`.toLocaleLowerCase("vi").includes(needle) || (product?.barcode === needle && lot.sku === product.skuCode)))
+    .sort((a, b) => sort === "expiry" ? a.date.localeCompare(b.date) : sort === "name" ? a.name.localeCompare(b.name, "vi") : 0);
+
+  function changeQuery(value: string) {
+    requestId.current++;
+    setQuery(value); setMessage(""); setBusy(false);
+    if (value.trim()) setTab("tracking");
+  }
+  async function search(value = query) {
+    const term = value.trim();
+    changeQuery(term);
+    if (!term) { setMessage("Nhập SKU, barcode, tên hàng hoặc số lô cần tìm."); return; }
+    const exactProduct = findProduct(term, lots);
+    if (!exactProduct && lots.some(lot => `${lot.name} ${lot.sku} ${lot.id}`.toLocaleLowerCase("vi").includes(normalize(term)))) return;
+    const current = ++requestId.current;
+    setBusy(true);
+    try {
+      const result = await mockBarcodeLookup(exactProduct?.barcode ?? term);
+      if (current !== requestId.current) return;
+      if (result.status !== "FOUND") setMessage("Không tìm thấy mã hàng. Quét lại hoặc nhập mã khác; không suy đoán sản phẩm.");
+    } catch (error) {
+      if (current === requestId.current) setMessage(error instanceof Error ? error.message : "Chưa thể tra cứu danh mục. Thử lại.");
+    } finally { if (current === requestId.current) setBusy(false); }
+  }
   function updateStatus(next: MockDateLotStatus) {
     if (!active || active.status === "resolved" || (next === "acknowledged" && active.status !== "open")) return;
-    onLotsChange(lots.map(l => l.id === active.id ? { ...l, status: next } : l));
+    onLotsChange(lots.map(lot => lot.id === active.id ? { ...lot, status: next } : lot));
     if (!desktop) setActiveId("");
   }
   useEffect(() => {
@@ -30,19 +94,66 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
     update(); media.addEventListener?.("change", update);
     return () => media.removeEventListener?.("change", update);
   }, []);
-  useEffect(() => { if (activeId && !visible.some(l => l.id === activeId)) setActiveId(""); }, [activeId, visible]);
+  useEffect(() => { if (activeId && !visible.some(lot => lot.id === activeId)) setActiveId(""); }, [activeId, visible]);
+  useEffect(() => () => { requestId.current++; }, []);
+
+  function detail(lot: MockDateLot) {
+    const assessment = assessments.get(lot.id)!;
+    const result = assessment.result;
+    return <>
+      <section className="store-date-lot-heading" aria-label="Thông tin lô"><h3>{lot.name}</h3><p><span>SKU {lot.sku}</span><span>Lô {lot.id}</span></p></section>
+      <section className="store-date-milestones" aria-label="Mốc DATE của lô">
+        <div className="store-date-detail-state"><div className="store-date-milestone-labels"><DateConditionLabel phase={assessment.phase} />{!desktop ? <DateProcessingLabel status={lot.status} /> : null}</div><p className={`store-date-remaining${assessment.phase === "EXPIRED" ? " is-expired" : ""}`}><span>HSD</span><strong>{remainingText(assessment.remainingDays)}</strong></p></div>
+        {result && assessment.nsx ? <>
+          <ShelfLifeTimeline nsx={assessment.nsx} hsd={lot.date} today={today} result={result} />
+          <dl className="store-date-milestone-facts"><div><dt>NSX</dt><dd>{formatDisplayDate(assessment.nsx)}</dd></div><div><dt>Cảnh báo</dt><dd>{result.warningDate ? formatDisplayDate(result.warningDate) : "Không áp dụng"}</dd></div><div className={assessment.phase === "EXPIRED" ? "" : "is-primary"}><dt>Hạn lùi</dt><dd>{formatDisplayDate(result.withdrawalDate)}</dd></div><div className={assessment.phase === "EXPIRED" ? "is-expired" : ""}><dt>HSD</dt><dd>{displayDate(lot.date)}</dd></div></dl>
+        </> : <div className="store-date-missing-dates"><p>{assessment.message}</p><dl className="store-date-milestone-facts">{lot.manufactured ? <div><dt>NSX</dt><dd>{lot.manufactured}</dd></div> : null}<div><dt>HSD</dt><dd>{displayDate(lot.date)}</dd></div></dl></div>}
+      </section>
+      <div className="store-sheet-actions"><Button className="store-date-acknowledge" disabled={lot.status !== "open"} onClick={() => updateStatus("acknowledged")}>Ghi nhận</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => updateStatus("resolved")}>Đã xử lý</Button></div>
+    </>;
+  }
   return <div className="store-date">
-    <div className="store-date-search-wrap"><img className="store-date-search-icon" data-figma-asset-slot="date-search" src={figmaAsset("date", "imgFeatherSearch")} alt="" /><Input className="store-date-search" aria-label="Tìm mã hàng hoặc lô" placeholder="Mã hàng, lô hoặc quét" value={query} onChange={e => setQuery(e.target.value)} /><button aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><span><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></span></button></div>
-    <div className="store-tabs" role="group" aria-label="Quản lý DATE">{[["alerts", "Cảnh báo", lots.filter(l => l.status !== "resolved").length], ["tracking", "Theo dõi DATE", lots.length]].map(([key, label, n]) => <button key={key} aria-pressed={tab === key} className={tab === key ? "is-active" : ""} onClick={() => setTab(String(key))}>{label}<small>{n}</small></button>)}</div>
-    <div className="store-list-heading"><div><h2>{tab === "alerts" ? "Cần xử lý" : "Theo dõi DATE"}</h2><p className="store-muted">{tab === "alerts" ? `${count("open")} cảnh báo đang mở` : `${lots.length} lô trong dữ liệu mẫu`}</p></div><div className="store-date-head-actions"><button className="store-filter" aria-label="Lọc DATE" onClick={() => setFilterOpen(true)}><img data-figma-asset-slot="date-filter" src={figmaAsset("r2", "imgFeatherSliders")} alt="" /></button><button className="store-date-add" disabled title="Chức năng chưa sẵn sàng trong bản dùng thử" aria-describedby="store-date-add-help"><img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" />Thêm theo dõi</button></div></div>
-    <span className="sr-only" id="store-date-add-help">Chức năng chưa sẵn sàng trong bản dùng thử</span>
-    {tab === "alerts" ? <div className="store-date-statuses">{Object.entries(statuses).map(([key, label]) => <button key={key} aria-pressed={status === key} className={status === key ? "is-selected" : ""} onClick={() => setStatus(key)}>{label}{key !== "resolved" ? ` ${count(key)}` : ""}</button>)}</div> : null}
-    <div className="store-date-workspace"><div className="store-date-lots">{visible.map(lot => { const remaining = daysBetween(formatBusinessDate(new Date()).iso, lot.date); return <button key={lot.id} className={`store-date-lot ${activeId === lot.id ? "is-active" : ""}`} onClick={() => setActiveId(lot.id)}><span><strong>{lot.name}</strong><small>SKU {lot.sku} · Lô {lot.id}</small></span><span><strong className={remaining <= 0 ? "is-danger" : "is-warning"}>{remaining < 0 ? `Qua ${Math.abs(remaining)}` : remaining} ngày</strong><small>{lot.date.split("-").reverse().join("/")}</small><b>{lot.status === "resolved" ? "Đã xử lý" : "Xử lý"}</b></span></button>; })}</div><section className="store-date-detail">{active ? <><div className="store-date-detail-heading"><div><h2>Chi tiết cảnh báo</h2><p>{active.name} · Lô {active.id}</p></div><span>{statuses[active.status as keyof typeof statuses]}</span></div><Summary rows={[["SKU", active.sku], ["Hạn sử dụng", active.date.split("-").reverse().join("/")], ["Còn lại", `${daysBetween(formatBusinessDate(new Date()).iso, active.date)} ngày`], ["Cửa hàng", "Cửa hàng mẫu"]]} /><h3>Xử lý cảnh báo</h3><p className="store-muted">Ghi nhận khi cửa hàng đã tiếp nhận cảnh báo. Chỉ đánh dấu đã xử lý khi hành động thực tế hoàn tất.</p><div className="store-sheet-actions"><Button variant="ghost" disabled={active.status !== "open"} onClick={() => updateStatus("acknowledged")}>Ghi nhận</Button><Button className="store-button" disabled={active.status === "resolved"} onClick={() => updateStatus("resolved")}>Đã xử lý</Button></div><p className="store-date-detail-note">{active.status === "open" ? "Chưa có thao tác xử lý" : active.status === "acknowledged" ? "Đã ghi nhận cảnh báo" : "Đã xử lý cảnh báo"}</p></> : <p className="store-muted">Chọn một lô để xem chi tiết.</p>}</section></div>
-    {!visible.length ? <p className="store-muted store-empty">Không có lô phù hợp.</p> : null}
-    <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={setQuery} presentation="screen" />
-    <StoreSheet open={filterOpen} onOpenChange={setFilterOpen} title="Lọc DATE" description="Chọn trạng thái cảnh báo DATE"><div className="store-choices">{Object.entries(statuses).map(([key, label]) => <button key={key} aria-pressed={status === key} className={status === key ? "is-selected" : ""} onClick={() => { setStatus(key); setTab("alerts"); }}>{label}</button>)}</div><p className="store-muted">Bộ lọc áp dụng ngay trên dữ liệu mẫu.</p></StoreSheet>
-    {!desktop ? <StoreSheet open={!!active} onOpenChange={open => { if (!open) setActiveId(""); }} title="Xử lý cảnh báo DATE" description="Cập nhật trạng thái lô trong dữ liệu mẫu">
-      {active ? <><Summary rows={[["Sản phẩm", active.name], ["SKU", active.sku], ["Lô", active.id], ["HSD", active.date.split("-").reverse().join("/")], ["Trạng thái", statuses[active.status as keyof typeof statuses]]]} /><p className="store-muted">Thao tác mô phỏng, chưa gắn API DATE.</p><div className="store-sheet-actions"><Button variant="ghost" disabled={active.status !== "open"} onClick={() => updateStatus("acknowledged")}>Ghi nhận</Button><Button className="store-button" disabled={active.status === "resolved"} onClick={() => updateStatus("resolved")}>Đã xử lý</Button></div></> : null}
-    </StoreSheet> : null}
+    <section className="store-date-search-panel" aria-label="Tra mã hàng" onFocusCapture={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+      <form className="store-date-search-form" onSubmit={event => { event.preventDefault(); void search(); }}>
+        <label className="store-date-search-wrap"><Search className="store-date-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm SKU, barcode, tên hàng hoặc lô</span><Input className="store-date-search" placeholder="Mã hàng, lô" autoComplete="off" value={query} onChange={event => changeQuery(event.target.value)} /></label>
+        <button type="button" className="store-date-scan" aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></button>
+        <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}>{busy ? "Tìm…" : "Tìm"}</Button>
+      </form>
+      {message ? <p className="store-date-message" role="status">{message}</p> : null}
+    </section>
+    <div className="store-date-workspace" onFocusCapture={revealBelowStickyTabs}>
+      {product ? <section className="store-date-product" aria-label="Thông tin mã hàng"><details key={product.id}><summary className="store-date-product-heading" aria-label={`Thông tin mã hàng: ${product.name}`}><div><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p></div><ChevronDown size={18} aria-hidden="true" /></summary><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.code} · {product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></details></section> : null}
+      <section className="store-date-browser" aria-label="Danh sách lô DATE">
+        <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Quản lý DATE">{[["alerts", "Cảnh báo", attentionLots.length], ["tracking", "Theo dõi DATE", lots.length]].map(([key, label, n]) => <button key={key} aria-pressed={tab === key} className={tab === key ? "is-active" : ""} onClick={() => setTab(String(key))}>{label}<small>{n}</small></button>)}</div></StoreStickyTabs>
+        <div className="store-date-list-controls">
+          <div className="store-date-list-heading"><div><h2>{tab === "alerts" ? "Cần xử lý" : "Theo dõi DATE"}</h2><p className="store-date-result-count">{visible.length} / {lots.length} lô</p></div><button className="store-date-add" disabled title="Chức năng chưa sẵn sàng trong bản dùng thử" aria-describedby="store-date-add-help"><CalendarDays size={18} aria-hidden="true" />Thêm theo dõi</button></div>
+          <div className="store-date-toolbar"><StoreQuickSort value={sort} onChange={value => setSort(value as DateSort)} options={DATE_SORT_OPTIONS} title="Sắp xếp lô DATE" groupLabel="Thứ tự lô" /><button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button></div>
+          <span className="sr-only" id={filterSummaryId}>{activeFilterCount ? `${activeFilterCount} tiêu chí lọc hoặc sắp xếp đang dùng` : "Đang dùng bộ lọc mặc định"}</span>
+          <span className="sr-only" id="store-date-add-help">Chức năng chưa sẵn sàng trong bản dùng thử</span>
+          {tab === "alerts" ? <div className="store-date-statuses">{Object.entries(statuses).map(([key, label]) => <button key={key} aria-pressed={status === key} className={status === key ? "is-selected" : ""} onClick={() => setStatus(key as MockDateLotStatus)}><span>{label}</span><small>{count(key as MockDateLotStatus)}</small></button>)}</div> : null}
+        </div>
+        <div className="store-date-lots">{visible.map(lot => {
+          const remaining = assessments.get(lot.id)!.remainingDays;
+          return <button key={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={() => setActiveId(lot.id)}><ListItemMarker variant="bar" tone={getDatePhaseTone(assessments.get(lot.id)!.phase)} /><span className="store-date-lot-main"><strong>{lot.name}</strong><small className="store-date-lot-identifiers"><span>SKU {lot.sku}</span>{" · "}<span>Lô {lot.id}</span></small><span className="store-date-lot-labels"><DateConditionLabel phase={assessments.get(lot.id)!.phase} /><DateProcessingLabel status={lot.status} /></span><small className="store-date-lot-dates">{lot.manufactured ? <span>NSX <b>{lot.manufactured}</b></span> : null}<span>HSD <b>{displayDate(lot.date)}</b></span></small></span><span className="store-date-lot-end"><strong className={remaining !== null && remaining < 0 ? "is-danger" : remaining === 0 ? "is-warning" : ""}>{remainingText(remaining)}</strong><span className="store-date-lot-action">{lot.status === "resolved" ? "Xem chi tiết" : "Xử lý"}<ChevronRight size={16} aria-hidden="true" /></span></span></button>;
+        })}{!visible.length ? <section className="store-date-empty"><Package size={28} aria-hidden="true" /><h3>Không có lô phù hợp</h3><p>{product ? "Mã hàng đã nhận diện. Thử trạng thái khác hoặc bỏ lọc để xem các lô." : "Thử mã hàng, tên hoặc số lô khác; bạn cũng có thể quét lại."}</p><Button variant="ghost" onClick={() => { changeQuery(""); setTab("tracking"); setPhaseFilter("all"); }}>Xem tất cả lô</Button></section> : null}</div>
+      </section>
+      {desktop ? <section className="store-date-detail" aria-label="Chi tiết lô DATE">{active ? <><div className="store-date-detail-heading"><h2>Chi tiết lô DATE</h2><DateProcessingLabel status={active.status} /></div>{detail(active)}</> : <div className="store-date-detail-placeholder"><CalendarDays size={32} aria-hidden="true" /><h2>Chọn một lô để xem chi tiết</h2><p>Thông tin sản phẩm, ngày và thao tác xử lý sẽ hiển thị tại đây.</p></div>}</section> : null}
+    </div>
+    <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={value => { void search(value); }} presentation="screen" />
+    <StoreSheet className="store-date-sheet store-date-filter" open={filterOpen} onOpenChange={setFilterOpen} title="Lọc DATE" description="Bộ lọc và sắp xếp áp dụng ngay khi thay đổi">
+      <section className="store-date-filter-section" aria-labelledby="date-filter-phase"><h3 id="date-filter-phase"><CalendarDays size={18} aria-hidden="true" />Tình trạng DATE</h3>
+        <div className="store-choices" role="group" aria-label="Tình trạng DATE">{([ ["all", "Tất cả tình trạng"], ...Object.entries(DATE_PHASE_LABELS)]).map(([key, label]) => <button key={key} aria-pressed={phaseFilter === key} className={phaseFilter === key ? "is-selected" : ""} onClick={() => setPhaseFilter(key as DatePhase | "all")}><span>{label}</span><Check size={16} aria-hidden="true" className={phaseFilter === key ? "" : "is-hidden"} /></button>)}</div>
+      </section>
+      <section className="store-date-filter-section" aria-labelledby="date-filter-status"><h3 id="date-filter-status"><CircleCheck size={18} aria-hidden="true" />Trạng thái xử lý</h3>
+        <div className="store-choices" role="group" aria-label="Trạng thái xử lý">
+          <button aria-pressed={tab === "tracking"} className={tab === "tracking" ? "is-selected" : ""} onClick={() => setTab("tracking")}><span>Tất cả</span><Check size={16} aria-hidden="true" className={tab === "tracking" ? "" : "is-hidden"} /></button>
+          {Object.entries(statuses).map(([key, label]) => <button key={key} aria-pressed={status === key && tab === "alerts"} className={status === key && tab === "alerts" ? "is-selected" : ""} onClick={() => { setStatus(key as MockDateLotStatus); setTab("alerts"); }}><span>{label}</span><Check size={16} aria-hidden="true" className={status === key && tab === "alerts" ? "" : "is-hidden"} /></button>)}
+        </div>
+      </section>
+      <section className="store-date-filter-section" aria-labelledby="date-filter-sort"><h3 id="date-filter-sort"><ArrowDownWideNarrow size={18} aria-hidden="true" />Sắp xếp</h3><div className="store-choices store-date-filter-sort" role="group" aria-label="Thứ tự lô">{DATE_SORT_OPTIONS.map(option => <button key={option.value} aria-pressed={sort === option.value} className={sort === option.value ? "is-selected" : ""} onClick={() => setSort(option.value)}><span>{option.label}</span><Check size={16} aria-hidden="true" className={sort === option.value ? "" : "is-hidden"} /></button>)}</div></section>
+      <p className="store-muted">Thay đổi áp dụng ngay trên các lô phù hợp với mã đang tìm.</p>
+      <div className="store-date-filter-footer"><button className="store-date-reset-filter" onClick={() => { setStatus("open"); setTab("alerts"); setSort("default"); setPhaseFilter("all"); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setFilterOpen(false)}>Xong</Button></div>
+    </StoreSheet>
+    {!desktop ? <StoreSheet className="store-date-sheet store-date-lot-sheet" open={!!active} onOpenChange={open => { if (!open) setActiveId(""); }} title="Chi tiết lô DATE" description="Ngày và trạng thái xử lý của lô">{active ? detail(active) : null}</StoreSheet> : null}
   </div>;
 }

@@ -34,7 +34,7 @@ import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 import type { components } from "@coopfood-kph/api";
 
-import { choiceAsset } from "./store-kph-form-assets";
+import { getKphChoicePresentation, KphChoiceContent } from "./store-kph-choice";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -104,6 +104,9 @@ export type CreatedRecordDraft = {
 };
 
 type CreateRecordDialogProps = {
+  /** The Store host owns the portal, chrome and focus lifecycle in this mode. */
+  embedded?: boolean;
+  onReviewingChange?: (reviewing: boolean) => void;
   initialScrollTop?: number;
   onOpenAutoFocus?: ComponentProps<typeof DialogContent>["onOpenAutoFocus"];
   onCloseAutoFocus?: ComponentProps<typeof DialogContent>["onCloseAutoFocus"];
@@ -142,7 +145,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   };
 }
 
-export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog" }: CreateRecordDialogProps) {
+export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog", embedded = false, onReviewingChange }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -158,6 +161,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     // Restore before the first paint; passive focus restoration alone can flash the top.
     if (form && initialScrollTop > 0) form.scrollTop = initialScrollTop;
   }, [initialScrollTop]);
+  useEffect(() => { onReviewingChange?.(reviewing); }, [reviewing, onReviewingChange]);
   const wasReviewingRef = useRef(false);
   const assetScreen = activeKind === "TPCN" ? "203-701" : "203-847";
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
@@ -430,17 +434,13 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     if (activePhoto?.id === id) setActivePhoto(null);
   }
 
-  return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent onOpenAutoFocus={onOpenAutoFocus} onCloseAutoFocus={onCloseAutoFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>
-          <DialogHeader className="create-dialog-header">
-            {screenPresentation ? <button type="button" className="store-form-back" aria-label={reviewing ? "Chỉnh sửa phiếu" : "Về danh sách KPH"} onClick={() => { if (reviewing) setReviewing(false); else onOpenChange(false); }}><img src={figmaAsset(assetScreen, "imgFeatherArrowLeft")} alt="" /></button> : null}
+  const content = <>
+    {!embedded ? <DialogHeader className="create-dialog-header">
             <DialogTitle className="create-dialog-title">{screenPresentation ? <>{reviewing ? "Xem lại phiếu KPH" : "Tạo phiếu KPH"}<small>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</small></> : <>Tạo phiếu KPH · {kindLabels[kind]}</>}</DialogTitle>
             <DialogDescription id="create-description" className="sr-only">
               Tạo phiếu hàng không phù hợp; trường có dấu sao là bắt buộc.
             </DialogDescription>
-          </DialogHeader>
+          </DialogHeader> : null}
 
           {screenPresentation && reviewing ? <div className="store-form-review">
             <p className={cn("store-review-notice", photoError && "is-error")} role={photoError ? "alert" : "status"}><img src={figmaAsset(photoError ? "280-1915" : "279-1299", photoError ? "imgFeatherWifiOff" : "imgFeatherAlertCircle")} alt="" /><span><strong>{photoError ? "Chưa gửi được phiếu" : "Chưa gửi"}</strong><small>{photoError || "Phiếu chỉ được tạo sau khi bạn bấm “Gửi phiếu”."}</small></span></p>
@@ -495,12 +495,12 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
             </FormSection>
 
             <FormSection number="3" title={screenPresentation ? "Tình trạng" : "Tình trạng hàng"}>
-              <ChoiceGroup legend="Tình trạng" name="condition" register={register} choices={options.conditions} assetScreen={screenPresentation ? assetScreen : undefined} />
+              <ChoiceGroup legend="Tình trạng" name="condition" register={register} choices={options.conditions} freshPresentation={screenPresentation} />
               {selectedCondition === "OTHER" ? <Field className="mt-3" label="Nội dung tình trạng khác" htmlFor="condition-detail" error={errors.conditionDetail?.message}><Input id="condition-detail" placeholder="Để trống sẽ giữ nhãn “Khác”" {...register("conditionDetail")} /></Field> : null}
             </FormSection>
 
             <FormSection number="4" title={screenPresentation ? "Xử lý" : "Biện pháp xử lý"}>
-              <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} assetScreen={screenPresentation ? assetScreen : undefined} />
+              <ChoiceGroup legend="Biện pháp xử lý" name="resolution" register={register} choices={options.resolutions} freshPresentation={screenPresentation} />
               {selectedResolution === "OTHER" ? <Field className="mt-3" label="Nội dung biện pháp khác" htmlFor="resolution-detail" error={errors.resolutionDetail?.message}><Input id="resolution-detail" placeholder="Để trống sẽ giữ nhãn “KHÁC”" {...register("resolutionDetail")} /></Field> : null}
               <Field className="mt-3" label="Ngày xử lý (nếu có)" htmlFor="treatment-date" error={errors.treatmentDate?.message}>
                 <CalendarInput id="treatment-date" initialMonth={initialMonth} label="Ngày xử lý (nếu có)" value={treatmentDate} icon={screenPresentation ? <img data-kph-calendar-icon="treatment" src={figmaAsset(assetScreen, "imgFeatherCalendar1")} alt="" /> : undefined} onValueChange={(value) => setValue("treatmentDate", value, { shouldDirty: true })} />
@@ -533,9 +533,11 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
               <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : screenPresentation ? "Xem lại" : "Lưu phiếu"}</Button>
             </footer>
           </form>
-        </DialogContent>
-      </Dialog>
-
+  </>;
+  return <>
+    {embedded ? content : <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent onOpenAutoFocus={onOpenAutoFocus} onCloseAutoFocus={onCloseAutoFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>{content}</DialogContent>
+    </Dialog>}
       <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName}${onlineMode ? "" : " đã đóng tem"}` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} presentation={presentation} index={Math.max(0, photos.findIndex(p => p.id === activePhoto?.id))} total={photos.length} onPrevious={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i > 0) setActivePhoto(photos[i - 1]!); }} onNext={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i < photos.length - 1) setActivePhoto(photos[i + 1]!); }} onRemove={screenPresentation && !reviewing && activePhoto ? () => removePhoto(activePhoto.id) : undefined} />
 
       <BarcodeScannerDialog
@@ -549,8 +551,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
             window.setTimeout(() => setFocus("barcode"), 0);
         }}
       />
-    </>
-  );
+    </>;
 });
 
 function FormSection({ children, number, title }: { children: ReactNode; number: string; title: string }) {
@@ -558,23 +559,23 @@ function FormSection({ children, number, title }: { children: ReactNode; number:
 }
 
 type ChoiceGroupProps = {
-  assetScreen?: "203-701" | "203-847" | undefined;
+  freshPresentation?: boolean | undefined;
   legend: string;
   name: "condition" | "resolution";
   register: UseFormRegister<FormData>;
   choices: readonly { value: string; label: string; tone: string }[];
 };
 
-function ChoiceGroup({ choices, legend, name, register, assetScreen }: ChoiceGroupProps) {
+function ChoiceGroup({ choices, legend, name, register, freshPresentation }: ChoiceGroupProps) {
   return (
     <fieldset>
       <legend className="sr-only">{legend}</legend>
       <div className={cn("choice-grid", choices.length === 2 && "choice-grid-two", choices.length === 5 && "choice-grid-five")}>
         {choices.map((choice) => (
-          <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`)}>
+          <label key={choice.value} className={cn("choice-card", `choice-${choice.tone}`, freshPresentation && "ui-label-palette")}
+            data-tone={freshPresentation ? getKphChoicePresentation(name, choice.value).tone : undefined} data-choice-value={choice.value}>
             <input className="sr-only" type="radio" value={choice.value} {...register(name)} />
-            <span className="choice-icon">{assetScreen ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, choiceAsset(choice.value))} alt="" /> : choiceIcon(choice.value)}</span>
-            <span>{choice.label}</span>
+            {freshPresentation ? <KphChoiceContent kind={name} value={choice.value} label={choice.label} /> : <><span className="choice-icon">{choiceIcon(choice.value)}</span><span>{choice.label}</span></>}
           </label>
         ))}
       </div>
