@@ -1,7 +1,8 @@
 # Công việc kế tiếp
 
 **Đóng lượt KPH/DATE theo “pass, merge”, 16/10/2026.** Owner đã nghiệm thu
-preview 4215; hoàn tất commit/CI/merge nhánh UI vào `main` rồi dừng.
+preview 4215; scope UI CLOSED, tích hợp qua
+[PR #12](https://github.com/VuPhm/coopfood-kph/pull/12) vào `main` rồi dừng.
 Các đề nghị thử preview bên dưới là lịch sử trước nghiệm thu. Không tự mở
 backend DATE, module mới hoặc deploy. [Hồ sơ tích hợp](delivery/figma-mobile-implementation/merge-2026-10-16.md).
 

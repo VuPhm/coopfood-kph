@@ -3,8 +3,10 @@
 **Owner chấp nhận KPH/DATE và yêu cầu merge, 16/10/2026:** phản hồi trực tiếp
 “pass, merge” sau preview 4215. Phạm vi gồm KPH CTA trắng/nhãn màu/controls
 compact, DATE nền xanh/nắp trắng và tab hai màn neo trên đỉnh khi cuộn tiếp.
-Các dòng pending bên dưới giữ lịch sử trước quyết định này. Đang đóng hồ sơ
-và tích hợp nhánh `store-app/figma-mobile-implementation` vào `main` qua PR;
+Các dòng pending bên dưới giữ lịch sử trước quyết định này. Scope UI CLOSED;
+`npm run verify` PASS 257 tests/build và close checker r15 PASS. Tích hợp
+`store-app/figma-mobile-implementation` vào `main` qua
+[PR #12](https://github.com/VuPhm/coopfood-kph/pull/12), nơi ghi CI/merge SHA;
 không mở scope mới. Backend DATE, thiết bị thật và Pages cutover giữ phạm vi
 riêng. [Nghiệm thu và tích hợp](delivery/figma-mobile-implementation/merge-2026-10-16.md).
 
