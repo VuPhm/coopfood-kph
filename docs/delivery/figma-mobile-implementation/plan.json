@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
   "id": "figma-mobile-implementation",
-  "revision": 14,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Consolidate product/SKU/barcode lookup into DATE, remove the standalone destination, and apply Co.op Fresh.",
+  "revision": 15,
+  "status": "CLOSED",
+  "objective": "Close owner-accepted Co.op Fresh KPH/DATE UI, compact sliding covers and sticky tabs, and integrate into main.",
   "inScope": [
-    "DATE unified catalog/lot search and processing from canonical synthetic fixtures",
-    "Co.op Fresh DATE search, product facts, tabs, lot cards, detail and sheets",
-    "Home/rail/mobile navigation removal and legacy lookup deep-link redirect",
-    "Technical verification and runnable owner preview"
+    "Previously checkpointed Fresh KPH/DATE, DATE lookup consolidation and label rollout since PR #11",
+    "Compact KPH white CTAs, DATE green search underlay and white sliding cover",
+    "Shared native sticky tabs for KPH/DATE and KPH loading, focus visibility and browser checks",
+    "Owner acceptance recording, frontend verification and PR integration into main"
   ],
   "outOfScope": [
-    "Other feature reskins, Admin/Pilot presentation changes",
-    "Backend/API/auth/business rule/dependency or online DATE wiring",
-    "Merge/push/deploy or Pages cutover"
+    "DATE backend/API/persistence or new feature development",
+    "Production rollout, Pages deployment/cutover or changes to protected Pages refs",
+    "Real-device or historical r5 backend acceptance claims"
   ],
-  "baseSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
-  "candidateSha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2",
-  "integrationOwner": "/root — sole writer for DATE consolidation",
+  "baseSha": "216c17c31d17b7f491b0b0f180fff1552b5c5515",
+  "candidateSha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
+  "integrationOwner": "/root — sole writer on existing branch/worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
     "apps/store-pwa/src/store-app-frame.tsx",
@@ -44,20 +44,24 @@
   "teams": [],
   "gates": [
     {
-      "id": "date-consolidation-technical",
+      "id": "accepted-ui-integration-technical",
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
-      "revision": 14,
-      "sha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2"
+      "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
+      "revision": 15,
+      "sha": "0a4dba490d73f41d8622630e4d33e772e905cf58"
     },
     {
-      "id": "owner-date-fresh-visual-workflow",
+      "id": "owner-kph-date-preview",
       "kind": "user",
       "required": true,
-      "status": "pending",
-      "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md"
+      "status": "pass",
+      "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
+      "revision": 15,
+      "sha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
+      "acceptedBy": "owner",
+      "decisionRef": "Current chat user message 2026-10-16: pass, merge; following preview http://127.0.0.1:4215/#kph and #date"
     }
   ],
   "changes": [
@@ -152,15 +156,22 @@
       "source": "Owner in current chat, 2026-10-11",
       "impact": "Standalone route/navigation removed; product lookup and lot fixtures consolidated into DATE. DATE/navigation evidence must be refreshed; prior KPH acceptance remains limited to r13.",
       "decision": "One writer in current branch/worktree from accepted KPH checkpoint d9845c7. Shared search with exact catalog metadata, live lot filtering, rescan/miss/recovery and legacy route redirect; canonical synthetic lots only. Co.op Fresh scoped DATE CSS; no Figma frame writes or API changes."
+    },
+    {
+      "revision": 15,
+      "request": "Compact KPH controls and white CTAs, apply DATE sliding cover, pin KPH/DATE tabs on further scroll; then pass, merge.",
+      "source": "Owner requests in current chat, final explicit acceptance and merge authorization 2026-10-16.",
+      "impact": "Supersedes pending final UI preview gate with actual owner decision on source 0a4dba4; earlier technical evidence stays historical. No claim of real-device or production acceptance.",
+      "decision": "Close final UI preview scope; retain historical ledgers; verify final source, commit and integrate via PR after remote CI without bypass or deploy."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner review DATE r14 at http://127.0.0.1:4202/#date; technical readiness is separate from visual/workflow acceptance. Stop until feedback.",
+  "nextAction": "Complete the authorized PR merge into main after remote CI; then stop. No new scope or deployment.",
   "workingTreeCandidate": {
-    "baseSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
+    "baseSha": "216c17c31d17b7f491b0b0f180fff1552b5c5515",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "note": "Committed DATE r14 candidate matches all verified source paths, including retirement. Subsequent ledger changes only; stable mock preview 4202, owner gate pending.",
-    "candidateSha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2"
+    "candidateSha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
+    "note": "Final source checkpoint accepted by owner on preview 4215; subsequent ledger-only changes."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -181,13 +192,13 @@
     "requiredBeforeDispatch": []
   },
   "referenceReview": "docs/delivery/figma-mobile-implementation/figma-ref-review-2026-10-07.json",
-  "implementationPlan": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
-  "handoff": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
+  "implementationPlan": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
+  "handoff": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
   "executionAuthorization": {
-    "date": "2026-10-11",
-    "source": "Owner requested consolidation then new UI",
-    "mode": "single DATE writer, same branch/worktree",
-    "checkpoint": "d9845c721c30055ed4424dfcbc851a55fd13f61d"
+    "date": "2026-10-16",
+    "source": "Owner: pass, merge",
+    "mode": "single writer, same branch/worktree; PR merge authorized; no deployment",
+    "checkpoint": "0a4dba490d73f41d8622630e4d33e772e905cf58"
   },
   "historicalRevision5": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r5.json",
@@ -204,10 +215,10 @@
   },
   "workingTreeVerification": {
     "result": "pass",
-    "revision": 14,
-    "evidence": "docs/delivery/figma-mobile-implementation/date-coop-fresh.md",
-    "note": "230 tests/default-online and mock builds PASS; unified DATE build/offline gate 3 viewport, 24 contrast states and KPH/navigation/workbook regressions PASS. Owner visual gate pending.",
-    "sha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2"
+    "revision": 15,
+    "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
+    "sha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
+    "note": "npm run verify PASS 257 tests/build; final sticky browser gate 10 screen/viewport combinations and progressive gate PASS on matching source before checkpoint."
   },
   "historicalRevision6": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
@@ -266,13 +277,13 @@
     "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-colors.md"
   },
   "closure": {
-    "date": "2026-10-11",
-    "scope": "KPH Co.op Fresh r13 UI preview",
-    "candidateSha": "d9845c721c30055ed4424dfcbc851a55fd13f61d",
+    "date": "2026-10-16",
+    "scope": "Current KPH/DATE UI preview including compact controls/sliding covers/sticky tabs",
+    "candidateSha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
     "acceptedBy": "owner",
-    "decisionRef": "Current chat: duyệt, checkpoint",
-    "evidence": "docs/delivery/figma-mobile-implementation/kph-coop-fresh-checkpoint.md",
-    "remoteActions": "none; local checkpoint only"
+    "decisionRef": "Current chat: pass, merge",
+    "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
+    "remoteActions": "PR integration authorized; remote checks/merge recorded in handoff when complete"
   },
   "historicalRevision13": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r13.json",
@@ -281,8 +292,13 @@
     "closureSha": "09411e8c644396f4b1a6271f7d53982112fcfb3c"
   },
   "preview": {
-    "url": "http://127.0.0.1:4202/#date",
-    "mode": "synthetic memory-only mock build",
-    "serverSessionId": 95585
+    "url": "http://127.0.0.1:4215/#kph",
+    "dateUrl": "http://127.0.0.1:4215/#date",
+    "mode": "synthetic memory-only mock build"
+  },
+  "historicalRevision14": {
+    "plan": "docs/delivery/figma-mobile-implementation/plan-r14.json",
+    "candidateSha": "59f2174d95684ebba9c58b73353a0c8e7971b3b2",
+    "scope": "Original DATE consolidation evidence preserved; final KPH/DATE UI accepted on preview 4215 on 2026-10-16."
   }
 }
