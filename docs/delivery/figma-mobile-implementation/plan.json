@@ -16,7 +16,7 @@
     "Real-device or historical r5 backend acceptance claims"
   ],
   "baseSha": "216c17c31d17b7f491b0b0f180fff1552b5c5515",
-  "candidateSha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
+  "candidateSha": "673ac9365941ece6133a6e1346c08ca2bb0ee825",
   "integrationOwner": "/root — sole writer on existing branch/worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-app.tsx",
@@ -50,7 +50,7 @@
       "status": "pass",
       "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
       "revision": 15,
-      "sha": "0a4dba490d73f41d8622630e4d33e772e905cf58"
+      "sha": "673ac9365941ece6133a6e1346c08ca2bb0ee825"
     },
     {
       "id": "owner-kph-date-preview",
@@ -59,7 +59,7 @@
       "status": "pass",
       "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
       "revision": 15,
-      "sha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
+      "sha": "673ac9365941ece6133a6e1346c08ca2bb0ee825",
       "acceptedBy": "owner",
       "decisionRef": "Current chat user message 2026-10-16: pass, merge; following preview http://127.0.0.1:4215/#kph and #date"
     }
@@ -170,8 +170,8 @@
   "workingTreeCandidate": {
     "baseSha": "216c17c31d17b7f491b0b0f180fff1552b5c5515",
     "path": "/Users/vup/Documents/coopfood-kph",
-    "candidateSha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
-    "note": "Final source checkpoint accepted by owner on preview 4215; subsequent ledger-only changes."
+    "candidateSha": "673ac9365941ece6133a6e1346c08ca2bb0ee825",
+    "note": "Candidate includes final source 0a4dba4 and docs-only closeout; runtime/e2e unchanged since full verify and preview. PR 12 is remote merge/CI authority."
   },
   "conditionalIntegratorPaths": [
     "packages/ui/package.json",
@@ -217,8 +217,8 @@
     "result": "pass",
     "revision": 15,
     "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
-    "sha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
-    "note": "npm run verify PASS 257 tests/build; final sticky browser gate 10 screen/viewport combinations and progressive gate PASS on matching source before checkpoint."
+    "sha": "673ac9365941ece6133a6e1346c08ca2bb0ee825",
+    "note": "Full verify 257 tests/build and browser checks at runtime-equivalent 0a4dba4; only documentation changed through this candidate, with docs/diff checks PASS. See current handoff for coverage rationale."
   },
   "historicalRevision6": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r6.json",
@@ -279,11 +279,12 @@
   "closure": {
     "date": "2026-10-16",
     "scope": "Current KPH/DATE UI preview including compact controls/sliding covers/sticky tabs",
-    "candidateSha": "0a4dba490d73f41d8622630e4d33e772e905cf58",
+    "candidateSha": "673ac9365941ece6133a6e1346c08ca2bb0ee825",
     "acceptedBy": "owner",
     "decisionRef": "Current chat: pass, merge",
     "evidence": "docs/delivery/figma-mobile-implementation/merge-2026-10-16.md",
-    "remoteActions": "PR integration authorized; remote checks/merge recorded in handoff when complete"
+    "remoteActions": "PR integration authorized; remote checks/merge recorded in handoff when complete",
+    "pullRequest": "https://github.com/VuPhm/coopfood-kph/pull/12"
   },
   "historicalRevision13": {
     "plan": "docs/delivery/figma-mobile-implementation/plan-r13.json",
