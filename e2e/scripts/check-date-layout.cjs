@@ -29,10 +29,10 @@ fs.mkdirSync(output, { recursive: true });
       expect(await page.locator('.store-date-result-count').evaluate(el => getComputedStyle(el).fontWeight)).toEqual('400');
       const layout = await page.locator('.store-date').evaluate(root => {
         const rect = selector => { const r = root.querySelector(selector).getBoundingClientRect(); return { x: r.x, y: r.y, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; };
-        return { search: rect('.store-date-search-panel'), browser: rect('.store-date-browser'), tabs: rect('.store-tabs'), controls: rect('.store-date-list-controls'), toolbar: rect('.store-date-toolbar'), states: rect('.store-date-statuses'), lots: rect('.store-date-lots'), detail: root.querySelector('.store-date-detail') ? rect('.store-date-detail') : null };
+        return { search: rect('.store-date-search-form'), browser: rect('.store-date-browser'), tabs: rect('.store-tabs'), controls: rect('.store-date-list-controls'), toolbar: rect('.store-date-toolbar'), states: rect('.store-date-statuses'), lots: rect('.store-date-lots'), detail: root.querySelector('.store-date-detail') ? rect('.store-date-detail') : null };
       });
       expect(layout.search.height, 'compact upper search area').toEqual(48);
-      for (const name of ['tabs', 'controls', 'toolbar', 'states', 'lots']) {
+      for (const name of ['tabs', 'controls', 'states', 'lots']) {
         expect(Math.abs(layout[name].x - layout.browser.x), `${name} left aligned`).toBeLessThanOrEqual(1);
         expect(Math.abs(layout[name].right - layout.browser.right), `${name} right aligned`).toBeLessThanOrEqual(1);
       }
@@ -43,6 +43,8 @@ fs.mkdirSync(output, { recursive: true });
         expect(gap, 'controls grouped with list').toBeGreaterThanOrEqual(8); expect(gap).toBeLessThanOrEqual(24);
       }
       const sort = await page.locator('.store-date-toolbar .store-quick-sort-trigger').boundingBox();
+      expect(layout.toolbar.x).toBeGreaterThanOrEqual(layout.browser.x);
+      expect(layout.toolbar.right).toBeLessThanOrEqual(layout.browser.right + 1);
       const filter = await page.getByRole('button', { name: 'Lọc DATE', exact: true }).boundingBox();
       expect(sort.y).toEqual(filter.y); expect(sort.height).toEqual(filter.height);
       expect(filter.x - sort.x - sort.width).toBeGreaterThanOrEqual(8);

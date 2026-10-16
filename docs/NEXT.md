@@ -1,5 +1,24 @@
 # Công việc kế tiếp
 
+**Đóng lượt KPH/DATE theo “pass, merge”, 16/10/2026.** Owner đã nghiệm thu
+preview 4215; hoàn tất commit/CI/merge nhánh UI vào `main` rồi dừng.
+Các đề nghị thử preview bên dưới là lịch sử trước nghiệm thu. Không tự mở
+backend DATE, module mới hoặc deploy. [Hồ sơ tích hợp](delivery/figma-mobile-implementation/merge-2026-10-16.md).
+
+**KPH + DATE: thử cuộn tiếp để neo tab tại 4215.** Tải lại
+<http://127.0.0.1:4215/#kph> và <http://127.0.0.1:4215/#date>; vuốt lên cho
+nắp phủ vùng tìm/CTA, vuốt tiếp để tab giữ trên đỉnh rồi đổi tab và cuộn về.
+Technical PASS 37 tests/build/Playwright năm viewport và loading no shift.
+Phần mới chưa commit; owner/device gate pending.
+[Bàn giao](delivery/figma-mobile-implementation/sticky-tabs.md).
+
+**DATE: xem nền xanh/nắp trượt/controls compact tại 4215.** Checkpoint UI trước
+đã lưu local `216c17c`; DATE mới chưa commit. Tải lại
+<http://127.0.0.1:4215/#date>, tìm SKU/lô, mở metadata, cuộn nắp và thử
+Ghi nhận/Đã xử lý. Technical PASS build/32 tests/Playwright workflow/contrast/
+reflow/scroll; owner/device gate pending.
+[Bàn giao/rollback](delivery/figma-mobile-implementation/date-sliding-cover.md).
+
 **KPH: xem CTA trắng, nhãn màu và cấu trúc mới tại 4215.** Tải lại
 <http://127.0.0.1:4215/#kph>, xem hai CTA cùng hàng/icon/nhãn và thử cả hai
 loại. Technical PASS build/11 tests/geometry/contrast/150% chữ/loading/workflow;

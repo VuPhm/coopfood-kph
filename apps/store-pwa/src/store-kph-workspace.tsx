@@ -1,3 +1,4 @@
+import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
 import { memo, useCallback, useEffect, useImperativeHandle, useId, useMemo, useRef, useState, useLayoutEffect, type Ref } from "react";
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
 import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
@@ -108,8 +109,8 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
       <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(kind)}><Maximize size={20} aria-hidden="true" /></button></div>
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <KphCreateButton key={k} kind={k} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)} />)}</div></section>
     </div>
-    <section className="store-ticket-list" aria-label="Phiếu khai báo">
-      <div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div>
+    <section className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
+      <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div></StoreStickyTabs>
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{filtered.length} phiếu</span></div>
         <div className="store-kph-list-toolbar"><KphQuickSort sort={sort} onChange={setSort} /><button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} /></div>

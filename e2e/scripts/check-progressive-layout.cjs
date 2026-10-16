@@ -43,7 +43,7 @@ function stable(before, after) {
         const chrome = ['.store-header', '.store-account', '#store-content', viewport.width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail'];
         const selectors = screen === 'home'
           ? [...chrome, viewport.width < 900 ? '.store-launcher-mobile' : '.store-launcher-desktop', '.store-home-decoration', '.store-home-art', '.store-header-brand img']
-          : [...chrome, '.store-create-actions', '.store-kph-toolbar', '.store-list-heading', '.store-kph-list-controls', '.store-kph-list-toolbar', '.store-tabs', '.store-kph-list', '.store-pagination', viewport.width < 900 ? '.store-ticket' : '.store-kph-table'];
+          : [...chrome, '.store-create-actions', '.store-kph-toolbar', '.store-list-heading', '.store-kph-list-controls', '.store-kph-list-toolbar', '.store-sticky-tabs', '.store-tabs', '.store-kph-list', '.store-pagination', viewport.width < 900 ? '.store-ticket' : '.store-kph-table'];
         const before = await boxes(page, selectors);
         await page.screenshot({ path: `${output}/${screen}-frame-${viewport.width}.png` });
         // Delay exceeds the 500ms input grace period: reveal shifts are counted.

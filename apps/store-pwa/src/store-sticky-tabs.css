@@ -1,0 +1,19 @@
+/* Keep the initial 12px cover inset; the same opaque surface pins at the top. */
+.store-kph { --store-sticky-tabs-gutter: var(--store-kph-gutter); }
+.store-date { --store-sticky-tabs-gutter: var(--store-date-gutter); }
+.store-sticky-tabs {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 3;
+  align-self: start;
+  margin: -12px calc(-1 * var(--store-sticky-tabs-gutter)) -4px;
+  padding: 12px var(--store-sticky-tabs-gutter) 8px;
+  background: var(--store-surface);
+  isolation: isolate;
+}
+/* Clip the resting plate to the cover's rounded edge without a scroll container. */
+.store-kph .store-ticket-list, .store-date-workspace { overflow: clip; }
+@media (min-width: 900px) {
+  /* DATE's tabs belong to the list column, clear of the detail column. */
+  .store-date-browser > .store-sticky-tabs { margin-right: -12px; padding-right: 12px; }
+}

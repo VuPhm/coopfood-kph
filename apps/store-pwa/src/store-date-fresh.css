@@ -163,3 +163,33 @@
 
 :is(.store-date, .store-date-sheet) .store-date-acknowledge { background: var(--store-action-orange); color: white; }
 :is(.store-date, .store-date-sheet) .store-date-acknowledge:hover:not(:disabled) { background: var(--store-action-orange-hover); }
+
+/* DATE uses the KPH compact controls and native sliding cover. Lookup output
+   lives in the white cover so expanded metadata can scroll without obstruction. */
+.store-screen-date,
+.store-screen-date > .store-main-column > .store-header,
+.store-screen-date #store-content { background: var(--store-brand-start); }
+.store-screen-date #store-content { border-radius: 0; }
+.store-date { --store-date-gutter: 20px; max-width: none; margin: 0; padding: 0; gap: 0; }
+.store-date-search-panel { position: sticky; top: 0; z-index: 0; gap: 8px; padding: 12px var(--store-date-gutter) 20px; background: var(--store-brand-start); }
+.store-date-search-form, .store-date-search-panel .store-date-message { width: 100%; max-width: 640px; }
+.store-date-search-panel .store-date-search { border-color: var(--store-line); }
+.store-date-search-panel .store-date-scan { border-color: var(--store-module-mint); }
+.store-date-search-panel .store-date-search-form > .store-button { background: var(--store-surface); color: var(--store-brand-action); }
+.store-date-search-panel .store-date-search-form > .store-button:hover { background: var(--store-module-mint); }
+.store-date .store-date-search-panel :is(button, input):focus-visible,
+.store-screen-date .store-header button:focus-visible { outline-color: white; }
+.store-date-workspace { position: relative; z-index: 1; align-content: start; gap: 12px 24px; min-height: 100dvh; margin-top: -12px; border-radius: 24px 24px 0 0; padding: 12px var(--store-date-gutter) 24px; background: var(--store-surface); box-shadow: 0 -8px 24px rgb(0 60 40 / 8%); }
+.store-date-workspace > .store-date-product { grid-column: 1 / -1; }
+.store-date-browser { gap: 12px; }
+.store-date .store-tabs { padding: 0; gap: 8px; }
+.store-date-list-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.store-date-list-heading { flex: 1 1 22rem; flex-wrap: wrap; min-width: 0; }
+.store-date-toolbar { flex: 1 1 14rem; min-width: 0; }
+.store-date-statuses { flex: 1 0 100%; min-width: 0; }
+@media (max-width: 359px) { .store-date { --store-date-gutter: 14px; } }
+@media (min-width: 900px) {
+  .store-date { --store-date-gutter: 36px; }
+  .store-date-search-panel { padding-top: 16px; }
+  .store-date-workspace { padding-bottom: 32px; }
+}

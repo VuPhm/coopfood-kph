@@ -1,3 +1,4 @@
+import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button, Input, ListItemMarker } from "@coopfood-kph/ui";
 import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, Search, SlidersHorizontal } from "lucide-react";
@@ -112,18 +113,18 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
     </>;
   }
   return <div className="store-date">
-    <section className="store-date-search-panel" aria-label="Tra mã hàng">
+    <section className="store-date-search-panel" aria-label="Tra mã hàng" onFocusCapture={() => window.scrollTo({ top: 0, behavior: "instant" })}>
       <form className="store-date-search-form" onSubmit={event => { event.preventDefault(); void search(); }}>
         <label className="store-date-search-wrap"><Search className="store-date-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm SKU, barcode, tên hàng hoặc lô</span><Input className="store-date-search" placeholder="Mã hàng, lô" autoComplete="off" value={query} onChange={event => changeQuery(event.target.value)} /></label>
         <button type="button" className="store-date-scan" aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></button>
         <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}>{busy ? "Tìm…" : "Tìm"}</Button>
       </form>
       {message ? <p className="store-date-message" role="status">{message}</p> : null}
-      {product ? <section className="store-date-product" aria-label="Thông tin mã hàng"><details key={product.id}><summary className="store-date-product-heading" aria-label={`Thông tin mã hàng: ${product.name}`}><div><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p></div><ChevronDown size={18} aria-hidden="true" /></summary><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.code} · {product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></details></section> : null}
     </section>
-    <div className="store-date-workspace">
+    <div className="store-date-workspace" onFocusCapture={revealBelowStickyTabs}>
+      {product ? <section className="store-date-product" aria-label="Thông tin mã hàng"><details key={product.id}><summary className="store-date-product-heading" aria-label={`Thông tin mã hàng: ${product.name}`}><div><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p></div><ChevronDown size={18} aria-hidden="true" /></summary><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.code} · {product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></details></section> : null}
       <section className="store-date-browser" aria-label="Danh sách lô DATE">
-        <div className="store-tabs" role="group" aria-label="Quản lý DATE">{[["alerts", "Cảnh báo", attentionLots.length], ["tracking", "Theo dõi DATE", lots.length]].map(([key, label, n]) => <button key={key} aria-pressed={tab === key} className={tab === key ? "is-active" : ""} onClick={() => setTab(String(key))}>{label}<small>{n}</small></button>)}</div>
+        <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Quản lý DATE">{[["alerts", "Cảnh báo", attentionLots.length], ["tracking", "Theo dõi DATE", lots.length]].map(([key, label, n]) => <button key={key} aria-pressed={tab === key} className={tab === key ? "is-active" : ""} onClick={() => setTab(String(key))}>{label}<small>{n}</small></button>)}</div></StoreStickyTabs>
         <div className="store-date-list-controls">
           <div className="store-date-list-heading"><div><h2>{tab === "alerts" ? "Cần xử lý" : "Theo dõi DATE"}</h2><p className="store-date-result-count">{visible.length} / {lots.length} lô</p></div><button className="store-date-add" disabled title="Chức năng chưa sẵn sàng trong bản dùng thử" aria-describedby="store-date-add-help"><CalendarDays size={18} aria-hidden="true" />Thêm theo dõi</button></div>
           <div className="store-date-toolbar"><StoreQuickSort value={sort} onChange={value => setSort(value as DateSort)} options={DATE_SORT_OPTIONS} title="Sắp xếp lô DATE" groupLabel="Thứ tự lô" /><button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button></div>

@@ -1,5 +1,31 @@
 # Trạng thái hiện tại
 
+**Owner chấp nhận KPH/DATE và yêu cầu merge, 16/10/2026:** phản hồi trực tiếp
+“pass, merge” sau preview 4215. Phạm vi gồm KPH CTA trắng/nhãn màu/controls
+compact, DATE nền xanh/nắp trắng và tab hai màn neo trên đỉnh khi cuộn tiếp.
+Các dòng pending bên dưới giữ lịch sử trước quyết định này. Đang đóng hồ sơ
+và tích hợp nhánh `store-app/figma-mobile-implementation` vào `main` qua PR;
+không mở scope mới. Backend DATE, thiết bị thật và Pages cutover giữ phạm vi
+riêng. [Nghiệm thu và tích hợp](delivery/figma-mobile-implementation/merge-2026-10-16.md).
+
+**KPH + DATE neo tab khi cuộn tiếp, 15/10/2026:** nắp trắng đi lên như trước;
+đến đỉnh thì thanh tab neo theo safe-area, cuộn về đầu trả lại vị trí ban đầu.
+Dùng chung StoreStickyTabs cho hai màn và loading KPH; DATE desktop chỉ neo
+cột danh sách. Focus dưới tab được hiện rõ, popup vẫn ở trên. Technical PASS
+build/37 tests, Playwright hai màn × năm viewport/chữ 150%/focus/sort và
+progressive no shift. Preview 4215 cập nhật; thay đổi mới chưa commit,
+owner/device acceptance pending.
+[Files/checks](delivery/figma-mobile-implementation/sticky-tabs.md).
+
+**Checkpoint và DATE theo KPH, 14/10/2026:** theo “tạm commit, tiếp với date”,
+lưu checkpoint UI local `216c17c` (74 files, `npm run verify` PASS 257 tests/build).
+DATE mới working tree: tìm/quét trên xanh, nắp trắng chứa metadata/tab/list/
+detail, controls compact và focus reveal; giữ workflow/nội dung. Lô đầu lên
+28 px mobile / 84 px desktop. Technical PASS 32 tests/build, Playwright năm
+viewport/150% chữ/focus/empty list và bốn gate DATE; Home/KPH progressive giữ
+no shift. Preview <http://127.0.0.1:4215/#date>, owner/device acceptance pending.
+[Files/checks/giới hạn](delivery/figma-mobile-implementation/date-sliding-cover.md).
+
 **KPH CTA trắng + nhãn màu, 14/10/2026:** owner yêu cầu sửa hai CTA lệch.
 Một cấu trúc chung mobile/desktop: header icon/Tạo phiếu/chevron, nhãn loại
 phiếu cam/xanh ở hàng dưới. CTA nền trắng, min 72 px; bỏ display:contents,
