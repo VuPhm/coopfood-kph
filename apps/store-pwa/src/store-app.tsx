@@ -7,6 +7,7 @@ import { PwaStatus } from "./pwa-status";
 import { ShelfLifeScreen, useShelfLifeLookup } from "./store-shelf-life";
 import { useShelfLookupHistory } from "./store-shelf-history";
 import { DateWorkspace } from "./store-date-workspace";
+import { ReportHub } from "./store-report-hub";
 import { StoreLogin } from "./store-login";
 import { StoreAccountControl } from "./store-account-sheet";
 import { mockDateLots, mockProfile, mockRecords } from "./store-app-mock";
@@ -81,6 +82,7 @@ function StoreAppContent() {
       {screen === "shelf" ? <div className="store-shelf-page"><ShelfLifeScreen history={shelfHistory.history} onCalculated={shelfHistory.remember} /></div> : null}
       {screen === "kph" ? <FeatureLoadBoundary><LazyKphWorkspace records={records} onRecordsChange={setRecords} onNotice={setNotice} /></FeatureLoadBoundary> : null}
       {screen === "date" ? <DateWorkspace lots={dateLots} onLotsChange={setDateLots} /> : null}
+      {screen === "reports" ? <ReportHub lots={dateLots} /> : null}
       {screen === "kph" || screen === "date" ? <button ref={quickFabRef} hidden={quickOpen} className="store-quick-fab" aria-label="Mở tiện ích tra cứu lùi hàng" aria-expanded={quickOpen} aria-controls={quickOpen ? "store-quick-panel" : undefined} onClick={() => setQuickOpen(open => !open)}><History size={22} strokeWidth={1.8} aria-hidden="true" /><span>Tra hạn lùi</span></button> : null}
       {screen === "kph" || screen === "date" ? <Dialog open={quickOpen} onOpenChange={setQuickOpen}><DialogContent id="store-quick-panel" ref={quickPanelRef} className="store-quick-panel" aria-label="Tra cứu lùi hàng nhanh" aria-labelledby={undefined} closeLabel="Đóng tiện ích" onOpenAutoFocus={event => { event.preventDefault(); quickPanelRef.current?.focus(); }} onCloseAutoFocus={event => { event.preventDefault(); window.requestAnimationFrame(() => quickFabRef.current?.focus()); }}><DialogHeader><DialogTitle>Tra cứu lùi hàng</DialogTitle></DialogHeader><DialogDescription className="sr-only">Tra hạn lùi tự động theo thông tin ngày đã nhập</DialogDescription><div className="store-modal-body"><ShelfLifeScreen idPrefix="quick-shelf" lookup={quickLookup} /></div></DialogContent></Dialog> : null}
   </StoreAppFrame>;

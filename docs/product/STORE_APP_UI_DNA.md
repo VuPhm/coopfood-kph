@@ -20,6 +20,18 @@ remains governed by the
 The older [UI_DNA](UI_DNA.md) is Tool KPH extraction and migration evidence, not
 the authority for this Store App direction.
 
+## Ready-to-use names — owner note 2026-10-14
+
+For user-named artifacts such as reports, templates and copies, provide an
+editable, populated suggestion plus a matching placeholder. Most operators
+should be able to accept it without typing. A cleared/whitespace-only name
+uses the suggestion; generated copy/template names avoid collisions. Preserve
+names the operator has edited. Naming dialogs may focus their confirmation
+button so keyboard entry is optional. Apply this to generated artifact names;
+identity and catalog values still follow their own business contracts.
+This records the owner's naming preference, not acceptance of every candidate
+screen. See [report naming behavior](STORE_REPORTS_DESIGN.md).
+
 ## Product intent and continuity
 
 **Durable principle.** Make the next operational task and its state clear before
@@ -114,3 +126,71 @@ workflow need their own evidence.
 Source trail: [R1-D01 audit](../evidence/r1-d01-ui-dna-audit.md),
 [R1-D02 comparison](../evidence/r1-d02-evaluation-and-directions.md), and
 [R1-D03 convergence](../evidence/r1-d03-ui-dna-convergence.md).
+
+
+## Candidate: Dropdown và thao tác tập hợp — 14/10/2026
+
+RPT01 revision 8 bổ sung Select/Menu primitive chung, áp trước tại Báo cáo.
+Select giữ một giá trị, action menu chạy thao tác; dùng đúng role và primitive,
+không dùng select cho lệnh tức thời. Mọi trigger có tên accessible, lựa chọn
+selected/check và focus rõ. Portal giữ theme và tự đổi phía/cuộn theo viewport.
+
+Chọn nhiều phải nêu phạm vi: master ba trạng thái cho phần đang xem, menu tách
+thao tác đang xem với toàn tập phù hợp. Không để “chọn tất cả/bỏ chọn” mơ hồ
+khi đang tìm; selection ngoài query được giữ nếu contract feature cho phép.
+Contract KPH online vẫn page-local/reset riêng.
+
+Nhóm CTA cần dùng khi cuộn có thể dùng StoreActionDock: một bộ nút, nổi khi
+chưa tới vị trí tự nhiên, inline tại cuối nội dung; trên toolbar/safe-area,
+chừa khoảng cho nội dung và focus, cho phép reflow/resize. Summary ngắn; không
+nhân đôi controls hoặc neo mọi button. Consumer đầu là Lưu mẫu/Tạo báo cáo.
+[Catalog/API](STORE_APP_COMPONENT_CATALOG.md), [bàn giao](../delivery/rpt01-report-design/handoff.md).
+Đây là candidate mới, chưa thay trạng thái owner acceptance của các feature cũ.
+
+
+## Candidate: Cụm điều khiển tham khảo — 18/10/2026, revision 14
+
+StoreSearchField, StoreSettingsGroup/Row và StoreChoiceSheet dùng cùng Fresh
+roles/type/touch size, có consumer thật trong báo cáo. Choice sheet chỉ cuộn
+list, không trôi search/footer; cancel/apply/focus/clear là contract có test.
+Đổi mẫu và Info gom vào navigation, tên mẫu đầy đủ và page cuộn native.
+[API và mẫu dùng](STORE_FORM_CONTROLS.md) để feature khác tham khảo; không
+suy quyền rollout hoặc owner acceptance của trang khác.
+
+## Candidate: Báo cáo dựng lại — 18/10/2026, revision 13
+
+R12 bị owner loại bỏ. R13 bỏ tab và bố cục nắp của composer: trang trắng
+bình thường dưới shell hiện có, title/search, một group thiết lập và danh mục.
+Đổi mẫu qua sheet tìm kiếm/radio/Dùng mẫu; Hủy không sửa draft. Không gesture
+ẩn, sticky hero, blur hoặc animation mới. Fresh token/type/touch size giữ
+nhất quán app; chi tiết theo modal, không bọc nhiều khung. History/snapshot
+còn pattern cũ; không suy acceptance cho r13 từ kiểm tra kỹ thuật.
+[Thiết kế](STORE_REPORTS_DESIGN.md), [bàn giao](../delivery/rpt01-report-design/handoff.md).
+
+## Candidate: Báo cáo tối giản — 18/10/2026, revision 12
+
+Tên mẫu và tìm kiếm tích hợp trên xanh; không chọn mẫu ở hero. Thanh đổi mẫu
+mỏng trên trắng chỉ vài tab nhanh, Xem thêm mở menu đầy đủ. Kỳ/lọc/nhóm DATE
+gom một cụm, danh mục hàng phẳng/hairline và checkbox, không bọc nhiều khung.
+Giữ Fresh typography/token/44–48 px touch target, nút neo dùng chung và thông
+tin chi tiết trong modal. Apple-like ở phân cấp/spacing/disclosure, không thêm
+font, blur/glass hoặc bộ theme khác. Composer không có vuốt để ẩn. Các mốc
+r9–r11 bên dưới ghi lịch sử; bố cục r12 là candidate mới chờ owner xem.
+[Thiết kế](STORE_REPORTS_DESIGN.md), [bàn giao](../delivery/rpt01-report-design/handoff.md).
+
+## Candidate: Nền xanh và nắp báo cáo — 14/10/2026
+
+Owner tạm đạt cụm dropdown/chọn/neo r8, yêu cầu r9 dùng hướng nắp của Home/Login.
+R10 giữ control mẫu có nhãn/icon/viền trên nền xanh; kỳ/ngày chốt chuyển lên
+đầu nắp trắng, cùng body danh mục. Nắp trắng
+radius 26 overlap 24. Lịch sử cùng pattern; menu chọn loại vẫn trắng, các mục
+r11 dùng nền màu liền khối và icon tròn đậm như Home. Composer bỏ grip và mọi
+listener pull-down; chỉ cuộn native, dùng nút “Chọn mẫu khác” để về menu.
+History/snapshot vẫn có grip 44 px/button/keyboard và pull-down.
+
+Motion dùng transform/opacity, tôn trọng reduced motion, không animate height/
+layout hoặc blur. Không giữ bản nội dung trùng phía sau và không dựng lại list
+trong touchmove. Khi scale inventory, tách tập dữ liệu/selection/export khỏi
+số row screen; kiểm print đủ dữ liệu trước khi chấp nhận giới hạn render.
+[Thiết kế](STORE_REPORTS_DESIGN.md), [bàn giao](../delivery/rpt01-report-design/handoff.md).
+Technical gate không thay nghiệm thu hình ảnh/gesture trên thiết bị thật.

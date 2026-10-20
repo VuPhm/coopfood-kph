@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ArrowLeft, CalendarDays, FileWarning, History, House, Package } from "lucide-react";
+import { ArrowLeft, CalendarDays, FileText, FileWarning, History, House, Package } from "lucide-react";
 import { figmaAsset } from "./figma-assets";
 import { assetUrl } from "./asset-url";
 import type { StoreProfile } from "./store-profile";
@@ -9,19 +9,21 @@ import "./store-kph-fresh.css";
 import "./store-date-fresh.css";
 import "./store-sticky-tabs.css";
 
-export type Screen = "home" | "kph" | "shelf" | "date" | "login";
+export type Screen = "home" | "kph" | "shelf" | "date" | "reports" | "login";
 const screens = {
   login: { title: "Đăng nhập", subtitle: "Tài khoản cửa hàng" },
   home: { title: "Trang chủ", subtitle: "Cửa hàng hiện tại" },
   kph: { title: "KPH", subtitle: "Hàng không phù hợp" },
   shelf: { title: "Tra cứu lùi hàng", subtitle: "NSX · HSD · hạn lùi" },
   date: { title: "DATE", subtitle: "Tra mã hàng · Theo dõi lô" },
+  reports: { title: "Báo cáo", subtitle: "Tồn kho theo DATE" },
 };
 const homeModuleIcons = { kph: FileWarning, shelf: History, date: Package };
 const mobileDestinations = [
   { screen: "home", label: "Trang chủ", icon: House },
   { screen: "kph", label: "KPH", icon: FileWarning },
   { screen: "date", label: "DATE", icon: CalendarDays },
+  { screen: "reports", label: "Báo cáo", icon: FileText },
 ] as const;
 export function HomeModuleIcon({ screen }: { screen: keyof typeof homeModuleIcons }) {
   const Icon = homeModuleIcons[screen];
@@ -47,6 +49,8 @@ export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account,
         <button className={screen === "kph" ? "is-active" : ""} onPointerEnter={onKphIntent} onFocus={onKphIntent} onClick={() => navigate("kph")}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherXSquare")} alt="" />KPH</button>
         <button className={screen === "date" ? "is-active" : ""} onClick={() => navigate("date")}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" />DATE</button>
       </nav>
+      <p className="store-rail-label">BÁO CÁO</p>
+      <nav><button className={screen === "reports" ? "is-active" : ""} aria-current={screen === "reports" ? "page" : undefined} onClick={() => navigate("reports")}><FileText size={18} aria-hidden="true" />Báo cáo</button></nav>
       <p className="store-rail-label">TIỆN ÍCH</p>
       <nav><button className={screen === "shelf" ? "is-active" : ""} onClick={() => navigate("shelf")}><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" />Tra hạn lùi hàng</button></nav>
       <div className="store-rail-store"><small>CỬA HÀNG HIỆN TẠI</small><strong>{profile.storeName}</strong></div>

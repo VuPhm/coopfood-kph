@@ -20,7 +20,7 @@ fs.mkdirSync(output, { recursive: true });
         await expect(nav).toBeHidden();
       } else {
         await expect(nav).toBeVisible();
-        await expect(nav.getByRole('link')).toHaveCount(3);
+        await expect(nav.getByRole('link')).toHaveCount(4);
         await expect(nav.getByRole('link', { name: 'KPH', exact: true })).toHaveAttribute('aria-current', 'page');
         const navBox = await nav.boundingBox();
         const fabBox = await fab.boundingBox();
