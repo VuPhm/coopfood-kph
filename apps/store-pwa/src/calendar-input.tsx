@@ -114,7 +114,9 @@ export function CalendarInput({ id, initialMonth, label, onValueChange, readOnly
       <Input
         id={id}
         value={value}
-        onChange={(event) => onValueChange(formatDateEntry(event.target.value))}
+        onChange={(event) => {
+          if (!readOnly) onValueChange(formatDateEntry(event.target.value));
+        }}
         inputMode="numeric"
         maxLength={10}
         placeholder="dd/mm/yyyy"

@@ -10,6 +10,17 @@ function CalendarInputHarness() {
 }
 
 describe("CalendarInput", () => {
+  it.each(["", "2026-10-20", "01/01/2000"])("ignores change events carrying %s when the date is read-only", (value) => {
+    const onValueChange = vi.fn();
+    render(<CalendarInput id="detected-date" initialMonth="2026-10-20" label="Ngày phát hiện" value="20/10/2026" readOnly onValueChange={onValueChange} />);
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value } });
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(input).toHaveValue("20/10/2026");
+    expect(input).toHaveAttribute("readonly");
+    expect(screen.getByRole("button", { name: "Chọn ngày phát hiện" })).toBeDisabled();
+  });
+
   it("portals above clipped forms and follows its anchor while the form scrolls", async () => {
     render(<CalendarInputHarness />);
     const anchor = document.querySelector('[data-calendar-input="treatment-date"]');
