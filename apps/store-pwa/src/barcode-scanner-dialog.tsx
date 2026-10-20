@@ -450,7 +450,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open }: BarcodeScan
             <span>Quét mã SKU / UPC</span>
           </DialogTitle>
           <DialogDescription id={descId} className="text-xs text-white/70">
-            Căn chỉnh mã vạch vào giữa khung quét. Mã sẽ điền vào SKU/UPC; tên hàng hóa và NCC cần nhập tay.
+            Căn chỉnh mã vạch vào giữa khung quét. Mã sẽ điền vào SKU/UPC; thông tin đã nhớ trên thiết bị sẽ gợi điền tên hàng và NCC.
           </DialogDescription>
         </DialogHeader>
 

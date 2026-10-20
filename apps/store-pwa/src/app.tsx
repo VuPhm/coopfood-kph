@@ -6,6 +6,7 @@ import { type KeyboardEvent, type MouseEvent, memo, useCallback, useEffect, useM
 import { assetUrl } from "./asset-url";
 import { formatBusinessDate } from "./business-date";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
+import { buildSkuMemory, type SkuMemory } from "./sku-memory";
 import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord } from "./demo-records";
 import { downloadKphWorkbook } from "./excel-export";
 import { ExpiryWorkbench } from "./expiry-dialog";
@@ -117,10 +118,11 @@ function sortValue(record: DemoRecord, key: RecordSortKey, approvalStatus: DemoA
 }
 
 // Keep dialog interaction updates from rendering the history workspace again.
-function KphCreateActions({ disabled, profile, onSaved }: {
+function KphCreateActions({ disabled, profile, onSaved, skuMemory }: {
   disabled: boolean;
   profile: StoreProfile;
   onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
+  skuMemory: SkuMemory;
 }) {
   const [kind, setKind] = useState<KphKind | null>(null);
   const [open, setOpen] = useState(false);
@@ -135,7 +137,7 @@ function KphCreateActions({ disabled, profile, onSaved }: {
           </button>
         ))}
       </div>
-      <CreateRecordDialog kind={kind} open={open} profile={profile} onOpenChange={setOpen} onSaved={onSaved} />
+      <CreateRecordDialog kind={kind} open={open} profile={profile} skuMemory={skuMemory} onOpenChange={setOpen} onSaved={onSaved} />
     </>
   );
 }
@@ -150,6 +152,7 @@ export function App() {
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
   const [notice, setNotice] = useState("");
   const [deletedIds, setDeletedIds] = useState<ReadonlySet<string>>(new Set());
+  const skuMemory = useMemo(() => buildSkuMemory(records, deletedIds, approvalByRecord), [records, deletedIds, approvalByRecord]);
   const [deleteIds, setDeleteIds] = useState<readonly string[]>([]);
   const [trashMode, setTrashMode] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
@@ -502,7 +505,7 @@ export function App() {
               <p id="workspace-title">Phiếu theo dõi hàng không phù hợp</p>
             </div>
 
-            <KphCreateActions disabled={!storageReady} profile={storeProfile} onSaved={saveCreatedRecord} />
+            <KphCreateActions disabled={!storageReady} profile={storeProfile} skuMemory={skuMemory} onSaved={saveCreatedRecord} />
 
             <button
               type="button"

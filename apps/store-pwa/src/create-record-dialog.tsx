@@ -42,6 +42,7 @@ import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 import { primeScanSuccessSound } from "./scanner-sound";
 import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
+import { EMPTY_SKU_MEMORY, REMEMBERED_SKU_FIELDS, skuMemoryKey, type RememberedSkuField, type SkuMemory } from "./sku-memory";
 
 function isDisplayDate(value: string) {
   try {
@@ -107,6 +108,7 @@ type CreateRecordDialogProps = {
   kind: KphKind | null;
   open: boolean;
   profile?: StoreProfile;
+  skuMemory?: SkuMemory;
   onOpenChange: (open: boolean) => void;
   onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
 };
@@ -135,7 +137,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile = DEFAULT_STORE_PROFILE }: CreateRecordDialogProps) {
+export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile = DEFAULT_STORE_PROFILE, skuMemory = EMPTY_SKU_MEMORY }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -146,7 +148,12 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [weightExtracted, setWeightExtracted] = useState(false);
-  const weightTimeoutRef = useRef<number | null>(null);
+  const [rememberedFields, setRememberedFields] = useState<RememberedSkuField[]>([]);
+  const rememberedValuesRef = useRef<Partial<Record<RememberedSkuField, string>>>({});
+  const manuallyEditedFieldsRef = useRef(new Set<RememberedSkuField>());
+  const observedBarcodeRef = useRef("");
+  const barcodeTimeoutRef = useRef<number | null>(null);
+  const skipPendingWeightRef = useRef(false);
   const focusTimeoutRef = useRef<number | null>(null);
   const sessionRef = useRef(0);
   const mountedRef = useRef(false);
@@ -156,6 +163,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const {
     formState: { errors },
     handleSubmit,
+    getValues,
     register,
     reset,
     setFocus,
@@ -187,25 +195,26 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     return () => {
       mountedRef.current = false;
       sessionRef.current += 1;
-      cancelPendingWeightExtraction();
+      cancelPendingBarcodeCompletion();
       if (focusTimeoutRef.current !== null) window.clearTimeout(focusTimeoutRef.current);
       focusTimeoutRef.current = null;
       releasePendingPhotoUrls();
     };
   }, [kind, open, profile]);
 
-  function cancelPendingWeightExtraction() {
-    if (weightTimeoutRef.current !== null) window.clearTimeout(weightTimeoutRef.current);
-    weightTimeoutRef.current = null;
+  function cancelPendingBarcodeCompletion() {
+    if (barcodeTimeoutRef.current !== null) window.clearTimeout(barcodeTimeoutRef.current);
+    barcodeTimeoutRef.current = null;
   }
 
   function clearWeightExtraction() {
-    cancelPendingWeightExtraction();
+    // Manual quantity/unit edits cancel pending weight, while name/NCC can still fill.
+    skipPendingWeightRef.current = true;
     setWeightExtracted(false);
   }
 
   function applyFreshFoodWeight(barcode: string) {
-    clearWeightExtraction();
+    setWeightExtracted(false);
     if (kind !== "TPTS") return;
     const weightKg = parseFreshFoodWeightKg(barcode);
     if (weightKg === null) return;
@@ -214,11 +223,61 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     setWeightExtracted(true);
   }
 
-  function scheduleFreshFoodWeight(barcode: string) {
-    clearWeightExtraction();
-    if (kind === "TPTS") {
-      weightTimeoutRef.current = window.setTimeout(() => applyFreshFoodWeight(barcode), 500);
+  function scheduleBarcodeCompletion(barcode: string) {
+    cancelPendingBarcodeCompletion();
+    setWeightExtracted(false);
+    prepareRememberedBarcode(barcode);
+    skipPendingWeightRef.current = false;
+    barcodeTimeoutRef.current = window.setTimeout(() => completeBarcode(barcode, !skipPendingWeightRef.current), 500);
+  }
+
+  function updateRememberedFields() {
+    const next = REMEMBERED_SKU_FIELDS.filter((field) => rememberedValuesRef.current[field] !== undefined);
+    setRememberedFields((current) => current.join() === next.join() ? current : next);
+  }
+
+  function markRememberedFieldEdited(field: RememberedSkuField) {
+    manuallyEditedFieldsRef.current.add(field);
+    delete rememberedValuesRef.current[field];
+    updateRememberedFields();
+  }
+
+  function prepareRememberedBarcode(barcode: string) {
+    const code = barcode.trim();
+    if (observedBarcodeRef.current === code) return;
+    for (const field of REMEMBERED_SKU_FIELDS) {
+      const previous = rememberedValuesRef.current[field];
+      if (previous !== undefined && getValues(field) === previous) setValue(field, "", { shouldDirty: true });
     }
+    observedBarcodeRef.current = code;
+    rememberedValuesRef.current = {};
+    manuallyEditedFieldsRef.current.clear();
+    updateRememberedFields();
+  }
+
+  function completeBarcode(barcode: string, applyWeight = true) {
+    cancelPendingBarcodeCompletion();
+    prepareRememberedBarcode(barcode);
+    if (applyWeight) applyFreshFoodWeight(barcode);
+    if (!kind) return;
+    const key = skuMemoryKey(kind, barcode);
+    const remembered = key ? skuMemory.get(key) : undefined;
+    if (!remembered) return;
+    for (const field of REMEMBERED_SKU_FIELDS) {
+      if (remembered[field] && !getValues(field).trim() && !manuallyEditedFieldsRef.current.has(field)) {
+        setValue(field, remembered[field], { shouldDirty: true, shouldValidate: true });
+        rememberedValuesRef.current[field] = remembered[field];
+      }
+    }
+    updateRememberedFields();
+  }
+
+  function resetRememberedFields() {
+    cancelPendingBarcodeCompletion();
+    observedBarcodeRef.current = "";
+    rememberedValuesRef.current = {};
+    manuallyEditedFieldsRef.current.clear();
+    setRememberedFields([]);
   }
 
   function clearPhotos() {
@@ -234,6 +293,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     clearWeightExtraction();
     if (!kind) return;
     reset(defaultValues(kind, profile));
+    resetRememberedFields();
     clearPhotos();
     setPhotoError("");
   }, [kind, profile, reset]);
@@ -243,7 +303,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   }, [open]);
 
   useEffect(() => () => {
-    cancelPendingWeightExtraction();
+    cancelPendingBarcodeCompletion();
     for (const photo of photoRef.current) {
       if (photo.url) URL.revokeObjectURL(photo.url);
     }
@@ -257,6 +317,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
       event.preventDefault();
       return;
     }
+    // Enter can submit without blur or waiting for the typing-pause timer.
+    completeBarcode(getValues("barcode"), barcodeTimeoutRef.current !== null && !skipPendingWeightRef.current);
     submitBusyRef.current = true;
     const session = sessionRef.current;
     try {
@@ -292,6 +354,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
           });
           if (!isCurrentSession(session)) return;
           reset(defaultValues(kind, profile));
+          resetRememberedFields();
           clearWeightExtraction();
           clearPhotos();
           onOpenChange(false);
@@ -374,8 +437,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative">
                     <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", {
-                      onChange: (event) => scheduleFreshFoodWeight(event.target.value),
-                      onBlur: (event) => applyFreshFoodWeight(event.target.value),
+                      onChange: (event) => scheduleBarcodeCompletion(event.target.value),
+                      onBlur: (event) => completeBarcode(event.target.value),
                     })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => {
                       primeScanSuccessSound();
@@ -386,12 +449,13 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                   </div>
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
-                  <Input id="supplier" placeholder="Điền tên NCC" {...register("supplier")} />
+                  <Input id="supplier" placeholder="Điền tên NCC" aria-describedby={rememberedFields.includes("supplier") ? "sku-memory-note" : undefined} {...register("supplier", { onChange: () => markRememberedFieldEdited("supplier") })} />
                 </Field>
                 <Field label="Tên hàng hóa" htmlFor="product-name" error={errors.productName?.message}>
-                  <Input id="product-name" placeholder="Điền tên hàng hóa" {...register("productName")} />
+                  <Input id="product-name" placeholder="Điền tên hàng hóa" aria-describedby={rememberedFields.includes("productName") ? "sku-memory-note" : undefined} {...register("productName", { onChange: () => markRememberedFieldEdited("productName") })} />
                 </Field>
               </div>
+              {rememberedFields.length ? <p id="sku-memory-note" className="mt-2 text-xs text-ink-muted" role="status">Đã điền {rememberedFields.map((field) => field === "productName" ? "tên hàng" : "nhà cung cấp").join(" và ")} từ phiếu đã lưu có mã này trên thiết bị. Bạn có thể sửa.</p> : null}
             </FormSection>
 
             <FormSection number="2" title="Số lượng & đơn vị">
@@ -459,7 +523,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         onScan={(scannedBarcode) => {
           if (!open) return;
           setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
-          applyFreshFoodWeight(scannedBarcode);
+          completeBarcode(scannedBarcode);
           const session = sessionRef.current;
           focusTimeoutRef.current = window.setTimeout(() => {
             focusTimeoutRef.current = null;

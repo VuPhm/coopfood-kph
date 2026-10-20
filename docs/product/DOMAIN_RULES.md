@@ -58,6 +58,14 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
 - Barcode không tìm thấy hiển thị lựa chọn quét lại hoặc nhập tay. Fallback manual
   phải lưu barcode đã quét (nếu có) cùng trạng thái `NOT_FOUND`, không suy diễn
   product hoặc hiển thị danh sách để người dùng chọn.
+- Ngoại lệ gợi nhớ trên pilot Pages theo yêu cầu ngày 21/10/2026: khi hoàn tất
+  nhập/quét, chỉ tự điền tên hàng và nhà cung cấp từ phiếu đã lưu gần nhất trên
+  cùng thiết bị, cùng loại phiếu và khớp toàn bộ mã (giữ số 0 đầu). Loại phiếu
+  trong thùng rác hoặc không được duyệt khỏi nguồn nhớ; không học từ nhãn mặc
+  định, bản nháp hoặc lần lưu lỗi. Giữ dữ liệu người dùng sửa tay và ghi rõ
+  nguồn trên thiết bị; đây không phải catalog lookup hoặc xác nhận `FOUND`.
+  Không nhớ ngày, số lượng, đơn vị, tình trạng, biện pháp, người nhập, ảnh/ghi
+  chú; barcode cân 29 vẫn chỉ tách trọng lượng theo rule hiện có.
 - Một NCC có thể cung cấp nhiều sản phẩm. Chính sách nhiều NCC cho một SKU/product
   và chọn NCC chính vẫn phải được chốt riêng trước publish.
 
