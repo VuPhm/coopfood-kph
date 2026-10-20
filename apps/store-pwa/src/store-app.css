@@ -542,7 +542,7 @@
 .store-mobile-toolbar { display: none; }
 @media (max-width: 899px) {
   .store-app { --store-mobile-toolbar-height: calc(72px + env(safe-area-inset-bottom)); }
-  .store-mobile-toolbar { position: fixed; z-index: 30; inset: auto 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); height: var(--store-mobile-toolbar-height); gap: 4px; border-top: 1px solid #e0ece5; border-radius: 22px 22px 0 0; padding: 6px 12px calc(6px + env(safe-area-inset-bottom)); background: white; box-shadow: 0 -4px 24px rgb(0 60 40 / 7%); }
+  .store-mobile-toolbar { position: fixed; z-index: 30; inset: auto 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); height: var(--store-mobile-toolbar-height); gap: 4px; border-top: 1px solid #e0ece5; border-radius: 22px 22px 0 0; padding: 6px 12px calc(6px + env(safe-area-inset-bottom)); background: white; box-shadow: 0 -4px 24px rgb(0 60 40 / 7%); }
   .store-mobile-toolbar a { display: flex; min-width: 0; min-height: 56px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 14px; color: #596b7d; font-size: 11px; font-weight: 500; line-height: 16px; text-decoration: none; }
   .store-mobile-toolbar-icon { display: grid; width: 44px; height: 28px; place-items: center; border-radius: 999px; }
   .store-mobile-toolbar a[aria-current="page"] { color: #00724e; font-weight: 650; }

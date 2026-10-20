@@ -66,3 +66,32 @@ The current design candidate is [CoopFood — Store UI foundation](https://www.f
 - Responsive layouts may add columns at wider viewports; preserve the mobile hierarchy and workflow order.
 - Keep review/submission boundaries visible. Mock data and prototype-only actions must be labeled as simulations and must not imply a server write.
 - Product/API semantics and authorization come from repo contracts and accepted ADRs. Figma controls visual presentation and interaction only.
+
+
+## Shared dropdowns — RPT01 candidate, 2026-10-14
+
+`Select` is a controlled single-value combobox, built on Radix Select. Pass
+`value`, `onValueChange`, readonly `options` (`value`, `label`, optional
+`disabled`), and an accessible label/labelledby. Native trigger props, `name`
+and `contentClassName` are supported. Empty application values are valid;
+named forms submit the original string value, including leading zeroes.
+Trigger is 48px, options at least 44px, with check/selected/highlight states.
+Radix owns keyboard/typeahead, focus restoration, collision and scrolling.
+Use `DropdownMenu`/Trigger/Content/Item/Label/Separator for commands instead
+of repurposing a value select. Both use `dropdown.css`; theme variables use
+`--dropdown-*` with semantic CF fallbacks. Apply the same theme class to the
+trigger and portal content. Store uses `store-dropdown` from store-controls.css.
+
+Current consumers are the DATE report scope, history month and template save
+settings, plus the report selection action menu. Existing Admin/native selects
+and KPH/DATE sort behavior have not been migrated in this slice. Store/UI/Admin
+TypeScript and Store/browser checks pass; owner acceptance remains pending.
+See [report design](../../docs/product/STORE_REPORTS_DESIGN.md).
+
+Multi-selection and floating action docks are Store compositions, not domain
+primitives in this package. `StoreSelectionBar` takes eligible/visible IDs and
+preserves off-query choices; the feature retains scope and paging policy.
+`StoreActionDock` renders actions once and changes positioning, measuring its
+real height/width to avoid jumps and keep focused controls visible. Parent
+contains one dock. Use it only when actions need to remain available while
+scrolling; it does not grant actions or decide what is selected.

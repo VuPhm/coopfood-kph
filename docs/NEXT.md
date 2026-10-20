@@ -1,5 +1,68 @@
 # Công việc kế tiếp
 
+**RPT01 — owner tạm chấp nhận và yêu cầu merge, 20/10/2026:** phản hồi trực tiếp
+“tạm, merge” áp dụng candidate revision 14. Tích hợp báo cáo DATE, mẫu/lịch sử
+browser-local và các control tham khảo; giữ KPH/DATE đã accepted trên `main`.
+[Bàn giao tích hợp](delivery/rpt01-report-design/merge-2026-10-20.md) ghi checkpoint,
+kiểm tra sau cập nhật nền và giới hạn. Các mục pending bên dưới là lịch sử
+trước quyết định này; chưa mở scope API tồn kho, backend báo cáo hoặc Pages.
+
+**Báo cáo DATE — RPT01 revision 14, 18/10/2026:** tối ưu và tách ba cụm Store
+PWA tham khảo: search có xóa, settings rows và choice sheet có xác nhận.
+Search dùng thật trong composer/picker/history; picker chỉ cuộn list, header/
+search/footer giữ trong viewport. Khu điều hướng gọn hơn, tên mẫu có thêm chỗ.
+Giữ không tab/không vuốt ẩn composer, nghiệp vụ mẫu/lịch sử/chọn lô không đổi.
+Candidate chờ owner xem; chưa rollout các feature đã accepted.
+Preview <http://127.0.0.1:5173/#reports>;
+[mẫu component](product/STORE_FORM_CONTROLS.md),
+[bàn giao/checks](delivery/rpt01-report-design/handoff.md).
+
+**Báo cáo DATE — RPT01 revision 13, 18/10/2026:** owner loại bỏ round tab r12.
+Đã tháo component/CSS tab và dựng composer riêng, trang trắng cuộn native;
+không hero/nắp/transform. Đổi mẫu mở sheet tìm kiếm, chọn tạm rồi Dùng mẫu;
+Hủy giữ draft, áp dụng giữ kỳ báo cáo. Kỳ/phạm vi là hai hàng thiết lập, lọc
+chi tiết qua modal. Nghiệp vụ chọn lô/mẫu/lịch sử/xuất giữ nguyên. R13 candidate
+chờ owner xem, không suy acceptance từ technical gate.
+Preview <http://127.0.0.1:5173/#reports>;
+[bàn giao/checks](delivery/rpt01-report-design/handoff.md).
+
+**Báo cáo DATE — RPT01 revision 12, 18/10/2026:** thiết kế lại composer theo
+hướng tối giản của app: nền xanh chỉ tên mẫu/tìm kiếm, bỏ control chọn mẫu lớn.
+Đổi mẫu qua thanh điều hướng tối đa hai tab nhanh (320 px chỉ mẫu hiện tại),
+Xem thêm mở thư viện đầy đủ. Kỳ/lọc/nhóm DATE gom thanh thiết lập; danh mục
+bỏ khung lồng, dùng hàng phẳng. Giữ chọn lô/mẫu/lịch sử/nút neo, không thêm
+vuốt ẩn composer. R12 candidate, chờ owner xem.
+Preview <http://127.0.0.1:5173/#reports>;
+[bàn giao/checks](delivery/rpt01-report-design/handoff.md).
+
+**Báo cáo DATE — RPT01 revision 11, 18/10/2026:** owner chưa đạt r10.
+Thẻ mẫu chuyển sang nền màu liền khối, icon tròn đậm theo Home; cả preset và
+mẫu cá nhân. Trang khai báo mẫu đang chọn dùng cuộn native, bỏ grip và toàn bộ
+listener kéo/vuốt ẩn; nút “Chọn mẫu khác” điều hướng rõ ràng. Kỳ vẫn trên nắp
+trắng. Giữ dropdown, chọn lô, lưu mẫu/tạo báo cáo, mock/browser-local.
+Preview <http://127.0.0.1:5173/#reports>; r11 chờ owner xem.
+[Bàn giao/checks](delivery/rpt01-report-design/handoff.md).
+
+**Báo cáo DATE — RPT01 revision 10, 14/10/2026:** đưa bộ chọn kỳ/ngày chốt
+lên đầu nắp trắng. Nền xanh giữ mẫu đang dùng trong control có nhãn, icon,
+viền và trạng thái mở rõ ràng; dùng dropdown hệ thống. Lịch vẫn portal trên
+modal, Escape đóng lịch trước và trả focus. Typecheck/mock build/PWA, browser
+390/1440/320 (lịch, keyboard, 150% chữ, contrast, chuyển mẫu, vuốt) và hồi quy
+mẫu/lịch sử đạt. Giữ 40 lô/đợt, snapshot/in đủ tập; vẫn mock/browser-local.
+Preview <http://127.0.0.1:5173/#reports>; phần r10 chờ owner xem.
+[Bàn giao/checks](delivery/rpt01-report-design/handoff.md).
+
+**Báo cáo DATE — RPT01 revision 9, 14/10/2026:** owner tạm đạt r8,
+yêu cầu nắp trượt. Tên/đổi loại và kỳ nằm trên nền xanh; danh mục và lịch sử
+là nắp trắng overlap như Home/Login. Kéo xuống đủ ngưỡng hoặc dùng nút về
+menu trắng; thẻ loại có màu. Giữ cuộn tự nhiên, reduced motion, không dựng lại
+rows theo từng touchmove. Stress 1.000 lô/CPU 4×: chỉ dựng layout đang dùng,
+40 lô/đợt, khoảng 1.600 nodes thay ~65.000; snapshot/in vẫn đủ tập. Store 226
+tests, mock build/PWA và browser 390/1440/320 đạt; chi tiết perf ở bàn giao.
+Vẫn mock/browser-local, phần r9 chờ owner xem.
+Preview <http://127.0.0.1:4221/#reports>; [thiết kế](product/STORE_REPORTS_DESIGN.md),
+[bàn giao/checks](delivery/rpt01-report-design/handoff.md).
+
 **Đóng lượt KPH/DATE theo “pass, merge”, 16/10/2026.** Owner đã nghiệm thu
 preview 4215; scope UI CLOSED, tích hợp qua
 [PR #12](https://github.com/VuPhm/coopfood-kph/pull/12) vào `main` rồi dừng.

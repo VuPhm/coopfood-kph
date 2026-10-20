@@ -8,3 +8,5 @@ export * from "./input";
 export * from "./list-label";
 export * from "./list-item-marker";
 export * from "./tag";
+export * from "./select";
+export * from "./dropdown-menu";

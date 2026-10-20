@@ -26,13 +26,15 @@ async function geometry(page) {
       await page.evaluate(() => document.fonts.ready);
       const account = page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true });
       const avatar = page.locator('.store-header .store-profile-avatar');
+      await expect(account).toBeVisible();
+      await expect(avatar).toBeVisible();
       const homeAvatar = await box(avatar), homeAccount = await box(account);
       expect(homeAvatar.width).toBe(40); expect(homeAvatar.height).toBe(40);
       expect(homeAccount.width).toBe(44); expect(homeAccount.height).toBe(44);
       const nav = page.locator(viewport.width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail');
       const navigation = await box(nav);
       let back;
-      for (const screen of ['shelf', 'lookup', 'kph', 'date', 'home']) {
+      for (const screen of ['shelf', 'kph', 'date', 'reports', 'home']) {
         await page.evaluate(screen => location.hash = screen, screen);
         await expect(page.locator(`.store-screen-${screen}`)).toBeVisible();
         await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);

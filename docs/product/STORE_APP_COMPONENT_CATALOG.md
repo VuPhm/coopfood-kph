@@ -141,3 +141,94 @@ Adapter nhân rộng: [DATE](../../apps/store-pwa/src/store-date-label.tsx),
 [Admin](../../apps/admin-web/src/list-labels.tsx);
 [history KPH](../../apps/store-pwa/src/history-records.tsx) reuse adapter KPH.
 Không đưa enum, permission hoặc state vào packages/ui.
+
+## Candidate: Menu, lịch sử và mẫu báo cáo DATE — RPT01 revision 9
+
+[ReportHub](../../apps/store-pwa/src/store-report-hub.tsx) tổ chức menu,
+lịch sử và navigation nội bộ; [DateReportWorkspace](../../apps/store-pwa/src/store-date-report.tsx)
+là composer/view snapshot. Reuse CalendarInput/StoreSheet/Button/Input/
+DateConditionLabel/DateProcessingLabel/ShelfLifeTimeline. Checkbox native có
+label touch riêng, không lồng vào nút mở chi tiết. Collection preset ID string
+và mẫu tự tạo dùng cùng cấu hình, không business state trong packages/ui.
+[Mock library](../../apps/store-pwa/src/store-report-library.ts) giữ lịch sử
+và mẫu trên browser theo store; chỉ consumer mock, không authority online.
+[Thiết kế](STORE_REPORTS_DESIGN.md), [bàn giao](../delivery/rpt01-report-design/handoff.md).
+
+Follow-up revision 5: quản lý mẫu bằng StoreSheet, native input/select để đặt
+tên, lưu cập nhật hoặc tạo bản mới; lịch sử có tìm, tháng chốt, đếm và Xem
+thêm. `store-report-library.ts` giữ validation tên, copy/upsert theo ID và
+query history; không thêm business API vào primitives.
+
+Revision 6: tên sẵn dùng/holder trong các sheet báo cáo. StoreSheet thêm
+`initialFocusRef` tùy chọn; consumer không truyền giữ autofocus hiện hành.
+Report dùng Button asChild với native button ref, không sửa packages/ui.
+
+Revision 7: Report reuse nhóm `store-date-filter`/`store-choices`, marker primitive
+và adapter `getDatePhaseTone`, nhãn xử lý cả mobile/table. Các khối scope/form
+và footer là composition local trong report, không thêm abstraction packages/ui.
+Typography/control đối chiếu computed styles với DATE; Playwright ba viewport
+và 150% chữ đạt. DATE/KPH chỉ là consumer tham chiếu, source không bị sửa lượt này.
+
+### Dropdown và hành động tập hợp — RPT01 revision 8
+
+- [Select](../../packages/ui/src/select.tsx) và [DropdownMenu](../../packages/ui/src/dropdown-menu.tsx)
+  là primitive dùng chung; CSS `dropdown.css`. Select nhận value/onValueChange,
+  options readonly (value/label/disabled), name, trigger props/contentClassName.
+  Giá trị rỗng được ánh xạ nội bộ; named form submit value gốc, kể cả leading zero.
+  Select dùng combobox/listbox; action menu dùng menu/menuitem. Không tráo
+  semantics. Radix giữ focus, roving/typeahead, dismiss và collision positioning.
+- Store Fresh áp theme cho cả trigger lẫn portal bằng `store-dropdown` trong
+  [store-controls.css](../../apps/store-pwa/src/store-controls.css). Chưa đổi
+  tất cả native select/sort trong Store/Admin; áp trước bốn vị trí Báo cáo.
+- [StoreSelectionBar](../../apps/store-pwa/src/store-selection-bar.tsx): ID/tập
+  eligible/visible + callback, itemLabel; master ba trạng thái và menu scope.
+  Helper `store-selection.ts` không biết DATE/store/API. Consumer giữ bộ lọc,
+  authorization và quy tắc selection online; không suy rộng sang cross-page.
+- [StoreActionDock](../../apps/store-pwa/src/store-action-dock.tsx): children,
+  summary, label, className; một bộ action, float/inline theo vị trí/chiều cao
+  thật, nav/safe-area, tránh che control focus. Parent có một dock; slot nút
+  tùy biến bằng `--store-action-columns` (mặc định 2). Report composer là consumer
+  đầu; chỉ gắn ở tác vụ cần tiếp cận khi cuộn. Không tự neo mọi button/modal.
+
+Radix Select 2.3.7 / DropdownMenu 2.1.24 tương thích đúng FocusScope và
+DismissableLayer trong lock hiện có. Root lock chỉ nối dependency mới; không
+nâng core cũ. Store 225 tests/UI 16 tests, typecheck Store/UI/Admin, mock build
+và browser 390/1440/320 đạt; phần tương tác mới vẫn pending owner acceptance.
+
+### ReportSurface — RPT01 revision 13 scope
+
+[Source](../../apps/store-pwa/src/store-report-surface.tsx),
+[CSS](../../apps/store-pwa/src/store-report-surface.css). Chỉ history/snapshot
+còn dùng nắp/gesture trước đó. Composer không dùng component này; toolbar slot
+r12 đã bỏ. Một active tree, cleanup listeners/RAF/timer, reduced motion; không
+đưa thành primitive Admin hoặc thay Home/Login.
+
+### ReportTemplatePicker và composer — RPT01 revision 13
+
+[Picker](../../apps/store-pwa/src/store-report-template-picker.tsx),
+[Workspace](../../apps/store-pwa/src/store-date-report.tsx),
+[CSS](../../apps/store-pwa/src/store-report-composer.css). Composer là trang
+trắng cuộn native. Props picker current/templates/onApply; chọn radio tạm,
+search, Hủy/Escape giữ draft, Dùng mẫu mới áp dụng recipe và giữ kỳ.
+StoreSheet/Radix giữ modal/focus; mở đầu sheet không auto-focus radio ở cuối
+thư viện. 60 mẫu dài có search/empty state, không có thanh tab. Component tab
+r12 đã xóa, không giữ nhánh fallback. Chưa có consumer Admin/packages/ui.
+
+Kỳ/phạm vi là hai button rows; phạm vi mở modal DATE/xử lý. Chọn từng lô,
+StoreSelectionBar và StoreActionDock giữ nghĩa dữ liệu và scope. Screen 40
+rows/đợt, snapshot/Excel/print đủ tập; không render mọi lô trên màn hình.
+
+### Store form controls — RPT01 revision 14 candidate
+
+[API/ví dụ/contract](STORE_FORM_CONTROLS.md),
+[SearchField](../../apps/store-pwa/src/store-search-field.tsx),
+[SettingsGroup/Row](../../apps/store-pwa/src/store-settings-group.tsx),
+[ChoiceSheet](../../apps/store-pwa/src/store-choice-sheet.tsx),
+[CSS](../../apps/store-pwa/src/store-form-controls.css).
+
+Search có ba consumer thật: report composer/template picker/history; Settings
+là hai action kỳ/phạm vi; ChoiceSheet được ReportTemplatePicker ánh xạ recipe.
+Không kéo business state/authorization/persistence vào control. Query/pending
+chỉ tồn tại khi sheet mở, chỉ Apply phát ra ID. Native scrolling list giữ
+search/header/footer trong viewport. Đã có test contract và browser gate;
+chưa coi là primitive Admin hoặc rollout ngoài feature báo cáo.

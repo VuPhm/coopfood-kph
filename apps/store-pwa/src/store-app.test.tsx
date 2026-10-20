@@ -35,7 +35,8 @@ describe("Store App session and route ownership", () => {
     expect(window.location.hash).toBe("#date");
     expect(screen.queryByRole("button", { name: "Tra cứu" })).not.toBeInTheDocument();
     const nav = within(screen.getByRole("navigation", { name: "Điều hướng chính trên mobile" }));
-    expect(nav.getAllByRole("link")).toHaveLength(3);
+    expect(nav.getAllByRole("link")).toHaveLength(4);
+    expect(nav.getByRole("link", { name: "Báo cáo" })).toHaveAttribute("href", "#reports");
     expect(nav.getByRole("link", { name: "DATE" })).toHaveAttribute("aria-current", "page");
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
     await screen.findByRole("button", { name: "Co.op Food — Trang chủ" });

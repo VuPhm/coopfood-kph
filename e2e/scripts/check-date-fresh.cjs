@@ -105,7 +105,7 @@ async function audit(page, selector, state) {
       await expect(page).toHaveURL(/#date$/);
       await expect(page.getByRole('heading',{name:'DATE',exact:true})).toBeVisible();
       const nav = page.locator('.store-mobile-toolbar');
-      if (!desktop) { await expect(nav.getByRole('link')).toHaveCount(3); await expect(nav.getByRole('link',{name:'DATE',exact:true})).toHaveAttribute('aria-current','page'); }
+      if (!desktop) { await expect(nav.getByRole('link')).toHaveCount(4); await expect(nav.getByRole('link',{name:'DATE',exact:true})).toHaveAttribute('aria-current','page'); }
       await expect(page.locator('[href="#lookup"]')).toHaveCount(0);
       await expect(page.locator('.store-desktop-rail').getByRole('button',{name:'Tra cứu',exact:true})).toHaveCount(0);
       await shot('alerts');
