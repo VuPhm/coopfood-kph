@@ -59,7 +59,7 @@ fs.mkdirSync(output, { recursive: true });
         await page.evaluate(() => document.fonts.ready);
         await page.waitForTimeout(500);
         const home = { scriptBytes: scripts.reduce((sum, item) => sum + item.transferBytes, 0), scripts: scripts.map(item => item.url), readyAt: await page.evaluate(() => performance.now()) };
-        const trigger = page.locator(viewport.width < 900 ? '.store-launcher-mobile .module-kph' : '.store-launcher-desktop .module-kph');
+        const trigger = page.locator('.store-launcher-grid .module-kph');
         if (process.env.KPH_INTENT_WAIT) { await trigger.hover(); await page.waitForTimeout(Number(process.env.KPH_INTENT_WAIT)); }
         const start = await page.evaluate(() => performance.now());
         await trigger.click();

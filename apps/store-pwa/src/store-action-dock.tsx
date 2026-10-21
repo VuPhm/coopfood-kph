@@ -13,6 +13,8 @@ export function StoreActionDock({ children, summary, label, className }: { child
     const container = anchor.current; const dock = panel.current; const probe = inset.current;
     if (!container || !dock || !probe) return;
     const boundary = container.parentElement;
+    const app = container.closest<HTMLElement>(".store-app");
+    const previousUtilityClearance = app?.style.getPropertyValue("--store-floating-action-clearance") ?? "";
     const previousClearance = boundary?.style.getPropertyValue("--store-action-clearance") ?? "";
     const previousBoundary = boundary?.getAttribute("data-store-action-boundary");
     boundary?.setAttribute("data-store-action-boundary", "");
@@ -29,6 +31,8 @@ export function StoreActionDock({ children, summary, label, className }: { child
       const floating = rect.top + height > window.innerHeight - bottom + 1 || rect.bottom < 0;
       const next = { floating, left: rect.left, width: rect.width, height, keyboard };
       const clearance = `${height + bottom + 16}px`;
+      const utilityClearance = floating && !keyboard ? `${height + bottom + 12}px` : "0px";
+      if (app?.style.getPropertyValue("--store-floating-action-clearance") !== utilityClearance) app?.style.setProperty("--store-floating-action-clearance", utilityClearance);
       if (boundary?.style.getPropertyValue("--store-action-clearance") !== clearance) boundary?.style.setProperty("--store-action-clearance", clearance);
       setPlacement(current => Object.keys(next).every(key => current[key as keyof Placement] === next[key as keyof Placement]) ? current : next);
     }
@@ -58,6 +62,8 @@ export function StoreActionDock({ children, summary, label, className }: { child
       window.removeEventListener("scroll", schedule); window.removeEventListener("resize", schedule);
       window.visualViewport?.removeEventListener("resize", schedule);
       document.removeEventListener("focusin", keepFocusedControlVisible); document.removeEventListener("focusout", schedule);
+      if (previousUtilityClearance) app?.style.setProperty("--store-floating-action-clearance", previousUtilityClearance);
+      else app?.style.removeProperty("--store-floating-action-clearance");
       if (previousBoundary == null) boundary?.removeAttribute("data-store-action-boundary");
       else boundary?.setAttribute("data-store-action-boundary", previousBoundary);
       if (previousClearance) boundary?.style.setProperty("--store-action-clearance", previousClearance);

@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@coopfood-kph/ui";
 import { ArrowRight, Home, Store } from "lucide-react";
 import { useRef, useState, type RefObject } from "react";
+import { StoreAccountTrigger, storeAccountIdentity } from "./store-account-trigger";
 import type { StoreProfile } from "./store-profile";
 
 // Opening the account sheet should not render the entire active workspace.
@@ -11,10 +12,9 @@ export function StoreAccountControl({ profile, onHome, onLoginPreview }: {
 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const profileName = profile.fullName.split(/\s+/).slice(-2).join(" ");
-  const initials = profileName.split(/\s+/).map(part => part[0]).join("").toUpperCase();
+  const { initials } = storeAccountIdentity(profile);
   return <>
-    <button ref={triggerRef} className="store-account" aria-label="Tài khoản và cửa hàng" onClick={() => setOpen(true)}><span className="store-profile-avatar">{initials}</span><span className="store-profile-meta"><strong>{profileName}</strong><small>Quản lý cửa hàng</small></span></button>
+    <StoreAccountTrigger ref={triggerRef} profile={profile} onClick={() => setOpen(true)} />
     <StoreAccountSheet open={open} onOpenChange={setOpen} profile={profile} initials={initials} triggerRef={triggerRef}
       onHome={() => { setOpen(false); onHome(); }}
       onLoginPreview={() => { setOpen(false); onLoginPreview(); }} />

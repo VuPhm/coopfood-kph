@@ -1,5 +1,12 @@
 # Store App Visual DNA — Co.op Fresh
 
+**Hướng mới 22/10/2026:** owner chưa đạt khung cũ và cho phép đồng bộ toàn app.
+[Page kit xuyên suốt](STORE_APP_FRAME.md) thay welcome/spacious/compact riêng:
+một AppHeader 72px, một gradient xanh, slot nội dung và lớp trắng overlap 12/
+góc24/gutter chung; áp cả Home/Tra hạn/login/nghiệp vụ. Login form một cột
+trong lớp trắng; không còn bố cục hai cột. Phần mô tả variant/chiều cao20–21/10
+bên dưới là lịch sử, được thay bởi page kit 22/10. Technical và owner gate riêng.
+
 ## Tạo phiếu KPH — follow-up 13/10/2026
 
 CTA cam/xanh giữ loại phiếu, icon PackagePlus/Leaf 22 px + chevron, nhãn Tạo
@@ -204,7 +211,7 @@ Xem [bàn giao sửa màu](../delivery/figma-mobile-implementation/kph-coop-fres
 - Nền nội dung bo góc trên 25px trên Home; thẻ launcher 18px; form/panel 16–20px
   tùy ngữ cảnh, control 12–14px là hướng áp dụng. Giữ primitive dialog/focus hiện có.
 - Gutter mobile 20px (14–16px ở 320px), khoảng giữa thẻ 12px; desktop 24–36px,
-  khoảng nhóm 16–24px. Home hẹp dùng 2 thẻ trên + tiện ích dưới; desktop có 3 cột.
+  khoảng nhóm 16–24px. Home dùng đủ bốn thẻ: hai cột khi hẹp, bốn cột từ 1280px.
 - Vòng icon Home 54px mobile, 64px desktop; glyph 28px, stroke 1.8. Icon thao tác
   nghiệp vụ 18–24px, vùng chạm ít nhất 44px. Không bọc mọi icon toolbar trong vòng lớn.
 - Icon nét đơn giản cùng trọng lượng thị giác. Home dùng Lucide hiện có; các asset
@@ -229,6 +236,51 @@ tính viewport, không phải biến thể riêng từng page.
 Home/Tra hạn/Tra cứu/KPH/DATE trên 6 viewport. Trang mới phải dùng hình học chung
 và được đưa vào kiểm tra này; không thêm override theo page để căn avatar bằng mắt.
 
+## Ownership khung global — 21/10/2026
+
+[Global frame](STORE_APP_FRAME.md) là nguồn cấu hình/implementation cho header,
+sidebar và navigation. Registry định nghĩa các mode welcome/spacious/compact;
+AppHeader/CSS chung render brand/Back/title/store/account, không selector hình
+học theo tên màn hoặc title class riêng của báo cáo. Loading và live dùng cùng
+account trigger/profile. Home/sidebar/mobile đọc cùng metadata label/icon.
+Các biến thể hình ảnh bên dưới vẫn giữ, nhưng ownership tập trung trong frame.
+Follow-up desktop dùng parent canvas chung và hàng grid AppHeader 44px; avatar
+không absolute, feature không giới hạn max-width khung chứa header/cover.
+Đã tái hiện và sửa dải xanh KPH ở 1920; [bàn giao](../delivery/header-style-rollout/desktop-frame-2026-10-21.md).
+
+## Header và nền xanh hợp nhất — 20/10/2026
+
+Owner bổ sung hai mật độ riêng: Home, đăng nhập và Tra hạn lùi là dạng rộng;
+KPH/DATE/Báo cáo dùng dạng tác nghiệp compact. Sau refactor global 21/10,
+StorePageHero lấy density từ registry qua frame; feature không tự chọn mode.
+Compact đặt Back/tiêu đề/avatar cùng hàng, vùng chạm vẫn 44px/avatar 40px,
+h1 20/26px, mô tả 12/16px; header 58px ở cỡ chữ thường và tự cao thêm khi
+chữ lớn/nội dung dài. Tìm/CTA cách header 8px. Desktop giữ tên cửa hàng cạnh
+tiêu đề. Home/Tra hạn vẫn header rộng 186/166px; đăng nhập giữ composition riêng.
+Không thu toàn hệ thống về một cỡ hoặc rút gọn workflow để tiết kiệm diện tích.
+
+Owner sửa hướng: ghép nền xanh tác nghiệp có sẵn vào cấu trúc trượt, không
+chồng thêm một hero riêng lên phía trên. KPH/DATE và lịch sử/chi tiết Báo cáo
+có **một** StorePageHero sticky gồm header, tiêu đề và các control xanh cũ;
+header bên trong trong suốt, không min-height 166px hay đệm đáy 38px riêng.
+Nắp trắng phủ cả khối khi cuộn native. Không listener điều khiển theo scroll.
+
+StoreAppFrame giữ ownership account/navigation và cung cấp header cho hero;
+StorePageHero dùng chung cả loading/runtime, density lấy từ registry qua frame, chỉ dựng một header. Gutter dùng
+chung 22/16/36px cho tiêu đề, tìm/CTA và nắp; avatar/Back giữ anchor Home.
+Hero tác nghiệp dùng ramp Fresh `#00724e → #008655` với chữ trắng để đủ tương
+phản; Home/Tra hạn giữ reference hiện có. Phần chừa navigation của KPH/DATE
+nằm trong nắp trắng, không để một dải xanh trống ở cuối màn ngang thấp.
+
+Báo cáo menu có header xanh và nắp trắng. Mẫu đang mở dùng tên mẫu làm tiêu
+đề chính trong header compact, subtitle Báo cáo DATE và Back về tất cả mẫu;
+tìm/Đổi mẫu/Info ghép cùng hero, kỳ/phạm vi/danh mục trên nắp trắng. Composer
+cuộn native, không gesture ẩn. Header options do caller cung cấp; shell giữ
+account/anchor, không nhân đôi tên trang hoặc thêm thanh điều hướng thừa. Lịch sử/chi tiết nhập header vào hero xanh của ReportSurface
+và giữ nút/cử chỉ hiện hữu. Print bỏ chrome và đệm hero. Chỉ Store App hiện tại,
+không mở Admin/online/Pilot. Technical gate không thay owner visual acceptance.
+[Bàn giao](../delivery/header-style-rollout/handoff.md).
+
 ## Lớp nội dung khi cuộn — Home follow-up 11/10/2026
 
 Theo yêu cầu owner, Home có nền/header xanh giữ vị trí bằng `position: sticky`,
@@ -241,7 +293,7 @@ Khi focus bàn phím quay về nút header, trang cuộn về đầu để contr
 Đã mở rộng sang trang đăng nhập và trang Tra hạn lùi theo yêu cầu owner kế tiếp.
 Tra hạn dùng cùng lớp trắng cuộn lên/header xanh phía sau, giữ form/result/history;
 xem [bàn giao Tra hạn và header chung](../delivery/figma-mobile-implementation/shelf-header-scroll.md).
-Các màn nghiệp vụ khác chưa dùng cơ chế cuộn này. Technical PASS 5 viewport cho Home;
+Rollout 20/10/2026 mở rộng header chung và lớp trắng cho Báo cáo; KPH/DATE giữ nắp riêng như ghi ở trên. Technical PASS 5 viewport cho Home;
 owner visual acceptance cho cơ chế mới còn pending, xem
 [bằng chứng cuộn Home](../delivery/figma-mobile-implementation/home-scroll-layer.md).
 
@@ -252,23 +304,34 @@ vùng xanh đứng yên và form trắng bên phải trượt từ offset 64px. 
 và online, không đổi semantics xác thực. Technical PASS 5 viewport và 14 tests;
 visual follow-up chờ owner xem, [evidence](../delivery/figma-mobile-implementation/login-scroll-layer.md).
 
-## Thanh dưới và tiện ích nổi — mobile follow-up 11/10/2026
+## Home, sidebar và thanh dưới — follow-up 21/10/2026
 
-Navigation dưới 900px dùng nền trắng, góc trên 22px, 4 mục thật Trang chủ,
-Tra cứu, KPH, DATE. Icon 23px stroke 1.8, label 11/16px luôn hiện; active màu
-`#00724e` và pill mint `#e6f7f2`, có `aria-current="page"`. Chiều cao 72px cộng
-safe-area; vùng bấm tối thiểu 44px. Desktop tiếp tục rail; login không có thanh này.
+Home có một launcher bốn tính năng DATE/KPH/Báo cáo/Tra hạn, mobile hai cột,
+desktop rộng bốn cột. Giữ hero chào rộng/artwork/native cover. Desktop từ
+900px dùng sidebar sáng rộng 248px: nhóm chung và nhóm tính năng đủ bốn nhánh
+DATE/KPH/Báo cáo/Tra hạn cùng nguồn Home; active mint/chữ xanh, store footer và
+cuộn riêng ở màn thấp.
 
-Tiện ích tra hạn lùi ở KPH/DATE dùng capsule peach `#fff0e6`, chữ/icon `#884312`,
-nhãn “Tra hạn lùi”, cao 48px và shadow nhẹ. Mobile đặt trên navigation 12px;
-Khi mở popup tra, ẩn navigation và nút nổi; popup sát đáy trên mobile, chừa
-safe-area và cuộn khi màn thấp. Đóng bằng X/Escape hiện lại công cụ, trả focus
-về nút nổi và giữ dữ liệu tra. Modal nghiệp vụ/tài khoản
-luôn ở lớp trên cả navigation. Nội dung cuối trang, decoration và toast chừa chỗ
-cho thanh/nút. Không suy diễn trạng thái nghiệp vụ từ peach/mint của navigation.
+Mobile thay thanh bốn mục cũ bằng capsule nổi **ba ô** Trang chủ, Thông báo,
+tính năng gần nhất. Cao 64px, bottom 12px + safe-area, tối đa 420px; icon
+23px/label 11px, touch >=44px. Theo phản hồi owner: tham khảo bố cục bo tròn
+của iOS 27, **không Liquid Glass**; nền đặc `#f9fdfb`, viền `#dce9e3`, shadow
+nhẹ, không transparency/backdrop-filter/blur/phản quang. Active mint `#dcefe6`,
+chữ `#006846`, có aria-current; pressed đổi màu, reduced-motion/forced-colors và
+focus. Recent giữ qua reload trong phiên, Home/Thông báo không ghi
+đè; phiên mới dùng ô “Tính năng” dẫn về launcher.
 
-Technical PASS trên working tree; owner visual follow-up pending, xem
-[evidence](../delivery/figma-mobile-implementation/mobile-toolbar.md).
+Thông báo là empty state theo lựa chọn owner; chưa tạo nội dung/badge/push.
+Tiện ích Tra hạn capsule peach cao 48px hiện trên Home/KPH/DATE/Báo cáo/
+Thông báo, không lặp ở full Tra hạn/login. Popup/focus/dữ liệu tra và modal
+layering giữ nguyên; FAB tránh action dock bằng clearance dùng chung, toast
+PWA nằm phía trên. Loading/runtime dùng cùng navigation/launcher.
+
+Chi tiết, nguồn Apple và giới hạn: [thiết kế điều hướng](STORE_NAVIGATION_DESIGN.md).
+Technical PASS, owner visual pending;
+[bàn giao](../delivery/header-style-rollout/navigation-2026-10-21.md).
+Bản thanh bốn mục 11/10 chỉ còn là
+[evidence lịch sử](../delivery/figma-mobile-implementation/mobile-toolbar.md).
 
 ## Modal và backdrop — follow-up 11/10/2026
 

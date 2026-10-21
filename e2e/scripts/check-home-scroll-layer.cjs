@@ -6,8 +6,8 @@ fs.mkdirSync(output, { recursive: true });
 
 async function geometry(page) {
   return page.evaluate(() => {
-    const header = document.querySelector('.store-header').getBoundingClientRect();
-    const content = document.querySelector('#store-content').getBoundingClientRect();
+    const header = document.querySelector('.store-page-hero').getBoundingClientRect();
+    const content = document.querySelector('.store-page-surface').getBoundingClientRect();
     return { headerTop: header.top, contentTop: content.top, contentHeight: content.height, scroll: scrollY };
   });
 }
@@ -20,7 +20,7 @@ async function geometry(page) {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(`${baseUrl}/#home`);
-      await page.locator('.store-home-art').evaluate(image => image.decode());
+      await page.locator('.store-header-brand img').evaluate(image => image.decode());
       const initial = await geometry(page);
       expect(initial.contentTop).toBeGreaterThan(0);
       expect(initial.contentHeight).toBeGreaterThanOrEqual(viewport.height);
@@ -34,7 +34,7 @@ async function geometry(page) {
       expect(midway.headerTop).toBeCloseTo(initial.headerTop, 0);
       expect(midway.contentTop).toBeCloseTo(initial.contentTop - midway.scroll, 0);
       expect(await page.evaluate(() => {
-        const main = document.querySelector('#store-content');
+        const main = document.querySelector('.store-page-surface');
         const rect = main.getBoundingClientRect();
         return main.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.top + 12));
       })).toBe(true);
@@ -58,10 +58,10 @@ async function geometry(page) {
       // The skip link still takes keyboard users directly into the white surface.
       await page.getByRole('link', { name: 'Đến nội dung' }).focus();
       await page.keyboard.press('Enter');
-      await expect(page.locator('#store-content')).toBeFocused();
-      const launcher = page.locator(viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile');
+      await expect(page.locator('.store-page-surface')).toBeFocused();
+      const launcher = page.locator('.store-launcher-grid');
       await launcher.getByRole('button').first().click();
-      await expect(page).toHaveURL(viewport.width >= 900 ? /#lookup$/ : /#date$/);
+      await expect(page).toHaveURL(/#date$/);
       await page.getByRole('button', { name: 'Về trang chủ', exact: true }).click();
       await expect(page).toHaveURL(/#home$/);
       await expect.poll(async () => (await geometry(page)).scroll).toBe(0);

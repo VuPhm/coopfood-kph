@@ -1,7 +1,3 @@
-.store-screen-reports > .store-main-column > .store-header { border: 0; background: linear-gradient(115deg, var(--store-brand-start), var(--store-brand-end)); color: white; }
-.store-screen-reports .store-header :is(h1, p, .store-back) { color: white; }
-.store-screen-reports .store-header-store { background: var(--store-brand-start); color: white; }
-.store-screen-reports #store-content { background: var(--store-surface); border-radius: 24px 24px 0 0; }
 .date-report { display: grid; gap: 16px; padding: 20px; color: var(--store-ink); }
 .date-report :is(button, input, select), .date-report-sheet :is(button, input, select) { font: inherit; }
 .date-report button, .date-report-sheet button { min-height: 44px; }

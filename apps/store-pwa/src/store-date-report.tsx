@@ -1,3 +1,4 @@
+import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Button, Input, ListItemMarker, Select } from "@coopfood-kph/ui";
 import { ArrowLeft, CalendarDays, Check, CircleCheck, ChevronDown, ChevronRight, FileDown, Info, Package, Save, Printer, Search, SlidersHorizontal } from "lucide-react";
@@ -145,7 +146,7 @@ export function DateReportWorkspace({ lots, template, savedReport, templates, ed
     setSearch(""); setNotice("");
     onChooseTemplate(next);
   }
-  const searchField = <StoreSearchField className="report-composer-search" inputRef={searchRef} label="Tìm mã hàng hoặc lô báo cáo" placeholder="Tìm mã hàng, tên hoặc lô" clearLabel="Xóa tìm kiếm báo cáo" title="Tìm chỉ thu gọn danh sách; giữ các lô đã chọn" value={search} onValueChange={setSearch} />;
+  const searchField = <StoreSearchField className="report-composer-search" inputRef={searchRef} label="Tìm mã hàng hoặc lô báo cáo" placeholder="Tìm mã hàng, lô" clearLabel="Xóa tìm kiếm báo cáo" title="Tìm chỉ thu gọn danh sách; giữ các lô đã chọn" value={search} onValueChange={setSearch} />;
   const documentHero = <><header className="date-report-heading"><button className="date-report-back" aria-label="Về lịch sử báo cáo" onClick={onBack}><ArrowLeft size={20} aria-hidden="true" /></button><div><h2 ref={report ? headingRef : undefined} tabIndex={-1}>Bản báo cáo DATE</h2><span>Dữ liệu mẫu</span></div><button className="date-report-info" aria-label="Thông tin dữ liệu báo cáo" onClick={() => setSourceOpen(true)}><Info size={20} aria-hidden="true" /></button></header>{report ? <section className="date-report-document-meta" aria-label="Phạm vi bản báo cáo"><strong>{report.title}</strong><p>{report.store}</p><p>{periodSummary}</p><p>{filterLabel(report.filter)}</p></section> : null}</>;
   const content = <div className={`date-report${report ? " is-document" : " is-compose"}`} data-printing={printing}>
     {!report ? <StoreSettingsGroup label="Thiết lập báo cáo" columns={2}>
@@ -185,12 +186,10 @@ export function DateReportWorkspace({ lots, template, savedReport, templates, ed
     <StoreSheet className="date-report-sheet store-date-sheet" open={sourceOpen} onOpenChange={setSourceOpen} title="Dữ liệu báo cáo" description="Nguồn và giới hạn dữ liệu mẫu."><Summary rows={[["Nguồn", "Danh mục lô trong DATE"], ["Ngày chốt", formatDisplayDate(asOf)], ["Số lượng tồn", "Chưa có dữ liệu"], ["Tồn kho các kỳ trước", "Chưa có dữ liệu"]]} /><p>Kỳ báo cáo dùng danh mục tại ngày chốt, không lọc theo HSD. “Đã xử lý” giữ nguyên ngày và không tự trừ tồn.</p><p>Bản đã tạo được giữ trong Lịch sử trên trình duyệt này. Đây là dữ liệu mẫu, chưa lưu máy chủ.</p><div className="report-sheet-footer"><Button className="store-button" onClick={() => setSourceOpen(false)}>Đóng</Button></div></StoreSheet>
     <StoreSheet className="date-report-sheet store-date-sheet" open={!!active} onOpenChange={open => { if (!open) setActive(null); }} title="Chi tiết lô báo cáo" description="Thông tin lô tại ngày chốt; chỉ xem.">{active ? <><section className="store-date-lot-heading"><h3>{active.name}</h3><p>SKU {active.sku} · Lô {active.id}</p></section><div className="date-report-detail-labels"><DateConditionLabel phase={active.assessment.phase} /><DateProcessingLabel status={active.status} /></div><Summary rows={[["Ngày chốt", formatDisplayDate(asOf)], ["NSX", active.manufactured ?? "Chưa có"], ["HSD", formatDisplayDate(active.date)], ["Tồn", "Chưa có dữ liệu"]]} />{active.assessment.result && active.assessment.nsx ? <ShelfLifeTimeline nsx={active.assessment.nsx} hsd={active.date} today={asOf} result={active.assessment.result} /> : <p>{active.assessment.message}</p>}<div className="report-sheet-footer"><Button className="store-button" onClick={() => setActive(null)}>Đóng chi tiết</Button></div></> : null}</StoreSheet>
   </div>;
-  return report ? <ReportSurface onDismiss={onDismiss} className="is-document" hero={documentHero}>{content}</ReportSurface> : <div className="report-composer">
-    <header className="report-composer-header">
-      <div className="report-composer-navigation"><button type="button" aria-label="Về menu báo cáo" onClick={onDismiss}><ArrowLeft size={18} aria-hidden="true" /><span>Tất cả mẫu</span></button><div className="report-composer-tools"><ReportTemplatePicker current={currentTemplate} templates={templates} onApply={applyTemplate} /><button type="button" className="report-composer-info" aria-label="Thông tin dữ liệu báo cáo" onClick={() => setSourceOpen(true)}><Info size={20} aria-hidden="true" /></button></div></div>
-      <div className="report-composer-title"><h2 ref={headingRef} tabIndex={-1}>{displayTemplateTitle}</h2></div>
-      {searchField}
-    </header>
-    {content}
-  </div>;
+  return report ? <ReportSurface onDismiss={onDismiss} className="is-document" hero={documentHero}>{content}</ReportSurface> : <StorePageLayout className="report-composer">
+    <StorePageHero className="report-composer-hero" header={{ title: displayTemplateTitle, subtitle: "Báo cáo DATE", onBack: onDismiss, backLabel: "Về menu báo cáo", titleRef: headingRef }}>
+      <div className="report-composer-controls">{searchField}<ReportTemplatePicker current={currentTemplate} templates={templates} onApply={applyTemplate} /><button type="button" className="report-composer-info" aria-label="Thông tin dữ liệu báo cáo" onClick={() => setSourceOpen(true)}><Info size={20} aria-hidden="true" /></button></div>
+    </StorePageHero>
+    <StorePageSurface className="report-composer-cap" aria-label="Thiết lập và danh mục báo cáo">{content}</StorePageSurface>
+  </StorePageLayout>;
 }

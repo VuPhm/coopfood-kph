@@ -16,13 +16,6 @@
   color: var(--cf-color-ink);
 }
 
-.store-app.store-screen-shelf { background: #008655; }
-.store-app.store-screen-shelf .store-header-copy { grid-column: 1 / -1; grid-row: 2; }
-.store-app.store-screen-shelf .store-header h1 { font-size: 25px; line-height: 32px; font-weight: 650; }
-.store-app.store-screen-shelf .store-header p { margin-top: 5px; color: #e0f9ed; font-size: 12px; line-height: 18px; }
-.store-app.store-screen-shelf .store-header .store-back { grid-column: 1; grid-row: 1; justify-self: start; color: white; }
-.store-app.store-screen-shelf .store-header-store { grid-column: 1; grid-row: 1; justify-self: end; background: #00724e; color: white; }
-.store-app.store-screen-shelf > .store-main-column > #store-content { max-width: none; margin-inline: 0; padding-top: 16px; padding-inline: 0; }
 .store-shelf-page { max-width: 1160px; margin-inline: auto; }
 
 :is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle { border-radius: 14px; padding-inline: 10px; background: var(--store-shelf-peach); color: var(--cf-color-ink); }

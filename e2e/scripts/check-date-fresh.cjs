@@ -147,9 +147,9 @@ async function audit(page, selector, state) {
       if (!desktop) await page.keyboard.press('Escape');
       await page.getByRole('button',{name:'Về trang chủ',exact:true}).click();
       await expect(page.locator('.store-home-panels')).toContainText('3 cảnh báo đang mở');
-      await expect(page.locator('.store-launcher-desktop button[aria-label="Tra cứu"]')).toHaveCount(0);
+      await expect(page.locator('.store-launcher-grid button[aria-label="Tra cứu"]')).toHaveCount(0);
       await shot('home');
-      if (desktop) await page.locator('.store-launcher-desktop').getByRole('button',{name:'DATE',exact:true}).click();
+      if (desktop) await page.locator('.store-launcher-grid').getByRole('button',{name:'Quản lý DATE',exact:true}).click();
       else await nav.getByRole('link',{name:'DATE',exact:true}).click();
       await input.fill('C24-118'); await page.locator('.store-date-lot').click();
       await expect(detail.getByRole('button',{name:'Đã xử lý',exact:true})).toBeDisabled();

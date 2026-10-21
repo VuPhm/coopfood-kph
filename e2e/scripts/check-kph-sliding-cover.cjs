@@ -81,7 +81,7 @@ async function covered(page) {
       await page.getByRole('button', { name: 'Về trang chủ', exact: true }).click();
       await expect(page).toHaveURL(/#home$/);
       if (viewport.width < 900) await page.getByRole('link', { name: 'KPH', exact: true }).click();
-      else await page.locator('.store-desktop-rail').getByRole('button', { name: 'KPH', exact: true }).click();
+      else await page.locator('.store-desktop-rail').getByRole('link', { name: 'KPH', exact: true }).click();
       await expect(page.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
       await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
       expect(errors).toEqual([]);

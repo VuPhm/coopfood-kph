@@ -29,8 +29,6 @@
 .store-form-skeleton .choice-icon img { width: 20px; height: 20px; }
 .store-form-skeleton .create-dialog-footer button { padding-inline: 16px; background: white; color: var(--cf-color-ink); line-height: 20px; }
 .store-form-skeleton .create-dialog-footer button:disabled { opacity: .45; }
-.store-home-art { aspect-ratio: 3 / 2; }
-.store-screen-home .store-header-brand img { aspect-ratio: 1024 / 550; }
 @media (min-width: 900px) {
   .store-form-skeleton-label { font-size: 10px; line-height: 13px; }
   .store-form-skeleton-input { height: 38px; border-radius: 10px; }

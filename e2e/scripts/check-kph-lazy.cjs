@@ -15,7 +15,7 @@ fs.mkdirSync(output, { recursive: true });
       const routeGate = new Promise(resolve => { releaseRoute = resolve; });
       await page.route('**/assets/store-kph-workspace-*.js', async route => { await routeGate; await route.continue(); });
       await page.goto(`${base}/#home`);
-      await page.locator(viewport.width < 900 ? '.store-launcher-mobile .module-kph' : '.store-launcher-desktop .module-kph').click();
+      await page.locator('.store-launcher-grid .module-kph').click();
       await expect(page.locator('.kph-loading-frame')).toHaveAttribute('aria-busy', 'true');
       await expect(page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'KPH', exact: true })).toBeVisible();

@@ -19,8 +19,8 @@ async function runViewport(browser, viewport) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(process.env.STORE_APP_URL || 'http://127.0.0.1:5175');
-  await page.locator(viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile').waitFor();
-  const launcher = viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile';
+  await page.locator('.store-launcher-grid').waitFor();
+  const launcher = '.store-launcher-grid';
   await page.locator(launcher).getByRole('button', { name: 'KPH', exact: true }).click();
   await page.getByRole('heading', { name: 'Phiếu khai báo' }).waitFor();
 

@@ -1,0 +1,3 @@
+/* Parent canvas owns the page boundary; green paint stays inside the page. */
+.store-frame-canvas { position: relative; isolation: isolate; width: 100%; min-width: 0; }
+.store-main-column > .store-frame-canvas { min-height: 100dvh; background: white; }

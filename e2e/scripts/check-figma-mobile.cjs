@@ -31,7 +31,7 @@ async function capture(page, options) {
   const page = await browser.newPage({viewport});
   page.setDefaultTimeout(7000); const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(process.env.STORE_APP_URL || 'http://127.0.0.1:5175');
-  const homeLauncher = page.locator(viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile');
+  const homeLauncher = page.locator('.store-launcher-grid');
   await homeLauncher.getByRole('button',{name:'KPH',exact:true}).waitFor();
   await capture(page, {path:`.local/figma-mobile/home-${viewport.width}.png`});
   await homeLauncher.getByRole('button',{name:'KPH',exact:true}).click();
@@ -127,8 +127,8 @@ async function capture(page, options) {
   await page.getByRole('button',{name:'Chỉnh sửa',exact:true}).click();
   await page.locator('.store-create-screen').getByRole('button',{name:'Đóng',exact:true}).click();
   await page.getByRole('button',{name:'Về trang chủ'}).click();
-  if(viewport.width >= 900) await page.locator('.store-desktop-rail').getByRole('button',{name:'Tra hạn lùi hàng',exact:true}).click();
-  else await page.locator('.store-launcher-mobile').getByRole('button',{name:'Tra cứu lùi hàng',exact:true}).click();
+  if(viewport.width >= 900) await page.locator('.store-desktop-rail').getByRole('link', {name:'Tra hạn lùi',exact:true}).click();
+  else await page.locator('.store-launcher-grid').getByRole('button',{name:'Tra cứu lùi hàng',exact:true}).click();
   await page.getByRole('textbox',{name:'Ngày sản xuất',exact:true}).fill('18/01/2026');
   await page.getByRole('textbox',{name:'Hạn sử dụng (HSD)',exact:true}).fill('18/10/2026');
   await page.locator('#store-content').getByRole('button',{name:'Tra cứu',exact:true}).click();
@@ -139,8 +139,8 @@ async function capture(page, options) {
   await page.getByRole('alert').waitFor();
   if(await page.locator('.store-shelf-result').count())throw Error('Cleared duration reused stale expiry');
   await page.getByRole('button',{name:'Về trang chủ'}).click();
-  if(viewport.width >= 900) await page.locator('.store-desktop-rail').getByRole('button',{name:'DATE',exact:true}).click();
-  else await page.locator('.store-launcher-mobile').getByRole('button',{name:'Quản lý DATE',exact:true}).click();
+  if(viewport.width >= 900) await page.locator('.store-desktop-rail').getByRole('link', {name:'Quản lý DATE',exact:true}).click();
+  else await page.locator('.store-launcher-grid').getByRole('button',{name:'Quản lý DATE',exact:true}).click();
   await page.getByRole('textbox',{name:'Tìm mã hàng hoặc lô'}).fill('089332');
   await page.getByRole('button').filter({hasText:'Sản phẩm C'}).click();
   await page.getByRole('button',{name:'Ghi nhận',exact:true}).click();

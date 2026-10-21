@@ -1,3 +1,4 @@
+import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
 import { memo, useCallback, useEffect, useImperativeHandle, useId, useMemo, useRef, useState, useLayoutEffect, type Ref } from "react";
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
@@ -104,12 +105,12 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
     finally { setExporting(false); }
   }
 
-  return <div className="store-kph">
-    <div className="store-kph-underlay" onFocusCapture={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+  return <StorePageLayout className="store-kph">
+    <StorePageHero className="store-kph-underlay">
       <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(kind)}><Maximize size={20} aria-hidden="true" /></button></div>
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <KphCreateButton key={k} kind={k} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)} />)}</div></section>
-    </div>
-    <section className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
+    </StorePageHero>
+    <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
       <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div></StoreStickyTabs>
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{filtered.length} phiếu</span></div>
@@ -123,7 +124,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
       <StoreKphList desktop={desktop} visible={visible} selectionMode={selectionMode} selection={selection} setSelection={setSelection} setActive={setActive} />
       {!visible.length ? <p className="store-muted store-empty">Không có phiếu phù hợp bộ lọc.</p> : null}
       {totalPages > 1 ? <div className="store-pagination"><span>{(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)} / {filtered.length}</span><button disabled={currentPage <= 1} onClick={() => changePage(currentPage - 1)} aria-label="Trang trước"><img data-figma-render-width="18" data-figma-render-height="18" className="is-previous" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button><button disabled={currentPage >= totalPages} onClick={() => changePage(currentPage + 1)} aria-label="Trang sau"><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button></div> : null}
-    </section>
+    </StorePageSurface>
     <KphCreateControl ref={createDialogRef} onSaved={save} />
 
     <StoreSheet open={exportOpen} onOpenChange={open => { if (!exporting) setExportOpen(open); }} className="store-kph-sheet store-kph-export" title="Xuất Excel" description="Xác nhận xuất các phiếu đủ điều kiện">
@@ -135,7 +136,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
       {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "Thực phẩm khô & khác" : "Thực phẩm tươi sống"} · {active.id}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["SKU", active.sku || "—"], ["UPC", active.barcode || "—"], ["Nhà cung cấp", active.supplier || "—"], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Biện pháp", active.resolution], ["Trạng thái duyệt", approvalLabels[active.approvalStatus]]]} /></section><section><h3>Ghi nhận</h3><Summary rows={[["Ghi chú", active.note || "Không có"]]} /><p className="store-evidence-count">Ảnh minh chứng · {active.photos.length}/3</p><div className="store-review-photos">{active.photos.map((p, index) => <button key={p.id} aria-label={`Xem ảnh minh chứng ${index + 1}`} onClick={() => setImage(p)}><img src={p.src} alt={p.alt} /><span>{index + 1}</span></button>)}</div>{!active.photos.length ? <p className="store-muted">Phiếu mẫu chưa có ảnh minh chứng.</p> : null}</section><div className="store-sheet-actions"><Button variant="ghost" onClick={() => review("REJECTED")}>Không duyệt</Button><Button className="store-button" onClick={() => review("APPROVED")}>Duyệt phiếu</Button></div></> : null}
     </StoreSheet>
     <EvidenceImageViewer image={image} open={image !== null} onOpenChange={open => { if (!open) setImage(null); }} />
-  </div>;
+  </StorePageLayout>;
 });
 
 // Opening filters updates this control only; history data changes still belong to the workspace.

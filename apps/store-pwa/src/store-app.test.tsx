@@ -4,6 +4,7 @@ import { StoreApp } from "./store-app";
 
 describe("Store App session and route ownership", () => {
   beforeEach(() => {
+    sessionStorage.clear();
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-06T12:00:00+07:00"));
     window.history.replaceState(null, "", "#home");
@@ -14,7 +15,7 @@ describe("Store App session and route ownership", () => {
 
   it("retains DATE updates across Home navigation and updates the Home summary", async () => {
     render(<StoreApp />);
-    const home = () => within(document.querySelector('.store-launcher-mobile') as HTMLElement);
+    const home = () => within(document.querySelector('.store-launcher-grid') as HTMLElement);
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
     fireEvent.click(await screen.findByRole("button", { name: /Cải thìa/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Ghi nhận" }));
@@ -35,12 +36,46 @@ describe("Store App session and route ownership", () => {
     expect(window.location.hash).toBe("#date");
     expect(screen.queryByRole("button", { name: "Tra cứu" })).not.toBeInTheDocument();
     const nav = within(screen.getByRole("navigation", { name: "Điều hướng chính trên mobile" }));
-    expect(nav.getAllByRole("link")).toHaveLength(4);
-    expect(nav.getByRole("link", { name: "Báo cáo" })).toHaveAttribute("href", "#reports");
+    expect(nav.getAllByRole("link")).toHaveLength(3);
+    expect(nav.getByRole("link", { name: "Thông báo" })).toHaveAttribute("href", "#notifications");
     expect(nav.getByRole("link", { name: "DATE" })).toHaveAttribute("aria-current", "page");
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
     await screen.findByRole("button", { name: "Co.op Food — Trang chủ" });
     expect(document.querySelector('[href="#lookup"]')).not.toBeInTheDocument();
+  });
+
+  it("offers every Home feature and keeps the last feature through notifications and a reload", async () => {
+    const app = render(<StoreApp />);
+    const launcher = within(document.querySelector(".store-launcher-grid") as HTMLElement);
+    expect(launcher.getAllByRole("button")).toHaveLength(4);
+    const nav = () => within(screen.getByRole("navigation", { name: "Điều hướng chính trên mobile" }));
+    expect(nav().getAllByRole("link")).toHaveLength(3);
+    expect(nav().getByRole("link", { name: "Tính năng" })).toHaveAttribute("data-recent-feature", "");
+    fireEvent.click(launcher.getByRole("button", { name: "Báo cáo" }));
+    await screen.findByRole("heading", { name: "Chọn báo cáo" });
+    expect(nav().getByRole("link", { name: "Báo cáo" })).toHaveAttribute("aria-current", "page");
+    fireEvent.click(nav().getByRole("link", { name: "Thông báo" }));
+    await screen.findByRole("heading", { name: "Chưa có thông báo" });
+    expect(nav().getByRole("link", { name: "Thông báo" })).toHaveAttribute("aria-current", "page");
+    expect(nav().getByRole("link", { name: "Báo cáo" })).toHaveAttribute("href", "#reports");
+    expect(nav().getByRole("link", { name: "Báo cáo" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("button", { name: "Mở tiện ích tra cứu lùi hàng" })).toBeInTheDocument();
+    app.unmount(); window.history.replaceState(null, "", "#home"); render(<StoreApp />);
+    expect(nav().getByRole("link", { name: "Báo cáo" })).toHaveAttribute("data-recent-feature", "reports");
+    fireEvent.click(nav().getByRole("link", { name: "Báo cáo" }));
+    await screen.findByRole("heading", { name: "Chọn báo cáo" });
+  });
+
+  it("keeps navigation usable when preference storage is unavailable", async () => {
+    const read = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => { throw new Error("Unavailable"); });
+    const write = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("Unavailable"); });
+    try {
+      render(<StoreApp />);
+      fireEvent.click(within(document.querySelector(".store-launcher-grid") as HTMLElement).getByRole("button", { name: "Quản lý DATE" }));
+      await screen.findByRole("region", { name: "Tra mã hàng" });
+      const nav = within(screen.getByRole("navigation", { name: "Điều hướng chính trên mobile" }));
+      expect(nav.getByRole("link", { name: "DATE" })).toHaveAttribute("aria-current", "page");
+    } finally { read.mockRestore(); write.mockRestore(); }
   });
 
   it("retains quick lookup mode, dates, duration and result across panel unmount and route changes", async () => {
@@ -70,7 +105,7 @@ describe("Store App session and route ownership", () => {
     window.location.hash = "home";
     fireEvent(window, new HashChangeEvent("hashchange"));
     await screen.findByText("Cần chú ý hôm nay");
-    fireEvent.click(within(document.querySelector('.store-launcher-mobile') as HTMLElement).getByRole("button", { name: "Quản lý DATE" }));
+    fireEvent.click(within(document.querySelector('.store-launcher-grid') as HTMLElement).getByRole("button", { name: "Quản lý DATE" }));
     await screen.findByRole("heading", { name: "Cần xử lý" });
     open();
     expect(quick().getByRole("textbox", { name: "HSD (Số ngày)" })).toHaveValue("10");
@@ -85,13 +120,13 @@ describe("Store App session and route ownership", () => {
 
   it("dismisses the quick utility when changing routes", async () => {
     render(<StoreApp />);
-    fireEvent.click(within(document.querySelector('.store-launcher-mobile') as HTMLElement).getByRole("button", { name: "KPH" }));
+    fireEvent.click(within(document.querySelector('.store-launcher-grid') as HTMLElement).getByRole("button", { name: "KPH" }));
     fireEvent.click(await screen.findByRole("button", { name: "Mở tiện ích tra cứu lùi hàng" }));
     expect(screen.getByRole("dialog", { name: "Tra cứu lùi hàng nhanh" })).toBeInTheDocument();
     window.location.hash = "home";
     fireEvent(window, new HashChangeEvent("hashchange"));
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "Tra cứu lùi hàng nhanh" })).not.toBeInTheDocument());
-    fireEvent.click(within(document.querySelector('.store-launcher-mobile') as HTMLElement).getByRole("button", { name: "Tra cứu lùi hàng" }));
+    fireEvent.click(within(document.querySelector('.store-launcher-grid') as HTMLElement).getByRole("button", { name: "Tra cứu lùi hàng" }));
     await screen.findByRole("textbox", { name: "Ngày sản xuất" });
     expect(document.querySelectorAll('#shelf-nsx')).toHaveLength(1);
     expect(document.querySelector('#quick-shelf-nsx')).toBeNull();
@@ -141,7 +176,7 @@ describe("Store App session and route ownership", () => {
     expect(screen.getByRole("region", { name: "Kết quả tra hạn lùi" })).not.toHaveAttribute("data-status", "EMPTY");
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
     await screen.findByText("Cần chú ý hôm nay");
-    fireEvent.click(within(document.querySelector('.store-launcher-mobile') as HTMLElement).getByRole("button", { name: "KPH" }));
+    fireEvent.click(within(document.querySelector('.store-launcher-grid') as HTMLElement).getByRole("button", { name: "KPH" }));
     fireEvent.click(await screen.findByRole("button", { name: "Mở tiện ích tra cứu lùi hàng" }));
     const quick = within(screen.getByRole("dialog", { name: "Tra cứu lùi hàng nhanh" }));
     expect(quick.queryByRole("region", { name: /^Lịch sử tra cứu/ })).not.toBeInTheDocument();
@@ -151,7 +186,7 @@ describe("Store App session and route ownership", () => {
     window.location.hash = "home";
     fireEvent(window, new HashChangeEvent("hashchange"));
     await screen.findByText("Cần chú ý hôm nay");
-    fireEvent.click(within(document.querySelector('.store-launcher-mobile') as HTMLElement).getByRole("button", { name: "Tra cứu lùi hàng" }));
+    fireEvent.click(within(document.querySelector('.store-launcher-grid') as HTMLElement).getByRole("button", { name: "Tra cứu lùi hàng" }));
     await screen.findByRole("region", { name: /^Lịch sử tra cứu/ });
     expect(history().getAllByRole("listitem")).toHaveLength(1);
   });

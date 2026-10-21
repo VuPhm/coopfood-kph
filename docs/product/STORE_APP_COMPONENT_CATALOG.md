@@ -18,7 +18,7 @@ implementation; test đạt không thay nghiệm thu owner.
 | Lớp | Nơi | Ranh giới |
 | --- | --- | --- |
 | Primitive | [packages/ui](../../packages/ui/src/index.ts) | Trình bày không biết KPH/DATE; Store + Admin dùng chung. Một integration owner quản lý API/export. |
-| Mẫu Store | [apps/store-pwa/src](../../apps/store-pwa/src/store-app-frame.tsx) | Header/sheet/sort/loading trong Store; ở app khi chưa có consumer Admin thực. |
+| Mẫu Store | [apps/store-pwa/src](../../apps/store-pwa/src/store-app-frame.tsx) | Page kit/header/sheet/sort/loading trong Store; ở app khi chưa có consumer Admin thực. |
 | Nghiệp vụ | KPH/DATE/tra hạn/account | Consumer giữ dữ liệu, validation, filter/reset, quyền và hành động. |
 | Prototype/evidence | [UI DNA prototype](../../apps/store-pwa/src/ui-dna-prototype.tsx), docs/delivery | Tham khảo lịch sử, không mặc định là mẫu production/Fresh hiện hành. |
 
@@ -61,7 +61,10 @@ cho Button/Input/Dialog/CloseButton/Tag; chưa có file test riêng Field/Card/n
 
 | Nhóm / source | Tái sử dụng và giới hạn |
 | --- | --- |
-| [Frame](../../apps/store-pwa/src/store-app-frame.tsx) + [header CSS](../../apps/store-pwa/src/store-header.css) | Slot avatar/back/rail/toolbar chung; avatar control 44 px/ảnh 40 px. Feature không dịch avatar bằng override. Home giữ hero/trang trí riêng. |
+| [Global frame](STORE_APP_FRAME.md) | Registry `store-app-routes.ts` cấp metadata cho AppHeader/Home/sidebar/mobile. Một page kit cho cả login/Home/Tra hạn/nghiệp vụ; AppHeader 72px, không mode rộng/gọn. CSS shared giữ root/hero/surface geometry. Loading/live dùng cùng StoreAccountTrigger từ profile. Avatar 44px/ảnh 40px, feature không override chrome. |
+| [StoreNavigation](../../apps/store-pwa/src/store-navigation.tsx) + [Home](../../apps/store-pwa/src/store-home.tsx) | Đọc feature metadata từ registry chung, launcher bốn nút, sidebar desktop 248px/mobile ba ô Home/Thông báo/gần nhất; preference ID hợp lệ trong sessionStorage, storage failure vẫn dùng được. Loading/runtime cùng component. [Thiết kế](STORE_NAVIGATION_DESIGN.md); candidate 21/10 chờ owner. |
+| [StoreNotifications](../../apps/store-pwa/src/store-notifications.tsx) | Empty state theo quyết định owner, hero compact/nắp trắng; chưa có API/badge/push. |
+| [StorePageLayout/Hero/Surface](../../apps/store-pwa/src/store-page-hero.tsx) | Ba vị trí lắp chung: AppHeader, nội dung xanh, nội dung trắng. Layout100%/gradient/sticky/overlap 12/góc 24/gutter chung trong store-header.css; feature giữ nội dung, không density/title class/khung ngoài riêng. StoreReportPage compose kit cho menu; login cũng cùng kit, form một cột. [Quy tắc 22/10](STORE_APP_FRAME.md); candidate chờ owner. |
 | [StoreSheet + Summary](../../apps/store-pwa/src/store-sheet.tsx) | Sheet modal mobile/centered desktop; `dl` nhãn/giá trị. Caller giữ state/action; Radix giữ focus/dismiss. |
 | [StoreQuickSort + QuickSortButton](../../apps/store-pwa/src/store-quick-sort.tsx) | Đã dùng chung KPH/DATE và loading trigger. Non-modal, áp dụng ngay, Arrow/Home/End, Escape/outside/focus. [KPH adapter](../../apps/store-pwa/src/store-kph-sort.tsx) và DATE giữ options riêng. CSS chung còn ở file KPH. |
 | [StoreStickyTabs](../../apps/store-pwa/src/store-sticky-tabs.tsx) + [CSS](../../apps/store-pwa/src/store-sticky-tabs.css) | Follow-up 15/10: KPH/DATE và loading KPH dùng chung lớp tab trắng, native sticky theo safe-area khi nắp lên đỉnh. Giữ group/aria-pressed của caller; focus reveal chỉ đo khi focus. DATE desktop neo trong cột list. [Evidence](../delivery/figma-mobile-implementation/sticky-tabs.md); owner chấp nhận preview bằng “pass, merge” ngày 16/10, chưa xác minh thiết bị thật. |
