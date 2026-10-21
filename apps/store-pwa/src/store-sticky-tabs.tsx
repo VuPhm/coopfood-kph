@@ -16,8 +16,9 @@ export function revealBelowStickyTabs(event: FocusEvent<HTMLElement>) {
     const inset = Number.parseFloat(getComputedStyle(tabs).top) || 0;
     const focused = target.getBoundingClientRect();
     if (pinned.top > inset + 1 || focused.right <= pinned.left || focused.left >= pinned.right) return;
-    const clearance = pinned.bottom + 8;
-    if (focused.top < clearance) window.scrollBy({ top: focused.top - clearance, behavior: "instant" });
+    // Reserve one pixel for native scroll anchoring and subpixel rounding.
+    const clearance = Math.ceil(pinned.bottom) + 9;
+    if (focused.top < clearance) window.scrollBy({ top: Math.floor(focused.top - clearance), behavior: "instant" });
   };
   reveal();
   // Recheck once after native focus/scroll anchoring settles, including tab changes.

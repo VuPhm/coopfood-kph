@@ -1,0 +1,7 @@
+/* Global frame geometry is shared by live pages and their loading states. */
+.store-app { display: flex; width: 100%; min-height: 100dvh; padding-top: env(safe-area-inset-top); background: white; }
+.store-main-column { width: 100%; min-width: 0; flex: 1; }
+@media (min-width: 900px) {
+  html:has(.store-app) { scrollbar-gutter: auto; }
+  .store-app { max-width: none; margin: 0; }
+}

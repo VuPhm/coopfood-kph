@@ -1,3 +1,4 @@
+import { StoreReportPage } from "./store-page-hero";
 import { useEffect, useRef, useState } from "react";
 import { Button, Input, Select } from "@coopfood-kph/ui";
 import { Check, ChevronRight, FileCheck2, FileText, History, Layers3, MoreHorizontal, Search, TriangleAlert } from "lucide-react";
@@ -46,9 +47,8 @@ export function ReportHub({ lots }: { lots: MockDateLot[] }) {
     library.saveTemplate({ ...manage, id: manageMode === "rename" ? manage.id : crypto.randomUUID(), title: name.trim() || manageHolder });
     setManage(null); setNotice(manageMode === "rename" ? "Đã đổi tên mẫu." : "Đã tạo bản sao mẫu.");
   }
-  if (view === "compose" || (view === "document" && activeReport)) return <>
-    {library.error ? <p className="report-library-error" role="status">{library.error}</p> : null}
-    <DateReportWorkspace key={view === "document" ? activeReport!.id : "report-composer"}
+  if (view === "compose" || (view === "document" && activeReport)) {
+    const workspace = <DateReportWorkspace key={view === "document" ? activeReport!.id : "report-composer"}
       lots={lots} template={draft.template} savedReport={view === "document" ? activeReport : null}
       templates={templates} editableTemplate={library.templates.some(template => template.id === draft.template.id)}
       onBack={() => setView(view === "document" ? "history" : "menu")}
@@ -56,8 +56,12 @@ export function ReportHub({ lots }: { lots: MockDateLot[] }) {
       onCreate={report => { library.addReport(report); setActiveReport(report); setHistorySearch(""); setMonth(""); setLimit(10); setView("document"); }}
       onSaveTemplate={library.saveTemplate}
       onReuse={report => openTemplate({ id: "from-history", title: report.title, filter: { ...report.filter }, selectedIds: report.rows.map(row => row.id) })}
-    />
-  </>;
+    />;
+    return <>
+      {library.error ? <p className="report-library-error" role="status">{library.error}</p> : null}
+      {workspace}
+    </>;
+  }
   if (view === "history") return <ReportSurface onDismiss={() => setView("menu")} hero={<><header className="date-report-heading"><div><h2 ref={heading} tabIndex={-1}>Lịch sử báo cáo</h2><span>Dữ liệu mẫu · Trên trình duyệt này</span></div><History size={28} aria-hidden="true" /></header><p className="report-history-hero-count">{library.history.length} báo cáo đã lưu</p></>}>
     <div className="date-report report-hub report-history-body">
       {library.error ? <p className="report-library-error" role="status">{library.error}</p> : null}
@@ -76,7 +80,7 @@ export function ReportHub({ lots }: { lots: MockDateLot[] }) {
 
     </div>
   </ReportSurface>;
-  return <div className="date-report report-hub">
+  return <StoreReportPage><div className="date-report report-hub">
     <header className="date-report-heading">
       <div><h2 ref={heading} tabIndex={-1}>Chọn báo cáo</h2><span>Danh mục DATE</span></div>
       <button className="report-history-entry" onClick={() => setView("history")}><History size={19} aria-hidden="true" /><span>Lịch sử</span>{library.history.length ? <small>{library.history.length}</small> : null}</button>
@@ -97,5 +101,5 @@ export function ReportHub({ lots }: { lots: MockDateLot[] }) {
       {nameError ? <p id="report-manage-name-error" role="alert">{nameError}</p> : null}
       <div className="report-sheet-footer"><Button asChild className="store-button" onClick={saveManagedTemplate}><button ref={manageSaveRef}>{manageMode === "rename" ? "Lưu tên mẫu" : "Tạo bản sao"}</button></Button></div>
     </StoreSheet>
-  </div>;
+  </div></StoreReportPage>;
 }

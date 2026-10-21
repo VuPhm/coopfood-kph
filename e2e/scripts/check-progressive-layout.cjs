@@ -42,7 +42,7 @@ function stable(before, after) {
         await expect(page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true })).toBeDisabled();
         const chrome = ['.store-header', '.store-account', '#store-content', viewport.width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail'];
         const selectors = screen === 'home'
-          ? [...chrome, viewport.width < 900 ? '.store-launcher-mobile' : '.store-launcher-desktop', '.store-home-decoration', '.store-home-art', '.store-header-brand img']
+          ? [...chrome, '.store-launcher-grid', '.store-home-attention', '.store-header-brand img']
           : [...chrome, '.store-create-actions', '.store-kph-toolbar', '.store-list-heading', '.store-kph-list-controls', '.store-kph-list-toolbar', '.store-sticky-tabs', '.store-tabs', '.store-kph-list', '.store-pagination', viewport.width < 900 ? '.store-ticket' : '.store-kph-table'];
         const before = await boxes(page, selectors);
         await page.screenshot({ path: `${output}/${screen}-frame-${viewport.width}.png` });
@@ -59,10 +59,8 @@ function stable(before, after) {
         stable(before, await boxes(page, selectors));
         art.release();
         if (screen === 'home') {
-          await page.locator('.store-home-art').evaluate(image => image.decode());
           await page.locator('.store-header-brand img').evaluate(image => image.decode());
           stable(before, await boxes(page, selectors));
-          expect(await page.locator('.store-home-art').evaluate(image => image.currentSrc)).toContain(viewport.width < 900 ? '-620.webp' : '-920.webp');
         }
         const shifts = await page.evaluate(() => window.layoutShifts);
         expect(shifts.reduce((sum, shift) => sum + shift.value, 0)).toBeLessThanOrEqual(0.005);

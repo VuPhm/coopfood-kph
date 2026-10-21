@@ -1,3 +1,4 @@
+import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { StoreStickyTabs } from "./store-sticky-tabs";
 import { KPH_OPTIONS, type KphKind } from "@coopfood-kph/kph-rules";
 import { getKphChoicePresentation, KphChoiceContent } from "./store-kph-choice";
@@ -17,13 +18,13 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
   const visible = useMemo(() => records.filter(record => record.kind === "TPTS")
     .sort((a, b) => b.detectedDate.split("/").reverse().join("-").localeCompare(a.detectedDate.split("/").reverse().join("-")) || a.id.localeCompare(b.id)).slice(0, 25), [records]);
   const total = records.filter(record => record.kind === "TPTS").length;
-  return <div className="store-kph kph-loading-frame" aria-busy="true" aria-label="Đang tải KPH">
+  return <StorePageLayout className="store-kph kph-loading-frame" aria-busy="true" aria-label="Đang tải KPH">
     <p className="sr-only" role="status">Đang tải KPH…</p>
-    <div className="store-kph-underlay">
+    <StorePageHero className="store-kph-underlay">
       <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input disabled aria-label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" /></label><button disabled className="store-scan-trigger" aria-label="Tạo phiếu TP tươi sống"><Maximize size={20} aria-hidden="true" /></button></div>
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled />)}</div></section>
-    </div>
-    <section className="store-ticket-list" aria-label="Phiếu khai báo">
+    </StorePageHero>
+    <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo">
       <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(kind => <button key={kind} disabled aria-pressed={kind === "TPTS"} className={kind === "TPTS" ? "is-active" : ""}>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}<small>{records.filter(record => record.kind === kind).length}</small></button>)}</div></StoreStickyTabs>
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{total} phiếu</span></div>
@@ -31,8 +32,8 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
       </div>
       <StoreKphList desktop={desktop} visible={visible} loading />
       {total > 25 ? <div className="store-pagination"><span>1–25 / {total}</span>{["Trang trước", "Trang sau"].map((label, index) => <button key={label} disabled aria-label={label}><img className={index === 0 ? "is-previous" : ""} src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button>)}</div> : null}
-    </section>
-  </div>;
+    </StorePageSurface>
+  </StorePageLayout>;
 }
 
 export function KphFormSkeleton({ kind, onCancel }: { kind: KphKind; onCancel: () => void }) {

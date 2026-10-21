@@ -20,11 +20,11 @@ fs.mkdirSync(output, { recursive: true });
         await expect(nav).toBeHidden();
       } else {
         await expect(nav).toBeVisible();
-        await expect(nav.getByRole('link')).toHaveCount(4);
+        await expect(nav.getByRole('link')).toHaveCount(3);
         await expect(nav.getByRole('link', { name: 'KPH', exact: true })).toHaveAttribute('aria-current', 'page');
         const navBox = await nav.boundingBox();
         const fabBox = await fab.boundingBox();
-        expect(navBox.y + navBox.height).toBeCloseTo(viewport.height, 0);
+        expect(navBox.y + navBox.height).toBeCloseTo(viewport.height - 12, 0);
         expect(fabBox.y + fabBox.height).toBeLessThanOrEqual(navBox.y - 10);
         for (const link of await nav.getByRole('link').all()) {
           const box = await link.boundingBox();
@@ -35,7 +35,7 @@ fs.mkdirSync(output, { recursive: true });
             return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
           })).toBe(true);
         }
-        expect(await page.locator('#store-content').evaluate(el => parseFloat(getComputedStyle(el).paddingBottom))).toBeGreaterThanOrEqual(156);
+        expect(await page.locator('.store-ticket-list').evaluate(el => parseFloat(getComputedStyle(el).paddingBottom))).toBeGreaterThanOrEqual(156);
         await page.evaluate(() => window.scrollTo(0, 100000));
         const lastCard = await page.locator('.store-ticket-open').last().boundingBox();
         expect(lastCard.y + lastCard.height).toBeLessThanOrEqual(fabBox.y);
@@ -73,7 +73,8 @@ fs.mkdirSync(output, { recursive: true });
         // Closing restores navigation; lookup state survives the route change.
         await quick.getByRole('button', { name: 'Đóng tiện ích', exact: true }).click();
         await expect(nav).toBeVisible();
-        await nav.getByRole('link', { name: 'DATE', exact: true }).click();
+        await nav.getByRole('link', { name: 'Trang chủ', exact: true }).click();
+        await page.locator('.store-launcher-grid').getByRole('button', { name: 'Quản lý DATE', exact: true }).click();
         await expect(page).toHaveURL(/#date$/);
         await expect(quick).toHaveCount(0);
         await expect(nav.getByRole('link', { name: 'DATE', exact: true })).toHaveAttribute('aria-current', 'page');
@@ -82,6 +83,7 @@ fs.mkdirSync(output, { recursive: true });
         await quick.getByRole('button', { name: 'Đóng tiện ích', exact: true }).click();
         await expect(fab).toBeFocused();
         for (const [label, route] of [['Trang chủ', 'home'], ['KPH', 'kph']]) {
+          if (route === 'kph') await page.locator('.store-launcher-grid').getByRole('button', { name: 'KPH', exact: true }).click();
           const link = nav.getByRole('link', { name: label, exact: true });
           await link.focus();
           await page.keyboard.press('Enter');

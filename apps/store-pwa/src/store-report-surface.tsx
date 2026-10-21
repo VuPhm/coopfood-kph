@@ -1,3 +1,4 @@
+import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import "./store-report-surface.css";
@@ -95,11 +96,11 @@ export function ReportSurface({ hero, children, onDismiss, dismissLabel = "Về 
       handle.removeEventListener("pointerdown", pointerDown); handle.removeEventListener("pointermove", pointerMove); handle.removeEventListener("pointerup", pointerEnd); handle.removeEventListener("pointercancel", pointerEnd);
     };
   }, [pullToDismiss]);
-  return <div className={`report-stage ${className}`}>
-    <div className="report-stage-hero">{hero}</div>
-    <section ref={capRef} className="report-sliding-cap" data-phase={pullToDismiss ? "entering" : "idle"} data-pull-enabled={pullToDismiss} aria-label="Nội dung báo cáo">
+  return <StorePageLayout className={`report-stage ${className}`}>
+    <StorePageHero className="report-stage-hero">{hero}</StorePageHero>
+    <StorePageSurface ref={capRef} className="report-sliding-cap" data-phase={pullToDismiss ? "entering" : "idle"} data-pull-enabled={pullToDismiss} aria-label="Nội dung báo cáo">
       {pullToDismiss ? <button ref={handleRef} type="button" className="report-cap-handle" aria-label={dismissLabel} title="Kéo xuống để chọn loại báo cáo" onClick={() => closeRef.current()}><span aria-hidden="true" /></button> : <nav className="report-cap-navigation" aria-label="Điều hướng mẫu báo cáo"><button type="button" aria-label={dismissLabel} onClick={onDismiss}><ArrowLeft size={18} aria-hidden="true" /><span>Chọn mẫu khác</span></button></nav>}
       {children}
-    </section>
-  </div>;
+    </StorePageSurface>
+  </StorePageLayout>;
 }

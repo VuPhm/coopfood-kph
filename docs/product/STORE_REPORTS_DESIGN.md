@@ -7,6 +7,21 @@ quản lý mẫu, tên báo cáo và truy vấn lịch sử, chưa mở slice t�
 **Owner tạm chấp nhận revision 14 và yêu cầu merge ngày 20/10/2026.**
 Phạm vi vẫn mock/browser-local; backend báo cáo và dữ liệu tồn thật chưa có.
 
+## Follow-up header compact cho mẫu đang mở — 20/10/2026
+
+Owner yêu cầu áp cùng tinh chỉnh compact cho trang mở từng mẫu. Composer dùng
+một StorePageHero: tên mẫu làm h1, subtitle Báo cáo DATE, Back về tất cả mẫu,
+avatar theo anchor chung. Tìm kiếm/Đổi mẫu/Info cùng hàng trên nền xanh; dưới
+360px Đổi mẫu hiện chevron có accessible name/title, tên mẫu vẫn đọc đầy đủ.
+Tên dài/chữ lớn wrap và tăng chiều cao tự nhiên, không cắt title.
+
+Kỳ/phạm vi, chọn lô, danh mục và CTA ở nắp trắng cuộn lên phủ cả hero. Cuộn
+native, không pull-to-dismiss/listener gesture hoặc tab mẫu; focus vào tìm/đổi
+mẫu đưa trang về đầu. Đây là thay đổi trình bày mới thay mô tả composer trắng
+r13/r14 bên dưới; giữ toàn bộ semantics mẫu/kỳ/selection/history/snapshot/export.
+Technical PASS không thay owner visual acceptance.
+[Bàn giao](../delivery/header-style-rollout/handoff.md).
+
 ## Luồng
 
 `#reports` mở menu nhỏ, không vào danh mục ngay. Ba preset ban đầu:

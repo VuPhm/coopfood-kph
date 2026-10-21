@@ -1,3 +1,4 @@
+import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button, Input, ListItemMarker } from "@coopfood-kph/ui";
@@ -112,16 +113,16 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
       <div className="store-sheet-actions"><Button className="store-date-acknowledge" disabled={lot.status !== "open"} onClick={() => updateStatus("acknowledged")}>Ghi nhận</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => updateStatus("resolved")}>Đã xử lý</Button></div>
     </>;
   }
-  return <div className="store-date">
-    <section className="store-date-search-panel" aria-label="Tra mã hàng" onFocusCapture={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+  return <StorePageLayout className="store-date">
+    <StorePageHero className="store-date-search-panel" contentLabel="Tra mã hàng">
       <form className="store-date-search-form" onSubmit={event => { event.preventDefault(); void search(); }}>
         <label className="store-date-search-wrap"><Search className="store-date-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm SKU, barcode, tên hàng hoặc lô</span><Input className="store-date-search" placeholder="Mã hàng, lô" autoComplete="off" value={query} onChange={event => changeQuery(event.target.value)} /></label>
         <button type="button" className="store-date-scan" aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></button>
         <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}>{busy ? "Tìm…" : "Tìm"}</Button>
       </form>
       {message ? <p className="store-date-message" role="status">{message}</p> : null}
-    </section>
-    <div className="store-date-workspace" onFocusCapture={revealBelowStickyTabs}>
+    </StorePageHero>
+    <StorePageSurface className="store-date-workspace" onFocusCapture={revealBelowStickyTabs}>
       {product ? <section className="store-date-product" aria-label="Thông tin mã hàng"><details key={product.id}><summary className="store-date-product-heading" aria-label={`Thông tin mã hàng: ${product.name}`}><div><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p></div><ChevronDown size={18} aria-hidden="true" /></summary><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.code} · {product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></details></section> : null}
       <section className="store-date-browser" aria-label="Danh sách lô DATE">
         <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Quản lý DATE">{[["alerts", "Cảnh báo", attentionLots.length], ["tracking", "Theo dõi DATE", lots.length]].map(([key, label, n]) => <button key={key} aria-pressed={tab === key} className={tab === key ? "is-active" : ""} onClick={() => setTab(String(key))}>{label}<small>{n}</small></button>)}</div></StoreStickyTabs>
@@ -138,7 +139,7 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
         })}{!visible.length ? <section className="store-date-empty"><Package size={28} aria-hidden="true" /><h3>Không có lô phù hợp</h3><p>{product ? "Mã hàng đã nhận diện. Thử trạng thái khác hoặc bỏ lọc để xem các lô." : "Thử mã hàng, tên hoặc số lô khác; bạn cũng có thể quét lại."}</p><Button variant="ghost" onClick={() => { changeQuery(""); setTab("tracking"); setPhaseFilter("all"); }}>Xem tất cả lô</Button></section> : null}</div>
       </section>
       {desktop ? <section className="store-date-detail" aria-label="Chi tiết lô DATE">{active ? <><div className="store-date-detail-heading"><h2>Chi tiết lô DATE</h2><DateProcessingLabel status={active.status} /></div>{detail(active)}</> : <div className="store-date-detail-placeholder"><CalendarDays size={32} aria-hidden="true" /><h2>Chọn một lô để xem chi tiết</h2><p>Thông tin sản phẩm, ngày và thao tác xử lý sẽ hiển thị tại đây.</p></div>}</section> : null}
-    </div>
+    </StorePageSurface>
     <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={value => { void search(value); }} presentation="screen" />
     <StoreSheet className="store-date-sheet store-date-filter" open={filterOpen} onOpenChange={setFilterOpen} title="Lọc DATE" description="Bộ lọc và sắp xếp áp dụng ngay khi thay đổi">
       <section className="store-date-filter-section" aria-labelledby="date-filter-phase"><h3 id="date-filter-phase"><CalendarDays size={18} aria-hidden="true" />Tình trạng DATE</h3>
@@ -155,5 +156,5 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
       <div className="store-date-filter-footer"><button className="store-date-reset-filter" onClick={() => { setStatus("open"); setTab("alerts"); setSort("default"); setPhaseFilter("all"); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setFilterOpen(false)}>Xong</Button></div>
     </StoreSheet>
     {!desktop ? <StoreSheet className="store-date-sheet store-date-lot-sheet" open={!!active} onOpenChange={open => { if (!open) setActiveId(""); }} title="Chi tiết lô DATE" description="Ngày và trạng thái xử lý của lô">{active ? detail(active) : null}</StoreSheet> : null}
-  </div>;
+  </StorePageLayout>;
 }

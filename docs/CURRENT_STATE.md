@@ -1,5 +1,64 @@
 # Trạng thái hiện tại
 
+**Owner cho phép merge page kit — 22/10/2026:** phản hồi trực tiếp “cho phép
+merge” áp dụng bản khung xuyên suốt và Home đã bỏ trang trí. Chốt scope UI
+hiện tại; các dòng pending phía dưới là lịch sử trước quyết định này.
+[Bàn giao tích hợp](delivery/header-style-rollout/merge-2026-10-22.md).
+
+**Home gọn — 22/10/2026:** theo yêu cầu owner, bỏ hình giỏ hàng, họa tiết lá/
+sóng và slogan trang trí. Gỡ CSS/đệm330px dành cho artwork, chỉ giữ khoảng
+chừa navigation/Tra hạn nổi; các nút tính năng và khung chung giữ nguyên.
+
+**Khung trang xuyên suốt — 22/10/2026:** owner chưa đạt các bản trước.
+Thay toàn bộ khung rộng/gọn riêng bằng page kit chung: AppHeader72px, slot
+xanh, lớp trắng overlap12/góc24/gutter chung. Home/Tra hạn/DATE/KPH/reports/
+Thông báo/login dùng cùng kit; login chuyển form một cột trong lớp trắng.
+Nghiệp vụ và dữ liệu giữ nguyên. [Quy tắc](product/STORE_APP_FRAME.md),
+[bàn giao](delivery/header-style-rollout/page-kit-2026-10-22.md).
+Preview <http://127.0.0.1:4232/#home>, owner visual pending.
+
+**Sửa khung desktop — follow-up 21/10/2026:** owner chưa đạt bản global trước.
+Đã tái hiện KPH bị max-width1440px ở viewport1920, gây lệch116px/dải xanh hai
+bên. Bỏ giới hạn ngoài; thêm parent canvas chung và hàng grid AppHeader chứa
+Back/title/account, không absolute avatar. Root neutral, Home/login vẫn rộng.
+Build/233 tests/browser technical PASS, thêm 1920/2560 vào header gate;
+[bàn giao/ảnh trước-sau](delivery/header-style-rollout/desktop-frame-2026-10-21.md).
+Chờ owner xem lại <http://127.0.0.1:4232/#kph>.
+
+**Bộ khung global — follow-up 21/10/2026:** registry màn hình dùng chung cho
+AppHeader/Home/sidebar/mobile; AppHeader có một markup/CSS với mode welcome/
+spacious/compact. Bỏ override header theo màn; loading/live dùng cùng account
+trigger từ profile. Giữ giao diện, native cover và nghiệp vụ hiện tại.
+Build/PWA, 233 tests và browser technical PASS; loading/live zero layout shifts.
+Owner visual pending tại <http://127.0.0.1:4232/#home>.
+[Thiết kế](product/STORE_APP_FRAME.md),
+[bàn giao](delivery/header-style-rollout/global-frame-2026-10-21.md).
+
+**Home/điều hướng — follow-up 21/10/2026:** Home đủ DATE/KPH/Báo cáo/Tra hạn;
+Tra hạn nổi trên các màn làm việc; desktop sidebar 248px; mobile capsule ba ô
+Trang chủ/Thông báo/tính năng gần nhất (nhớ trong phiên). Follow-up cùng ngày:
+sidebar gom đủ bốn nhánh trong một nhóm; menu nền đặc kiểu capsule iOS 27,
+không Liquid Glass/blur/trong suốt. Owner chọn Thông báo
+rỗng, chờ nguồn dữ liệu. Giữ header rộng/compact và workflow hiện hành, chỉ
+Store App. Build/PWA, 231 tests và browser technical PASS; owner visual pending.
+Preview <http://127.0.0.1:4232/#home>;
+[thiết kế](product/STORE_NAVIGATION_DESIGN.md),
+[bàn giao](delivery/header-style-rollout/navigation-2026-10-21.md).
+
+**Mẫu báo cáo đang mở — compact follow-up 20/10/2026:** tên mẫu thay tiêu đề
+chung ở header, Back về menu mẫu, tìm/Đổi mẫu/Info ghép vào nền xanh; kỳ/phạm
+vi/danh mục ở nắp trắng cuộn native. Giữ workflow và Home/login/Tra hạn.
+Build/229 tests và browser technical PASS; chờ owner xem ở
+<http://127.0.0.1:4232/#reports>; [bàn giao](delivery/header-style-rollout/handoff.md).
+
+**Header Store App — thêm dạng compact 20/10/2026:** theo yêu cầu owner,
+Home/đăng nhập/Tra hạn giữ dạng rộng; KPH/DATE/Báo cáo dùng biến thể tác nghiệp
+Back/tiêu đề/avatar cùng hàng, xanh gọn và nắp trượt chung. 390px: KPH/DATE
+lên thêm 67px, menu Báo cáo 80px so bản hợp nhất rộng. Giữ 44px touch/focus,
+workflow và loading geometry. Candidate chờ owner xem.
+Preview <http://127.0.0.1:4232/#kph>;
+[bàn giao](delivery/header-style-rollout/handoff.md).
+
 **RPT01 — owner tạm chấp nhận và yêu cầu merge, 20/10/2026:** phản hồi trực tiếp
 “tạm, merge” áp dụng candidate revision 14. Tích hợp báo cáo DATE, mẫu/lịch sử
 browser-local và các control tham khảo; giữ KPH/DATE đã accepted trên `main`.

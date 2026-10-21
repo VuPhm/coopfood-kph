@@ -27,14 +27,14 @@ async function capture(page, name) {
   await page.screenshot({path:`.local/figma-mobile/${name}.png`, fullPage:true});
 }
 async function homeNavigate(page, viewport, label) {
-  const launcher = viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile';
+  const launcher = '.store-launcher-grid';
   await page.locator(launcher).getByRole('button', {name:label, exact:true}).click();
 }
 async function checkScreen(page, viewport) {
   const tag = `${viewport.width}x${viewport.height}`;
   const errors=[]; page.on('pageerror',e=>errors.push(e.message));
   await page.goto(process.env.STORE_APP_URL || 'http://127.0.0.1:5175');
-  await page.locator(viewport.width >= 900 ? '.store-launcher-desktop' : '.store-launcher-mobile').waitFor();
+  await page.locator('.store-launcher-grid').waitFor();
   if (viewport.width >= 900) {
     const desktopShell = await page.evaluate(() => {
       const app = document.querySelector('.store-app').getBoundingClientRect();
@@ -72,7 +72,7 @@ async function checkScreen(page, viewport) {
     await page.getByRole('heading',{name:'Bánh quy bơ hộp 300 g'}).waitFor();
     await capture(page,`lookup-${tag}`);
     await page.getByRole('button',{name:'Về trang chủ'}).click();
-    await page.locator('.store-desktop-rail').getByRole('button',{name:'DATE',exact:true}).click();
+    await page.locator('.store-desktop-rail').getByRole('link', {name:'Quản lý DATE',exact:true}).click();
   } else {
     await homeNavigate(page,viewport,'Quản lý DATE');
   }

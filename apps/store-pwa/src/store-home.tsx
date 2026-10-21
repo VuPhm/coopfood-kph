@@ -1,19 +1,23 @@
-import { HomeModuleIcon, type Screen } from "./store-app-frame";
-import { figmaAsset } from "./figma-assets";
-import { assetUrl } from "./asset-url";
+import { StorePageLayout, StorePageHero, StorePageSurface } from "./store-page-hero";
+import type { StoreProfile } from "./store-profile";
+import { Bell, ChevronRight } from "lucide-react";
+import type { Screen } from "./store-app-routes";
+import { storeFeatures } from "./store-app-routes";
+import "./store-home.css";
 
-export function StoreHomeContent({ navigate, onKphIntent, openDateLots, pendingRecords }: {
-  navigate: (screen: Screen) => void; onKphIntent?: () => void; openDateLots: number; pendingRecords: number;
+export function StoreHomeContent({ profile, navigate, onKphIntent, openDateLots, pendingRecords }: {
+  profile: StoreProfile; navigate: (screen: Screen) => void; onKphIntent?: () => void; openDateLots: number; pendingRecords: number;
 }) {
-  return <><div className="store-launcher store-launcher-mobile" aria-label="Công việc cửa hàng">
-        {([
-          ["date", "Quản lý DATE", "Quản lý DATE", "Tra mã hàng và theo dõi lô"],
-          ["kph", "KPH", "Hàng không phù hợp", "Ghi nhận và quản lý phiếu"],
-          ["shelf", "Tra cứu lùi hàng", "Tra hạn lùi hàng", "Kiểm tra NSX, HSD và hạn lùi"],
-        ] as const).map(([key, label, title, description]) => <button key={key} className={`store-module module-${key}`} aria-label={label} onPointerEnter={key === "kph" ? onKphIntent : undefined} onFocus={key === "kph" ? onKphIntent : undefined} onClick={() => navigate(key)}>
-          <HomeModuleIcon screen={key} /><span className="store-module-copy"><strong>{title}</strong><small>{description}</small></span>
-        </button>)}
-      </div><div className="store-launcher store-launcher-desktop" aria-label="Công việc cửa hàng">{([
-        ["date", "DATE", "Quản lý DATE", "Tra mã hàng và theo dõi lô"], ["kph", "KPH", "Hàng không phù hợp", "Ghi nhận và quản lý phiếu"], ["shelf", "Tra cứu lùi hàng", "Tra hạn lùi hàng", "Kiểm tra NSX, HSD và hạn lùi"],
-        ] as const).map(([key, label, title, description]) => <button key={key} className={`store-module module-${key}`} aria-label={label} onPointerEnter={key === "kph" ? onKphIntent : undefined} onFocus={key === "kph" ? onKphIntent : undefined} onClick={() => navigate(key)}><HomeModuleIcon screen={key} /><span className="store-module-copy"><strong>{title}</strong><small>{description}</small></span></button>)}</div><div className="store-home-panels"><section><h3>Cần chú ý hôm nay</h3><button onClick={() => navigate("date")}><span>DATE</span><strong>{openDateLots} cảnh báo đang mở</strong><b>Mở</b></button><button onClick={() => navigate("kph")}><span>KPH</span><strong>{pendingRecords} phiếu chờ duyệt</strong><b>Mở</b></button></section><section><span className="store-home-utility-icon"><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-0", "imgFeatherCalendar")} alt="" /></span><div><strong>Tra hạn lùi hàng</strong><small>Tiện ích dùng chung</small></div><button onClick={() => navigate("shelf")}>Mở</button></section></div><div className="store-home-decoration" aria-hidden="true"><span className="store-home-leaf leaf-one" /><span className="store-home-leaf leaf-two" /><img className="store-home-art" src={assetUrl("brand/coopfood-home-basket-620.webp")} srcSet={`${assetUrl("brand/coopfood-home-basket-620.webp")} 620w, ${assetUrl("brand/coopfood-home-basket-920.webp")} 920w`} sizes="(min-width: 900px) 460px, (min-width: 500px) 360px, 310px" alt="" width={1536} height={1024} loading="lazy" fetchPriority="low" decoding="async" /><p className="store-home-motto"><span>An toàn</span><span>Tiện lợi</span><span>Tươi ngon</span><span>Mỗi ngày</span></p></div></>;
+  return <StorePageLayout className="store-home-page"><StorePageHero><div className="store-home-welcome"><span>Xin chào,</span><h2>{profile.fullName}</h2><p>Cửa hàng: {profile.storeCode} · {profile.storeName}</p></div></StorePageHero><StorePageSurface className="store-home-surface"><section id="store-home-features" className="store-home-features" aria-labelledby="store-home-features-title">
+    <div className="store-home-section-heading"><div><h2 id="store-home-features-title">Công việc cửa hàng</h2><p>Chọn tính năng để bắt đầu</p></div><button type="button" aria-label="Thông báo" onClick={() => navigate("notifications")}><Bell size={21} aria-hidden="true" /></button></div>
+    <div className="store-launcher store-launcher-grid" aria-label="Công việc cửa hàng">
+      {storeFeatures.map(({ screen, title, description, homeLabel, icon: Icon }) => <button key={screen} className={`store-module module-${screen}`} aria-label={homeLabel}
+        onPointerEnter={screen === "kph" ? onKphIntent : undefined} onFocus={screen === "kph" ? onKphIntent : undefined} onClick={() => navigate(screen)}>
+        <span className="store-module-icon"><Icon size={28} strokeWidth={1.8} aria-hidden="true" /></span><span className="store-module-copy"><strong>{title}</strong><small>{description}</small></span>
+      </button>)}
+    </div>
+  </section><section className="store-home-attention" aria-labelledby="store-home-attention-title"><h2 id="store-home-attention-title">Cần chú ý hôm nay</h2>
+    <button type="button" onClick={() => navigate("date")}><span className="store-home-attention-kind">DATE</span><strong>{openDateLots} cảnh báo đang mở</strong><ChevronRight size={18} aria-hidden="true" /></button>
+    <button type="button" onClick={() => navigate("kph")}><span className="store-home-attention-kind">KPH</span><strong>{pendingRecords} phiếu chờ duyệt</strong><ChevronRight size={18} aria-hidden="true" /></button>
+  </section></StorePageSurface></StorePageLayout>;
 }

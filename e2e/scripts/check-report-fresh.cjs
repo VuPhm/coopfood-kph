@@ -46,9 +46,8 @@ async function bulk(page, name) {
   await inspect(page,'menu',viewport.width);
   await page.getByRole('button',{name:/^Báo cáo tổng hợp/}).click();
   const heroSearch=await props(page.locator('.report-composer-search input'),['height','borderRadius','borderColor','backgroundColor']);expect(heroSearch.height).toBe(search.height);expect(heroSearch.borderRadius).toBe(search.borderRadius);expect(heroSearch.backgroundColor).toBe(search.backgroundColor);
-  // DATE search now sits on green; the white composer needs the stronger control
-  // boundary token. inspect() separately enforces input contrast >= 3:1.
-  expect(await page.locator('.report-composer-search input').evaluate(node => getComputedStyle(node).borderTopColor === (() => { const probe = document.createElement('span'); probe.style.color = 'var(--store-control-line)'; node.parentElement.append(probe); const color = getComputedStyle(probe).color; probe.remove(); return color; })())).toBe(true);
+  // Both queries share the compact green plate and its inverse control boundary.
+  expect(heroSearch.borderColor).toBe(search.borderColor);
   const list=page.locator(viewport.width<1100?'.date-report-cards':'.date-report-table');
   await expect(list.locator('.ui-list-item-marker')).toHaveCount(7);
   await expect(list.locator('[data-processing-status]')).toHaveCount(7);

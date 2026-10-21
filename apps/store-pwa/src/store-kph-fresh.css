@@ -19,16 +19,7 @@
   --store-control-line: #718578;
   --store-focus: #20344a;
 }
-.store-screen-kph > .store-main-column > .store-header {
-  border: 0;
-  background: linear-gradient(115deg, var(--store-brand-start), var(--store-brand-end));
-  color: white;
-}
-.store-screen-kph .store-header :is(h1, .store-back) { color: white; }
-.store-screen-kph .store-header p { color: white; }
-.store-screen-kph .store-header-store { background: var(--store-brand-start); color: white; }
-.store-screen-kph #store-content { background: var(--store-surface); border-radius: 24px 24px 0 0; }
-.store-kph { padding: 20px 20px 24px; color: var(--store-ink); }
+.store-kph { color: var(--store-ink); }
 .store-kph h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 650; }
 .store-create-actions { margin-bottom: 24px; }
 .store-create-actions h2 { display: none; }
@@ -238,7 +229,6 @@
 }
 
 @media (max-width: 359px) {
-  .store-kph { padding-inline: 14px; }
   .store-create-screen .form-section { padding: 12px; }
   .store-kph .store-batch { flex-wrap: wrap; }
 }
@@ -246,7 +236,6 @@
   .store-create-screen.create-dialog-content { inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: min(880px, calc(100vw - 48px)); height: min(840px, calc(100dvh - 48px)); max-height: calc(100dvh - 48px); border-radius: var(--cf-modal-radius); }
 }
 @media (min-width: 900px) {
-  .store-kph { max-width: 1440px; margin-inline: auto; padding: 28px 36px; }
   .store-create-actions .store-two-col { max-width: 640px; }
   .store-kph .store-tabs { width: fit-content; min-width: 380px; }
   .store-kph-toolbar { max-width: 640px; }
@@ -309,25 +298,18 @@
 .store-kph .store-kph-list-toolbar { flex: 1 1 18rem; }
 /* The cover starts at the type switch; only the controls above it stay behind.
    Keep native document scrolling and reveal covered controls on keyboard focus. */
-.store-kph { --store-kph-gutter: 20px; padding: 0; }
-.store-kph-underlay { position: sticky; top: 0; z-index: 0; padding: 12px var(--store-kph-gutter) 20px; border-radius: 24px 24px 0 0; background: var(--store-canvas); }
+.store-kph { --store-kph-gutter: var(--store-header-gutter); padding: 0; }
 .store-kph-underlay .store-kph-toolbar { margin-bottom: 8px; }
 .store-kph-underlay .store-create-actions { margin-bottom: 0; }
 .store-kph .store-ticket-list { position: relative; z-index: 1; align-content: start; min-height: 100dvh; margin-top: -12px; padding: 12px var(--store-kph-gutter) 24px; border-radius: 24px 24px 0 0; background: var(--store-surface); box-shadow: 0 -8px 24px rgb(0 60 40 / 8%); }
-@media (max-width: 359px) { .store-kph { --store-kph-gutter: 14px; } }
 @media (min-width: 900px) {
-  .store-kph { --store-kph-gutter: 36px; }
-  .store-kph-underlay { padding-top: 16px; }
   .store-kph .store-ticket-list { padding-bottom: 28px; }
 }
 
 /* One green background under the sliding cover, continuous with the header. */
-.store-screen-kph,
-.store-screen-kph > .store-main-column > .store-header,
-.store-screen-kph #store-content,
-.store-kph-underlay { background: var(--store-brand-start); }
-.store-screen-kph #store-content,
-.store-kph-underlay { border-radius: 0; }
+
 .store-kph-underlay .store-kph-search input { border-color: var(--store-line); }
-.store-kph .store-kph-underlay :is(button, input):focus-visible,
-.store-screen-kph .store-header :where(button):focus-visible { outline-color: white; }
+.store-kph .store-kph-underlay :is(button, input):focus-visible { outline-color: white; }
+
+/* Keep the last row above global navigation, inside the native cover. */
+@media (max-width: 899px) { .store-screen-kph .store-kph .store-ticket-list { padding-bottom: calc(var(--store-mobile-toolbar-height) + 108px); } }

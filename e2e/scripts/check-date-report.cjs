@@ -27,7 +27,15 @@ async function create(page) {
   await page.getByRole('button', { name: 'Tạo bản báo cáo', exact: true }).click();
   await page.getByRole('button', { name: 'Tạo và lưu lịch sử', exact: true }).click();
 }
-const go = async (page, width, name) => page.locator(width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail').getByRole(width < 900 ? 'link' : 'button', { name, exact: true }).click();
+async function go(page, width, name) {
+  const label = name === 'DATE' ? 'Quản lý DATE' : name;
+  if (width < 900) {
+    await page.locator('.store-mobile-toolbar').getByRole('link', { name: 'Trang chủ', exact: true }).click();
+    await page.locator('.store-launcher-grid').getByRole('button', { name: label, exact: true }).click();
+  } else {
+    await page.locator('.store-desktop-rail').getByRole('link', { name: label, exact: true }).click();
+  }
+}
 async function summary(page) { await page.getByRole('button', { name: /^Báo cáo tổng hợp/ }).click(); await expect(page.getByRole('heading', { name: 'Báo cáo tổng hợp', exact: true })).toBeFocused(); }
 async function oneLot(page) { await bulk(page, 'Bỏ chọn toàn bộ'); await page.getByRole('checkbox', { name: 'Chọn lô C24-118', exact: true }).check(); }
 
@@ -53,7 +61,7 @@ async function bulk(page, name) {
       await expect(page.getByRole('heading', { name: 'Chọn báo cáo', exact: true })).toBeFocused();
       await expect(page.locator('.report-type-card')).toHaveCount(3);
       const nav = page.locator(viewport.width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail');
-      await expect(nav.getByRole(viewport.width < 900 ? 'link' : 'button', { name: 'Báo cáo', exact: true })).toHaveAttribute('aria-current', 'page');
+      await expect(nav.getByRole('link', { name: 'Báo cáo', exact: true })).toHaveAttribute('aria-current', 'page');
       await inspect(page, 'menu', viewport.width);
       await page.getByRole('button', { name: 'Lịch sử', exact: true }).click();
       await expect(page.getByRole('heading', { name: 'Chưa có báo cáo', exact: true })).toBeVisible();
