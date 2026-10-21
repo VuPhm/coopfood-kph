@@ -139,6 +139,74 @@ describe("SKU memory completion", () => {
     expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
   });
 
+  it.each(["pending", "completed"])("preserves manual quantity and unit through repeated blur after %s completion", async (timing) => {
+    vi.useFakeTimers();
+    render(<CreateRecordDialog kind="TPTS" open skuMemory={skuMemory} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    fireEvent.change(barcode(), { target: { value: "2912345612345" } });
+    if (timing === "completed") await act(async () => { vi.advanceTimersByTime(500); });
+    fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7,5" } });
+    fireEvent.click(screen.getByRole("radio", { name: "EA" }));
+    fireEvent.blur(barcode());
+    fireEvent.blur(barcode());
+    await act(async () => { vi.advanceTimersByTime(500); });
+    expect(product()).toHaveValue("Tươi sống tổng hợp");
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7,5");
+    expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+    expect(screen.queryByText("Trọng lượng đã được trích xuất từ mã barcode.")).not.toBeInTheDocument();
+  });
+
+  it.each(["new code", "scanner"])("starts a new weight extraction after a manual edit followed by %s", (interaction) => {
+    render(<CreateRecordDialog kind="TPTS" open skuMemory={skuMemory} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    complete("2912345612345");
+    fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
+    fireEvent.click(screen.getByRole("radio", { name: "EA" }));
+    if (interaction === "new code") complete("2912345602505");
+    else {
+      fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
+      fireEvent.click(screen.getByText("Trả mã scanner tổng hợp"));
+    }
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue(interaction === "new code" ? "0.25" : "1.234");
+    expect(screen.getByRole("radio", { name: "kg" })).toBeChecked();
+    expect(screen.getByText("Trọng lượng đã được trích xuất từ mã barcode.")).toBeVisible();
+  });
+
+  it("keeps a manual unit-only change when the same barcode blurs again", () => {
+    render(<CreateRecordDialog kind="TPTS" open skuMemory={skuMemory} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    complete("2912345612345");
+    fireEvent.click(screen.getByRole("radio", { name: "EA" }));
+    fireEvent.blur(barcode());
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("1.234");
+    expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+  });
+
+  it("does not publish a stale known code while typing a different code", async () => {
+    vi.useFakeTimers();
+    render(<CreateRecordDialog kind="TPCN" open skuMemory={skuMemory} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    fireEvent.change(barcode(), { target: { value: "000123" } });
+    await act(async () => { vi.advanceTimersByTime(499); });
+    fireEvent.change(barcode(), { target: { value: "000456" } });
+    await act(async () => { vi.advanceTimersByTime(1); });
+    expect(product()).toHaveValue("");
+    expect(supplier()).toHaveValue("");
+    await act(async () => { vi.advanceTimersByTime(499); });
+    expect(product()).toHaveValue("Hàng tổng hợp B");
+    expect(supplier()).toHaveValue("NCC tổng hợp B");
+  });
+
+  it("preserves a corrected draft and a deliberately cleared field across close/reopen", () => {
+    const props = { kind: "TPCN" as const, open: true, skuMemory, onOpenChange: vi.fn(), onSaved: vi.fn() };
+    const view = render(<CreateRecordDialog {...props} />);
+    complete("000123");
+    fireEvent.change(product(), { target: { value: "Tên sửa tay" } });
+    fireEvent.change(supplier(), { target: { value: "" } });
+    view.rerender(<CreateRecordDialog {...props} open={false} />);
+    view.rerender(<CreateRecordDialog {...props} />);
+    fireEvent.blur(barcode());
+    expect(product()).toHaveValue("Tên sửa tay");
+    expect(supplier()).toHaveValue("");
+    expect(screen.queryByText(/từ phiếu đã lưu có mã này/)).not.toBeInTheDocument();
+  });
+
   it("does not look up memory after unmount", async () => {
     vi.useFakeTimers();
     const lookup = vi.spyOn(skuMemory, "get");

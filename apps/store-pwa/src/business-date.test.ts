@@ -22,4 +22,13 @@ describe("canonical business date", () => {
     expect(date).toEqual({ display: "20/10/2026", iso: "2026-10-20" });
     expect(parseDisplayDate(date.display)).toBe(date.iso);
   });
+
+  it("uses named parts and pads digits regardless of part order or locale literals", () => {
+    vi.spyOn(Intl.DateTimeFormat.prototype, "formatToParts").mockReturnValue([
+      { type: "year", value: "2026" }, { type: "literal", value: "\u200e-" },
+      { type: "day", value: "3" }, { type: "literal", value: " thg " },
+      { type: "month", value: "2" },
+    ]);
+    expect(formatBusinessDate(new Date("2026-02-03T05:00:00Z"))).toEqual({ display: "03/02/2026", iso: "2026-02-03" });
+  });
 });

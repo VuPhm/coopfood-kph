@@ -208,7 +208,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   }
 
   function clearWeightExtraction() {
-    // Manual quantity/unit edits cancel pending weight, while name/NCC can still fill.
+    // Manual quantity/unit edits suppress timer/blur weight, while name/NCC can still fill.
     skipPendingWeightRef.current = true;
     setWeightExtracted(false);
   }
@@ -438,7 +438,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                   <div className="relative">
                     <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", {
                       onChange: (event) => scheduleBarcodeCompletion(event.target.value),
-                      onBlur: (event) => completeBarcode(event.target.value),
+                      onBlur: (event) => completeBarcode(event.target.value, !skipPendingWeightRef.current),
                     })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => {
                       primeScanSuccessSound();

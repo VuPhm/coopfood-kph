@@ -73,3 +73,35 @@ Chưa kiểm camera hoặc Android/iOS thật cho tính năng này. Bước ti�
 nhập/quét mã đã từng lưu trên thiết bị pilot, xác nhận thông tin gợi nhớ và sửa
 NCC nếu đã thay đổi. Rollback revert riêng tính năng, không reset IndexedDB;
 giữ fix ngày khóa `0c42b31` và các codec ảnh đã có.
+
+## Round rà an toàn bổ sung — 21/10/2026
+
+Rà cả candidate ngày khóa `0c42b31` và SKU memory `34f9d28`, vẫn trên đúng
+worktree/branch, chưa push/deploy.
+
+- Tái hiện được lỗi: sau khi sửa tay số lượng/đơn vị của mã cân TPTS, blur lại
+  ô mã sẽ cân lại và ghi đè phần sửa tay. Hai regression tests thất bại trước
+  patch (nhận `1.234` thay vì `7,5`), cả lúc timer đang chờ và đã hoàn tất.
+- Fix chỉ ở handler blur, dùng cờ bảo vệ sửa tay đã có. Cùng mã giữ số lượng/
+  đơn vị sửa tay; nhập mã mới hoặc scanner trả mã vẫn trích xuất ngay theo
+  đường xử lý chung. Tên/NCC vẫn được gợi điền khi blur. Không đổi JSX layout,
+  schema, validation số lượng > 0, storage hay Pages configuration.
+- Thêm 12 cases: hai đường ghi đè trên; đổi mã/quét lại; sửa riêng đơn vị;
+  gõ tiếp trước debounce; giữ sửa/xóa chủ động khi đóng/mở lại; hai loại form
+  lưu lỗi rồi retry thành công và hydrate lại bằng IndexedDB thật trong test;
+  nguồn mới hơn bị trash/rejected sau hydrate; formatToParts khác thứ tự,
+  literal locale và padding. Không dùng dữ liệu hoặc ảnh vận hành.
+- File sửa trong round này: `create-record-dialog.tsx`,
+  `create-record-sku-memory.test.tsx`, `app-sku-memory.test.tsx`,
+  `business-date.test.ts` trong `apps/store-pwa/src/`, và tài liệu này.
+- `npm test`: pass toàn bộ workspace (**347 tests**, riêng Store PWA **318
+  tests / 29 files**). `npm run build`: pass. Build Pages base `/coopfood-kph/`:
+  pass, entry `index-DDVM3pqW.js`, workspace `workspace-BWO68BEB.js`; CSS không
+  đổi. Cảnh báo chunk ExcelJS và experimental localStorage của Node đã có sẵn.
+- `npm run check:docs`, `git diff --check`: pass. Round này không thêm kiểm
+  chứng camera hoặc thiết bị thật; kết quả browser của round trước vẫn ghi ở
+  phần kiểm chứng phía trên, không gộp thành kiểm chứng bản build mới.
+
+Giữ giới hạn cần kiểm Android/iOS thật đã nêu trên. Bước nhỏ tiếp theo: trên
+thiết bị pilot, nhập/quét mã đã nhớ, sửa số lượng/NCC, blur lại mã rồi lưu và
+mở lại để xác nhận bản lưu. Không coi test mô phỏng là đã xác nhận máy thật.

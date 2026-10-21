@@ -103,3 +103,43 @@ it.each(["TPCN", "TPTS"] as const)("flushes %s completion when Enter submits bef
   const saved = (await loadPilotRecords()).find((record) => !record.id.startsWith("synthetic-"));
   expect(saved).toMatchObject({ kind, sku: code, productName: "Tên tổng hợp cũ", supplier: "NCC tổng hợp cũ", quantityValue: kind === "TPTS" ? 1.234 : 1, unit: kind === "TPTS" ? "kg" : "EA" });
 });
+
+it.each(["TPCN", "TPTS"] as const)("keeps %s corrections through a failed save and learns them only after retry succeeds", async (kind) => {
+  const code = kind === "TPCN" ? "000123" : "2912345612345";
+  if (kind === "TPTS") await savePilotRecord({ ...DEMO_RECORDS[0]!, id: "synthetic-tpts", kind, sku: code, productName: "Tên tổng hợp cũ", supplier: "NCC tổng hợp cũ", createdAt: "2000-01-01T00:00:00Z", photos: [] });
+  const view = render(<App />);
+  await openForm(kind);
+  complete(code);
+  fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Tên sửa cần giữ" } });
+  fireEvent.change(screen.getByRole("textbox", { name: "Nhà cung cấp" }), { target: { value: "NCC sửa cần giữ" } });
+  fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7,5" } });
+  fireEvent.click(screen.getByRole("radio", { name: "EA" }));
+  fireEvent.blur(screen.getByRole("textbox", { name: "Mã SKU / UPC" }));
+  await prepareEvidence();
+  vi.mocked(savePilotRecord).mockRejectedValueOnce(new Error("Synthetic correction write failed"));
+  fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+  expect(await screen.findByText("Synthetic correction write failed")).toBeVisible();
+  expect((await loadPilotRecords()).filter((record) => record.sku === code)).toHaveLength(1);
+  expect(screen.getByRole("textbox", { name: "Tên hàng hóa" })).toHaveValue("Tên sửa cần giữ");
+  expect(screen.getByRole("textbox", { name: "Nhà cung cấp" })).toHaveValue("NCC sửa cần giữ");
+  expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7,5");
+  expect(screen.getByRole("button", { name: "Xem ảnh minh chứng 1" })).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+  await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  expect((await loadPilotRecords()).find((record) => !record.id.startsWith("synthetic-"))).toMatchObject({ sku: code, quantityValue: 7.5, unit: "EA", productName: "Tên sửa cần giữ", supplier: "NCC sửa cần giữ" });
+  view.unmount();
+  render(<App />);
+  await openForm(kind);
+  complete(code);
+  expect(screen.getByRole("textbox", { name: "Tên hàng hóa" })).toHaveValue("Tên sửa cần giữ");
+  expect(screen.getByRole("textbox", { name: "Nhà cung cấp" })).toHaveValue("NCC sửa cần giữ");
+});
+
+it.each(["trash", "rejected"] as const)("does not recall a newer %s source after IndexedDB hydration", async (state) => {
+  await savePilotRecord({ ...DEMO_RECORDS[0]!, id: "synthetic-ineligible", sku: "000123", productName: "Không được gợi điền", supplier: "NCC không hợp lệ", createdAt: "2000-01-02T00:00:00Z", approvalStatus: state === "rejected" ? "REJECTED" : "PENDING", photos: [] }, state === "trash" ? "trash" : "active");
+  render(<App />);
+  await openForm();
+  complete("000123");
+  expect(screen.getByRole("textbox", { name: "Tên hàng hóa" })).toHaveValue("Tên tổng hợp cũ");
+  expect(screen.getByRole("textbox", { name: "Nhà cung cấp" })).toHaveValue("NCC tổng hợp cũ");
+});
