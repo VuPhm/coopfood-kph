@@ -74,8 +74,19 @@ trong form/review/scrim. Screenshot đã xem mobile/desktop/form/review.
   Không thay geometry/domain/lazy/portal, nên giữ evidence panel và unit gate.
 - `npm run check:docs`, `git diff --check`: PASS.
 
-So sánh lab mở form đang được ghi riêng bên dưới trước handoff; không dùng
-một sample để tuyên bố nhanh hơn baseline.
+Lab mở form, cùng script `check-modal-inp.cjs`, CPU6×, 2 samples/viewport,
+base4263 và candidate4272 chạy tuần tự:
+
+| Viewport | Base146e2e1 | Candidate |
+| --- | --- | --- |
+| 390×844 | 384 / 160ms | 376 / 168ms |
+| 1440×1024 | 376 / 160ms | 376 / 168ms |
+
+Mẫu nhỏ, dao động8ms; coi là tương đương trong phép thử này, không tuyên bố
+cải thiện field INP. Geometry/focus/Escape/scrim không blur PASS. Log
+`perf-base.log`/`perf-final.log`; event JSON ở `.local/modal-inp/kph03-base-146e2e1`
+và `kph03-final`. Đã bỏ watch barcode mỗi ký tự, không thêm filter/observer
+hoặc layout measurement vào vòng typing/scroll.
 Evidence ignored trong `.local/kph03/`: baseline ảnh ở `/tmp/kph03-before`,
 `forms/results.json`/screenshots/contrast, `panel/results.json`, log verify/build.
 Không commit ảnh/dữ liệu vận hành thật. Các ảnh dùng fixture tổng hợp.
@@ -90,3 +101,13 @@ Production mock preview <http://127.0.0.1:4272/#kph>. Mở lần lượt **TP kh
 và **TP tươi sống**; xem khối đầu/số lượng, đổi tình trạng và Khác, thử ảnh,
 Xem lại → Chỉnh sửa để kiểm draft. Dữ liệu mẫu chỉ trong phiên, không gửi backend.
 Gate owner đang pending; kỹ thuật PASS không tự thay nghiệm thu thực.
+
+## Candidate handoff
+
+Code checkpoint **`a78e36842469ab90912b8e110dc0a7a7b59b1ddf`**, review round1/limit2.
+Sau checkpoint chỉ ghi ledger/plan; `npm run check:docs`, local links và
+`git diff --check` được kiểm lại. Source đã kiểm như gate bên trên; phần cuối
+sau verify/panel chỉ là khai báo transition CSS đã nêu, được mock build/type
+và gate form cuối xác minh. Không đổi implementation trong handoff.
+
+Main vẫn ở3fe1c9c, cây main sạch. Candidate ở nhánh riêng, chưa merge/push/deploy.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kph03-create-forms",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Optimize both Store Fresh KPH creation forms TPCN/TPTS with Home soft surfaces, mobile-first composition, accessible validation and stable/performance-conscious loading/review.",
   "inScope": [
     "TPCN/TPTS Store Fresh create form and review, field/choice/photo hierarchy, mobile and desktop layout",
@@ -16,7 +16,7 @@
     "Automatic merge, push, Pages or deployment"
   ],
   "baseSha": "146e2e16bd78c37bc0b726bdd73e1903d022571b",
-  "candidateSha": "",
+  "candidateSha": "a78e36842469ab90912b8e110dc0a7a7b59b1ddf",
   "integrationOwner": "Current chat sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/create-record-dialog.tsx",
@@ -39,7 +39,10 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "a78e36842469ab90912b8e110dc0a7a7b59b1ddf",
+      "evidence": "docs/delivery/kph03-create-forms/technical.md"
     },
     {
       "id": "owner",
@@ -50,6 +53,7 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Audit current form at 390/1440, implement scoped soft surfaces and accessible field validation, test both kinds and serve candidate.",
-  "authorization": "Direct user22/10/2026: “146e2e1 từ đây áp tiếp cho kph; tối ưu toàn diệu cho 2 form tạo phiếu”."
+  "nextAction": "Owner review both Fresh create forms at production mock preview4272: goods/quantity, choices/Other, evidence, review/edit. No merge/push/deploy authorized.",
+  "authorization": "Direct user22/10/2026: “146e2e1 từ đây áp tiếp cho kph; tối ưu toàn diệu cho 2 form tạo phiếu”.",
+  "preview": "http://127.0.0.1:4272/#kph"
 }
