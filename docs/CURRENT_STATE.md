@@ -1,5 +1,16 @@
 # Trạng thái hiện tại
 
+**KPH02 — CLOSED22/10/2026:** owner chấp nhận revision5 bằng “có thể merge”.
+Đã merge main local tại`146e2e1`, source đúng checkpoint`48438cf`: nhóm ngày mặc
+định bật, checkbox ngày/chạm thu mở riêng trong Chọn, ngày flat mobile căn trái;
+item/tag/click hàng/lọc nhanh/Hiển thị thêm và nền trắng đã duyệt cùng bản này.
+Gate trực tiếp main`VITEST_MAX_WORKERS=2 npm run verify` PASS294 tests/contracts/
+API/types/build; mock PWA và Playwright390/1440/320,5màn surface, skeleton/live
+PASS. Preview <http://127.0.0.1:4263/#kph> chạy từ main. Chưa push/deploy;
+Store Fresh memory-only, API/thiết bị thật là giới hạn riêng. Các pending KPH
+bên dưới là lịch sử trước nghiệm thu. Đóng task, chờ yêu cầu mới.
+[Hồ sơ tích hợp/kiểm tra](delivery/kph02-merge-2026-10-22.md).
+
 **KPH02 revision5 — candidate22/10/2026:** mặc định bật Nhóm theo ngày; reset
 lọc trả về bật. Trong Chọn, checkbox ngày có vùng44×44px riêng; phần ngày/count/
 chevron vẫn thu/mở, giữ selection và collapse khi vào/thoát Chọn. Tắt nhóm: ngày

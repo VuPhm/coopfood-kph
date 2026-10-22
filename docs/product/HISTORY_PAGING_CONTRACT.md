@@ -3,7 +3,7 @@
 Trạng thái: Accepted — owner chấp nhận D01 revision 2 ngày 2026-09-24.
 Bản tích hợp trên baseline P04/P05; owner decision tại handoff D01.
 
-Store Fresh có [candidate compact/Hiển thị thêm](KPH_COMPACT_HISTORY.md) theo
+Store Fresh có [UI compact/Hiển thị thêm đã duyệt22/10](KPH_COMPACT_HISTORY.md) theo
 owner ngày22/10/2026, áp dụng workspace fixture trong phiên. Candidate đó giữ
 selection trên phần đã hiện khi nối thêm, không áp dụng cho online D01 bên dưới.
 

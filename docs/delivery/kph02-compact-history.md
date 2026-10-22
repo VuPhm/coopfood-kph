@@ -1,11 +1,12 @@
 # KPH02 — nhóm/lọc/tag và surface Store, revision 5
 
-Ngày22/10/2026; candidate chờ owner xem. Revision5 đổi default nhóm ngày và
-tách vùng chọn/thu mở theo feedback; nền trắng revision4 giữ nguyên. Không suy
-acceptance từ technical PASS. Một writer Codex; cùng nhánh
-`store-app/kph02-compact-history`, worktree
+Owner chấp nhận revision5 bằng “có thể merge” ngày22/10/2026. Checkpoint
+`48438cf`, merge main local`146e2e1`; [hồ sơ tích hợp/đóng vòng](kph02-merge-2026-10-22.md).
+Các kết quả/pending bên dưới là lịch sử kỹ thuật trước acceptance, không mở thêm
+round. Một writer Codex; nhánh`store-app/kph02-compact-history`, worktree
 `/Users/vup/.codex/worktrees/kph-compact-history/coopfood-kph`, base`982c04c`.
-Main`fb8e4b7` vẫn sạch/riêng; chưa commit/merge/push/deploy, không mở cycle/team.
+Main trước merge`fb8e4b7`; chỉ xung đột CURRENT_STATE/NEXT, giữ cả lịch sử UI01.
+Chưa push/deploy; Store Fresh mock và online API vẫn có phạm vi riêng.
 
 ## Kết quả và quyết định
 
@@ -53,7 +54,7 @@ Main`fb8e4b7` vẫn sạch/riêng; chưa commit/merge/push/deploy, không mở c
 - `check-progressive-layout.cjs`: footer more; `check-store-navigation.cjs`:
   fallback trắng mới; `check-store-surfaces.cjs`: canvas/holder/contrast scope.
 - CURRENT_STATE/NEXT, KPH design/contract index/D01 note/label system/component
-  catalog/Visual DNA và handoff này: candidate R5 (nền trắng R4 giữ nguyên), không đổi accepted business API.
+  catalog/Visual DNA và handoff này: R5 đã duyệt (nền trắng R4 giữ nguyên), không đổi accepted business API.
 
 ## Technical verification
 
@@ -142,5 +143,4 @@ Store Fresh memory-only; fixture08/2026 nên lọc ngày hiện tại có thể 
 Không đổi backend/OpenAPI/authorization/online/Pilot/Pages hoặc frame Figma.
 Chưa API wiring cho UX này, không đổi contract D01 page-local của online.
 
-Bước nhỏ tiếp theo: owner tải lại4262, thử Chọn → thu gọn một ngày → tick ngày
-đang thu gọn → mở lại; tắt Nhóm theo ngày trong lọc để xem ngày mobile căn trái.
+Bước tiếp theo: đóng task, chờ yêu cầu mới; xem hồ sơ tích hợp phía trên.

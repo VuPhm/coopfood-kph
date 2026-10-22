@@ -1,9 +1,12 @@
 # KPH hiển thị/lọc và bề mặt Store — revision 5, 22/10/2026
 
-Candidate theo feedback owner: mặc định nhóm ngày, thu/mở cả trong chế độ Chọn;
-nền trắng revision4 và UX còn lại giữ nguyên. Cùng task/
-worktree từ`982c04c`. KPH Store Fresh vẫn fixture trong phiên; không thay D01
-online hoặc cấp quyền chọn dữ liệu chưa tải. Palette bề mặt áp khung Store chung.
+Owner chấp nhận và cho phép merge bằng “có thể merge” ngày22/10/2026, áp dụng
+revision5 tại preview4262: mặc định nhóm ngày, chọn/thu mở độc lập, nền trắng.
+Candidate checkpoint`48438cf`, merge main local`146e2e1`; [hồ sơ tích hợp](../delivery/kph02-merge-2026-10-22.md).
+Cùng task/worktree từ`982c04c`. KPH Store Fresh vẫn fixture trong phiên;
+không thay D01 online hoặc cấp quyền chọn dữ liệu chưa tải. Palette áp khung
+Store chung. Thiết bị thật/API wiring là giới hạn riêng, không suy từ owner
+visual acceptance thành kiểm chứng production.
 
 ## Kiểu danh sách và nhóm ngày
 
@@ -60,8 +63,7 @@ và tách holder bằng viền/bóng nhẹ; giữ geometry và workflow hiện c
 Hero holders trắng đặc; navigation/dock vẫn có glass có giới hạn, fallback trắng.
 Sidebar trắng. Home pastel module và nhãn trạng thái giữ meaning; glow
 Tra hạn không đổi. Login/online/Pilot có composition/style riêng không được nhập
-lại vào khung mock vì thay đổi này. Xem candidate trong Visual DNA, không suy
-owner acceptance từ technical PASS.
+lại vào khung mock vì thay đổi này. Xem palette trong Visual DNA và hồ sơ owner acceptance ở trên.
 
 ## Lọc nhanh và hiển thị thêm
 

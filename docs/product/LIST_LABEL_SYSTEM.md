@@ -144,7 +144,7 @@ Pattern CSS `ui-list-marker-card` / `ui-list-marker-cell` dành gutter trái
 cho phép `--ui-list-marker-top` để canh khối tên. Không tự tô nền selection.
 KPH Fresh giữ grid/checkbox đã accepted, API marker dot/bar không đổi.
 
-## KPH Store Fresh — candidate revision3,22/10/2026
+## KPH Store Fresh — nhãn đã duyệt cùng revision5,22/10/2026
 
 Mobile giữ nhãn12px/line16px/min22px/icon14px/bar28px, một strip cuộn ngang có
 fade khi còn nội dung, ẩn scrollbar; trang không cuộn ngang. Desktop giữ nhãn26px/
@@ -153,4 +153,4 @@ mobile cap146px, desktop theo cột. Title native khi hover, DOM/accessible text
 và chi tiết phiếu giữ nguyên văn. Nhãn chuẩn vẫn đầy đủ; không đổi mapping,
 quyền, token shared, form choice hoặc dữ liệu. Grouping là tùy chọn mặc định bật theo feedback revision5; tắt nhóm thì ngày
 căn trái trong cụm metadata mobile.
-Xem [thiết kế/phạm vi](KPH_COMPACT_HISTORY.md), owner nghiệm thu còn pending.
+Xem [thiết kế/phạm vi](KPH_COMPACT_HISTORY.md) và [owner acceptance](../delivery/kph02-merge-2026-10-22.md).

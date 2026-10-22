@@ -1,13 +1,13 @@
 # Store App Visual DNA — Co.op Fresh
 
-**Candidate palette revision4,22/10/2026:** owner nhận xét canvas xám của
+**Palette revision4, đã duyệt cùng KPH revision5 ngày22/10/2026:** owner nhận xét canvas xám của
 revision3 “xấu dơ”. Bỏ mảng xám, dùng nền và sidebar trắng thuần`#fff`; holder
 trắng, viền mảnh`#dfe5e9`/bóng nhẹ; inner well gần trắng`#fafbfc` chỉ ở tab/
 header/filter. Không thêm gradient phủ nền. Giữ geometry, xanh thương hiệu,
 pastel module và semantic label; hero holders trắng đặc, nav/dock vẫn glass có
 fallback trắng. Không đổi login/online/Pilot composition hoặc glow Tra hạn.
-Technical PASS không là owner acceptance; [scope/checks](KPH_COMPACT_HISTORY.md).
-Các palette đã accepted bên dưới vẫn là provenance, không tự nhận revision4 đã duyệt.
+Owner cho phép merge bằng “có thể merge”; [phạm vi/checks/acceptance](KPH_COMPACT_HISTORY.md).
+Các palette lịch sử bên dưới là provenance; giới hạn thiết bị thật giữ riêng.
 
 **Hướng mới 22/10/2026:** owner chưa đạt khung cũ và cho phép đồng bộ toàn app.
 [Page kit xuyên suốt](STORE_APP_FRAME.md) thay welcome/spacious/compact riêng:
