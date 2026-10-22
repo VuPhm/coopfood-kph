@@ -17,7 +17,7 @@
     "Push, Pages or deployment"
   ],
   "baseSha": "90af8cbe4ff874016fd11e84d927544a5d786a4a",
-  "candidateSha": "982c04c86826b8c5542db9f28e5d77afa1b026bc",
+  "candidateSha": "b63eaeffb7ea9c355304445a0c06f6756ef5c18a",
   "integrationOwner": "UI01 current chat, sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -40,7 +40,7 @@
       "required": true,
       "status": "pass",
       "revision": 2,
-      "sha": "982c04c86826b8c5542db9f28e5d77afa1b026bc",
+      "sha": "b63eaeffb7ea9c355304445a0c06f6756ef5c18a",
       "evidence": "docs/delivery/ui01-mobile-perf/merge-2026-10-22.md"
     },
     {
@@ -49,7 +49,7 @@
       "required": true,
       "status": "pass",
       "revision": 2,
-      "sha": "982c04c86826b8c5542db9f28e5d77afa1b026bc",
+      "sha": "b63eaeffb7ea9c355304445a0c06f6756ef5c18a",
       "evidence": "docs/delivery/ui01-mobile-perf/merge-2026-10-22.md",
       "acceptedBy": "Repository owner in current chat",
       "decisionRef": "Direct user message 22/10/2026: “rất ổn, cho phép merge”"
