@@ -17,6 +17,11 @@ if (import.meta.env.VITE_STORE_APP_MOCK === "true" && window.location.hash === "
   void import("./store-kph-workspace").catch(() => {});
 }
 
+// Direct report links fetch feature code alongside the entry point, not after it.
+if (import.meta.env.VITE_STORE_APP_MOCK === "true" && window.location.hash === "#reports") {
+  void import("./store-report-hub").catch(() => {});
+}
+
 function AppBootstrap() {
   const [EntryPoint, setEntryPoint] = useState<ComponentType | null>(null);
   const [failed, setFailed] = useState(false);

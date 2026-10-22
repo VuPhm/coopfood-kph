@@ -1,0 +1,25 @@
+/* Auxiliary mobile density only. Keep the shared 72px app bar, type and targets. */
+@media (max-width: 899px) {
+  .store-app .store-page-hero { padding-bottom: calc(var(--store-cover-overlap) + 4px); }
+  .store-app .store-home-features { padding-top: 16px; }
+  .store-app .store-home-section-heading { margin-bottom: 12px; }
+  .store-app.store-screen-home .store-launcher-grid .store-module {
+    min-height: 164px; gap: 10px; padding: 14px 16px;
+  }
+  .store-app.store-screen-home .store-launcher-grid .store-module-icon { width: 48px; height: 48px; flex-basis: 48px; }
+  .store-app .store-home-attention { margin-top: 16px; }
+  .store-app .store-home-attention > button { min-height: 48px; padding-block: 8px; }
+  .store-app .store-kph-underlay .store-kph-toolbar { margin-bottom: 6px; }
+  .store-app .store-create-actions .store-create-cta { min-height: 64px; gap: 4px; padding: 6px 8px; }
+  .store-app .store-kph .store-ticket-list { gap: 10px; }
+  .store-app .store-kph .store-kph-list-controls { gap: 6px 8px; }
+  .store-app .store-date-browser { gap: 10px; }
+  .store-app .store-date-list-controls { gap: 6px 8px; }
+  .store-app .store-date-product-heading { min-height: 56px; }
+  .store-app .report-composer .date-report.is-compose { gap: 12px; padding-top: 8px; }
+  .store-app .report-composer .store-settings-row { min-height: 60px; padding-block: 8px; }
+  .store-app .report-composer .date-report-catalog-heading { padding-bottom: 8px; }
+  .store-app .report-composer .report-selection-bar { padding: 8px 10px; }
+  .store-app .store-action-dock { padding: 10px; }
+  .store-app .store-action-summary { margin-bottom: 6px; }
+}

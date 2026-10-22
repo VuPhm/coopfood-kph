@@ -1,5 +1,19 @@
 # Công việc kế tiếp
 
+**UI01 mobile/performance — AWAITING_ACCEPTANCE, 22/10/2026:** mở
+<http://127.0.0.1:4247/#home>; xem Home gọn, viền phụ nhẹ theo Home, thử
+KPH/DATE đổi tab/tìm/chọn/lọc và Báo cáo lần đầu. Cỡ chữ/record/touch giữ
+nguyên; JS nạp khi mở Home giảm19,6%, popup/scroll/offline technical đạt. Chờ owner
+xem trên thiết bị thật; không tự mở thêm round hoặc merge/deploy.
+[Phạm vi và evidence](delivery/ui01-mobile-perf/technical.md).
+
+**UI01 — xem soft depth mới trên baseline `cbf750a`, 22/10/2026:** mở
+<http://127.0.0.1:4247/#home>, kiểm capsule ba ô và utility/dock trong Báo cáo.
+Giữ page kit/Home gọn; thêm gradient/shadow mềm theo feedback thô/phẳng.
+Candidate vật liệu chờ owner xem trên máy
+thật. Compact phần phụ mobile để round kế tiếp, chưa mở.
+[Bàn giao và kiểm chứng](delivery/ui01-light-glass.md).
+
 **Page kit/Home/navigation đã tích hợp — CLOSED 22/10/2026:** theo owner
 “cho phép merge”, checkpoint `af425bb` merge vào main local tại `cbf750a`.
 Kiểm trực tiếp main: `VITEST_MAX_WORKERS=2 npm run verify` PASS 286 tests/

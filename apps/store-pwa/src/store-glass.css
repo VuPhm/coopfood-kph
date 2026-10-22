@@ -1,0 +1,154 @@
+/* Fresh glass: floating navigation/actions and tinted hero controls.
+   Content and modal scrims stay solid.
+   Opaque defaults also cover browsers without backdrop-filter support. */
+.store-app {
+  --store-glass-surface: #f9fdfb;
+  --store-glass-peach: #fff0e6;
+  --store-glass-dock: #f9fdfb;
+  --store-glass-hero-surface: #fff;
+  --store-glass-hero-mint: #e6f7f2;
+  --store-glass-blur: 10px;
+  --store-glass-edge: rgb(0 60 40 / 6%);
+  --store-soft-edge: rgb(0 60 40 / 6%);
+  --store-glass-sheen: linear-gradient(155deg, rgb(255 255 255 / 46%), rgb(255 255 255 / 8%) 52%, rgb(0 72 48 / 3%));
+  --store-glass-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 2px 4px rgb(0 60 40 / 5%), 0 8px 20px rgb(0 60 40 / 11%);
+  --store-soft-card-shadow: inset 0 1px 0 rgb(255 255 255 / 80%), 0 4px 12px rgb(0 60 40 / 6%);
+}
+.store-app .store-mobile-toolbar {
+  border-color: var(--store-glass-edge);
+  background-color: var(--store-glass-surface);
+  background-image: var(--store-glass-sheen);
+  box-shadow: var(--store-glass-shadow);
+}
+.store-app .store-mobile-toolbar a:not([aria-current="page"]) { color: #203c42; }
+.store-app .store-mobile-toolbar a[aria-current="page"] {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 85%), 0 1px 3px rgb(0 60 40 / 8%);
+}
+.store-app .store-quick-fab {
+  color: #713507;
+  background-color: var(--store-glass-peach);
+  background-image: var(--store-glass-sheen);
+  box-shadow: var(--store-glass-shadow);
+}
+.store-app .store-quick-fab:hover { background: #ffe4d0; }
+.store-app .store-action-dock[data-floating="true"] {
+  border-color: var(--store-glass-edge);
+  background-color: var(--store-glass-dock);
+  background-image: var(--store-glass-sheen);
+  box-shadow: var(--store-glass-shadow);
+}
+/* Darker foregrounds keep the more transparent materials legible. */
+.store-app .store-mobile-toolbar a:focus-visible { outline-color: #005638; }
+.store-app .store-action-dock[data-floating="true"] .store-action-summary [role="status"] { color: #005638; }
+.store-app .store-page-hero { --store-ink-muted: #40555b; }
+.store-app .store-page-hero :is(.store-kph-search input, .store-date-search, .store-search-input)::placeholder { color: #40555b; }
+.store-app .store-page-hero :is(.report-change-template, .report-composer-info) { color: #005638; }
+/* More frequent glass cues on the green plate, with no extra filter surfaces. */
+.store-app .store-page-hero :is(.store-kph-search input, .store-date-search, .store-search-input, .store-create-cta) {
+  background-color: var(--store-glass-hero-surface);
+  background-image: var(--store-glass-sheen);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 75%), 0 3px 9px rgb(0 45 30 / 10%);
+}
+.store-app .store-page-hero :is(.store-scan-trigger, .store-date-scan, .report-change-template, .report-composer-info) {
+  background-color: var(--store-glass-hero-mint);
+  background-image: var(--store-glass-sheen);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 75%), 0 3px 9px rgb(0 45 30 / 10%);
+}
+/* Surface depth without another blur layer or changes to shared control geometry. */
+.store-app .store-header .store-profile-avatar {
+  background: rgb(237 255 247 / 94%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 65%), 0 2px 8px rgb(0 60 40 / 8%);
+}
+@media (min-width: 900px) {
+  .store-app .store-desktop-rail {
+    background: linear-gradient(155deg, rgb(255 255 255 / 6%), transparent 55%), #f5f9f7;
+    box-shadow: inset -1px 0 0 rgb(255 255 255 / 18%);
+  }
+  .store-app .store-desktop-rail nav a[aria-current="page"] {
+    background-color: #dcefe6;
+    background-image: var(--store-glass-sheen);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 24%), 0 2px 6px rgb(0 60 40 / 8%);
+  }
+}
+/* Home-style quiet edges: keep the 1px box for stable geometry, fade its paint.
+   Filled controls identify the action; focus and selected states stay explicit. */
+.store-app .store-page-surface { --store-line: var(--store-soft-edge); }
+.store-app .store-page-hero :is(.store-kph-search input, .store-date-search, .store-search-input, .store-create-cta, .store-date-scan, .report-change-template, .report-composer-info) {
+  border-color: rgb(255 255 255 / 20%);
+}
+.store-app :is(.store-kph-list-toolbar, .store-date-toolbar) :is(.store-quick-sort-trigger, .store-compact, .store-filter):where(:not([aria-pressed="true"]):not([aria-expanded="true"]):not(.is-filtered)) {
+  border-color: var(--store-soft-edge);
+}
+.store-app .store-date-statuses button:not(.is-selected) { border-color: var(--store-soft-edge); }
+.store-app .store-selection-menu:not([data-state="open"]) { border-color: var(--store-soft-edge); }
+@media (min-width: 900px) {
+  .store-app .store-desktop-rail { border-right-color: var(--store-soft-edge); }
+  .store-app .store-desktop-rail .store-rail-store { border-top-color: var(--store-soft-edge); }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .store-app { --store-soft-edge: #718578; --store-glass-edge: #718578; }
+  .store-app .store-page-hero :is(.store-kph-search input, .store-date-search, .store-search-input, .store-create-cta, .store-date-scan, .report-change-template, .report-composer-info) { border-color: white; }
+}
+/* A soft canvas separates white content from the green hero without new layers.
+   Gradients/shadows are static: no per-row filters or animation. */
+.store-app .store-page-layout > .store-page-surface {
+  background-image: linear-gradient(155deg, #f3f9f6, #fff 45%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 -6px 24px rgb(0 50 34 / 12%);
+}
+.store-app.store-screen-home .store-launcher-grid .store-module {
+  background-image: var(--store-glass-sheen);
+  box-shadow: var(--store-soft-card-shadow);
+}
+.store-app.store-screen-home .store-module-copy small { color: #4f6274; }
+.store-app.store-screen-home .store-launcher-grid .store-module-icon {
+  background-image: linear-gradient(145deg, rgb(255 255 255 / 16%), transparent 60%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 4px 10px rgb(0 60 40 / 12%);
+}
+.store-app .store-home-attention > button {
+  background-image: var(--store-glass-sheen);
+  box-shadow: var(--store-soft-card-shadow);
+}
+.store-app .store-page-hero .store-create-cta { box-shadow: var(--store-glass-shadow); }
+.store-app :is(.store-ticket, .store-date-lot:not(.is-active)) {
+  box-shadow: 0 2px 7px rgb(0 60 40 / 4%);
+}
+/* At most two small blur surfaces: capsule toolbar + floating report dock.
+   The utility button can coexist with both: tint/sheen only, no third blur.
+   Never animate the filter, add will-change, or blur a viewport/list/card. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .store-app {
+    --store-glass-surface: rgb(255 255 255 / 68%);
+    --store-glass-dock: rgb(255 255 255 / 78%);
+    --store-glass-hero-surface: rgb(255 255 255 / 80%);
+    --store-glass-hero-mint: rgb(230 247 242 / 76%);
+    --store-glass-peach: rgb(255 240 230 / 78%);
+  }
+  .store-app :is(.store-mobile-toolbar, .store-action-dock[data-floating="true"]) {
+    -webkit-backdrop-filter: blur(var(--store-glass-blur));
+    backdrop-filter: blur(var(--store-glass-blur));
+  }
+}
+/* Suspend background filtering during dialogs as well as respecting OS/browser preferences. */
+@media (prefers-reduced-transparency: reduce), (prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .store-app {
+    --store-glass-surface: #f9fdfb;
+    --store-glass-peach: #fff0e6;
+    --store-glass-dock: #f9fdfb;
+    --store-glass-hero-surface: #fff;
+    --store-glass-hero-mint: #e6f7f2;
+    --store-glass-blur: 0px;
+    --store-glass-sheen: none;
+    --store-glass-shadow: none;
+    --store-soft-card-shadow: none;
+  }
+  .store-app :is(.store-mobile-toolbar, .store-quick-fab, .store-action-dock[data-floating="true"]) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+body:has([data-slot="dialog-overlay"]) .store-app :is(.store-mobile-toolbar, .store-quick-fab, .store-action-dock[data-floating="true"]) {
+  background: var(--store-glass-solid-surface, #fff);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+body:has([data-slot="dialog-overlay"]) .store-app .store-quick-fab { --store-glass-solid-surface: #fff0e6; }

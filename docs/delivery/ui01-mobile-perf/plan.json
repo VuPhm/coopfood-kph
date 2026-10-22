@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "id": "ui01-mobile-perf",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Match Home hairline surface style, compact auxiliary mobile UI, then reduce measured startup work without workflow changes.",
+  "inScope": [
+    "Home-style thin decorative edges; keep focus/selection explicit",
+    "Mobile auxiliary spacing/cards/settings/dock; fonts and >=44px targets preserved",
+    "Measure startup, scroll and popup; defer report feature code from Home when evidence supports it"
+  ],
+  "outOfScope": [
+    "Business/API/auth/data changes",
+    "Desktop geometry redesign",
+    "Backend, packages/ui, root config/lockfile",
+    "Merge, push, Pages or deployment"
+  ],
+  "baseSha": "90af8cbe4ff874016fd11e84d927544a5d786a4a",
+  "candidateSha": "d4d254cf2a6a3e37ab3de7ffcd426bb3bdb6c9c6",
+  "integrationOwner": "UI01 current chat, sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/check-kph-colors.cjs",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/ui01-light-glass.md",
+    "docs/delivery/ui01-mobile-perf/**",
+    "e2e/scripts/check-store-page-kit.cjs",
+    "e2e/scripts/check-report-loading.cjs",
+    "e2e/scripts/check-report-offline.cjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "d4d254cf2a6a3e37ab3de7ffcd426bb3bdb6c9c6",
+      "evidence": "docs/delivery/ui01-mobile-perf/technical.md"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Owner review Home-style edges, compact mobile and first Reports entry on a real phone at http://127.0.0.1:4251/#home. No merge/deploy authorized.",
+  "authorization": "Direct user messages 22/10/2026: “viền như các mục home là đạt”; async answer “Cả hai, làm mobile trước”.",
+  "preview": "http://127.0.0.1:4251/#home"
+}

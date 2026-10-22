@@ -1,5 +1,23 @@
 # Trạng thái hiện tại
 
+**UI01 mobile/performance — candidate chờ nghiệm thu, 22/10/2026:** theo owner
+“viền như các mục Home” và “Cả hai, làm mobile trước”. Giữ mép Home làm mẫu,
+viền phụ alpha6%, focus/selection rõ. Mobile giảm khoảng phụ: Home attention
+lên86px, KPH18px/DATE12px/report36px ở390px; record/type/touch/header72 giữ
+nguyên, desktop geometry không đổi. Deferred reports giảm JS Home19,6%
+(546.931→439.943B); loading/error/deep link/offline đã kiểm. 233 tests/build/
+Playwright technical PASS; owner và thiết bị thật pending. Preview
+<http://127.0.0.1:4247/#home>; [kết quả/giới hạn](delivery/ui01-mobile-perf/technical.md).
+Main/Pages không đổi, chưa merge/push.
+
+**UI01 — soft depth candidate từ đúng `cbf750a`, 22/10/2026:** khách chưa đạt
+round trước vì thô/phẳng. Thêm gradient mint sáng ở canvas, sheen/shadow mềm
+cho thẻ Home/CTA/navigation, bóng sát mép ở list. Blur10px tối đa hai vùng;
+capsule68%/dock78%, hero80%/mint76%, utility chỉ tint. Giữ geometry/workflow,
+fallback đặc và round compact mobile để sau. Build/PWA và Playwright technical
+đạt; visual/thiết bị thật pending. Preview <http://127.0.0.1:4247/#home>;
+[phạm vi/base/checks](delivery/ui01-light-glass.md). Bản thử0041ac0 đã thay thế.
+
 **Page kit/Home/navigation đã tích hợp — CLOSED 22/10/2026:** theo owner
 “cho phép merge”, checkpoint `af425bb` merge vào main local tại `cbf750a`.
 Kiểm trực tiếp main: `VITEST_MAX_WORKERS=2 npm run verify` PASS 286 tests/
