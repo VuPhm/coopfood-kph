@@ -25,7 +25,7 @@ async function hit(locator) {
       if(mobile){
         await expect(tabs.getByRole('link')).toHaveCount(3);
         const surface=await tabs.evaluate(el=>{const s=getComputedStyle(el);return {background:s.backgroundColor,backdrop:s.backdropFilter,webkitBackdrop:s.webkitBackdropFilter||'none',filter:s.filter,opacity:s.opacity}});
-        expect(surface).toEqual({background:'rgb(249, 253, 251)',backdrop:'none',webkitBackdrop:'none',filter:'none',opacity:'1'});
+        expect(surface).toEqual({background:'rgb(255, 255, 255)',backdrop:'none',webkitBackdrop:'none',filter:'none',opacity:'1'});
         await expect(tabs.locator('[data-recent-feature]')).toHaveText('Tính năng');
         const r=await tabs.boundingBox();expect(r.height).toBe(64);expect(r.x).toBeGreaterThanOrEqual(12);expect(r.x+r.width).toBeLessThanOrEqual(viewport.width-12);expect(r.y+r.height).toBe(viewport.height-12);
       }else{

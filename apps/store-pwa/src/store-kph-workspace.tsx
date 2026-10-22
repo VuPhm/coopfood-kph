@@ -11,7 +11,8 @@ import { StoreSheet, Summary } from "./store-sheet";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { EvidenceImageViewer } from "./image-viewer";
-import { StoreKphList } from "./store-kph-list";
+import { KPH_BATCH_SIZE, KPH_DATE_SHORTCUTS, kphDateRange } from "./store-kph-history";
+import { StoreKphMore, StoreKphList } from "./store-kph-list";
 import { KphQuickSort, KPH_SORT_OPTIONS } from "./store-kph-sort";
 import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, Maximize, Search, SlidersHorizontal } from "lucide-react";
 import { KphFormSkeleton } from "./store-kph-loading";
@@ -24,7 +25,6 @@ function dateIso(value: string) { try { return parseDisplayDate(value); } catch 
 const nameCollator = new Intl.Collator("vi");
 
 const labels: Record<KphKind, string> = { TPCN: "TP khô & khác", TPTS: "TP tươi sống" };
-const PAGE_SIZE = 25;
 export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChange, onNotice }: {
   records: RecordView[]; onRecordsChange: (records: RecordView[]) => void; onNotice: (message: string) => void;
 }) {
@@ -32,13 +32,17 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
   const [kind, setKind] = useState<KphKind>("TPTS");
   const createDialogRef = useRef<KphCreateHandle>(null);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [groupByDate, setGroupByDate] = useState(true);
+  const [collapsedDates, setCollapsedDates] = useState<string[]>([]);
   const [selection, setSelection] = useState<string[]>([]);
   const [approval, setApproval] = useState<"ALL" | ApprovalStatus>("ALL");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [sort, setSort] = useState("newest");
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const listRef = useRef<HTMLDivElement>(null);
+  const nextFocusId = useRef<string | null>(null);
+  const [shownCount, setShownCount] = useState(KPH_BATCH_SIZE);
   const [active, setActive] = useState<RecordView | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -46,7 +50,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
   const [image, setImage] = useState<{ src: string; alt: string } | null>(null);
   // Record URLs outlive workspace navigation. StoreApp owns the records in memory.
   const latestRecords = useRef(records); latestRecords.current = records;
-  useEffect(() => { setSelection([]); setPage(1); setActive(null); }, [kind, approval, from, to, sort, query]);
+  useEffect(() => { setSelection([]); setCollapsedDates([]); setShownCount(KPH_BATCH_SIZE); setActive(null); }, [kind, approval, from, to, sort, query]);
   const fromIso = from ? dateIso(from) : null, toIso = to ? dateIso(to) : null;
   const filterError = (from && !fromIso) || (to && !toIso) ? "Nhập ngày hợp lệ theo dd/mm/yyyy" : fromIso && toIso && fromIso > toIso ? "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc" : "";
   // Parse/normalize each record once per data update, not in every sort comparison.
@@ -65,11 +69,20 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
         return (sort === "oldest" ? -delta : delta) || a.record.id.localeCompare(b.record.id);
       }).map(({ record }) => record);
   }, [dateFiltered, kind, approval, sort, query]);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const visible = useMemo(() => filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE), [filtered, currentPage]);
+  const visible = useMemo(() => filtered.slice(0, shownCount), [filtered, shownCount]);
+  useLayoutEffect(() => {
+    if (!nextFocusId.current) return;
+    const row = Array.from(listRef.current?.querySelectorAll<HTMLElement>("[data-record-id]") ?? [])
+      .find(element => element.dataset.recordId === nextFocusId.current);
+    row?.querySelector<HTMLElement>(".store-ticket-open, .store-kph-row-open")?.focus({ preventScroll: true });
+    nextFocusId.current = null;
+  }, [visible]);
+  const totalByDate = useMemo(() => {
+    const totals = new Map<string, number>();
+    for (const record of filtered) totals.set(record.detectedDate, (totals.get(record.detectedDate) ?? 0) + 1);
+    return totals;
+  }, [filtered]);
   const eligible = visible.filter(r => selection.includes(r.id) && r.approvalStatus === "APPROVED");
-  const changePage = (next: number) => { setPage(next); setSelection([]); setActive(null); };
   // Keep modal props stable when only history/filter or account state changes.
   const save = useCallback(async (draft: CreatedRecordDraft) => {
     const record: RecordView = {
@@ -81,7 +94,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
       approvalStatus: "PENDING", note: draft.note,
       photos: draft.photos.map((p, i) => ({ id: p.id, blob: p.blob, fileName: p.fileName, src: URL.createObjectURL(p.blob), alt: `Ảnh minh chứng ${i + 1}` })),
     };
-    onRecordsChange([record, ...latestRecords.current]); setKind(draft.kind); setApproval("ALL"); setFrom(""); setTo(""); setPage(1); setSelection([]);
+    onRecordsChange([record, ...latestRecords.current]); setKind(draft.kind); setApproval("ALL"); setFrom(""); setTo(""); setShownCount(KPH_BATCH_SIZE); setSelection([]); setCollapsedDates([]);
     onNotice("Đã tạo phiếu trong phiên dữ liệu mẫu; chưa gửi lên hệ thống.");
   }, [onRecordsChange, onNotice]);
   function review(status: ApprovalStatus) {
@@ -114,16 +127,19 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
       <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div></StoreStickyTabs>
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{filtered.length} phiếu</span></div>
-        <div className="store-kph-list-toolbar"><KphQuickSort sort={sort} onChange={setSort} /><button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} /></div>
+        <div className="store-kph-list-toolbar"><KphQuickSort sort={sort} onChange={setSort} /><button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} groupByDate={groupByDate} onGroupByDateChange={value => { setGroupByDate(value); setCollapsedDates([]); }} /></div>
       </div>
-      {selectionMode ? <div className="store-batch"><label><input type="checkbox" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
+      {selectionMode ? <div className="store-batch"><label><input type="checkbox" aria-label="Chọn tất cả" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
         const visibleIds = new Set(visible.map(r => r.id));
         setSelection(e.target.checked ? [...new Set([...selection, ...visibleIds])] : selection.filter(id => !visibleIds.has(id)));
-      }} />Chọn tất cả</label><span>{selection.length} đã chọn</span><Button className="store-export" disabled={!selection.length} onClick={() => { setError(""); setExportOpen(true); }}><img src={figmaAsset("124-445", "imgFileDown")} alt="" />Xuất Excel</Button></div> : null}
+      }} />Chọn tất cả đã hiện</label><span>{selection.length} đã chọn</span><small>Chỉ chọn phiếu đã hiển thị</small><Button className="store-export" disabled={!selection.length} onClick={() => { setError(""); setExportOpen(true); }}><img src={figmaAsset("124-445", "imgFileDown")} alt="" />Xuất Excel</Button></div> : null}
       {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
-      <StoreKphList desktop={desktop} visible={visible} selectionMode={selectionMode} selection={selection} setSelection={setSelection} setActive={setActive} />
+      <div ref={listRef}><StoreKphList desktop={desktop} visible={visible} totalByDate={totalByDate} groupByDate={groupByDate} collapsedDates={collapsedDates} onToggleDate={date => setCollapsedDates(dates => dates.includes(date) ? dates.filter(value => value !== date) : [...dates, date])} selectionMode={selectionMode} selection={selection} setSelection={setSelection} setActive={setActive} /></div>
       {!visible.length ? <p className="store-muted store-empty">Không có phiếu phù hợp bộ lọc.</p> : null}
-      {totalPages > 1 ? <div className="store-pagination"><span>{(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)} / {filtered.length}</span><button disabled={currentPage <= 1} onClick={() => changePage(currentPage - 1)} aria-label="Trang trước"><img data-figma-render-width="18" data-figma-render-height="18" className="is-previous" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button><button disabled={currentPage >= totalPages} onClick={() => changePage(currentPage + 1)} aria-label="Trang sau"><img data-figma-render-width="18" data-figma-render-height="18" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button></div> : null}
+      <StoreKphMore shown={visible.length} total={filtered.length} onMore={() => { nextFocusId.current = filtered[visible.length]?.id ?? null;
+        const newDates = new Set(filtered.slice(visible.length, shownCount + KPH_BATCH_SIZE).map(record => record.detectedDate));
+        setCollapsedDates(dates => dates.filter(date => !newDates.has(date)));
+        setShownCount(count => count + KPH_BATCH_SIZE); }} />
     </StorePageSurface>
     <KphCreateControl ref={createDialogRef} onSaved={save} />
 
@@ -140,27 +156,36 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
 });
 
 // Opening filters updates this control only; history data changes still belong to the workspace.
-const KphFilterControl = memo(function KphFilterControl({ from, onFromChange, to, onToChange, approval, onApprovalChange, sort, onSortChange, filterError }: {
+const KphFilterControl = memo(function KphFilterControl({ from, onFromChange, to, onToChange, approval, onApprovalChange, sort, onSortChange, filterError, groupByDate, onGroupByDateChange }: {
   from: string; onFromChange: (value: string) => void;
   to: string; onToChange: (value: string) => void;
   approval: "ALL" | ApprovalStatus; onApprovalChange: (value: "ALL" | ApprovalStatus) => void;
   sort: string; onSortChange: (value: string) => void; filterError: string;
+  groupByDate: boolean; onGroupByDateChange: (value: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
   const summaryId = useId();
-  const activeCount = Number(Boolean(from)) + Number(Boolean(to)) + Number(approval !== "ALL") + Number(sort !== "newest");
+  const activeCount = Number(Boolean(from)) + Number(Boolean(to)) + Number(approval !== "ALL") + Number(sort !== "newest") + Number(!groupByDate);
   return <>
     <button className={`store-filter ${activeCount ? "is-filtered" : ""}`} aria-label="Lọc phiếu KPH" aria-describedby={summaryId} onClick={() => setOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeCount ? <span className="store-filter-count" aria-hidden="true">{activeCount}</span> : null}</button>
-    <span id={summaryId} className="sr-only">{activeCount ? `${activeCount} tiêu chí lọc hoặc sắp xếp đang dùng` : "Chưa có bộ lọc"}</span>
+    <span id={summaryId} className="sr-only">{activeCount ? `${activeCount} tiêu chí lọc, sắp xếp hoặc trình bày đang dùng` : "Chưa có bộ lọc"}</span>
     <StoreSheet open={open} onOpenChange={setOpen} className="store-kph-sheet store-kph-filter" title="Lọc & sắp xếp" description="Bộ lọc phiếu áp dụng ngay khi thay đổi">
       <section className="store-kph-filter-section" aria-labelledby="kph-filter-dates"><h3 id="kph-filter-dates"><CalendarDays size={18} aria-hidden="true" />Ngày phát hiện hàng KPH</h3>
+        <div className="store-kph-date-shortcuts" role="group" aria-label="Lọc nhanh ngày phát hiện">{KPH_DATE_SHORTCUTS.map(shortcut => {
+          const range = kphDateRange(shortcut.value);
+          return <button key={shortcut.value} type="button" aria-pressed={from === range.from && to === range.to} onClick={() => {
+            const next = kphDateRange(shortcut.value);
+            onFromChange(next.from); onToChange(next.to);
+          }}>{shortcut.label}</button>;
+        })}</div>
         <div className="store-date-range"><div className="store-field"><label htmlFor="filter-from">Từ ngày</label><CalendarInput id="filter-from" label="Từ ngày" initialMonth={formatBusinessDate(new Date()).iso} value={from} onValueChange={onFromChange} /></div><span aria-hidden="true">→</span><div className="store-field"><label htmlFor="filter-to">Đến ngày</label><CalendarInput id="filter-to" label="Đến ngày" initialMonth={formatBusinessDate(new Date()).iso} value={to} onValueChange={onToChange} /></div></div>
         {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
       </section>
       <section className="store-kph-filter-section" aria-labelledby="kph-filter-status"><h3 id="kph-filter-status"><CircleCheck size={18} aria-hidden="true" />Trạng thái duyệt</h3><div className="store-choices" role="group" aria-label="Trạng thái duyệt">{([ ["ALL", "Tất cả"], ["PENDING", "Chờ duyệt"], ["APPROVED", "Đã duyệt"], ["REJECTED", "Không duyệt"] ] as const).map(([key, label]) => <button key={key} aria-pressed={approval === key} className={approval === key ? "is-selected" : ""} onClick={() => onApprovalChange(key)}><span>{label}</span><Check size={16} aria-hidden="true" className={approval === key ? "" : "is-hidden"} /></button>)}</div></section>
       <section className="store-kph-filter-section" aria-labelledby="kph-filter-sort"><h3 id="kph-filter-sort"><ArrowDownWideNarrow size={18} aria-hidden="true" />Sắp xếp</h3><div className="store-choices store-kph-filter-sort" role="group" aria-label="Thứ tự phiếu">{KPH_SORT_OPTIONS.map(({value, label}) => <button key={value} aria-pressed={sort === value} className={sort === value ? "is-selected" : ""} onClick={() => onSortChange(value)}><span>{label}</span><Check size={16} aria-hidden="true" className={sort === value ? "" : "is-hidden"} /></button>)}</div></section>
-      <p className="store-muted">Thay đổi áp dụng ngay. Lựa chọn phiếu được đặt lại khi đổi bộ lọc hoặc trang.</p>
-      <div className="store-kph-filter-footer"><button className="store-reset-filter" onClick={() => { onFromChange(""); onToChange(""); onApprovalChange("ALL"); onSortChange("newest"); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setOpen(false)}>Xong</Button></div>
+      <section className="store-kph-filter-section" aria-label="Trình bày danh sách"><button type="button" role="switch" aria-checked={groupByDate} aria-label="Nhóm theo ngày" className="store-kph-group-option" onClick={() => onGroupByDateChange(!groupByDate)}><span><strong>Nhóm theo ngày</strong><small>Thu gọn hoặc mở từng ngày</small></span><span className="store-kph-switch-track" aria-hidden="true"><span /></span></button></section>
+      <p className="store-muted">Thay đổi áp dụng ngay. Lựa chọn phiếu được đặt lại khi đổi loại phiếu, bộ lọc hoặc sắp xếp. Hiển thị thêm giữ các phiếu đang chọn.</p>
+      <div className="store-kph-filter-footer"><button className="store-reset-filter" onClick={() => { onFromChange(""); onToChange(""); onApprovalChange("ALL"); onSortChange("newest"); onGroupByDateChange(true); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setOpen(false)}>Xong</Button></div>
     </StoreSheet>
   </>;
 });

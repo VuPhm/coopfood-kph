@@ -1,5 +1,13 @@
 # Công việc kế tiếp
 
+**KPH02 revision5 — candidate22/10/2026:** mặc định bật Nhóm theo ngày; reset
+lọc trả về bật. Trong Chọn, checkbox ngày có vùng44×44px riêng; phần ngày/count/
+chevron vẫn thu/mở, giữ selection và collapse khi vào/thoát Chọn. Tắt nhóm: ngày
+mobile nằm cùng cụm SKU/số lượng căn trái. Nền trắng revision4 và UX click hàng/
+OTHER/tag scroll/lọc nhanh/nối25 giữ nguyên. Cùng task từ`982c04c`, online/API
+không đổi. Xem <http://127.0.0.1:4262/#kph>; chưa commit/merge/push/deploy,
+owner pending. [Bàn giao/phạm vi/checks](delivery/kph02-compact-history.md).
+
 **UI01 soft glass/mobile/performance — CLOSED 22/10/2026:** owner xác nhận
 “rất ổn, cho phép merge”. Đã tích hợp vào main local tại `982c04c`; source
 đúng candidate `d4d254c` đã duyệt. Gate tích hợp `VITEST_MAX_WORKERS=2 npm run

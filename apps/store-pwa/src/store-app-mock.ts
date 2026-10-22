@@ -11,7 +11,7 @@ const generatedKphRecords: RecordView[] = Array.from({ length: 56 }, (_, index) 
   const condition = kind === "TPCN"
     ? ["Cận date", "Hết HSD", "Rách bao bì", "Xì chân không", "Khác"][(number - 1) % 5]!
     : ["Dập úng", "Thối mốc", "Cận date", "Hết HSD", "Khác"][(number - 1) % 5]!;
-  const dayDate = new Date(Date.UTC(2026, 7, 15 - number));
+  const dayDate = new Date(Date.UTC(2026, 7, 14 - Math.floor((number - 1) / 5)));
   const detectedDate = `${String(dayDate.getUTCDate()).padStart(2, "0")}/${String(dayDate.getUTCMonth() + 1).padStart(2, "0")}/${dayDate.getUTCFullYear()}`;
   const approvalStatus = (["APPROVED", "PENDING", "REJECTED"] as const)[(number - 1) % 3]!;
   return {
@@ -21,7 +21,7 @@ const generatedKphRecords: RecordView[] = Array.from({ length: 56 }, (_, index) 
     supplier: "Nhà cung cấp mẫu", detectedDate, detectedBy: mockProfile.fullName,
     quantity: `${number % 4 + 1} ${kind === "TPCN" ? "EA" : "kg"}`,
     quantityValue: number % 4 + 1, unit: kind === "TPCN" ? "EA" : "kg",
-    condition, resolution: kind === "TPCN" ? (["Hủy", "Đổi", "Xuất trả", "Khác"] as const)[(number - 1) % 4]! : (["Hủy", "Khác"] as const)[(number - 1) % 2]!,
+    condition: number === 5 ? "Khác: bao bì có dấu hiệu ảnh hưởng, cần đối chiếu lô và kiểm tra thêm trước khi xử lý" : condition, resolution: number === 2 ? "Khác: chờ quản lý xác nhận hướng xử lý phù hợp" : kind === "TPCN" ? (["Hủy", "Đổi", "Xuất trả", "Khác"] as const)[(number - 1) % 4]! : (["Hủy", "Khác"] as const)[(number - 1) % 2]!,
     treatmentDate: "", approvalStatus, photos: [],
   };
 });

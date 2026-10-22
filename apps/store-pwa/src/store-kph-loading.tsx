@@ -8,7 +8,7 @@ import { KphSortButton } from "./store-kph-sort";
 import { KphCreateButton } from "./store-kph-create-button";
 import type { RecordView } from "./record-view";
 import { figmaAsset } from "./figma-assets";
-import { StoreKphList } from "./store-kph-list";
+import { StoreKphMore, StoreKphList } from "./store-kph-list";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 
 // These are existing session records, never fabricated online data. Hidden text
@@ -17,6 +17,11 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
   const desktop = useStoreDesktopLayout();
   const visible = useMemo(() => records.filter(record => record.kind === "TPTS")
     .sort((a, b) => b.detectedDate.split("/").reverse().join("-").localeCompare(a.detectedDate.split("/").reverse().join("-")) || a.id.localeCompare(b.id)).slice(0, 25), [records]);
+  const totalByDate = useMemo(() => {
+    const totals = new Map<string, number>();
+    for (const record of records) if (record.kind === "TPTS") totals.set(record.detectedDate, (totals.get(record.detectedDate) ?? 0) + 1);
+    return totals;
+  }, [records]);
   const total = records.filter(record => record.kind === "TPTS").length;
   return <StorePageLayout className="store-kph kph-loading-frame" aria-busy="true" aria-label="Đang tải KPH">
     <p className="sr-only" role="status">Đang tải KPH…</p>
@@ -30,8 +35,8 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{total} phiếu</span></div>
         <div className="store-kph-list-toolbar"><KphSortButton disabled sort="newest" /><button disabled className="store-compact" aria-pressed="false"><ListChecks size={20} aria-hidden="true" /><span>Chọn</span></button><button disabled className="store-filter" aria-label="Lọc phiếu KPH"><SlidersHorizontal size={20} aria-hidden="true" /></button></div>
       </div>
-      <StoreKphList desktop={desktop} visible={visible} loading />
-      {total > 25 ? <div className="store-pagination"><span>1–25 / {total}</span>{["Trang trước", "Trang sau"].map((label, index) => <button key={label} disabled aria-label={label}><img className={index === 0 ? "is-previous" : ""} src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></button>)}</div> : null}
+      <StoreKphList desktop={desktop} visible={visible} totalByDate={totalByDate} loading />
+      <StoreKphMore shown={visible.length} total={total} loading />
     </StorePageSurface>
   </StorePageLayout>;
 }
