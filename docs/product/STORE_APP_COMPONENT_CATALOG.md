@@ -1,5 +1,11 @@
 # Danh mục component Store App
 
+**Vật liệu/khối/viền — reference22/10/2026:**
+[STORE_APP_SURFACE_STYLE](STORE_APP_SURFACE_STYLE.md) ghi recipe thật và số đo
+Home, các token hiện có trong `store-glass.css`, cascade và cách áp có scope.
+Dùng trước khi thêm card style khác. Không có primitive/card API mới ở lượt
+hệ thống hoá này; các đề xuất refactor trong catalog vẫn là đề xuất.
+
 Rà soát **12/10/2026**, nhánh `store-app/figma-mobile-implementation`, base
 `c6d9fa5` và working tree có follow-up KPH/DATE ngày 11–12/10. Lượt này chỉ cập
 nhật tài liệu để quản lý/tìm component; đề xuất bên dưới chưa triển khai.

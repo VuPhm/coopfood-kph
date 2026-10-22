@@ -14,6 +14,8 @@ Thứ tự đọc bắt buộc cho mọi thay đổi:
 được mang từ hai repository tham chiếu. Hai repository đó là read-only.
 
 Hướng giao diện hiện tại: [Store App UI DNA](product/STORE_APP_UI_DNA.md).
+Quy tắc áp khối/viền theo Home: [Co.op Fresh — khối mềm, viền nhẹ](product/STORE_APP_SURFACE_STYLE.md)
+(`coop-fresh-soft-v1`); dùng cho phần owner chỉ định ở các round tiếp theo.
 [Round 2 shell handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md) xác định slice
 kiểm chứng tiếp theo; [UI DNA Tool KPH](product/UI_DNA.md) là evidence legacy.
 

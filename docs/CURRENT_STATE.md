@@ -1,5 +1,13 @@
 # Trạng thái hiện tại
 
+**UI03 — hệ thống hoá phong cách22/10/2026:**
+[Co.op Fresh — khối mềm, viền nhẹ](product/STORE_APP_SURFACE_STYLE.md)
+(`coop-fresh-soft-v1`) lấy Home trên main9089f47 làm reference: pastel viền
+trong suốt1px + sheen/bóng thấp, holder trắng viền `#dfe5e9`, glass có budget.
+Đã đối chiếu computed styles/screenshot390/1440; chỉ tài liệu, không đổi UI.
+Round sau từ main mới nhất, owner chỉ định phần cần áp; giữ contract và scope,
+không tự rollout. UI DNA/Visual DNA/catalog/frame đã trỏ tới cùng hướng dẫn.
+
 **KPH02 — CLOSED22/10/2026:** owner chấp nhận revision5 bằng “có thể merge”.
 Đã merge main local tại`146e2e1`, source đúng checkpoint`48438cf`: nhóm ngày mặc
 định bật, checkbox ngày/chạm thu mở riêng trong Chọn, ngày flat mobile căn trái;

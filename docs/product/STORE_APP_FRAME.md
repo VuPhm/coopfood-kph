@@ -53,7 +53,9 @@ bộ toàn app của owner ngày 22/10. Giữ form/busy/error/password/preview b
   brand/Back/title/store/account. Mẫu báo cáo chỉ cung cấp title/Back/ref.
   Login lắp cùng component vào slot appHeader, không có implementation riêng.
 - [StoreNavigation](../../apps/store-pwa/src/store-navigation.tsx): giữ sidebar
-  đủ bốn feature, mobile ba ô/nền đặc không glass, recent trong phiên.
+  đủ bốn feature, mobile ba ô, recent trong phiên. Vật liệu nav đã được UI01
+  thay bằng glass nhẹ có fallback đặc; xem
+  [khối/viền hiện tại](STORE_APP_SURFACE_STYLE.md). Geometry/semantics do frame giữ.
 - White surface có target `store-page-content`/tabIndex-1; skip link vào nội
   dung trắng, bỏ qua hero. Focus control trên xanh đưa trang về đầu.
 

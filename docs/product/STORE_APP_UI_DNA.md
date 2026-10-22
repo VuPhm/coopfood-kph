@@ -1,5 +1,11 @@
 # Store App UI DNA
 
+Reference triển khai khối/viền cho round tiếp theo:
+[Co.op Fresh — khối mềm, viền nhẹ](STORE_APP_SURFACE_STYLE.md)
+(`coop-fresh-soft-v1`, 22/10/2026). Dùng Home làm mẫu, phân biệt pastel card,
+holder trắng và lớp nổi; giữ focus/selected và giới hạn blur. Đây là phần
+mở rộng đã hệ thống hoá của Co.op Fresh, không mở rollout ngoài scope owner.
+
 Implemented components, their consumers and variants, and the proposed extension
 priorities are indexed in the [component catalog](STORE_APP_COMPONENT_CATALOG.md)
 (reviewed 2026-10-12). Use it before introducing another control or Store pattern;

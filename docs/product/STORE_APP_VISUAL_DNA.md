@@ -1,5 +1,14 @@
 # Store App Visual DNA — Co.op Fresh
 
+**Khối/viền tham chiếu hiện tại — 22/10/2026:**
+[Co.op Fresh — khối mềm, viền nhẹ](STORE_APP_SURFACE_STYLE.md)
+(`coop-fresh-soft-v1`) hệ thống hoá UI01 đã duyệt và palette trắng KPH02.
+Ưu tiên recipe/geometry đo từ Home trong tài liệu này khi áp vật liệu: card
+pastel viền trong suốt1px + sheen/shadow thấp; holder trắng viền1px `#dfe5e9`;
+glass chỉ lớp nổi nhỏ. Các mô tả Home phẳng/ít bóng, icon64px, artwork/slogan
+và palette cũ bên dưới là lịch sử nếu khác reference/page kit mới.
+Đây là hướng dẫn tái sử dụng, rollout chỉ tới phần owner chỉ định.
+
 **Palette revision4, đã duyệt cùng KPH revision5 ngày22/10/2026:** owner nhận xét canvas xám của
 revision3 “xấu dơ”. Bỏ mảng xám, dùng nền và sidebar trắng thuần`#fff`; holder
 trắng, viền mảnh`#dfe5e9`/bóng nhẹ; inner well gần trắng`#fafbfc` chỉ ở tab/
