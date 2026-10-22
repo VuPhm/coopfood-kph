@@ -71,7 +71,10 @@ async function audit(page, selector, state) {
         const rect = input.getBoundingClientRect(); if (!rect.width || input.disabled) continue;
         text(input, input.value || input.placeholder || input.tagName, [rect], input.value || !input.placeholder ? undefined : '::placeholder');
         const style = getComputedStyle(input), point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-        borders.push({ name: input.id || input.getAttribute('aria-label'), ratio: ratio(rgba(style.borderTopColor), background(input.parentElement, point)) });
+        // A translucent edge paints over the field fill. That composed contour,
+        // rather than the border's uncomposited RGB, must separate it from the page.
+        const contour = blend(rgba(style.borderTopColor), background(input, point));
+        borders.push({ name: input.id || input.getAttribute('aria-label'), ratio: ratio(contour, background(input.parentElement, point)) });
       }
     }
     for (const root of roots) for (const el of root.querySelectorAll(':focus-visible, .choice-card:has(input:checked), .store-choices .is-selected, .store-tabs [aria-pressed="true"], .store-quick-sort-options [aria-pressed="true"], .store-date-statuses [aria-pressed="true"]')) {

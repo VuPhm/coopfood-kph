@@ -13,7 +13,8 @@ Giữ round compact kích thước phần phụ mobile cho lượt sau.
   Evidence cũ trong `.local/light-glass` / `.local/modal-inp/light-glass-build`
   không dùng để nghiệm thu candidate này. Main không bị sửa.
 - Preview build <http://127.0.0.1:4247/#home> và các route KPH/DATE/Báo cáo.
-- Chưa commit/merge/push/deploy, không thay Pages.
+- Checkpoint soft-depth local `90af8cb`; chưa merge/push/deploy, không thay Pages.
+  Round viền/mobile/performance tiếp tục trong [hồ sơ UI01](ui01-mobile-perf/technical.md).
 
 ## Thay đổi
 

@@ -11,6 +11,9 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));let accountAnchor,backAnchor;
   for(const route of routes){
    await page.goto(`${base}/#${route}`);
+   // Measure the loaded report frame, not the transient feature placeholder.
+   // Slow/failed chunk behavior has its own deferred-loading gate.
+   if(route==='reports')await expect(page.getByRole('heading',{name:'Chọn báo cáo',exact:true})).toBeVisible();
    await expect(page.locator('.store-page-layout')).toHaveCount(1);await expect(page.locator('.store-header')).toHaveCount(1);
    if(route!=='login')await expect(page.getByRole('button',{name:'Tài khoản và cửa hàng',exact:true})).toBeEnabled();
    await page.evaluate(()=>document.fonts.ready);

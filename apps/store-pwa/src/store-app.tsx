@@ -1,15 +1,14 @@
-import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
+import { StorePageHero, StorePageLayout, StorePageSurface, StoreReportPage } from "./store-page-hero";
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
 import { History } from "lucide-react";
-import { FeatureLoadBoundary, FeatureLoadError } from "./feature-loading";
+import { FeatureLoadBoundary, FeatureLoadError, KphLoadingSkeleton } from "./feature-loading";
 import { PwaStatus } from "./pwa-status";
 
 import { ShelfLifeScreen, useShelfLifeLookup } from "./store-shelf-life";
 import { useShelfLookupHistory } from "./store-shelf-history";
 import { DateWorkspace } from "./store-date-workspace";
 import { StoreNotifications } from "./store-notifications";
-import { ReportHub } from "./store-report-hub";
 import { StoreLogin } from "./store-login";
 import { StoreAccountControl } from "./store-account-sheet";
 import { mockDateLots, mockProfile, mockRecords } from "./store-app-mock";
@@ -38,6 +37,26 @@ function LazyKphWorkspace(props: ComponentProps<KphWorkspaceComponent>) {
   }, [Workspace]);
   if (failed) return <StorePageLayout><StorePageHero /><StorePageSurface><FeatureLoadError /></StorePageSurface></StorePageLayout>;
   return Workspace ? <Workspace {...props} /> : <KphWorkspaceSkeleton records={props.records} />;
+}
+
+// Report composition/history is not startup work for Home or other features.
+// Keep the frame visible and a local recovery action when a feature chunk fails.
+type ReportHubComponent = typeof import("./store-report-hub").ReportHub;
+let loadedReportHub: ReportHubComponent | null = null;
+function DeferredReportHub(props: ComponentProps<ReportHubComponent>) {
+  const [Hub, setHub] = useState(() => loadedReportHub);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (Hub) return;
+    let current = true;
+    import("./store-report-hub").then(module => {
+      loadedReportHub = module.ReportHub;
+      if (current) setHub(() => module.ReportHub);
+    }).catch(() => { if (current) setFailed(true); });
+    return () => { current = false; };
+  }, [Hub]);
+  if (Hub) return <Hub {...props} />;
+  return <StoreReportPage>{failed ? <FeatureLoadError /> : <KphLoadingSkeleton compact label="Đang tải báo cáo" />}</StoreReportPage>;
 }
 
 export function StoreApp() {
@@ -86,7 +105,7 @@ function StoreAppContent() {
       {screen === "shelf" ? <StorePageLayout><StorePageHero /><StorePageSurface className="store-shelf-surface"><div className="store-shelf-page"><ShelfLifeScreen history={shelfHistory.history} onCalculated={shelfHistory.remember} /></div></StorePageSurface></StorePageLayout> : null}
       {screen === "kph" ? <FeatureLoadBoundary><LazyKphWorkspace records={records} onRecordsChange={setRecords} onNotice={setNotice} /></FeatureLoadBoundary> : null}
       {screen === "date" ? <DateWorkspace lots={dateLots} onLotsChange={setDateLots} /> : null}
-      {screen === "reports" ? <ReportHub lots={dateLots} /> : null}
+      {screen === "reports" ? <FeatureLoadBoundary><DeferredReportHub lots={dateLots} /></FeatureLoadBoundary> : null}
       {screen === "notifications" ? <StoreNotifications navigate={navigate} /> : null}
       {showQuickLookup ? <button ref={quickFabRef} hidden={quickOpen} className="store-quick-fab" aria-label="Mở tiện ích tra cứu lùi hàng" aria-expanded={quickOpen} aria-controls={quickOpen ? "store-quick-panel" : undefined} onClick={() => setQuickOpen(open => !open)}><History size={22} strokeWidth={1.8} aria-hidden="true" /><span>Tra hạn lùi</span></button> : null}
       {showQuickLookup ? <Dialog open={quickOpen} onOpenChange={setQuickOpen}><DialogContent id="store-quick-panel" ref={quickPanelRef} className="store-quick-panel" aria-label="Tra cứu lùi hàng nhanh" aria-labelledby={undefined} closeLabel="Đóng tiện ích" onOpenAutoFocus={event => { event.preventDefault(); quickPanelRef.current?.focus(); }} onCloseAutoFocus={event => { event.preventDefault(); window.requestAnimationFrame(() => quickFabRef.current?.focus()); }}><DialogHeader><DialogTitle>Tra cứu lùi hàng</DialogTitle></DialogHeader><DialogDescription className="sr-only">Tra hạn lùi tự động theo thông tin ngày đã nhập</DialogDescription><div className="store-modal-body"><ShelfLifeScreen idPrefix="quick-shelf" lookup={quickLookup} /></div></DialogContent></Dialog> : null}

@@ -1,5 +1,12 @@
 # Công việc kế tiếp
 
+**UI01 mobile/performance — AWAITING_ACCEPTANCE, 22/10/2026:** mở
+<http://127.0.0.1:4247/#home>; xem Home gọn, viền phụ nhẹ theo Home, thử
+KPH/DATE đổi tab/tìm/chọn/lọc và Báo cáo lần đầu. Cỡ chữ/record/touch giữ
+nguyên; JS nạp khi mở Home giảm19,6%, popup/scroll/offline technical đạt. Chờ owner
+xem trên thiết bị thật; không tự mở thêm round hoặc merge/deploy.
+[Phạm vi và evidence](delivery/ui01-mobile-perf/technical.md).
+
 **UI01 — xem soft depth mới trên baseline `cbf750a`, 22/10/2026:** mở
 <http://127.0.0.1:4247/#home>, kiểm capsule ba ô và utility/dock trong Báo cáo.
 Giữ page kit/Home gọn; thêm gradient/shadow mềm theo feedback thô/phẳng.

@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "ui01-mobile-perf",
+  "revision": 1,
+  "status": "VERIFYING",
+  "objective": "Match Home hairline surface style, compact auxiliary mobile UI, then reduce measured startup work without workflow changes.",
+  "inScope": [
+    "Home-style thin decorative edges; keep focus/selection explicit",
+    "Mobile auxiliary spacing/cards/settings/dock; fonts and >=44px targets preserved",
+    "Measure startup, scroll and popup; defer report feature code from Home when evidence supports it"
+  ],
+  "outOfScope": [
+    "Business/API/auth/data changes",
+    "Desktop geometry redesign",
+    "Backend, packages/ui, root config/lockfile",
+    "Merge, push, Pages or deployment"
+  ],
+  "baseSha": "90af8cbe4ff874016fd11e84d927544a5d786a4a",
+  "candidateSha": "",
+  "integrationOwner": "UI01 current chat, sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/check-kph-colors.cjs",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/ui01-light-glass.md",
+    "docs/delivery/ui01-mobile-perf/**",
+    "e2e/scripts/check-store-page-kit.cjs",
+    "e2e/scripts/check-report-loading.cjs",
+    "e2e/scripts/check-report-offline.cjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Capture baseline, soften edges, compact mobile, measure and optimize startup, verify candidate for owner review.",
+  "authorization": "Direct user messages 22/10/2026: “viền như các mục home là đạt”; async answer “Cả hai, làm mobile trước”."
+}
