@@ -304,4 +304,51 @@ describe("Create KPH record", () => {
     expect(onSaved.mock.calls[0]?.[0].photos[0]).toHaveProperty("originalFile", expect.any(File));
     expect(onSaved.mock.calls[0]?.[0].photos[0]).toHaveProperty("capturedAt", expect.any(Date));
   });
+  it.each(["TPCN", "TPTS"] as const)("groups quantity with goods in Fresh %s without changing defaults", kind => {
+    render(<CreateRecordDialog kind={kind} open presentation="screen" profile={DEFAULT_STORE_PROFILE} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    const groups = screen.getAllByRole("heading", { level: 3 });
+    expect(groups.map(h => h.textContent)).toEqual(["1. Hàng hóa", "2. Tình trạng", "3. Xử lý", "4. Ghi nhận"]);
+    expect(within(groups[0]!.closest("section")!).getByRole("textbox", { name: "Số lượng" })).toHaveValue("1");
+    expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+    const conditions = screen.getByRole("group", { name: "Tình trạng" });
+    expect(within(conditions).getByRole("radio", { name: kind === "TPCN" ? "Cận date" : "Dập úng" })).toBeChecked();
+    fireEvent.click(within(conditions).getByRole("radio", { name: "Khác" }));
+    expect(screen.getByRole("textbox", { name: "Nội dung tình trạng khác" })).toBeVisible();
+  });
+
+  it("connects inline validation to invalid product, barcode and quantity controls", async () => {
+    renderDialog();
+    const barcode = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    const quantity = screen.getByRole("textbox", { name: "Số lượng" });
+    const product = screen.getByRole("textbox", { name: "Tên hàng hóa" });
+    fireEvent.change(quantity, { target: { value: "0" } });
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    await waitFor(() => expect(product).toHaveAttribute("aria-invalid", "true"));
+    expect(product).toHaveAccessibleDescription("Nhập SKU/UPC hoặc tên hàng hóa");
+    expect(quantity).toHaveAttribute("aria-invalid", "true");
+    expect(quantity).toHaveAccessibleDescription("Số lượng phải lớn hơn 0");
+    fireEvent.change(barcode, { target: { value: "1".repeat(51) } });
+    fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
+    await waitFor(() => expect(barcode).toHaveAttribute("aria-invalid", "true"));
+    expect(barcode).toHaveAccessibleDescription("SKU/UPC tối đa 50 ký tự");
+  });
+
+  it("discards an image still processing when its draft is closed and reopened", async () => {
+    let finish!: (value: Awaited<ReturnType<typeof processEvidencePhoto>>) => void;
+    vi.mocked(processEvidencePhoto).mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+    const createUrl = vi.fn(() => "blob:late-image");
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: createUrl });
+    const props = { kind: "TPCN" as const, onSaved: vi.fn(), onOpenChange: vi.fn(), profile: DEFAULT_STORE_PROFILE };
+    const view = render(<CreateRecordDialog {...props} open />);
+    fireEvent.change(screen.getByLabelText("Chọn ảnh"), { target: { files: [new File(["synthetic"], "late.png", { type: "image/png" })] } });
+    await screen.findByText("Đang tối ưu và đóng tem ảnh…");
+    view.rerender(<CreateRecordDialog {...props} open={false} />);
+    view.rerender(<CreateRecordDialog {...props} open />);
+    finish({ blob: new Blob(["late"]), capturedAt: new Date(), width: 1, height: 1 });
+    await waitFor(() => expect(screen.getByLabelText("Chọn ảnh")).toBeEnabled());
+    expect(screen.getByText("Chưa chọn ảnh")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Xem ảnh minh chứng 1" })).not.toBeInTheDocument();
+    expect(createUrl).not.toHaveBeenCalled();
+  });
+
 });

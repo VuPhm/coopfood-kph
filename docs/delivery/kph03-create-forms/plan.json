@@ -28,7 +28,8 @@
     "e2e/scripts/check-kph-create-forms.cjs",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
-    "docs/delivery/kph03-create-forms/**"
+    "docs/delivery/kph03-create-forms/**",
+    "apps/store-pwa/src/store-glass.css"
   ],
   "reviewLimit": 2,
   "reviewRound": 1,

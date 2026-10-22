@@ -16,6 +16,7 @@ import { StoreKphMore, StoreKphList } from "./store-kph-list";
 import { KphQuickSort, KPH_SORT_OPTIONS } from "./store-kph-sort";
 import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, Maximize, Search, SlidersHorizontal } from "lucide-react";
 import { KphFormSkeleton } from "./store-kph-loading";
+import "./store-kph-create-forms.css";
 import { KphCreateButton } from "./store-kph-create-button";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 

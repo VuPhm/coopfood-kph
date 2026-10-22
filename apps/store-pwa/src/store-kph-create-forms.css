@@ -1,0 +1,87 @@
+/* KPH creation only: Home soft surfaces, no additional filter/layers. */
+.store-create-screen[data-kind] .create-dialog-form,
+.store-create-screen[data-kind][data-reviewing="true"] .store-form-review {
+  gap: 12px; padding: 16px 16px 0;
+  scroll-padding: 16px 0 calc(96px + env(safe-area-inset-bottom));
+  align-content: start;
+}
+.store-create-screen[data-kind] .form-section {
+  padding: 14px; border-color: var(--store-holder-edge); background: var(--store-holder-surface);
+  box-shadow: var(--store-soft-card-shadow);
+}
+.store-create-screen[data-kind] .form-section > h3 { margin-bottom: 12px; }
+.store-create-screen[data-kind] .form-section > h3::before { background-image: var(--store-glass-sheen); }
+.store-create-screen[data-kind] .kph-create-discovery {
+  display: grid; grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 160px); align-items: center; gap: 8px;
+}
+.store-create-screen[data-kind] .kph-create-discovery input[readonly],
+.store-create-screen[data-kind] .kph-create-discovery .store-form-skeleton-input { height: 44px; }
+.store-create-screen[data-kind] .kph-create-quantity {
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--store-holder-edge);
+}
+.store-create-screen[data-kind] .kph-create-quantity > .grid { max-width: none; align-items: start; }
+.store-create-screen[data-kind] .unit-fieldset { height: auto; min-width: 0; padding: 0; margin: 0; }
+.store-create-screen[data-kind] .unit-fieldset legend { margin-bottom: 4px; }
+.store-create-screen[data-kind] .unit-options { background: var(--store-canvas); }
+.store-create-screen[data-kind] .form-section .choice-card {
+  min-height: 52px; border-color: transparent; border-radius: 14px;
+  background-color: var(--cf-label-surface); background-image: var(--store-glass-sheen);
+  box-shadow: var(--store-soft-card-shadow);
+  transition: background-color var(--cf-motion-fast) ease, border-color var(--cf-motion-fast) ease;
+}
+.store-create-screen[data-kind] .form-section .choice-card:hover { border-color: var(--cf-label-ink); transform: none; }
+.store-create-screen[data-kind] .form-section .choice-card:has(input:checked) {
+  border-color: var(--cf-label-ink); box-shadow: inset 0 0 0 1px var(--cf-label-ink);
+}
+.store-create-screen[data-kind] .choice-icon { border-radius: 50%; }
+.store-create-screen[data-kind] .choice-indicator { border-color: var(--store-control-line); }
+.store-create-screen[data-kind] .photo-picker { transition: background-color var(--cf-motion-fast) ease, border-color var(--cf-motion-fast) ease; }
+.store-create-screen[data-kind] .photo-picker:hover { transform: none; box-shadow: none; }
+.store-create-screen[data-kind] .form-section .photo-picker { background-image: var(--store-glass-sheen); border-color: transparent; box-shadow: var(--store-soft-card-shadow); }
+.store-create-screen[data-kind] .photo-preview { animation: none; }
+.store-create-screen[data-kind] .photo-preview-remove { width: 44px; height: 44px; top: 2px; right: 2px; }
+.store-create-screen[data-kind] .photo-picker:has(input:focus-visible) { outline: 3px solid var(--store-focus); outline-offset: 3px; }
+.store-create-screen[data-kind] [id="kph-photo-feedback"]:focus { outline: 3px solid var(--store-focus); outline-offset: 3px; border-radius: 6px; }
+.store-create-screen[data-kind] .form-section :is(input, textarea)[aria-invalid="true"] { border-color: var(--store-error-ink); background-color: var(--store-error-soft); }
+.store-create-screen[data-kind] .create-dialog-footer {
+  grid-column: 1 / -1; grid-template-columns: 112px minmax(0, 1fr);
+  margin-inline: -16px; padding-inline: 16px;
+  border-top-color: var(--store-holder-edge); box-shadow: 0 -4px 12px rgb(28 44 64 / 4%);
+}
+.store-create-screen[data-kind] .create-dialog-footer button { min-height: 48px; height: auto; white-space: nowrap; }
+.store-create-screen[data-kind] .create-dialog-footer button:first-child { border-color: var(--store-holder-edge); }
+.store-create-screen[data-kind] .store-review-section {
+  padding: 14px; border: 1px solid var(--store-holder-edge); border-radius: 18px;
+  background: var(--store-holder-surface); box-shadow: var(--store-soft-card-shadow);
+}
+.store-create-screen[data-kind] .store-review-section .store-summary { border: 0; border-radius: 0; background: transparent; }
+.store-create-screen[data-kind] .store-review-section .store-summary > div { padding-inline: 0; border-color: var(--store-holder-edge); }
+.store-create-screen[data-kind] .store-form-evidence { padding: 12px 0 0; border: 0; border-top: 1px solid var(--store-holder-edge); border-radius: 0; }
+.store-create-screen[data-kind] .store-review-notice { background-image: var(--store-glass-sheen); }
+@media (min-width: 900px) {
+  .store-create-screen[data-kind] .create-dialog-form > .form-section:nth-of-type(1),
+  .store-create-screen[data-kind] .create-dialog-form > .form-section:nth-of-type(4) { grid-column: 1 / -1; }
+  .store-create-screen[data-kind] .create-dialog-form > .form-section:nth-of-type(2),
+  .store-create-screen[data-kind] .create-dialog-form > .form-section:nth-of-type(3) { grid-column: auto; }
+  .store-create-screen[data-kind] .create-dialog-footer { grid-template-columns: auto auto; }
+  .store-create-screen[data-kind] .kph-create-quantity { max-width: 400px; }
+  .store-create-screen[data-kind] .form-section:first-of-type > .grid > :last-child { grid-column: 1 / -1; }
+  .store-create-screen[data-kind] .kph-create-discovery { grid-template-columns: auto 160px; justify-content: start; }
+  .store-create-screen[data-kind] .kph-create-quantity input:not([type="radio"]),
+  .store-create-screen[data-kind] .kph-create-quantity .store-form-skeleton-input { height: 52px; }
+}
+@media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .store-create-screen[data-kind] .create-dialog-footer { box-shadow: none; }
+  .store-create-screen[data-kind] :is(.choice-card, .photo-picker) { transition: none; }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .store-create-screen[data-kind] .form-section,
+  .store-create-screen[data-kind] .store-review-section,
+  .store-create-screen[data-kind] .form-section .choice-card,
+  .store-create-screen[data-kind] .form-section .photo-picker { border-color: var(--store-control-line); }
+}
+
+/* Keep hidden native controls anchored to their visible hit area. */
+.store-create-screen[data-kind] :is(.choice-card, .photo-picker, .unit-options label) { position: relative; }
+.store-create-screen[data-kind] :is(.choice-card, .photo-picker, .unit-options label) > input.sr-only { top: 50%; left: 50%; }
