@@ -111,3 +111,10 @@ sau verify/panel chỉ là khai báo transition CSS đã nêu, được mock bui
 và gate form cuối xác minh. Không đổi implementation trong handoff.
 
 Main vẫn ở3fe1c9c, cây main sạch. Candidate ở nhánh riêng, chưa merge/push/deploy.
+
+## Quyết định sau preview
+
+Owner đã duyệt bằng “merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng”.
+KPH03 **CLOSED**, merge main local4cb54ae; gate main298 tests và browser hai
+form390/1440/320 PASS. Các ghi chú pending/main3fe1c9c ở trên là lịch sử trước
+quyết định; [hồ sơ nghiệm thu/tích hợp](merge-2026-10-22.md).

@@ -1,22 +1,23 @@
 {
   "schemaVersion": 1,
   "id": "kph03-create-forms",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "CLOSED",
   "objective": "Optimize both Store Fresh KPH creation forms TPCN/TPTS with Home soft surfaces, mobile-first composition, accessible validation and stable/performance-conscious loading/review.",
   "inScope": [
     "TPCN/TPTS Store Fresh create form and review, field/choice/photo hierarchy, mobile and desktop layout",
     "Field error linkage and recovery without changing validation/domain",
-    "Loading geometry parity, targeted tests and runnable mock preview"
+    "Loading geometry parity, targeted tests and runnable mock preview",
+    "Owner-authorized local main merge and closure"
   ],
   "outOfScope": [
     "API/backend/auth/business rules, option matrix/defaults, photos policy",
     "KPH history, Home, DATE, reports or global theme rollout",
     "Root config/lockfile/packages/ui changes",
-    "Automatic merge, push, Pages or deployment"
+    "Push, Pages or deployment"
   ],
   "baseSha": "146e2e16bd78c37bc0b726bdd73e1903d022571b",
-  "candidateSha": "a78e36842469ab90912b8e110dc0a7a7b59b1ddf",
+  "candidateSha": "4cb54ae60a3d1d4b6a4c901979ad39f6404b893e",
   "integrationOwner": "Current chat sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/create-record-dialog.tsx",
@@ -40,20 +41,33 @@
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 1,
-      "sha": "a78e36842469ab90912b8e110dc0a7a7b59b1ddf",
-      "evidence": "docs/delivery/kph03-create-forms/technical.md"
+      "revision": 2,
+      "sha": "4cb54ae60a3d1d4b6a4c901979ad39f6404b893e",
+      "evidence": "docs/delivery/kph03-create-forms/merge-2026-10-22.md"
     },
     {
       "id": "owner",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "4cb54ae60a3d1d4b6a4c901979ad39f6404b893e",
+      "evidence": "docs/delivery/kph03-create-forms/merge-2026-10-22.md",
+      "acceptedBy": "Repository owner in current chat",
+      "decisionRef": "Direct owner22/10/2026: “merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng”"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Accept and merge KPH forms; continue with separate shelf utility task",
+      "source": "Direct owner22/10/2026: “merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng”",
+      "impact": "Local main integration/closure only; shelf work starts separately",
+      "decision": "Merge4cb54ae, KPH03 CLOSED"
+    }
+  ],
   "blockers": [],
-  "nextAction": "Owner review both Fresh create forms at production mock preview4272: goods/quantity, choices/Other, evidence, review/edit. No merge/push/deploy authorized.",
-  "authorization": "Direct user22/10/2026: “146e2e1 từ đây áp tiếp cho kph; tối ưu toàn diệu cho 2 form tạo phiếu”.",
+  "nextAction": "KPH03 closed after accepted local main merge. Continue only the newly authorized separate shelf utility task. No push/Pages/deploy.",
+  "authorization": "Direct user22/10/2026: “146e2e1 từ đây áp tiếp cho kph; tối ưu toàn diệu cho 2 form tạo phiếu”. Direct owner merge authorization22/10/2026.",
   "preview": "http://127.0.0.1:4272/#kph"
 }
