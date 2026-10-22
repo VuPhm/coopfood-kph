@@ -1,22 +1,23 @@
 {
   "schemaVersion": 1,
   "id": "ui01-mobile-perf",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "CLOSED",
   "objective": "Match Home hairline surface style, compact auxiliary mobile UI, then reduce measured startup work without workflow changes.",
   "inScope": [
     "Home-style thin decorative edges; keep focus/selection explicit",
     "Mobile auxiliary spacing/cards/settings/dock; fonts and >=44px targets preserved",
-    "Measure startup, scroll and popup; defer report feature code from Home when evidence supports it"
+    "Measure startup, scroll and popup; defer report feature code from Home when evidence supports it",
+    "Owner-authorized merge into local main and acceptance records"
   ],
   "outOfScope": [
     "Business/API/auth/data changes",
     "Desktop geometry redesign",
     "Backend, packages/ui, root config/lockfile",
-    "Merge, push, Pages or deployment"
+    "Push, Pages or deployment"
   ],
   "baseSha": "90af8cbe4ff874016fd11e84d927544a5d786a4a",
-  "candidateSha": "d4d254cf2a6a3e37ab3de7ffcd426bb3bdb6c9c6",
+  "candidateSha": "982c04c86826b8c5542db9f28e5d77afa1b026bc",
   "integrationOwner": "UI01 current chat, sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -38,20 +39,33 @@
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 1,
-      "sha": "d4d254cf2a6a3e37ab3de7ffcd426bb3bdb6c9c6",
-      "evidence": "docs/delivery/ui01-mobile-perf/technical.md"
+      "revision": 2,
+      "sha": "982c04c86826b8c5542db9f28e5d77afa1b026bc",
+      "evidence": "docs/delivery/ui01-mobile-perf/merge-2026-10-22.md"
     },
     {
       "id": "owner",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "982c04c86826b8c5542db9f28e5d77afa1b026bc",
+      "evidence": "docs/delivery/ui01-mobile-perf/merge-2026-10-22.md",
+      "acceptedBy": "Repository owner in current chat",
+      "decisionRef": "Direct user message 22/10/2026: “rất ổn, cho phép merge”"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Accept current UI and merge",
+      "source": "Direct owner chat message 22/10/2026: “rất ổn, cho phép merge”",
+      "impact": "Local main integration and closure records only; implementation unchanged",
+      "decision": "Accepted; merge982c04c, no push/Pages/deploy"
+    }
+  ],
   "blockers": [],
-  "nextAction": "Owner review Home-style edges, compact mobile and first Reports entry on a real phone at http://127.0.0.1:4251/#home. No merge/deploy authorized.",
-  "authorization": "Direct user messages 22/10/2026: “viền như các mục home là đạt”; async answer “Cả hai, làm mobile trước”.",
+  "nextAction": "Cycle closed after owner acceptance and local main merge. Stop; await a new owner request. No push/Pages/deployment authorized.",
+  "authorization": "Direct user messages 22/10/2026: “viền như các mục home là đạt”; async answer “Cả hai, làm mobile trước”. Direct owner message 22/10/2026: “rất ổn, cho phép merge”.",
   "preview": "http://127.0.0.1:4251/#home"
 }

@@ -102,3 +102,11 @@ Preview owner mới <http://127.0.0.1:4251/#home> phục vụ cùng production a
 Review round1/limit2; gate owner vẫn pending. Phản hồi “đã ổn hơn”/viền Home
 là reference chỉ áp cho bản style trước, không tự nghiệm thu round compact.
 Main local vẫn sạch tại6a229f5; không merge/push/Pages/deploy.
+
+## Nghiệm thu sau handoff
+
+Ngày22/10/2026 owner xác nhận **“rất ổn, cho phép merge”**. Đã merge main
+local tại `982c04c`; ghi chú pending phía trên được thay bằng quyết định
+CLOSED trong [hồ sơ tích hợp](merge-2026-10-22.md). Implementation bằng
+candidate d4d254c; gate tích hợp286 tests và kiểm browser trực tiếp main PASS.
+Không push/deploy, không suy ra đã kiểm thiết bị thật.

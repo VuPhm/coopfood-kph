@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**UI01 soft glass/mobile/performance — CLOSED 22/10/2026:** owner xác nhận
+“rất ổn, cho phép merge”. Đã tích hợp vào main local tại `982c04c`; source
+đúng candidate `d4d254c` đã duyệt. Gate tích hợp `VITEST_MAX_WORKERS=2 npm run
+verify` PASS 286 tests/contracts/API/types/build. Mock PWA build và Playwright
+trực tiếp main390/1440, report loading/retry/deep-link/offline PASS. Preview
+<http://127.0.0.1:4251/#home> chạy từ main. Chưa push/deploy; các mục pending
+UI01 bên dưới là lịch sử trước acceptance. Đóng vòng, chờ yêu cầu tiếp theo.
+[Hồ sơ nghiệm thu/tích hợp](delivery/ui01-mobile-perf/merge-2026-10-22.md).
+
 **UI01 mobile/performance — AWAITING_ACCEPTANCE, 22/10/2026:** mở
 <http://127.0.0.1:4247/#home>; xem Home gọn, viền phụ nhẹ theo Home, thử
 KPH/DATE đổi tab/tìm/chọn/lọc và Báo cáo lần đầu. Cỡ chữ/record/touch giữ
