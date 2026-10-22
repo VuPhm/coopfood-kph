@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "shelf02-soft-utility",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Apply accepted Home soft surfaces and optimize main/quick shelf-life lookup, result clarity, field recovery and session history without changing date rules or accepted automatic calculation.",
+  "inScope": [
+    "Main Tra hạn and quick utility form/result/history, mobile first, Home soft surfaces and static depth",
+    "Accessible field errors and manual-submit recovery; preserve350ms typing/picker immediacy and quick/session behavior",
+    "Remove shelf-specific animated glow paint; keep shared DATE timeline semantics/geometry and existing modal lifecycle",
+    "Targeted component/domain/browser/performance checks and candidate preview"
+  ],
+  "outOfScope": [
+    "Date calculations, rounding, business/API/auth/data rules",
+    "KPH/DATE/reports/Home layout changes, legacy online/Pilot expiry workbench",
+    "Backend/OpenAPI/packages/ui/root config/lockfile",
+    "Automatic merge/push/Pages/deploy of shelf candidate"
+  ],
+  "baseSha": "467d8d6152e1708b2bb735459d701659f03f52bf",
+  "candidateSha": "",
+  "integrationOwner": "Current chat sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-shelf-life.tsx",
+    "apps/store-pwa/src/store-shelf-life.css",
+    "apps/store-pwa/src/store-shelf-life.test.tsx",
+    "apps/store-pwa/src/store-app.css",
+    "apps/store-pwa/src/store-glass.css",
+    "e2e/scripts/check-shelf-auto.cjs",
+    "e2e/scripts/check-shelf-dna.cjs",
+    "e2e/scripts/check-shelf-motion.cjs",
+    "e2e/scripts/check-shelf-refinement.cjs",
+    "docs/product/STORE_APP_VISUAL_DNA.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/shelf02-soft-utility/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Implement from integrated main467d8d6, compare main/quick at390/1440 and retain date/history workflows.",
+  "authorization": "Direct owner22/10/2026: “merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng”."
+}
