@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ShelfLifeScreen } from "./store-shelf-life";
 
@@ -152,6 +152,44 @@ describe("Shelf life input corrections", () => {
     expect(document.querySelectorAll('#shelf-nsx')).toHaveLength(1);
     expect(document.querySelectorAll('#quick-shelf-nsx')).toHaveLength(1);
   });
+  it("links the date-order error to HSD and clears it as soon as the date is edited", async () => {
+    render(<ShelfLifeScreen />);
+    change("Ngày sản xuất", "01/10/2026"); change("Hạn sử dụng (HSD)", "01/10/2026"); lookup();
+    const hsd = screen.getByRole("textbox", { name: "Hạn sử dụng (HSD)" });
+    expect(hsd).toHaveAttribute("aria-invalid", "true");
+    expect(hsd).toHaveAccessibleDescription("HSD phải sau NSX");
+    await waitFor(() => expect(hsd).toHaveFocus());
+    change("Hạn sử dụng (HSD)", "10/10/2026");
+    expect(hsd).not.toHaveAttribute("aria-invalid", "true");
+    expect(hsd).not.toHaveAttribute("aria-describedby");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("identifies an invalid manufacture date and a missing duration in unknown mode", () => {
+    render(<ShelfLifeScreen />);
+    change("Ngày sản xuất", "0/10/2026"); change("Hạn sử dụng (HSD)", "10/10/2026"); lookup();
+    expect(screen.getByRole("textbox", { name: "Ngày sản xuất" })).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByRole("textbox", { name: "Ngày sản xuất" })).toHaveAttribute("aria-describedby", "shelf-error");
+    fireEvent.click(screen.getByRole("switch"));
+    change("HSD (Số ngày)", ""); lookup();
+    for (const label of ["HSD (Số ngày)", "HSD (Số tháng)"]) {
+      expect(screen.getByRole("textbox", { name: label })).toHaveAttribute("aria-invalid", "true");
+      expect(screen.getByRole("textbox", { name: label })).toHaveAccessibleDescription(/Nhập thời hạn/);
+    }
+  });
+
+  it("keeps feedback IDs scoped when main and quick utilities coexist", () => {
+    render(<><section aria-label="Main"><ShelfLifeScreen /></section><section aria-label="Quick"><ShelfLifeScreen idPrefix="quick-shelf" /></section></>);
+    const main = within(screen.getByRole("region", { name: "Main" }));
+    const quick = within(screen.getByRole("region", { name: "Quick" }));
+    fireEvent.change(quick.getByRole("textbox", { name: "Ngày sản xuất" }), { target: { value: "01/10/2026" } });
+    fireEvent.change(quick.getByRole("textbox", { name: "Hạn sử dụng (HSD)" }), { target: { value: "01/10/2026" } });
+    fireEvent.click(quick.getByRole("button", { name: "Tra cứu" }));
+    expect(quick.getByRole("textbox", { name: "Hạn sử dụng (HSD)" })).toHaveAttribute("aria-describedby", "quick-shelf-error");
+    expect(main.getByRole("textbox", { name: "Hạn sử dụng (HSD)" })).not.toHaveAttribute("aria-describedby");
+    expect(document.querySelectorAll('#quick-shelf-error')).toHaveLength(1);
+  });
+
 });
 
 

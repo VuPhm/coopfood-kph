@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**SHELF02 — candidate chờ nghiệm thu, 22/10/2026:** Tra hạn màn chính/tiện ích
+nổi áp khối mềm/viền nhẹ Home; mobile gọn70px, kết quả lên46px. Error liên kết
+trường/focus rõ; bỏ viền glow động, giữ tính350ms/picker/rules và lịch sử20mục.
+Technical PASS301 tests/contracts/types/build/PWA, browser390/1440/320, contrast/
+chữ150%/motion/history; lab cuộn20mục CPU4× không frame>34ms. Preview
+<http://127.0.0.1:4276/#shelf>; [phạm vi, evidence và giới hạn](delivery/shelf02-soft-utility/technical.md).
+KPH03 đã merge/đóng vòng; SHELF02 ở nhánh riêng từ main467d8d6, chưa merge/push/deploy.
+Bước tiếp theo: owner xem màn chính và tiện ích nổi, giữ nghiệp vụ ngày hiện có.
+
 **KPH03 — owner đã duyệt và cho phép merge22/10/2026:** phản hồi trực tiếp
 “merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng” áp dụng candidate hai
 form `a78e368`. Đã tích hợp bản khối mềm/bốn nhóm, error linkage/ảnh/focus/review;

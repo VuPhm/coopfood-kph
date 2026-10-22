@@ -70,7 +70,7 @@ async function geometry(page, scope) {
       if (scenario.facts) for (let i = 0; i < 2; i++) await expect(result.locator('.store-result-facts > div').nth(i)).toHaveText(scenario.facts[i]);
       if (await result.locator('.is-overdue').count()) {
         await expect(result.locator('.is-overdue dt')).toHaveText('Đã qua hạn lùi');
-        for (const selector of ['dt', 'dd']) await expect(result.locator(`.is-overdue ${selector}`)).toHaveCSS('color', 'rgb(226, 5, 20)');
+        for (const selector of ['dt', 'dd']) await expect(result.locator(`.is-overdue ${selector}`)).toHaveCSS('color', 'rgb(180, 35, 24)');
       }
       await geometry(page, result);
       if (!scenario.short) {

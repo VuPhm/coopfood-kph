@@ -32,7 +32,8 @@
     "docs/product/STORE_APP_VISUAL_DNA.md",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
-    "docs/delivery/shelf02-soft-utility/**"
+    "docs/delivery/shelf02-soft-utility/**",
+    "e2e/scripts/check-shelf-result.cjs"
   ],
   "reviewLimit": 2,
   "reviewRound": 1,

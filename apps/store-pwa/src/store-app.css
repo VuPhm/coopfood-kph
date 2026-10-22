@@ -82,68 +82,7 @@
 .store-app:is(.store-screen-kph, .store-screen-date) + .store-pwa-status .pwa-status-toast { bottom: 84px; }
 .store-toast button { margin-left: auto; min-height: 44px; padding: 0 8px; font-weight: 600; }
 .store-shelf { display: grid; gap: 20px; padding: 12px 16px 24px; }
-/* Typed paint properties allow short, interruptible CSS transitions. */
-@property --store-shelf-glow-width { syntax: "<length>"; inherits: false; initial-value: 24px; }
-@property --store-shelf-glow-start { syntax: "<color>"; inherits: false; initial-value: transparent; }
-@property --store-shelf-glow-middle { syntax: "<color>"; inherits: false; initial-value: transparent; }
-@property --store-shelf-glow-end { syntax: "<color>"; inherits: false; initial-value: transparent; }
-/* Pale state palettes for the narrow perimeter; the center stays white. */
-.store-screen-shelf, .store-quick-panel:has(.store-shelf) {
-  --store-shelf-glow-a: #a5b4fc;
-  --store-shelf-glow-b: #7dd3fc;
-  --store-shelf-glow-c: #cbd5e1;
-  --store-shelf-glow-strength: 16%;
-}
-.store-screen-shelf:has(.shelf-safe), .store-quick-panel:has(.shelf-safe) {
-  --store-shelf-glow-a: #34d399;
-  --store-shelf-glow-b: #2dd4bf;
-  --store-shelf-glow-c: #a3e635;
-  --store-shelf-glow-strength: 32%;
-}
-.store-screen-shelf:has(.shelf-warning), .store-quick-panel:has(.shelf-warning) {
-  --store-shelf-glow-a: #fbbf24;
-  --store-shelf-glow-b: #fb923c;
-  --store-shelf-glow-c: #fde047;
-  --store-shelf-glow-strength: 32%;
-}
-.store-screen-shelf:has(.shelf-danger, [data-state="invalid"]), .store-quick-panel:has(.shelf-danger, [data-state="invalid"]) {
-  --store-shelf-glow-a: #fb7185;
-  --store-shelf-glow-b: #f87171;
-  --store-shelf-glow-c: #fb923c;
-  --store-shelf-glow-strength: 32%;
-}
-.store-screen-shelf:has(.shelf-expired), .store-quick-panel:has(.shelf-expired) {
-  --store-shelf-glow-a: #f472b6;
-  --store-shelf-glow-b: #fb7185;
-  --store-shelf-glow-c: #c084fc;
-  --store-shelf-glow-strength: 32%;
-}
-/* Paint only the glow; transparent stops preserve the white center. */
-.store-screen-shelf .store-shelf, .store-quick-panel > .store-modal-body {
-  --store-shelf-glow-width: 24px;
-  --store-shelf-glow-start: color-mix(in srgb, var(--store-shelf-glow-a) var(--store-shelf-glow-strength), transparent);
-  --store-shelf-glow-middle: color-mix(in srgb, var(--store-shelf-glow-b) var(--store-shelf-glow-strength), transparent);
-  --store-shelf-glow-end: color-mix(in srgb, var(--store-shelf-glow-c) var(--store-shelf-glow-strength), transparent);
-  border: 8px solid transparent;
-  background:
-    linear-gradient(rgb(255 255 255 / 80%), rgb(255 255 255 / 35%) 32px, transparent 120px) border-box,
-    radial-gradient(ellipse calc(var(--store-shelf-glow-width) * 2.5) 20px at 0% 12px, var(--store-shelf-glow-start), transparent) border-box,
-    radial-gradient(ellipse calc(var(--store-shelf-glow-width) * 2.5) 20px at 100% 12px, var(--store-shelf-glow-start), transparent) border-box,
-    radial-gradient(ellipse var(--store-shelf-glow-width) 90% at 0% 20%, var(--store-shelf-glow-start), var(--store-shelf-glow-middle) 40%, transparent) border-box,
-    radial-gradient(ellipse var(--store-shelf-glow-width) 90% at 100% 20%, var(--store-shelf-glow-start), var(--store-shelf-glow-middle) 40%, transparent) border-box,
-    radial-gradient(ellipse var(--store-shelf-glow-width) 70% at 0% 100%, var(--store-shelf-glow-end), transparent) border-box,
-    radial-gradient(ellipse var(--store-shelf-glow-width) 70% at 100% 100%, var(--store-shelf-glow-end), transparent) border-box;
-  background-color: var(--cf-color-surface);
-  transition: --store-shelf-glow-width 180ms ease-out,
-    --store-shelf-glow-start 200ms ease-out,
-    --store-shelf-glow-middle 200ms ease-out,
-    --store-shelf-glow-end 200ms ease-out;
-}
-.store-screen-shelf .store-shelf:has(.store-field:focus-within, .expiry-calendar-trigger[aria-expanded="true"]),
-.store-quick-panel:has(.store-field:focus-within, .expiry-calendar-trigger[aria-expanded="true"]) > .store-modal-body { --store-shelf-glow-width: 12px; }
-/* Compensate for the decorative border to preserve content bounds. */
-.store-screen-shelf .store-shelf { border-radius: 24px; padding: 4px 24px 16px; }
-.store-quick-panel > .store-modal-body { border-radius: 0 0 var(--cf-modal-radius) var(--cf-modal-radius); padding: 16px 16px calc(10px + env(safe-area-inset-bottom)); }
+/* Shelf surfaces and focus feedback are owned by store-shelf-life.css. */
 /* Finite transform/opacity pop: no layout animation or persistent GPU hint. */
 @keyframes store-shelf-pop {
   from { opacity: .65; transform: translateY(5px) scale(.985); }
