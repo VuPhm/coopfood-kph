@@ -57,3 +57,19 @@ describe("KPH list labels", () => {
     expect(open).toHaveBeenCalledWith(record);
   });
 });
+
+
+it("opens a desktop record from any data cell and keeps selection separate", () => {
+  const record = mockRecords[0]!;
+  const open = vi.fn(), select = vi.fn();
+  const { container } = render(<StoreKphList desktop visible={[record]} selectionMode setActive={open} setSelection={select} />);
+  fireEvent.click(screen.getByText(record.quantity));
+  expect(open).toHaveBeenCalledTimes(1);
+  expect(open).toHaveBeenCalledWith(record);
+  fireEvent.click(screen.getByTitle(`Tình trạng: ${record.condition}`));
+  expect(open).toHaveBeenCalledTimes(2);
+  fireEvent.click(screen.getByRole("checkbox", { name: `Chọn ${record.productName}` }));
+  expect(select).toHaveBeenCalledWith([record.id]);
+  expect(open).toHaveBeenCalledTimes(2);
+  expect(container.querySelector('.store-kph-row-chevron')).toBeInTheDocument();
+});

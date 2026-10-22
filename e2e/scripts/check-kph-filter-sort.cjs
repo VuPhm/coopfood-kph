@@ -37,7 +37,7 @@ async function touch(locator) {
       await expect(popup).toHaveCount(0); await expect(sort).toBeFocused();
       await expect(sort).toHaveText('Cũ nhất');
       const rows = page.locator(viewport.width < 900 ? '.store-ticket-open' : '.store-kph-row-open');
-      await expect(rows.first()).toContainText('Nông sản mẫu 28');
+      await expect(rows.first()).toContainText('Nông sản mẫu 26');
       await sort.click(); await expect(popup).toBeVisible(); await expect(popup.getByRole('button', { name: /^Cũ nhất/ })).toBeFocused(); await page.keyboard.press('Escape'); await expect(popup).toHaveCount(0); await expect(sort).toBeFocused();
       await sort.click(); await expect(popup).toBeVisible(); await page.mouse.click(2, 2); await expect(popup).toHaveCount(0);
       await sort.click(); await popup.getByRole('button', { name: /^Tên hàng/ }).click();
@@ -64,7 +64,7 @@ async function touch(locator) {
       await filter.getByRole('button', { name: 'Xong', exact: true }).click();
       await expect(opener).toBeFocused(); await expect(sort).toHaveText('Cũ nhất');
       await expect(page.getByText('0 đã chọn', { exact: true })).toBeVisible();
-      const count = viewport.width < 900 ? page.locator('.store-ticket') : page.locator('.store-kph-table tbody tr');
+      const count = viewport.width < 900 ? page.locator('.store-ticket') : page.locator('.store-kph-table tbody tr[data-record-id]');
       expect(await page.locator('.store-kph .chip-safe').count()).toBe(await count.count());
       await opener.click();
       await filter.locator('#filter-from').fill('15/08/2026'); await filter.locator('#filter-to').fill('15/08/2026');

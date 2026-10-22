@@ -26,7 +26,7 @@ async function touch(locator) {
       await page.evaluate(() => document.fonts.ready);
       const desktop = viewport.width >= 900;
       expect(await page.locator('.store-ticket').count()).toBe(desktop ? 0 : 25);
-      expect(await page.locator('.store-kph-table tbody tr').count()).toBe(desktop ? 25 : 0);
+      expect(await page.locator('.store-kph-table tbody tr[data-record-id]').count()).toBe(desktop ? 25 : 0);
       await noOverflow(page);
       await touch(page.locator('.store-create-actions button, .store-kph .store-compact, .store-kph .store-filter, .store-kph .store-tabs button, .store-scan-trigger'));
       await page.screenshot({ path: `${output}/list-${viewport.width}.png` });

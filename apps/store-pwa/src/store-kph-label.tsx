@@ -50,5 +50,5 @@ export function getKphLabelPresentation(kind: KphLabelKind, value: string): Pres
 export function KphListLabel({ kind, value, className }: { kind: KphLabelKind; value: string; className?: string }) {
   const { tone, icon: Icon } = getKphLabelPresentation(kind, value);
   return <ListLabel tone={tone} category={categories[kind]} title={`${categories[kind]}: ${value}`}
-    data-label-kind={kind} className={className} icon={<Icon />}>{value}</ListLabel>;
+    data-label-kind={kind} data-custom-detail={(kind !== "approval" && !aliases[kind].has(normalize(value))) || undefined} className={className} icon={<Icon />}>{value}</ListLabel>;
 }
