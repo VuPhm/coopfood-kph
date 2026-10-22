@@ -12,6 +12,7 @@ import "./store-kph-fresh.css";
 import "./store-date-fresh.css";
 import "./store-sticky-tabs.css";
 import "./store-navigation.css";
+import "./store-glass.css";
 
 export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {
   screen: StoreAppScreen; profile: StoreProfile; navigate: (screen: Screen) => void;

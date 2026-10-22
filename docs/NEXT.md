@@ -1,5 +1,12 @@
 # Công việc kế tiếp
 
+**UI01 — xem soft depth mới trên baseline `cbf750a`, 22/10/2026:** mở
+<http://127.0.0.1:4247/#home>, kiểm capsule ba ô và utility/dock trong Báo cáo.
+Giữ page kit/Home gọn; thêm gradient/shadow mềm theo feedback thô/phẳng.
+Candidate vật liệu chờ owner xem trên máy
+thật. Compact phần phụ mobile để round kế tiếp, chưa mở.
+[Bàn giao và kiểm chứng](delivery/ui01-light-glass.md).
+
 **Owner cho phép merge page kit — 22/10/2026:** phản hồi trực tiếp “cho phép
 merge” áp dụng bản khung xuyên suốt và Home đã bỏ trang trí. Chốt scope UI
 hiện tại; các dòng pending phía dưới là lịch sử trước quyết định này.
