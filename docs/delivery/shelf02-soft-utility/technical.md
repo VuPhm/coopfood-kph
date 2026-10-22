@@ -110,3 +110,9 @@ Mở <http://127.0.0.1:4276/#shelf>, thử nhập ngày, đổi chế độ chư
 sửa lỗi nhập và gọi lại lịch sử. Từ Home mở tiện ích Tra hạn nổi để xem cùng
 ngôn ngữ vật liệu, đóng/mở giữ form. Owner visual pending; technical PASS
 không thay nghiệm thu thực. Main giữ sạch ở467d8d6, chỉ KPH03 đã được merge.
+
+## Candidate handoff
+
+Code checkpoint **`efe6f989b3558b618edcf32ec3924939a35394e1`**, revision1,
+review1/limit2, AWAITING_ACCEPTANCE. Sau checkpoint chỉ ghi ledger/plan; không
+đổi source đã kiểm. Docs/local links/diff kiểm lại PASS. Owner gate pending.
