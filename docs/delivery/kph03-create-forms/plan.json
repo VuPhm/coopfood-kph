@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "kph03-create-forms",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Optimize both Store Fresh KPH creation forms TPCN/TPTS with Home soft surfaces, mobile-first composition, accessible validation and stable/performance-conscious loading/review.",
+  "inScope": [
+    "TPCN/TPTS Store Fresh create form and review, field/choice/photo hierarchy, mobile and desktop layout",
+    "Field error linkage and recovery without changing validation/domain",
+    "Loading geometry parity, targeted tests and runnable mock preview"
+  ],
+  "outOfScope": [
+    "API/backend/auth/business rules, option matrix/defaults, photos policy",
+    "KPH history, Home, DATE, reports or global theme rollout",
+    "Root config/lockfile/packages/ui changes",
+    "Automatic merge, push, Pages or deployment"
+  ],
+  "baseSha": "146e2e16bd78c37bc0b726bdd73e1903d022571b",
+  "candidateSha": "a78e36842469ab90912b8e110dc0a7a7b59b1ddf",
+  "integrationOwner": "Current chat sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/create-record-dialog.tsx",
+    "apps/store-pwa/src/create-record-dialog.test.tsx",
+    "apps/store-pwa/src/store-create-review.test.tsx",
+    "apps/store-pwa/src/store-kph-create-forms.css",
+    "apps/store-pwa/src/store-kph-workspace.tsx",
+    "apps/store-pwa/src/store-kph-loading.tsx",
+    "e2e/scripts/check-kph-create-forms.cjs",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/kph03-create-forms/**",
+    "apps/store-pwa/src/store-glass.css"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "a78e36842469ab90912b8e110dc0a7a7b59b1ddf",
+      "evidence": "docs/delivery/kph03-create-forms/technical.md"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Owner review both Fresh create forms at production mock preview4272: goods/quantity, choices/Other, evidence, review/edit. No merge/push/deploy authorized.",
+  "authorization": "Direct user22/10/2026: “146e2e1 từ đây áp tiếp cho kph; tối ưu toàn diệu cho 2 form tạo phiếu”.",
+  "preview": "http://127.0.0.1:4272/#kph"
+}

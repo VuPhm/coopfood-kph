@@ -1,5 +1,12 @@
 # Công việc kế tiếp
 
+**KPH03 — owner đã duyệt và cho phép merge22/10/2026:** phản hồi trực tiếp
+“merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng” áp dụng candidate hai
+form `a78e368`. Đã tích hợp bản khối mềm/bốn nhóm, error linkage/ảnh/focus/review;
+source không đổi khi merge. Kiểm sau tích hợp và hồ sơ nghiệm thu tại
+[kph03-create-forms](delivery/kph03-create-forms/technical.md). Chưa push/deploy.
+Yêu cầu Tra hạn là round kế tiếp, giữ scope riêng.
+
 **UI03 — hệ thống hoá phong cách22/10/2026:**
 [Co.op Fresh — khối mềm, viền nhẹ](product/STORE_APP_SURFACE_STYLE.md)
 (`coop-fresh-soft-v1`) lấy Home trên main9089f47 làm reference: pastel viền
