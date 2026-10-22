@@ -88,3 +88,17 @@ cần feature chunk; loading/error có recovery; precache offline được kiể
 Owner chưa nghiệm thu round viền/mobile/performance mới. Bước nhỏ: xem Home,
 KPH/DATE và composer trên điện thoại, thử đổi tab/chọn/lọc, mở popup và Báo cáo.
 Preview <http://127.0.0.1:4247/#home>.
+
+## Candidate và review
+
+Code checkpoint **`d4d254cf2a6a3e37ab3de7ffcd426bb3bdb6c9c6`**. Sau commit,
+`npm run check --workspace @coopfood-kph/store-pwa`, `npm run check:docs`,
+`git diff --check` và tracked `check-report-loading.cjs` PASS lại. Các gate
+broad ở trên chạy trên cùng nội dung source trước checkpoint; sau đó không
+đổi implementation. Chỉ ledger/evidence trong thư mục cycle được nối tiếp.
+
+Preview owner mới <http://127.0.0.1:4251/#home> phục vụ cùng production artifact
+đã kiểm tại4247, origin mới để không vướng service-worker cache các round cũ.
+Review round1/limit2; gate owner vẫn pending. Phản hồi “đã ổn hơn”/viền Home
+là reference chỉ áp cho bản style trước, không tự nghiệm thu round compact.
+Main local vẫn sạch tại6a229f5; không merge/push/Pages/deploy.
