@@ -18,6 +18,14 @@ fallback đặc và round compact mobile để sau. Build/PWA và Playwright tec
 đạt; visual/thiết bị thật pending. Preview <http://127.0.0.1:4247/#home>;
 [phạm vi/base/checks](delivery/ui01-light-glass.md). Bản thử0041ac0 đã thay thế.
 
+**Page kit/Home/navigation đã tích hợp — CLOSED 22/10/2026:** theo owner
+“cho phép merge”, checkpoint `af425bb` merge vào main local tại `cbf750a`.
+Kiểm trực tiếp main: `VITEST_MAX_WORKERS=2 npm run verify` PASS 286 tests/
+contracts/API/types/build; browser 7 màn ×7 viewport và report regression
+390/1440/320 PASS. Preview4232 chạy từ main. Chưa push/deploy; các mục pending
+bên dưới là lịch sử trước acceptance. Không tự mở scope mới.
+[Hồ sơ nghiệm thu/tích hợp](delivery/header-style-rollout/merge-2026-10-22.md).
+
 **Owner cho phép merge page kit — 22/10/2026:** phản hồi trực tiếp “cho phép
 merge” áp dụng bản khung xuyên suốt và Home đã bỏ trang trí. Chốt scope UI
 hiện tại; các dòng pending phía dưới là lịch sử trước quyết định này.
