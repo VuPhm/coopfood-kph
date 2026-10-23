@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "date02-soft-detail",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Apply accepted soft surfaces to DATE, prioritize lot detail and show colored remaining shelf-life percentages in list.",
+  "inScope": [
+    "DATE workspace/list/detail/filter soft surfaces, mobile first",
+    "Remaining shelf-life percentage presentation and missing/invalid recovery",
+    "Meaningful tests, browser preview, delivery evidence"
+  ],
+  "outOfScope": [
+    "Business milestone changes, API/backend/auth/persistence",
+    "KPH/Tra hạn/Home/reports rollout or shared timeline changes",
+    "Root config, lockfile, packages/ui, push/deploy"
+  ],
+  "baseSha": "06ff18b3f74c93cf45cac8bb713cedc2ea42569b",
+  "candidateSha": "",
+  "integrationOwner": "Current chat sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-date-workspace.tsx",
+    "apps/store-pwa/src/store-date-fresh.css",
+    "apps/store-pwa/src/store-date-assessment.ts",
+    "apps/store-pwa/src/store-date-assessment.test.ts",
+    "apps/store-pwa/src/store-date-lookup.test.tsx",
+    "apps/store-pwa/src/store-date-milestones.test.tsx",
+    "apps/store-pwa/src/store-glass.css",
+    "docs/product/DATE_MILESTONE_MODEL.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/date02-soft-detail/**",
+    "e2e/scripts/check-date-refinement.cjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Implement and verify DATE from accepted SHELF02 checkpoint; main unchanged.",
+  "authorization": "Owner23/10/2026: đạt, áp tiếp lên DATE, đặc biệt phần chi tiết item; thay quá x ngày bằng phần trăm còn lại có màu. Follow-up: làm đoạn chưa làm được."
+}
