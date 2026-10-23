@@ -5,7 +5,7 @@ import { mockDateLots } from "./store-app-mock";
 import { useState } from "react";
 function StoreLookupWorkspace() {
   const [lots, setLots] = useState(mockDateLots);
-  return <DateWorkspace lots={lots} onLotsChange={setLots} />;
+  return <DateWorkspace lots={lots} onLotsChange={setLots} onCreateKph={async () => "synthetic-kph"} />;
 }
 
 describe("DATE unified product and lot lookup", () => {
@@ -20,15 +20,15 @@ describe("DATE unified product and lot lookup", () => {
     expect(screen.getByText(/Lô A24-301/)).toBeInTheDocument();
   });
 
-  it("derives remaining days from fixture expiry and Ho Chi Minh business date", async () => {
+  it("derives remaining percentages from inclusive shelf life and Ho Chi Minh business date", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-10-07T12:00:00.000Z"));
     render(<StoreLookupWorkspace />);
     fireEvent.change(screen.getByRole("textbox", { name: "Tìm SKU, barcode, tên hàng hoặc lô" }), { target: { value: "0008421" } });
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Tìm mã hàng" })); await Promise.resolve(); });
-    expect(screen.getByText("Còn 39 ngày")).toBeInTheDocument();
-    expect(screen.getByText("Còn 11 ngày")).toBeInTheDocument();
-    expect(screen.getByText("HSD hôm nay")).toBeInTheDocument();
+    expect(screen.getByText("Còn 38% HSD")).toBeInTheDocument();
+    expect(screen.getByText("Còn 13% HSD")).toBeInTheDocument();
+    expect(screen.getByText("Còn 1% HSD")).toBeInTheDocument();
   });
 
   it("resolves an exact tracked lot ID to its product", async () => {

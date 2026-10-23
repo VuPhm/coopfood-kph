@@ -36,17 +36,17 @@ fs.mkdirSync(output, { recursive: true });
       await expect(holder.locator('.store-result-facts')).toHaveCount(0);
       await expect(holder.locator('.store-timeline-track')).toHaveCount(0);
       await fitsPanel();
-      await expect(quick).toHaveCSS('--store-shelf-glow-width', '24px');
+      await expect(quick.locator('.store-modal-body')).toHaveCSS('background-image', 'none');
       const restingBounds = await quick.boundingBox();
       for (const input of await quick.getByRole('textbox').all()) {
         await input.focus();
-        await expect(quick).toHaveCSS('--store-shelf-glow-width', '12px');
+        expect(await quick.locator('.store-modal-body').evaluate(el => el.getAnimations().some(a => (a.transitionProperty || '').startsWith('--store-shelf-glow')))).toBe(false);
         const focusedBounds = await quick.boundingBox();
         for (const key of ['x', 'y', 'width', 'height']) expect(Math.abs(restingBounds[key] - focusedBounds[key])).toBeLessThan(1);
         await fitsPanel();
       }
       await quick.getByRole('button', { name: 'Đóng tiện ích' }).focus();
-      await expect(quick).toHaveCSS('--store-shelf-glow-width', '24px');
+      await expect(quick.locator('.store-modal-body')).toHaveCSS('background-image', 'none');
       const original = await holder.elementHandle();
       const bounds = await holder.boundingBox();
       const panelBounds = await quick.boundingBox();
@@ -66,7 +66,7 @@ fs.mkdirSync(output, { recursive: true });
       }
       // Selecting either date runs immediately, before a 350ms debounce.
       await quick.getByRole('button', { name: 'Chọn hạn sử dụng', exact: true }).click();
-      await expect(quick).toHaveCSS('--store-shelf-glow-width', '12px');
+      await expect(quick.locator('.store-modal-body')).toHaveCSS('background-image', 'none');
       await page.getByRole('dialog', { name: 'Lịch chọn ngày' }).getByRole('button', { name: '11 tháng 10, 2026', exact: true }).click();
       await expect(date).toHaveText('09/10/2026', { timeout: 200 });
       await quick.getByRole('button', { name: 'Chọn ngày sản xuất', exact: true }).click();
@@ -115,7 +115,7 @@ fs.mkdirSync(output, { recursive: true });
       await quick.screenshot({ path: `${output}/reset-${viewport.width}.png` });
       expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
       expect(errors).toEqual([]);
-      console.log(`PASS ${viewport.width}x${viewport.height}: holder/layout, auto input, picker, reopen, modes, invalid/incomplete, Reset, full panel without vertical scroll, glow 24px/12px on focus without layout shift`);
+      console.log(`PASS ${viewport.width}x${viewport.height}: holder/layout, auto input, picker, reopen, modes, invalid/incomplete, Reset, full panel without vertical scroll, static surfaces on focus without layout shift`);
       await page.close();
     }
   } finally { await browser.close(); }

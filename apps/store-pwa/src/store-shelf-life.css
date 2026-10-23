@@ -1,11 +1,15 @@
 /* Home Visual DNA, scoped to the shelf utility. Shared tokens retain their defaults. */
 .store-app.store-screen-shelf,
 .store-quick-panel:has(.store-shelf) {
-  --cf-color-brand: #008655;
+  --cf-color-brand: #00724e;
   --cf-color-brand-hover: #00724e;
   --cf-color-brand-active: #006846;
   --cf-color-brand-soft: #e6f7f2;
   --cf-color-ink: #20344a;
+  --cf-color-success: #00724e;
+  --cf-color-amber: #884312;
+  --cf-color-danger: #b42318;
+  --cf-color-danger-soft: #fef3f2;
   --cf-color-ink-muted: #596b7d;
   --cf-color-surface-muted: #f5f8fa;
   --cf-color-border: #d6e3df;
@@ -52,4 +56,74 @@
 @media (min-width: 900px) {
   .store-shelf-page { padding-inline: 24px; }
   .store-app.store-screen-shelf .store-shelf-history h2 { font-size: 18px; line-height: 25px; }
+}
+
+/* Shelf02: white holders and quiet edges, static depth instead of animated glow. */
+.store-app.store-screen-shelf .store-shelf-page {
+  max-width: 1160px; padding-inline: var(--store-header-gutter, 22px);
+}
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf {
+  grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 0;
+  border: 0; background: none; transition: none;
+}
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf-form {
+  container: shelf-form / inline-size; grid-template-columns: minmax(0, 1fr);
+  gap: 12px; min-width: 0;
+}
+.store-app.store-screen-shelf .store-shelf-form {
+  align-content: start; padding: 14px; border: 1px solid var(--store-holder-edge);
+  border-radius: 18px; background: white; box-shadow: var(--store-soft-card-shadow);
+}
+.store-quick-panel[data-slot="dialog-content"] > .store-modal-body {
+  border: 0; border-radius: 0 0 var(--cf-modal-radius) var(--cf-modal-radius);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: white;
+}
+.store-quick-panel[data-slot="dialog-content"] .store-shelf-form { gap: 8px; }
+.store-shelf-dates { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; }
+.store-shelf-dates > :only-child { grid-column: 1 / -1; }
+.store-shelf-duration { min-width: 0; }
+.store-shelf-help { margin: 6px 0 0; color: var(--cf-color-ink-muted); font-size: 12px; line-height: 18px; }
+@container shelf-form (min-width: 304px) {
+  .store-shelf-dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-field input {
+  min-width: 0; border-color: #718578; background: white;
+  padding-left: 12px; color: #20344a; font-size: 16px; font-weight: 400;
+}
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-known-toggle {
+  border: 1px solid transparent; border-radius: 14px;
+  background-image: var(--store-glass-sheen); box-shadow: var(--store-soft-card-shadow);
+}
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-known-toggle strong { font-size: 13px; line-height: 20px; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-field input:focus { border-color: #00724e; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-field input[aria-invalid="true"] { border-color: #b42318; background: #fef3f2; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf :is(input,button):focus-visible { outline: 3px solid #20344a; outline-offset: 3px; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-shelf-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-shelf-actions button { flex: 2 1 8em; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-shelf-actions .store-secondary { flex: 1 1 auto; min-width: 118px; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-shelf-actions button { height: auto; min-height: 48px; white-space: nowrap; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf-result {
+  min-height: 297px; gap: 8px; padding: 12px; border-color: var(--store-holder-edge);
+  border-radius: 18px; background: white; box-shadow: var(--store-soft-card-shadow);
+}
+.store-result-primary { display: grid; gap: 2px; }
+.store-result-label { color: var(--cf-color-ink-muted); font-size: 12px; line-height: 16px; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-result-date { font-size: 28px; line-height: 34px; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-result-facts > div { padding: 8px; }
+:is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf-placeholder { min-height: 0; }
+.store-quick-panel[data-slot="dialog-content"] .store-shelf-result { min-height: 288px; }
+.store-quick-panel[data-slot="dialog-content"] .store-shelf .store-result-date { font-size: 26px; line-height: 32px; }
+.store-app.store-screen-shelf .store-shelf-history { margin: 20px 0 0; border: 0; border-radius: 0; padding: 0; background: white; }
+.store-app.store-screen-shelf .store-shelf-history > header { gap: 8px; margin-bottom: 12px; }
+.store-app.store-screen-shelf .store-shelf-history-empty { padding: 20px 12px; background: #fafbfc; }
+.store-app.store-screen-shelf .store-shelf-history-list > li { border-color: var(--store-holder-edge); background: white; }
+.store-app.store-screen-shelf .store-shelf-history-recall { background-image: var(--store-glass-sheen); }
+@media (max-width: 1199px) {
+  .store-app.store-screen-shelf .store-shelf-history-list > li { box-shadow: var(--store-soft-card-shadow); }
+}
+@media (min-width: 1200px) {
+  .store-app.store-screen-shelf .store-shelf { grid-template-columns: minmax(340px, .95fr) minmax(0, 1.05fr); gap: 20px; align-items: start; }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  :is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) :is(.store-shelf-form,.store-shelf-result,.store-known-toggle) { border-color: #718578; }
 }

@@ -32,8 +32,14 @@ Hết HSD; đổi trạng thái xử lý không sửa ngày hay điều kiện t
 
 ## Giao diện được triển khai
 
-Danh sách không có progress bar hoặc %: tên hàng → SKU/lô → NSX/HSD → nhãn DATE và
-nhãn xử lý. Dùng [ListLabel](LIST_LABEL_SYSTEM.md), màu kèm chữ/icon, không
+Theo yêu cầu owner23/10/2026, danh sách thay số ngày còn/quá bằng phần trăm
+HSD còn lại; vẫn không có progress bar. Tên hàng → SKU/lô → NSX/HSD → nhãn DATE
+và nhãn xử lý giữ nguyên. Phần trăm = ceil((HSD − hôm nay + 1) / shelfLife ×100),
+giới hạn0–100; tính cả ngày hôm nay nên trong hạn tối thiểu1%, sau HSD là0%.
+Đây chỉ là cách trình bày: màu theo phase DATE đã tính bằng mốc thật, không
+suy lại phase từ phần trăm làm tròn. Trước NSX tối đa100% với nhãn Chưa đến NSX.
+Thiếu NSX/ngày lỗi hiện Chưa đủ dữ liệu/Kiểm tra ngày, không suy phần trăm kể cả
+khi biết HSD đã qua. Chi tiết giữ số ngày và thêm phần trăm để đối chiếu. Dùng [ListLabel](LIST_LABEL_SYSTEM.md), màu kèm chữ/icon, không
 thêm target riêng vào thẻ. Theo yêu cầu mới “Toàn bộ nhãn màu và thanh nhãn”
 ngày 12/10/2026, thêm bar cạnh trái 3px trang trí theo nhãn DATE, tách biệt với
 timeline hạn dùng; đổi xử lý không đổi màu bar. Đây là cập nhật cho hướng
@@ -59,17 +65,41 @@ timeline `memo` dùng cùng implementation Tra hạn. CSS tĩnh, không thư vi�
 chart, timer hoặc vòng animation JS. Đây là lựa chọn cấu trúc cho dữ liệu mẫu,
 chưa là benchmark hiệu năng dữ liệu lớn/thiết bị cửa hàng.
 
+## Ghi nhận và xử lý — prototype theo owner23/10/2026
+
+**Ghi nhận** mở lựa chọn báo lại sau1ngày hoặc1tuần (7ngày lịch), hiển thị ngày
+cụ thể theo Asia/Ho_Chi_Minh. Chỉ bấm Hẹn báo lại mới cập nhật acknowledged +
+remindOn; Hủy giữ nguyên lô. Có thể đổi lịch của lô đã ghi nhận; lô resolved
+không hẹn tiếp. Đến ngày hẹn, lô trở lại Mở trong Cảnh báo dù phase vẫn an toàn,
+hiện trong Thông báo và nhắc một lần khi ứng dụng đang hiển thị. Nhắc không
+thay tình trạng DATE hoặc mốc biểu đồ. Một đồng hồ calendar cấp Store cập nhật
+qua nửa đêm HCM và khi ứng dụng/tab hoạt động lại, không timer cho từng lô.
+
+**Xử lý** mở form KPH đang có, chưa đổi trạng thái lô. Loại TPCN/TPTS lấy từ
+metadata explicit của catalog mẫu; thiếu loại thì hỏi người dùng, không suy
+loại từ tên/SKU. Điền tên/SKU/barcode/NCC/đơn vị đã biết; ghi lô, NSX/HSD vào
+ghi chú. Hết HSD gợi ý EXPIRED, cảnh báo/đến hạn lùi gợi ý NEAR_EXPIRY; các
+trường hợp khác giữ default form, cho người dùng xác nhận. Không tạo field
+ngày mới ngoài contract KPH. Ngày phát hiện/người/ảnh/review và lựa chọn xử lý
+của KPH giữ nguyên. SKU khác nguồn bị chặn lưu liên kết.
+
+Chỉ sau Gửi phiếu thành công mới lưu record KPH vào cùng phiên, đặt resolved
+và kphRecordId của lô. Phiếu mới PENDING, chưa tự duyệt. Hủy, lỗi lưu hoặc đổi
+sai mã hàng không resolve lô; retry giữ idempotency key. DATE condition/percent/
+biểu đồ không đổi sau resolve. Không tự tạo ảnh, số lượng tồn hoặc sản phẩm.
+
+Các luồng này vẫn **memory-only của prototype Store Fresh**: reload mất lịch
+nhắc và dữ liệu mẫu; chưa có API DATE, scheduler backend, push khi đóng app hay
+persistence. Báo cáo DATE vẫn là snapshot theo ngày chốt; không rollout UI báo
+cáo trong slice này. Backend authority/authorization chưa được thay bằng state
+browser. Không thêm queue/Redis/microservice hoặc migration.
+
 ## Mở rộng sau — chưa triển khai
 
-- Theo dõi ngày thực liên tục, cập nhật qua nửa đêm và khi app hoạt động lại.
-- Thông báo khi lô qua mốc, quy tắc nhận/thừa nhận/chống lặp và scope cửa hàng.
+- Lịch nhắc bền vững trên backend, push/nhận biết đã đọc, audit/quyền và retention.
 - Thống kê theo tình trạng, lô, sản phẩm, cửa hàng và lịch sử xử lý.
-
-Prototype hiện tính nhãn theo ngày HCM khi view render; không đăng ký đồng
-hồ cập nhật ngày, không gửi thông báo, không tạo thống kê hoặc persistence.
-API, tạo/sửa lô, quyền/store scope, nguồn ngày, dữ liệu lịch sử và định nghĩa
-thống kê cần contract riêng trước khi làm backend. Không thêm queue/Redis/
-scheduler hay migration từ hướng product này. Không sửa nguồn provenance cũ.
+- API/tạo/sửa lô và định nghĩa số lượng/tồn cần contract riêng trước backend.
 
 Nghiệm thu owner và technical PASS giữ riêng; xem
-[bàn giao](../delivery/figma-mobile-implementation/date-compact-detail.md).
+[bàn giao DATE02](../delivery/date02-soft-detail/technical.md) và
+[evidence kế thừa](../delivery/figma-mobile-implementation/date-compact-detail.md).

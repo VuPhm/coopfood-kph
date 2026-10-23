@@ -1,5 +1,34 @@
 # Trạng thái hiện tại
 
+**DATE02 revision3 — nhắc lại và tạo KPH, candidate23/10/2026:** Ghi nhận cho
+chọn1ngày/1tuần và xác nhận ngày báo lại; đến hẹn mở lại Cảnh báo/Thông báo trong
+phiên. Xử lý mở form KPH tương ứng, điền SKU/lô và dữ liệu đã biết; chỉ Gửi phiếu
+thành công mới resolved, phiếu PENDING cùng Store session. Hủy/lỗi/SKU khác giữ
+lô; loại hàng chưa biết phải chọn. Giữ nền trắng/xám và màu biểu đồ r2.
+Technical327tests/build + browser transaction/visual/KPH gốc; preview
+<http://127.0.0.1:4278/#date>, [evidence/giới hạn](delivery/date02-soft-detail/technical.md).
+Vẫn prototype memory-only, chưa backend/push khi đóng app; chưa merge/push/deploy.
+Bước tiếp theo: owner thử Ghi nhận và Xử lý → form KPH tại preview4278.
+
+**DATE02 — candidate revision2 chờ nghiệm thu, 23/10/2026:** đã tiếp tục DATE
+sau Tra hạn được owner xác nhận “đạt”. Chi tiết lô dùng holder trắng/viền mảnh,
+nền trắng/xám nhẹ thống nhất theo feedback màu lộn xộn; biểu đồ giữ nguyên màu.
+List thay số ngày bằng % HSD còn lại có màu theo phase; thiếu NSX/ngày lỗi không
+suy %. Technical PASS313 tests/contracts/types/build/PWA, browser390/1440/320,
+chữ150%, màn thấp và chart color parity. Preview <http://127.0.0.1:4278/#date>.
+[Phạm vi, quy tắc và evidence](delivery/date02-soft-detail/technical.md).
+Nhánh riêng từ SHELF02 snapshot06ff18b; main giữ467d8d6, chưa merge/push/deploy.
+Bước tiếp theo: owner xem nền và chi tiết item tại đúng preview4278.
+
+**SHELF02 — candidate chờ nghiệm thu, 22/10/2026:** Tra hạn màn chính/tiện ích
+nổi áp khối mềm/viền nhẹ Home; mobile gọn70px, kết quả lên46px. Error liên kết
+trường/focus rõ; bỏ viền glow động, giữ tính350ms/picker/rules và lịch sử20mục.
+Technical PASS301 tests/contracts/types/build/PWA, browser390/1440/320, contrast/
+chữ150%/motion/history; lab cuộn20mục CPU4× không frame>34ms. Preview
+<http://127.0.0.1:4276/#shelf>; [phạm vi, evidence và giới hạn](delivery/shelf02-soft-utility/technical.md).
+KPH03 đã merge/đóng vòng; SHELF02 ở nhánh riêng từ main467d8d6, chưa merge/push/deploy.
+Bước tiếp theo: owner xem màn chính và tiện ích nổi, giữ nghiệp vụ ngày hiện có.
+
 **KPH03 — owner đã duyệt và cho phép merge22/10/2026:** phản hồi trực tiếp
 “merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng” áp dụng candidate hai
 form `a78e368`. Đã tích hợp bản khối mềm/bốn nhóm, error linkage/ảnh/focus/review;

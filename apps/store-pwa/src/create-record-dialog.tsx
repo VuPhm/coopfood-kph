@@ -103,7 +103,10 @@ export type CreatedRecordDraft = {
   photos: readonly { id: string; fileName: string; blob: Blob; originalFile: File; capturedAt: Date }[];
 };
 
+export type CreateRecordSeed = { barcode: string; skuCode: string; productName: string; supplier: string; unit: "EA" | "kg"; note: string; condition?: "NEAR_EXPIRY" | "EXPIRED" };
+
 type CreateRecordDialogProps = {
+  initialValues?: CreateRecordSeed | undefined;
   /** The Store host owns the portal, chrome and focus lifecycle in this mode. */
   embedded?: boolean;
   onReviewingChange?: (reviewing: boolean) => void;
@@ -126,26 +129,26 @@ const kindLabels: Record<KphKind, string> = {
   TPTS: "Thực phẩm tươi sống",
 };
 
-function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
+function defaultValues(kind: KphKind, profile: StoreProfile, initial?: CreateRecordSeed): FormData {
   const options = KPH_OPTIONS[kind];
   return {
     detectedDate: formatBusinessDate(new Date()).display,
-    barcode: "",
-    supplier: "",
-    productName: "",
+    barcode: initial?.barcode ?? "",
+    supplier: initial?.supplier ?? "",
+    productName: initial?.productName ?? "",
     quantity: "1",
-    unit: "EA",
-    condition: options.defaultCondition,
+    unit: initial?.unit ?? "EA",
+    condition: initial?.condition ?? options.defaultCondition,
     conditionDetail: "",
     resolution: options.defaultResolution,
     resolutionDetail: "",
     treatmentDate: "",
     detectedBy: profile.fullName,
-    note: "",
+    note: initial?.note ?? "",
   };
 }
 
-export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog", embedded = false, onReviewingChange }: CreateRecordDialogProps) {
+export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, initialValues, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog", embedded = false, onReviewingChange }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -186,7 +189,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues(activeKind, profile),
+    defaultValues: defaultValues(activeKind, profile, initialValues),
   });
 
   const selectedCondition = watch("condition");
@@ -209,7 +212,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
 
   useEffect(() => {
     if (!kind) return;
-    reset(defaultValues(kind, profile));
+    reset(defaultValues(kind, profile, initialValues));
     setReviewing(false);
     clearPhotos();
     setPhotoError("");
@@ -217,12 +220,12 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     setLookupRetryValue("");
     lookupRequestId.current += 1;
     idempotencyKeyRef.current = null;
-    clearAutoFilledLookup();
-  }, [kind, profile, reset]);
+    autoFilledLookup.current = initialValues ? { barcode: initialValues.barcode, skuCode: initialValues.skuCode, productName: initialValues.productName, supplier: initialValues.supplier } : { barcode: "", skuCode: "", productName: "", supplier: "" };
+  }, [kind, profile, reset, initialValues]);
 
   useEffect(() => {
     if (open || !kind) return;
-    reset(defaultValues(kind, profile));
+    reset(defaultValues(kind, profile, initialValues));
     setReviewing(false);
     clearPhotos();
     setPhotoError("");
@@ -231,7 +234,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     lookupRequestId.current += 1;
     idempotencyKeyRef.current = null;
     clearAutoFilledLookup();
-  }, [open, kind, profile, reset]);
+  }, [open, kind, profile, reset, initialValues]);
 
   useEffect(() => {
     const subscription = watch(() => {
@@ -274,6 +277,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
 
   async function lookupBarcode(value = getValues("barcode")) {
     const normalized = value.trim();
+    if (initialValues && normalized === initialValues.barcode && autoFilledLookup.current.skuCode === initialValues.skuCode && autoFilledLookup.current.barcode === normalized) return;
     if (!normalized) {
       lookupRequestId.current += 1;
       clearAutoFilledLookup();
