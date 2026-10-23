@@ -60,11 +60,11 @@ async function hit(locator) {
       await toast.getByRole('button',{name:'Đóng thông báo PWA',exact:true}).click();await page.evaluate(()=>window.dispatchEvent(new Event('online')));
       await page.screenshot({path:`${output}/reports-${viewport.width}.png`});
       await fab.click();await expect(quick.getByRole('textbox',{name:'HSD (Số ngày)',exact:true})).toHaveValue('10');await page.keyboard.press('Escape');
-      await nav.getByRole('link',{name:'Thông báo',exact:true}).click();await expect(page.getByRole('heading',{name:'Chưa có thông báo',exact:true})).toBeVisible();
+      await nav.getByRole('link',{name:'Thông báo',exact:true}).click();await expect(page.getByRole('heading',{name:'DATE',exact:true})).toBeVisible();
       await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
       if(mobile)await expect(tabs.locator('[data-recent-feature]')).toHaveAttribute('data-recent-feature','reports');
       await expect(fab).toBeVisible();await hit(fab);await page.screenshot({path:`${output}/notifications-${viewport.width}.png`});
-      await page.reload();await expect(page.getByRole('heading',{name:'Chưa có thông báo',exact:true})).toBeVisible();
+      await page.reload();await expect(page.getByRole('heading',{name:'DATE',exact:true})).toBeVisible();
       if(mobile)await expect(tabs.locator('[data-recent-feature]')).toHaveAttribute('data-recent-feature','reports');
       await nav.getByRole('link',{name:'Trang chủ',exact:true}).click();await page.locator('.store-launcher-grid').waitFor();
       await page.locator('.store-launcher-grid').getByRole('button',{name:'Quản lý DATE',exact:true}).click();await page.locator('.store-date-search-form').waitFor();
@@ -76,7 +76,7 @@ async function hit(locator) {
       }
       await page.screenshot({path:`${output}/date-${viewport.width}.png`});
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-      expect(errors).toEqual([]);console.log(`PASS navigation ${viewport.width}x${viewport.height}: all Home features, sidebar/three tabs, recent/reload, empty notifications, quick utility/dock/focus`);
+      expect(errors).toEqual([]);console.log(`PASS navigation ${viewport.width}x${viewport.height}: all Home features, sidebar/three tabs, recent/reload, DATE notifications, quick utility/dock/focus`);
       await page.close();
     }
   } finally {await browser.close();}

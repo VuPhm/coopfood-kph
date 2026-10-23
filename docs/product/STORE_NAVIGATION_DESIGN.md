@@ -45,10 +45,12 @@ Nguồn tham khảo: [Apple iOS 27](https://apps.apple.com/us/iphone/story/id189
 
 ## Thông báo và Tra hạn nổi
 
-Owner chọn **trang Thông báo rỗng, chờ nối dữ liệu**. Route `#notifications`
-có header compact/nắp trắng, “Chưa có thông báo” và nút về Home. Không có
-thông báo giả, badge số, push hoặc API mới. Nguồn sự kiện, unread, quyền,
-retention và đồng bộ chưa nằm trong scope này.
+Follow-up owner23/10: route `#notifications` có header compact/nắp trắng,
+nhóm DATE với các nhóm hạn dùng và lịch báo lại từ cùng state lô. Click mở đúng
+lô DATE; lô chuyển KPH không còn thông báo. Không có nhóm tương lai rỗng, unread
+giả hoặc API/push mới. Không có lô cần chú ý mới hiện “Chưa có thông báo” và nút
+về Home. [Thiết kế Thông báo](STORE_NOTIFICATIONS_DESIGN.md) ghi nguồn, cách nhóm,
+suppression và giới hạn trong phiên.
 
 Nút “Tra hạn lùi” nổi trên Home/KPH/DATE/Báo cáo/Thông báo. Trang Tra hạn đầy
 đủ và đăng nhập không lặp nút. Giữ popup và phép tính hiện hành; mở popup ẩn

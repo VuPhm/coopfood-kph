@@ -26,15 +26,22 @@ hạn lùi bằng HSD trừ `round(20% × shelfLife)`. Không suy mốc từ ph�
 | Thiếu NSX nhưng HSD đã qua | Hết HSD | Đỏ; thiếu NSX vẫn được giải thích, không vẽ timeline |
 | Ngày lỗi hoặc HSD không lớn hơn NSX | Ngày không hợp lệ | Đỏ; không vẽ timeline hoặc suy tình trạng khác |
 
-Hai chiều **tình trạng DATE** và **trạng thái xử lý** độc lập. Mở/Đã ghi nhận/
-Đã xử lý giữ workflow prototype hiện có. Lô Hết HSD đã xử lý vẫn giữ nhãn
-Hết HSD; đổi trạng thái xử lý không sửa ngày hay điều kiện thời hạn.
+Hai chiều **tình trạng DATE** và **trạng thái xử lý** độc lập. Follow-up owner
+23/10: DATE chỉ có Mở/Đã ghi nhận; bỏ nhóm và bộ lọc Đã xử lý vì phiếu thuộc
+KPH. Chỉ gửi KPH thành công mới đặt resolved/kphRecordId, lô rời cả Cảnh báo,
+Theo dõi DATE và Thông báo. Dữ liệu nguồn vẫn giữ cho liên kết/báo cáo, không
+xóa lô và không đổi mốc/phase/ngày. Hủy/lỗi gửi vẫn giữ lô DATE. Xem
+[Thông báo DATE](STORE_NOTIFICATIONS_DESIGN.md).
 
 ## Giao diện được triển khai
 
 Theo yêu cầu owner23/10/2026, danh sách thay số ngày còn/quá bằng phần trăm
-HSD còn lại; vẫn không có progress bar. Tên hàng → SKU/lô → NSX/HSD → nhãn DATE
-và nhãn xử lý giữ nguyên. Phần trăm = ceil((HSD − hôm nay + 1) / shelfLife ×100),
+HSD còn lại; vẫn không có progress bar. Follow-up DATE03 ngày23/10 từ
+`630ec7b`: danh sách ưu tiên phần trăm24px bên phải, tên hàng/SKU/lô bên trái.
+NSX/HSD là dòng chữ phụ12px, không in đậm hay có khối nền riêng; nhãn DATE
+và xử lý giữ chữ/icon/màu. Thẻ nghỉ/hover trắng, chỉ lô đang chọn nền mint với
+viền xanh và `aria-pressed`; đóng chi tiết/lọc mất lô trả về trắng. Candidate
+chờ owner xem tại [bàn giao DATE03](../delivery/date03-compact-list.md). Phần trăm = ceil((HSD − hôm nay + 1) / shelfLife ×100),
 giới hạn0–100; tính cả ngày hôm nay nên trong hạn tối thiểu1%, sau HSD là0%.
 Đây chỉ là cách trình bày: màu theo phase DATE đã tính bằng mốc thật, không
 suy lại phase từ phần trăm làm tròn. Trước NSX tối đa100% với nhãn Chưa đến NSX.
@@ -43,7 +50,7 @@ khi biết HSD đã qua. Chi tiết giữ số ngày và thêm phần trăm đ�
 thêm target riêng vào thẻ. Theo yêu cầu mới “Toàn bộ nhãn màu và thanh nhãn”
 ngày 12/10/2026, thêm bar cạnh trái 3px trang trí theo nhãn DATE, tách biệt với
 timeline hạn dùng; đổi xử lý không đổi màu bar. Đây là cập nhật cho hướng
-bỏ progress bar trước đó. Theo dõi DATE xem toàn bộ lô; Cảnh báo chỉ đưa
+bỏ progress bar trước đó. Theo dõi DATE xem lô chưa chuyển sang KPH; Cảnh báo chỉ đưa
 lô cần chú ý (cảnh báo, đến hạn lùi, hết HSD, thiếu/lỗi dữ liệu) vào các nhóm
 xử lý. Bộ lọc thêm tình trạng DATE, giữ tìm SKU/barcode/tên/lô và sắp xếp cũ.
 
