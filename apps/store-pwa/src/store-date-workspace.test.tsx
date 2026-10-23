@@ -26,13 +26,13 @@ describe("memory-only DATE workspace", () => {
     expect(screen.getByText("Chức năng chưa sẵn sàng trong bản dùng thử")).toBeInTheDocument();
   });
 
-  it("prevents acknowledging an already resolved lot on mobile", async () => {
+  it("leaves resolved lots in KPH instead of offering a completed DATE group", () => {
     render(<DateWorkspace resolved />);
+    expect(screen.queryByRole("button", { name: /Cải thìa/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Theo dõi DATE/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
-    const dialog = await screen.findByRole("dialog", { name: "Chi tiết lô DATE" });
-    expect(dialog).toHaveTextContent("Đã xử lý");
-    expect(screen.getByRole("button", { name: "Ghi nhận" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Đã xử lý" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: /Cải thìa/ })).not.toBeInTheDocument();
+    expect(screen.getByText("6 / 6 lô")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Lọc DATE" }));
+    expect(screen.queryByRole("button", { name: "Đã xử lý" })).not.toBeInTheDocument();
   });
 });

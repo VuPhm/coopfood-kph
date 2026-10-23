@@ -1,5 +1,20 @@
 # Công việc kế tiếp
 
+**DATE03 follow-up / Thông báo DATE — candidate23/10:** owner yêu cầu bỏ Đã
+xử lý vì thuộc KPH; DATE chỉ Mở/Đã ghi nhận và resolved rời list. Thông báo có
+nhóm DATE theo phase/ngày báo lại, thu/mở và mở đúng lô. Verify333tests/build,
+browser390/1440/320 và navigation5viewport PASS; chờ owner xem tại
+<http://127.0.0.1:4281/#notifications>;
+[scope, quyết định, evidence](delivery/date03-notifications.md),
+[thiết kế](product/STORE_NOTIFICATIONS_DESIGN.md). Tiếp cùng worktree/base630ec7b;
+chưa commit/merge/push/deploy, memory-only.
+
+**DATE03 — candidate23/10/2026 từ `630ec7b`:** danh sách gọn, phần trăm24px
+là chính, NSX/HSD chữ phụ; item trắng, chỉ chọn lô đổi mint/viền xanh và có
+aria-state. Rule/chi tiết/nhắc1/7ngày/DATE→KPH giữ nguyên. Verify327tests/build
+đạt; preview <http://127.0.0.1:4281/#date>, [phạm vi/checks](delivery/date03-compact-list.md).
+Nhánh/worktree riêng, chờ owner xem; chưa commit/merge/push/deploy.
+
 **DATE02 / SHELF02 — CLOSED, 23/10/2026:** owner “cho phép merge” candidate
 DATE02 revision3 b50ec3f. Đã merge main local tại `d28b9c4`, source đúng bản đã
 duyệt: chi tiết trắng/xám, % HSD, báo lại1ngày/1tuần, Xử lý → KPH đúng lô; Tra

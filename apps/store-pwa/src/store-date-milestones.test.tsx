@@ -11,8 +11,8 @@ function Workspace({ initial = [expired] }: { initial?: MockDateLot[] }) {
 describe("DATE milestones and processing are separate", () => {
   afterEach(() => vi.useRealTimers());
   function today() { vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(new Date("2026-10-12T00:00:00+07:00")); }
-  it("keeps Hết HSD after resolution and reuses the Tra hạn timeline with lot identity", () => {
-    today(); render(<Workspace initial={[{ ...expired, status: "resolved" }]} />);
+  it("keeps Hết HSD on an active lot and reuses the Tra hạn timeline with lot identity", () => {
+    today(); render(<Workspace />);
     fireEvent.click(screen.getByRole("button", { name: /Theo dõi DATE/ }));
     fireEvent.click(screen.getByRole("button", { name: /Lô hết hạn/ }));
     let dialog = screen.getByRole("dialog", { name: "Chi tiết lô DATE" });
@@ -20,17 +20,17 @@ describe("DATE milestones and processing are separate", () => {
     expect(milestones.querySelector(".store-date-condition")).toHaveAttribute("data-date-phase", "EXPIRED");
     expect(within(milestones).getByRole("img", { name: "Hôm nay · Qua HSD 12/10/2026" })).toBeInTheDocument();
     expect(dialog).toHaveTextContent("000001"); expect(dialog).toHaveTextContent("LOT-01");
-    expect(within(dialog).getByRole("button", { name: "Đã xử lý" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "Xử lý" })).toBeEnabled();
     fireEvent.click(within(dialog).getByRole("button", { name: "Đóng" }));
     const card = screen.getByRole("button", { name: /Lô hết hạn/ });
-    expect(card.querySelector('[data-processing-status="resolved"]')).toHaveTextContent("Đã xử lý");
+    expect(card.querySelector('[data-processing-status="open"]')).toHaveTextContent("Mở");
     expect(card.querySelector('[data-date-phase="EXPIRED"]')).toHaveTextContent("Hết HSD");
     expect(card.querySelector(".store-timeline, .store-date-life")).toBeNull();
     expect(card.querySelector(".store-date-percent")).toHaveTextContent("Còn 0% HSD");
     expect(card.querySelector(".store-date-percent")).toHaveAttribute("data-tone", "danger");
     fireEvent.click(card);
     dialog = screen.getByRole("dialog", { name: "Chi tiết lô DATE" });
-    expect(dialog.querySelector('[data-processing-status="resolved"]')).toHaveTextContent("Đã xử lý");
+    expect(dialog.querySelector('[data-processing-status="open"]')).toHaveTextContent("Mở");
     expect(dialog.querySelector('[data-date-phase="EXPIRED"]')).toHaveTextContent("Hết HSD");
   });
   it("filters DATE phase and restores all lots from an empty result", () => {

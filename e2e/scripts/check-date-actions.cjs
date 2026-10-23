@@ -27,11 +27,11 @@ async function settle(scope){await scope.evaluate(async root=>Promise.all(root.g
     await audit(p,viewport.width>=900?'.store-date-detail':'.store-date-lot-sheet',`reminder-${days}-${viewport.width}`);
     await p.screenshot({path:`${output}/reminder-${days}-${viewport.width}.png`,fullPage:true});
     await detail.getByRole('button',{name:'Hẹn báo lại',exact:true}).click();await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','acknowledged');
-    await expect(lot).toContainText(`Báo lại ${due}`);await route(p,'notifications');await expect(p.getByRole('heading',{name:'Chưa có thông báo'})).toBeVisible();
+    await expect(lot).toContainText(`Báo lại ${due}`);await route(p,'notifications');await expect(p.getByRole('region',{name:'Danh sách thông báo'})).toBeVisible();await expect(p.locator('[data-notification-lot="A24-255"]')).toHaveCount(0);
     const dueISO=days===1?'2026-10-24':'2026-10-30';
     await p.clock.setFixedTime(new Date(`${dueISO}T00:00:00+07:00`));await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
-    await expect(p.getByRole('heading',{name:'DATE cần xem lại'})).toBeVisible();await p.getByRole('button',{name:new RegExp(`A24-255.*Đến lịch báo lại ${due}`)}).click();
-    await expect(p.getByRole('heading',{name:'Cần xử lý',exact:true})).toBeVisible();await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','open');
+    await expect(p.getByRole('heading',{name:/Đến lịch báo lại/})).toBeVisible();await p.getByRole('button',{name:new RegExp(`A24-255.*Đến lịch báo lại ${due}`)}).click();
+    await expect(p.getByRole('heading',{name:'Chi tiết lô DATE',exact:true})).toBeVisible();await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','open');
     await p.screenshot({path:`${output}/due-${days}-${viewport.width}.png`,fullPage:true});await p.close();
    }
    for(const [id,kind,barcode,unit]of[['A24-255','tpcn','8936000123456','EA'],['C24-118','tpts','29123415005','kg']]){
@@ -48,9 +48,8 @@ async function settle(scope){await scope.evaluate(async root=>Promise.all(root.g
     await form.getByRole('button',{name:'Xem lại',exact:true}).click();await expect(form.getByRole('button',{name:'Gửi phiếu',exact:true})).toBeVisible();
     await expect(form.locator('.store-form-review')).toContainText(id);await expect(form.locator('.store-form-review')).toContainText(`1 ${unit}`);
     await p.screenshot({path:`${output}/kph-${kind}-${viewport.width}.png`});await form.getByRole('button',{name:'Gửi phiếu',exact:true}).dblclick();
-    await expect(form).toHaveCount(0);await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','resolved');await expect(lot.locator('[data-date-phase]')).toHaveAttribute('data-date-phase','EXPIRED');await expect(lot.locator('.store-date-percent')).toHaveText('Còn 0% HSD');
-    await lot.click();const detail=dateDetail(p,viewport.width);await expect(detail).toContainText('Đã tạo phiếu KPH cho lô này.');await expect(detail.getByRole('button',{name:'Đã xử lý',exact:true})).toBeDisabled();await expect(detail.getByRole('button',{name:'Ghi nhận',exact:true})).toBeDisabled();
-    if(viewport.width<900)await p.keyboard.press('Escape');await route(p,'kph');await expect(p.getByRole('textbox',{name:'Tìm tên hàng hoặc SKU'})).toBeEnabled();
+    await expect(form).toHaveCount(0);await expect(lot).toHaveCount(0);
+    await route(p,'notifications');await expect(p.getByRole('region',{name:'Danh sách thông báo'})).toBeVisible();await expect(p.locator(`[data-notification-lot="${id}"]`)).toHaveCount(0);await route(p,'kph');await expect(p.getByRole('textbox',{name:'Tìm tên hàng hoặc SKU'})).toBeEnabled();
     if(kind==='tpcn')await p.locator('.store-tabs').getByRole('button',{name:/TP khô & khác/}).click();
     const record=p.locator('[data-record-id]').first();await expect(record).toContainText(kind==='tpcn'?'Bánh quy bơ':'Cải thìa');await expect(record).toContainText('Chờ duyệt');const recordId=await record.getAttribute('data-record-id');await expect(p.locator(`[data-record-id="${recordId}"]`)).toHaveCount(1);
     await record.locator('.store-ticket-open,.store-kph-row-open').click();await expect(p.getByRole('dialog',{name:'Chi tiết phiếu KPH',exact:true})).toContainText(id);

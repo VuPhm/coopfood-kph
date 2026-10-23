@@ -1,13 +1,43 @@
-import { Bell } from "lucide-react";
+import { useMemo } from "react";
+import { Bell, CalendarDays, ChevronDown, ChevronRight } from "lucide-react";
+import { ListItemMarker } from "@coopfood-kph/ui";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
-import { formatDisplayDate } from "@coopfood-kph/kph-rules";
+import { formatDisplayDate, type LocalDate } from "@coopfood-kph/kph-rules";
 import type { MockDateLot } from "./store-app-mock";
 import type { Screen } from "./store-app-routes";
+import { groupDateNotifications } from "./store-notifications-model";
+import { remainingShelfPercent } from "./store-date-assessment";
+import { DateConditionLabel, getDatePhaseTone } from "./store-date-label";
+import "./store-notifications.css";
 
-export function StoreNotifications({ navigate, reminders = [] }: { navigate: (screen: Screen) => void; reminders?: MockDateLot[] }) {
-  return <StorePageLayout className="store-notifications"><StorePageHero /><StorePageSurface className="store-report-page-cap store-notifications-body" aria-label="Danh sách thông báo">
-    <span className="store-notifications-icon"><Bell size={30} strokeWidth={1.7} aria-hidden="true" /></span>
-    {reminders.length ? <><h2>DATE cần xem lại</h2><div className="store-date-reminder-list">{reminders.map(lot => <button key={lot.id} onClick={() => navigate("date")}><strong>{lot.name}</strong><span>SKU {lot.sku} · Lô {lot.id}</span><span>Đến lịch báo lại {formatDisplayDate(lot.remindOn!)}</span></button>)}</div></> : <><h2>Chưa có thông báo</h2><p>Thông báo về hoạt động cửa hàng sẽ xuất hiện tại đây.</p>
-    <button type="button" onClick={() => navigate("home")}>Mở trang chủ</button></>}
+export function StoreNotifications({ navigate, lots, today, onOpenDateLot }: {
+  navigate: (screen: Screen) => void; lots: MockDateLot[]; today: LocalDate; onOpenDateLot: (id: string) => void;
+}) {
+  const groups = useMemo(() => groupDateNotifications(lots, today), [lots, today]);
+  const count = groups.reduce((total, group) => total + group.items.length, 0);
+  return <StorePageLayout className="store-notifications"><StorePageHero /><StorePageSurface
+    className={`store-report-page-cap store-notifications-body${count ? " has-notifications" : ""}`} aria-label="Danh sách thông báo">
+    {count ? <div className="store-notification-groups">
+      <section className="store-notification-module" aria-labelledby="notification-date-title">
+        <header className="store-notification-module-heading">
+          <span className="store-notification-module-icon"><CalendarDays size={22} aria-hidden="true" /></span>
+          <div><h2 id="notification-date-title">DATE</h2><p>Cảnh báo hạn dùng và lịch báo lại</p></div>
+          <span className="store-notification-total">{count}<span className="sr-only"> lô cần chú ý</span></span>
+        </header>
+        <div className="store-notification-sections">{groups.map(group => <details key={group.id} open className="store-notification-section" data-notification-group={group.id}>
+          <summary><div><h3>{group.title}<span>{group.items.length}</span></h3><p>{group.description}</p></div><ChevronDown size={18} aria-hidden="true" /></summary>
+          <div className="store-notification-items">{group.items.map(({ lot, assessment }) => {
+            const percent = remainingShelfPercent(assessment);
+            return <button key={lot.id} className="store-notification-item ui-list-marker-card" data-notification-lot={lot.id} onClick={() => onOpenDateLot(lot.id)}>
+              <ListItemMarker variant="bar" tone={getDatePhaseTone(assessment.phase)} />
+              <span className="store-notification-item-copy"><strong>{lot.name}</strong><small>SKU {lot.sku} · Lô {lot.id}</small>
+                <span className="store-notification-item-state"><DateConditionLabel phase={assessment.phase} />{group.id === "reminder" ? <small>Đến lịch báo lại {formatDisplayDate(lot.remindOn!)}</small> : null}</span>
+              </span>
+              <span className="store-notification-item-end">{percent !== null ? <span className="store-notification-percent" data-tone={getDatePhaseTone(assessment.phase)}><small>Còn </small><strong>{percent}%</strong><span className="sr-only"> HSD</span></span> : null}<ChevronRight size={18} aria-hidden="true" /></span>
+            </button>;
+          })}</div>
+        </details>)}</div>
+      </section>
+    </div> : <><span className="store-notifications-icon"><Bell size={30} strokeWidth={1.7} aria-hidden="true" /></span><h2>Chưa có thông báo</h2><p>Cảnh báo và lịch báo lại cần chú ý sẽ xuất hiện tại đây.</p><button type="button" onClick={() => navigate("home")}>Mở trang chủ</button></>}
   </StorePageSurface></StorePageLayout>;
 }

@@ -76,6 +76,7 @@ function StoreAppContent() {
   const quickFabRef = useRef<HTMLButtonElement>(null);
   const quickPanelRef = useRef<HTMLDivElement>(null);
   const [records, setRecords] = useState(mockRecords);
+  const [dateTarget, setDateTarget] = useState<string>();
   const [storedDateLots, setDateLots] = useState(mockDateLots);
   const today = useBusinessDate();
   const dateLots = useMemo(() => reactivateDueDateLots(storedDateLots, today), [storedDateLots, today]);
@@ -121,6 +122,8 @@ function StoreAppContent() {
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
   }, []);
+  useEffect(() => { if (screen === "date") setDateTarget(undefined); }, [screen]);
+  const openDateLot = (id: string) => { setDateTarget(id); window.location.hash = "date"; };
   const navigate = (next: Screen) => { window.location.hash = next; };
 
   if (screen === "login") return <><StoreLogin busy={false} error={loginPreviewError}
@@ -134,9 +137,9 @@ function StoreAppContent() {
       {screen === "home" ? <StoreHomeContent profile={mockProfile} navigate={navigate} onKphIntent={preloadKph} openDateLots={dateLots.filter(lot => lot.status === "open").length} pendingRecords={records.filter(r => r.approvalStatus === "PENDING").length} /> : null}
       {screen === "shelf" ? <StorePageLayout><StorePageHero /><StorePageSurface className="store-shelf-surface"><div className="store-shelf-page"><ShelfLifeScreen history={shelfHistory.history} onCalculated={shelfHistory.remember} /></div></StorePageSurface></StorePageLayout> : null}
       {screen === "kph" ? <FeatureLoadBoundary><LazyKphWorkspace records={records} onRecordsChange={setRecords} onNotice={setNotice} /></FeatureLoadBoundary> : null}
-      {screen === "date" ? <DateWorkspace lots={dateLots} onLotsChange={setDateLots} today={today} onCreateKph={createDateKph} /> : null}
+      {screen === "date" ? <DateWorkspace lots={dateLots} onLotsChange={setDateLots} today={today} onCreateKph={createDateKph} initialLotId={dateTarget} /> : null}
       {screen === "reports" ? <FeatureLoadBoundary><DeferredReportHub lots={dateLots} /></FeatureLoadBoundary> : null}
-      {screen === "notifications" ? <StoreNotifications navigate={navigate} reminders={dueReminders} /> : null}
+      {screen === "notifications" ? <StoreNotifications navigate={navigate} lots={dateLots} today={today} onOpenDateLot={openDateLot} /> : null}
       {showQuickLookup ? <button ref={quickFabRef} hidden={quickOpen} className="store-quick-fab" aria-label="Mở tiện ích tra cứu lùi hàng" aria-expanded={quickOpen} aria-controls={quickOpen ? "store-quick-panel" : undefined} onClick={() => setQuickOpen(open => !open)}><History size={22} strokeWidth={1.8} aria-hidden="true" /><span>Tra hạn lùi</span></button> : null}
       {showQuickLookup ? <Dialog open={quickOpen} onOpenChange={setQuickOpen}><DialogContent id="store-quick-panel" ref={quickPanelRef} className="store-quick-panel" aria-label="Tra cứu lùi hàng nhanh" aria-labelledby={undefined} closeLabel="Đóng tiện ích" onOpenAutoFocus={event => { event.preventDefault(); quickPanelRef.current?.focus(); }} onCloseAutoFocus={event => { event.preventDefault(); window.requestAnimationFrame(() => quickFabRef.current?.focus()); }}><DialogHeader><DialogTitle>Tra cứu lùi hàng</DialogTitle></DialogHeader><DialogDescription className="sr-only">Tra hạn lùi tự động theo thông tin ngày đã nhập</DialogDescription><div className="store-modal-body"><ShelfLifeScreen idPrefix="quick-shelf" lookup={quickLookup} /></div></DialogContent></Dialog> : null}
   </StoreAppFrame>;

@@ -1,0 +1,35 @@
+.store-notifications-body.has-notifications { align-items: stretch; padding: 16px var(--store-header-gutter) calc(var(--store-mobile-toolbar-height, 0px) + 108px); text-align: left; }
+.store-notification-groups { display: grid; gap: 24px; width: 100%; max-width: 1040px; margin-inline: auto; }
+.store-notification-module { display: grid; gap: 16px; min-width: 0; }
+.store-notification-module-heading { display: flex; align-items: center; gap: 12px; min-width: 0; padding-block: 4px; }
+.store-notification-module-heading > div { flex: 1; min-width: 0; }
+.store-notifications .store-notification-module-heading h2 { font-size: 17px; line-height: 24px; }
+.store-notifications .store-notification-module-heading p { max-width: none; font-size: 13px; line-height: 20px; }
+.store-notification-module-icon { display: grid; flex-shrink: 0; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--store-module-mint); color: var(--store-brand-action); }
+.store-notification-total { display: grid; place-items: center; min-width: 32px; min-height: 32px; padding: 4px 9px; border-radius: 999px; background: var(--store-module-mint); color: var(--store-brand-action); font-size: 14px; font-weight: 650; }
+.store-notification-sections { display: grid; gap: 12px; min-width: 0; }
+.store-notification-section { min-width: 0; border: 1px solid var(--store-holder-edge); border-radius: 16px; background: var(--store-holder-surface); }
+.store-notification-section > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 12px 14px; border-radius: 16px; cursor: pointer; list-style: none; }
+.store-notification-section > summary::-webkit-details-marker { display: none; }
+.store-notification-section > summary > div { min-width: 0; }
+.store-notification-section > summary > svg { flex-shrink: 0; color: var(--store-ink-muted); transition: transform 120ms ease; }
+.store-notification-section[open] > summary > svg { transform: rotate(180deg); }
+.store-notification-section h3 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 0; font-size: 15px; line-height: 22px; font-weight: 650; }
+.store-notification-section h3 > span { color: var(--store-ink-muted); font-size: 12px; font-weight: 400; }
+.store-notifications .store-notification-section summary p { max-width: none; margin-top: 2px; font-size: 12px; line-height: 18px; }
+.store-notification-items { padding-inline: 14px; }
+.store-notification-item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 96px; border-top: 1px solid var(--store-holder-edge); padding: 12px 0 12px 16px; background: white; color: var(--store-ink); text-align: left; }
+.store-notification-item > .ui-list-item-marker[data-variant="bar"] { left: 0; top: 16px; }
+.store-notification-item-copy { display: grid; flex: 1; gap: 4px; min-width: 0; }
+.store-notification-item-copy > strong { font-size: 16px; line-height: 23px; font-weight: 650; overflow-wrap: anywhere; }
+.store-notification-item small { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.store-notification-item-state { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.store-notification-item-end { display: flex; align-items: center; gap: 6px; color: var(--store-brand-action); }
+.store-notification-percent { display: grid; justify-items: end; }
+.store-notification-percent strong { font-size: 20px; line-height: 26px; font-variant-numeric: tabular-nums; }
+.store-notification-percent[data-tone="info"] { color: #235786; }
+.store-notification-percent[data-tone="danger"] { color: var(--store-error-ink); }
+.store-notification-percent[data-tone="warning"] { color: var(--store-warning-ink); }
+.store-notifications :is(summary,button):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 3px; }
+@media (min-width: 900px) { .store-notifications-body.has-notifications { padding-top: 24px; } }
+@media (prefers-reduced-motion: reduce) { .store-notification-section > summary > svg { transition: none; } }

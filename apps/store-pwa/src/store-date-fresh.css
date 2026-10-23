@@ -60,7 +60,7 @@
 .store-date-toolbar .store-quick-sort-trigger { width: 100%; }
 .store-date-toolbar > :first-child { flex: 1; min-width: 0; }
 .store-date-add { display: none; }
-.store-date-statuses { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.store-date-statuses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .store-date-statuses button { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; min-height: 44px; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 3px 6px; background: var(--store-surface); color: var(--store-ink); font-size: 12px; font-weight: 600; line-height: 16px; }
 .store-date-statuses button > span { min-width: 0; }
 .store-date-statuses small { display: grid; place-items: center; min-width: 21px; height: 20px; border: 1px solid var(--store-line); border-radius: 999px; padding-inline: 5px; background: white; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; font-weight: 400; }
@@ -68,22 +68,24 @@
 .store-date-statuses .is-selected small { border-radius: 999px; padding-inline: 5px; background: white; color: var(--store-brand-action); }
 .store-date-workspace { display: grid; gap: 24px; min-width: 0; }
 .store-date-lots { display: grid; grid-template-columns: 1fr; align-content: start; gap: 8px; min-width: 0; }
-.store-date-lot { --ui-list-marker-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; min-width: 0; border: 1px solid var(--store-line); border-radius: 16px; padding: 12px 12px 12px 28px; background: var(--store-surface); color: var(--store-ink); text-align: left; }
-.store-date-lot:hover { background: var(--store-canvas); }
-.store-date-lot.is-active { border-color: var(--store-brand-action); box-shadow: inset 0 0 0 1px var(--store-brand-action); background: var(--store-canvas); }
+.store-date-lot { --ui-list-marker-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; min-width: 0; border: 1px solid var(--store-holder-edge); border-radius: 16px; padding: 12px 12px 12px 28px; background: var(--store-surface); color: var(--store-ink); text-align: left; }
+.store-date-lot:hover { border-color: var(--store-control-line); }
+.store-date-lot.is-active { border-color: var(--store-brand-action); box-shadow: inset 0 0 0 1px var(--store-brand-action); background: var(--store-module-mint); }
 .store-date-lot-main, .store-date-lot-end { display: contents; }
 .store-date-lot-main > strong { grid-column: 1; grid-row: 1; font-size: 16px; font-weight: 650; line-height: 23px; overflow-wrap: anywhere; }
 .store-date-lot small { font-size: 12px; line-height: 18px; color: var(--store-ink-muted); overflow-wrap: anywhere; }
-.store-date-lot-main > small:first-of-type { grid-column: 1 / -1; grid-row: 2; min-width: 0; align-self: center; }
+.store-date-lot-main > small:first-of-type { grid-column: 1; grid-row: 2; min-width: 0; align-self: start; }
 .store-date-lot-identifiers > span { white-space: nowrap; }
-.store-date-lot-labels { display: flex; grid-column: 1 / -1; grid-row: 4; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; padding-right: 64px; }
-.store-date-lot-main > .store-date-lot-dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; grid-column: 1 / -1; grid-row: 3; padding: 8px; border-radius: 12px; background: var(--store-canvas); }
-.store-date-lot-dates > span { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; row-gap: 2px; }
-.store-date-lot-dates b { color: var(--store-ink); font-size: 13px; line-height: 20px; font-weight: 600; }
-.store-date-lot-end > strong { grid-column: 2; grid-row: 1; max-width: 96px; font-size: 13px; font-weight: 600; line-height: 20px; text-align: right; }
+.store-date-lot-footer { display: flex; grid-column: 1 / -1; grid-row: 4; align-items: center; gap: 12px; min-width: 0; margin-top: 4px; }
+.store-date-lot-labels { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.store-date-lot-main > .store-date-lot-dates { display: flex; flex-wrap: wrap; gap: 2px 12px; grid-column: 1 / -1; grid-row: 3; min-width: 0; }
+.store-date-lot-dates > span { white-space: nowrap; }
+.store-date-lot-end > strong { display: grid; align-content: start; justify-items: end; grid-column: 2; grid-row: 1 / 3; align-self: start; max-width: 96px; color: var(--store-ink-muted); font-size: 13px; font-weight: 600; line-height: 20px; text-align: right; overflow-wrap: anywhere; }
+.store-date-percent-caption { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; font-weight: 400; }
+.store-date-percent-value { font-size: 24px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .store-date-lot-end .is-danger { color: var(--store-error-ink); }
 .store-date-lot-end .is-warning { color: var(--store-warning-ink); }
-.store-date-lot-action { display: inline-flex; grid-column: 2; grid-row: 4; align-items: center; justify-self: end; gap: 4px; color: var(--store-brand-action); font-size: 12px; line-height: 18px; font-weight: 650; }
+.store-date-lot-action { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; color: var(--store-brand-action); font-size: 12px; line-height: 18px; font-weight: 650; }
 .store-date-lot-heading { display: grid; gap: 4px; min-width: 0; }
 :is(.store-date, .store-date-sheet) .store-date-lot-heading h3 { color: var(--store-ink); font-size: 16px; line-height: 23px; overflow-wrap: anywhere; }
 .store-date-lot-heading p { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
@@ -202,15 +204,12 @@
 :is(.store-date-detail, .store-date-lot-sheet) .store-date-milestone-facts { gap: 8px; }
 :is(.store-date-detail, .store-date-lot-sheet) .store-date-milestone-facts > div { padding: 8px 0; border-top: 1px solid var(--store-holder-edge); }
 :is(.store-date, .store-date-lot-sheet) .store-date-percent { color: var(--store-ink-muted); }
-:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="success"] { color: var(--store-brand-action); background-color: #e6f7f2; }
-:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="warning"] { color: var(--store-warning-ink); background-color: #fff2dc; }
-:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="danger"] { color: var(--store-error-ink); background-color: #fef3f2; }
-:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="info"] { color: #235786; background-color: #edf5ff; }
-.store-date .store-date-lot-end > .store-date-percent { align-self: start; max-width: 106px; padding: 3px 7px; border-radius: 9px; font-size: 12px; line-height: 18px; }
-.store-date .store-date-lot:not(.is-active) { box-shadow: var(--store-soft-card-shadow); }
-.store-date .store-date-lot-main > .store-date-lot-dates { background: #f5f8fa; }
-.store-date .store-date-lot { transition: background-color 120ms ease, border-color 120ms ease; }
-.store-date .store-date-lot:hover { border-color: var(--store-control-line); }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="success"] { color: var(--store-brand-action); }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="warning"] { color: var(--store-warning-ink); }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="danger"] { color: var(--store-error-ink); }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="info"] { color: #235786; }
+.store-date .store-date-lot { transition: border-color 120ms ease; }
+@media (prefers-reduced-motion: reduce) { .store-date .store-date-lot { transition: none; } }
 .store-date .store-date-product { background: white; }
 .store-date-filter .store-date-filter-section { border-color: var(--store-holder-edge); background: white; }
 .store-date-filter .store-choices button:not(.is-selected) { border-color: var(--store-holder-edge); background: #f5f8fa; }
@@ -240,9 +239,6 @@
 .store-date-reminder-choices small { display: block; font-size: 12px; line-height: 18px; color: var(--store-ink-muted); }
 :is(.store-date,.store-date-lot-sheet) .store-date-remind-note { margin: 0; font-size: 13px; line-height: 20px; color: var(--store-ink-muted); }
 .store-date .store-date-remind-label { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
-.store-date-reminder-list { display: grid; gap: 12px; width: min(100%,640px); }
-.store-date-reminder-list button { display: grid; gap: 4px; min-height: 64px; border: 1px solid var(--store-holder-edge); border-radius: 14px; padding: 14px; background: white; color: var(--store-ink); text-align: left; }
-.store-date-reminder-list span { color: var(--store-ink-muted); font-size: 13px; line-height: 20px; }
 
 .store-date-action-notice { margin: 0; padding: 10px 12px; border-radius: 12px; background: #f5f8fa; color: var(--store-ink); font-size: 13px; line-height: 20px; }
 

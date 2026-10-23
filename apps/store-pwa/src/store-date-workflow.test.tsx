@@ -8,7 +8,7 @@ import { processEvidencePhoto } from "./image-processing";
 vi.mock("./image-processing",()=>({processEvidencePhoto:vi.fn()}));
 function Workspace({save}: {save:(draft:CreatedRecordDraft)=>Promise<string>}) {
   const [lots,setLots]=useState([mockDateLots[5]!]);
-  return <DateWorkspace lots={lots} onLotsChange={setLots} today="2026-11-16" onCreateKph={save} />;
+  return <><DateWorkspace lots={lots} onLotsChange={setLots} today="2026-11-16" onCreateKph={save} /><output aria-label="Trạng thái lô nguồn">{lots[0]?.status}</output></>;
 }
 async function openKph(save=vi.fn<(_:CreatedRecordDraft)=>Promise<string>>().mockResolvedValue("kph-created")) {
   render(<Workspace save={save}/>);
@@ -48,7 +48,7 @@ describe("DATE actions use real KPH form",()=>{
     await reviewKph();fireEvent.click(screen.getByRole('button',{name:'Gửi phiếu'}));
     expect(await screen.findByRole('alert')).toHaveTextContent('Lưu chưa thành công');expect(document.querySelector('.store-date-lot [data-processing-status]')).toHaveAttribute('data-processing-status','open');
     fireEvent.click(screen.getByRole('button',{name:'Gửi phiếu'}));await waitFor(()=>expect(document.querySelector('.store-create-screen')).not.toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button',{name:/Theo dõi DATE/}));const card=screen.getByRole('button',{name:/Bánh quy/});expect(card.querySelector('[data-processing-status]')).toHaveAttribute('data-processing-status','resolved');expect(card.querySelector('[data-date-phase]')).toHaveAttribute('data-date-phase','EXPIRED');
+    fireEvent.click(screen.getByRole('button',{name:/Theo dõi DATE/}));expect(screen.queryByRole('button',{name:/Bánh quy/})).not.toBeInTheDocument();expect(screen.getByLabelText('Trạng thái lô nguồn')).toHaveTextContent('resolved');
     expect(save.mock.calls[0]?.[0]).toMatchObject({skuCode:'0008421',kind:'TPCN',photos:[expect.any(Object)]});
   });
   it("rejects a different product instead of resolving the source lot",async()=>{

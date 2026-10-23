@@ -33,12 +33,12 @@ describe("Store App session and route ownership", () => {
   it("reopens a due DATE reminder in alerts and notifications after tab resume", async () => {
     window.history.replaceState(null, "", "#date");render(<StoreApp />);
     fireEvent.click(screen.getByRole("button",{name:/Cải thìa/}));fireEvent.click(screen.getByRole("button",{name:"Ghi nhận"}));fireEvent.click(screen.getByRole("button",{name:"Hẹn báo lại"}));
-    window.location.hash="notifications";fireEvent(window,new HashChangeEvent("hashchange"));await screen.findByText("Chưa có thông báo");
+    window.location.hash="notifications";fireEvent(window,new HashChangeEvent("hashchange"));await screen.findByRole("heading",{name:"DATE"});expect(document.querySelector('[data-notification-lot="C24-118"]')).not.toBeInTheDocument();
     vi.setSystemTime(new Date("2026-10-07T08:00:00+07:00"));fireEvent(document,new Event("visibilitychange"));
     await screen.findByText("Đến lịch báo lại: 1 lô DATE cần xem lại.");
-    await screen.findByText("DATE cần xem lại");fireEvent.click(screen.getByRole("button",{name:/Đến lịch báo lại 07\/10\/2026/}));
-    await screen.findByRole("heading",{name:"Cần xử lý"});
-    const lot=await screen.findByRole("button",{name:/Cải thìa/});expect(lot.querySelector('[data-processing-status]')).toHaveAttribute('data-processing-status','open');
+    await screen.findByRole("heading",{name:/Đến lịch báo lại/});fireEvent.click(screen.getByRole("button",{name:/Đến lịch báo lại 07\/10\/2026/}));
+    await screen.findByRole("heading",{name:"Chi tiết lô DATE"});
+    const lot=document.querySelector('[data-date-lot-id="C24-118"]')!;expect(lot.querySelector('[data-processing-status]')).toHaveAttribute('data-processing-status','open');
   });
 
   it("opens legacy lookup links in DATE with a single navigation destination", async () => {
@@ -67,7 +67,7 @@ describe("Store App session and route ownership", () => {
     await screen.findByRole("heading", { name: "Chọn báo cáo" });
     expect(nav().getByRole("link", { name: "Báo cáo" })).toHaveAttribute("aria-current", "page");
     fireEvent.click(nav().getByRole("link", { name: "Thông báo" }));
-    await screen.findByRole("heading", { name: "Chưa có thông báo" });
+    await screen.findByRole("heading", { name: "DATE" });
     expect(nav().getByRole("link", { name: "Thông báo" })).toHaveAttribute("aria-current", "page");
     expect(nav().getByRole("link", { name: "Báo cáo" })).toHaveAttribute("href", "#reports");
     expect(nav().getByRole("link", { name: "Báo cáo" })).not.toHaveAttribute("aria-current");
