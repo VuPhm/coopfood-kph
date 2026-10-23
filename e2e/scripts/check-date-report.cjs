@@ -148,7 +148,8 @@ async function bulk(page, name) {
       await expect(page.locator('.report-selection-bar')).toContainText('Đã chọn 3 / 3 lô');
       await go(page, viewport.width, 'DATE');
       await page.getByRole('button', { name: /Cải thìa/ }).click();
-      await page.getByRole('button', { name: 'Đã xử lý', exact: true }).click();
+      await page.getByRole('button', { name: 'Ghi nhận', exact: true }).click();
+      await page.getByRole('button', { name: 'Hẹn báo lại', exact: true }).click();
       await go(page, viewport.width, 'Báo cáo');
       await page.getByRole('button', { name: 'Lịch sử 1', exact: true }).click();
       await page.locator('.report-history-card').click();
@@ -159,7 +160,7 @@ async function bulk(page, name) {
       await expect(page.locator('.report-selection-bar')).toContainText('Đã chọn 1 / 3 lô');
       await create(page);
       await page.getByRole('button', { name: 'Chi tiết lô C24-118', exact: true }).click();
-      await expect(page.getByRole('dialog')).toContainText('Đã xử lý');
+      await expect(page.getByRole('dialog')).toContainText('Đã ghi nhận');
       await page.getByRole('button', { name: 'Đóng chi tiết', exact: true }).click();
       await page.reload();
       await expect(page.getByRole('heading', { name: 'Chọn báo cáo', exact: true })).toBeFocused();
@@ -169,7 +170,7 @@ async function bulk(page, name) {
       await expect(page.locator('.report-history-card')).toHaveCount(2);
       await page.locator('.report-history-card').first().click();
       await page.getByRole('button', { name: 'Chi tiết lô C24-118', exact: true }).click();
-      await expect(page.getByRole('dialog')).toContainText('Đã xử lý'); // restored snapshot, live source reset on reload
+      await expect(page.getByRole('dialog')).toContainText('Đã ghi nhận'); // restored snapshot, live source reset on reload
       await page.getByRole('button', { name: 'Đóng chi tiết', exact: true }).click();
       await page.getByRole('button', { name: 'Về lịch sử báo cáo', exact: true }).click();
       await page.addStyleTag({ content: '.date-report :is(p, small, span, label, button, input, select) { font-size: 150% !important; }' });

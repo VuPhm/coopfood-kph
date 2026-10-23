@@ -11,6 +11,7 @@ import { StoreSearchField } from "./store-search-field";
 import { ReportSurface } from "./store-report-surface";
 import "./store-controls.css";
 import "./store-date-report.css";
+import "./store-report-soft.css";
 
 export function ReportHub({ lots }: { lots: MockDateLot[] }) {
   const library = useReportLibrary(mockProfile.storeCode);

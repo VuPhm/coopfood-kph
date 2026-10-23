@@ -21,6 +21,7 @@ import { StoreSettingsGroup, StoreSettingsRow } from "./store-settings-group";
 import { ReportTemplatePicker } from "./store-report-template-picker";
 import "./store-report-composer.css";
 import "./store-date-report.css";
+import "./store-report-soft.css";
 
 function useReportMedia(query: string) {
   const source = useMemo(() => {

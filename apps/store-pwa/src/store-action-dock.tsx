@@ -14,6 +14,7 @@ export function StoreActionDock({ children, summary, label, className }: { child
     if (!container || !dock || !probe) return;
     const boundary = container.parentElement;
     const app = container.closest<HTMLElement>(".store-app");
+    const utility = app?.querySelector<HTMLElement>(".store-quick-fab");
     const previousUtilityClearance = app?.style.getPropertyValue("--store-floating-action-clearance") ?? "";
     const previousClearance = boundary?.style.getPropertyValue("--store-action-clearance") ?? "";
     const previousBoundary = boundary?.getAttribute("data-store-action-boundary");
@@ -31,7 +32,11 @@ export function StoreActionDock({ children, summary, label, className }: { child
       const floating = rect.top + height > window.innerHeight - bottom + 1 || rect.bottom < 0;
       const next = { floating, left: rect.left, width: rect.width, height, keyboard };
       const clearance = `${height + bottom + 16}px`;
-      const utilityClearance = floating && !keyboard ? `${height + bottom + 12}px` : "0px";
+      // The inline dock can still share the utility's bottom strip after focus restores.
+      // Keep its actions reachable; reuse the current scroll/resize measurement.
+      const utilityHeight = utility?.getBoundingClientRect().height ?? 48;
+      const inlineNearBottom = !floating && rect.top < window.innerHeight && rect.bottom > window.innerHeight - bottom - utilityHeight - 12;
+      const utilityClearance = keyboard ? "0px" : floating ? `${height + bottom + 12}px` : inlineNearBottom ? `${window.innerHeight - rect.top + 12}px` : "0px";
       if (app?.style.getPropertyValue("--store-floating-action-clearance") !== utilityClearance) app?.style.setProperty("--store-floating-action-clearance", utilityClearance);
       if (boundary?.style.getPropertyValue("--store-action-clearance") !== clearance) boundary?.style.setProperty("--store-action-clearance", clearance);
       setPlacement(current => Object.keys(next).every(key => current[key as keyof Placement] === next[key as keyof Placement]) ? current : next);

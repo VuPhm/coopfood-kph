@@ -87,3 +87,22 @@ custom title/Back, login và account modal/skip link. Lệnh `check-store-header
 Back/ref, không remount account/sidebar và active theo route. Hồi quy báo cáo,
 loading geometry và navigation riêng vẫn giữ. Không dùng pixel snapshot rộng.
 [Handoff và giới hạn](../delivery/header-style-rollout/page-kit-2026-10-22.md).
+
+## Thanh cuộn desktop — UI02 candidate23/10/2026
+
+Từ900px, root Store/login, sidebar, KPH table và body/results/form trong Store
+portal dùng native scrollbar mảnh, thumb đủ rõ trên nền trắng. Không thêm JS
+scrollbar, không tắt wheel/keyboard/native drag. High contrast trả về bar đầy đủ
+và màu hệ thống. Quy tắc trong `store-scrollbars.css`, import bởi StoreAppFrame;
+không áp qua packages/ui, online/Pilot hoặc màn ngoài Store Fresh.
+
+StoreSheet/tiện ích/tài khoản giới hạn outer container, chỉ body cuộn; header và
+nút đóng đứng yên, thanh không chạy qua phần xanh/bo góc. Choice sheet giữ grid
+search/results/actions riêng; chỉ results cuộn. KPH/DATE sticky actions không
+để hở đệm dưới khi body cuộn. Radix vẫn sở hữu khóa cuộn/focus; nút nổi bù đúng
+khoảng scrollbar bị gỡ khi modal mở. Form tạo/review/skeleton hiện bar desktop,
+mobile và hàng tags ngang giữ cách dùng đã duyệt.
+
+Gate phải launch Chromium với `ignoreDefaultArgs: ['--hide-scrollbars']` để kiểm
+đúng geometry và thao tác native; gate headless mặc định ẩn bar không đủ cho
+lỗi này. [Kết quả và giới hạn](../delivery/ui02-scrollbars.md). Chờ owner xem.
