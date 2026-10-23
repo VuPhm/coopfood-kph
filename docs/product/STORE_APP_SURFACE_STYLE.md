@@ -182,14 +182,17 @@ headless đạt; kiểm thiết bị mục tiêu khi có scope đó.
 
 Owner yêu cầu làm mềm các thành phần form hiện tại và đặt tên phong cách.
 Dùng tên **Co.op Fresh Soft** cho cùng bộ `coop-fresh-soft-v1`; không tạo theme,
-setting hay họ token shared mới. Recipe form nằm trong stylesheet local
+setting hay họ token shared mới. Revision 2 theo feedback “viền vẫn dày”:
+ưu tiên cách Home phân khối bằng fill/mép sáng thay đường bao đậm. Recipe form
+nằm trong stylesheet local
 [store-form-soft.css](../../apps/store-pwa/src/store-form-soft.css), áp Store Fresh/
 login và các portal của Store; Admin/online/Pilot giữ riêng.
 
 | Vai trò | Recipe form |
 | --- | --- |
-| Input/select/textarea | Radius 16px, border 1px `#7d9084`, fill `#f3f8f5`, mép sáng/bóng thấp tĩnh; giữ kích thước và text hiện có |
-| Hover/focus | Border xanh `#00724e`, fill trắng; ring keyboard hiện có vẫn rõ, bounds không đổi |
+| Input/select/textarea nghỉ | Radius 16px, hộp border 1px giữ geometry nhưng màu chỉ `rgb(0 60 40 / 6%)`; fill `#f0f7f3`, mép sáng/bóng thấp; label + nội dung/placeholder rõ |
+| Hover | Fill `#eaf4ee`, giữ mép nhẹ; không vẽ lại khung đậm chỉ vì trỏ chuột |
+| Focus | Border xanh `#00724e`, fill trắng; ring keyboard hiện có vẫn rõ, bounds không đổi |
 | Readonly | Fill `#f0f5f2`, giữ readonly/native value/nhãn và focus của caller |
 | Disabled | Fill `#f0f3f1`, bỏ bóng; trạng thái disabled thuộc caller |
 | Invalid | Fill `#fef3f2`, edge `#b42318`, lỗi chữ/aria vẫn do form cung cấp |
@@ -198,10 +201,19 @@ login và các portal của Store; Admin/online/Pilot giữ riêng.
 | Login | Một shell chứa icon/input/reveal, cùng recipe; không thêm viền lồng lên input |
 
 Màu xanh rất nhẹ chỉ ở **bên trong ô nhập**; canvas/holder vẫn trắng như đã
-nghiệm thu. Hero search/CTA giữ vật liệu riêng trên xanh. Control boundary cần
-≥3:1, chữ/value/placeholder ≥4.5:1 trên nền thật. Reduced motion/transparency
-bỏ bóng; high contrast dùng màu hệ thống. Không thêm blur, animation shadow,
+nghiệm thu. Hero search/CTA giữ vật liệu riêng trên xanh. Viền nghỉ là trang trí,
+không phải cue duy nhất: field giữ label và nội dung/placeholder rõ; Số lượng
+Store Fresh có thêm “Nhập số lượng” khi trống. Chữ/value/placeholder ≥4.5:1;
+focus/error/selection vẫn ≥3:1. Field thiếu cue nhận diện phải giữ boundary ≥3:1,
+không dùng viền 6% cho ô trống không label. Reduced motion/transparency bỏ bóng; high contrast dùng màu hệ thống. Không thêm blur, animation shadow,
 listener, dependency hoặc thay rule ngày/snapshot/dữ liệu.
+
+Tham khảo [iOS 27](https://www.apple.com/lae/os/ios/) về khả năng đọc và độ tách
+lớp, cùng [Apple Materials](https://developer.apple.com/design/human-interface-guidelines/materials)
+về dùng vật liệu có chọn lọc. Đây là diễn giải cho PWA/Co.op Fresh, không mô phỏng
+native glass hoặc thêm blur. Kiểm cue theo vai trò, xem
+[WCAG 1.4.11 — Boundaries](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html#boundaries);
+không suy kiểm scoped thành chứng nhận accessibility đầy đủ.
 
 Giữ skeleton/live cùng geometry. [Phạm vi, gate và preview](../delivery/form01-fresh-soft/technical.md).
 Recipe form còn chờ owner xem; không suy technical PASS thành acceptance.

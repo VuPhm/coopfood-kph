@@ -1,14 +1,15 @@
 {
   "schemaVersion": 1,
   "id": "form01-fresh-soft",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "EXECUTING",
   "objective": "Soften existing Store Fresh form controls with the Co.op Fresh Soft form recipe while preserving interaction, state, validation and domain behavior.",
   "inScope": [
     "Name and document the existing coop-fresh-soft-v1 visual style as Co.op Fresh Soft; define its form recipe",
     "Harmonize text/date/select/textarea surfaces, grouped choices and action controls in Store Fresh/login and Store portals",
     "Preserve field sizes, native semantics, selected/error/readonly/disabled/focus states and scroll geometry",
-    "Verify KPH create/review/photo validation, report dialogs/pickers, filters, shelf and login on mobile/desktop"
+    "Verify KPH create/review/photo validation, report dialogs/pickers, filters, shelf and login on mobile/desktop",
+    "Revision 2: quiet resting edges based on Home pastel items; Apple iOS 27/material guidance is reference, not native UI implementation"
   ],
   "outOfScope": [
     "Domain/API/backend/authorization/data or storage changes",
@@ -17,7 +18,7 @@
     "Merge/push/deploy without owner approval"
   ],
   "baseSha": "f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8",
-  "candidateSha": "de548b7b6e0261f887fd81cb38b449e0878bb88a",
+  "candidateSha": "",
   "integrationOwner": "Current chat, sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-form-soft.css",
@@ -32,20 +33,19 @@
     "docs/product/STORE_APP_COMPONENT_CATALOG.md",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
-    "docs/delivery/form01-fresh-soft/**"
+    "docs/delivery/form01-fresh-soft/**",
+    "e2e/scripts/check-kph-colors.cjs",
+    "apps/store-pwa/src/create-record-dialog.tsx"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "de548b7b6e0261f887fd81cb38b449e0878bb88a",
-      "evidence": "docs/delivery/form01-fresh-soft/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner",
@@ -54,8 +54,16 @@
       "status": "pending"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Viền vẫn dày; cân nhắc triết lý viền item Home và tham khảo tiếp iOS 27.",
+      "source": "Direct owner feedback 24/10/2026 after preview 4301, candidate de548b7.",
+      "impact": "Resting form surfaces/edges, rendered affordance audit, cross-form browser evidence and recipe documentation.",
+      "decision": "Continue same branch/worktree/base. Use Home soft decorative edges, visible label/content cues and strong focus/error/selection states; invalidate material and browser evidence from revision 1."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Owner review production mock preview at http://127.0.0.1:4301/#kph: KPH forms/filters, reports, shelf and login; await explicit acceptance before merge.",
+  "nextAction": "Implement quiet resting edges, verify visible affordances/focus/states and geometry, then prepare revision 2 for owner review.",
   "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
 }

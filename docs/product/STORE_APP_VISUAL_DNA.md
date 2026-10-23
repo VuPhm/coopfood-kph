@@ -2,7 +2,8 @@
 
 **FORM01 candidate 24/10/2026:** tên ngắn của hướng khối mềm/viền nhẹ là
 **Co.op Fresh Soft** (`coop-fresh-soft-v1`). Recipe form bổ sung fill nhẹ trong
-field, radius 16/edge1px đủ tương phản, nhóm trắng và selected/error/focus rõ;
+field, radius 16/mép nghỉ 6% theo Home (revision 2), nhóm trắng; label/content
+và selected/error/focus giữ rõ;
 canvas và header giữ hướng đã duyệt. [Recipe](STORE_APP_SURFACE_STYLE.md),
 [phạm vi/kiểm tra](../delivery/form01-fresh-soft/technical.md); chờ owner xem.
 

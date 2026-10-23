@@ -462,7 +462,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
   });
   const quantityFields = <div className="grid max-w-md grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                 <Field label="Số lượng" htmlFor="quantity" required error={errors.quantity?.message}>
-                  <Input {...feedback("quantity", "quantity")} id="quantity" inputMode="decimal" {...register("quantity")} />
+                  <Input {...feedback("quantity", "quantity")} id="quantity" inputMode="decimal" placeholder={screenPresentation ? "Nhập số lượng" : undefined} {...register("quantity")} />
                 </Field>
                 <fieldset className="unit-fieldset">
                   <legend className="text-sm font-bold">Đơn vị</legend>

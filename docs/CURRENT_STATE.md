@@ -1,11 +1,13 @@
 # Trạng thái hiện tại
 
-**FORM01 — candidate 24/10/2026:** theo owner làm mềm thành phần form và đặt tên.
+**FORM01 — candidate revision 2, 24/10/2026:** theo owner làm mềm form;
+feedback viền còn dày, tham khảo item Home và iOS 27.
 Dùng tên **Co.op Fresh Soft** cho `coop-fresh-soft-v1`; input/date/select/textarea
-fill rất nhẹ/radius 16/viền 1px, lựa chọn giữ semantic/check và bớt nét kép, nhóm/
+fill nhẹ/radius 16/mép nghỉ 6%; label/content nhận diện, focus/error/selection
+rõ; Số lượng có placeholder khi trống. Giữ semantic/check, nhóm/
 footer mềm hơn. Giữ rule/validation/readonly/disabled/focus và kích thước control;
 không đổi packages/ui, API, header/nav/list/chart. Nhánh `store-app/form01-fresh-soft`
-từ `f77034d`; preview <http://127.0.0.1:4301/#kph>. Chưa merge/push/deploy;
+từ `f77034d`; preview <http://127.0.0.1:4302/#kph>. Chưa merge/push/deploy;
 [phạm vi, kiểm tra và giới hạn](delivery/form01-fresh-soft/technical.md).
 Bước tiếp theo: owner xem KPH form/bộ lọc, Báo cáo, Tra hạn và đăng nhập.
 

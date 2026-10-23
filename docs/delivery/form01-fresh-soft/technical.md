@@ -1,89 +1,92 @@
-# FORM01 — Co.op Fresh Soft cho form, 24/10/2026
+# FORM01 revision 2 — Co.op Fresh Soft, mép nhẹ theo Home
 
-Owner yêu cầu “các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách
-mới, đặt tên cho phong cách đó luôn”. Tên ngắn **Co.op Fresh Soft**, giữ mã
-recipe `coop-fresh-soft-v1` đã có, không tạo theme/setting mới. Candidate chờ owner
-xem; chưa merge/push/deploy. Base `f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8`, nhánh
-`store-app/form01-fresh-soft`, một writer tại worktree
-`/Users/vup/.codex/worktrees/form01-fresh-soft/coopfood-kph`; không team.
-Preview production mock: <http://127.0.0.1:4301/#kph>.
+Ngày 24/10/2026. Owner xem revision 1 tại 4301 và nhận xét “viền vẫn dày, có thể
+cân nhắc triết lý viền của các item home, tham khảo iếp theo ios27”. Tiếp cùng
+nhánh `store-app/form01-fresh-soft`, worktree
+`/Users/vup/.codex/worktrees/form01-fresh-soft/coopfood-kph`, base
+`f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8`, một writer, không team.
+Revision1 `de548b7` và [evidence cũ](revision 1.md) được giữ làm lịch sử;
+không dùng thay cho kiểm vật liệu revision 2.
 
-## Phạm vi và quyết định
+**Tên giữ Co.op Fresh Soft (`coop-fresh-soft-v1`).** Preview revision 2:
+<http://127.0.0.1:4302/#kph>. Technical và owner acceptance tách riêng;
+chưa merge/push/deploy.
 
-Rà form KPH đã có material của KPH03 và các control local trước khi sửa. Phần
-cứng còn lại là field trắng/contour mạnh, viền lồng và selected nét kép. Tái dùng
-component hiện có; chỉ thêm recipe CSS scoped Store Fresh/login/portal.
+## Quyết định và nguồn tham khảo
 
-- Input/select/textarea: fill rất nhẹ `#f3f8f5`, edge `#7d9084`/1px, radius 16;
-  mép sáng và bóng nhỏ tĩnh. Giữ height/padding/text, không ép layout compact.
-- Hover/focus chuyển fill trắng/edge xanh, giữ ring. Readonly/disabled/invalid có
-  vật liệu riêng; native attrs, value/label/validation vẫn thuộc form/caller.
-- Choice KPH giữ palette semantic, radio/check và selection; bỏ cảm giác nét
-  kép bằng một edge với bóng thấp. Unit và footer radius đồng bộ, nhóm trắng.
-- Login một outer shell cho icon/input/reveal, không thêm border lồng. Hero
-  search/CTA giữ vật liệu riêng; không nhuộm canvas trắng đã duyệt.
-- Reduced motion/transparency bỏ bóng, high contrast dùng hệ màu OS; không thêm
-  blur, JS listener, dependency hoặc thay domain/API/storage/authorization.
+- Home dùng border trong suốt/mép 6%, pastel, mép sáng và bóng card thấp.
+  Form nghỉ nay dùng edge `rgb(0 60 40 / 6%)` thay `#7d9084`; fill `#f0f7f3`,
+  highlight trắng và bóng `0 2px 5px rgb(0 60 40 / 5%)`. Hộp border 1px vẫn giữ
+  bounds, radius 16, không thay padding/height/text hoặc canvas trắng.
+- Hover chỉ đổi fill `#eaf4ee`; focus dùng edge xanh/fill trắng/ring thật.
+  Error, selected, readonly và disabled giữ trạng thái/semantics. Tăng tương
+  phản hoặc forced colors dùng Canvas/CanvasText, bỏ bóng, cả login shell.
+- Chữ gợi ý login đổi sang màu muted đậm hơn để đạt 4.5:1 trên fill mới. Số
+  lượng chỉ ở Store Fresh có placeholder “Nhập số lượng” khi trống; không đổi
+  default 1, validation, logic hoặc online/Pilot.
+- [Apple iOS 27](https://www.apple.com/lae/os/ios/) nhấn mạnh độ đọc, độ tách lớp
+  và khả năng điều chỉnh vật liệu; [Apple Materials](https://developer.apple.com/design/human-interface-guidelines/materials)
+  hướng dẫn chọn vật liệu theo vai trò. Áp dụng ở đây là diễn giải cho PWA,
+  không sao chép native glass hoặc thêm blur/lớp filter.
+- Viền nghỉ là trang trí khi đã có label và content/placeholder rõ. Audit
+  phân biệt cue với contour theo [WCAG 1.4.11 — Boundaries](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html#boundaries):
+  field thiếu cue vẫn cần contour≥3:1; chữ≥4.5:1 và focus/error/selection≥3:1.
+  Search cho phép icon tương phản + content, vẫn cần accessible name. Không
+  dùng kết quả scoped để tuyên bố chứng nhận WCAG đầy đủ.
 
 ## Files
 
-- `apps/store-pwa/src/store-form-soft.css`: recipe, state, preference fallbacks.
-- `store-app-frame.tsx`, `store-login.tsx`: import stylesheet local; không đổi props/logic.
-- `e2e/scripts/check-store-form-soft.cjs`: baseline field bounds, rendered boundary/
-  value/placeholder contrast, focus, native readonly và lỗi thật, login/reveal/
-  error recovery, 150% chữ và forced-colors.
-- Surface guide/Form controls/Visual DNA/component catalog, CURRENT_STATE/NEXT,
-  plan và technical này: tên và recipe/phạm vi, không nhận owner acceptance hộ.
+- `apps/store-pwa/src/store-form-soft.css`: resting/focus/hover và fallback.
+- `apps/store-pwa/src/create-record-dialog.tsx`: placeholder Số lượng có scope.
+- `e2e/scripts/check-kph-colors.cjs`: audit cue nhận diện; không bỏ ngưỡng chữ/
+  focus/selected. `check-store-form-soft.cjs` có fixture đối chứng: field thiếu
+  content, cue ẩn, chữ nhạt và focus nhạt phải thất bại; field đủ cue mới pass.
+- Recipe/Form controls/Visual DNA/catalog, CURRENT_STATE/NEXT và ledger r2.
+  Import từ StoreAppFrame/StoreLogin giữ nguyên revision 1. Không đổi packages/ui,
+  dependency, API, rule ngày, ảnh/snapshot, authorization hoặc storage.
 
-## Checkpoint
+## Kiểm tra trên production mock
 
-Candidate `de548b7b6e0261f887fd81cb38b449e0878bb88a` chứa toàn bộ implementation và test đã chạy ở trên
-working tree trước commit; commit không đổi source sau QA. Các commit tiếp theo
-trong ledger chỉ ghi bằng chứng. Technical PASS, owner pending; chưa merge.
+Runtime source đã được build và kiểm trước checkpoint; các artifact synthetic
+đều ignored trong `.local/form01/`, Chromium headless. Không dùng Computer Use.
+Port 4301 và 4302 cùng serve `.local/form01/build`; 4302 là origin mới cho owner.
 
-## Gate và evidence
-
-Đã chạy trên production mock build tại 4301, artifact synthetic/ignored trong
-`.local/form01/`; Playwright Chromium headless, không Computer Use. Các kiểm tra:
-
-- `VITEST_MAX_WORKERS=2 npm run verify`: PASS; 333 tests (Store 280, Admin 16,
-  API 2, rules 19, UI 16), typecheck, contract/examples/generated client và hai
-  production builds/PWA. Log `verify.log`. Cảnh báo chunk ExcelJS lớn có từ base.
 - `VITE_STORE_APP_MOCK=true npm --workspace @coopfood-kph/store-pwa run build
-  -- --outDir ../../.local/form01/build --emptyOutDir`: PASS; build dùng để xem/QA.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_FORM_OUTPUT=.local/form01/production-controls
+  -- --outDir ../../.local/form01/build --emptyOutDir`: PASS; `r2-build.log`.
+- `VITEST_MAX_WORKERS=2 npm run verify`: PASS 333 tests (Store 280, Admin 16,
+  API 2, rules 19, UI 16), types/contracts/examples/generated client và hai
+  production builds/PWA; `r2-verify.log`. ExcelJS large chunk là cảnh báo từ base.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_FORM_OUTPUT=.local/form01/r2-production-controls
   node e2e/scripts/check-store-form-soft.cjs`: PASS 390×844,1440×1024,320×844,
-  375×812,844×390. Đối chiếu baseline 4296 (runtime e5628ab không đổi qua f77034d):
-  bounds 4 field giữ trong 1px; contour≥3:1, value/placeholder≥4.5:1; keyboard
-  focus, readonly, lỗi thật/focus lỗi, login/reveal/recovery, chữ 150%, forced colors.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_CREATE_FORMS_OUTPUT=.local/form01/production-kph
-  node e2e/scripts/check-kph-create-forms.cjs`: PASS cả 2 loại tại 390/1440/320;
-  validation/link lỗi, Other/calendar, ảnh/recovery, review, focus và contrast.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_REPORT_OUTPUT=.local/form01/production-header
-  node e2e/scripts/check-report-header.cjs`: PASS 390/1440/320; mẫu dài 60 mục,
-  lựa chọn tạm/cancel/xác nhận, kỳ/calendar, chữ 150% và focus.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_REPORT_OUTPUT=.local/form01/production-report
-  node e2e/scripts/check-report-fresh.cjs`: PASS 390/1440/320.
+  375×812,844×390; geometry 4 field so baseline 4296 giữ trong 1px, mép nghỉ nhẹ,
+  label/content, focus/error/readonly, login/reveal/recovery, chữ 150%, forced
+  colors và increased contrast. Đối chứng audit đủ 4 trường hợp âm đều reject.
+- Cùng script chạy tại 4302, output `.local/form01/r2-preview-controls`: PASS
+  cả 5 viewport; đây là đúng origin bàn giao, cùng production artifact.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_CREATE_FORMS_OUTPUT=.local/form01/r2-production-kph
+  node e2e/scripts/check-kph-create-forms.cjs`: PASS cả 2 loại ở 390/1440/320,
+  linked validation, Other/calendar, ảnh 1–3/recovery, review và focus.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_REPORT_OUTPUT=.local/form01/r2-production-report
+  node e2e/scripts/check-report-fresh.cjs`: PASS 390/1440/320, gồm audit text/cue.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_REPORT_OUTPUT=.local/form01/r2-production-header
+  node e2e/scripts/check-report-header.cjs`: PASS 390/1440/320, picker 60 mục,
+  chọn tạm/cancel, giữ kỳ, calendar, chữ 150% và focus.
 - `STORE_APP_URL=http://127.0.0.1:4301 node e2e/scripts/check-shelf-refinement.cjs`:
-  PASS main + quick tại 390/1440/320; lỗi ngày/khoảng ngày, picker, chữ 150%,
-  focus/contrast. Log `production-shelf.log`.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_SCROLLBARS_OUTPUT=.local/form01/production-scrollbars
+  PASS main + quick ở 390/1440/320, lỗi ngày/duration, picker, text150/focus.
+  Log `r2-production-shelf.log`; ảnh/JSON ở `.local/shelf02/refinement`.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4301 STORE_SCROLLBARS_OUTPUT=.local/form01/r2-production-scrollbars
   node e2e/scripts/check-store-scrollbars.cjs`: PASS 390×844,1440×1024,1280×720,
-  900×650,1440×500; 7 screens, modal/picker, drag native, lock/restore, không tràn
-  ngang và forced colors. Sửa setup test: hash navigation/wheel có thể còn vị
-  trí cuộn cũ; đợi ổn định rồi đặt thumb về đầu trước kéo. Không đổi CSS scroll,
-  threshold hay thao tác native. Log `production-scrollbars.log`.
-- `npm run check:docs`, `git diff --check`: PASS.
+  900×650,1440×500; 7 màn, modal, native drag, lock/restore/no overflow/forced colors.
+- `npm run check:docs`, `git diff --check`: PASS trước checkpoint.
 
-Đã xem screenshot KPH mobile, login desktop và report create mobile; các ảnh,
-JSON và log tương ứng nằm trong thư mục production của `.local/form01/`.
-Không có thay đổi runtime sau lượt build/QA này.
+Đã xem screenshot production KPH ở 390/1440 và login390: không còn contour đậm
+quanh mọi field; selected/error/focus vẫn tách rõ. Dev HMR từng đổi thứ tự CSS
+lazy khiến quantity desktop 44px; production fresh navigation xác nhận 52px khớp
+baseline, cả 5 viewport geometry pass. Dùng production artifact để owner xem.
 
-## Giới hạn / bước tiếp
+## Giới hạn và bước tiếp
 
-Store Fresh memory-only, reports browser-local, không kiểm backend thật hoặc
-Safari/Windows/thiết bị thật. Không thêm unit tests chỉ mirror CSS; kiểm qua
-build/types, interaction/geometry/contrast và hồi quy các form có sẵn.
-
-Owner xem 4301: Tạo KPH cả 2 loại → field/Other/lỗi/ảnh/review, KPH/DATE filters,
-report picker/kỳ/tạo/lưu, Tra hạn main/quick, login/reveal/focus. Chưa merge.
+Mock memory-only/browser-local, chưa kiểm backend hoặc Safari/Windows/thiết bị
+thật; kiểm Chromium không thay nghiệm thu owner. Owner xem 4302: mở tạo KPH,
+để trống Số lượng, Tab vào ô nhập, gây lỗi, thử Other/ảnh/review; kiểm filters,
+Báo cáo/Tra hạn/login. Nhìn mép nghỉ, không gian và độ rõ trước duyệt; chưa merge.

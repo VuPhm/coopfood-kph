@@ -1,10 +1,10 @@
 /* Co.op Fresh Soft / coop-fresh-soft-v1: a form recipe, not a new app theme.
    Body scope reaches Store portals while keeping online/Pilot/Admin untouched. */
 body:has(.store-app, .store-login) {
-  --store-form-field-surface: #f3f8f5;
-  --store-form-field-edge: #7d9084;
+  --store-form-field-surface: #f0f7f3;
+  --store-form-field-edge: rgb(0 60 40 / 6%);
   --store-form-control-radius: 16px;
-  --store-form-field-shadow: inset 0 1px 0 rgb(255 255 255 / 85%), 0 2px 5px rgb(28 44 64 / 4%);
+  --store-form-field-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 2px 5px rgb(0 60 40 / 5%);
 }
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
   :is(input, textarea, select, .ui-select-trigger):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not(.sr-only):not(.store-page-hero input) {
@@ -14,9 +14,16 @@ body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-s
   box-shadow: var(--store-form-field-shadow);
   transition: background-color 120ms ease-out, border-color 120ms ease-out;
 }
+/* Like Home pastel items, resting bounds are defined by fill and visible content.
+   Fields keep visible labels/placeholders; focus/error states carry strong edges.
+   Keep the 1px box to avoid shifts; reserve the contrasting edge for focus/errors. */
+body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
+  :is(input, textarea, select, .ui-select-trigger):hover:not(:disabled):not([readonly]):not([aria-invalid="true"]) {
+  --store-form-field-surface: #eaf4ee;
+}
 /* State changes alter material only; native labels, values and focus stay owned by controls. */
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
-  :is(input, textarea, select, .ui-select-trigger):is(:hover, :focus-visible):not(:disabled):not([readonly]):not([aria-invalid="true"]) {
+  :is(input, textarea, select, .ui-select-trigger):focus-visible:not(:disabled):not([readonly]):not([aria-invalid="true"]) {
   --store-form-field-edge: #00724e;
   --store-form-field-surface: #fff;
 }
@@ -45,8 +52,10 @@ body:has(.store-login) .store-login .store-login-input {
   background: var(--store-form-field-surface);
   box-shadow: var(--store-form-field-shadow);
 }
+body:has(.store-login) .store-login .store-login-input:hover { background: #eaf4ee; }
 body:has(.store-login) .store-login .store-login-input:focus-within { border-color: #00724e; background: white; }
 body:has(.store-login) .store-login .store-login-input input { border-radius: var(--store-form-control-radius); }
+body:has(.store-login) .store-login .store-login-input input::placeholder { color: var(--login-muted); opacity: 1; }
 body:has(.store-app, .store-login) .store-create-screen .unit-options { border-radius: 16px; background: #eef5f1; }
 body:has(.store-app, .store-login) .store-create-screen .unit-options label span { border-radius: 12px; }
 /* Keep semantic KPH option colors and checked indicator; a single edge replaces the double stroke. */
@@ -73,5 +82,6 @@ body:has(.store-app, .store-login) :is(.expiry-calendar, .ui-dropdown-surface) {
 @media (prefers-contrast: more), (forced-colors: active) {
   body:has(.store-app, .store-login) { --store-form-field-edge: CanvasText; --store-form-field-surface: Canvas; --store-form-field-shadow: none; }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
-    :is(input, textarea, select, .ui-select-trigger):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only):not(.store-page-hero input) { border-color: CanvasText; background-color: Canvas; box-shadow: none; }
+    :is(input, textarea, select, .ui-select-trigger):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only):not(.store-page-hero input) { --store-form-field-surface: Canvas; --store-canvas: Canvas; border-color: CanvasText; background-color: Canvas; box-shadow: none; }
+  body:has(.store-login) .store-login .store-login-input { border-color: CanvasText; background: Canvas; box-shadow: none; }
 }
