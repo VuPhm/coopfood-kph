@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { ArrowRight, Eye, EyeOff, LoaderCircle, LockKeyhole, UserRound } from "lucide-react";
 import "./store-frame-canvas.css";
 import "./store-login.css";
+import "./store-form-soft.css";
 
 export function StoreLogin({ busy, error, onSubmit, onPreview }: {
   busy: boolean;

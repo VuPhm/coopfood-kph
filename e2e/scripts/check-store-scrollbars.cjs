@@ -70,6 +70,15 @@ async function scrollBody(page, dialog, selector, desktop) {
           await expect(rail.locator('.store-rail-store')).toBeInViewport();
           await rail.evaluate(el => { el.scrollTop = 0; });
         }
+        // Hash navigation can retain scroll position; start with the thumb at the top.
+        // Let any preceding wheel/scroll anchoring finish before placing the thumb.
+        let previousTop;
+        await expect.poll(async () => {
+          const top = await page.evaluate(() => scrollY);
+          const settled = top === previousTop; previousTop = top; return settled;
+        }).toBe(true);
+        await page.evaluate(() => scrollTo(0, 0));
+        await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
         await page.mouse.move(viewport.width - 3, 20); await page.mouse.down();
         await page.mouse.move(viewport.width - 3, 160, { steps: 8 }); await page.mouse.up();
         await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);

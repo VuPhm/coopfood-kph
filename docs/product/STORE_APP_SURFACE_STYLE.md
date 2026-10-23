@@ -1,6 +1,7 @@
-# Co.op Fresh — khối mềm, viền nhẹ
+# Co.op Fresh Soft — khối mềm, viền nhẹ
 
-Mã tham chiếu: **`coop-fresh-soft-v1`**, ngày 22/10/2026. Đây là bộ quy tắc
+Tên ngắn: **Co.op Fresh Soft**. Mã tham chiếu giữ **`coop-fresh-soft-v1`**.
+Ngày 22/10/2026; tên ngắn và recipe form bổ sung 24/10/2026. Đây là bộ quy tắc
 vật liệu/khối của **Co.op Fresh**, bổ sung [Visual DNA](STORE_APP_VISUAL_DNA.md),
 không tạo theme hay tuỳ chọn mới trong ứng dụng. Round sau có thể yêu cầu:
 **“Áp Co.op Fresh khối mềm, viền nhẹ theo Home cho [phạm vi chỉ định]”.**
@@ -80,7 +81,7 @@ xanh DATE để suy “an toàn”. Không đưa vòng icon lớn vào mọi too
 
 ### Holder trắng và lớp trang
 
-- Hàng “Cần chú ý”: radius14px, gap12px, border1px `#dfe5e9`, nền trắng,
+- Hàng “Cần chú ý”: radius14px, gap12px, border 1px `#dfe5e9`, nền trắng,
   bóng card thấp. Mobile min-height48px/padding8px 14px; desktop56px/10px 14px.
 - Nút chuông: 44×44px/radius14px, cùng nền/viền holder, không bóng.
 - Page surface: trắng đặc, không gradient, chỉ bo hai góc trên24px và overlap12px.
@@ -177,7 +178,35 @@ filter/sheen/shadow qua token theo implementation hiện có. Viền more-contra
 chuyển rõ hơn. Không suy ra blur chạy tốt trên mọi GPU/Safari chỉ vì Chromium
 headless đạt; kiểm thiết bị mục tiêu khi có scope đó.
 
-## 6. Cách áp cho round sau
+## 6. Recipe form — FORM01 candidate 24/10/2026
+
+Owner yêu cầu làm mềm các thành phần form hiện tại và đặt tên phong cách.
+Dùng tên **Co.op Fresh Soft** cho cùng bộ `coop-fresh-soft-v1`; không tạo theme,
+setting hay họ token shared mới. Recipe form nằm trong stylesheet local
+[store-form-soft.css](../../apps/store-pwa/src/store-form-soft.css), áp Store Fresh/
+login và các portal của Store; Admin/online/Pilot giữ riêng.
+
+| Vai trò | Recipe form |
+| --- | --- |
+| Input/select/textarea | Radius 16px, border 1px `#7d9084`, fill `#f3f8f5`, mép sáng/bóng thấp tĩnh; giữ kích thước và text hiện có |
+| Hover/focus | Border xanh `#00724e`, fill trắng; ring keyboard hiện có vẫn rõ, bounds không đổi |
+| Readonly | Fill `#f0f5f2`, giữ readonly/native value/nhãn và focus của caller |
+| Disabled | Fill `#f0f3f1`, bỏ bóng; trạng thái disabled thuộc caller |
+| Invalid | Fill `#fef3f2`, edge `#b42318`, lỗi chữ/aria vẫn do form cung cấp |
+| Choice KPH | Giữ màu semantic + radio/check; dùng một đường biên và bóng thấp thay nét kép khi chọn |
+| Nhóm/filter và footer | Nhóm trắng/radius 18, bóng nhẹ; nút radius 16; không thay padding/layout hoặc CTA semantics |
+| Login | Một shell chứa icon/input/reveal, cùng recipe; không thêm viền lồng lên input |
+
+Màu xanh rất nhẹ chỉ ở **bên trong ô nhập**; canvas/holder vẫn trắng như đã
+nghiệm thu. Hero search/CTA giữ vật liệu riêng trên xanh. Control boundary cần
+≥3:1, chữ/value/placeholder ≥4.5:1 trên nền thật. Reduced motion/transparency
+bỏ bóng; high contrast dùng màu hệ thống. Không thêm blur, animation shadow,
+listener, dependency hoặc thay rule ngày/snapshot/dữ liệu.
+
+Giữ skeleton/live cùng geometry. [Phạm vi, gate và preview](../delivery/form01-fresh-soft/technical.md).
+Recipe form còn chờ owner xem; không suy technical PASS thành acceptance.
+
+## 7. Cách áp cho round sau
 
 1. Từ main mới nhất, đọc tài liệu này, Visual DNA, page kit và contract feature.
    Tạo task branch/worktree, ghi rõ vùng owner chỉ định và phần cần giữ.
@@ -206,12 +235,12 @@ Mẫu yêu cầu có thể copy:
 > Dùng khối/viền Home làm mẫu, chọn đúng pastel hoặc holder trắng; giữ nghiệp vụ,
 > nội dung, focus/selected và budget blur. Mobile trước, đối chiếu desktop.
 
-## 7. Kiểm chứng tài liệu và giới hạn
+## 8. Kiểm chứng tài liệu và giới hạn
 
 Lượt UI03 chỉ thêm hướng dẫn và liên kết; **không đổi runtime/token/component**.
 Đã đối chiếu source trên main9089f47 và đo Home qua preview main4263 bằng
 Playwright headless390×844/1440×1024: bốn màu pastel, border trong suốt1px,
-radius18px/sheen/card shadow/no blur, holder trắng/edge, icon48/54px,
+radius 18px/sheen/card shadow/no blur, holder trắng/edge, icon48/54px,
 hover xanh và focus ring. Kiểm thêm320/768px để xác nhận cascade title/icon/
 hướng xếp/min-height; bốn viewport PASS vật liệu. Đã xem screenshot mobile
 để xác nhận cách tạo khối.

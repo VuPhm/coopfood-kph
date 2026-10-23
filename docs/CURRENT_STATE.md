@@ -1,5 +1,14 @@
 # Trạng thái hiện tại
 
+**FORM01 — candidate 24/10/2026:** theo owner làm mềm thành phần form và đặt tên.
+Dùng tên **Co.op Fresh Soft** cho `coop-fresh-soft-v1`; input/date/select/textarea
+fill rất nhẹ/radius 16/viền 1px, lựa chọn giữ semantic/check và bớt nét kép, nhóm/
+footer mềm hơn. Giữ rule/validation/readonly/disabled/focus và kích thước control;
+không đổi packages/ui, API, header/nav/list/chart. Nhánh `store-app/form01-fresh-soft`
+từ `f77034d`; preview <http://127.0.0.1:4301/#kph>. Chưa merge/push/deploy;
+[phạm vi, kiểm tra và giới hạn](delivery/form01-fresh-soft/technical.md).
+Bước tiếp theo: owner xem KPH form/bộ lọc, Báo cáo, Tra hạn và đăng nhập.
+
 **UI02 + RPT02 — CLOSED,23/10/2026:** owner “merge với `0757b6d`” cho bản
 scrollbar đang xem tại4295 và report checkpoint0757b6d. Merge main local
 `e5628ab` gồm scrollbar`e2c2ab5` + report đúng0757b6d; source hợp nhất không sửa
@@ -15,7 +24,7 @@ soát hết”. Desktop dùng native scrollbar mảnh; popup cuộn trong body, 
 close/bo góc, form và tiện ích có bar kéo được. Choice sheet chỉ cuộn results;
 khóa/mở cuộn giữ layout và nút nổi. Mobile tags giữ bar ẩn. Build/Playwright với
 scrollbars thật ở390×844/1440×1024/1280×720/900×650/1440×500, high contrast,
-KPH/chrome regression đạt. Nhánh`store-app/ui02-scrollbars` từ`3b0da6c`, chưa
+KPH/chrome regression đạt. Nhánh `store-app/ui02-scrollbars` từ `3b0da6c`, chưa
 merge/push/deploy. Preview <http://127.0.0.1:4295/#kph>;
 [phạm vi, files, lệnh kiểm và giới hạn](delivery/ui02-scrollbars.md).
 Bước tiếp: owner xem thanh cuộn trang và các popup trên desktop thực.
@@ -135,7 +144,7 @@ bên dưới là lịch sử trước nghiệm thu. Đóng task, chờ yêu cầ
 lọc trả về bật. Trong Chọn, checkbox ngày có vùng44×44px riêng; phần ngày/count/
 chevron vẫn thu/mở, giữ selection và collapse khi vào/thoát Chọn. Tắt nhóm: ngày
 mobile nằm cùng cụm SKU/số lượng căn trái. Nền trắng revision4 và UX click hàng/
-OTHER/tag scroll/lọc nhanh/nối25 giữ nguyên. Cùng task từ`982c04c`, online/API
+OTHER/tag scroll/lọc nhanh/nối25 giữ nguyên. Cùng task từ `982c04c`, online/API
 không đổi. Xem <http://127.0.0.1:4262/#kph>; chưa commit/merge/push/deploy,
 owner pending. [Bàn giao/phạm vi/checks](delivery/kph02-compact-history.md).
 

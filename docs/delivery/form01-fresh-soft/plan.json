@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "form01-fresh-soft",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Soften existing Store Fresh form controls with the Co.op Fresh Soft form recipe while preserving interaction, state, validation and domain behavior.",
+  "inScope": [
+    "Name and document the existing coop-fresh-soft-v1 visual style as Co.op Fresh Soft; define its form recipe",
+    "Harmonize text/date/select/textarea surfaces, grouped choices and action controls in Store Fresh/login and Store portals",
+    "Preserve field sizes, native semantics, selected/error/readonly/disabled/focus states and scroll geometry",
+    "Verify KPH create/review/photo validation, report dialogs/pickers, filters, shelf and login on mobile/desktop"
+  ],
+  "outOfScope": [
+    "Domain/API/backend/authorization/data or storage changes",
+    "Admin/online/Pilot, packages/ui, root config/dependencies",
+    "Header/nav/list/chart/print redesign, new form logic or theme switch",
+    "Merge/push/deploy without owner approval"
+  ],
+  "baseSha": "f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8",
+  "candidateSha": "",
+  "integrationOwner": "Current chat, sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-form-soft.css",
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-login.tsx",
+    "apps/store-pwa/src/store-kph-create-forms.css",
+    "e2e/scripts/check-store-form-soft.cjs",
+    "e2e/scripts/check-store-scrollbars.cjs",
+    "docs/product/STORE_APP_SURFACE_STYLE.md",
+    "docs/product/STORE_FORM_CONTROLS.md",
+    "docs/product/STORE_APP_VISUAL_DNA.md",
+    "docs/product/STORE_APP_COMPONENT_CATALOG.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/form01-fresh-soft/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Implement the bounded form material recipe, verify visible state/interaction and prepare a mock preview for owner review.",
+  "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
+}

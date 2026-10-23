@@ -15,6 +15,7 @@ import "./store-navigation.css";
 import "./store-glass.css";
 import "./store-mobile-refinements.css";
 import "./store-scrollbars.css";
+import "./store-form-soft.css";
 
 export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {
   screen: StoreAppScreen; profile: StoreProfile; navigate: (screen: Screen) => void;
