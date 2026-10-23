@@ -30,7 +30,20 @@
   "reviewLimit": 2,
   "reviewRound": 0,
   "teams": [],
-  "gates": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
   "changes": [],
   "blockers": [],
   "nextAction": "Capture reports baseline; apply accepted surface recipe; verify mock preview and await owner feedback.",
