@@ -5,6 +5,12 @@ yêu cầu làm tổng thể token nút rồi áp tiếp vào mép khối trư�
 [Revision 3](revision3.md) là lịch sử; form revision 2 đã được owner chấp nhận,
 revision 4 còn chờ owner xem. Không suy technical PASS thành nghiệm thu.
 
+## Checkpoint
+
+Candidate `d4f9d17d14ab6abbccaeb930c04ac5592cae8069` chứa source/test/docs đã kiểm trên production mock artifact.
+Technical PASS revision4; owner pending. Sau checkpoint chỉ cập nhật ledger,
+không đổi runtime. Build và QA ở trên chạy đúng source của checkpoint này.
+
 ## Phạm vi và quyết định
 
 - Cùng nhánh `store-app/form01-fresh-soft`, một writer tại
