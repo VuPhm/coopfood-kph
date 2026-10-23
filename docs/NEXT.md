@@ -1,5 +1,15 @@
 # Công việc kế tiếp
 
+**DATE02 revision3 — nhắc lại và tạo KPH, candidate23/10/2026:** Ghi nhận cho
+chọn1ngày/1tuần và xác nhận ngày báo lại; đến hẹn mở lại Cảnh báo/Thông báo trong
+phiên. Xử lý mở form KPH tương ứng, điền SKU/lô và dữ liệu đã biết; chỉ Gửi phiếu
+thành công mới resolved, phiếu PENDING cùng Store session. Hủy/lỗi/SKU khác giữ
+lô; loại hàng chưa biết phải chọn. Giữ nền trắng/xám và màu biểu đồ r2.
+Technical327tests/build + browser transaction/visual/KPH gốc; preview
+<http://127.0.0.1:4278/#date>, [evidence/giới hạn](delivery/date02-soft-detail/technical.md).
+Vẫn prototype memory-only, chưa backend/push khi đóng app; chưa merge/push/deploy.
+Bước tiếp theo: owner thử Ghi nhận và Xử lý → form KPH tại preview4278.
+
 **DATE02 — candidate revision2 chờ nghiệm thu, 23/10/2026:** đã tiếp tục DATE
 sau Tra hạn được owner xác nhận “đạt”. Chi tiết lô dùng holder trắng/viền mảnh,
 nền trắng/xám nhẹ thống nhất theo feedback màu lộn xộn; biểu đồ giữ nguyên màu.

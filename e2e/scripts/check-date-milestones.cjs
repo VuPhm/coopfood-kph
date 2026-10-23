@@ -59,8 +59,8 @@ async function timelineGeometry(scope) {
         const data = await timelineData(detail);
         await page.screenshot({ path: `${output}/${state.phase}-${i}-${viewport.width}.png`, fullPage: true });
         if (state.phase === 'EXPIRED') {
-          await detail.getByRole('button', { name: 'Đã xử lý', exact: true }).click();
-          await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status', 'resolved');
+          await expect(detail.getByRole('button', { name: 'Xử lý', exact: true })).toBeEnabled();
+          await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status', 'acknowledged');
           await expect(lot.locator('[data-date-phase]')).toHaveAttribute('data-date-phase', 'EXPIRED');
         }
         if (state.phase === 'WARNING') {

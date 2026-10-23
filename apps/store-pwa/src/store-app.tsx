@@ -1,5 +1,5 @@
 import { StorePageHero, StorePageLayout, StorePageSurface, StoreReportPage } from "./store-page-hero";
-import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
 import { History } from "lucide-react";
 import { FeatureLoadBoundary, FeatureLoadError, KphLoadingSkeleton } from "./feature-loading";
@@ -7,6 +7,10 @@ import { PwaStatus } from "./pwa-status";
 
 import { ShelfLifeScreen, useShelfLifeLookup } from "./store-shelf-life";
 import { useShelfLookupHistory } from "./store-shelf-history";
+import { useBusinessDate } from "./use-business-date";
+import { reactivateDueDateLots } from "./store-date-actions";
+import { kphRecordFromDraft } from "./store-kph-draft-record";
+import type { CreatedRecordDraft } from "./create-record-dialog";
 import { DateWorkspace } from "./store-date-workspace";
 import { StoreNotifications } from "./store-notifications";
 import { StoreLogin } from "./store-login";
@@ -72,9 +76,35 @@ function StoreAppContent() {
   const quickFabRef = useRef<HTMLButtonElement>(null);
   const quickPanelRef = useRef<HTMLDivElement>(null);
   const [records, setRecords] = useState(mockRecords);
-  const [dateLots, setDateLots] = useState(mockDateLots);
+  const [storedDateLots, setDateLots] = useState(mockDateLots);
+  const today = useBusinessDate();
+  const dateLots = useMemo(() => reactivateDueDateLots(storedDateLots, today), [storedDateLots, today]);
+  const dueReminders = useMemo(() => dateLots.filter(lot => lot.status === "open" && !!lot.remindOn && lot.remindOn <= today), [dateLots, today]);
+  const announcedReminders = useRef(new Set<string>());
   const recordRef = useRef(records); recordRef.current = records;
   const [notice, setNotice] = useState("");
+  useEffect(() => {
+    const announce = () => {
+      if (document.visibilityState === "hidden") return;
+      const fresh = dueReminders.filter(lot => !announcedReminders.current.has(`${lot.id}:${lot.remindOn}`));
+      if (!fresh.length) return;
+      fresh.forEach(lot => announcedReminders.current.add(`${lot.id}:${lot.remindOn}`));
+      setNotice(`Đến lịch báo lại: ${fresh.length} lô DATE cần xem lại.`);
+    };
+    announce();
+    document.addEventListener("visibilitychange", announce);
+    window.addEventListener("focus", announce);
+    return () => { document.removeEventListener("visibilitychange", announce); window.removeEventListener("focus", announce); };
+  }, [dueReminders]);
+  const createDateKph = useCallback(async (draft: CreatedRecordDraft) => {
+    const existing = draft.idempotencyKey ? recordRef.current.find(record => record.id === draft.idempotencyKey) : undefined;
+    if (existing) return existing.id;
+    const record = kphRecordFromDraft(draft);
+    recordRef.current = [record, ...recordRef.current];
+    setRecords(recordRef.current);
+    setNotice("Đã tạo phiếu KPH và cập nhật lô DATE trong phiên dữ liệu mẫu.");
+    return record.id;
+  }, []);
   useEffect(() => {
     if (!notice) return;
     const timer = window.setTimeout(() => setNotice(""), 5000);
@@ -104,9 +134,9 @@ function StoreAppContent() {
       {screen === "home" ? <StoreHomeContent profile={mockProfile} navigate={navigate} onKphIntent={preloadKph} openDateLots={dateLots.filter(lot => lot.status === "open").length} pendingRecords={records.filter(r => r.approvalStatus === "PENDING").length} /> : null}
       {screen === "shelf" ? <StorePageLayout><StorePageHero /><StorePageSurface className="store-shelf-surface"><div className="store-shelf-page"><ShelfLifeScreen history={shelfHistory.history} onCalculated={shelfHistory.remember} /></div></StorePageSurface></StorePageLayout> : null}
       {screen === "kph" ? <FeatureLoadBoundary><LazyKphWorkspace records={records} onRecordsChange={setRecords} onNotice={setNotice} /></FeatureLoadBoundary> : null}
-      {screen === "date" ? <DateWorkspace lots={dateLots} onLotsChange={setDateLots} /> : null}
+      {screen === "date" ? <DateWorkspace lots={dateLots} onLotsChange={setDateLots} today={today} onCreateKph={createDateKph} /> : null}
       {screen === "reports" ? <FeatureLoadBoundary><DeferredReportHub lots={dateLots} /></FeatureLoadBoundary> : null}
-      {screen === "notifications" ? <StoreNotifications navigate={navigate} /> : null}
+      {screen === "notifications" ? <StoreNotifications navigate={navigate} reminders={dueReminders} /> : null}
       {showQuickLookup ? <button ref={quickFabRef} hidden={quickOpen} className="store-quick-fab" aria-label="Mở tiện ích tra cứu lùi hàng" aria-expanded={quickOpen} aria-controls={quickOpen ? "store-quick-panel" : undefined} onClick={() => setQuickOpen(open => !open)}><History size={22} strokeWidth={1.8} aria-hidden="true" /><span>Tra hạn lùi</span></button> : null}
       {showQuickLookup ? <Dialog open={quickOpen} onOpenChange={setQuickOpen}><DialogContent id="store-quick-panel" ref={quickPanelRef} className="store-quick-panel" aria-label="Tra cứu lùi hàng nhanh" aria-labelledby={undefined} closeLabel="Đóng tiện ích" onOpenAutoFocus={event => { event.preventDefault(); quickPanelRef.current?.focus(); }} onCloseAutoFocus={event => { event.preventDefault(); window.requestAnimationFrame(() => quickFabRef.current?.focus()); }}><DialogHeader><DialogTitle>Tra cứu lùi hàng</DialogTitle></DialogHeader><DialogDescription className="sr-only">Tra hạn lùi tự động theo thông tin ngày đã nhập</DialogDescription><div className="store-modal-body"><ShelfLifeScreen idPrefix="quick-shelf" lookup={quickLookup} /></div></DialogContent></Dialog> : null}
   </StoreAppFrame>;

@@ -1,3 +1,4 @@
+import type { KphKind, LocalDate } from "@coopfood-kph/kph-rules";
 import type { components } from "@coopfood-kph/api";
 import type { RecordView } from "./record-view";
 
@@ -38,12 +39,12 @@ export const mockCatalogProducts: MockCatalogProduct[] = [
   { id: "synthetic-product-1", barcode: "29123415005", skuCode: "0011730", name: "Cải thìa VietGAP 500 g", primarySupplier: { code: "NCC001", name: "Nông sản Miền Đông" } },
 ];
 // Presentation metadata belongs to synthetic fixtures, not the public Product schema.
-export const mockProductMetadata: Record<string, { group: string; unit: "EA" | "kg" }> = {
-  "synthetic-product-2": { group: "Thực phẩm khô", unit: "EA" },
-  "synthetic-product-1": { group: "Thực phẩm tươi sống", unit: "kg" },
+export const mockProductMetadata: Record<string, { group: string; unit: "EA" | "kg"; kphKind: KphKind }> = {
+  "synthetic-product-2": { group: "Thực phẩm khô", unit: "EA", kphKind: "TPCN" },
+  "synthetic-product-1": { group: "Thực phẩm tươi sống", unit: "kg", kphKind: "TPTS" },
 };
 export type MockDateLotStatus = "open" | "acknowledged" | "resolved";
-export type MockDateLot = { id: string; name: string; sku: string; date: `${number}-${number}-${number}`; manufactured?: string; status: MockDateLotStatus };
+export type MockDateLot = { id: string; name: string; sku: string; date: `${number}-${number}-${number}`; manufactured?: string; status: MockDateLotStatus; remindOn?: LocalDate; kphRecordId?: string };
 export const mockDateLots: MockDateLot[] = [
   { id: "C24-118", name: "Cải thìa VietGAP 500 g", sku: "0011730", manufactured: "01/09/2026", date: "2026-10-07", status: "open" },
   { id: "D24-090", name: "Sản phẩm D", sku: "071204", date: "2026-10-12", status: "open" },

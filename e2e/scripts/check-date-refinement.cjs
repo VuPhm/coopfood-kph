@@ -54,7 +54,7 @@ async function noClip(scope) {
         expect(await detail.locator('.store-date-lot-heading').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(255, 255, 255)');
         expect(await detail.locator('.store-date-detail-metrics > p').evaluateAll(els=>els.map(el=>getComputedStyle(el).backgroundColor))).toEqual(['rgb(245, 248, 250)','rgb(245, 248, 250)']);
         expect(await detail.evaluate(root=>[root,...root.querySelectorAll('*')].filter(el=>getComputedStyle(el).backdropFilter!=='none').length)).toBe(0);
-        for(const name of ['Ghi nhận','Đã xử lý']) {
+        for(const name of ['Ghi nhận','Xử lý']) {
           const box=await detail.getByRole('button',{name,exact:true}).boundingBox();
           expect(box.height).toBeGreaterThanOrEqual(48);expect(box.width).toBeGreaterThanOrEqual(44);
           expect(box.y+box.height).toBeLessThanOrEqual(viewport.height+1);
@@ -66,13 +66,13 @@ async function noClip(scope) {
           await detail.evaluate(root=>{const styles=[...root.querySelectorAll('*')].map(el=>{const s=getComputedStyle(el);return{el,font:parseFloat(s.fontSize),line:parseFloat(s.lineHeight)}});for(const{el,font,line}of styles){el.style.fontSize=`${font*1.5}px`;if(Number.isFinite(line))el.style.lineHeight=`${line*1.5}px`;}});
           await noClip(detail);
           expect(await detail.evaluate(root=>root.scrollWidth<=root.clientWidth+1)).toBe(true);
-          const action=detail.getByRole('button',{name:'Đã xử lý',exact:true});await action.focus();
+          const action=detail.getByRole('button',{name:'Xử lý',exact:true});await action.focus();
           const box=await action.boundingBox();expect(box.y).toBeGreaterThanOrEqual(0);expect(box.y+box.height).toBeLessThanOrEqual(viewport.height+1);
           await page.screenshot({path:`${output}/text150-${viewport.width}.png`,fullPage:true});
         }
         if(phase==='EXPIRED') {
-          await detail.getByRole('button',{name:'Đã xử lý',exact:true}).click();
-          await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','resolved');
+          await expect(detail.getByRole('button',{name:'Xử lý',exact:true})).toBeEnabled();
+          await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','acknowledged');
           await expect(badge).toHaveText('Còn 0% HSD');await expect(badge).toHaveAttribute('data-tone','danger');
         } else if(viewport.width<900) {
           await page.keyboard.press('Escape');await expect(detail).toBeHidden();await expect(lot).toBeFocused();
@@ -94,7 +94,7 @@ async function noClip(scope) {
     await short.clock.setFixedTime(new Date('2026-10-07T05:00:00+07:00'));await short.goto(`${base}/#date`);
     await short.getByRole('textbox',{name:'Tìm SKU, barcode, tên hàng hoặc lô'}).fill('A24-255');await short.locator('.store-date-lot').click();
     const sheet=short.getByRole('dialog',{name:'Chi tiết lô DATE'});
-    for(const name of ['Ghi nhận','Đã xử lý']) {
+    for(const name of ['Ghi nhận','Xử lý']) {
       const button=sheet.getByRole('button',{name,exact:true});await button.focus();await expect(button).toBeFocused();
       const box=await button.boundingBox();expect(box.y).toBeGreaterThanOrEqual(0);expect(box.y+box.height).toBeLessThanOrEqual(568);
     }

@@ -5,7 +5,7 @@ import { mockDateLots } from "./store-app-mock";
 import { useState } from "react";
 function StoreLookupWorkspace() {
   const [lots, setLots] = useState(mockDateLots);
-  return <DateWorkspace lots={lots} onLotsChange={setLots} />;
+  return <DateWorkspace lots={lots} onLotsChange={setLots} onCreateKph={async () => "synthetic-kph"} />;
 }
 
 describe("DATE unified product and lot lookup", () => {

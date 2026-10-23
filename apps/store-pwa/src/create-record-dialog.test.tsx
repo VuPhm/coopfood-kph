@@ -352,3 +352,17 @@ describe("Create KPH record", () => {
   });
 
 });
+
+
+describe("DATE-seeded KPH forms",()=>{
+  it.each(["8936000123456", ""])("keeps source SKU and defaults for unchanged identifier %s",async barcode=>{
+    const saved=vi.fn();const lookup=vi.fn();
+    vi.mocked(processEvidencePhoto).mockResolvedValue({blob:new Blob(["stamped"],{type:"image/jpeg"}),capturedAt:new Date(),width:1,height:1});
+    render(<CreateRecordDialog kind="TPCN" open profile={{...DEFAULT_STORE_PROFILE,fullName:"Người mẫu"}} onOpenChange={vi.fn()} onSaved={saved} onBarcodeLookup={lookup} initialValues={{barcode,skuCode:"0008421",productName:"Hàng từ lô",supplier:"NCC mẫu",unit:"kg",note:"Lô DATE source",condition:"EXPIRED"}}/>);
+    const input=screen.getByRole("textbox",{name:"Mã SKU / UPC"});fireEvent.blur(input);
+    expect(screen.getByRole("textbox",{name:"Tên hàng hóa"})).toHaveValue("Hàng từ lô");expect(lookup).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText("Chọn ảnh"),{target:{files:[new File(["original"],"evidence.jpg",{type:"image/jpeg"})]}});await screen.findByText(/Đã xử lý 1\/3 ảnh/);
+    fireEvent.click(screen.getByRole("button",{name:"Lưu phiếu"}));await waitFor(()=>expect(saved).toHaveBeenCalledTimes(1));
+    expect(saved.mock.calls[0]?.[0]).toMatchObject({skuCode:"0008421",barcode,unit:"kg",quantity:1,conditionValue:"EXPIRED",note:"Lô DATE source",detectedDate:formatBusinessDate(new Date()).display});
+  });
+});

@@ -1,21 +1,23 @@
 {
   "schemaVersion": 1,
   "id": "date02-soft-detail",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 3,
+  "status": "EXECUTING",
   "objective": "Apply accepted soft surfaces to DATE, prioritize lot detail and show colored remaining shelf-life percentages in list.",
   "inScope": [
     "DATE workspace/list/detail/filter soft surfaces, mobile first",
     "Remaining shelf-life percentage presentation and missing/invalid recovery",
-    "Meaningful tests, browser preview, delivery evidence"
+    "Meaningful tests, browser preview, delivery evidence",
+    "Acknowledgement reminder +1/+7 business calendar days with in-app due alerts in current session",
+    "DATE creates corresponding KPH via shared accepted form; only successful matching-product save resolves lot"
   ],
   "outOfScope": [
     "Business milestone changes, API/backend/auth/persistence",
-    "KPH/Tra hạn/Home/reports rollout or shared timeline changes",
+    "Unrelated KPH/Tra hạn/Home/reports redesign or shared timeline changes; no backend persistence/OS push",
     "Root config, lockfile, packages/ui, push/deploy"
   ],
   "baseSha": "06ff18b3f74c93cf45cac8bb713cedc2ea42569b",
-  "candidateSha": "fa1a5369213227976e5d7556e41a4d9a7ff4f70e",
+  "candidateSha": "",
   "integrationOwner": "Current chat sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-date-workspace.tsx",
@@ -29,20 +31,35 @@
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "docs/delivery/date02-soft-detail/**",
-    "e2e/scripts/check-date-refinement.cjs"
+    "e2e/scripts/check-date-refinement.cjs",
+    "apps/store-pwa/src/store-date-actions.ts",
+    "apps/store-pwa/src/store-date-actions.test.ts",
+    "apps/store-pwa/src/use-business-date.ts",
+    "apps/store-pwa/src/use-business-date.test.ts",
+    "apps/store-pwa/src/store-kph-create-control.tsx",
+    "apps/store-pwa/src/store-kph-draft-record.ts",
+    "apps/store-pwa/src/store-kph-workspace.tsx",
+    "apps/store-pwa/src/create-record-dialog.tsx",
+    "apps/store-pwa/src/create-record-dialog.test.tsx",
+    "apps/store-pwa/src/store-app-mock.ts",
+    "apps/store-pwa/src/store-app.tsx",
+    "apps/store-pwa/src/store-app.test.tsx",
+    "apps/store-pwa/src/store-date-workspace.test.tsx",
+    "apps/store-pwa/src/store-date-workflow.test.tsx",
+    "apps/store-pwa/src/store-notifications.tsx",
+    "e2e/scripts/check-date-actions.cjs",
+    "e2e/scripts/check-date-compact.cjs",
+    "e2e/scripts/check-date-milestones.cjs"
   ],
-  "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewLimit": 3,
+  "reviewRound": 3,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "fa1a5369213227976e5d7556e41a4d9a7ff4f70e",
-      "evidence": "docs/delivery/date02-soft-detail/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner",
@@ -58,9 +75,16 @@
       "source": "Owner trực tiếp23/10/2026",
       "impact": "Thống nhất surfaces DATE về trắng/xám nhẹ; giữ màu semantic trên chữ/nhãn và phần trăm, không sửa biểu đồ.",
       "decision": "Neutralize identity/fact/metric backgrounds; recheck contrast/screenshots, no timeline or domain changes."
+    },
+    {
+      "revision": 3,
+      "request": "Ghi nhận: cho chọn1ngày hoặc1tuần sau báo lại. Xử lý: tạo phiếu KPH tương ứng.",
+      "source": "Owner trực tiếp23/10/2026",
+      "impact": "Thêm lịch nhắc trong phiên và DATE→KPH seed/save linkage; giữ mốc/biểu đồ/palette đã chỉnh.",
+      "decision": "Extend bounded review to3 for requested functional scope; reuse shared KPH form, require matching SKU/success before resolving, keep prototype memory-only; reverify all affected gates."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner reviews neutral DATE surfaces and item detail at http://127.0.0.1:4278/#date; chart colors unchanged, remaining percentages complete. No automatic merge/push/deploy.",
+  "nextAction": "Implement reminders and DATE to KPH workflow in existing worktree, technical evidence invalidated for affected workflow.",
   "authorization": "Owner23/10/2026: đạt, áp tiếp lên DATE, đặc biệt phần chi tiết item; thay quá x ngày bằng phần trăm còn lại có màu. Follow-up: làm đoạn chưa làm được."
 }

@@ -4,9 +4,9 @@ import { useState } from "react";
 import { DateWorkspace as ControlledDateWorkspace } from "./store-date-workspace";
 import { mockDateLots } from "./store-app-mock";
 
-function DateWorkspace() {
-  const [lots, setLots] = useState(mockDateLots);
-  return <ControlledDateWorkspace lots={lots} onLotsChange={setLots} />;
+function DateWorkspace({ resolved = false } = {}) {
+  const [lots, setLots] = useState(resolved ? mockDateLots.map(lot => lot.id === "C24-118" ? { ...lot, status: "resolved" as const } : lot) : mockDateLots);
+  return <ControlledDateWorkspace lots={lots} onLotsChange={setLots} onCreateKph={async () => "synthetic-kph"} />;
 }
 
 describe("memory-only DATE workspace", () => {
@@ -15,6 +15,7 @@ describe("memory-only DATE workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
     await screen.findByRole("heading", { name: "Chi tiết lô DATE" });
     fireEvent.click(screen.getByRole("button", { name: "Ghi nhận" }));
+    fireEvent.click(screen.getByRole("button", { name: "Hẹn báo lại" }));
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Chi tiết lô DATE" })).not.toBeInTheDocument());
     expect(screen.getAllByRole("button", { name: /Sản phẩm/ })).toHaveLength(1);
   });
@@ -26,11 +27,8 @@ describe("memory-only DATE workspace", () => {
   });
 
   it("prevents acknowledging an already resolved lot on mobile", async () => {
-    render(<DateWorkspace />);
+    render(<DateWorkspace resolved />);
     fireEvent.click(screen.getByRole("button", { name: /Theo dõi DATE/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
-    fireEvent.click(await screen.findByRole("button", { name: "Đã xử lý" }));
-    await waitFor(() => expect(screen.queryByRole("heading", { name: "Chi tiết lô DATE" })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
     const dialog = await screen.findByRole("dialog", { name: "Chi tiết lô DATE" });
     expect(dialog).toHaveTextContent("Đã xử lý");

@@ -3,9 +3,13 @@ import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button, Input, ListItemMarker } from "@coopfood-kph/ui";
 import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, Search, SlidersHorizontal } from "lucide-react";
+import { acknowledgeDateLot, dateLotKphSeed } from "./store-date-actions";
+import { KphCreateControl, type KphCreateHandle } from "./store-kph-create-control";
+import { KphCreateButton } from "./store-kph-create-button";
+import type { CreatedRecordDraft } from "./create-record-dialog";
 import { StoreSheet } from "./store-sheet";
 import { figmaAsset } from "./figma-assets";
-import { formatDisplayDate } from "@coopfood-kph/kph-rules";
+import { addDays, formatDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { StoreQuickSort } from "./store-quick-sort";
@@ -34,7 +38,7 @@ function remainingText(remaining: number | null) {
   return remaining < 0 ? `Quá ${Math.abs(remaining)} ngày` : remaining === 0 ? "HSD hôm nay" : `Còn ${remaining} ngày`;
 }
 
-export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onLotsChange: (lots: MockDateLot[]) => void }) {
+export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCreateKph }: { lots: MockDateLot[]; onLotsChange: (lots: MockDateLot[]) => void; today?: LocalDate; onCreateKph: (draft: CreatedRecordDraft) => Promise<string> }) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("alerts");
   const [status, setStatus] = useState<MockDateLotStatus>("open");
@@ -52,12 +56,23 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
   const product = findProduct(query, lots);
   const metadata = product ? mockProductMetadata[product.id] : undefined;
   const active = lots.find(lot => lot.id === activeId);
-  const today = formatBusinessDate(new Date()).iso;
+  const today = businessToday ?? formatBusinessDate(new Date()).iso;
+  const [reminderPicking, setReminderPicking] = useState(false);
+  const [actionNotice, setActionNotice] = useState("");
+  const [reminderDays, setReminderDays] = useState<1 | 7>(1);
+  const [kindChoice, setKindChoice] = useState<MockDateLot | null>(null);
+  const createRef = useRef<KphCreateHandle>(null);
+  const processingLot = useRef<MockDateLot | null>(null);
+  const createFrame = useRef(0);
+  const latestLots = useRef(lots); latestLots.current = lots;
+  useEffect(() => { setReminderPicking(false); setReminderDays(1); }, [activeId]);
+  useEffect(() => () => window.cancelAnimationFrame(createFrame.current), []);
   const assessments = useMemo(() => new Map(lots.map(lot => [lot.id, assessDateLot(lot, today)])), [lots, today]);
-  const attentionLots = lots.filter(lot => needsDateAttention(assessments.get(lot.id)!) && lot.status !== "resolved");
-  const count = (value: MockDateLotStatus) => lots.filter(lot => lot.status === value && needsDateAttention(assessments.get(lot.id)!)).length;
+  const requiresAttention = (lot: MockDateLot) => needsDateAttention(assessments.get(lot.id)!) || !!(lot.remindOn && lot.remindOn <= today);
+  const attentionLots = lots.filter(lot => requiresAttention(lot) && lot.status !== "resolved");
+  const count = (value: MockDateLotStatus) => lots.filter(lot => lot.status === value && requiresAttention(lot)).length;
   const needle = normalize(query);
-  const visible = lots.filter(lot => (tab === "tracking" || (lot.status === status && needsDateAttention(assessments.get(lot.id)!))) &&
+  const visible = lots.filter(lot => (tab === "tracking" || (lot.status === status && requiresAttention(lot))) &&
     (phaseFilter === "all" || assessments.get(lot.id)!.phase === phaseFilter) &&
     (!needle || `${lot.name} ${lot.sku} ${lot.id}`.toLocaleLowerCase("vi").includes(needle) || (product?.barcode === needle && lot.sku === product.skuCode)))
     .sort((a, b) => sort === "expiry" ? a.date.localeCompare(b.date) : sort === "name" ? a.name.localeCompare(b.name, "vi") : 0);
@@ -83,9 +98,29 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
       if (current === requestId.current) setMessage(error instanceof Error ? error.message : "Chưa thể tra cứu danh mục. Thử lại.");
     } finally { if (current === requestId.current) setBusy(false); }
   }
-  function updateStatus(next: MockDateLotStatus) {
-    if (!active || active.status === "resolved" || (next === "acknowledged" && active.status !== "open")) return;
-    onLotsChange(lots.map(lot => lot.id === active.id ? { ...lot, status: next } : lot));
+  function confirmReminder() {
+    if (!active || active.status === "resolved") return;
+    onLotsChange(lots.map(lot => lot.id === active.id ? acknowledgeDateLot(lot, today, reminderDays) : lot));
+    setActionNotice(`Đã hẹn báo lại ${formatDisplayDate(addDays(today, reminderDays))}.`);
+    setReminderPicking(false);
+    if (!desktop) setActiveId("");
+  }
+  function startProcessing(lot: MockDateLot, chosenKind?: KphKind) {
+    if (lot.status === "resolved" || lot.kphRecordId) return;
+    const { kind, seed } = dateLotKphSeed(lot, today);
+    const opener = desktop ? document.activeElement as HTMLElement : Array.from(document.querySelectorAll<HTMLElement>("[data-date-lot-id]")).find(el => el.dataset.dateLotId === lot.id);
+    if (!desktop) setActiveId("");
+    if (!kind && !chosenKind) { setKindChoice(lot); return; }
+    processingLot.current = lot;
+    setKindChoice(null);
+    createFrame.current = window.requestAnimationFrame(() => createRef.current?.open(chosenKind ?? kind!, seed, opener));
+  }
+  async function finishKph(draft: CreatedRecordDraft) {
+    const source = processingLot.current;
+    if (!source || draft.skuCode !== source.sku) throw new Error("Mã hàng trên phiếu phải khớp lô DATE. Hủy để mở lại phiếu từ đúng lô.");
+    const recordId = await onCreateKph(draft);
+    onLotsChange(latestLots.current.map(lot => lot.id === source.id ? { ...lot, status: "resolved", kphRecordId: recordId } : lot));
+    processingLot.current = null;
     if (!desktop) setActiveId("");
   }
   useEffect(() => {
@@ -112,7 +147,10 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
         </> : <div className="store-date-missing-dates"><p>{assessment.message}</p><dl className="store-date-milestone-facts">{lot.manufactured ? <div><dt>NSX</dt><dd>{lot.manufactured}</dd></div> : null}<div><dt>HSD</dt><dd>{displayDate(lot.date)}</dd></div></dl></div>}
         </div>
       </section>
-      <div className="store-sheet-actions"><Button className="store-date-acknowledge" disabled={lot.status !== "open"} onClick={() => updateStatus("acknowledged")}>Ghi nhận</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => updateStatus("resolved")}>Đã xử lý</Button></div>
+      {lot.remindOn && lot.status !== "resolved" ? <p className="store-date-remind-note">{lot.remindOn > today ? "Báo lại" : "Đã đến lịch báo lại"} {formatDisplayDate(lot.remindOn)}</p> : null}
+      {lot.kphRecordId ? <p className="store-date-remind-note" role="status">Đã tạo phiếu KPH cho lô này.</p> : null}
+      {reminderPicking ? <fieldset className="store-date-reminder-choices"><legend>Báo lại sau</legend>{([1,7] as const).map(days => <label key={days}><input type="radio" name="date-reminder" checked={reminderDays === days} onChange={() => setReminderDays(days)} /><span>{days === 1 ? "1 ngày" : "1 tuần"}<small>{formatDisplayDate(addDays(today, days))}</small></span></label>)}</fieldset> : null}
+      <div className="store-sheet-actions">{reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" onClick={confirmReminder}>Hẹn báo lại</Button></> : <><Button className="store-date-acknowledge" disabled={lot.status === "resolved"} onClick={() => { setReminderDays(1); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn && lot.status === "acknowledged" ? "Đổi lịch nhắc" : "Ghi nhận"}</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => startProcessing(lot)}>{lot.status === "resolved" ? "Đã xử lý" : "Xử lý"}</Button></>}</div>
     </>;
   }
   return <StorePageLayout className="store-date">
@@ -135,14 +173,17 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
           <span className="sr-only" id="store-date-add-help">Chức năng chưa sẵn sàng trong bản dùng thử</span>
           {tab === "alerts" ? <div className="store-date-statuses">{Object.entries(statuses).map(([key, label]) => <button key={key} aria-pressed={status === key} className={status === key ? "is-selected" : ""} onClick={() => setStatus(key as MockDateLotStatus)}><span>{label}</span><small>{count(key as MockDateLotStatus)}</small></button>)}</div> : null}
         </div>
+        {actionNotice ? <p className="store-date-action-notice" role="status">{actionNotice}</p> : null}
         <div className="store-date-lots">{visible.map(lot => {
           const assessment = assessments.get(lot.id)!;
           const percent = remainingShelfPercent(assessment);
-          return <button key={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={() => setActiveId(lot.id)}><ListItemMarker variant="bar" tone={getDatePhaseTone(assessments.get(lot.id)!.phase)} /><span className="store-date-lot-main"><strong>{lot.name}</strong><small className="store-date-lot-identifiers"><span>SKU {lot.sku}</span>{" · "}<span>Lô {lot.id}</span></small><span className="store-date-lot-labels"><DateConditionLabel phase={assessments.get(lot.id)!.phase} /><DateProcessingLabel status={lot.status} /></span><small className="store-date-lot-dates">{lot.manufactured ? <span>NSX <b>{lot.manufactured}</b></span> : null}<span>HSD <b>{displayDate(lot.date)}</b></span></small></span><span className="store-date-lot-end"><strong className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}>{percent === null ? assessment.phase === "INVALID" ? "Kiểm tra ngày" : "Chưa đủ dữ liệu" : `Còn ${percent}% HSD`}</strong><span className="store-date-lot-action">{lot.status === "resolved" ? "Xem chi tiết" : "Xử lý"}<ChevronRight size={16} aria-hidden="true" /></span></span></button>;
+          return <button key={lot.id} data-date-lot-id={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={() => setActiveId(lot.id)}><ListItemMarker variant="bar" tone={getDatePhaseTone(assessments.get(lot.id)!.phase)} /><span className="store-date-lot-main"><strong>{lot.name}</strong><small className="store-date-lot-identifiers"><span>SKU {lot.sku}</span>{" · "}<span>Lô {lot.id}</span></small><span className="store-date-lot-labels"><DateConditionLabel phase={assessments.get(lot.id)!.phase} /><DateProcessingLabel status={lot.status} />{lot.remindOn && lot.status !== "resolved" ? <span className="store-date-remind-label">Báo lại {formatDisplayDate(lot.remindOn)}</span> : null}</span><small className="store-date-lot-dates">{lot.manufactured ? <span>NSX <b>{lot.manufactured}</b></span> : null}<span>HSD <b>{displayDate(lot.date)}</b></span></small></span><span className="store-date-lot-end"><strong className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}>{percent === null ? assessment.phase === "INVALID" ? "Kiểm tra ngày" : "Chưa đủ dữ liệu" : `Còn ${percent}% HSD`}</strong><span className="store-date-lot-action">{lot.status === "resolved" ? "Xem chi tiết" : "Xử lý"}<ChevronRight size={16} aria-hidden="true" /></span></span></button>;
         })}{!visible.length ? <section className="store-date-empty"><Package size={28} aria-hidden="true" /><h3>Không có lô phù hợp</h3><p>{product ? "Mã hàng đã nhận diện. Thử trạng thái khác hoặc bỏ lọc để xem các lô." : "Thử mã hàng, tên hoặc số lô khác; bạn cũng có thể quét lại."}</p><Button variant="ghost" onClick={() => { changeQuery(""); setTab("tracking"); setPhaseFilter("all"); }}>Xem tất cả lô</Button></section> : null}</div>
       </section>
       {desktop ? <section className="store-date-detail" aria-label="Chi tiết lô DATE">{active ? <><div className="store-date-detail-heading"><h2>Chi tiết lô DATE</h2><DateProcessingLabel status={active.status} /></div>{detail(active)}</> : <div className="store-date-detail-placeholder"><CalendarDays size={32} aria-hidden="true" /><h2>Chọn một lô để xem chi tiết</h2><p>Thông tin sản phẩm, ngày và thao tác xử lý sẽ hiển thị tại đây.</p></div>}</section> : null}
     </StorePageSurface>
+    <KphCreateControl ref={createRef} onSaved={finishKph} />
+    <StoreSheet className="store-date-sheet store-date-kind-sheet" open={!!kindChoice} onOpenChange={open => { if (!open) { const row = Array.from(document.querySelectorAll<HTMLElement>("[data-date-lot-id]")).find(el => el.dataset.dateLotId === kindChoice?.id); setKindChoice(null); window.requestAnimationFrame(() => row?.focus()); } }} title="Chọn loại phiếu KPH" description="Chưa có phân loại hàng; chọn biểu mẫu phù hợp.">{kindChoice ? <><p>{kindChoice.name} · SKU {kindChoice.sku}</p><div className="store-two-col">{(["TPCN","TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} onClick={() => startProcessing(kindChoice, kind)} />)}</div></> : null}</StoreSheet>
     <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={value => { void search(value); }} presentation="screen" />
     <StoreSheet className="store-date-sheet store-date-filter" open={filterOpen} onOpenChange={setFilterOpen} title="Lọc DATE" description="Bộ lọc và sắp xếp áp dụng ngay khi thay đổi">
       <section className="store-date-filter-section" aria-labelledby="date-filter-phase"><h3 id="date-filter-phase"><CalendarDays size={18} aria-hidden="true" />Tình trạng DATE</h3>

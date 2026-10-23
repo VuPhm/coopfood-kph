@@ -17,7 +17,7 @@ async function geometry(detail, viewport) {
   expect(r.actionBottom, 'actions are visible before any scroll').toBeLessThanOrEqual(viewport.height + 1);
   expect(r.actionTop).toBeGreaterThanOrEqual(0);
   expect(r.content - r.client, 'detail does not need vertical scrolling').toBeLessThanOrEqual(1);
-  for (const name of ['Ghi nhận', 'Đã xử lý']) {
+  for (const name of ['Ghi nhận', 'Xử lý']) {
     const b = await detail.getByRole('button', { name, exact: true }).boundingBox();
     expect(b.height).toBeGreaterThanOrEqual(48); expect(b.width).toBeGreaterThanOrEqual(44);
   }

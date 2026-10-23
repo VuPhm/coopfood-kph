@@ -232,3 +232,19 @@
 
 /* Neutral surfaces throughout the detail; semantic tint stays on list status badges only. */
 :is(.store-date-detail, .store-date-lot-sheet) .store-date-detail-metrics > .store-date-percent { background-color: #f5f8fa; }
+.store-date-reminder-choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0; border: 1px solid var(--store-holder-edge); border-radius: 14px; padding: 12px; }
+.store-date-reminder-choices legend { padding-inline: 4px; color: var(--store-ink); font-size: 14px; font-weight: 600; }
+.store-date-reminder-choices label { display: flex; align-items: center; gap: 8px; min-height: 48px; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 8px; background: white; color: var(--store-ink); cursor: pointer; }
+.store-date-reminder-choices label:has(input:checked) { border-color: var(--store-brand-action); background: #e6f7f2; }
+.store-date-reminder-choices input { accent-color: var(--store-brand-action); }
+.store-date-reminder-choices small { display: block; font-size: 12px; line-height: 18px; color: var(--store-ink-muted); }
+:is(.store-date,.store-date-lot-sheet) .store-date-remind-note { margin: 0; font-size: 13px; line-height: 20px; color: var(--store-ink-muted); }
+.store-date .store-date-remind-label { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-date-reminder-list { display: grid; gap: 12px; width: min(100%,640px); }
+.store-date-reminder-list button { display: grid; gap: 4px; min-height: 64px; border: 1px solid var(--store-holder-edge); border-radius: 14px; padding: 14px; background: white; color: var(--store-ink); text-align: left; }
+.store-date-reminder-list span { color: var(--store-ink-muted); font-size: 13px; line-height: 20px; }
+
+.store-date-action-notice { margin: 0; padding: 10px 12px; border-radius: 12px; background: #f5f8fa; color: var(--store-ink); font-size: 13px; line-height: 20px; }
+
+:is(.store-date,.store-date-lot-sheet) .store-button.store-date-reminder-cancel { border: 1px solid var(--store-control-line); background: white; color: var(--store-ink); }
+:is(.store-date,.store-date-lot-sheet) .store-button.store-date-reminder-cancel:hover { background: #f5f8fa; }

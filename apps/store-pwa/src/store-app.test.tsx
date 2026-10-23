@@ -19,6 +19,7 @@ describe("Store App session and route ownership", () => {
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
     fireEvent.click(await screen.findByRole("button", { name: /Cải thìa/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Ghi nhận" }));
+    fireEvent.click(screen.getByRole("button", { name: "Hẹn báo lại" }));
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Chi tiết lô DATE" })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
     await screen.findByText("3 cảnh báo đang mở");
@@ -27,6 +28,17 @@ describe("Store App session and route ownership", () => {
     expect(screen.queryByRole("button", { name: /Cải thìa/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Đã ghi nhận 4/ }));
     expect(screen.getByRole("button", { name: /Cải thìa/ })).toBeInTheDocument();
+  });
+
+  it("reopens a due DATE reminder in alerts and notifications after tab resume", async () => {
+    window.history.replaceState(null, "", "#date");render(<StoreApp />);
+    fireEvent.click(screen.getByRole("button",{name:/Cải thìa/}));fireEvent.click(screen.getByRole("button",{name:"Ghi nhận"}));fireEvent.click(screen.getByRole("button",{name:"Hẹn báo lại"}));
+    window.location.hash="notifications";fireEvent(window,new HashChangeEvent("hashchange"));await screen.findByText("Chưa có thông báo");
+    vi.setSystemTime(new Date("2026-10-07T08:00:00+07:00"));fireEvent(document,new Event("visibilitychange"));
+    await screen.findByText("Đến lịch báo lại: 1 lô DATE cần xem lại.");
+    await screen.findByText("DATE cần xem lại");fireEvent.click(screen.getByRole("button",{name:/Đến lịch báo lại 07\/10\/2026/}));
+    await screen.findByRole("heading",{name:"Cần xử lý"});
+    const lot=await screen.findByRole("button",{name:/Cải thìa/});expect(lot.querySelector('[data-processing-status]')).toHaveAttribute('data-processing-status','open');
   });
 
   it("opens legacy lookup links in DATE with a single navigation destination", async () => {
