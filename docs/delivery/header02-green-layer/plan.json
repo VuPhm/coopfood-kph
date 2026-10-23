@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "header02-green-layer",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Unify the green underlay and app header color/layout across Store screens, keeping accepted white surfaces, chart colors and workflows.",
   "inScope": [
     "Shared green chrome across seven Store screens and report subviews",
@@ -15,7 +15,7 @@
     "packages/ui, root config/lockfile, Pages, automatic merge/push/deploy"
   ],
   "baseSha": "630ec7b06b369e566b3bd5c9326bebed82b22b72",
-  "candidateSha": "",
+  "candidateSha": "4450982c93d29a6c99746bd95ba487341c6ec00f",
   "integrationOwner": "Current chat sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-header.css",
@@ -41,7 +41,10 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "4450982c93d29a6c99746bd95ba487341c6ec00f",
+      "evidence": "docs/delivery/header02-green-layer/technical.md"
     },
     {
       "id": "owner",
@@ -52,6 +55,6 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Implement shared chrome from main630ec7b; validate baseline and candidate at390/1440/320 then preview owner.",
+  "nextAction": "Owner review http://127.0.0.1:4283/#home and shared page/modal headers; await actual feedback before merge.",
   "authorization": "23/10/2026 owner: tối ưu lại màu và bố cục vùng nền xanh lớp dưới, headerapp trong tất cả màn."
 }
