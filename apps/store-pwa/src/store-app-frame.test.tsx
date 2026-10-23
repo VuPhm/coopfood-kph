@@ -21,8 +21,10 @@ describe("Global Store frame", () => {
     expect(titleRef.current).toBe(screen.getByRole("heading", { name: "Mẫu riêng" }));
     expect(within(sidebar).getByRole("link", { name: "Báo cáo" })).toHaveAttribute("aria-current", "page");
     expect(within(sidebar).getByText("Cửa hàng kiểm tra")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Về danh sách mẫu" }));
+    fireEvent.click(document.querySelector(".store-back")!);
     expect(onBack).toHaveBeenCalledOnce(); expect(navigate).not.toHaveBeenCalled();
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Vị trí hiện tại" })).getByRole("button", { name: "Về danh sách mẫu" }));
+    expect(onBack).toHaveBeenCalledTimes(2); expect(navigate).not.toHaveBeenCalled();
 
     app.rerender(<StoreAppFrame screen="date" profile={profile} account={account} navigate={navigate}>
       <StorePageHero><input aria-label="Tra mã hàng" /></StorePageHero>
@@ -44,6 +46,8 @@ describe("Global Store frame", () => {
     const app = render(<StoreAppFrame screen="home" profile={mockProfile} account={account} navigate={navigate}><StorePageLayout><StorePageHero /><StorePageSurface>Nội dung Home</StorePageSurface></StorePageLayout></StoreAppFrame>);
     expect(document.querySelectorAll(".store-header")).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "Trang chủ" })).toBeInTheDocument();
+    expect(screen.queryByText("Cửa hàng hiện tại")).not.toBeInTheDocument();
+    expect(document.querySelector(".store-header-copy > div")).toHaveClass("sr-only");
     const appBar = document.querySelector(".store-appbar-row");
     app.rerender(<StoreAppFrame screen="shelf" profile={mockProfile} account={account} navigate={navigate}><StorePageLayout><StorePageHero /><StorePageSurface>Nội dung Tra hạn</StorePageSurface></StorePageLayout></StoreAppFrame>);
     expect(document.querySelectorAll(".store-header")).toHaveLength(1);
@@ -53,5 +57,15 @@ describe("Global Store frame", () => {
     const features = within(screen.getByRole("navigation", { name: "Tính năng cửa hàng" }));
     expect(features.getAllByRole("link")).toHaveLength(4);
     expect(features.getByRole("link", { name: "Tra hạn lùi" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("keeps the report ancestor action when a template shares the module title", () => {
+    const onBack = vi.fn();
+    render(<StoreAppFrame screen="reports" profile={mockProfile} account={account} navigate={vi.fn()}>
+      <StorePageHero header={{ title: "Báo cáo", onBack, backLabel: "Về menu báo cáo" }} />
+    </StoreAppFrame>);
+    const location = within(screen.getByRole("navigation", { name: "Vị trí hiện tại" }));
+    fireEvent.click(location.getByRole("button", { name: "Về menu báo cáo" }));
+    expect(onBack).toHaveBeenCalledOnce();
   });
 });

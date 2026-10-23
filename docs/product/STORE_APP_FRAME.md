@@ -27,19 +27,34 @@ ngoài, nắp trắng hoặc chọn một density khác.
 
 | Vai trò | Quy tắc chung |
 | --- | --- |
-| Thanh trên | Padding top/bottom 14px; hàng grid tối thiểu 44px, mặc định tổng 72px. Ba cột 44px/minmax(0,1fr)/44px, gap8. |
-| Back/brand/tài khoản | Control44px; avatar40px, cùng tâm dọc. Back/brand dùng nền trắng8%, viền trắng20% mảnh và góc14px. Logo gốc trên nền xanh, không đổi màu asset. Mọi màn cùng anchor, không absolute theo wrapper riêng. Login không có tài khoản hoặc sidebar giả. |
+| Thanh trên | Padding top/bottom 14px; hàng grid tối thiểu 44px, mặc định tổng 72px. Mobile/Home/login ba cột44px/minmax(0,1fr)/44px, gap8. Desktop màn chức năng hai cột nội dung/44px; sidebar và ancestor thay Back. |
+| Back/brand/tài khoản | Control44px; avatar40px, cùng tâm dọc. Brand dùng nền trắng8%, viền trắng20% mảnh và góc14px. Back mobile không viền/nền, vẫn44px và focus rõ. Logo gốc trên nền xanh, không đổi màu asset. Mọi màn cùng anchor, không absolute theo wrapper riêng. Login không có tài khoản hoặc sidebar giả. |
 | Tiêu đề | 20/26px, subtitle 12/16px trên mọi màn. Một dòng/ellipsis để không dịch bar; giữ nguyên text trong DOM/title attribute và tên mẫu đầy đủ trong picker. Text accessibility lớn có thể tăng chiều cao hàng. |
 | Gutter | 22px mobile, 16px dưới360px, 36px desktop từ900px. Hero content và nội dung feature dùng cùng token. |
 | Vùng xanh | Cùng gradient115deg `#006b4b → #007a52`; sticky native, đệm cuối sau slot8px trên mọi breakpoint. Chiều cao do nội dung slot, không là một min-height riêng cho từng màn. |
 | Lớp trắng | Section rộng 100%, min-height100dvh, overlap12px, góc24px, white/shadow chung. Phần cuối trang giữ clearance navigation/action riêng của nội dung. |
 | Parent | Page layout rộng 100%, max-width none/margin0, isolation. Không giới hạn khung chứa header/cover bởi max-width của feature. |
 
-Home có lời chào trong slot xanh; header vẫn là hàng có title như các màn
-khác. Tra hạn không còn header riêng cao166px. Đăng nhập dùng cùng header/
+Home có lời chào trong slot xanh; AppHeader chỉ hiện logo/tài khoản và
+badge cửa hàng trên desktop, không lặp “Trang chủ / Cửa hàng hiện tại”. H1
+Trang chủ giữ sr-only để nhận biết trang bằng screen reader. Tra hạn không còn header riêng cao166px. Đăng nhập dùng cùng header/
 hero/surface; form trắng một cột, rộng tối đa480px và căn giữa bên trong lớp
 trắng, kể cả desktop. Bố cục login hai cột trước đây được thay theo hướng đồng
 bộ toàn app của owner ngày 22/10. Giữ form/busy/error/password/preview behavior.
+
+## HEADER03 — candidate 24/10/2026
+
+Theo yêu cầu owner tiếp tục tối ưu AppHeader: bỏ hai dòng copy Home, mũi tên
+Back mobile không khung/nền kể cả hover. Desktop từ900px dùng sidebar cùng
+breadcrumb trong header `Trang chủ › màn hiện tại`; mẫu đang mở có thêm cấp
+`Báo cáo`. Các ancestor là button điều hướng44px, dùng callback hiện có;
+current item là H1 có `aria-current=page` trên li. Không dùng browser history
+hoặc navigation stack mới. Login giữ title/brand, không tạo ancestor giả.
+
+Giữ header72px, focus/skip link/account, chữ lớn được tăng chiều cao, tên dài
+ellipsis/title đầy đủ; không thêm blur/listener hay đổi palette/white cover.
+Owner chưa nghiệm thu candidate; xem
+[scope và evidence](../delivery/header03-context-nav/technical.md).
 
 ## HEADER02 — candidate 23/10/2026
 

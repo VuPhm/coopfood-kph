@@ -1,5 +1,12 @@
 # Home, điều hướng và tiện ích Store App — 21/10/2026
 
+**HEADER03 candidate24/10:** AppHeader Home bỏ hai dòng “Trang chủ / Cửa hàng
+hiện tại” trên hình, giữ heading accessible và lời chào. Mobile Back là mũi
+tên không khung; desktop thay bằng đường dẫn ancestor trong header, phối hợp
+sidebar đang có, không đổi recent/mobile tabs/store capability. Khi mở mẫu:
+`Trang chủ › Báo cáo › tên mẫu`; cấp Báo cáo gọi callback về menu mẫu hiện có.
+Technical/owner status tại [hồ sơ HEADER03](../delivery/header03-context-nav/technical.md).
+
 UI đã được owner cho phép merge ngày 22/10/2026, tiếp nối header/hợp nhất
 nền xanh. Chỉ Store App hiện tại; không áp Admin Web hay entry online/Pilot cũ.
 Technical gate đạt không thay nghiệm thu hình ảnh của owner.

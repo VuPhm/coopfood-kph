@@ -12,7 +12,9 @@ async function chart(p){return p.locator('.store-date-milestones .store-timeline
    await expect(p.locator('.store-page-hero')).toHaveCSS('background-image',green);
    expect(await p.locator('.store-page-hero').evaluate(root=>[root,...root.querySelectorAll('*')].filter(el=>getComputedStyle(el).backdropFilter!=='none').length)).toBe(0);
    const end=p.locator('.store-page-hero-content').or(p.locator('.store-header')).last();const last=await end.boundingBox();const cover=await p.locator('.store-page-surface').boundingBox();expect(cover.y-last.y-last.height).toBe(8);
-   const lead=await p.locator('.store-header-brand,.store-back').boundingBox();expect(lead.width).toBe(44);expect(lead.height).toBe(44);
+   const desktop=viewport.width>=900&&route!=='home'&&route!=='login';
+   const lead=await p.locator(desktop?'.store-header-account':'.store-header-brand,.store-back').boundingBox();expect(lead.width).toBe(44);expect(lead.height).toBe(44);
+   if(desktop)await expect(p.locator('.store-back')).toBeHidden();
    if(route!=='login'){const avatar=await p.locator('.store-header .store-profile-avatar').boundingBox();expect(avatar.y+avatar.height/2).toBe(lead.y+lead.height/2)}
    await audit(p,'.store-page-hero',`${route}-${viewport.width}`);
    await p.screenshot({path:`${output}/${route}-${viewport.width}.png`});
