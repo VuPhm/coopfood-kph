@@ -1,6 +1,6 @@
 # Báo cáo DATE — RPT01 revision 14
 
-## RPT02 — Co.op Fresh khối mềm, candidate23/10/2026
+## RPT02 — Co.op Fresh khối mềm, đã duyệt23/10/2026
 
 Owner yêu cầu áp giao diện mới cho vùng Báo cáo, từ main3b0da6c đã có
 HEADER02/DATE03. Giữ toàn bộ semantics bên dưới: chọn lô, đổi/lưu/quản lý mẫu,
@@ -19,8 +19,10 @@ kỳ/phạm vi, snapshot độc lập, lịch sử theo store, Excel và in/PDF.
   Sáu màn khác không nhận các rule của report.
 
 Source CSS riêng `store-report-soft.css`, scope report/portal rõ ràng; recipe
-chung tại [Co.op Fresh](STORE_APP_SURFACE_STYLE.md). Đây là candidate chờ owner
-nghiệm thu; [scope, checks và giới hạn](../delivery/reports02-soft-surfaces/technical.md).
+Home tại [Visual DNA](STORE_APP_VISUAL_DNA.md). Owner đã cho phép merge đúng
+0757b6d cùng UI02 bằng “merge với `0757b6d`”;
+[scope/checks](../delivery/reports02-soft-surfaces/technical.md),
+[nghiệm thu/tích hợp](../delivery/reports02-soft-surfaces/merge-2026-10-23.md).
 
 Ngày 14/10/2026. Owner tạm chấp nhận bố cục trang riêng revision 3, yêu cầu
 thêm menu loại báo cáo, lịch sử, chọn item và tạo/dùng lại template.

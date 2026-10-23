@@ -1,7 +1,9 @@
 # RPT02 — Co.op Fresh cho Báo cáo, 23/10/2026
 
-Technical PASS; owner acceptance pending. Preview mock production:
-<http://127.0.0.1:4290/#reports>. Chưa merge/push/deploy.
+Owner cho phép “merge với `0757b6d`” ngày23/10/2026, áp report checkpoint0757b6d
+và scrollbar UI02 đang xem tại4295. Đã merge main local`e5628ab`;
+[nghiệm thu, gate tích hợp và đóng vòng](merge-2026-10-23.md). Các pending/preview4290
+bên dưới là lịch sử trước quyết định này. Chưa push/deploy.
 
 ## Mốc, writer và phạm vi
 
@@ -99,5 +101,5 @@ trắng/viền mảnh, trạng thái chọn và focus vẫn rõ, header đồng 
 Mock report library vẫn browser-local theo store, chưa có persistence/server
 online; tồn chưa có dữ liệu. Chưa kiểm iOS/GPU/keyboard OS thật, không tuyên bố
 benchmark hiệu năng; chỉ giữ budget blur, không thêm listener/animation. Owner
-chưa nghiệm thu RPT02. Bước nhỏ tiếp theo: nhận feedback đúng preview4290,
-chỉ tích hợp main sau khi được cho phép.
+đã nghiệm thu/tích hợp như ghi chú đầu file; các giới hạn thiết bị thật vẫn giữ.
+Bước tiếp theo: đóng vòng, chờ yêu cầu mới.

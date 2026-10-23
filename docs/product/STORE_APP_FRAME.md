@@ -88,7 +88,7 @@ Back/ref, không remount account/sidebar và active theo route. Hồi quy báo c
 loading geometry và navigation riêng vẫn giữ. Không dùng pixel snapshot rộng.
 [Handoff và giới hạn](../delivery/header-style-rollout/page-kit-2026-10-22.md).
 
-## Thanh cuộn desktop — UI02 candidate23/10/2026
+## Thanh cuộn desktop — UI02 đã duyệt23/10/2026
 
 Từ900px, root Store/login, sidebar, KPH table và body/results/form trong Store
 portal dùng native scrollbar mảnh, thumb đủ rõ trên nền trắng. Không thêm JS
@@ -105,4 +105,5 @@ mobile và hàng tags ngang giữ cách dùng đã duyệt.
 
 Gate phải launch Chromium với `ignoreDefaultArgs: ['--hide-scrollbars']` để kiểm
 đúng geometry và thao tác native; gate headless mặc định ẩn bar không đủ cho
-lỗi này. [Kết quả và giới hạn](../delivery/ui02-scrollbars.md). Chờ owner xem.
+lỗi này. [Kết quả và giới hạn](../delivery/ui02-scrollbars.md). Owner cho phép merge cùng
+0757b6d; [hồ sơ tích hợp](../delivery/reports02-soft-surfaces/merge-2026-10-23.md).

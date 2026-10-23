@@ -1,5 +1,15 @@
 # Công việc kế tiếp
 
+**UI02 + RPT02 — CLOSED,23/10/2026:** owner “merge với `0757b6d`” cho bản
+scrollbar đang xem tại4295 và report checkpoint0757b6d. Merge main local
+`e5628ab` gồm scrollbar`e2c2ab5` + report đúng0757b6d; source hợp nhất không sửa
+thêm. Verify333tests/contracts/API/types/build/PWA, native scrollbars7màn×5
+viewport, report fresh/header/selection-dock/library/Excel/PDF và soft-material
+chart/print parity PASS. Preview main <http://127.0.0.1:4296/#kph> và reports.
+Chưa push/deploy; mock/browser-local và thiết bị thật giữ giới hạn riêng. Các
+pending UI02/RPT02 bên dưới là lịch sử trước acceptance. Đóng vòng, chờ yêu cầu
+mới. [SHA, quyết định và kiểm tra](delivery/reports02-soft-surfaces/merge-2026-10-23.md).
+
 **UI02 scrollbar — candidate23/10/2026:** rà cả7màn và popup theo owner “rà
 soát hết”. Desktop dùng native scrollbar mảnh; popup cuộn trong body, giữ header/
 close/bo góc, form và tiện ích có bar kéo được. Choice sheet chỉ cuộn results;

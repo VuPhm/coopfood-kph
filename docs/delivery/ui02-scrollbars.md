@@ -1,10 +1,13 @@
 # UI02 — rà soát/sửa scrollbar Store Fresh, 23/10/2026
 
 Owner yêu cầu “tối ưu scroll bar, có lỗi hiển thị thanh scroll trên máy tính”,
-sau đó xác nhận “rà soát hết”. Candidate, chưa owner acceptance/merge/push/deploy.
+sau đó xác nhận “rà soát hết”. Owner đã cho phép “merge với `0757b6d`” ngày
+23/10/2026: scrollbar checkpoint`e2c2ab5`, main merge`e5628ab`.
+[Hồ sơ tích hợp/đóng vòng](reports02-soft-surfaces/merge-2026-10-23.md). Các pending
+trong ghi chú candidate là lịch sử; chưa push/deploy.
 Base`3b0da6c`; nhánh`store-app/ui02-scrollbars`, worktree
 `/Users/vup/.codex/worktrees/ui-scrollbars/coopfood-kph`; một writer, không team.
-Main/Pages không thay đổi bởi task. Preview production mock:
+Task được tích hợp main cùng RPT02; Pages không đổi. Preview candidate đã xem:
 <http://127.0.0.1:4295/#kph>.
 
 ## Phát hiện và cách sửa
@@ -63,5 +66,5 @@ backend hoặc shared package. Không thêm tests unit chỉ để mirror CSS; b
 interaction gate kiểm trực tiếp thay đổi. Không coi đây là đo production hoặc
 kiểm Safari/Windows/thiết bị thật. Store Fresh vẫn memory-only.
 
-Owner xem4295 ở desktop: cuộn trang, mở chi tiết KPH/bộ lọc/tạo phiếu/tiện ích,
-kéo thumb, thu cửa sổ thấp và đóng bằng Escape. Chưa merge/deploy.
+Đã đóng task sau merge và gate main. Preview main <http://127.0.0.1:4296/#kph>.
+Bước tiếp theo: chờ yêu cầu mới, không tự mở thêm review/deploy.
