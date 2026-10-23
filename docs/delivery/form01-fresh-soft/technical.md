@@ -5,6 +5,12 @@ phần khác triết lý này, ghi lại triết lý này; pull `816b4e3` rồi 
 [Quyết định/acceptance revision 2](acceptance-revision2.md),
 [evidence revision 2](revision2.md). Rollout mới còn chờ owner xem.
 
+## Checkpoint
+
+Candidate `5fd74fcf816df376b69473445be992ec158a1701` chứa source/test đã kiểm trên production
+artifact. Commit không đổi runtime sau QA; ledger tiếp chỉ ghi bằng chứng.
+Technical PASS revision 3; form revision 2 đã accepted, rollout mới owner pending.
+
 ## Tích hợp và phạm vi
 
 - Giữ cùng nhánh `store-app/form01-fresh-soft`, một writer tại

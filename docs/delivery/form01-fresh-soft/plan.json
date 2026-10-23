@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "form01-fresh-soft",
   "revision": 3,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Apply accepted Co.op Fresh Soft material philosophy to remaining Store Fresh components after integrating requested 816b4e3; document durable role/state rules.",
   "inScope": [
     "Integrate exact requested header commit 816b4e3 while preserving accepted Fresh Soft forms",
@@ -18,7 +18,7 @@
     "Merge main/push/deploy without owner authorization"
   ],
   "baseSha": "568c8cd2b320f0d1d33abb875cc8df15979e5516",
-  "candidateSha": "",
+  "candidateSha": "5fd74fcf816df376b69473445be992ec158a1701",
   "integrationOwner": "Current chat, sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-form-soft.css",
@@ -50,7 +50,10 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "5fd74fcf816df376b69473445be992ec158a1701",
+      "evidence": "docs/delivery/form01-fresh-soft/technical.md"
     },
     {
       "id": "owner",
@@ -76,6 +79,6 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Audit current component roles, implement bounded soft material rollout, document the philosophy and verify against integrated baseline.",
+  "nextAction": "Owner review integrated Fresh Soft rollout at http://127.0.0.1:4304/#home across KPH/DATE/notifications/reports/login. Accepted form philosophy is recorded; await new rollout acceptance before merge main.",
   "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
 }
