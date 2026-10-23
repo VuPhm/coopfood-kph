@@ -15,7 +15,7 @@
     "packages/ui, root config/lockfile, Pages, automatic merge/push/deploy"
   ],
   "baseSha": "630ec7b06b369e566b3bd5c9326bebed82b22b72",
-  "candidateSha": "23f6b19e28d5d5be2bf1ff2b13bcff7efd0665ea",
+  "candidateSha": "9d325da843384ba77a1b110f451d92e5e90a939e",
   "integrationOwner": "Current DATE03 chat, sole main integration writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-header.css",
@@ -43,7 +43,7 @@
       "required": true,
       "status": "pass",
       "revision": 2,
-      "sha": "23f6b19e28d5d5be2bf1ff2b13bcff7efd0665ea",
+      "sha": "9d325da843384ba77a1b110f451d92e5e90a939e",
       "evidence": "docs/delivery/header02-green-layer/merge-2026-10-23.md"
     },
     {
@@ -52,7 +52,7 @@
       "required": true,
       "status": "pass",
       "revision": 2,
-      "sha": "23f6b19e28d5d5be2bf1ff2b13bcff7efd0665ea",
+      "sha": "9d325da843384ba77a1b110f451d92e5e90a939e",
       "evidence": "docs/delivery/header02-green-layer/merge-2026-10-23.md",
       "acceptedBy": "Repository owner, direct message",
       "decisionRef": "23/10/2026 owner message in current DATE03 chat: cho phép merge cái này và `4450982`"
