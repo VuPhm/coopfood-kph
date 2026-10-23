@@ -86,3 +86,9 @@ Mở <http://127.0.0.1:4278/#date>, tìm A24-301/A24-255 để xem % và chi ti�
 D24-090 để xem thiếu NSX; thử Ghi nhận/Đã xử lý. Kiểm nền trắng/xám và đối chiếu
 biểu đồ cũ. Technical PASS; owner pending. Bước tiếp theo chỉ nghiệm thu scope
 DATE này, không tự merge/push/deploy hoặc rollout màn khác.
+
+## Candidate handoff
+
+Checkpoint **`fa1a5369213227976e5d7556e41a4d9a7ff4f70e`**, revision2, review2/limit2.
+Sau checkpoint chỉ ghi ledger, không đổi source đã kiểm. Cây task sạch, main
+không đổi. AWAITING_ACCEPTANCE; owner gate pending cho DATE02.
