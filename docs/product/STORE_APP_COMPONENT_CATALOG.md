@@ -1,5 +1,10 @@
 # Danh mục component Store App
 
+FORM01 revision4: [Button role/state tokens](../../apps/store-pwa/src/store-button-system.css)
+và [chrome boundary tokens](../../apps/store-pwa/src/store-chrome-soft.css) dùng
+cùng [quy chuẩn Fresh Soft](STORE_APP_SURFACE_STYLE.md). Shared Button xuất
+metadata variant/size; chỉ Store-local CSS tiêu thụ, giữ component/default ngoài Store.
+
 **Vật liệu/khối/viền — reference22/10/2026:**
 [STORE_APP_SURFACE_STYLE](STORE_APP_SURFACE_STYLE.md) ghi recipe thật và số đo
 Home, các token hiện có trong `store-glass.css`, cascade và cách áp có scope.

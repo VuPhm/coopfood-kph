@@ -1,5 +1,10 @@
 # Store PWA — các cụm điều khiển tham khảo
 
+**FORM01 revision4 — candidate24/10:** hệ token nút bao gồm primary xanh,
+secondary/ghost/danger, selected/disabled/focus và native command. Vật liệu mép
+khối trượt/sidebar/menu dùng token layer riêng, không đổi geometry/navigation.
+[Giá trị và binding theo vai trò](STORE_APP_SURFACE_STYLE.md#token-nút-và-mép-chrome--form01-revision-4).
+
 Candidate RPT01 revision 14, ngày 18/10/2026. Dùng thật trong báo cáo trước khi
 đề xuất nhân rộng. Đây là component local Store PWA; chưa phải primitive Admin
 hoặc thay đổi toàn hệ thống. Giữ workflow/authorization ở feature/backend.

@@ -1,5 +1,10 @@
 # Store App UI DNA
 
+**FORM01 revision4 — candidate24/10:** hệ token nút bao gồm primary xanh,
+secondary/ghost/danger, selected/disabled/focus và native command. Vật liệu mép
+khối trượt/sidebar/menu dùng token layer riêng, không đổi geometry/navigation.
+[Giá trị và binding theo vai trò](STORE_APP_SURFACE_STYLE.md#token-nút-và-mép-chrome--form01-revision-4).
+
 **Owner visual principle — 2026-10-24:** Co.op Fresh Soft:
 background and spacing establish groups; resting edges recede; meaningful states
 remain explicit. Accepted forms are the reference; owner authorized extension

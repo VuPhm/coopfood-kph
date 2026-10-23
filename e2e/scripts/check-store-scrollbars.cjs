@@ -8,7 +8,7 @@ async function ready(page, screen) {
   await page.goto(`${base}/#${screen}`);
   if (screen === 'login') await expect(page.locator('.store-login-form')).toBeVisible();
   else await expect(page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true })).toBeEnabled();
-  if (screen === 'kph') await expect(page.locator('.kph-loading-frame')).toHaveCount(0);
+  if (screen === 'kph') await expect(page.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
   if (screen === 'reports') await expect(page.locator('.report-type-card').first()).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
 }
@@ -72,11 +72,18 @@ async function scrollBody(page, dialog, selector, desktop) {
         }
         // Hash navigation can retain scroll position; start with the thumb at the top.
         // Let any preceding wheel/scroll anchoring finish before placing the thumb.
-        let previousTop;
-        await expect.poll(async () => {
-          const top = await page.evaluate(() => scrollY);
-          const settled = top === previousTop; previousTop = top; return settled;
-        }).toBe(true);
+        // A pair of equal samples can fall between compositor wheel frames.
+        // Require a continuous quiet period before resetting this test precondition.
+        await page.evaluate(() => new Promise((resolve, reject) => {
+          const start = performance.now(); let lastTop = scrollY; let quietSince = start;
+          const check = now => {
+            if (scrollY !== lastTop) { lastTop = scrollY; quietSince = now; }
+            if (now - quietSince >= 300) resolve();
+            else if (now - start > 5000) reject(new Error('Root wheel scrolling did not settle'));
+            else requestAnimationFrame(check);
+          };
+          requestAnimationFrame(check);
+        }));
         await page.evaluate(() => scrollTo(0, 0));
         await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
         await page.mouse.move(viewport.width - 3, 20); await page.mouse.down();

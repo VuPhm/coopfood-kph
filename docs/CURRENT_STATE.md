@@ -1,5 +1,16 @@
 # Trạng thái hiện tại
 
+**FORM01 revision 4 — candidate24/10/2026:** owner yêu cầu đủ mọi nút, đặc biệt
+nút xanh; làm tổng thể token nút và mép khối trượt/sidebar/menu bar. Dùng một
+role/state matrix cho primary/secondary/ghost/danger/selected/disabled và native
+command; primary có gradient/mép sáng/bóng thấp, pressed tại chỗ. Chrome dùng
+edge/elevation token, giữ canvas trắng và header816b4e3. Shared Button chỉ thêm
+metadata cho binding Store-local; không đổi global UI palette/API.
+[Token/triết lý](product/STORE_APP_SURFACE_STYLE.md),
+[scope/evidence](delivery/form01-fresh-soft/technical.md).
+Technical PASS: 334 tests và Playwright nút/chrome/native scrollbar.
+Preview <http://127.0.0.1:4306/#kph>; owner xem bản mới, chưa merge main/push/deploy.
+
 **FORM01 revision 3 — candidate24/10/2026:** owner chấp nhận hướng form bằng
 “ổn, làm tiếp”, yêu cầu mở rộng và ghi triết lý. Đã tích hợp đúng header
 `816b4e3` vào nhánh task, base hợp nhất `568c8cd`; không đổi main. Mở rộng

@@ -1,5 +1,10 @@
 # Store App Visual DNA — Co.op Fresh
 
+**FORM01 revision4 — candidate24/10:** hệ token nút bao gồm primary xanh,
+secondary/ghost/danger, selected/disabled/focus và native command. Vật liệu mép
+khối trượt/sidebar/menu dùng token layer riêng, không đổi geometry/navigation.
+[Giá trị và binding theo vai trò](STORE_APP_SURFACE_STYLE.md#token-nút-và-mép-chrome--form01-revision-4).
+
 **FORM01 revision 3,24/10:** form/mép nhẹ được owner chấp nhận; tiếp tục triết lý
 “Nền và khoảng cách tạo khối; viền nghỉ lùi xuống; trạng thái giữ rõ” cho control/
 nhóm/picker hiện có. [Quy chuẩn theo vai trò](STORE_APP_SURFACE_STYLE.md) là nguồn

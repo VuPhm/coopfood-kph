@@ -6,6 +6,8 @@ import "./store-frame-canvas.css";
 import "./store-login.css";
 import "./store-form-soft.css";
 import "./store-component-soft.css";
+import "./store-button-system.css";
+import "./store-chrome-soft.css";
 
 export function StoreLogin({ busy, error, onSubmit, onPreview }: {
   busy: boolean;

@@ -26,7 +26,7 @@ Owner đã chấp nhận form revision 2 bằng “ổn, làm tiếp” và yêu
 các thành phần khác, ghi lại triết lý. **Co.op Fresh Soft** là tên của hướng
 này, giữ mã `coop-fresh-soft-v1`. Reference hiện tại: Home, form `56e2edd` đã
 duyệt và header `816b4e3` được yêu cầu tích hợp; base hợp nhất `568c8cd`.
-Rollout component revision 3 là candidate riêng, không thay nghiệm thu từng
+Rollout button/chrome revision 4 là candidate riêng, không thay nghiệm thu từng
 implementation bằng acceptance của triết lý.
 
 1. **Tạo phân cấp trước khi vẽ khung.** Trắng là nền chính; pastel nhẹ nhận
@@ -60,12 +60,55 @@ implementation bằng acceptance của triết lý.
 | Nhóm filter/settings/reminder/Thông báo | Nền theo vai trò, mép 6%, bóng thấp | Check/native state/collapse riêng; focus không bị thay |
 | Hàng picker và divider bên trong | Mép 6%; text/check làm cue | Hover fill; radio/check và keyboard giữ native semantics |
 | Popup sort/dropdown/calendar | Mép 6%, nền đặc, bóng nổi nhỏ | Focus trap, điều hướng, cạnh màn và scroll không đổi |
-| Header/navigation/primary action | Giữ geometry/màu đã duyệt | Không đổi header816b4e3, primary hoặc tab/checkbox để làm nhẹ |
+| Header/navigation/primary action | Revision4 bổ sung token vật liệu nút xanh và mép chrome | Giữ header816b4e3/geometry; trạng thái đọc được, không đổi checkbox hoặc màu nghiệp vụ |
 
 Runtime rollout local ở [store-component-soft.css](../../apps/store-pwa/src/store-component-soft.css),
 form ở [store-form-soft.css](../../apps/store-pwa/src/store-form-soft.css).
 Chỉ Store Fresh/login và các portal thuộc Store; không tự áp Admin/online/Pilot
 hoặc `packages/ui`. [Scope, acceptance đã có và evidence mới](../delivery/form01-fresh-soft/technical.md).
+
+## Token nút và mép chrome — FORM01 revision 4
+
+Owner nhận xét chưa hiệu quả trên mọi nút, nhất là nút xanh, và yêu cầu một
+round tổng thể token nút rồi áp vào mép khối trượt/sidebar/menu bar. Scope mới
+cho phép sửa vật liệu primary/selected/navigation; giữ quy tắc và geometry.
+
+[store-button-system.css](../../apps/store-pwa/src/store-button-system.css) là
+nguồn token và binding theo vai trò của Store Fresh. Button shared chỉ thêm
+`data-slot="button"`, `data-variant`, `data-size` để consumer áp recipe tin cậy;
+không thay class/API/default styling của Admin/online/Pilot. Button native của
+Store được nối cùng role, không suy primary từ tên utility hoặc text của nút.
+
+| Vai trò/token | Giá trị / sử dụng |
+| --- | --- |
+| Primary | `#00724e`; gradient150° `#07825a → #00724e(58%) → #006746`, chữ trắng |
+| Primary hover / pressed | `#006b49` / `#005e40`; hover gradient sâu hơn, pressed fill đặc và bóng inset |
+| Secondary | Fill `#f0f7f3`, chữ `#005e40`, hover `#e6f2eb`, pressed `#dceee3` |
+| Secondary edge | Hộp border giữ nguyên, sơn transparent; inset1px 6% thay viền dày/đôi |
+| Ghost / icon | Chữ `#40566a`, nền nghỉ transparent; icon hover tint nhẹ, giữ hit area |
+| Selected | Cùng vật liệu xanh primary; check/aria-state/underline vẫn giữ; edge xanh đồng nền |
+| Danger | `#b42318 → #9c2118`, chữ trắng; không áp màu này cho thao tác trung tính |
+| Disabled | Fill `#e4ece7`, chữ `#506358`, không gradient/bóng/giảm opacity; native disabled giữ nguyên |
+| Radius | Action16px; icon14px; capsule/navigation giữ hình dạng phù hợp |
+| Focus | Ring3px `#20344a`, inverse hero trắng; không dùng bóng hoặc màu nền làm cue duy nhất |
+| Motion | Hover nền nhẹ120ms; chữ và selected/disabled đổi đồng bộ, không cross-fade màu trạng thái; pressed tại chỗ, không translate1px/brightness cả nút |
+
+Các token `--store-button-*` áp trực tiếp vào primary của form/review, report
+dock, bộ lọc, login/account, Tra hạn, nút chọn và native command. KPH create CTA
+vẫn có nhãn loại hàng theo màu riêng; “Ghi nhận” DATE giữ cam `#c24e00 → #a63f00`.
+Không thay switch, radio/check, semantic label, row/item clickable thành CTA.
+
+[store-chrome-soft.css](../../apps/store-pwa/src/store-chrome-soft.css) định nghĩa
+`--store-layer-*`: mép6%, highlight trắng90%, cap shadow `0 -2px 10px /6%`,
+panel shadow `0 12px 32px /14%`, nav shadow thấp và sidebar shadow sát mép.
+Dùng inset/box-shadow thay border làm đổi box: khối trắng trượt, sheet/modal,
+sidebar248px, menu capsule và floating report dock giữ placement/scroll owners.
+Sidebar current có stripe3px, menu current giữ capsule và aria-current.
+
+Reduced motion/transparency bỏ bóng trang trí và chuyển màu tức thì; increased
+contrast/forced colors đưa viền và current marker về hệ màu OS, bỏ gradient.
+Không thêm backdrop blur hoặc đổi layout để tạo cảm giác mềm. Recipe ở mục
+trước vẫn áp theo vai trò; phần token/chrome revision4 đang chờ owner xem.
 
 ## 1. Công thức thị giác
 

@@ -1,24 +1,23 @@
 {
   "schemaVersion": 1,
   "id": "form01-fresh-soft",
-  "revision": 3,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Apply accepted Co.op Fresh Soft material philosophy to remaining Store Fresh components after integrating requested 816b4e3; document durable role/state rules.",
+  "revision": 4,
+  "status": "EXECUTING",
+  "objective": "Complete Fresh Soft button tokens including green primary/selected buttons, then harmonize sliding surfaces/sidebar/menu edges without changing behavior or geometry.",
   "inScope": [
-    "Integrate exact requested header commit 816b4e3 while preserving accepted Fresh Soft forms",
-    "Quiet resting secondary actions, filter choices, picker rows, grouping and nested chrome across Store Fresh surfaces/portals",
-    "Maintain white holders, semantic colors, selected/focus/error cues, current geometry and workflows",
-    "Write the accepted philosophy and role/state recipes in the canonical surface guide, link UI DNA/catalog",
-    "Verify integrated Home/context navigation, KPH/DATE/reports/shelf/login, keyboard/contrast/scroll/mobile/desktop"
+    "Central Store-local button role/state tokens for primary, secondary, ghost, destructive, icon and selected controls, covering native and shared Button consumers",
+    "Add nonvisual variant metadata to shared Button for reliable Store-scoped token binding; current chat is sole packages/ui integration owner for button.tsx",
+    "Apply compatible edge/elevation tokens to white sliding page/modal surfaces, desktop sidebar and mobile menu/action bars",
+    "Preserve approved 816b4e3 navigation, white canvas, business palette, chart/print outputs, semantics, touch targets and dimensions",
+    "Document exact role/state values and verify real primary actions, disabled/busy recovery, selection, keyboard, borders, geometry and cross-entry-point isolation"
   ],
   "outOfScope": [
-    "Domain/API/backend/authorization/data/storage or enum changes",
-    "Admin/online/Pilot, packages/ui, root config/dependencies",
-    "New navigation/layout/compact behavior beyond requested 816b4e3; chart colors/print redesign",
+    "Backend/API/auth/data/storage/dependencies/root config or shared global palette changes",
+    "Admin/online/Pilot appearance changes, chart/status recoloring, new navigation, compact/layout redesign",
     "Merge main/push/deploy without owner authorization"
   ],
   "baseSha": "568c8cd2b320f0d1d33abb875cc8df15979e5516",
-  "candidateSha": "5fd74fcf816df376b69473445be992ec158a1701",
+  "candidateSha": "",
   "integrationOwner": "Current chat, sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-form-soft.css",
@@ -40,20 +39,21 @@
     "e2e/scripts/check-store-component-soft.cjs",
     "docs/product/STORE_APP_UI_DNA.md",
     "e2e/scripts/check-store-chrome.cjs",
-    "e2e/scripts/check-header-context.cjs"
+    "e2e/scripts/check-header-context.cjs",
+    "packages/ui/src/button.tsx",
+    "apps/store-pwa/src/store-button-system.css",
+    "apps/store-pwa/src/store-chrome-soft.css",
+    "e2e/scripts/check-store-button-system.cjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "5fd74fcf816df376b69473445be992ec158a1701",
-      "evidence": "docs/delivery/form01-fresh-soft/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner",
@@ -76,9 +76,16 @@
       "source": "Direct owner message 24/10/2026: ổn, làm tiếp ... pull 816b4e3 rồi làm tiếp.",
       "impact": "Exact local integration, remaining Store Fresh component materials, canonical philosophy and integrated visual/behavior gates.",
       "decision": "Same task/worktree/sole writer; merge exact 816b4e3 -> 568c8cd. Preserve form revision 2 acceptance separately. New material scope needs fresh technical/owner gates; no main merge."
+    },
+    {
+      "revision": 4,
+      "request": "Not effective on all buttons, especially green ones; optimize button tokens overall, then sliding surfaces/sidebar/menu borders.",
+      "source": "Direct owner feedback24/10/2026 at preview4304.",
+      "impact": "Button material and state bindings including primary/selected; additive shared Button metadata; appropriate chrome surface edges; new integrated QA.",
+      "decision": "Continue same branch/worktree and integrated 816b4e3 base; current chat owns shared Button metadata only. Invalidate affected visual evidence; preserve behavior/geometry and shared default styling outside Fresh."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner review integrated Fresh Soft rollout at http://127.0.0.1:4304/#home across KPH/DATE/notifications/reports/login. Accepted form philosophy is recorded; await new rollout acceptance before merge main.",
+  "nextAction": "Audit actual button roles, implement complete local tokens/bindings and compatible chrome edges, then verify against revision3 preview4304.",
   "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
 }
