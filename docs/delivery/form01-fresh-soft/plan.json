@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "form01-fresh-soft",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Soften existing Store Fresh form controls with the Co.op Fresh Soft form recipe while preserving interaction, state, validation and domain behavior.",
   "inScope": [
     "Name and document the existing coop-fresh-soft-v1 visual style as Co.op Fresh Soft; define its form recipe",
@@ -18,7 +18,7 @@
     "Merge/push/deploy without owner approval"
   ],
   "baseSha": "f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8",
-  "candidateSha": "",
+  "candidateSha": "56e2edd3aae3710aec7de8101a20f158c5189956",
   "integrationOwner": "Current chat, sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-form-soft.css",
@@ -45,7 +45,10 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "56e2edd3aae3710aec7de8101a20f158c5189956",
+      "evidence": "docs/delivery/form01-fresh-soft/technical.md"
     },
     {
       "id": "owner",
@@ -64,6 +67,6 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Implement quiet resting edges, verify visible affordances/focus/states and geometry, then prepare revision 2 for owner review.",
+  "nextAction": "Owner review revision 2 at http://127.0.0.1:4302/#kph: resting edges versus Home, focus/errors and KPH/report/shelf/login forms. Await explicit acceptance before merge.",
   "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
 }

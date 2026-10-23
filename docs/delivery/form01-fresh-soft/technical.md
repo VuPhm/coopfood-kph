@@ -5,12 +5,18 @@ cân nhắc triết lý viền của các item home, tham khảo iếp theo ios2
 nhánh `store-app/form01-fresh-soft`, worktree
 `/Users/vup/.codex/worktrees/form01-fresh-soft/coopfood-kph`, base
 `f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8`, một writer, không team.
-Revision1 `de548b7` và [evidence cũ](revision 1.md) được giữ làm lịch sử;
+Revision 1 `de548b7` và [evidence cũ](revision1.md) được giữ làm lịch sử;
 không dùng thay cho kiểm vật liệu revision 2.
 
 **Tên giữ Co.op Fresh Soft (`coop-fresh-soft-v1`).** Preview revision 2:
 <http://127.0.0.1:4302/#kph>. Technical và owner acceptance tách riêng;
 chưa merge/push/deploy.
+
+## Checkpoint và gate
+
+Candidate `56e2edd3aae3710aec7de8101a20f158c5189956` chứa runtime/test đúng working tree đã
+kiểm trên production artifact. Sau QA không sửa runtime; commit ledger tiếp
+chỉ ghi bằng chứng. Technical PASS revision 2; owner pending, chưa merge.
 
 ## Quyết định và nguồn tham khảo
 
