@@ -181,3 +181,54 @@
 
 /* Keep the last row above global navigation, inside the native cover. */
 @media (max-width: 899px) { .store-screen-date .store-date-workspace { padding-bottom: calc(var(--store-mobile-toolbar-height) + 108px); } }
+
+/* DATE02: quiet holders, pastel identity and static depth from the accepted Home recipe. */
+.store-date .store-date-detail,
+.store-date-sheet.store-date-lot-sheet .store-modal-body { gap: 16px; }
+.store-date .store-date-detail { padding: 16px; border-color: var(--store-holder-edge); box-shadow: var(--store-soft-card-shadow); }
+:is(.store-date-detail, .store-date-lot-sheet) .store-date-lot-heading {
+  padding: 14px; border: 1px solid var(--store-holder-edge); border-radius: 16px;
+  background: white; box-shadow: var(--store-soft-card-shadow);
+}
+:is(.store-date-detail, .store-date-lot-sheet) .store-date-lot-heading p { margin-top: 4px; }
+:is(.store-date-detail, .store-date-lot-sheet) .store-date-milestones {
+  gap: 14px; padding: 14px; border: 1px solid var(--store-holder-edge); border-radius: 18px; background: white;
+}
+.store-date-detail-metrics { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.store-date-detail-metrics > p { display: grid; align-content: start; gap: 4px; margin: 0; padding: 10px; border-radius: 12px; background: #f5f8fa; }
+.store-date-detail-metrics span { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-date-detail-metrics strong { font-size: 16px; line-height: 24px; font-weight: 650; overflow-wrap: anywhere; }
+.store-date-timeline-content { display: grid; gap: 14px; min-width: 0; }
+:is(.store-date-detail, .store-date-lot-sheet) .store-date-milestone-facts { gap: 8px; }
+:is(.store-date-detail, .store-date-lot-sheet) .store-date-milestone-facts > div { padding: 8px 0; border-top: 1px solid var(--store-holder-edge); }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent { color: var(--store-ink-muted); }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="success"] { color: var(--store-brand-action); background-color: #e6f7f2; }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="warning"] { color: var(--store-warning-ink); background-color: #fff2dc; }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="danger"] { color: var(--store-error-ink); background-color: #fef3f2; }
+:is(.store-date, .store-date-lot-sheet) .store-date-percent[data-tone="info"] { color: #235786; background-color: #edf5ff; }
+.store-date .store-date-lot-end > .store-date-percent { align-self: start; max-width: 106px; padding: 3px 7px; border-radius: 9px; font-size: 12px; line-height: 18px; }
+.store-date .store-date-lot:not(.is-active) { box-shadow: var(--store-soft-card-shadow); }
+.store-date .store-date-lot-main > .store-date-lot-dates { background: #f5f8fa; }
+.store-date .store-date-lot { transition: background-color 120ms ease, border-color 120ms ease; }
+.store-date .store-date-lot:hover { border-color: var(--store-control-line); }
+.store-date .store-date-product { background: white; }
+.store-date-filter .store-date-filter-section { border-color: var(--store-holder-edge); background: white; }
+.store-date-filter .store-choices button:not(.is-selected) { border-color: var(--store-holder-edge); background: #f5f8fa; }
+.store-date-lot-sheet .store-sheet-actions {
+  position: sticky; bottom: 0; z-index: 2;
+  margin: 0 -16px calc(-16px - env(safe-area-inset-bottom)); border-top: 1px solid var(--store-holder-edge);
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); background: white;
+}
+:is(.store-date-detail, .store-date-lot-sheet) .store-sheet-actions { gap: 10px; }
+:is(.store-date-detail, .store-date-lot-sheet) .store-sheet-actions button { height: auto; white-space: normal; padding: 10px; line-height: 20px; }
+.store-date-detail .store-sheet-actions button { box-shadow: var(--store-soft-card-shadow); }
+.store-date-lot-sheet .store-modal-body { scroll-padding-block: 16px 84px; }
+@media (prefers-contrast: more), (forced-colors: active) {
+  :is(.store-date-detail, .store-date-lot-sheet) :is(.store-date-lot-heading,.store-date-milestones) { border-color: var(--store-control-line); }
+}
+/* Keep the sheet header in place; only detail content scrolls on short/large-text views. */
+.store-date-lot-sheet[data-slot="dialog-content"] { grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+.store-date-lot-sheet .store-modal-body { min-height: 0; overflow-y: auto; align-content: start; }
+
+/* Neutral surfaces throughout the detail; semantic tint stays on list status badges only. */
+:is(.store-date-detail, .store-date-lot-sheet) .store-date-detail-metrics > .store-date-percent { background-color: #f5f8fa; }

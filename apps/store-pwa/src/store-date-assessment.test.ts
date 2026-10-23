@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assessDateLot, needsDateAttention } from "./store-date-assessment";
+import { assessDateLot, needsDateAttention, remainingShelfPercent } from "./store-date-assessment";
 
 const lot = { manufactured: "01/10/2026", date: "2026-10-10" as const };
 describe("DATE lot assessment using Tra hạn rules", () => {
@@ -33,5 +33,24 @@ describe("DATE lot assessment using Tra hạn rules", () => {
   });
   it("returns a data error instead of throwing when HSD is invalid", () => {
     expect(assessDateLot({ date: "2026-02-31" }, "2026-10-12")).toMatchObject({ phase: "INVALID", remainingDays: null, result: null });
+  });
+});
+
+
+describe("remaining shelf-life percentage presentation", () => {
+  it.each([
+    ["2026-09-30", 100], ["2026-10-01", 100], ["2026-10-05", 60],
+    ["2026-10-06", 50], ["2026-10-08", 30], ["2026-10-10", 10], ["2026-10-11", 0],
+  ] as const)("uses inclusive days and clamps %s to %s%%", (today, expected) => {
+    expect(remainingShelfPercent(assessDateLot(lot, today))).toBe(expected);
+  });
+  it("rounds up so an unexpired long-life lot never shows zero", () => {
+    expect(remainingShelfPercent(assessDateLot({ manufactured: "01/01/2024", date: "2026-10-10" }, "2026-10-10"))).toBe(1);
+  });
+  it("counts leap days and HCM calendar dates independently of elapsed hours", () => {
+    expect(remainingShelfPercent(assessDateLot({ manufactured: "28/02/2024", date: "2024-03-02" }, "2024-03-01"))).toBe(50);
+  });
+  it.each([undefined, "31/02/2026", "10/10/2026"])("does not invent a ratio for missing/invalid NSX %s", manufactured => {
+    expect(remainingShelfPercent(assessDateLot({ ...lot, manufactured }, "2026-10-11"))).toBeNull();
   });
 });

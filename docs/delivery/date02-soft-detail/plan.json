@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "date02-soft-detail",
-  "revision": 1,
+  "revision": 2,
   "status": "EXECUTING",
   "objective": "Apply accepted soft surfaces to DATE, prioritize lot detail and show colored remaining shelf-life percentages in list.",
   "inScope": [
@@ -32,7 +32,7 @@
     "e2e/scripts/check-date-refinement.cjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
@@ -48,7 +48,15 @@
       "status": "pending"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Màu sắc các phần giao diện và nền bị lộn xộn; màu biểu đồ ok, đừng chạm vào.",
+      "source": "Owner trực tiếp23/10/2026",
+      "impact": "Thống nhất surfaces DATE về trắng/xám nhẹ; giữ màu semantic trên chữ/nhãn và phần trăm, không sửa biểu đồ.",
+      "decision": "Neutralize identity/fact/metric backgrounds; recheck contrast/screenshots, no timeline or domain changes."
+    }
+  ],
   "blockers": [],
   "nextAction": "Implement and verify DATE from accepted SHELF02 checkpoint; main unchanged.",
   "authorization": "Owner23/10/2026: đạt, áp tiếp lên DATE, đặc biệt phần chi tiết item; thay quá x ngày bằng phần trăm còn lại có màu. Follow-up: làm đoạn chưa làm được."

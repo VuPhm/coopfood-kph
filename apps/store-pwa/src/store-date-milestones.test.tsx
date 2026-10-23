@@ -25,6 +25,8 @@ describe("DATE milestones and processing are separate", () => {
     expect(card.querySelector('[data-processing-status="resolved"]')).toHaveTextContent("Đã xử lý");
     expect(card.querySelector('[data-date-phase="EXPIRED"]')).toHaveTextContent("Hết HSD");
     expect(card.querySelector(".store-timeline, .store-date-life")).toBeNull();
+    expect(card.querySelector(".store-date-percent")).toHaveTextContent("Còn 0% HSD");
+    expect(card.querySelector(".store-date-percent")).toHaveAttribute("data-tone", "danger");
     fireEvent.click(card);
     dialog = screen.getByRole("dialog", { name: "Chi tiết lô DATE" });
     expect(dialog.querySelector('[data-processing-status="resolved"]')).toHaveTextContent("Đã xử lý");
@@ -49,5 +51,6 @@ describe("DATE milestones and processing are separate", () => {
     const detail = screen.getByRole("region", { name: "Mốc DATE của lô" });
     expect(detail.querySelector(".store-date-condition")).toHaveAttribute("data-date-phase", phase);
     expect(detail.querySelector(".store-timeline")).toBeNull();
+    expect(detail.querySelector(".store-date-percent")).toHaveTextContent("Chưa đủ dữ liệu");
   });
 });

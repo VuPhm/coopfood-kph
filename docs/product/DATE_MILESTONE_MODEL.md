@@ -32,8 +32,14 @@ Hết HSD; đổi trạng thái xử lý không sửa ngày hay điều kiện t
 
 ## Giao diện được triển khai
 
-Danh sách không có progress bar hoặc %: tên hàng → SKU/lô → NSX/HSD → nhãn DATE và
-nhãn xử lý. Dùng [ListLabel](LIST_LABEL_SYSTEM.md), màu kèm chữ/icon, không
+Theo yêu cầu owner23/10/2026, danh sách thay số ngày còn/quá bằng phần trăm
+HSD còn lại; vẫn không có progress bar. Tên hàng → SKU/lô → NSX/HSD → nhãn DATE
+và nhãn xử lý giữ nguyên. Phần trăm = ceil((HSD − hôm nay + 1) / shelfLife ×100),
+giới hạn0–100; tính cả ngày hôm nay nên trong hạn tối thiểu1%, sau HSD là0%.
+Đây chỉ là cách trình bày: màu theo phase DATE đã tính bằng mốc thật, không
+suy lại phase từ phần trăm làm tròn. Trước NSX tối đa100% với nhãn Chưa đến NSX.
+Thiếu NSX/ngày lỗi hiện Chưa đủ dữ liệu/Kiểm tra ngày, không suy phần trăm kể cả
+khi biết HSD đã qua. Chi tiết giữ số ngày và thêm phần trăm để đối chiếu. Dùng [ListLabel](LIST_LABEL_SYSTEM.md), màu kèm chữ/icon, không
 thêm target riêng vào thẻ. Theo yêu cầu mới “Toàn bộ nhãn màu và thanh nhãn”
 ngày 12/10/2026, thêm bar cạnh trái 3px trang trí theo nhãn DATE, tách biệt với
 timeline hạn dùng; đổi xử lý không đổi màu bar. Đây là cập nhật cho hướng

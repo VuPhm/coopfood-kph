@@ -1,7 +1,7 @@
 /* Fresh glass: floating navigation/actions and tinted hero controls.
    Content and modal scrims stay solid.
    Opaque defaults also cover browsers without backdrop-filter support. */
-.store-app, .store-create-screen, .store-quick-panel {
+.store-app, .store-create-screen, .store-quick-panel, .store-date-sheet {
   --store-glass-surface: #fff;
   --store-glass-peach: #fff0e6;
   --store-glass-dock: #fff;
@@ -134,7 +134,7 @@
 }
 /* Suspend background filtering during dialogs as well as respecting OS/browser preferences. */
 @media (prefers-reduced-transparency: reduce), (prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active) {
-  .store-app, .store-create-screen, .store-quick-panel {
+  .store-app, .store-create-screen, .store-quick-panel, .store-date-sheet {
     --store-glass-surface: #fff;
     --store-glass-peach: #fff0e6;
     --store-glass-dock: #fff;

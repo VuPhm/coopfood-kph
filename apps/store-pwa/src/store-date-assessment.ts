@@ -24,3 +24,9 @@ export function assessDateLot({ manufactured, date }: { manufactured?: string | 
 export function needsDateAttention(assessment: DateAssessment) {
   return assessment.phase !== "SAFE" && assessment.phase !== "BEFORE_NSX";
 }
+
+// Presentation only: inclusive days match shelfLifeDays; milestone status stays authoritative.
+export function remainingShelfPercent(assessment: DateAssessment): number | null {
+  if (!assessment.result || assessment.remainingDays === null) return null;
+  return Math.min(100, Math.max(0, Math.ceil((assessment.remainingDays + 1) * 100 / assessment.result.shelfLifeDays)));
+}

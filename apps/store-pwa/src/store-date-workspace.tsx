@@ -9,7 +9,7 @@ import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
 import { StoreQuickSort } from "./store-quick-sort";
-import { assessDateLot, DATE_PHASE_LABELS, needsDateAttention, type DatePhase } from "./store-date-assessment";
+import { assessDateLot, remainingShelfPercent, DATE_PHASE_LABELS, needsDateAttention, type DatePhase } from "./store-date-assessment";
 import { DateConditionLabel, DateProcessingLabel, getDatePhaseTone } from "./store-date-label";
 import { ShelfLifeTimeline } from "./store-shelf-timeline";
 import { mockBarcodeLookup, mockCatalogProducts, mockProductMetadata, mockProfile, type MockDateLot, type MockDateLotStatus } from "./store-app-mock";
@@ -101,14 +101,16 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
   function detail(lot: MockDateLot) {
     const assessment = assessments.get(lot.id)!;
     const result = assessment.result;
+    const percent = remainingShelfPercent(assessment);
     return <>
       <section className="store-date-lot-heading" aria-label="Thông tin lô"><h3>{lot.name}</h3><p><span>SKU {lot.sku}</span><span>Lô {lot.id}</span></p></section>
       <section className="store-date-milestones" aria-label="Mốc DATE của lô">
-        <div className="store-date-detail-state"><div className="store-date-milestone-labels"><DateConditionLabel phase={assessment.phase} />{!desktop ? <DateProcessingLabel status={lot.status} /> : null}</div><p className={`store-date-remaining${assessment.phase === "EXPIRED" ? " is-expired" : ""}`}><span>HSD</span><strong>{remainingText(assessment.remainingDays)}</strong></p></div>
+        <div className="store-date-detail-state"><div className="store-date-milestone-labels"><DateConditionLabel phase={assessment.phase} />{!desktop ? <DateProcessingLabel status={lot.status} /> : null}</div></div><div className="store-date-detail-metrics"><p className={`store-date-remaining${assessment.phase === "EXPIRED" ? " is-expired" : ""}`}><span>Hạn sử dụng</span><strong>{remainingText(assessment.remainingDays)}</strong></p><p className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}><span>HSD còn lại</span><strong>{percent === null ? "Chưa đủ dữ liệu" : `${percent}%`}</strong></p></div><div className="store-date-timeline-content">
         {result && assessment.nsx ? <>
           <ShelfLifeTimeline nsx={assessment.nsx} hsd={lot.date} today={today} result={result} />
           <dl className="store-date-milestone-facts"><div><dt>NSX</dt><dd>{formatDisplayDate(assessment.nsx)}</dd></div><div><dt>Cảnh báo</dt><dd>{result.warningDate ? formatDisplayDate(result.warningDate) : "Không áp dụng"}</dd></div><div className={assessment.phase === "EXPIRED" ? "" : "is-primary"}><dt>Hạn lùi</dt><dd>{formatDisplayDate(result.withdrawalDate)}</dd></div><div className={assessment.phase === "EXPIRED" ? "is-expired" : ""}><dt>HSD</dt><dd>{displayDate(lot.date)}</dd></div></dl>
         </> : <div className="store-date-missing-dates"><p>{assessment.message}</p><dl className="store-date-milestone-facts">{lot.manufactured ? <div><dt>NSX</dt><dd>{lot.manufactured}</dd></div> : null}<div><dt>HSD</dt><dd>{displayDate(lot.date)}</dd></div></dl></div>}
+        </div>
       </section>
       <div className="store-sheet-actions"><Button className="store-date-acknowledge" disabled={lot.status !== "open"} onClick={() => updateStatus("acknowledged")}>Ghi nhận</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => updateStatus("resolved")}>Đã xử lý</Button></div>
     </>;
@@ -134,8 +136,9 @@ export function DateWorkspace({ lots, onLotsChange }: { lots: MockDateLot[]; onL
           {tab === "alerts" ? <div className="store-date-statuses">{Object.entries(statuses).map(([key, label]) => <button key={key} aria-pressed={status === key} className={status === key ? "is-selected" : ""} onClick={() => setStatus(key as MockDateLotStatus)}><span>{label}</span><small>{count(key as MockDateLotStatus)}</small></button>)}</div> : null}
         </div>
         <div className="store-date-lots">{visible.map(lot => {
-          const remaining = assessments.get(lot.id)!.remainingDays;
-          return <button key={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={() => setActiveId(lot.id)}><ListItemMarker variant="bar" tone={getDatePhaseTone(assessments.get(lot.id)!.phase)} /><span className="store-date-lot-main"><strong>{lot.name}</strong><small className="store-date-lot-identifiers"><span>SKU {lot.sku}</span>{" · "}<span>Lô {lot.id}</span></small><span className="store-date-lot-labels"><DateConditionLabel phase={assessments.get(lot.id)!.phase} /><DateProcessingLabel status={lot.status} /></span><small className="store-date-lot-dates">{lot.manufactured ? <span>NSX <b>{lot.manufactured}</b></span> : null}<span>HSD <b>{displayDate(lot.date)}</b></span></small></span><span className="store-date-lot-end"><strong className={remaining !== null && remaining < 0 ? "is-danger" : remaining === 0 ? "is-warning" : ""}>{remainingText(remaining)}</strong><span className="store-date-lot-action">{lot.status === "resolved" ? "Xem chi tiết" : "Xử lý"}<ChevronRight size={16} aria-hidden="true" /></span></span></button>;
+          const assessment = assessments.get(lot.id)!;
+          const percent = remainingShelfPercent(assessment);
+          return <button key={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={() => setActiveId(lot.id)}><ListItemMarker variant="bar" tone={getDatePhaseTone(assessments.get(lot.id)!.phase)} /><span className="store-date-lot-main"><strong>{lot.name}</strong><small className="store-date-lot-identifiers"><span>SKU {lot.sku}</span>{" · "}<span>Lô {lot.id}</span></small><span className="store-date-lot-labels"><DateConditionLabel phase={assessments.get(lot.id)!.phase} /><DateProcessingLabel status={lot.status} /></span><small className="store-date-lot-dates">{lot.manufactured ? <span>NSX <b>{lot.manufactured}</b></span> : null}<span>HSD <b>{displayDate(lot.date)}</b></span></small></span><span className="store-date-lot-end"><strong className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}>{percent === null ? assessment.phase === "INVALID" ? "Kiểm tra ngày" : "Chưa đủ dữ liệu" : `Còn ${percent}% HSD`}</strong><span className="store-date-lot-action">{lot.status === "resolved" ? "Xem chi tiết" : "Xử lý"}<ChevronRight size={16} aria-hidden="true" /></span></span></button>;
         })}{!visible.length ? <section className="store-date-empty"><Package size={28} aria-hidden="true" /><h3>Không có lô phù hợp</h3><p>{product ? "Mã hàng đã nhận diện. Thử trạng thái khác hoặc bỏ lọc để xem các lô." : "Thử mã hàng, tên hoặc số lô khác; bạn cũng có thể quét lại."}</p><Button variant="ghost" onClick={() => { changeQuery(""); setTab("tracking"); setPhaseFilter("all"); }}>Xem tất cả lô</Button></section> : null}</div>
       </section>
       {desktop ? <section className="store-date-detail" aria-label="Chi tiết lô DATE">{active ? <><div className="store-date-detail-heading"><h2>Chi tiết lô DATE</h2><DateProcessingLabel status={active.status} /></div>{detail(active)}</> : <div className="store-date-detail-placeholder"><CalendarDays size={32} aria-hidden="true" /><h2>Chọn một lô để xem chi tiết</h2><p>Thông tin sản phẩm, ngày và thao tác xử lý sẽ hiển thị tại đây.</p></div>}</section> : null}
