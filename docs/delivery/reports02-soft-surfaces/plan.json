@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "reports02-soft-surfaces",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Apply accepted Co.op Fresh soft blocks and quiet edges to report menu, composer, history and report sheets; preserve selection/template/snapshot/export semantics.",
+  "inScope": [
+    "Report menu/custom templates/history soft card surfaces",
+    "Composer lot/settings groups and report sheets visual consistency",
+    "Mobile-first reflow/contrast and existing report workflow verification"
+  ],
+  "outOfScope": [
+    "Business, API, DATE rules, storage, selection/snapshot/export logic",
+    "Other screens, shared packages, dependencies, navigation/header geometry",
+    "Merge/push/deploy without owner authorization"
+  ],
+  "baseSha": "3b0da6c586fa4f067be73529c3a86101cd3e665a",
+  "candidateSha": "",
+  "integrationOwner": "Current chat sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-report-soft.css",
+    "apps/store-pwa/src/store-report-hub.tsx",
+    "apps/store-pwa/src/store-date-report.tsx",
+    "e2e/scripts/check-report-soft.cjs",
+    "docs/product/STORE_REPORTS_DESIGN.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/reports02-soft-surfaces/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Capture reports baseline; apply accepted surface recipe; verify mock preview and await owner feedback.",
+  "authorization": "23/10/2026 direct owner request: áp dụng giao diện mới cho vùng báo cáo."
+}
