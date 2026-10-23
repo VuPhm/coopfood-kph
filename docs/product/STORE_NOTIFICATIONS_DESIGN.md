@@ -48,4 +48,5 @@ Source: [model](../../apps/store-pwa/src/store-notifications-model.ts),
 [view](../../apps/store-pwa/src/store-notifications.tsx),
 [tests](../../apps/store-pwa/src/store-notifications-model.test.ts),
 [browser gate](../../e2e/scripts/check-store-notifications.cjs).
-Candidate chờ owner xem; [bàn giao](../delivery/date03-notifications.md).
+Owner đã cho phép merge23/10; [bàn giao](../delivery/date03-notifications.md)
+và [kiểm main](../delivery/header02-green-layer/merge-2026-10-23.md).

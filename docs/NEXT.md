@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**DATE03 + HEADER02 — CLOSED, 23/10/2026:** owner “cho phép merge cái này
+và `4450982`”. Đã merge main local HEADER02 đúng4450982 và DATE/Thông báo
+checkpoint721e1ca; source tích hợp tại `23f6b19`. Verify333tests/contracts/API/
+types/build/PWA, browser DATE/Thông báo/KPH và chrome7màn ở390/1440/320 PASS;
+chart parity giữ nguyên. Preview main <http://127.0.0.1:4284/#home>.
+[Nghiệm thu, SHA, lệnh kiểm và giới hạn](delivery/header02-green-layer/merge-2026-10-23.md).
+Chưa push/deploy, Pages không đổi. Memory-only/thiết bị thật vẫn là giới hạn.
+Các pending bên dưới là lịch sử. Đóng vòng, chờ yêu cầu mới.
+
 **HEADER02 — candidate chờ nghiệm thu, 23/10/2026:** nền xanh và AppHeader
 đồng bộ7màn, báo cáo con và header popup; gradient `#006b4b → #007a52`,
 control căn giữa/viền nhẹ, đệm8px trước lớp trắng. Giữ thanh72px, nội dung

@@ -52,8 +52,9 @@ trước nắp trắng tăng4px để thống nhất8px; không thu gọn nội 
 Token `--store-chrome-background` trong `store-header.css` cấp nền chung cho
 page hero và `--cf-modal-header` trên portal Store (chi tiết, form tạo KPH,
 tài khoản, tiện ích, scanner). Không sửa token brand/status/chart toàn cục;
-không thêm blur hay animation. Chế độ in giữ nền trắng. Đây là candidate
-chờ owner nghiệm thu; xem [evidence](../delivery/header02-green-layer/technical.md).
+không thêm blur hay animation. Chế độ in giữ nền trắng. Owner đã cho phép
+merge4450982 ngày23/10; xem [evidence](../delivery/header02-green-layer/technical.md)
+và [kiểm main](../delivery/header02-green-layer/merge-2026-10-23.md).
 
 ## Ownership
 

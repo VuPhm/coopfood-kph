@@ -1,5 +1,9 @@
 # DATE03 follow-up / Thông báo DATE — 23/10/2026
 
+**CLOSED23/10/2026:** owner cho phép merge DATE03 và4450982. Đã tích hợp
+main local23f6b19, source giữ nguyên; [nghiệm thu/kiểm main](header02-green-layer/merge-2026-10-23.md).
+Các trạng thái pending/chưa merge dưới đây là bản ghi trước nghiệm thu.
+
 User yêu cầu tiếp candidate4281: “bỏ phần đã xử lý, nó là kph”, rồi bắt đầu
 Thông báo theo nhóm DATE; nhóm nguồn khác để sau. Tiếp tục cùng nhánh/worktree
 và base630ec7b, một writer tại chat này. Không suy acceptance/merge cho DATE03

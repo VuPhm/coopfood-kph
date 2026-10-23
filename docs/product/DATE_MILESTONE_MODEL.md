@@ -40,8 +40,8 @@ HSD còn lại; vẫn không có progress bar. Follow-up DATE03 ngày23/10 từ
 `630ec7b`: danh sách ưu tiên phần trăm24px bên phải, tên hàng/SKU/lô bên trái.
 NSX/HSD là dòng chữ phụ12px, không in đậm hay có khối nền riêng; nhãn DATE
 và xử lý giữ chữ/icon/màu. Thẻ nghỉ/hover trắng, chỉ lô đang chọn nền mint với
-viền xanh và `aria-pressed`; đóng chi tiết/lọc mất lô trả về trắng. Candidate
-chờ owner xem tại [bàn giao DATE03](../delivery/date03-compact-list.md). Phần trăm = ceil((HSD − hôm nay + 1) / shelfLife ×100),
+viền xanh và `aria-pressed`; đóng chi tiết/lọc mất lô trả về trắng. Owner đã
+cho phép merge23/10; xem [bàn giao DATE03](../delivery/date03-compact-list.md). Phần trăm = ceil((HSD − hôm nay + 1) / shelfLife ×100),
 giới hạn0–100; tính cả ngày hôm nay nên trong hạn tối thiểu1%, sau HSD là0%.
 Đây chỉ là cách trình bày: màu theo phase DATE đã tính bằng mốc thật, không
 suy lại phase từ phần trăm làm tròn. Trước NSX tối đa100% với nhãn Chưa đến NSX.

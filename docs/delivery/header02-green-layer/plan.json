@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "header02-green-layer",
-  "revision": 1,
-  "status": "EXECUTING",
+  "revision": 2,
+  "status": "CLOSED",
   "objective": "Unify the green underlay and app header color/layout across Store screens, keeping accepted white surfaces, chart colors and workflows.",
   "inScope": [
     "Shared green chrome across seven Store screens and report subviews",
@@ -15,8 +15,8 @@
     "packages/ui, root config/lockfile, Pages, automatic merge/push/deploy"
   ],
   "baseSha": "630ec7b06b369e566b3bd5c9326bebed82b22b72",
-  "candidateSha": "",
-  "integrationOwner": "Current chat sole writer",
+  "candidateSha": "23f6b19e28d5d5be2bf1ff2b13bcff7efd0665ea",
+  "integrationOwner": "Current DATE03 chat, sole main integration writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-header.css",
     "apps/store-pwa/src/store-app-header.tsx",
@@ -41,17 +41,33 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "23f6b19e28d5d5be2bf1ff2b13bcff7efd0665ea",
+      "evidence": "docs/delivery/header02-green-layer/merge-2026-10-23.md"
     },
     {
       "id": "owner",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "23f6b19e28d5d5be2bf1ff2b13bcff7efd0665ea",
+      "evidence": "docs/delivery/header02-green-layer/merge-2026-10-23.md",
+      "acceptedBy": "Repository owner, direct message",
+      "decisionRef": "23/10/2026 owner message in current DATE03 chat: cho phép merge cái này và `4450982`"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "cho phép merge cái này và `4450982`",
+      "source": "Direct owner message in DATE03 chat, 23/10/2026",
+      "impact": "Local main integration of exact HEADER02 4450982 and accepted DATE03 721e1ca; runtime sources unchanged.",
+      "decision": "Merged both; verify main and close. No push, deploy or Pages cutover."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Implement shared chrome from main630ec7b; validate baseline and candidate at390/1440/320 then preview owner.",
+  "nextAction": "CLOSED on main; wait for a new owner request.",
   "authorization": "23/10/2026 owner: tối ưu lại màu và bố cục vùng nền xanh lớp dưới, headerapp trong tất cả màn."
 }

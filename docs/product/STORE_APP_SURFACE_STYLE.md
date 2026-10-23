@@ -14,7 +14,8 @@ không tự mở rollout ra màn khác. Khi áp dụng dùng main mới nhất, 
 HEADER02 candidate23/10/2026 chỉ tinh chỉnh vùng chrome: gradient xanh
 `#006b4b → #007a52`, header/portal đồng màu và control căn giữa; giữ nguyên
 recipe khối/viền và màu biểu đồ. Thông số/giới hạn tại
-[page kit](STORE_APP_FRAME.md#header02--candidate-23102026). Chờ owner nghiệm thu.
+[page kit](STORE_APP_FRAME.md#header02--candidate-23102026). Owner đã cho phép
+merge4450982 ngày23/10; [kiểm main](../delivery/header02-green-layer/merge-2026-10-23.md).
 
 ## 1. Công thức thị giác
 

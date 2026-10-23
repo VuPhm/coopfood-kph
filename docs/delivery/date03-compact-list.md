@@ -1,5 +1,9 @@
 # DATE03 — danh sách gọn, phần trăm là chính
 
+**CLOSED23/10/2026:** owner cho phép merge DATE03 và4450982. Đã tích hợp
+main local23f6b19, source giữ nguyên; [nghiệm thu/kiểm main](header02-green-layer/merge-2026-10-23.md).
+Các trạng thái pending/chưa merge dưới đây là bản ghi trước nghiệm thu.
+
 Ngày23/10/2026, owner yêu cầu từ `630ec7b` trình bày lại item DATE gọn gàng,
 nền chuẩn chỉ đổi khi select, không nhấn NSX/HSD, ưu tiên % còn lại.
 

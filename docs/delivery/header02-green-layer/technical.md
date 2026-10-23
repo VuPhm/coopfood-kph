@@ -1,5 +1,9 @@
 # HEADER02 — nền xanh và AppHeader, 23/10/2026
 
+**CLOSED23/10/2026:** owner cho phép merge DATE03 và4450982. Đã tích hợp
+main local23f6b19, source giữ nguyên; [nghiệm thu/kiểm main](merge-2026-10-23.md).
+Các trạng thái pending/chưa merge dưới đây là bản ghi trước nghiệm thu.
+
 Technical PASS; owner acceptance pending. Không merge/push/deploy trong round này.
 
 ## Mốc và phạm vi
