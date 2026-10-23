@@ -23,7 +23,7 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    expect(h.y).toBe(0);expect(h.y+h.height-s.y).toBe(12);expect(bar.y).toBe(14);expect(bar.height).toBe(44);
    const header=page.locator('.store-header');expect((await bounds(header)).height).toBe(72);
    await expect(header.locator('h1')).toHaveCSS('font-size','20px');await expect(header.locator('h1')).toHaveCSS('line-height','26px');
-   await expect(hero).toHaveCSS('background-image','linear-gradient(115deg, rgb(0, 114, 78), rgb(0, 134, 85))');
+   await expect(hero).toHaveCSS('background-image','linear-gradient(115deg, rgb(0, 107, 75), rgb(0, 122, 82))');
    await expect(surface).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(surface).toHaveCSS('border-top-left-radius','24px');
    if(route!=='login'){
     const a=await bounds(page.locator('.store-account'));expect(a.x+a.width).toBe(bar.x+bar.width);expect(a.y).toBe(bar.y);

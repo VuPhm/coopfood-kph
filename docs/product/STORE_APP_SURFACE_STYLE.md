@@ -11,6 +11,11 @@ implementation trên main **`9089f476a7514ef5176686b08295b0fbcbd2b090`**;
 không tự mở rollout ra màn khác. Khi áp dụng dùng main mới nhất, giữ các quyết
 định được duyệt sau mốc này và chỉ sửa phần owner chỉ định.
 
+HEADER02 candidate23/10/2026 chỉ tinh chỉnh vùng chrome: gradient xanh
+`#006b4b → #007a52`, header/portal đồng màu và control căn giữa; giữ nguyên
+recipe khối/viền và màu biểu đồ. Thông số/giới hạn tại
+[page kit](STORE_APP_FRAME.md#header02--candidate-23102026). Chờ owner nghiệm thu.
+
 ## 1. Công thức thị giác
 
 **Nền trắng sạch → khối màu rất nhẹ → mép sáng → bóng mềm có chọn lọc.**

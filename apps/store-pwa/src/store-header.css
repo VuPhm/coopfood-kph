@@ -1,35 +1,44 @@
+/* Shared Store chrome only: page/portal headers, never chart or business-status colors. */
+.store-app, .store-login, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-scanner-screen {
+  --store-chrome-base: #006b4b;
+  --store-chrome-background: linear-gradient(115deg, #006b4b, #007a52);
+  --cf-modal-header: var(--store-chrome-background);
+}
 /* Page kit: a single coordinate system, green underlay and white cover. */
 .store-page-layout {
   --store-header-gutter: 22px;
   --store-header-control-top: 14px;
   --store-cover-overlap: 12px;
   --store-cover-radius: 24px;
-  --store-hero-background: linear-gradient(115deg, #00724e, #008655);
+  --store-hero-background: var(--store-chrome-background);
   position: relative; isolation: isolate; width: 100%; min-width: 0; max-width: none; margin: 0; padding: 0;
   background: var(--store-hero-background); color: #20344a;
 }
 .store-page-hero { position: sticky; top: 0; z-index: 0; width: 100%; min-width: 0; padding: 0 0 calc(var(--store-cover-overlap) + 8px); background: var(--store-hero-background); color: white; }
 .store-header { min-width: 0; margin: 0; padding: var(--store-header-control-top) var(--store-header-gutter); border: 0; background: transparent; color: white; }
-.store-appbar-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: start; gap: 8px; width: 100%; min-width: 0; min-height: 44px; }
+.store-appbar-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; width: 100%; min-width: 0; min-height: 44px; }
 .store-header-brand, .store-back { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 10px; background: transparent; color: white; }
-.store-header-brand img { display: block; width: 44px; height: auto; aspect-ratio: 1024 / 550; }
+.store-header-brand { background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; }
+.store-back { border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; background: rgb(255 255 255 / 8%); }
+.store-back:hover { background: rgb(255 255 255 / 16%); }
+.store-header-brand img { display: block; width: 42px; height: auto; aspect-ratio: 1024 / 550; }
 .store-header-copy { display: flex; align-items: center; justify-content: space-between; align-self: center; gap: 12px; min-width: 0; }
 .store-header-copy > div { min-width: 0; }
 .store-header h1 { margin: 0; color: white; font-size: 20px; line-height: 26px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.store-header p { margin: 0; color: white; font-size: 12px; line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.store-header-store { display: none; min-width: 0; border-radius: 9px; padding: 5px 10px; background: #006846; color: white; font-size: 10px; line-height: 16px; overflow-wrap: anywhere; }
-.store-header-account { display: flex; align-items: start; justify-content: end; width: 44px; min-height: 44px; }
-.store-header .store-account { display: flex; align-items: start; justify-content: center; width: 44px; min-width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; }
+.store-header p { margin: 1px 0 0; color: #e3f4ed; font-size: 12px; line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.store-header-store { display: none; min-width: 0; border: 1px solid rgb(255 255 255 / 16%); border-radius: 999px; padding: 5px 10px; background: rgb(255 255 255 / 8%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; font-size: 10px; line-height: 16px; overflow-wrap: anywhere; }
+.store-header-account { display: flex; align-items: center; justify-content: end; width: 44px; min-height: 44px; }
+.store-header .store-account { display: flex; align-items: center; justify-content: center; width: 44px; min-width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; }
 .store-header .store-profile-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; background: #edfff7; color: #00724e; font-size: 13px; font-weight: 650; }
 .store-header .store-profile-meta { display: none; }
 .store-header :where(button):focus-visible { outline: 3px solid white; outline-offset: 3px; }
 .store-header h1[tabindex="-1"]:focus { outline: none; }
 .store-page-hero-content { min-width: 0; padding: 0 var(--store-header-gutter) 0; }
-.store-page-layout > .store-page-surface { position: relative; z-index: 1; width: 100%; min-width: 0; min-height: 100dvh; margin: calc(-1 * var(--store-cover-overlap)) 0 0; border-radius: var(--store-cover-radius) var(--store-cover-radius) 0 0; background: white; box-shadow: 0 -8px 24px rgb(0 60 40 / 8%); }
+.store-page-layout > .store-page-surface { position: relative; z-index: 1; width: 100%; min-width: 0; min-height: 100dvh; margin: calc(-1 * var(--store-cover-overlap)) 0 0; border-radius: var(--store-cover-radius) var(--store-cover-radius) 0 0; background: white; box-shadow: 0 -3px 12px rgb(0 60 40 / 6%); }
 .store-home-welcome { padding: 4px 0 8px; }
 .store-home-welcome > span { color: white; font-size: 14px; line-height: 20px; }
 .store-home-welcome h2 { margin: 2px 0 0; color: white; font-size: 25px; font-weight: 650; line-height: 32px; letter-spacing: -.025em; }
 .store-home-welcome p { margin: 5px 0 0; color: white; font-size: 12px; line-height: 18px; }
 @media (max-width: 359px) { .store-page-layout { --store-header-gutter: 16px; } }
 @media (min-width: 900px) { .store-page-layout { --store-header-gutter: 36px; } .store-header-store { display: inline-flex; flex-shrink: 0; max-width: 40%; } }
-@media print { .store-page-layout { background: white; } .store-page-hero { position: static; padding: 0; background: white; } .store-page-layout > .store-page-surface { margin: 0; border-radius: 0; box-shadow: none; min-height: 0; } }
+@media print { body .store-app, body .store-login { background: white; } .store-page-layout { background: white; } .store-page-hero { position: static; padding: 0; background: white; } .store-page-layout > .store-page-surface { margin: 0; border-radius: 0; box-shadow: none; min-height: 0; } }

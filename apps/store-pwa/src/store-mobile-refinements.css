@@ -1,6 +1,5 @@
 /* Auxiliary mobile density only. Keep the shared 72px app bar, type and targets. */
 @media (max-width: 899px) {
-  .store-app .store-page-hero { padding-bottom: calc(var(--store-cover-overlap) + 4px); }
   .store-app .store-home-features { padding-top: 16px; }
   .store-app .store-home-section-heading { margin-bottom: 12px; }
   .store-app.store-screen-home .store-launcher-grid .store-module {
