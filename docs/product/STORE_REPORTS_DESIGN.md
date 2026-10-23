@@ -1,5 +1,27 @@
 # Báo cáo DATE — RPT01 revision 14
 
+## RPT02 — Co.op Fresh khối mềm, candidate23/10/2026
+
+Owner yêu cầu áp giao diện mới cho vùng Báo cáo, từ main3b0da6c đã có
+HEADER02/DATE03. Giữ toàn bộ semantics bên dưới: chọn lô, đổi/lưu/quản lý mẫu,
+kỳ/phạm vi, snapshot độc lập, lịch sử theo store, Excel và in/PDF.
+
+- Menu preset/mẫu cá nhân dùng pastel nhẹ + sheen/bóng thấp theo Home,
+  viền trong suốt1px/radius18, icon48px mobile/54px desktop.
+- Trang khai báo giữ page kit; thiết lập, danh mục mobile và lịch sử dùng holder
+  trắng/viền `#dfe5e9`, dates/summary xám nhẹ. Chọn vẫn checkbox/radio explicit,
+  tint mint nhẹ; nhãn DATE/xử lý và màu timeline giữ nguyên.
+- Popup kỳ/phạm vi/tạo/lưu mẫu/chi tiết và picker đồng bộ holder; ô nhập giữ
+  viền đủ tương phản/focus rõ. Không thêm blur hoặc thư viện/animation.
+- Khi dock trở về inline, tiện ích Tra hạn tiếp tục tránh vùng hành động gần
+  đáy màn. Reuse scroll/resize measurement hiện có, không thêm listener.
+- Vật liệu mới chỉ áp ở screen; bản in giữ table/header/snapshot nguyên trạng.
+  Sáu màn khác không nhận các rule của report.
+
+Source CSS riêng `store-report-soft.css`, scope report/portal rõ ràng; recipe
+chung tại [Co.op Fresh](STORE_APP_SURFACE_STYLE.md). Đây là candidate chờ owner
+nghiệm thu; [scope, checks và giới hạn](../delivery/reports02-soft-surfaces/technical.md).
+
 Ngày 14/10/2026. Owner tạm chấp nhận bố cục trang riêng revision 3, yêu cầu
 thêm menu loại báo cáo, lịch sử, chọn item và tạo/dùng lại template.
 Follow-up: owner chọn ưu tiên hoàn thiện mẫu và lịch sử; revision 5 bổ sung
