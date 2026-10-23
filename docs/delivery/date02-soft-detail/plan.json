@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "date02-soft-detail",
   "revision": 3,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Apply accepted soft surfaces to DATE, prioritize lot detail and show colored remaining shelf-life percentages in list.",
   "inScope": [
     "DATE workspace/list/detail/filter soft surfaces, mobile first",
@@ -17,7 +17,7 @@
     "Root config, lockfile, packages/ui, push/deploy"
   ],
   "baseSha": "06ff18b3f74c93cf45cac8bb713cedc2ea42569b",
-  "candidateSha": "b50ec3fdd9b15196a00b6173c28d5169024a3c8c",
+  "candidateSha": "733e98e95ab61f431b42b6e76c1877c6e6a661a9",
   "integrationOwner": "Current chat sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-date-workspace.tsx",
@@ -61,14 +61,19 @@
       "required": true,
       "status": "pass",
       "revision": 3,
-      "sha": "b50ec3fdd9b15196a00b6173c28d5169024a3c8c",
-      "evidence": "docs/delivery/date02-soft-detail/technical.md"
+      "sha": "733e98e95ab61f431b42b6e76c1877c6e6a661a9",
+      "evidence": "docs/delivery/date02-soft-detail/merge-2026-10-23.md"
     },
     {
       "id": "owner",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "733e98e95ab61f431b42b6e76c1877c6e6a661a9",
+      "evidence": "docs/delivery/date02-soft-detail/merge-2026-10-23.md",
+      "acceptedBy": "Owner trực tiếp trong chat",
+      "decisionRef": "23/10/2026: cho phép merge, candidate b50ec3f / preview4278"
     }
   ],
   "changes": [
@@ -88,6 +93,6 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Owner tries Ghi nhận →1day/1week and Xử lý → existing KPH form at http://127.0.0.1:4278/#date. Technical PASS; session-only reminders/records, no automatic merge/push/deploy.",
+  "nextAction": "CLOSED on main: merge d28b9c4, integration docs checkpoint733e98e, direct main327tests and DATE/KPH/shelf browser gates PASS. Wait for a new owner request; no push/deploy.",
   "authorization": "Owner23/10/2026: đạt, áp tiếp lên DATE, đặc biệt phần chi tiết item; thay quá x ngày bằng phần trăm còn lại có màu. Follow-up: làm đoạn chưa làm được."
 }

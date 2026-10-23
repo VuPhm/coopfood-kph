@@ -182,3 +182,16 @@ transaction gate390/1440/320 chạy lại PASS, không đổi data/mốc/timelin
 Code checkpoint r3 **`b50ec3fdd9b15196a00b6173c28d5169024a3c8c`**; sau checkpoint
 chỉ ghi ledger. Cây task sạch, source giữ đúng bản kiểm; owner pending.
 Main vẫn467d8d6 sạch, chưa merge/push/deploy candidate này.
+
+## Owner acceptance và tích hợp main
+
+23/10/2026 owner trực tiếp “cho phép merge”, chấp nhận candidate b50ec3f.
+Merge main **d28b9c4**, không conflict/không đổi source; kiểm trực tiếp main327
+tests/contracts/API/types/build/PWA và browser DATE→KPH, hai form gốc và Tra
+hạn390/1440/320 PASS. [Hồ sơ nghiệm thu](merge-2026-10-23.md).
+
+Integration checkpoint **733e98e95ab61f431b42b6e76c1877c6e6a661a9** chỉ bổ sung
+docs/contract index/accepted SHELF ledger trên merge; runtime đúng b50ec3f,
+đã đối chiếu git diff. Docs/links được kiểm lại; sau checkpoint chỉ ghi DATE
+ledger. CLOSED, preview main4279; chưa push/deploy. Các pending/main467d8d6
+trước đó là lịch sử trước quyết định này. Đóng vòng, chờ yêu cầu mới.
