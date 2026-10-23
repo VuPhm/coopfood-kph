@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "shelf02-soft-utility",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Apply accepted Home soft surfaces and optimize main/quick shelf-life lookup, result clarity, field recovery and session history without changing date rules or accepted automatic calculation.",
   "inScope": [
     "Main Tra hạn and quick utility form/result/history, mobile first, Home soft surfaces and static depth",
@@ -52,11 +52,16 @@
       "id": "owner",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "efe6f989b3558b618edcf32ec3924939a35394e1",
+      "evidence": "docs/delivery/shelf02-soft-utility/technical.md",
+      "acceptedBy": "Owner trực tiếp trong chat",
+      "decisionRef": "23/10/2026: đạt, áp tiếp lên DATE, đặc biệt phần chi tiết item"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Owner reviews main lookup and quick utility at http://127.0.0.1:4276/#shelf; technical PASS, owner pending. No automatic merge/push/deploy.",
+  "nextAction": "CLOSED; accepted SHELF baseline integrated with DATE02 on main d28b9c4, main327tests and shelf browser checks PASS. Wait for new owner request; no push/deploy.",
   "authorization": "Direct owner22/10/2026: “merge rồi tối ưu tiếp toàn diện cho tra hạn lùi hàng”."
 }

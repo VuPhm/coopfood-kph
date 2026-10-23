@@ -1,5 +1,15 @@
 # Công việc kế tiếp
 
+**DATE02 / SHELF02 — CLOSED, 23/10/2026:** owner “cho phép merge” candidate
+DATE02 revision3 b50ec3f. Đã merge main local tại `d28b9c4`, source đúng bản đã
+duyệt: chi tiết trắng/xám, % HSD, báo lại1ngày/1tuần, Xử lý → KPH đúng lô; Tra
+hạn efe6f98 đã được duyệt đi cùng baseline. Màu biểu đồ giữ nguyên. Kiểm trực
+tiếp main PASS327tests/contracts/API/types/build/PWA, browser DATE→KPH và
+TPCN/TPTS/Tra hạn ở390/1440/320. Preview main <http://127.0.0.1:4279/#date>.
+[Hồ sơ nghiệm thu/tích hợp](delivery/date02-soft-detail/merge-2026-10-23.md).
+Cây main sạch sau ledger; chưa push/deploy. Giới hạn memory-only/thiết bị thật
+vẫn giữ. Các dòng pending bên dưới là lịch sử. Đóng vòng, chờ yêu cầu mới.
+
 **DATE02 revision3 — nhắc lại và tạo KPH, candidate23/10/2026:** Ghi nhận cho
 chọn1ngày/1tuần và xác nhận ngày báo lại; đến hẹn mở lại Cảnh báo/Thông báo trong
 phiên. Xử lý mở form KPH tương ứng, điền SKU/lô và dữ liệu đã biết; chỉ Gửi phiếu
