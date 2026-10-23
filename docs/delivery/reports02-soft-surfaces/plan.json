@@ -7,7 +7,8 @@
   "inScope": [
     "Report menu/custom templates/history soft card surfaces",
     "Composer lot/settings groups and report sheets visual consistency",
-    "Mobile-first reflow/contrast and existing report workflow verification"
+    "Mobile-first reflow/contrast and existing report workflow verification",
+    "Keep floating utility clear of report actions when dock returns inline after detail closes"
   ],
   "outOfScope": [
     "Business, API, DATE rules, storage, selection/snapshot/export logic",
@@ -25,7 +26,9 @@
     "docs/product/STORE_REPORTS_DESIGN.md",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
-    "docs/delivery/reports02-soft-surfaces/**"
+    "docs/delivery/reports02-soft-surfaces/**",
+    "e2e/scripts/check-date-report.cjs",
+    "apps/store-pwa/src/store-action-dock.tsx"
   ],
   "reviewLimit": 2,
   "reviewRound": 0,

@@ -1,0 +1,95 @@
+/* Co.op Fresh report surfaces. Screen-only material; print keeps the plain document.
+   Scoped to report consumers/portals so DATE/status/chart and shared controls stay intact. */
+.store-app.store-screen-reports, .date-report-sheet.store-sheet, .report-template-picker.store-sheet {
+  --report-soft-edge: #dfe5e9;
+  --report-soft-surface: #fff;
+  --report-soft-inset: #f5f7f9;
+  --report-soft-selected: #eef8f3;
+  --report-soft-shadow: 0 2px 7px rgb(28 44 64 / 6%);
+  --report-tile-shadow: inset 0 1px 0 rgb(255 255 255 / 80%), 0 4px 12px rgb(28 44 64 / 7%);
+  --report-tile-sheen: linear-gradient(155deg, rgb(255 255 255 / 46%), rgb(255 255 255 / 8%) 52%, rgb(0 72 48 / 3%));
+}
+@media screen {
+  .store-screen-reports .report-hub { padding-inline: var(--store-header-gutter); }
+  .store-screen-reports .report-type-card[data-report-tone],
+  .store-screen-reports .report-custom-card[data-report-tone] {
+    border: 1px solid transparent;
+    background-image: var(--report-tile-sheen);
+    box-shadow: var(--report-tile-shadow);
+  }
+  .store-screen-reports [data-report-tone="mint"] { --report-card-surface: #e6f7f2; --report-card-hover: #d9efe6; --report-card-icon: #00724e; }
+  .store-screen-reports [data-report-tone="peach"] { --report-card-surface: #fff0e6; --report-card-hover: #ffe5d3; --report-card-icon: #a84f17; }
+  .store-screen-reports [data-report-tone="sky"] { --report-card-surface: #e3efff; --report-card-hover: #d6e7fa; --report-card-icon: #286a9c; }
+  .store-screen-reports [data-report-tone="lilac"] { --report-card-surface: #f2edff; --report-card-hover: #e8def8; --report-card-icon: #674a94; }
+  .store-screen-reports :is(.report-type-card[data-report-tone], .report-custom-card .report-type-card) { grid-template-columns: 48px minmax(0,1fr) 18px; gap: 12px; }
+  .store-screen-reports [data-report-tone] .report-type-icon {
+    width: 48px; height: 48px;
+    background-image: linear-gradient(145deg, rgb(255 255 255 / 16%), transparent 60%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 4px 10px rgb(0 60 40 / 12%);
+  }
+  .store-screen-reports [data-report-tone] .report-type-card p,
+  .store-screen-reports .report-type-card[data-report-tone] p { color: #4f6274; }
+  .store-screen-reports :is(.report-history-entry, .report-history-card) {
+    border-color: var(--report-soft-edge); background: var(--report-soft-surface); border-radius: 14px;
+  }
+  .store-screen-reports .report-history-card { box-shadow: var(--report-soft-shadow); }
+  .store-screen-reports .report-history-card .report-type-icon { border-radius: 50%; color: #286a9c; background: #e3efff; }
+  .store-screen-reports .report-history-card:hover { background: var(--report-soft-inset); }
+  .store-screen-reports .report-history-entry:hover { background: var(--report-soft-selected); }
+  .store-screen-reports .report-custom-card > .report-template-manage:hover { background: rgb(255 255 255 / 45%); }
+  .store-screen-reports .report-history-tools { padding: 12px; border: 1px solid var(--report-soft-edge); border-radius: 16px; background: var(--report-soft-surface); }
+  .store-screen-reports .report-history-tools :is(.store-search-input, .ui-select-trigger) { border-color: var(--store-control-line); background: var(--report-soft-inset); }
+  .store-screen-reports .report-composer-hero .store-search-field > label > .store-search-input { border-color: rgb(255 255 255 / 20%); }
+  .store-screen-reports .store-settings-group {
+    border-color: var(--report-soft-edge); background: var(--report-soft-surface); box-shadow: var(--report-soft-shadow);
+  }
+  .store-screen-reports .store-settings-row { background: transparent; }
+  .store-screen-reports .store-settings-row + .store-settings-row { border-color: var(--report-soft-edge); }
+  .store-screen-reports .store-settings-row:hover { background: var(--report-soft-inset); }
+  .store-screen-reports .report-selection-bar { margin-bottom: 12px; border: 1px solid transparent; border-radius: 14px; background: var(--report-soft-inset); }
+  .store-screen-reports .report-selection-bar .store-selection-menu { border-color: var(--report-soft-edge); }
+  .store-screen-reports .date-report-cards { gap: 8px; padding: 0; }
+  .store-screen-reports .date-report-card {
+    border: 1px solid var(--report-soft-edge); border-radius: 16px; padding-block: 12px;
+    background: var(--report-soft-surface); box-shadow: var(--report-soft-shadow);
+  }
+  .store-screen-reports .date-report-card:has(input:checked) { border: 1px solid #cfe2d8; border-radius: 16px; background: var(--report-soft-selected); }
+  .store-screen-reports .date-report-card-open:hover { background: transparent; }
+  .store-screen-reports .date-report-card-dates { border-radius: 10px; padding: 6px 8px; background: var(--report-soft-inset); }
+  .store-screen-reports .date-report-table { overflow: hidden; border: 1px solid var(--report-soft-edge); border-radius: 16px; border-collapse: separate; border-spacing: 0; }
+  .store-screen-reports .date-report-table th { background: var(--report-soft-inset); border-top: 0; }
+  .store-screen-reports .date-report-table :is(th,td) { border-color: var(--report-soft-edge); }
+  .store-screen-reports .date-report-table tr:has(input:checked) { background: var(--report-soft-selected); }
+  .store-screen-reports .date-report-table tbody tr:hover { background: var(--report-soft-inset); }
+  .store-screen-reports .date-report-catalog { border-color: var(--report-soft-edge); }
+  .store-screen-reports .date-report.is-document .date-report-catalog { border: 0; border-radius: 0; overflow: visible; }
+  .store-screen-reports .date-report.is-document .date-report-catalog-heading { padding: 0 0 12px; }
+  .store-screen-reports .date-report-footnote { margin-top: 12px; padding-inline: 0; border-color: var(--report-soft-edge); }
+  .store-screen-reports .date-report-empty { border: 1px solid var(--report-soft-edge); border-radius: 16px; background: var(--report-soft-inset); }
+  .store-screen-reports .report-stage-hero :is(.date-report-info,.date-report-back) { border-color: rgb(255 255 255 / 20%); background: rgb(255 255 255 / 8%); border-radius: 14px; }
+  .store-screen-reports .report-stage-hero .date-report-document-meta { border-color: rgb(255 255 255 / 16%); background: rgb(255 255 255 / 8%); }
+  .date-report-sheet.store-sheet, .report-template-picker.store-sheet { --store-canvas: #f5f7f9; --store-line: var(--report-soft-edge); }
+  .date-report-sheet.store-sheet :is(.report-sheet-section,.store-summary) { border-color: var(--report-soft-edge); background: var(--report-soft-inset); border-radius: 16px; }
+  .date-report-sheet.store-sheet .report-sheet-section .store-summary { background: transparent; }
+  .date-report-sheet.store-sheet input:not([type="checkbox"]):not([type="radio"]):not([aria-invalid="true"]),
+  .date-report-sheet.store-sheet .ui-select-trigger { border-color: var(--store-control-line); background: var(--report-soft-inset); }
+  .date-report-sheet.store-sheet .store-choices button:not([aria-pressed="true"]) { border-color: var(--report-soft-edge); background: white; }
+  .date-report-sheet.store-sheet .report-sheet-footer { border-color: var(--report-soft-edge); }
+  .report-template-picker.store-sheet .store-choice-options { gap: 8px; padding: 3px; }
+  .report-template-picker.store-sheet .store-choice-option { border: 1px solid var(--report-soft-edge); border-radius: 14px; background: white; }
+  .report-template-picker.store-sheet .store-choice-option:has(input:checked) { border-color: #cfe2d8; background: var(--report-soft-selected); }
+  .report-template-picker.store-sheet .store-choice-option:hover { background: var(--report-soft-inset); }
+  .report-template-picker.store-sheet :is(.store-search-input,.store-choice-cancel) { border-color: var(--store-control-line); background: var(--report-soft-inset); }
+}
+@media screen and (min-width: 900px) {
+  .store-screen-reports :is(.report-type-card[data-report-tone], .report-custom-card .report-type-card) { grid-template-columns: 54px minmax(0,1fr) 18px; gap: 14px; }
+  .store-screen-reports [data-report-tone] .report-type-icon { width: 54px; height: 54px; }
+}
+@media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .store-app.store-screen-reports { --report-tile-sheen: none; --report-tile-shadow: none; --report-soft-shadow: none; }
+  .store-screen-reports [data-report-tone] .report-type-icon { background-image: none; box-shadow: none; }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .store-app.store-screen-reports, .date-report-sheet.store-sheet, .report-template-picker.store-sheet { --report-soft-edge: #718578; }
+  .store-screen-reports .date-report-card:has(input:checked), .report-template-picker.store-sheet .store-choice-option:has(input:checked) { border-color: var(--store-brand-action); }
+}

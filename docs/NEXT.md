@@ -1,5 +1,16 @@
 # Công việc kế tiếp
 
+**RPT02 — candidate chờ nghiệm thu, 23/10/2026:** áp Co.op Fresh khối mềm,
+viền nhẹ cho menu mẫu, composer, danh mục/lịch sử và popup Báo cáo. Pastel theo
+Home, holder trắng, summary xám nhẹ; giữ header xanh đã duyệt và màu biểu đồ.
+Dock inline tránh tiện ích nổi che nút. Technical333tests/contracts/API/types/
+build/PWA; browser390/1440/320, chữ150%, mẫu/kỳ/selection/history/Excel/PDF,
+chart/print parity và6màn khác giữ nguyên. Preview <http://127.0.0.1:4290/#reports>.
+[Scope, lệnh kiểm, evidence/giới hạn](delivery/reports02-soft-surfaces/technical.md).
+Nhánh `store-app/reports02-soft-surfaces` từ main3b0da6c; chưa merge/push/deploy.
+Bước tiếp theo: owner xem menu → Tổng hợp → chi tiết/tạo → lịch sử trước duyệt.
+Các trạng thái pending bên dưới là lịch sử.
+
 **DATE03 + HEADER02 — CLOSED, 23/10/2026:** owner “cho phép merge cái này
 và `4450982`”. Đã merge main local HEADER02 đúng4450982 và DATE/Thông báo
 checkpoint721e1ca; source tích hợp tại `23f6b19`. Verify333tests/contracts/API/
