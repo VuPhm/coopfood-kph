@@ -17,7 +17,7 @@ export function StoreAppHeader({ leading = "back", title, subtitle, storeName, a
     <div className="store-appbar-row">
       {leading === "brand" ? onHome ? <button type="button" className="store-header-brand" aria-label="Co.op Food — Trang chủ" onClick={onHome}>{logo}</button> : <span className="store-header-brand">{logo}</span>
         : <button type="button" className="store-back" aria-label={backLabel} onClick={onBack}><ArrowLeft size={20} aria-hidden="true" /></button>}
-      <div className="store-header-copy"><div><h1 title={title} id={titleId} ref={titleRef} tabIndex={titleRef ? -1 : undefined}>{title}</h1><p title={subtitle}>{subtitle}</p></div>{storeName ? <span className="store-header-store">{storeName}</span> : null}</div>
+      <div className="store-header-copy"><div><h1 title={title} id={titleId} ref={titleRef} tabIndex={titleRef ? -1 : undefined}>{title}</h1><p title={subtitle}>{subtitle}</p></div>{storeName ? <span className="store-header-store" title={storeName}>{storeName}</span> : null}</div>
       <div className="store-header-account">{account}</div>
     </div>
   </header>;

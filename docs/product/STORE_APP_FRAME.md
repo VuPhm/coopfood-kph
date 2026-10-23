@@ -28,10 +28,10 @@ ngoài, nắp trắng hoặc chọn một density khác.
 | Vai trò | Quy tắc chung |
 | --- | --- |
 | Thanh trên | Padding top/bottom 14px; hàng grid tối thiểu 44px, mặc định tổng 72px. Ba cột 44px/minmax(0,1fr)/44px, gap8. |
-| Back/brand/tài khoản | Control44px; avatar40px. Mọi màn cùng anchor, không absolute theo wrapper riêng. Login không có tài khoản hoặc sidebar giả. |
+| Back/brand/tài khoản | Control44px; avatar40px, cùng tâm dọc. Back/brand dùng nền trắng8%, viền trắng20% mảnh và góc14px. Logo gốc trên nền xanh, không đổi màu asset. Mọi màn cùng anchor, không absolute theo wrapper riêng. Login không có tài khoản hoặc sidebar giả. |
 | Tiêu đề | 20/26px, subtitle 12/16px trên mọi màn. Một dòng/ellipsis để không dịch bar; giữ nguyên text trong DOM/title attribute và tên mẫu đầy đủ trong picker. Text accessibility lớn có thể tăng chiều cao hàng. |
 | Gutter | 22px mobile, 16px dưới360px, 36px desktop từ900px. Hero content và nội dung feature dùng cùng token. |
-| Vùng xanh | Cùng gradient115deg `#00724e → #008655`; sticky native. Chiều cao do nội dung slot, không là một min-height riêng cho từng màn. |
+| Vùng xanh | Cùng gradient115deg `#006b4b → #007a52`; sticky native, đệm cuối sau slot8px trên mọi breakpoint. Chiều cao do nội dung slot, không là một min-height riêng cho từng màn. |
 | Lớp trắng | Section rộng 100%, min-height100dvh, overlap12px, góc24px, white/shadow chung. Phần cuối trang giữ clearance navigation/action riêng của nội dung. |
 | Parent | Page layout rộng 100%, max-width none/margin0, isolation. Không giới hạn khung chứa header/cover bởi max-width của feature. |
 
@@ -40,6 +40,20 @@ khác. Tra hạn không còn header riêng cao166px. Đăng nhập dùng cùng h
 hero/surface; form trắng một cột, rộng tối đa480px và căn giữa bên trong lớp
 trắng, kể cả desktop. Bố cục login hai cột trước đây được thay theo hướng đồng
 bộ toàn app của owner ngày 22/10. Giữ form/busy/error/password/preview behavior.
+
+## HEADER02 — candidate 23/10/2026
+
+Owner yêu cầu tối ưu nền xanh lớp dưới và AppHeader trên mọi màn. Palette
+candidate dịu hơn, subtitle `#e3f4ed`; thanh vẫn72px, chữ20/26 và12/16px.
+Vùng an toàn phía trên cùng màu xanh, nắp trắng giữ overlap12px/radius24px,
+bóng mép giảm về `0 -3px 12px rgb(0 60 40 / 6%)`. Chỉ khoảng đệm mobile
+trước nắp trắng tăng4px để thống nhất8px; không thu gọn nội dung nghiệp vụ.
+
+Token `--store-chrome-background` trong `store-header.css` cấp nền chung cho
+page hero và `--cf-modal-header` trên portal Store (chi tiết, form tạo KPH,
+tài khoản, tiện ích, scanner). Không sửa token brand/status/chart toàn cục;
+không thêm blur hay animation. Chế độ in giữ nền trắng. Đây là candidate
+chờ owner nghiệm thu; xem [evidence](../delivery/header02-green-layer/technical.md).
 
 ## Ownership
 

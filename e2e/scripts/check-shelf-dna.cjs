@@ -36,7 +36,7 @@ async function bounds(page, scope) {
       const card = page.getByRole('region', { name: 'Kết quả tra hạn lùi' });
       const history = page.getByRole('region', { name: /^Lịch sử tra cứu/ });
       await expect(form).toBeVisible();
-      await expect(page.locator('.store-page-hero')).toHaveCSS('background-image', 'linear-gradient(115deg, rgb(0, 114, 78), rgb(0, 134, 85))');
+      await expect(page.locator('.store-page-hero')).toHaveCSS('background-image', 'linear-gradient(115deg, rgb(0, 107, 75), rgb(0, 122, 82))');
       await expect(form.locator('.store-known-toggle')).toHaveCSS('background-color', 'rgb(255, 240, 230)');
       await expect(form.getByRole('button', { name: 'Tra cứu', exact: true })).toHaveCSS('background-color', 'rgb(0, 114, 78)');
       await expect(card).toHaveCSS('border-top-left-radius', '18px');

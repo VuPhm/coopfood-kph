@@ -1,5 +1,16 @@
 # Trạng thái hiện tại
 
+**HEADER02 — candidate chờ nghiệm thu, 23/10/2026:** nền xanh và AppHeader
+đồng bộ7màn, báo cáo con và header popup; gradient `#006b4b → #007a52`,
+control căn giữa/viền nhẹ, đệm8px trước lớp trắng. Giữ thanh72px, nội dung
+trắng, màu biểu đồ/trạng thái và workflow. Technical PASS327tests/contracts/
+API/types/build/PWA; production browser7màn×7viewport, chrome/contrast/print/
+chart parity và DATE→KPH/Tra hạn. Preview <http://127.0.0.1:4283/#home>.
+[Phạm vi, lệnh kiểm và giới hạn](delivery/header02-green-layer/technical.md).
+Nhánh `store-app/header02-green-layer` từ main630ec7b; chưa merge/push/deploy.
+Bước tiếp theo: owner xem nền/header ở Home, DATE, KPH và popup trước khi duyệt.
+Các trạng thái pending bên dưới là lịch sử.
+
 **DATE02 / SHELF02 — CLOSED, 23/10/2026:** owner “cho phép merge” candidate
 DATE02 revision3 b50ec3f. Đã merge main local tại `d28b9c4`, source đúng bản đã
 duyệt: chi tiết trắng/xám, % HSD, báo lại1ngày/1tuần, Xử lý → KPH đúng lô; Tra

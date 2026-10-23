@@ -1,5 +1,5 @@
 /* Sign-in uses the same page kit; only form content is specific. */
-.store-login { --login-brand: #00724e; --login-ink: #20344a; --login-muted: #596b7d; min-height: 100dvh; margin: 0; padding: env(safe-area-inset-top) 0 0; background: white; color: var(--login-ink); font-family: var(--cf-font-family); }
+.store-login { --login-brand: #00724e; --login-ink: #20344a; --login-muted: #596b7d; min-height: 100dvh; margin: 0; padding: env(safe-area-inset-top) 0 0; background: var(--store-chrome-base, #006b4b); color: var(--login-ink); font-family: var(--cf-font-family); }
 .store-login-brand-copy { padding: 4px 0 8px; color: white; }
 .store-login-brand-copy > span { font-size: 10px; font-weight: 600; letter-spacing: .12em; }
 .store-login-brand-copy h2 { margin: 6px 0; font-size: 25px; line-height: 32px; font-weight: 650; }
