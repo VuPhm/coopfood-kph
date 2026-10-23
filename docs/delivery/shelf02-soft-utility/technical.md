@@ -116,3 +116,10 @@ không thay nghiệm thu thực. Main giữ sạch ở467d8d6, chỉ KPH03 đã 
 Code checkpoint **`efe6f989b3558b618edcf32ec3924939a35394e1`**, revision1,
 review1/limit2, AWAITING_ACCEPTANCE. Sau checkpoint chỉ ghi ledger/plan; không
 đổi source đã kiểm. Docs/local links/diff kiểm lại PASS. Owner gate pending.
+
+## Owner acceptance, 23/10/2026
+
+Owner xác nhận “đạt, áp tiếp lên DATE, đặc biệt phần chi tiết item”. Chấp nhận
+candidate efe6f98; SHELF02 CLOSED trên task branch, source không đổi sau technical
+gate. DATE là task riêng từ snapshot06ff18b. Không suy ra merge/push/deploy;
+main vẫn467d8d6. Các dòng pending ở trên là lịch sử trước quyết định này.
