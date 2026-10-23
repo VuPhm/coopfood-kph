@@ -35,6 +35,12 @@ component hiện có; chỉ thêm recipe CSS scoped Store Fresh/login/portal.
 - Surface guide/Form controls/Visual DNA/component catalog, CURRENT_STATE/NEXT,
   plan và technical này: tên và recipe/phạm vi, không nhận owner acceptance hộ.
 
+## Checkpoint
+
+Candidate `de548b7b6e0261f887fd81cb38b449e0878bb88a` chứa toàn bộ implementation và test đã chạy ở trên
+working tree trước commit; commit không đổi source sau QA. Các commit tiếp theo
+trong ledger chỉ ghi bằng chứng. Technical PASS, owner pending; chưa merge.
+
 ## Gate và evidence
 
 Đã chạy trên production mock build tại 4301, artifact synthetic/ignored trong
