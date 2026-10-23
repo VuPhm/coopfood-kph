@@ -1,0 +1,56 @@
+/* Desktop keeps native, draggable scrollbars. Portal content is outside .store-app.
+   Mobile tag strips retain their intentionally hidden horizontal scrollbar. */
+@media (min-width: 900px) {
+  html:has(.store-app, .store-login),
+  .store-app :is(.store-desktop-rail, .store-kph-table-wrap, .expiry-timeline-scroll),
+  :is(.store-sheet, .store-quick-panel) .store-modal-body,
+  .store-sheet .store-choice-results,
+  .store-account-sheet .store-account-body,
+  .store-create-screen :is(.create-dialog-form, .store-form-review, .store-create-loading-body) {
+    scrollbar-width: thin;
+    scrollbar-color: #7b9187 transparent;
+  }
+  html:has(.store-app, .store-login) { background-color: white; }
+  /* Radix compensates the body when locking; fixed actions need the same gap. */
+  body[data-scroll-locked] .store-app .store-quick-fab { margin-right: var(--removed-body-scroll-bar-size, 0px); }
+
+  /* Native WebKit fallback; display restores legacy hidden form scrollbars. */
+  html:has(.store-app, .store-login)::-webkit-scrollbar,
+  .store-app :is(.store-desktop-rail, .store-kph-table-wrap, .expiry-timeline-scroll)::-webkit-scrollbar,
+  :is(.store-sheet, .store-quick-panel) .store-modal-body::-webkit-scrollbar,
+  .store-sheet .store-choice-results::-webkit-scrollbar,
+  .store-account-sheet .store-account-body::-webkit-scrollbar,
+  .store-create-screen :is(.create-dialog-form, .store-form-review, .store-create-loading-body)::-webkit-scrollbar {
+    display: block; width: var(--store-scrollbar-size, 10px); height: var(--store-scrollbar-size, 10px);
+  }
+  html:has(.store-app, .store-login)::-webkit-scrollbar-thumb,
+  .store-app :is(.store-desktop-rail, .store-kph-table-wrap, .expiry-timeline-scroll)::-webkit-scrollbar-thumb,
+  :is(.store-sheet, .store-quick-panel) .store-modal-body::-webkit-scrollbar-thumb,
+  .store-sheet .store-choice-results::-webkit-scrollbar-thumb,
+  .store-account-sheet .store-account-body::-webkit-scrollbar-thumb,
+  .store-create-screen :is(.create-dialog-form, .store-form-review, .store-create-loading-body)::-webkit-scrollbar-thumb {
+    border: 2px solid var(--store-scrollbar-border, transparent); border-radius: 999px;
+    background: var(--store-scrollbar-thumb, #7b9187); background-clip: padding-box;
+  }
+
+  /* A single body owns scrolling, leaving headers, close buttons and corners clear.
+     Choice sheets retain their own body/search/results/footer grid. */
+  [data-slot="dialog-content"]:is(.store-sheet:not(.store-choice-sheet), .store-quick-panel, .store-account-sheet) {
+    display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden;
+  }
+  .store-sheet > .store-modal-body,
+  .store-quick-panel > .store-modal-body,
+  .store-account-sheet > .store-account-body { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; }
+  :is(.store-kph-detail, .store-date-lot-sheet) > .store-modal-body { padding-bottom: 0; scroll-padding-bottom: 96px; }
+  :is(.store-kph-detail, .store-date-lot-sheet) .store-sheet-actions { margin-bottom: 0; }
+
+}
+/* High contrast keeps full-size bars and system colors, including WebKit. */
+@media (min-width: 900px) and (forced-colors: active), (min-width: 900px) and (prefers-contrast: more) {
+  html:has(.store-app, .store-login),
+  .store-app :is(.store-desktop-rail, .store-kph-table-wrap, .expiry-timeline-scroll),
+  :is(.store-sheet, .store-quick-panel) .store-modal-body,
+  .store-sheet .store-choice-results,
+  .store-account-sheet .store-account-body,
+  .store-create-screen :is(.create-dialog-form, .store-form-review, .store-create-loading-body) { scrollbar-width: auto; scrollbar-color: auto; --store-scrollbar-size: auto; --store-scrollbar-thumb: ButtonText; --store-scrollbar-border: Canvas; }
+}

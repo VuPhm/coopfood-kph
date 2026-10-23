@@ -14,6 +14,7 @@ import "./store-sticky-tabs.css";
 import "./store-navigation.css";
 import "./store-glass.css";
 import "./store-mobile-refinements.css";
+import "./store-scrollbars.css";
 
 export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {
   screen: StoreAppScreen; profile: StoreProfile; navigate: (screen: Screen) => void;
