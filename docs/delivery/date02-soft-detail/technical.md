@@ -178,3 +178,7 @@ bounded; technical PASS không thay owner acceptance, chưa merge/push/deploy.
 Final polish sau các gate: Hủy của picker dùng nền trắng/viền control để phân
 biệt Hẹn báo lại; chỉ CSS và comment thừa. Final mock build/typecheck và
 transaction gate390/1440/320 chạy lại PASS, không đổi data/mốc/timeline.
+
+Code checkpoint r3 **`b50ec3fdd9b15196a00b6173c28d5169024a3c8c`**; sau checkpoint
+chỉ ghi ledger. Cây task sạch, source giữ đúng bản kiểm; owner pending.
+Main vẫn467d8d6 sạch, chưa merge/push/deploy candidate này.

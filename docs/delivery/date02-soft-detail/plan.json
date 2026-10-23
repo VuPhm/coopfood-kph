@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "date02-soft-detail",
   "revision": 3,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Apply accepted soft surfaces to DATE, prioritize lot detail and show colored remaining shelf-life percentages in list.",
   "inScope": [
     "DATE workspace/list/detail/filter soft surfaces, mobile first",
@@ -17,7 +17,7 @@
     "Root config, lockfile, packages/ui, push/deploy"
   ],
   "baseSha": "06ff18b3f74c93cf45cac8bb713cedc2ea42569b",
-  "candidateSha": "",
+  "candidateSha": "b50ec3fdd9b15196a00b6173c28d5169024a3c8c",
   "integrationOwner": "Current chat sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-date-workspace.tsx",
@@ -59,7 +59,10 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "b50ec3fdd9b15196a00b6173c28d5169024a3c8c",
+      "evidence": "docs/delivery/date02-soft-detail/technical.md"
     },
     {
       "id": "owner",
@@ -85,6 +88,6 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Implement reminders and DATE to KPH workflow in existing worktree, technical evidence invalidated for affected workflow.",
+  "nextAction": "Owner tries Ghi nhận →1day/1week and Xử lý → existing KPH form at http://127.0.0.1:4278/#date. Technical PASS; session-only reminders/records, no automatic merge/push/deploy.",
   "authorization": "Owner23/10/2026: đạt, áp tiếp lên DATE, đặc biệt phần chi tiết item; thay quá x ngày bằng phần trăm còn lại có màu. Follow-up: làm đoạn chưa làm được."
 }
