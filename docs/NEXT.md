@@ -1,5 +1,15 @@
 # Công việc kế tiếp
 
+**FORM01 revision 3 — candidate24/10/2026:** owner chấp nhận hướng form bằng
+“ổn, làm tiếp”, yêu cầu mở rộng và ghi triết lý. Đã tích hợp đúng header
+`816b4e3` vào nhánh task, base hợp nhất `568c8cd`; không đổi main. Mở rộng
+**Co.op Fresh Soft** cho nút phụ/toolbar, filter choices, nhóm thông tin, picker/
+popup và divider: nền tạo khối, mép nghỉ nhẹ, selected/focus/error rõ.
+[Triết lý và role/state recipe](product/STORE_APP_SURFACE_STYLE.md),
+[scope/acceptance/checks](delivery/form01-fresh-soft/technical.md).
+Preview <http://127.0.0.1:4304/#home>. Chưa merge main/push/deploy; owner xem
+các màn và trạng thái mới. Các candidate cũ dưới đây là lịch sử.
+
 **FORM01 — candidate revision 2, 24/10/2026:** theo owner làm mềm form;
 feedback viền còn dày, tham khảo item Home và iOS 27.
 Dùng tên **Co.op Fresh Soft** cho `coop-fresh-soft-v1`; input/date/select/textarea

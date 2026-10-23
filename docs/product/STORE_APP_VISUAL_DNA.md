@@ -1,5 +1,10 @@
 # Store App Visual DNA — Co.op Fresh
 
+**FORM01 revision 3,24/10:** form/mép nhẹ được owner chấp nhận; tiếp tục triết lý
+“Nền và khoảng cách tạo khối; viền nghỉ lùi xuống; trạng thái giữ rõ” cho control/
+nhóm/picker hiện có. [Quy chuẩn theo vai trò](STORE_APP_SURFACE_STYLE.md) là nguồn
+tham chiếu; giữ header816b4e3, canvas trắng và palette nghiệp vụ. Rollout mới chờ xem.
+
 **FORM01 candidate 24/10/2026:** tên ngắn của hướng khối mềm/viền nhẹ là
 **Co.op Fresh Soft** (`coop-fresh-soft-v1`). Recipe form bổ sung fill nhẹ trong
 field, radius 16/mép nghỉ 6% theo Home (revision 2), nhóm trắng; label/content

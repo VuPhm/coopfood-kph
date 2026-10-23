@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
   "id": "form01-fresh-soft",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Soften existing Store Fresh form controls with the Co.op Fresh Soft form recipe while preserving interaction, state, validation and domain behavior.",
+  "revision": 3,
+  "status": "EXECUTING",
+  "objective": "Apply accepted Co.op Fresh Soft material philosophy to remaining Store Fresh components after integrating requested 816b4e3; document durable role/state rules.",
   "inScope": [
-    "Name and document the existing coop-fresh-soft-v1 visual style as Co.op Fresh Soft; define its form recipe",
-    "Harmonize text/date/select/textarea surfaces, grouped choices and action controls in Store Fresh/login and Store portals",
-    "Preserve field sizes, native semantics, selected/error/readonly/disabled/focus states and scroll geometry",
-    "Verify KPH create/review/photo validation, report dialogs/pickers, filters, shelf and login on mobile/desktop",
-    "Revision 2: quiet resting edges based on Home pastel items; Apple iOS 27/material guidance is reference, not native UI implementation"
+    "Integrate exact requested header commit 816b4e3 while preserving accepted Fresh Soft forms",
+    "Quiet resting secondary actions, filter choices, picker rows, grouping and nested chrome across Store Fresh surfaces/portals",
+    "Maintain white holders, semantic colors, selected/focus/error cues, current geometry and workflows",
+    "Write the accepted philosophy and role/state recipes in the canonical surface guide, link UI DNA/catalog",
+    "Verify integrated Home/context navigation, KPH/DATE/reports/shelf/login, keyboard/contrast/scroll/mobile/desktop"
   ],
   "outOfScope": [
-    "Domain/API/backend/authorization/data or storage changes",
+    "Domain/API/backend/authorization/data/storage or enum changes",
     "Admin/online/Pilot, packages/ui, root config/dependencies",
-    "Header/nav/list/chart/print redesign, new form logic or theme switch",
-    "Merge/push/deploy without owner approval"
+    "New navigation/layout/compact behavior beyond requested 816b4e3; chart colors/print redesign",
+    "Merge main/push/deploy without owner authorization"
   ],
-  "baseSha": "f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8",
-  "candidateSha": "56e2edd3aae3710aec7de8101a20f158c5189956",
+  "baseSha": "568c8cd2b320f0d1d33abb875cc8df15979e5516",
+  "candidateSha": "",
   "integrationOwner": "Current chat, sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/store-form-soft.css",
@@ -35,20 +35,22 @@
     "docs/NEXT.md",
     "docs/delivery/form01-fresh-soft/**",
     "e2e/scripts/check-kph-colors.cjs",
-    "apps/store-pwa/src/create-record-dialog.tsx"
+    "apps/store-pwa/src/create-record-dialog.tsx",
+    "apps/store-pwa/src/store-component-soft.css",
+    "e2e/scripts/check-store-component-soft.cjs",
+    "docs/product/STORE_APP_UI_DNA.md",
+    "e2e/scripts/check-store-chrome.cjs",
+    "e2e/scripts/check-header-context.cjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "56e2edd3aae3710aec7de8101a20f158c5189956",
-      "evidence": "docs/delivery/form01-fresh-soft/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner",
@@ -64,9 +66,16 @@
       "source": "Direct owner feedback 24/10/2026 after preview 4301, candidate de548b7.",
       "impact": "Resting form surfaces/edges, rendered affordance audit, cross-form browser evidence and recipe documentation.",
       "decision": "Continue same branch/worktree/base. Use Home soft decorative edges, visible label/content cues and strong focus/error/selection states; invalidate material and browser evidence from revision 1."
+    },
+    {
+      "revision": 3,
+      "request": "Accept Fresh Soft forms; apply philosophy to other components, record it, pull 816b4e3 before continuing.",
+      "source": "Direct owner message 24/10/2026: ổn, làm tiếp ... pull 816b4e3 rồi làm tiếp.",
+      "impact": "Exact local integration, remaining Store Fresh component materials, canonical philosophy and integrated visual/behavior gates.",
+      "decision": "Same task/worktree/sole writer; merge exact 816b4e3 -> 568c8cd. Preserve form revision 2 acceptance separately. New material scope needs fresh technical/owner gates; no main merge."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner review revision 2 at http://127.0.0.1:4302/#kph: resting edges versus Home, focus/errors and KPH/report/shelf/login forms. Await explicit acceptance before merge.",
+  "nextAction": "Audit current component roles, implement bounded soft material rollout, document the philosophy and verify against integrated baseline.",
   "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
 }

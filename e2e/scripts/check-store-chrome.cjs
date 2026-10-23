@@ -2,7 +2,13 @@ const {chromium,expect}=require('@playwright/test');const fs=require('node:fs');
 const base=process.env.STORE_PREVIEW_URL||'http://127.0.0.1:4280';const baseline=process.env.STORE_BASELINE_URL||'http://127.0.0.1:4279';
 const output=process.env.STORE_CHROME_OUTPUT||'.local/header02/chrome';fs.mkdirSync(output,{recursive:true});process.env.STORE_KPH_COLORS_OUTPUT=output;
 const {audit}=require('./check-kph-colors.cjs');const green='linear-gradient(115deg, rgb(0, 107, 75), rgb(0, 122, 82))';
-async function ready(p,url){await p.goto(url);await expect(p.locator('.store-header')).toBeVisible();await p.evaluate(()=>document.fonts.ready)}
+async function ready(p,url){
+ await p.goto(url);const route=new URL(url).hash.slice(1);
+ await expect(p.locator(route==='login'?'.store-login':`.store-app.store-screen-${route}`)).toBeVisible();
+ if(route==='kph')await expect(p.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
+ if(route==='reports')await expect(p.getByRole('heading',{name:'Chọn báo cáo',exact:true})).toBeVisible();
+ await expect(p.locator('.store-header')).toBeVisible();await p.evaluate(()=>document.fonts.ready);
+}
 async function chart(p){return p.locator('.store-date-milestones .store-timeline').evaluate(root=>[root,...root.querySelectorAll('*')].flatMap(el=>[null,'::before','::after'].map(pseudo=>{const s=getComputedStyle(el,pseudo);return{cls:el.className,pseudo,color:s.color,bg:s.backgroundColor,image:s.backgroundImage,border:s.borderColor}})))}
 (async()=>{const b=await chromium.launch();const results=[];try{
  for(const viewport of[{width:390,height:844},{width:1440,height:1024},{width:320,height:740}]){

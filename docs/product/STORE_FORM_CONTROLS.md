@@ -4,7 +4,7 @@ Candidate RPT01 revision 14, ngày 18/10/2026. Dùng thật trong báo cáo trư
 đề xuất nhân rộng. Đây là component local Store PWA; chưa phải primitive Admin
 hoặc thay đổi toàn hệ thống. Giữ workflow/authorization ở feature/backend.
 
-## Co.op Fresh Soft — FORM01 candidate 24/10/2026
+## Co.op Fresh Soft — FORM01, 24/10/2026
 
 Owner yêu cầu làm mềm các form hiện tại. Tên ngắn **Co.op Fresh Soft** dùng chung
 mã `coop-fresh-soft-v1`, [recipe form](STORE_APP_SURFACE_STYLE.md#6-recipe-form--form01-candidate-24102026).
@@ -12,6 +12,9 @@ Revision 2: input/date/select/textarea có fill nhẹ + radius 16, mép nghỉ 6
 theo item Home; focus/error/selection rõ và có label/nội dung nhận diện;
 nhóm trắng/viền nhẹ, footer và chọn có độ nổi thấp. CSS local được import bởi
 StoreAppFrame/StoreLogin, portal scope theo Store Fresh đang mở.
+
+Revision 3 thêm recipe nút phụ/choice/group/popup; mép nghỉ nhẹ, selected/focus
+giữ rõ. [Triết lý theo vai trò](STORE_APP_SURFACE_STYLE.md).
 
 Giữ API của các control bên dưới, label/value, required/readonly/disabled/error,
 calendar/Other/photo recovery và keyboard. Không đổi packages/ui hoặc Admin.

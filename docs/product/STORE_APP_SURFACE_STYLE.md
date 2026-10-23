@@ -18,6 +18,55 @@ recipe khối/viền và màu biểu đồ. Thông số/giới hạn tại
 [page kit](STORE_APP_FRAME.md#header02--candidate-23102026). Owner đã cho phép
 merge4450982 ngày23/10; [kiểm main](../delivery/header02-green-layer/merge-2026-10-23.md).
 
+## Triết lý được owner chấp nhận — 24/10/2026
+
+**Nền và khoảng cách tạo khối; viền nghỉ lùi xuống; trạng thái giữ rõ.**
+
+Owner đã chấp nhận form revision 2 bằng “ổn, làm tiếp” và yêu cầu áp dụng cho
+các thành phần khác, ghi lại triết lý. **Co.op Fresh Soft** là tên của hướng
+này, giữ mã `coop-fresh-soft-v1`. Reference hiện tại: Home, form `56e2edd` đã
+duyệt và header `816b4e3` được yêu cầu tích hợp; base hợp nhất `568c8cd`.
+Rollout component revision 3 là candidate riêng, không thay nghiệm thu từng
+implementation bằng acceptance của triết lý.
+
+1. **Tạo phân cấp trước khi vẽ khung.** Trắng là nền chính; pastel nhẹ nhận
+   diện nhóm/chức năng. Dùng khoảng cách, tiêu đề, icon và hướng sáng để mắt
+   nhận ra khối. Không quây mỗi nhãn/hàng/nút trong một đường bao đậm.
+2. **Viền nghỉ chỉ hỗ trợ nhận diện.** Pastel dùng transparent; action có chữ/
+   icon dùng mép 6% và fill nhẹ; holder trắng vẫn có mép `#dfe5e9` để tách trắng/
+   trắng. Giữ hộp border1px để kích thước không nhảy. Không coi tất cả border
+   là trang trí: check/radio/switch/cue nhập liệu vẫn phải đọc được.
+3. **Phản hồi có trọng số.** Hover đổi fill nhẹ, không thêm nét kép. Chọn dùng
+   check/radio, chữ/aria-state và màu đúng vai trò; một đường biên là đủ. Focus
+   bàn phím giữ ring rõ; lỗi có chữ/aria và màu lỗi. Không làm mờ cả control
+   bằng opacity để đạt cảm giác nhẹ, cũng không dùng bóng thay dấu hiệu chọn.
+4. **Độ nổi có giới hạn.** Một mép sáng và bóng thấp tĩnh cho khối cần tách lớp;
+   popup dùng bóng cao hơn. Divider lồng nhau rất nhẹ. Không thêm blur cho form,
+   list/card hoặc animation shadow/filter. Reduced motion/transparency bỏ bóng;
+   increased contrast/forced colors đưa viền cần thiết về màu hệ thống.
+5. **Thông tin và thao tác quyết định.** Chữ/icon vẫn đủ tương phản, label và
+   placeholder nhận diện ô nhập. Giữ touch target, geometry, thứ tự đọc, scroll,
+   nghiệp vụ, semantic labels và màu biểu đồ. Đây là quy chuẩn Co.op Fresh cho
+   PWA, chỉ tham khảo iOS27 về vật liệu/phân cấp; không tạo bản sao hệ điều hành.
+
+### Áp theo vai trò, không đổi đồng loạt mọi border
+
+| Vai trò | Nghỉ | Tương tác / trạng thái |
+| --- | --- | --- |
+| Card chức năng Home/Báo cáo | Pastel, mép transparent, sheen/bóng thấp | Hover fill; focus ring, giữ nhãn rõ |
+| Holder nghiệp vụ trắng | Trắng + `#dfe5e9`, bóng thấp nơi cần tách lớp | Selected dùng semantic/check; không nhuộm toàn list |
+| Input/date/select/textarea | Fill `#f0f7f3`, mép 6%, label/content rõ | Focus/error rõ, readonly/disabled thật; recipe mục6 |
+| Nút phụ, toolbar, chip bộ lọc | Fill `#f0f7f3`, mép 6%, chữ/icon rõ | Hover `#e6f2eb`; chọn/open giữ cue hiện có, không nét kép |
+| Nhóm filter/settings/reminder/Thông báo | Nền theo vai trò, mép 6%, bóng thấp | Check/native state/collapse riêng; focus không bị thay |
+| Hàng picker và divider bên trong | Mép 6%; text/check làm cue | Hover fill; radio/check và keyboard giữ native semantics |
+| Popup sort/dropdown/calendar | Mép 6%, nền đặc, bóng nổi nhỏ | Focus trap, điều hướng, cạnh màn và scroll không đổi |
+| Header/navigation/primary action | Giữ geometry/màu đã duyệt | Không đổi header816b4e3, primary hoặc tab/checkbox để làm nhẹ |
+
+Runtime rollout local ở [store-component-soft.css](../../apps/store-pwa/src/store-component-soft.css),
+form ở [store-form-soft.css](../../apps/store-pwa/src/store-form-soft.css).
+Chỉ Store Fresh/login và các portal thuộc Store; không tự áp Admin/online/Pilot
+hoặc `packages/ui`. [Scope, acceptance đã có và evidence mới](../delivery/form01-fresh-soft/technical.md).
+
 ## 1. Công thức thị giác
 
 **Nền trắng sạch → khối màu rất nhẹ → mép sáng → bóng mềm có chọn lọc.**
@@ -180,7 +229,8 @@ headless đạt; kiểm thiết bị mục tiêu khi có scope đó.
 
 ## 6. Recipe form — FORM01 candidate 24/10/2026
 
-Owner yêu cầu làm mềm các thành phần form hiện tại và đặt tên phong cách.
+Owner yêu cầu làm mềm các thành phần form hiện tại và đặt tên phong cách;
+form revision 2 đã được chấp nhận24/10, xem phần triết lý phía trên.
 Dùng tên **Co.op Fresh Soft** cho cùng bộ `coop-fresh-soft-v1`; không tạo theme,
 setting hay họ token shared mới. Revision 2 theo feedback “viền vẫn dày”:
 ưu tiên cách Home phân khối bằng fill/mép sáng thay đường bao đậm. Recipe form
@@ -216,7 +266,8 @@ native glass hoặc thêm blur. Kiểm cue theo vai trò, xem
 không suy kiểm scoped thành chứng nhận accessibility đầy đủ.
 
 Giữ skeleton/live cùng geometry. [Phạm vi, gate và preview](../delivery/form01-fresh-soft/technical.md).
-Recipe form còn chờ owner xem; không suy technical PASS thành acceptance.
+Form revision 2 đã được owner chấp nhận; component rollout revision 3 chờ xem.
+Không suy technical PASS thành acceptance.
 
 ## 7. Cách áp cho round sau
 

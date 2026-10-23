@@ -5,6 +5,7 @@ import { ArrowRight, Eye, EyeOff, LoaderCircle, LockKeyhole, UserRound } from "l
 import "./store-frame-canvas.css";
 import "./store-login.css";
 import "./store-form-soft.css";
+import "./store-component-soft.css";
 
 export function StoreLogin({ busy, error, onSubmit, onPreview }: {
   busy: boolean;

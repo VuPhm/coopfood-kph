@@ -19,8 +19,9 @@ Authority: [contract](STORE_APP_CONTRACTS.md), [UI DNA](STORE_APP_UI_DNA.md),
 và [ADR-0006](../adr/0006-store-app-evolution.md). Source là bằng chứng
 implementation; test đạt không thay nghiệm thu owner.
 
-FORM01 candidate revision 2,24/10: mép nghỉ theo Home, presentation form dùng [Co.op Fresh Soft](STORE_APP_SURFACE_STYLE.md)
-qua stylesheet local `store-form-soft.css`; tái dùng component/semantics hiện có,
+FORM01 revision 3,24/10: mở rộng control/nhóm/picker theo triết lý đã duyệt;
+presentation local dùng [Co.op Fresh Soft](STORE_APP_SURFACE_STYLE.md)
+qua `store-form-soft.css` và `store-component-soft.css`; tái dùng component/semantics hiện có,
 không thêm primitive hay API form. [Scope/checks](../delivery/form01-fresh-soft/technical.md).
 
 ## Nơi quản lý

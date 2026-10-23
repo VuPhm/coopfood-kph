@@ -5,6 +5,13 @@ const output = process.env.STORE_HEADER_OUTPUT || '.local/header03/context';
 fs.mkdirSync(output, { recursive: true });
 process.env.STORE_KPH_COLORS_OUTPUT = output;
 const { audit } = require('./check-kph-colors.cjs');
+async function ready(page, route) {
+  await page.goto(`${base}/#${route}`);
+  await expect(page.locator(`.store-app.store-screen-${route}`)).toBeVisible();
+  if (route === 'home') await expect(page.locator('.store-home-welcome')).toBeVisible();
+  if (route === 'kph') await expect(page.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
+  if (route === 'reports') await expect(page.getByRole('heading', { name:'Chọn báo cáo', exact:true })).toBeVisible();
+}
 async function hit(locator) {
   await expect(locator).toBeVisible();
   const r = await locator.boundingBox();
@@ -18,7 +25,7 @@ async function hit(locator) {
       const page = await browser.newPage({ viewport, serviceWorkers:'block', reducedMotion:'reduce' });
       const errors = []; page.on('pageerror', e => errors.push(e.message));
       const desktop = viewport.width >= 900;
-      await page.goto(`${base}/#home`);
+      await ready(page, 'home');
       await expect(page.locator('.store-home-welcome')).toBeVisible();
       await expect(page.locator('.store-header h1')).toHaveText('Trang chủ');
       expect((await page.locator('.store-header h1').boundingBox()).width).toBeLessThanOrEqual(1);
@@ -26,7 +33,7 @@ async function hit(locator) {
       await expect(page.locator('.store-header-brand')).toBeVisible();
       await page.screenshot({path:`${output}/home-${viewport.width}.png`});
       for (const route of ['date','kph','shelf','notifications','reports']) {
-        await page.goto(`${base}/#${route}`);
+        await ready(page, route);
         await expect(page.locator('.store-header h1')).toBeVisible();
         await expect(page.getByRole('button',{name:'Tài khoản và cửa hàng',exact:true})).toBeEnabled();
         const header = page.locator('.store-header');
@@ -43,8 +50,9 @@ async function hit(locator) {
           await hit(back); await back.click();
         }
         await expect(page).toHaveURL(/#home$/);
+        await expect(page.locator('.store-home-welcome')).toBeVisible();
       }
-      await page.goto(`${base}/#reports`);
+      await ready(page, 'reports');
       await page.getByRole('button',{name:/^Báo cáo tổng hợp/}).click();
       const header = page.locator('.store-header');
       await expect(header.locator('h1')).toHaveText('Báo cáo tổng hợp');
@@ -53,7 +61,7 @@ async function hit(locator) {
       const parent = header.getByRole('button',{name:'Về menu báo cáo',exact:true});
       await hit(parent); await parent.click();
       await expect(page.getByRole('heading',{name:'Chọn báo cáo',exact:true})).toBeVisible();
-      await page.goto(`${base}/#date`);
+      await ready(page, 'date');
       await page.addStyleTag({content:'.store-header h1{font-size:30px;line-height:39px}.store-header p{font-size:18px;line-height:24px}.store-header-ancestor>button{font-size:19.5px;line-height:39px}'});
       await audit(page,'.store-header',`large-${viewport.width}`);
       expect(await header.evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
