@@ -11,6 +11,16 @@ từ `f77034d`; preview <http://127.0.0.1:4302/#kph>. Chưa merge/push/deploy;
 [phạm vi, kiểm tra và giới hạn](delivery/form01-fresh-soft/technical.md).
 Bước tiếp theo: owner xem KPH form/bộ lọc, Báo cáo, Tra hạn và đăng nhập.
 
+**HEADER03 — candidate24/10/2026:** Home bỏ copy “Trang chủ / Cửa hàng
+hiện tại” khỏi hình, giữ heading accessible/lời chào. Back mobile chỉ mũi tên,
+không nền/viền; desktop dùng sidebar + ancestor `Trang chủ › màn`, mẫu báo cáo
+thêm cấp Báo cáo. Giữ72px/44px/focus, palette/header và nghiệp vụ. Technical334tests/build/PWA,
+7màn×7viewport, context/contrast/chart parity PASS. Preview
+<http://127.0.0.1:4331/#home>; [scope và evidence](delivery/header03-context-nav/technical.md).
+Nhánh `store-app/header03-context-nav` từ mainf77034d; chưa merge/push/deploy.
+Bước tiếp: owner xem Home/mobile arrow/desktop đường dẫn tại preview4331.
+Các pending bên dưới là lịch sử.
+
 **UI02 + RPT02 — CLOSED,23/10/2026:** owner “merge với `0757b6d`” cho bản
 scrollbar đang xem tại4295 và report checkpoint0757b6d. Merge main local
 `e5628ab` gồm scrollbar`e2c2ab5` + report đúng0757b6d; source hợp nhất không sửa
