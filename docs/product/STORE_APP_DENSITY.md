@@ -24,10 +24,10 @@ sidebar/menu và nghiệp vụ giữ baseline. Item giảm nhẹ đệm, không 
 | Báo cáo kỳ/phạm vi | Một hàng kỳ + lọc44px, face icon36px/hit44px, có active context |
 | Bộ lọc | Section phẳng phân cách nhẹ, gap8/12px; sort nằm trong sheet |
 | Choice sheet | Option60px/padding dọc8px; header/search/footer vẫn riêng |
-| Form KPH | Section inset12px, heading gap8px, lựa chọn≥48px/input44px; ảnh không thu nhỏ |
+| Form KPH | Section phẳng/padding dọc12px, heading gap8px, lựa chọn≥48px/input≥44px; ảnh không thu nhỏ |
 | Tra hạn | Gap8px, form chính inset12px, nút≥44px; kết quả và timeline giữ nguyên |
 | KPH mobile / DATE item | Padding dọc8px /10px; tag và tên không gộp |
-| KPH desktop | Row cell height52px, padding dọc6px; control44px có thể làm row cao56px |
+| KPH desktop | Minimum row hai tầng56px, padding dọc6px; nội dung dài được nở cao |
 | Thông báo | Nhóm20/12/8px theo tầng; summary≥56px; item≥92px |
 
 Token `--store-density-*` chỉ sống dưới `html[data-store-density="compact"]`

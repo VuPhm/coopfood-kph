@@ -167,7 +167,7 @@
   html[data-store-density="compact"] .store-app .store-date-search-icon { top: 50%; transform: translateY(-50%); }
 
   @media (min-width: 900px) {
-    html[data-store-density="compact"] .store-app .store-kph-table .store-kph-record-row td { height: var(--store-size-control-lg); padding-block: calc(var(--store-space-1) * 1.5); }
+    html[data-store-density="compact"] .store-app .store-kph-table .store-kph-record-row td { height: var(--store-size-row-two); padding-block: calc(var(--store-space-1) * 1.5); }
   }
 }
 @media screen and (forced-colors: active) {
