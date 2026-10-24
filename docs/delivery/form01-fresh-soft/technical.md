@@ -125,3 +125,10 @@ Memory-only/browser-local; chưa xác minh backend, Safari/Windows hay thiết b
 thật. Audit contrast có mục tiêu, không suy thành chứng nhận toàn bộ WCAG.
 Owner xem4306: nút xanh Xem lại/Xong/Tạo báo cáo/Tra cứu, chọn filter, mở sheet,
 so mép khối/sidebar/menu mobile và thử focus/disabled. Chưa merge main/push/deploy.
+
+## Chuẩn bị tích hợp và vòng kế tiếp — 24/10/2026
+
+Theo yêu cầu mới, [gói merge cùng816b4e3](merge-preparation-2026-10-24.md) đã
+preflight sạch, không đổi runtime hoặc main. [Compact tùy chọn trong Cài đặt](compact-next-round.md)
+là phạm vi chuẩn bị cho vòng sau, mặc định tắt; chưa triển khai hoặc đổi token
+mật độ ở candidate này. Owner gate vẫn pending; không tự ghi nghiệm thu.

@@ -89,6 +89,13 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Owner review preview4306: green primary/selected states and disabled recovery, sliding cap/sheets, desktop sidebar and mobile menu; no main merge until authorized.",
-  "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
+  "nextAction": "Merge package prepared with exact816b4e3 already included; review merge-preparation-2026-10-24.md. Compact next round scoped as an opt-in Settings preference; implementation starts after FORM01 integration. Main remains unchanged; owner gate pending.",
+  "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn.",
+  "preparation": {
+    "date": "2026-10-24",
+    "request": "cùng với816b4e3 chuẩn bị merge vào main, chuẩn bị vòng tối ưu compact (tuỳ chọn trong cài đặt) cho giao diện",
+    "mergeEvidence": "docs/delivery/form01-fresh-soft/merge-preparation-2026-10-24.md",
+    "nextRound": "docs/delivery/form01-fresh-soft/compact-next-round.md",
+    "runtimeUnchanged": true
+  }
 }
