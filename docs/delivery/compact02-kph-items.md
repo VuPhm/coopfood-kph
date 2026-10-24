@@ -9,7 +9,7 @@ sau đề xuất thử một candidate item KPH trước khi mở rộng list kh
 Feedback tiếp: “đối với đã hoặc không duyệt nếu hết chỗ thì chỉ hiện icon hoặc
 nhãn màu là được, không quan trọng”. Áp fallback này, ưu tiên định danh/số
 lượng, giữ Chờ duyệt có chữ. Đây là slice nhỏ, dùng hồ sơ bàn giao này; không dispatch agent hoặc mở
-milestone nhiều team. **Technical PASS, owner chưa nghiệm thu hình ảnh.**
+milestone nhiều team. **CLOSED — Technical PASS, owner chấp nhận bằng “ổn, tiếp” ngày25/10/2026.**
 
 ## Baseline và phạm vi
 
@@ -100,5 +100,7 @@ Chế độ gọn. So TPTS/TPCN, nhãn dài, Chọn/nhóm ngày, tắt lại đ�
 
 Không phải backend wiring hoặc nghiệm thu thiết bị thật/Safari/Windows.
 Mock memory-only/browser-local và warning chunk ExcelJS lớn vẫn giữ. Không
-claim WCAG certification toàn app. Chưa có acceptance item mới; bước nhỏ
-tiếp theo là owner quyết định candidate KPH trước khi mở rộng list khác.
+claim WCAG certification toàn app. Owner gửi trực tiếp “ổn, tiếp” sau bản
+4346; ghi nhận chấp nhận runtime`c3f05c5` và cho tiếp tục item list khác.
+Không suy quyền merge main/push/deploy hoặc acceptance backend. Vòng KPH
+đã đóng; slice tiếp theo giữ candidate này làm mốc và làm trên nhánh riêng.
