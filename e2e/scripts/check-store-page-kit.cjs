@@ -38,7 +38,11 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
     await page.locator('.store-header h1').evaluate(el=>{el.style.fontSize='30px';el.style.lineHeight='39px'});
     if(await page.locator('.store-header p').count())await page.locator('.store-header p').evaluate(el=>{el.style.fontSize='18px';el.style.lineHeight='24px'});
     const large=await bounds(page.locator('.store-header-account')),leading=await bounds(page.locator(viewport.width>=900&&route!=='home'&&route!=='login'?'.store-header-location':'.store-header-brand,.store-back'));
-    if(viewport.width<900||route==='home'||route==='login')expect(large.y).toBe(leading.y);expect(large.x).toBeGreaterThan(leading.x+leading.width);
+    // Login has no account control; its empty grid slot is not an alignment anchor.
+    // With enlarged copy the baseline logo remains 44px, centered in the taller row.
+    if(route!=='login'&&(viewport.width<900||route==='home'))expect(large.y).toBe(leading.y);
+    if(route==='login'){expect(leading.width).toBe(44);expect(leading.height).toBe(44);}
+    expect(large.x).toBeGreaterThan(leading.x+leading.width);
     expect(await page.locator('.store-header h1').getAttribute('title')).toBe(await page.locator('.store-header h1').textContent());
    }
    await page.locator('.store-header').evaluate(el=>[...el.querySelectorAll('button')].find(b=>b.getBoundingClientRect().width>0)?.focus());

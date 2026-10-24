@@ -6,8 +6,9 @@ settings/form, item chỉ giảm đệm nhẹ; giữ state và mật độ mặc
 từ task base0a25730 gồm đúng FORM01d4f9d17 + header816; main vẫnf77034d, không
 suy acceptance FORM01. Preview <http://127.0.0.1:4342/#kph>.
 [Scope/kiểm tra/giới hạn](delivery/compact01-interface-density/technical.md),
-[quy tắc](product/STORE_APP_DENSITY.md). Owner xem cả hai chế độ; chưa merge/
-push/deploy. Bước tiếp: hoàn tất technical gate rồi nghiệm thu Compact.
+[quy tắc](product/STORE_APP_DENSITY.md). Technical342tests + production browser hai mật độ/5viewport, frame7màn/7viewport,
+native scrollbar và report dock đạt; owner xem cả hai chế độ. Chưa merge/
+push/deploy. Bước tiếp: owner dùng thử và quyết định nghiệm thu Compact.
 
 **FORM01 revision 4 — candidate24/10/2026:** owner yêu cầu đủ mọi nút, đặc biệt
 nút xanh; làm tổng thể token nút và mép khối trượt/sidebar/menu bar. Dùng một
