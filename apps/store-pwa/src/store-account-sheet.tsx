@@ -3,6 +3,7 @@ import { ArrowRight, Home, Store } from "lucide-react";
 import { useRef, useState, type RefObject } from "react";
 import { StoreAccountTrigger, storeAccountIdentity } from "./store-account-trigger";
 import type { StoreProfile } from "./store-profile";
+import { StoreDensitySetting } from "./store-density";
 
 // Opening the account sheet should not render the entire active workspace.
 export function StoreAccountControl({ profile, onHome, onLoginPreview }: {
@@ -44,6 +45,7 @@ export function StoreAccountSheet({ open, onOpenChange, profile, initials, trigg
           <span className="store-account-store-icon"><Store size={24} strokeWidth={1.8} aria-hidden="true" /></span>
           <div><h3 id="account-store-title">Cửa hàng đang sử dụng</h3><p>{profile.storeName}</p><span>Mã cửa hàng · {profile.storeCode}</span></div>
         </section>
+        <StoreDensitySetting />
         <p className="store-account-preview-note">Bản dùng thử · Thông tin mẫu</p>
         <div className="store-account-actions">
           <button className="store-account-home" onClick={onHome}><Home size={18} aria-hidden="true" />Trang chủ</button>

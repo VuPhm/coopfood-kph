@@ -1,7 +1,9 @@
 # COMPACT01 — Chế độ gọn tùy chọn
 
-Ngày lập: 24/10/2026. Trạng thái **PLANNING**, chỉ lập kế hoạch theo yêu cầu
-owner; chưa sửa runtime, chạy team hoặc tạo candidate UI.
+Ngày lập:24/10/2026; revision2 **EXECUTING** theo owner “tiếp tục thực hiện”.
+Triển khai solo trên cùng task. Base0a25730 ghép đúng FORM01d4f9d17 + header816
+vào nhánh Compact; main và nghiệm thu FORM01 giữ riêng. Dependency main-merge
+trong bản kế hoạch ban đầu được thay bằng task baseline này để tiến hành ngay.
 
 ## Mục tiêu và thứ tự ưu tiên
 
@@ -89,18 +91,16 @@ fixed-height clipping hoặc tự thu/mở nhóm theo density.
 
 | Bước | Đầu ra | Điều kiện qua bước |
 | --- | --- | --- |
-| 0. Chốt baseline | FORM01 + đúng header816b4e3 được tích hợp theo vòng riêng; cập nhật worktree/record bằng SHA main thực | Main chứa source mong đợi, scope/owner rõ, không dùng SHA giả định hoặc tip nhánh mới hơn |
+| 0. Chốt baseline | Đã ghép FORM01d4f9d17 + đúng header816b4e3 vào task base0a25730; main giữ riêng | Task chứa source mong đợi, scope/owner rõ; không thay main hoặc nghiệm thu FORM01 |
 | 1. Đo và thiết lập preference | Ma trận comfortable ở390/1440; switch, persistence và app/portal scope chạy thật | Default không đổi; reload/storage lỗi/cleanup đạt; chưa rollout spacing |
 | 2. Làm vùng chức năng | KPH/DATE toolbar và bộ lọc trước, tiếp theo Báo cáo settings/selection/dock | So trước/sau cùng dữ liệu; khu vực thao tác gọn rõ, control còn dễ dùng |
 | 3. Hoàn thiện | Form/picker/Tra hạn, giảm nhẹ item và Home nếu có dư | Không mất nhãn/trạng thái/draft, không tràn hoặc che thao tác; dừng nén ở ngưỡng đọc/chạm |
 | 4. Kiểm và nghiệm thu | Candidate SHA, preview thật, evidence hai chế độ và kịch bản owner | Technical đạt rồi chờ owner chấp nhận Compact; ghi phần đạt/chưa đạt riêng |
 
-Baseline hiện quan sát là main `f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8`;
-đây chỉ là base **lập kế hoạch**, chưa phải base triển khai Compact. FORM01
-đang có runtime candidate `d4f9d17d14ab6abbccaeb930c04ac5592cae8069` chứa đúng
-header `816b4e33d27ef9512af05e5968511e6a29690536`; không tự merge ở lượt này.
-Sau khi baseline thay đổi phải rà lại diff/token/test, cập nhật revision và
-baseSha trước khi chuyển EXECUTING. Yêu cầu hiện tại chỉ là lập kế hoạch.
+Base thực thi revision2 là `0a257309ae0db1a45cc9d225207a8e0080a99206`, task merge
+của kế hoạch với đúng runtime FORM01d4f9d17 chứa header816b4e3. Main vẫnf77034d.
+Owner đã yêu cầu tiếp tục; dependency phải merge main trước trong revision1
+được thay bằng stacked task baseline. Không suy acceptance hoặc main merge.
 
 ## Tiêu chí kiểm chứng
 
@@ -152,6 +152,5 @@ Chỉ merge khi có quyền theo vòng nghiệm thu. Không push/deploy/Pages cu
 trong phạm vi này. Đóng vòng sau khi ghi candidate/evidence/owner decision/
 giới hạn và cập nhật CURRENT_STATE/NEXT; không tự mở vòng tiếp theo.
 
-**Bước nhỏ tiếp theo:** hoàn tất baseline Fresh Soft theo vòng hiện có; khi
-được triển khai Compact, đo ba khu chức năng KPH/DATE/Báo cáo trước rồi làm
-switch + scope preference. Kế hoạch này chưa thay giao diện hiện tại.
+**Bước nhỏ tiếp theo:** hoàn tất gate production và đưa owner dùng thử hai mật
+độ tại4342; chưa merge main/push/deploy.

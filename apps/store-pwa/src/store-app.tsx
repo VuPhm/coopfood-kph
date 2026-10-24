@@ -20,6 +20,7 @@ import { StoreAppFrame } from "./store-app-frame";
 import { readStoreScreen as readScreen, type Screen } from "./store-app-routes";
 import { StoreHomeContent } from "./store-home";
 import { KphWorkspaceSkeleton } from "./store-kph-loading";
+import { StoreDensityProvider } from "./store-density";
 
 type KphWorkspaceComponent = typeof import("./store-kph-workspace").KphWorkspace;
 let loadedKphWorkspace: KphWorkspaceComponent | null = null;
@@ -64,7 +65,7 @@ function DeferredReportHub(props: ComponentProps<ReportHubComponent>) {
 }
 
 export function StoreApp() {
-  return <StoreAppContent />;
+  return <StoreDensityProvider><StoreAppContent /></StoreDensityProvider>;
 }
 
 function StoreAppContent() {

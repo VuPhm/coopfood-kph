@@ -1,0 +1,101 @@
+/* Settings is available in either density. Geometry overrides below are opt-in,
+   screen-only and scoped to Fresh consumers (including their Radix portals). */
+.store-account-sheet .store-appearance-settings { color: var(--store-ink, #20344a); }
+.store-account-sheet { display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+.store-account-sheet > .store-account-body { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; }
+.store-appearance-settings h3 { margin: 0 0 12px; font-size: 16px; line-height: 24px; font-weight: 650; }
+.store-appearance-heading { margin: 0 0 6px; color: var(--store-ink-muted, #596b7d); font-size: 12px; line-height: 18px; }
+.store-density-switch { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 64px; border: 1px solid var(--store-holder-edge, #dfe5e9); border-radius: 16px; padding: 12px; background: var(--store-holder-surface, #fff); color: inherit; text-align: left; cursor: pointer; }
+.store-density-switch > span:first-child { display: grid; min-width: 0; gap: 4px; }
+.store-density-switch strong { font-size: 14px; line-height: 21px; font-weight: 650; }
+.store-density-switch small, .store-density-storage { font-size: 12px; line-height: 18px; color: var(--store-ink-muted, #596b7d); }
+.store-density-storage { margin: 8px 0 0; }
+.store-density-track { display: block; flex: 0 0 42px; width: 42px; height: 26px; border: 1px solid var(--store-control-line, #718578); border-radius: 99px; padding: 3px; background: var(--store-canvas, #fafbfc); }
+.store-density-track > span { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--store-ink-muted, #596b7d); }
+.store-density-switch[aria-checked="true"] .store-density-track { background: var(--store-brand-action, #00724e); border-color: var(--store-brand-action, #00724e); }
+.store-density-switch[aria-checked="true"] .store-density-track > span { background: white; transform: translateX(16px); }
+.store-density-switch:hover { background-color: var(--store-canvas, #fafbfc); }
+.store-account-sheet .store-density-switch:focus-visible { outline: 3px solid var(--store-focus, #20344a); outline-offset: 3px; }
+@media (max-height: 600px) {
+  .store-account-sheet .store-account-hero { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 6px 12px; padding: 12px 16px; }
+  .store-account-sheet .store-account-hero h2 { grid-column: 1 / -1; margin: 0 44px 4px 0; }
+  .store-account-sheet .store-account-avatar { grid-row: 2 / 4; width: 44px; height: 44px; border-width: 2px; font-size: 18px; }
+  .store-account-sheet .store-account-hero h3 { margin: 0; font-size: 17px; line-height: 24px; text-align: left; }
+  .store-account-sheet .store-account-role { justify-self: start; }
+}
+@media (forced-colors: active) {
+  .store-density-track, .store-density-switch { border-color: ButtonText; }
+  .store-density-track > span { background: ButtonText; }
+  .store-density-switch[aria-checked="true"] .store-density-track { background: Highlight; border-color: Highlight; }
+  .store-density-switch[aria-checked="true"] .store-density-track > span { background: HighlightText; }
+}
+
+@media screen {
+  html[data-store-density="compact"] body:has(.store-app) {
+    --store-density-control: 44px;
+    --store-density-section-inset: 12px;
+    --store-density-section-gap: 8px;
+    --store-density-field-gap: 12px;
+    --store-density-setting-row: 56px;
+  }
+
+  /* Functional areas first. Existing 44px tabs/actions retain their hit area. */
+  html[data-store-density="compact"] .store-app .store-kph-underlay .store-kph-toolbar { margin-bottom: 4px; }
+  html[data-store-density="compact"] .store-app .store-kph-search input { height: var(--store-density-control); font-size: 16px; }
+  html[data-store-density="compact"] .store-app .store-scan-trigger { height: var(--store-density-control); }
+  html[data-store-density="compact"] .store-app .store-create-actions .store-create-cta { min-height: 56px; gap: 2px; padding-block: 2px; }
+  html[data-store-density="compact"] .store-app .store-kph .store-ticket-list { gap: var(--store-density-section-gap); padding-top: 8px; }
+  html[data-store-density="compact"] .store-app .store-date-search-panel :is(.store-date-search, .store-date-scan, .store-date-search-form > .store-button) { height: var(--store-density-control); }
+  html[data-store-density="compact"] .store-app .store-date-search-icon { top: 13px; }
+  html[data-store-density="compact"] .store-app .store-date-workspace { padding-top: 8px; row-gap: var(--store-density-section-gap); }
+  html[data-store-density="compact"] .store-app .store-date-browser { gap: var(--store-density-section-gap); }
+  html[data-store-density="compact"] .store-app .store-date-product-heading { min-height: 52px; padding-block: 6px; }
+
+  html[data-store-density="compact"] .store-app .store-search-field > label > .store-search-input { height: var(--store-density-control); padding-block: 8px; }
+  html[data-store-density="compact"] .store-app .store-search-field > button { inset-block: 0; }
+  html[data-store-density="compact"] .store-app .report-composer-controls :is(.report-change-template, .report-composer-info) { min-height: var(--store-density-control); }
+  html[data-store-density="compact"] .store-app .report-composer .date-report.is-compose { gap: var(--store-density-section-gap); padding-top: 8px; }
+  html[data-store-density="compact"] .store-app .store-settings-group > .store-settings-row { min-height: var(--store-density-setting-row); padding-block: 6px; }
+  html[data-store-density="compact"] .store-app .report-composer .date-report-catalog-heading { padding-bottom: 4px; }
+  html[data-store-density="compact"] .store-app .report-selection-bar { padding-block: 6px; }
+  html[data-store-density="compact"] .store-app .store-action-dock { padding-block: 8px; }
+
+  /* Popup padding and fields: no outer geometry or scroll-owner changes. */
+  html[data-store-density="compact"] :is(.store-kph-filter, .store-date-filter, .date-report-sheet) .store-modal-body { gap: var(--store-density-field-gap); }
+  html[data-store-density="compact"] :is(.store-kph-filter-section, .store-date-filter-section, .date-report-sheet .report-sheet-section) { padding: var(--store-density-section-inset); gap: var(--store-density-section-gap); }
+  html[data-store-density="compact"] .store-choice-sheet.store-sheet > .store-modal-body { gap: var(--store-density-field-gap); padding-top: var(--store-density-section-inset); }
+  html[data-store-density="compact"] .store-choice-sheet .store-search-field > label > .store-search-input { height: var(--store-density-control); padding-block: 8px; }
+  html[data-store-density="compact"] .store-choice-sheet .store-search-field > button { inset-block: 0; }
+  html[data-store-density="compact"] .store-choice-sheet.store-sheet .store-choice-option { min-height: 60px; padding-block: 8px; }
+  html[data-store-density="compact"] .store-choice-sheet .store-choice-actions { padding-top: 12px; }
+  html[data-store-density="compact"] .store-choice-sheet .store-choice-actions > button { min-height: var(--store-density-control); padding-block: 8px; }
+
+  html[data-store-density="compact"] .store-create-screen[data-kind] :is(.create-dialog-form, .store-form-review) { gap: var(--store-density-field-gap); padding-top: 12px; }
+  html[data-store-density="compact"] .store-create-screen[data-kind] :is(.form-section, .store-review-section) { padding: var(--store-density-section-inset); }
+  html[data-store-density="compact"] .store-create-screen[data-kind] .form-section > h3 { margin-bottom: 8px; }
+  html[data-store-density="compact"] .store-create-screen[data-kind] .kph-create-quantity { margin-top: 8px; padding-top: 8px; }
+  html[data-store-density="compact"] .store-create-screen[data-kind] .form-section .choice-card { min-height: 48px; padding-block: 8px; }
+  html[data-store-density="compact"] .store-create-screen[data-kind] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):not(.sr-only) { height: var(--store-density-control); font-size: 16px; }
+  html[data-store-density="compact"] .store-create-screen[data-kind] .create-dialog-footer button { min-height: var(--store-density-control); }
+
+  html[data-store-density="compact"] :is(.store-app, .store-quick-panel) .store-shelf-form { gap: var(--store-density-section-gap); }
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-form { padding: var(--store-density-section-inset); }
+  html[data-store-density="compact"] :is(.store-app, .store-quick-panel) .store-shelf-actions button { min-height: var(--store-density-control); }
+
+  /* Light item adjustment, keeping text, tags, status hierarchy and 44px controls. */
+  html[data-store-density="compact"] .store-app .store-ticket-body { padding-block: 8px; }
+  html[data-store-density="compact"] .store-app .store-date-lot { padding-block: 10px; }
+  html[data-store-density="compact"] .store-app .report-composer .date-report-card { padding-block: 12px; }
+  html[data-store-density="compact"] .store-app .store-notification-groups { gap: 20px; }
+  html[data-store-density="compact"] .store-app .store-notification-module { gap: 12px; }
+  html[data-store-density="compact"] .store-app .store-notification-sections { gap: 8px; }
+  html[data-store-density="compact"] .store-app .store-notification-section > summary { min-height: 56px; padding-block: 8px; }
+  html[data-store-density="compact"] .store-app .store-notification-item { min-height: 92px; padding-block: 10px; }
+  html[data-store-density="compact"] .store-app .store-home-features { padding-top: 12px; }
+  html[data-store-density="compact"] .store-app .store-home-section-heading { margin-bottom: 8px; }
+  html[data-store-density="compact"] .store-app .store-home-attention { margin-top: 12px; }
+
+  @media (min-width: 900px) {
+    html[data-store-density="compact"] .store-app .store-kph-table .store-kph-record-row td { height: 52px; padding-block: 6px; }
+  }
+}

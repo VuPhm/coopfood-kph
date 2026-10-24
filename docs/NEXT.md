@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**COMPACT01 — candidate24/10/2026:** thêm Chế độ gọn tại Tài khoản → Cài đặt
+→ Giao diện; mặc định tắt, nhớ theo thiết bị. Gọn chủ yếu search/CTA/bộ lọc/
+settings/form, item chỉ giảm đệm nhẹ; giữ state và mật độ mặc định. Nhánh riêng
+từ task base0a25730 gồm đúng FORM01d4f9d17 + header816; main vẫnf77034d, không
+suy acceptance FORM01. Preview <http://127.0.0.1:4342/#kph>.
+[Scope/kiểm tra/giới hạn](delivery/compact01-interface-density/technical.md),
+[quy tắc](product/STORE_APP_DENSITY.md). Owner xem cả hai chế độ; chưa merge/
+push/deploy. Bước tiếp: hoàn tất technical gate rồi nghiệm thu Compact.
+
 **FORM01 revision 4 — candidate24/10/2026:** owner yêu cầu đủ mọi nút, đặc biệt
 nút xanh; làm tổng thể token nút và mép khối trượt/sidebar/menu bar. Dùng một
 role/state matrix cho primary/secondary/ghost/danger/selected/disabled và native

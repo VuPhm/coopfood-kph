@@ -15,7 +15,12 @@ export function StorePageHero({ children, className = "", contentLabel, header, 
   children?: ReactNode; className?: string; contentLabel?: string; header?: StorePageHeaderOptions; appHeader?: ReactNode;
 }) {
   const renderHeader = useContext(StorePageHeaderContext);
-  return <div className={`store-page-hero ${className}`} onFocusCapture={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+  return <div className={`store-page-hero ${className}`} onFocusCapture={event => {
+    // React portal focus bubbles through this component although its DOM is outside.
+    if (!event.currentTarget.contains(event.target)) return;
+    // Account/settings opens above the current work; preserve its scroll anchor.
+    if (!(event.target instanceof Element && event.target.closest(".store-account"))) window.scrollTo({ top: 0, behavior: "instant" });
+  }}>
     {appHeader ?? renderHeader?.(header)}
     {children ? <div className="store-page-hero-content" role={contentLabel ? "region" : undefined} aria-label={contentLabel}>{children}</div> : null}
   </div>;

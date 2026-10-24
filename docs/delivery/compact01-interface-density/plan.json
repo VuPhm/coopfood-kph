@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "compact01-interface-density",
-  "revision": 1,
-  "status": "PLANNING",
-  "objective": "Plan opt-in Compact in Store Fresh Settings: primarily compact functional controls, filters, settings groups and forms, with only light item spacing reductions; preserve approved workflow and Fresh Soft materials.",
+  "revision": 2,
+  "status": "VERIFYING",
+  "objective": "Implement opt-in Compact in Store Fresh Settings: primarily compact functional controls, filters, settings groups and forms, with only light item spacing reductions; preserve approved workflow and Fresh Soft materials.",
   "inScope": [
     "Account sheet Settings > Appearance > Compact switch; proposed default off, immediate change and device-local preference with safe storage fallback",
     "Store-local density scope shared by app and Radix portals, cleaned on leaving Store Fresh; comfortable preserves integrated baseline",
@@ -12,17 +12,29 @@
     "Before/after geometry measurements and state, accessibility, output-isolation and affected-workflow verification in both modes"
   ],
   "outOfScope": [
-    "Runtime implementation or launching agents during this planning request",
-    "Merging FORM01/header, changing current default UI or redesigning AppHeader/sidebar/navigation geometry",
+    "Agent delegation; execution is solo in this task worktree",
+    "Merging main/FORM01 acceptance, changing default comfortable geometry or redesigning AppHeader/sidebar/navigation",
     "Backend/API/authorization/domain/schema changes; preferences as business-data authority or account synchronization",
     "Admin, legacy online/Pilot, login, print/PDF/Excel or chart density changes; Pages cutover/push/deployment",
     "New dependencies, global palette/font tokens, root configuration/lockfile or packages/ui changes without a revised ownership scope"
   ],
-  "baseSha": "f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8",
+  "baseSha": "0a257309ae0db1a45cc9d225207a8e0080a99206",
   "candidateSha": "",
   "integrationOwner": "Current chat, sole writer in the COMPACT01 planning worktree; no shared UI ownership transferred from FORM01",
   "sharedPaths": [
-    "docs/delivery/compact01-interface-density/**"
+    "docs/delivery/compact01-interface-density/**",
+    "apps/store-pwa/src/store-density.tsx",
+    "apps/store-pwa/src/store-density.css",
+    "apps/store-pwa/src/store-density.test.tsx",
+    "apps/store-pwa/src/store-app.tsx",
+    "apps/store-pwa/src/store-account-sheet.tsx",
+    "e2e/scripts/check-store-density.cjs",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-page-hero.tsx",
+    "apps/store-pwa/src/store-app-header.tsx",
+    "docs/product/STORE_APP_DENSITY.md"
   ],
   "reviewLimit": 2,
   "reviewRound": 0,
@@ -53,23 +65,33 @@
       "status": "pending"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "tiếp tục thực hiện",
+      "source": "Direct owner request24/10/2026 in this chat",
+      "impact": "Runtime Compact implementation and verification; baseline integration and scoped files",
+      "decision": "Integrate exact d4f9d17 into Compact task only at0a25730; maintain comfortable baseline, implement solo, no main merge. Prior planning dependency on main integration replaced by stacked task dependency; FORM01 acceptance is not inferred."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Planning complete. Baseline integration remains in the existing FORM01 cycle. When Compact execution is requested, verify actual integrated main, update revision/baseSha and write scope, then measure KPH/DATE/report functional areas and implement the preference before spacing.",
+  "nextAction": "Finish production gates on the reviewed candidate, record technical results and prepare owner acceptance at4342; no main merge.",
   "authorization": {
     "date": "2026-10-24",
     "source": "Direct owner request in this chat",
     "request": "lên kế hoạch bắt đầu vòng tạo chế độ compact cho giao diện; tuỳ chọn tắt bật trong cài đặt; làm gọn 1 phần item, làm gọn chủ yếu vào các phần chức năng",
-    "scope": "Planning only; no runtime, agent launch, merge, push or deployment authorized by this request"
+    "scope": "Implement and verify Compact locally; prepare preview for owner. No main merge, push or deploy.",
+    "executionRequest": "tiếp tục thực hiện"
   },
-  "executionReady": false,
+  "executionReady": true,
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact01-interface-density",
   "branch": "store-app/compact01-interface-density",
   "baseline": {
-    "meaningOfBaseSha": "Observed main and planning branch base only; replace with actual integrated baseline before execution",
+    "meaningOfBaseSha": "Task merge checkpoint includes exact Fresh Soft runtime d4f9d17 and header816b4e3; main remains f77034d",
     "requiredIntegration": "FORM01 Fresh Soft runtime d4f9d17d14ab6abbccaeb930c04ac5592cae8069 including exact header816b4e33d27ef9512af05e5968511e6a29690536, subject to actual FORM01 closure",
     "upstreamPreparation": "store-app/form01-fresh-soft at3bd013173bce54abd2eb3f51ba79631bb87b05e1: docs/delivery/form01-fresh-soft/compact-next-round.md",
-    "remoteFreshness": "not checked"
+    "remoteFreshness": "not checked",
+    "integrationDecision": "Proceed on stacked task baseline while FORM01 main acceptance remains separate; no source edits to FORM01 worktree"
   },
   "documents": {
     "plan": "docs/delivery/compact01-interface-density/plan.md",
@@ -79,7 +101,14 @@
     "compactEnabled": false,
     "storageScope": "browser/device, independent of account/store",
     "storageKey": "coopfood.store-ui.density.v1",
-    "values": ["comfortable", "compact"],
-    "priority": ["functional areas", "forms and pickers", "light item spacing"]
+    "values": [
+      "comfortable",
+      "compact"
+    ],
+    "priority": [
+      "functional areas",
+      "forms and pickers",
+      "light item spacing"
+    ]
   }
 }
