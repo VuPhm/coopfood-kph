@@ -1,14 +1,16 @@
 # Công việc kế tiếp
 
-**COMPACT01 revision3 — candidate24/10/2026:** theo feedback owner4342, chuyển
-từ giảm padding sang size roles và lược cấu trúc. KPH có Tạo TPCN/TPTS một
-hàng, bỏ shortcut tạo/sort trùng; DATE toolbar một hàng; report kỳ/lọc gộp và
-count vào selection; section form/filter phẳng. Comfortable và workflow giữ.
-[Size/nguồn Apple/W3C](product/STORE_APP_SIZE_TOKENS.md),
-[evidence](delivery/compact01-interface-density/technical.md). Preview mới
-<http://127.0.0.1:4344/#kph>; technical346tests + browser hai mật độ/5viewport, frame7màn/7viewport,
-scrollbar/dock và form text150/200 đạt; owner pending. Cùng task/base,
-main vẫnf77034d; chưa merge/push/deploy. Bước tiếp: owner xem size và cấu trúc mới trước nghiệm thu.
+**COMPACT01 revision3 — CLOSED, chốt tạm24/10/2026:** owner xác nhận
+“tạm, đến đây chốt được. cân nhắc tiếp cho các item list” sau khi xem preview4344.
+Chốt phạm vi token size và cấu trúc Compact hiện tại, runtime`ca543e6`;
+không coi đây là nghiệm thu thiết kế item mới hoặc FORM01/main integration.
+Technical346tests và production browser đã PASS;
+[quyết định/giới hạn](delivery/compact01-interface-density/acceptance-revision3.md).
+Main vẫn`f77034d`, chưa merge/push/deploy. Đã rà source và ghi
+[đề xuất item list](delivery/compact01-interface-density/list-items-next.md):
+KPH trước, sau đó Báo cáo/DATE/Thông báo; mới là đánh giá, chưa đổi runtime.
+Bước nhỏ tiếp theo: một candidate item KPH Compact có phân cấp nhãn rõ hơn,
+giữ đủ thông tin/chọn/nhóm ngày; chờ yêu cầu triển khai vòng riêng.
 
 **COMPACT01 revision2 — lịch sử24/10/2026:** thêm Chế độ gọn tại Tài khoản → Cài đặt
 → Giao diện; mặc định tắt, nhớ theo thiết bị. Gọn chủ yếu search/CTA/bộ lọc/
