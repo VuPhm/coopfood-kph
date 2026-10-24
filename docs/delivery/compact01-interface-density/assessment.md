@@ -68,3 +68,10 @@ milestone thực thi song song với FORM01.
 - Runtime không đổi; chưa chạy unit/build/browser cho Compact, các technical
   gate trong plan vẫn pending. Không dùng kết quả FORM01 làm bằng chứng cho
   density chưa triển khai.
+
+## Tiếp tục thực hiện24/10
+
+Owner trực tiếp “tiếp tục thực hiện”. Revision2 thay planning-only bằng solo
+implementation; ghép đúng FORM01d4f9d17 vào task ở0a25730 để không cần thay
+main hoặc chờ vòng khác. Source candidatea89d13c; kết quả/giới hạn/owner gate
+ởtechnical.md vàplan.json. Main/worktreeFORM01 không sửa.

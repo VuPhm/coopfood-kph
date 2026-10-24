@@ -1,6 +1,6 @@
 # COMPACT01 — Chế độ gọn tùy chọn
 
-Ngày lập:24/10/2026; revision2 **EXECUTING** theo owner “tiếp tục thực hiện”.
+Ngày lập:24/10/2026; revision2 **AWAITING_ACCEPTANCE** theo owner “tiếp tục thực hiện”.
 Triển khai solo trên cùng task. Base0a25730 ghép đúng FORM01d4f9d17 + header816
 vào nhánh Compact; main và nghiệm thu FORM01 giữ riêng. Dependency main-merge
 trong bản kế hoạch ban đầu được thay bằng task baseline này để tiến hành ngay.
@@ -152,5 +152,5 @@ Chỉ merge khi có quyền theo vòng nghiệm thu. Không push/deploy/Pages cu
 trong phạm vi này. Đóng vòng sau khi ghi candidate/evidence/owner decision/
 giới hạn và cập nhật CURRENT_STATE/NEXT; không tự mở vòng tiếp theo.
 
-**Bước nhỏ tiếp theo:** hoàn tất gate production và đưa owner dùng thử hai mật
+**Bước nhỏ tiếp theo:** technical PASS; đưa owner dùng thử hai mật
 độ tại4342; chưa merge main/push/deploy.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact01-interface-density",
   "revision": 2,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Implement opt-in Compact in Store Fresh Settings: primarily compact functional controls, filters, settings groups and forms, with only light item spacing reductions; preserve approved workflow and Fresh Soft materials.",
   "inScope": [
     "Account sheet Settings > Appearance > Compact switch; proposed default off, immediate change and device-local preference with safe storage fallback",
@@ -19,7 +19,7 @@
     "New dependencies, global palette/font tokens, root configuration/lockfile or packages/ui changes without a revised ownership scope"
   ],
   "baseSha": "0a257309ae0db1a45cc9d225207a8e0080a99206",
-  "candidateSha": "",
+  "candidateSha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
   "integrationOwner": "Current chat, sole writer in the COMPACT01 planning worktree; no shared UI ownership transferred from FORM01",
   "sharedPaths": [
     "docs/delivery/compact01-interface-density/**",
@@ -34,29 +34,39 @@
     "apps/store-pwa/src/store-app-frame.tsx",
     "apps/store-pwa/src/store-page-hero.tsx",
     "apps/store-pwa/src/store-app-header.tsx",
-    "docs/product/STORE_APP_DENSITY.md"
+    "docs/product/STORE_APP_DENSITY.md",
+    "e2e/scripts/check-store-page-kit.cjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "preference-state-isolation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
+      "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
       "id": "density-geometry-accessibility",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
+      "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
       "id": "integrated-regression-output-parity",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
+      "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
       "id": "owner-compact-acceptance",
@@ -75,7 +85,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Finish production gates on the reviewed candidate, record technical results and prepare owner acceptance at4342; no main merge.",
+  "nextAction": "Owner review production4342: Settings Compact toggle and both densities across KPH/DATE/reports/forms. Technical PASS342tests plus browser gates. No main merge/push/deploy until applicable owner decision.",
   "authorization": {
     "date": "2026-10-24",
     "source": "Direct owner request in this chat",
