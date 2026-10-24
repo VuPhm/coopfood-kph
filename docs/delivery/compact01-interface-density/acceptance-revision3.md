@@ -30,7 +30,7 @@ DATE→KPH, form text150/200, báo cáo/Excel/PDF và print parity.
 Những scenario này là kiểm tra kỹ thuật, không tuyên bố owner đã tự thử hết.
 
 Checkpoint đóng hồ sơ ghi ở `plan.json.candidateSha` chỉ cập nhật tài liệu
-CURRENT_STATE/NEXT và ledger sau runtime`ca543e6`; không đổi app/test/build.
+CURRENT_STATE/NEXT, trạng thái product density và ledger sau runtime`ca543e6`; không đổi app/test/build.
 Tái dùng bằng chứng revision3/runtime`ca543e6` vì diff ngoài docs rỗng.
 Kiểm cuối: `npm run check:docs`, `git diff --check`, đối chiếu diff chỉ docs,
 `cycle.mjs check --phase close`. Không chạy lại toàn bộ UI cho thay đổi docs.

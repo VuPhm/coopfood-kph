@@ -1,8 +1,8 @@
-# COMPACT01 revision3 — technical PASS, owner pending
+# COMPACT01 revision3 — technical PASS, owner chốt tạm
 
 Candidate`ca543e6c610801c53e97fd84f35a553855e84ec6`, revision3.
 Preview production <http://127.0.0.1:4344/#kph>;4342 giữ revision2 để so,
-4341 là comfortable baseline trước Compact. Trạng thái **AWAITING_ACCEPTANCE**.
+4341 là comfortable baseline trước Compact. Trạng thái **CLOSED, chốt tạm**; [quyết định owner](acceptance-revision3.md).
 [Evidence r2](revision2.md) là lịch sử, không chứng minh cấu trúc mới.
 
 ## Scope và nguồn quyết định
@@ -103,10 +103,20 @@ print nằm ngoài screen scope. Build cuối đã PASS trên candidate source.
 
 Mở4344 → Tài khoản → Cài đặt → Giao diện → Chế độ gọn. Xem Tạo TPCN/TPTS,
 list toolbar, sort trong filter, DATE, report kỳ/lọc/count và form phẳng.
-Tắt lại để so bản mặc định. Bước nhỏ tiếp: owner nghiệm thu size/composition;
-reviewRound2/limit2, chưa có quyết định chấp nhận.
+Tắt lại để so bản mặc định. Owner đã chốt tạm size/composition tại
+reviewRound2/limit2; [đánh giá item list tiếp theo](list-items-next.md) chưa triển khai.
 
 Preview production4344 session69782;4343 là dev revision3,4342 làr2.
 Mock memory-only/browser-local, chưa backend/Safari/Windows/keyboard OS hoặc
 thiết bị thật. Không đổi palette/chart/timeline/ảnh/export/nghiệp vụ; không
 chạm packages/ui/root config/lock/schema/Pages sau base. Main giữf77034d.
+
+## Checkpoint đóng hồ sơ24/10/2026
+
+Candidate hồ sơ`6875575928b9bf7894df1c9744169977dab976b3`; runtime không đổi
+từ`ca543e6c610801c53e97fd84f35a553855e84ec6`. `git diff --name-only ca543e6
+6875575` chỉ có CURRENT_STATE/NEXT, product density status và ledger COMPACT01.
+Tái dùng toàn bộ evidence revision3 ở trên vì không đổi app/test/config/API
+hoặc assets. Owner chốt tạm đúng runtime4344; không suy nghiệm thu item mới.
+`npm run check:docs` và `git diff --check` PASS sau thay đổi docs;
+close consistency gate chạy trên checkpoint này cùng ledger sau đó.

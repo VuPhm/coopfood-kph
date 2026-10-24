@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact01-interface-density",
   "revision": 3,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Standardize Store-local size tokens and simplify Compact functional composition using Apple HIG grouping/hierarchy/disclosure, preserving direct KPH actions and workflows.",
   "inScope": [
     "Account sheet Settings > Appearance > Compact switch; proposed default off, immediate change and device-local preference with safe storage fallback",
@@ -22,7 +22,7 @@
     "New dependencies, global palette/font tokens, root configuration/lockfile or packages/ui changes without a revised ownership scope"
   ],
   "baseSha": "0a257309ae0db1a45cc9d225207a8e0080a99206",
-  "candidateSha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+  "candidateSha": "6875575928b9bf7894df1c9744169977dab976b3",
   "integrationOwner": "Current chat, sole writer in the COMPACT01 planning worktree; no shared UI ownership transferred from FORM01",
   "sharedPaths": [
     "docs/delivery/compact01-interface-density/**",
@@ -60,7 +60,7 @@
       "required": true,
       "status": "pass",
       "revision": 3,
-      "sha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+      "sha": "6875575928b9bf7894df1c9744169977dab976b3",
       "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
@@ -69,7 +69,7 @@
       "required": true,
       "status": "pass",
       "revision": 3,
-      "sha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+      "sha": "6875575928b9bf7894df1c9744169977dab976b3",
       "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
@@ -78,14 +78,19 @@
       "required": true,
       "status": "pass",
       "revision": 3,
-      "sha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+      "sha": "6875575928b9bf7894df1c9744169977dab976b3",
       "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
       "id": "owner-compact-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "6875575928b9bf7894df1c9744169977dab976b3",
+      "evidence": "docs/delivery/compact01-interface-density/acceptance-revision3.md",
+      "acceptedBy": "Owner, direct user in this chat",
+      "decisionRef": "docs/delivery/compact01-interface-density/acceptance-revision3.md — direct message24/10/2026: tạm, đến đây chốt được. cân nhắc tiếp cho các item list"
     }
   ],
   "changes": [
@@ -105,7 +110,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Owner review production4344 size roles and reduced Compact composition;346tests and production gates PASS. ReviewRound2. No main merge/push/deploy without applicable owner decision.",
+  "nextAction": "COMPACT01 closed with provisional owner acceptance of runtime ca543e6. List assessment saved in list-items-next.md; no new implementation cycle started. Main merge/push/deploy remain outside authorization.",
   "authorization": {
     "date": "2026-10-24",
     "source": "Direct owner request in this chat",
@@ -140,5 +145,12 @@
       "forms and pickers",
       "light item spacing"
     ]
+  },
+  "closure": {
+    "date": "2026-10-24",
+    "runtimeSha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+    "decision": "Provisional acceptance of current size tokens and Compact composition; consider list items next.",
+    "evidence": "docs/delivery/compact01-interface-density/acceptance-revision3.md",
+    "deferred": "docs/delivery/compact01-interface-density/list-items-next.md"
   }
 }
