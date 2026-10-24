@@ -1,6 +1,7 @@
 # Store Fresh — Chế độ gọn (COMPACT01)
 
-Candidate revision3,24/10/2026; thay bố cục Compact sau feedback owner, chưa nghiệm thu. Base task0a25730 có Fresh Soft
+Revision3 chốt tạm ngày24/10/2026 theo owner “tạm, đến đây chốt được”.
+Runtime`ca543e6`; [quyết định/phạm vi](../delivery/compact01-interface-density/acceptance-revision3.md). Base task0a25730 có Fresh Soft
 d4f9d17 và đúng header816b4e3; chưa merge main. [Hồ sơ](../delivery/compact01-interface-density/plan.json).
 
 ## Sử dụng
