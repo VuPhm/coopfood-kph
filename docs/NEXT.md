@@ -1,5 +1,18 @@
 # Công việc kế tiếp
 
+**COMPACT02 — candidate item KPH,25/10/2026:** owner “ok thử đi” cho slice
+KPH đã đề xuất. Chỉ Compact: mobile đưa trạng thái duyệt ra khỏi strip, cạnh
+SKU/số lượng; giữ chip tình trạng và biện pháp dạng chữ/icon không nền.
+Desktop giữ bảng, lược vỏ nhãn phụ. Theo feedback tiếp, Đã/Không duyệt
+rút còn icon khi thiếu chỗ; Chờ duyệt giữ chữ, accessible text/detail vẫn đủ.
+Giữ màu/meaning, tên/định danh, chọn/nhóm/nối25, comfortable và print.
+Nhánh `store-app/compact02-kph-items`, base`e0054c7` từ COMPACT01 đã chốt tạm;
+không suy acceptance FORM01 hoặc tích hợp main. Preview production
+<http://127.0.0.1:4346/#kph> → bật Chế độ gọn;4344 giữ bản chốt trước.
+[Scope/evidence/giới hạn](delivery/compact02-kph-items.md). Owner chưa nghiệm thu
+candidate item; chưa mở rộng các list khác, chưa merge/push/deploy.
+Bước nhỏ tiếp: owner so item KPH ở hai mật độ trước khi quyết định.
+
 **COMPACT01 revision3 — CLOSED, chốt tạm24/10/2026:** owner xác nhận
 “tạm, đến đây chốt được. cân nhắc tiếp cho các item list” sau khi xem preview4344.
 Chốt phạm vi token size và cấu trúc Compact hiện tại, runtime`ca543e6`;

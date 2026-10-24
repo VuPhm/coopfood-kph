@@ -77,3 +77,27 @@ Mock giữ29 phiếu/loại, nhóm5phiếu/ngày14/08→09/08 và OTHER dài ở
 là dữ liệu tổng hợp ngày cố định, lối tắt ngày hiện tại có thể trả rỗng.
 
 [Bàn giao/checks/giới hạn](../delivery/kph02-compact-history.md).
+
+## Candidate COMPACT02 — item trong Chế độ gọn,25/10/2026
+
+Owner “ok thử đi” sau [đề xuất item list](../delivery/compact01-interface-density/list-items-next.md).
+Phần dưới là candidate opt-in, chưa thay acceptance revision5 của comfortable.
+
+- Mobile: trạng thái duyệt chuyển lên dòng SKU/số lượng, tách khỏi vùng tag
+  cuộn ngang. Button mở có accessible description của trạng thái duyệt.
+  Tình trạng giữ chip; biện pháp xử lý giữ chữ/icon, bỏ nền/viền pill.
+- Tên tối đa2dòng ở trạng thái thường; title/detail giữ đầy đủ. Metadata
+  được wrap khi tên, mã, số lượng hoặc chữ lớn cần chỗ, không ép chiều cao.
+- Desktop: giữ các cột và vùng mở/chọn. Biện pháp và duyệt dạng chữ/icon
+  không nền/viền. Theo feedback owner tiếp theo,900–1099px Đã/Không duyệt
+  chỉ giữ icon; Chờ duyệt vẫn có chữ.
+- Mobile đo chỗ cho định danh/số lượng/ngày và approval. Nếu không đủ một
+  hàng, chỉ Đã/Không duyệt rút còn icon màu; đủ chỗ thì hiện lại chữ.
+  Chờ duyệt giữ chữ. Text được ẩn trực quan, không xóa accessible description.
+- Giữ mapping tone/icon/enum và OTHER nguyên văn; icon trang trí của Chờ duyệt
+  ở bảng hẹp được lược để dành chỗ cho chữ. Điều kiện/resolution vẫn cuộn riêng với touch/
+  keyboard; detail đầy đủ, không dựa riêng vào title hover để đọc OTHER.
+- Comfortable giữ bố cục cũ. Print trả composition cũ bằng density hook,
+  không nhận CSS Compact screen. DATE/Thông báo/Báo cáo không thuộc slice.
+
+[Preview, số đo, kiểm tra và giới hạn](../delivery/compact02-kph-items.md).
