@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact01-interface-density",
   "revision": 3,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Standardize Store-local size tokens and simplify Compact functional composition using Apple HIG grouping/hierarchy/disclosure, preserving direct KPH actions and workflows.",
   "inScope": [
     "Account sheet Settings > Appearance > Compact switch; proposed default off, immediate change and device-local preference with safe storage fallback",
@@ -22,7 +22,7 @@
     "New dependencies, global palette/font tokens, root configuration/lockfile or packages/ui changes without a revised ownership scope"
   ],
   "baseSha": "0a257309ae0db1a45cc9d225207a8e0080a99206",
-  "candidateSha": "",
+  "candidateSha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
   "integrationOwner": "Current chat, sole writer in the COMPACT01 planning worktree; no shared UI ownership transferred from FORM01",
   "sharedPaths": [
     "docs/delivery/compact01-interface-density/**",
@@ -51,26 +51,35 @@
     "docs/product/STORE_APP_SIZE_TOKENS.md"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "preference-state-isolation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+      "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
       "id": "density-geometry-accessibility",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+      "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
       "id": "integrated-regression-output-parity",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "ca543e6c610801c53e97fd84f35a553855e84ec6",
+      "evidence": "docs/delivery/compact01-interface-density/technical.md"
     },
     {
       "id": "owner-compact-acceptance",
@@ -96,7 +105,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Freeze revision3 source, verify production size/composition and business regressions, then owner preview4344. No main merge.",
+  "nextAction": "Owner review production4344 size roles and reduced Compact composition;346tests and production gates PASS. ReviewRound2. No main merge/push/deploy without applicable owner decision.",
   "authorization": {
     "date": "2026-10-24",
     "source": "Direct owner request in this chat",

@@ -1,6 +1,6 @@
 # COMPACT01 — Chế độ gọn tùy chọn
 
-Ngày lập:24/10/2026; revision3 **VERIFYING** theo owner “tiếp tục thực hiện”.
+Ngày lập:24/10/2026; revision3 **AWAITING_ACCEPTANCE** theo owner “tiếp tục thực hiện”.
 Triển khai solo trên cùng task. Base0a25730 ghép đúng FORM01d4f9d17 + header816
 vào nhánh Compact; main và nghiệm thu FORM01 giữ riêng. Dependency main-merge
 trong bản kế hoạch ban đầu được thay bằng task baseline này để tiến hành ngay.
