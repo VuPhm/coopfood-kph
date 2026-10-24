@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "compact01-interface-density",
+  "revision": 1,
+  "status": "PLANNING",
+  "objective": "Plan opt-in Compact in Store Fresh Settings: primarily compact functional controls, filters, settings groups and forms, with only light item spacing reductions; preserve approved workflow and Fresh Soft materials.",
+  "inScope": [
+    "Account sheet Settings > Appearance > Compact switch; proposed default off, immediate change and device-local preference with safe storage fallback",
+    "Store-local density scope shared by app and Radix portals, cleaned on leaving Store Fresh; comfortable preserves integrated baseline",
+    "Functional areas first: KPH/DATE search, filters and actions; report settings, selection and dock; then forms, pickers and shelf-life lookup",
+    "Light item padding/gap adjustment after functional areas, preserving primary typography, states and touch targets",
+    "Before/after geometry measurements and state, accessibility, output-isolation and affected-workflow verification in both modes"
+  ],
+  "outOfScope": [
+    "Runtime implementation or launching agents during this planning request",
+    "Merging FORM01/header, changing current default UI or redesigning AppHeader/sidebar/navigation geometry",
+    "Backend/API/authorization/domain/schema changes; preferences as business-data authority or account synchronization",
+    "Admin, legacy online/Pilot, login, print/PDF/Excel or chart density changes; Pages cutover/push/deployment",
+    "New dependencies, global palette/font tokens, root configuration/lockfile or packages/ui changes without a revised ownership scope"
+  ],
+  "baseSha": "f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8",
+  "candidateSha": "",
+  "integrationOwner": "Current chat, sole writer in the COMPACT01 planning worktree; no shared UI ownership transferred from FORM01",
+  "sharedPaths": [
+    "docs/delivery/compact01-interface-density/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "preference-state-isolation",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "density-geometry-accessibility",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "integrated-regression-output-parity",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-compact-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Planning complete. Baseline integration remains in the existing FORM01 cycle. When Compact execution is requested, verify actual integrated main, update revision/baseSha and write scope, then measure KPH/DATE/report functional areas and implement the preference before spacing.",
+  "authorization": {
+    "date": "2026-10-24",
+    "source": "Direct owner request in this chat",
+    "request": "lên kế hoạch bắt đầu vòng tạo chế độ compact cho giao diện; tuỳ chọn tắt bật trong cài đặt; làm gọn 1 phần item, làm gọn chủ yếu vào các phần chức năng",
+    "scope": "Planning only; no runtime, agent launch, merge, push or deployment authorized by this request"
+  },
+  "executionReady": false,
+  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact01-interface-density",
+  "branch": "store-app/compact01-interface-density",
+  "baseline": {
+    "meaningOfBaseSha": "Observed main and planning branch base only; replace with actual integrated baseline before execution",
+    "requiredIntegration": "FORM01 Fresh Soft runtime d4f9d17d14ab6abbccaeb930c04ac5592cae8069 including exact header816b4e33d27ef9512af05e5968511e6a29690536, subject to actual FORM01 closure",
+    "upstreamPreparation": "store-app/form01-fresh-soft at3bd013173bce54abd2eb3f51ba79631bb87b05e1: docs/delivery/form01-fresh-soft/compact-next-round.md",
+    "remoteFreshness": "not checked"
+  },
+  "documents": {
+    "plan": "docs/delivery/compact01-interface-density/plan.md",
+    "assessment": "docs/delivery/compact01-interface-density/assessment.md"
+  },
+  "proposedDefaults": {
+    "compactEnabled": false,
+    "storageScope": "browser/device, independent of account/store",
+    "storageKey": "coopfood.store-ui.density.v1",
+    "values": ["comfortable", "compact"],
+    "priority": ["functional areas", "forms and pickers", "light item spacing"]
+  }
+}
