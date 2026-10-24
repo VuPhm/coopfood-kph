@@ -1,5 +1,10 @@
 # Danh mục component Store App
 
+FORM01 revision4: [Button role/state tokens](../../apps/store-pwa/src/store-button-system.css)
+và [chrome boundary tokens](../../apps/store-pwa/src/store-chrome-soft.css) dùng
+cùng [quy chuẩn Fresh Soft](STORE_APP_SURFACE_STYLE.md). Shared Button xuất
+metadata variant/size; chỉ Store-local CSS tiêu thụ, giữ component/default ngoài Store.
+
 **Vật liệu/khối/viền — reference22/10/2026:**
 [STORE_APP_SURFACE_STYLE](STORE_APP_SURFACE_STYLE.md) ghi recipe thật và số đo
 Home, các token hiện có trong `store-glass.css`, cascade và cách áp có scope.
@@ -18,6 +23,11 @@ Authority: [contract](STORE_APP_CONTRACTS.md), [UI DNA](STORE_APP_UI_DNA.md),
 [Co.op Fresh](STORE_APP_VISUAL_DNA.md), [ADR-0001](../adr/0001-foundation-stack.md)
 và [ADR-0006](../adr/0006-store-app-evolution.md). Source là bằng chứng
 implementation; test đạt không thay nghiệm thu owner.
+
+FORM01 revision 3,24/10: mở rộng control/nhóm/picker theo triết lý đã duyệt;
+presentation local dùng [Co.op Fresh Soft](STORE_APP_SURFACE_STYLE.md)
+qua `store-form-soft.css` và `store-component-soft.css`; tái dùng component/semantics hiện có,
+không thêm primitive hay API form. [Scope/checks](../delivery/form01-fresh-soft/technical.md).
 
 ## Nơi quản lý
 

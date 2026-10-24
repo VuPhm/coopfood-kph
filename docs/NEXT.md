@@ -1,5 +1,47 @@
 # Công việc kế tiếp
 
+**FORM01 revision 4 — candidate24/10/2026:** owner yêu cầu đủ mọi nút, đặc biệt
+nút xanh; làm tổng thể token nút và mép khối trượt/sidebar/menu bar. Dùng một
+role/state matrix cho primary/secondary/ghost/danger/selected/disabled và native
+command; primary có gradient/mép sáng/bóng thấp, pressed tại chỗ. Chrome dùng
+edge/elevation token, giữ canvas trắng và header816b4e3. Shared Button chỉ thêm
+metadata cho binding Store-local; không đổi global UI palette/API.
+[Token/triết lý](product/STORE_APP_SURFACE_STYLE.md),
+[scope/evidence](delivery/form01-fresh-soft/technical.md).
+Technical PASS: 334 tests và Playwright nút/chrome/native scrollbar.
+Preview <http://127.0.0.1:4306/#kph>; owner xem bản mới, chưa merge main/push/deploy.
+
+**FORM01 revision 3 — candidate24/10/2026:** owner chấp nhận hướng form bằng
+“ổn, làm tiếp”, yêu cầu mở rộng và ghi triết lý. Đã tích hợp đúng header
+`816b4e3` vào nhánh task, base hợp nhất `568c8cd`; không đổi main. Mở rộng
+**Co.op Fresh Soft** cho nút phụ/toolbar, filter choices, nhóm thông tin, picker/
+popup và divider: nền tạo khối, mép nghỉ nhẹ, selected/focus/error rõ.
+[Triết lý và role/state recipe](product/STORE_APP_SURFACE_STYLE.md),
+[scope/acceptance/checks](delivery/form01-fresh-soft/technical.md).
+Preview <http://127.0.0.1:4304/#home>. Chưa merge main/push/deploy; owner xem
+các màn và trạng thái mới. Các candidate cũ dưới đây là lịch sử.
+
+**FORM01 — candidate revision 2, 24/10/2026:** theo owner làm mềm form;
+feedback viền còn dày, tham khảo item Home và iOS 27.
+Dùng tên **Co.op Fresh Soft** cho `coop-fresh-soft-v1`; input/date/select/textarea
+fill nhẹ/radius 16/mép nghỉ 6%; label/content nhận diện, focus/error/selection
+rõ; Số lượng có placeholder khi trống. Giữ semantic/check, nhóm/
+footer mềm hơn. Giữ rule/validation/readonly/disabled/focus và kích thước control;
+không đổi packages/ui, API, header/nav/list/chart. Nhánh `store-app/form01-fresh-soft`
+từ `f77034d`; preview <http://127.0.0.1:4302/#kph>. Chưa merge/push/deploy;
+[phạm vi, kiểm tra và giới hạn](delivery/form01-fresh-soft/technical.md).
+Bước tiếp theo: owner xem KPH form/bộ lọc, Báo cáo, Tra hạn và đăng nhập.
+
+**HEADER03 — candidate24/10/2026:** Home bỏ copy “Trang chủ / Cửa hàng
+hiện tại” khỏi hình, giữ heading accessible/lời chào. Back mobile chỉ mũi tên,
+không nền/viền; desktop dùng sidebar + ancestor `Trang chủ › màn`, mẫu báo cáo
+thêm cấp Báo cáo. Giữ72px/44px/focus, palette/header và nghiệp vụ. Technical334tests/build/PWA,
+7màn×7viewport, context/contrast/chart parity PASS. Preview
+<http://127.0.0.1:4331/#home>; [scope và evidence](delivery/header03-context-nav/technical.md).
+Nhánh `store-app/header03-context-nav` từ mainf77034d; chưa merge/push/deploy.
+Bước tiếp: owner xem Home/mobile arrow/desktop đường dẫn tại preview4331.
+Các pending bên dưới là lịch sử.
+
 **UI02 + RPT02 — CLOSED,23/10/2026:** owner “merge với `0757b6d`” cho bản
 scrollbar đang xem tại4295 và report checkpoint0757b6d. Merge main local
 `e5628ab` gồm scrollbar`e2c2ab5` + report đúng0757b6d; source hợp nhất không sửa
@@ -15,7 +57,7 @@ soát hết”. Desktop dùng native scrollbar mảnh; popup cuộn trong body, 
 close/bo góc, form và tiện ích có bar kéo được. Choice sheet chỉ cuộn results;
 khóa/mở cuộn giữ layout và nút nổi. Mobile tags giữ bar ẩn. Build/Playwright với
 scrollbars thật ở390×844/1440×1024/1280×720/900×650/1440×500, high contrast,
-KPH/chrome regression đạt. Nhánh`store-app/ui02-scrollbars` từ`3b0da6c`, chưa
+KPH/chrome regression đạt. Nhánh `store-app/ui02-scrollbars` từ `3b0da6c`, chưa
 merge/push/deploy. Preview <http://127.0.0.1:4295/#kph>;
 [phạm vi, files, lệnh kiểm và giới hạn](delivery/ui02-scrollbars.md).
 Bước tiếp: owner xem thanh cuộn trang và các popup trên desktop thực.
@@ -135,7 +177,7 @@ bên dưới là lịch sử trước nghiệm thu. Đóng task, chờ yêu cầ
 lọc trả về bật. Trong Chọn, checkbox ngày có vùng44×44px riêng; phần ngày/count/
 chevron vẫn thu/mở, giữ selection và collapse khi vào/thoát Chọn. Tắt nhóm: ngày
 mobile nằm cùng cụm SKU/số lượng căn trái. Nền trắng revision4 và UX click hàng/
-OTHER/tag scroll/lọc nhanh/nối25 giữ nguyên. Cùng task từ`982c04c`, online/API
+OTHER/tag scroll/lọc nhanh/nối25 giữ nguyên. Cùng task từ `982c04c`, online/API
 không đổi. Xem <http://127.0.0.1:4262/#kph>; chưa commit/merge/push/deploy,
 owner pending. [Bàn giao/phạm vi/checks](delivery/kph02-compact-history.md).
 

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "id": "form01-fresh-soft",
+  "revision": 3,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Apply accepted Co.op Fresh Soft material philosophy to remaining Store Fresh components after integrating requested 816b4e3; document durable role/state rules.",
+  "inScope": [
+    "Integrate exact requested header commit 816b4e3 while preserving accepted Fresh Soft forms",
+    "Quiet resting secondary actions, filter choices, picker rows, grouping and nested chrome across Store Fresh surfaces/portals",
+    "Maintain white holders, semantic colors, selected/focus/error cues, current geometry and workflows",
+    "Write the accepted philosophy and role/state recipes in the canonical surface guide, link UI DNA/catalog",
+    "Verify integrated Home/context navigation, KPH/DATE/reports/shelf/login, keyboard/contrast/scroll/mobile/desktop"
+  ],
+  "outOfScope": [
+    "Domain/API/backend/authorization/data/storage or enum changes",
+    "Admin/online/Pilot, packages/ui, root config/dependencies",
+    "New navigation/layout/compact behavior beyond requested 816b4e3; chart colors/print redesign",
+    "Merge main/push/deploy without owner authorization"
+  ],
+  "baseSha": "568c8cd2b320f0d1d33abb875cc8df15979e5516",
+  "candidateSha": "5fd74fcf816df376b69473445be992ec158a1701",
+  "integrationOwner": "Current chat, sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-form-soft.css",
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-login.tsx",
+    "apps/store-pwa/src/store-kph-create-forms.css",
+    "e2e/scripts/check-store-form-soft.cjs",
+    "e2e/scripts/check-store-scrollbars.cjs",
+    "docs/product/STORE_APP_SURFACE_STYLE.md",
+    "docs/product/STORE_FORM_CONTROLS.md",
+    "docs/product/STORE_APP_VISUAL_DNA.md",
+    "docs/product/STORE_APP_COMPONENT_CATALOG.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/form01-fresh-soft/**",
+    "e2e/scripts/check-kph-colors.cjs",
+    "apps/store-pwa/src/create-record-dialog.tsx",
+    "apps/store-pwa/src/store-component-soft.css",
+    "e2e/scripts/check-store-component-soft.cjs",
+    "docs/product/STORE_APP_UI_DNA.md",
+    "e2e/scripts/check-store-chrome.cjs",
+    "e2e/scripts/check-header-context.cjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 3,
+      "sha": "5fd74fcf816df376b69473445be992ec158a1701",
+      "evidence": "docs/delivery/form01-fresh-soft/technical.md"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Viền vẫn dày; cân nhắc triết lý viền item Home và tham khảo tiếp iOS 27.",
+      "source": "Direct owner feedback 24/10/2026 after preview 4301, candidate de548b7.",
+      "impact": "Resting form surfaces/edges, rendered affordance audit, cross-form browser evidence and recipe documentation.",
+      "decision": "Continue same branch/worktree/base. Use Home soft decorative edges, visible label/content cues and strong focus/error/selection states; invalidate material and browser evidence from revision 1."
+    },
+    {
+      "revision": 3,
+      "request": "Accept Fresh Soft forms; apply philosophy to other components, record it, pull 816b4e3 before continuing.",
+      "source": "Direct owner message 24/10/2026: ổn, làm tiếp ... pull 816b4e3 rồi làm tiếp.",
+      "impact": "Exact local integration, remaining Store Fresh component materials, canonical philosophy and integrated visual/behavior gates.",
+      "decision": "Same task/worktree/sole writer; merge exact 816b4e3 -> 568c8cd. Preserve form revision 2 acceptance separately. New material scope needs fresh technical/owner gates; no main merge."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner review integrated Fresh Soft rollout at http://127.0.0.1:4304/#home across KPH/DATE/notifications/reports/login. Accepted form philosophy is recorded; await new rollout acceptance before merge main.",
+  "authorization": "24/10/2026 direct owner request: các thành phần form hiện tại cứng, tối ưu mềm mại theo phong cách mới, đặt tên cho phong cách đó luôn."
+}

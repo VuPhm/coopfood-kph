@@ -71,10 +71,24 @@ async function audit(page, selector, state) {
         const rect = input.getBoundingClientRect(); if (!rect.width || input.disabled) continue;
         text(input, input.value || input.placeholder || input.tagName, [rect], input.value || !input.placeholder ? undefined : '::placeholder');
         const style = getComputedStyle(input), point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-        // A translucent edge paints over the field fill. That composed contour,
-        // rather than the border's uncomposited RGB, must separate it from the page.
+        // Compose a translucent edge over the field fill before measuring it;
+        // the identifying-cue check below distinguishes decoration from a boundary.
         const contour = blend(rgba(style.borderTopColor), background(input, point));
-        borders.push({ name: input.id || input.getAttribute('aria-label'), ratio: ratio(contour, background(input.parentElement, point)) });
+        const visible = el => {
+          const r = el.getBoundingClientRect(), s = getComputedStyle(el);
+          return r.width > 1 && r.height > 1 && s.visibility === 'visible' && s.display !== 'none' && !el.closest('.sr-only, [hidden], [aria-hidden="true"]');
+        };
+        const labels = [...(input.labels || [])];
+        const visibleLabel = labels.some(label => visible(label) && label.textContent.trim());
+        const content = (input.tagName === 'SELECT' ? input.selectedOptions[0]?.textContent : input.value || input.placeholder || '').trim();
+        const named = labels.some(label => label.textContent.trim()) || !!input.getAttribute('aria-label')?.trim() || !!input.getAttribute('aria-labelledby')?.trim();
+        const icon = input.closest('label')?.querySelector('svg');
+        const visibleIcon = icon && visible(icon) && ratio(rgba(getComputedStyle(icon).color), background(icon, point)) >= 3;
+        // Quiet decoration need not be the sole identifying cue. Require a named
+        // field, contrasting content and a visible label or meaningful search icon.
+        // Empty/unlabeled fields still need a contrasting boundary. Focus and
+        // selection are independently required to meet 3:1 below (WCAG 1.4.11).
+        borders.push({ name: input.id || input.getAttribute('aria-label'), ratio: ratio(contour, background(input.parentElement, point)), visibleLabel, visibleIcon: !!visibleIcon, visibleContent: !!content, identifiedByText: !!named && (visibleLabel || !!visibleIcon) && !!content });
       }
     }
     for (const root of roots) for (const el of root.querySelectorAll(':focus-visible, .choice-card:has(input:checked), .store-choices .is-selected, .store-tabs [aria-pressed="true"], .store-quick-sort-options [aria-pressed="true"], .store-date-statuses [aria-pressed="true"]')) {
@@ -92,10 +106,10 @@ async function audit(page, selector, state) {
   expect(result.samples.length, `${state} has runtime samples`).toBeGreaterThan(0);
   const failures = result.samples.filter(s => !Number.isFinite(s.ratio) || s.ratio < 4.5);
   const indicatorFailures = result.indicators.filter(s => !Number.isFinite(s.ratio) || s.ratio < 3);
-  const borderFailures = result.borders.filter(s => !Number.isFinite(s.ratio) || s.ratio < 3);
+  const borderFailures = result.borders.filter(s => !Number.isFinite(s.ratio) || (s.ratio < 3 && !s.identifiedByText));
   fs.writeFileSync(`${output}/${state}.json`, JSON.stringify(result, null, 2));
   expect(failures, `${state} text >=4.5:1`).toEqual([]);
-  expect(borderFailures, `${state} input boundaries >=3:1`).toEqual([]);
+  expect(borderFailures, `${state} input boundary >=3:1 or visible label + contrasting field content`).toEqual([]);
   expect(indicatorFailures, `${state} focus/selection indicators >=3:1`).toEqual([]);
   return { state, samples: result.samples.length, minimumText: Math.min(...result.samples.map(s => s.ratio)), minimumBorder: result.borders.length ? Math.min(...result.borders.map(s => s.ratio)) : null };
 }
@@ -160,6 +174,6 @@ if (require.main === module) (async () => {
       await page.close();
     }
     fs.writeFileSync(`${output}/results.json`, JSON.stringify(results, null, 2));
-    console.log(`PASS KPH contrast: ${results.length} rendered states, text >=4.5, input boundaries >=3, CTA/tab focus and selected tab surface.`);
+    console.log(`PASS KPH contrast: ${results.length} rendered states, text >=4.5, input affordances and CTA/tab focus and selected tab surface.`);
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

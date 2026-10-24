@@ -1,10 +1,27 @@
 # Store App Visual DNA — Co.op Fresh
 
+**FORM01 revision4 — candidate24/10:** hệ token nút bao gồm primary xanh,
+secondary/ghost/danger, selected/disabled/focus và native command. Vật liệu mép
+khối trượt/sidebar/menu dùng token layer riêng, không đổi geometry/navigation.
+[Giá trị và binding theo vai trò](STORE_APP_SURFACE_STYLE.md#token-nút-và-mép-chrome--form01-revision-4).
+
+**FORM01 revision 3,24/10:** form/mép nhẹ được owner chấp nhận; tiếp tục triết lý
+“Nền và khoảng cách tạo khối; viền nghỉ lùi xuống; trạng thái giữ rõ” cho control/
+nhóm/picker hiện có. [Quy chuẩn theo vai trò](STORE_APP_SURFACE_STYLE.md) là nguồn
+tham chiếu; giữ header816b4e3, canvas trắng và palette nghiệp vụ. Rollout mới chờ xem.
+
+**FORM01 candidate 24/10/2026:** tên ngắn của hướng khối mềm/viền nhẹ là
+**Co.op Fresh Soft** (`coop-fresh-soft-v1`). Recipe form bổ sung fill nhẹ trong
+field, radius 16/mép nghỉ 6% theo Home (revision 2), nhóm trắng; label/content
+và selected/error/focus giữ rõ;
+canvas và header giữ hướng đã duyệt. [Recipe](STORE_APP_SURFACE_STYLE.md),
+[phạm vi/kiểm tra](../delivery/form01-fresh-soft/technical.md); chờ owner xem.
+
 **Khối/viền tham chiếu hiện tại — 22/10/2026:**
 [Co.op Fresh — khối mềm, viền nhẹ](STORE_APP_SURFACE_STYLE.md)
 (`coop-fresh-soft-v1`) hệ thống hoá UI01 đã duyệt và palette trắng KPH02.
 Ưu tiên recipe/geometry đo từ Home trong tài liệu này khi áp vật liệu: card
-pastel viền trong suốt1px + sheen/shadow thấp; holder trắng viền1px `#dfe5e9`;
+pastel viền trong suốt1px + sheen/shadow thấp; holder trắng viền 1px `#dfe5e9`;
 glass chỉ lớp nổi nhỏ. Các mô tả Home phẳng/ít bóng, icon64px, artwork/slogan
 và palette cũ bên dưới là lịch sử nếu khác reference/page kit mới.
 Đây là hướng dẫn tái sử dụng, rollout chỉ tới phần owner chỉ định.

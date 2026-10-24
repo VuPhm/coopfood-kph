@@ -8,7 +8,7 @@ async function ready(page, screen) {
   await page.goto(`${base}/#${screen}`);
   if (screen === 'login') await expect(page.locator('.store-login-form')).toBeVisible();
   else await expect(page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true })).toBeEnabled();
-  if (screen === 'kph') await expect(page.locator('.kph-loading-frame')).toHaveCount(0);
+  if (screen === 'kph') await expect(page.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
   if (screen === 'reports') await expect(page.locator('.report-type-card').first()).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
 }
@@ -70,6 +70,22 @@ async function scrollBody(page, dialog, selector, desktop) {
           await expect(rail.locator('.store-rail-store')).toBeInViewport();
           await rail.evaluate(el => { el.scrollTop = 0; });
         }
+        // Hash navigation can retain scroll position; start with the thumb at the top.
+        // Let any preceding wheel/scroll anchoring finish before placing the thumb.
+        // A pair of equal samples can fall between compositor wheel frames.
+        // Require a continuous quiet period before resetting this test precondition.
+        await page.evaluate(() => new Promise((resolve, reject) => {
+          const start = performance.now(); let lastTop = scrollY; let quietSince = start;
+          const check = now => {
+            if (scrollY !== lastTop) { lastTop = scrollY; quietSince = now; }
+            if (now - quietSince >= 300) resolve();
+            else if (now - start > 5000) reject(new Error('Root wheel scrolling did not settle'));
+            else requestAnimationFrame(check);
+          };
+          requestAnimationFrame(check);
+        }));
+        await page.evaluate(() => scrollTo(0, 0));
+        await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
         await page.mouse.move(viewport.width - 3, 20); await page.mouse.down();
         await page.mouse.move(viewport.width - 3, 160, { steps: 8 }); await page.mouse.up();
         await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);

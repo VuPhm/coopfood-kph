@@ -1,6 +1,7 @@
-# Co.op Fresh — khối mềm, viền nhẹ
+# Co.op Fresh Soft — khối mềm, viền nhẹ
 
-Mã tham chiếu: **`coop-fresh-soft-v1`**, ngày 22/10/2026. Đây là bộ quy tắc
+Tên ngắn: **Co.op Fresh Soft**. Mã tham chiếu giữ **`coop-fresh-soft-v1`**.
+Ngày 22/10/2026; tên ngắn và recipe form bổ sung 24/10/2026. Đây là bộ quy tắc
 vật liệu/khối của **Co.op Fresh**, bổ sung [Visual DNA](STORE_APP_VISUAL_DNA.md),
 không tạo theme hay tuỳ chọn mới trong ứng dụng. Round sau có thể yêu cầu:
 **“Áp Co.op Fresh khối mềm, viền nhẹ theo Home cho [phạm vi chỉ định]”.**
@@ -16,6 +17,98 @@ HEADER02 candidate23/10/2026 chỉ tinh chỉnh vùng chrome: gradient xanh
 recipe khối/viền và màu biểu đồ. Thông số/giới hạn tại
 [page kit](STORE_APP_FRAME.md#header02--candidate-23102026). Owner đã cho phép
 merge4450982 ngày23/10; [kiểm main](../delivery/header02-green-layer/merge-2026-10-23.md).
+
+## Triết lý được owner chấp nhận — 24/10/2026
+
+**Nền và khoảng cách tạo khối; viền nghỉ lùi xuống; trạng thái giữ rõ.**
+
+Owner đã chấp nhận form revision 2 bằng “ổn, làm tiếp” và yêu cầu áp dụng cho
+các thành phần khác, ghi lại triết lý. **Co.op Fresh Soft** là tên của hướng
+này, giữ mã `coop-fresh-soft-v1`. Reference hiện tại: Home, form `56e2edd` đã
+duyệt và header `816b4e3` được yêu cầu tích hợp; base hợp nhất `568c8cd`.
+Rollout button/chrome revision 4 là candidate riêng, không thay nghiệm thu từng
+implementation bằng acceptance của triết lý.
+
+1. **Tạo phân cấp trước khi vẽ khung.** Trắng là nền chính; pastel nhẹ nhận
+   diện nhóm/chức năng. Dùng khoảng cách, tiêu đề, icon và hướng sáng để mắt
+   nhận ra khối. Không quây mỗi nhãn/hàng/nút trong một đường bao đậm.
+2. **Viền nghỉ chỉ hỗ trợ nhận diện.** Pastel dùng transparent; action có chữ/
+   icon dùng mép 6% và fill nhẹ; holder trắng vẫn có mép `#dfe5e9` để tách trắng/
+   trắng. Giữ hộp border1px để kích thước không nhảy. Không coi tất cả border
+   là trang trí: check/radio/switch/cue nhập liệu vẫn phải đọc được.
+3. **Phản hồi có trọng số.** Hover đổi fill nhẹ, không thêm nét kép. Chọn dùng
+   check/radio, chữ/aria-state và màu đúng vai trò; một đường biên là đủ. Focus
+   bàn phím giữ ring rõ; lỗi có chữ/aria và màu lỗi. Không làm mờ cả control
+   bằng opacity để đạt cảm giác nhẹ, cũng không dùng bóng thay dấu hiệu chọn.
+4. **Độ nổi có giới hạn.** Một mép sáng và bóng thấp tĩnh cho khối cần tách lớp;
+   popup dùng bóng cao hơn. Divider lồng nhau rất nhẹ. Không thêm blur cho form,
+   list/card hoặc animation shadow/filter. Reduced motion/transparency bỏ bóng;
+   increased contrast/forced colors đưa viền cần thiết về màu hệ thống.
+5. **Thông tin và thao tác quyết định.** Chữ/icon vẫn đủ tương phản, label và
+   placeholder nhận diện ô nhập. Giữ touch target, geometry, thứ tự đọc, scroll,
+   nghiệp vụ, semantic labels và màu biểu đồ. Đây là quy chuẩn Co.op Fresh cho
+   PWA, chỉ tham khảo iOS27 về vật liệu/phân cấp; không tạo bản sao hệ điều hành.
+
+### Áp theo vai trò, không đổi đồng loạt mọi border
+
+| Vai trò | Nghỉ | Tương tác / trạng thái |
+| --- | --- | --- |
+| Card chức năng Home/Báo cáo | Pastel, mép transparent, sheen/bóng thấp | Hover fill; focus ring, giữ nhãn rõ |
+| Holder nghiệp vụ trắng | Trắng + `#dfe5e9`, bóng thấp nơi cần tách lớp | Selected dùng semantic/check; không nhuộm toàn list |
+| Input/date/select/textarea | Fill `#f0f7f3`, mép 6%, label/content rõ | Focus/error rõ, readonly/disabled thật; recipe mục6 |
+| Nút phụ, toolbar, chip bộ lọc | Fill `#f0f7f3`, mép 6%, chữ/icon rõ | Hover `#e6f2eb`; chọn/open giữ cue hiện có, không nét kép |
+| Nhóm filter/settings/reminder/Thông báo | Nền theo vai trò, mép 6%, bóng thấp | Check/native state/collapse riêng; focus không bị thay |
+| Hàng picker và divider bên trong | Mép 6%; text/check làm cue | Hover fill; radio/check và keyboard giữ native semantics |
+| Popup sort/dropdown/calendar | Mép 6%, nền đặc, bóng nổi nhỏ | Focus trap, điều hướng, cạnh màn và scroll không đổi |
+| Header/navigation/primary action | Revision4 bổ sung token vật liệu nút xanh và mép chrome | Giữ header816b4e3/geometry; trạng thái đọc được, không đổi checkbox hoặc màu nghiệp vụ |
+
+Runtime rollout local ở [store-component-soft.css](../../apps/store-pwa/src/store-component-soft.css),
+form ở [store-form-soft.css](../../apps/store-pwa/src/store-form-soft.css).
+Chỉ Store Fresh/login và các portal thuộc Store; không tự áp Admin/online/Pilot
+hoặc `packages/ui`. [Scope, acceptance đã có và evidence mới](../delivery/form01-fresh-soft/technical.md).
+
+## Token nút và mép chrome — FORM01 revision 4
+
+Owner nhận xét chưa hiệu quả trên mọi nút, nhất là nút xanh, và yêu cầu một
+round tổng thể token nút rồi áp vào mép khối trượt/sidebar/menu bar. Scope mới
+cho phép sửa vật liệu primary/selected/navigation; giữ quy tắc và geometry.
+
+[store-button-system.css](../../apps/store-pwa/src/store-button-system.css) là
+nguồn token và binding theo vai trò của Store Fresh. Button shared chỉ thêm
+`data-slot="button"`, `data-variant`, `data-size` để consumer áp recipe tin cậy;
+không thay class/API/default styling của Admin/online/Pilot. Button native của
+Store được nối cùng role, không suy primary từ tên utility hoặc text của nút.
+
+| Vai trò/token | Giá trị / sử dụng |
+| --- | --- |
+| Primary | `#00724e`; gradient150° `#07825a → #00724e(58%) → #006746`, chữ trắng |
+| Primary hover / pressed | `#006b49` / `#005e40`; hover gradient sâu hơn, pressed fill đặc và bóng inset |
+| Secondary | Fill `#f0f7f3`, chữ `#005e40`, hover `#e6f2eb`, pressed `#dceee3` |
+| Secondary edge | Hộp border giữ nguyên, sơn transparent; inset1px 6% thay viền dày/đôi |
+| Ghost / icon | Chữ `#40566a`, nền nghỉ transparent; icon hover tint nhẹ, giữ hit area |
+| Selected | Cùng vật liệu xanh primary; check/aria-state/underline vẫn giữ; edge xanh đồng nền |
+| Danger | `#b42318 → #9c2118`, chữ trắng; không áp màu này cho thao tác trung tính |
+| Disabled | Fill `#e4ece7`, chữ `#506358`, không gradient/bóng/giảm opacity; native disabled giữ nguyên |
+| Radius | Action16px; icon14px; capsule/navigation giữ hình dạng phù hợp |
+| Focus | Ring3px `#20344a`, inverse hero trắng; không dùng bóng hoặc màu nền làm cue duy nhất |
+| Motion | Hover nền nhẹ120ms; chữ và selected/disabled đổi đồng bộ, không cross-fade màu trạng thái; pressed tại chỗ, không translate1px/brightness cả nút |
+
+Các token `--store-button-*` áp trực tiếp vào primary của form/review, report
+dock, bộ lọc, login/account, Tra hạn, nút chọn và native command. KPH create CTA
+vẫn có nhãn loại hàng theo màu riêng; “Ghi nhận” DATE giữ cam `#c24e00 → #a63f00`.
+Không thay switch, radio/check, semantic label, row/item clickable thành CTA.
+
+[store-chrome-soft.css](../../apps/store-pwa/src/store-chrome-soft.css) định nghĩa
+`--store-layer-*`: mép6%, highlight trắng90%, cap shadow `0 -2px 10px /6%`,
+panel shadow `0 12px 32px /14%`, nav shadow thấp và sidebar shadow sát mép.
+Dùng inset/box-shadow thay border làm đổi box: khối trắng trượt, sheet/modal,
+sidebar248px, menu capsule và floating report dock giữ placement/scroll owners.
+Sidebar current có stripe3px, menu current giữ capsule và aria-current.
+
+Reduced motion/transparency bỏ bóng trang trí và chuyển màu tức thì; increased
+contrast/forced colors đưa viền và current marker về hệ màu OS, bỏ gradient.
+Không thêm backdrop blur hoặc đổi layout để tạo cảm giác mềm. Recipe ở mục
+trước vẫn áp theo vai trò; phần token/chrome revision4 đang chờ owner xem.
 
 ## 1. Công thức thị giác
 
@@ -80,7 +173,7 @@ xanh DATE để suy “an toàn”. Không đưa vòng icon lớn vào mọi too
 
 ### Holder trắng và lớp trang
 
-- Hàng “Cần chú ý”: radius14px, gap12px, border1px `#dfe5e9`, nền trắng,
+- Hàng “Cần chú ý”: radius14px, gap12px, border 1px `#dfe5e9`, nền trắng,
   bóng card thấp. Mobile min-height48px/padding8px 14px; desktop56px/10px 14px.
 - Nút chuông: 44×44px/radius14px, cùng nền/viền holder, không bóng.
 - Page surface: trắng đặc, không gradient, chỉ bo hai góc trên24px và overlap12px.
@@ -177,7 +270,49 @@ filter/sheen/shadow qua token theo implementation hiện có. Viền more-contra
 chuyển rõ hơn. Không suy ra blur chạy tốt trên mọi GPU/Safari chỉ vì Chromium
 headless đạt; kiểm thiết bị mục tiêu khi có scope đó.
 
-## 6. Cách áp cho round sau
+## 6. Recipe form — FORM01 candidate 24/10/2026
+
+Owner yêu cầu làm mềm các thành phần form hiện tại và đặt tên phong cách;
+form revision 2 đã được chấp nhận24/10, xem phần triết lý phía trên.
+Dùng tên **Co.op Fresh Soft** cho cùng bộ `coop-fresh-soft-v1`; không tạo theme,
+setting hay họ token shared mới. Revision 2 theo feedback “viền vẫn dày”:
+ưu tiên cách Home phân khối bằng fill/mép sáng thay đường bao đậm. Recipe form
+nằm trong stylesheet local
+[store-form-soft.css](../../apps/store-pwa/src/store-form-soft.css), áp Store Fresh/
+login và các portal của Store; Admin/online/Pilot giữ riêng.
+
+| Vai trò | Recipe form |
+| --- | --- |
+| Input/select/textarea nghỉ | Radius 16px, hộp border 1px giữ geometry nhưng màu chỉ `rgb(0 60 40 / 6%)`; fill `#f0f7f3`, mép sáng/bóng thấp; label + nội dung/placeholder rõ |
+| Hover | Fill `#eaf4ee`, giữ mép nhẹ; không vẽ lại khung đậm chỉ vì trỏ chuột |
+| Focus | Border xanh `#00724e`, fill trắng; ring keyboard hiện có vẫn rõ, bounds không đổi |
+| Readonly | Fill `#f0f5f2`, giữ readonly/native value/nhãn và focus của caller |
+| Disabled | Fill `#f0f3f1`, bỏ bóng; trạng thái disabled thuộc caller |
+| Invalid | Fill `#fef3f2`, edge `#b42318`, lỗi chữ/aria vẫn do form cung cấp |
+| Choice KPH | Giữ màu semantic + radio/check; dùng một đường biên và bóng thấp thay nét kép khi chọn |
+| Nhóm/filter và footer | Nhóm trắng/radius 18, bóng nhẹ; nút radius 16; không thay padding/layout hoặc CTA semantics |
+| Login | Một shell chứa icon/input/reveal, cùng recipe; không thêm viền lồng lên input |
+
+Màu xanh rất nhẹ chỉ ở **bên trong ô nhập**; canvas/holder vẫn trắng như đã
+nghiệm thu. Hero search/CTA giữ vật liệu riêng trên xanh. Viền nghỉ là trang trí,
+không phải cue duy nhất: field giữ label và nội dung/placeholder rõ; Số lượng
+Store Fresh có thêm “Nhập số lượng” khi trống. Chữ/value/placeholder ≥4.5:1;
+focus/error/selection vẫn ≥3:1. Field thiếu cue nhận diện phải giữ boundary ≥3:1,
+không dùng viền 6% cho ô trống không label. Reduced motion/transparency bỏ bóng; high contrast dùng màu hệ thống. Không thêm blur, animation shadow,
+listener, dependency hoặc thay rule ngày/snapshot/dữ liệu.
+
+Tham khảo [iOS 27](https://www.apple.com/lae/os/ios/) về khả năng đọc và độ tách
+lớp, cùng [Apple Materials](https://developer.apple.com/design/human-interface-guidelines/materials)
+về dùng vật liệu có chọn lọc. Đây là diễn giải cho PWA/Co.op Fresh, không mô phỏng
+native glass hoặc thêm blur. Kiểm cue theo vai trò, xem
+[WCAG 1.4.11 — Boundaries](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html#boundaries);
+không suy kiểm scoped thành chứng nhận accessibility đầy đủ.
+
+Giữ skeleton/live cùng geometry. [Phạm vi, gate và preview](../delivery/form01-fresh-soft/technical.md).
+Form revision 2 đã được owner chấp nhận; component rollout revision 3 chờ xem.
+Không suy technical PASS thành acceptance.
+
+## 7. Cách áp cho round sau
 
 1. Từ main mới nhất, đọc tài liệu này, Visual DNA, page kit và contract feature.
    Tạo task branch/worktree, ghi rõ vùng owner chỉ định và phần cần giữ.
@@ -206,12 +341,12 @@ Mẫu yêu cầu có thể copy:
 > Dùng khối/viền Home làm mẫu, chọn đúng pastel hoặc holder trắng; giữ nghiệp vụ,
 > nội dung, focus/selected và budget blur. Mobile trước, đối chiếu desktop.
 
-## 7. Kiểm chứng tài liệu và giới hạn
+## 8. Kiểm chứng tài liệu và giới hạn
 
 Lượt UI03 chỉ thêm hướng dẫn và liên kết; **không đổi runtime/token/component**.
 Đã đối chiếu source trên main9089f47 và đo Home qua preview main4263 bằng
 Playwright headless390×844/1440×1024: bốn màu pastel, border trong suốt1px,
-radius18px/sheen/card shadow/no blur, holder trắng/edge, icon48/54px,
+radius 18px/sheen/card shadow/no blur, holder trắng/edge, icon48/54px,
 hover xanh và focus ring. Kiểm thêm320/768px để xác nhận cascade title/icon/
 hướng xếp/min-height; bốn viewport PASS vật liệu. Đã xem screenshot mobile
 để xác nhận cách tạo khối.

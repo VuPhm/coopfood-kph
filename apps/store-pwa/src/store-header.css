@@ -19,11 +19,17 @@
 .store-appbar-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; width: 100%; min-width: 0; min-height: 44px; }
 .store-header-brand, .store-back { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 10px; background: transparent; color: white; }
 .store-header-brand { background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; }
-.store-back { border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; background: rgb(255 255 255 / 8%); }
-.store-back:hover { background: rgb(255 255 255 / 16%); }
+.store-back { border: 0; border-radius: 14px; background: transparent; }
+.store-back:hover { background: transparent; color: #e3f4ed; }
 .store-header-brand img { display: block; width: 42px; height: auto; aspect-ratio: 1024 / 550; }
 .store-header-copy { display: flex; align-items: center; justify-content: space-between; align-self: center; gap: 12px; min-width: 0; }
 .store-header-copy > div { min-width: 0; }
+.store-header-location { min-width: 0; }
+.store-header-location ol { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.store-header-location li[aria-current="page"] { min-width: 0; }
+.store-header-location .store-header-ancestor { display: none; }
+.store-header-ancestor > button { min-width: 44px; min-height: 44px; margin-block: -9px; border: 0; border-radius: 6px; padding: 9px 0; background: transparent; color: #e3f4ed; font-size: 13px; line-height: 26px; white-space: nowrap; }
+.store-header-ancestor > button:hover { color: white; text-decoration: underline; text-underline-offset: 4px; }
 .store-header h1 { margin: 0; color: white; font-size: 20px; line-height: 26px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .store-header p { margin: 1px 0 0; color: #e3f4ed; font-size: 12px; line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .store-header-store { display: none; min-width: 0; border: 1px solid rgb(255 255 255 / 16%); border-radius: 999px; padding: 5px 10px; background: rgb(255 255 255 / 8%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; font-size: 10px; line-height: 16px; overflow-wrap: anywhere; }
@@ -42,3 +48,11 @@
 @media (max-width: 359px) { .store-page-layout { --store-header-gutter: 16px; } }
 @media (min-width: 900px) { .store-page-layout { --store-header-gutter: 36px; } .store-header-store { display: inline-flex; flex-shrink: 0; max-width: 40%; } }
 @media print { body .store-app, body .store-login { background: white; } .store-page-layout { background: white; } .store-page-hero { position: static; padding: 0; background: white; } .store-page-layout > .store-page-surface { margin: 0; border-radius: 0; box-shadow: none; min-height: 0; } }
+
+/* Desktop uses the persistent sidebar and explicit ancestors, rather than a Back control. */
+@media (min-width: 900px) {
+  .store-app .store-header:not(.is-home) .store-appbar-row { grid-template-columns: minmax(0, 1fr) 44px; }
+  .store-app .store-header .store-back { display: none; }
+  .store-header-location .store-header-ancestor { display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
+  .store-header-ancestor > svg { flex-shrink: 0; color: #e3f4ed; }
+}
