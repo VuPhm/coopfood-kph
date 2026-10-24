@@ -1,6 +1,6 @@
 # Store Fresh — Chế độ gọn (COMPACT01)
 
-Candidate24/10/2026, owner chưa nghiệm thu. Base task0a25730 có Fresh Soft
+Candidate revision3,24/10/2026; thay bố cục Compact sau feedback owner, chưa nghiệm thu. Base task0a25730 có Fresh Soft
 d4f9d17 và đúng header816b4e3; chưa merge main. [Hồ sơ](../delivery/compact01-interface-density/plan.json).
 
 ## Sử dụng
@@ -10,6 +10,8 @@ ngay, nhớ theo browser/device. Không đổi account/store hoặc quyền. Kh�
 `coopfood.store-ui.density.v1` chỉ nhận `comfortable`/`compact`; thiếu/sai/đọc
 lỗi dùng comfortable, ghi lỗi vẫn đổi trong phiên và có thông báo chưa lưu.
 
+Size roles/cấu trúc và nguồn Apple/W3C ở [quy ước size](STORE_APP_SIZE_TOKENS.md).
+
 ## Hình ảnh
 
 Ưu tiên vùng chức năng; giữ font chính, màu và Co.op Fresh Soft. Header72px,
@@ -18,9 +20,9 @@ sidebar/menu và nghiệp vụ giữ baseline. Item giảm nhẹ đệm, không 
 | Consumer | Compact |
 | --- | --- |
 | Tìm kiếm KPH/DATE/Báo cáo, clear/scan | 44px; clear button vẫn44px, input16px |
-| Tạo phiếu KPH | Tối thiểu56px, giữ hai loại và đầy đủ nhãn |
-| Báo cáo kỳ/phạm vi | Tối thiểu56px, padding dọc6px; nở theo text |
-| Bộ lọc | Section inset12px, gap8px; body gap12px |
+| Tạo phiếu KPH | Button một hàng44px Tạo TPCN/TPTS, accessible name đầy đủ; bỏ shortcut trùng |
+| Báo cáo kỳ/phạm vi | Một hàng kỳ + lọc44px, face icon36px/hit44px, có active context |
+| Bộ lọc | Section phẳng phân cách nhẹ, gap8/12px; sort nằm trong sheet |
 | Choice sheet | Option60px/padding dọc8px; header/search/footer vẫn riêng |
 | Form KPH | Section inset12px, heading gap8px, lựa chọn≥48px/input44px; ảnh không thu nhỏ |
 | Tra hạn | Gap8px, form chính inset12px, nút≥44px; kết quả và timeline giữ nguyên |

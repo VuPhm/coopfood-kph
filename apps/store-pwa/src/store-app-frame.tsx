@@ -20,6 +20,7 @@ import "./store-form-soft.css";
 import "./store-component-soft.css";
 import "./store-button-system.css";
 import "./store-chrome-soft.css";
+import "./store-size-tokens.css";
 import "./store-density.css";
 
 export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {

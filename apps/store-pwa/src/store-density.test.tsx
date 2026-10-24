@@ -1,10 +1,14 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { createPortal } from "react-dom";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { readStoreDensity, STORE_DENSITY_KEY, StoreDensityProvider, StoreDensityScope, StoreDensitySetting } from "./store-density";
+import { readStoreDensity, STORE_DENSITY_KEY, StoreDensityProvider, StoreDensityScope, StoreDensitySetting, useStoreDensityValue } from "./store-density";
 import { StorePageHero } from "./store-page-hero";
 import { StoreAppHeader } from "./store-app-header";
+import { KphCreateButton } from "./store-kph-create-button";
+import { StoreReportSettings } from "./store-report-settings";
+import { KphWorkspace } from "./store-kph-workspace";
+import { mockRecords } from "./store-app-mock";
 
 // This Node runtime exposes an unavailable global Web Storage getter to jsdom.
 // Supply a deterministic storage boundary; browser persistence is tested in E2E.
@@ -109,5 +113,55 @@ describe("Store density preference", () => {
     expect(scroll).not.toHaveBeenCalled();
     fireEvent.focus(screen.getByRole("textbox", { name: "Tìm hàng" }));
     expect(scroll).toHaveBeenCalledWith({ top: 0, behavior: "instant" });
+  });
+
+  it("provides two direct Compact create actions without repeated caption/card structure", () => {
+    window.localStorage.setItem(STORE_DENSITY_KEY, "compact");
+    const dry = vi.fn(), fresh = vi.fn();
+    render(<StoreDensityProvider><KphCreateButton kind="TPCN" onClick={dry} /><KphCreateButton kind="TPTS" onClick={fresh} /></StoreDensityProvider>);
+    const dryButton=screen.getByRole("button", { name: "Tạo phiếu TP khô & khác" });
+    expect(dryButton).toHaveTextContent("Tạo TPCN");
+    expect(dryButton.querySelector(".store-create-kind-label,.store-create-heading")).toBeNull();
+    fireEvent.click(dryButton);fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu TP tươi sống" }));
+    expect(dry).toHaveBeenCalledOnce();expect(fresh).toHaveBeenCalledOnce();
+  });
+
+  it("keeps sort available in the existing filter when Compact removes the standalone shortcut", () => {
+    window.localStorage.setItem(STORE_DENSITY_KEY, "compact");
+    render(<StoreDensityProvider><StoreDensitySetting /><KphWorkspace records={mockRecords} onRecordsChange={vi.fn()} onNotice={vi.fn()} /></StoreDensityProvider>);
+    expect(screen.getAllByRole("button", { name: /^Tạo phiếu TP/ })).toHaveLength(2);
+    expect(screen.queryByRole("button", { name: /^Sắp xếp phiếu:/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Lọc phiếu KPH" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tên hàng" }));
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Lọc & sắp xếp" })).getByRole("button", { name: "Xong" }));
+    fireEvent.click(screen.getByRole("switch", { name: "Chế độ gọn" }));
+    expect(screen.getByRole("button", { name: "Sắp xếp phiếu: Tên hàng" })).toBeInTheDocument();
+  });
+
+  it("preserves report settings meaning and callbacks in the reduced composition", () => {
+    window.localStorage.setItem(STORE_DENSITY_KEY, "compact");
+    const period=vi.fn(), filter=vi.fn();
+    render(<StoreDensityProvider><StoreReportSettings period="01/10/2026 – 31/10/2026" scope="Hết HSD · Mở" filterCount={2} onPeriod={period} onFilter={filter} /></StoreDensityProvider>);
+    const group=screen.getByRole("region", { name: "Thiết lập báo cáo" });
+    expect(group.querySelectorAll("button")).toHaveLength(2);
+    expect(group.querySelector(".store-settings-row")).toBeNull();
+    const periodButton=screen.getByRole("button", { name: "Chọn kỳ báo cáo" });
+    expect(periodButton).toHaveAccessibleDescription("01/10/2026 – 31/10/2026");
+    const filterButton=screen.getByRole("button", { name: "Lọc danh mục báo cáo" });
+    expect(filterButton).toHaveAccessibleDescription("Hết HSD · Mở");
+    fireEvent.click(periodButton);fireEvent.click(filterButton);
+    expect(period).toHaveBeenCalledOnce();expect(filter).toHaveBeenCalledOnce();
+  });
+
+  it("uses the comfortable composition for print and restores Compact without losing a draft", () => {
+    window.localStorage.setItem(STORE_DENSITY_KEY, "compact");
+    let printing=false;const listeners=new Set<() => void>();
+    vi.stubGlobal("matchMedia", () => ({get matches(){return printing;},addEventListener:(_type:string,listener:()=>void)=>listeners.add(listener),removeEventListener:(_type:string,listener:()=>void)=>listeners.delete(listener)}));
+    function View(){ const density=useStoreDensityValue();return <><p>{density}</p><input aria-label="Print draft" defaultValue="Đang nhập" /></>; }
+    render(<StoreDensityProvider><View /></StoreDensityProvider>);
+    const draft=screen.getByRole("textbox", { name: "Print draft" });expect(screen.getByText("compact")).toBeInTheDocument();
+    act(()=>{printing=true;listeners.forEach(notify=>notify());});expect(screen.getByText("comfortable")).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Print draft" })).toBe(draft);
+    act(()=>{printing=false;listeners.forEach(notify=>notify());});expect(screen.getByText("compact")).toBeInTheDocument();expect(draft).toHaveValue("Đang nhập");
   });
 });

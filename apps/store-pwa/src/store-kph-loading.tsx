@@ -10,11 +10,13 @@ import type { RecordView } from "./record-view";
 import { figmaAsset } from "./figma-assets";
 import { StoreKphMore, StoreKphList } from "./store-kph-list";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
+import { useStoreDensityValue } from "./store-density";
 
 // These are existing session records, never fabricated online data. Hidden text
 // preserves the actual wrapping and chip widths in each row while code loads.
 export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
   const desktop = useStoreDesktopLayout();
+  const compact = useStoreDensityValue() === "compact";
   const visible = useMemo(() => records.filter(record => record.kind === "TPTS")
     .sort((a, b) => b.detectedDate.split("/").reverse().join("-").localeCompare(a.detectedDate.split("/").reverse().join("-")) || a.id.localeCompare(b.id)).slice(0, 25), [records]);
   const totalByDate = useMemo(() => {
@@ -26,14 +28,14 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
   return <StorePageLayout className="store-kph kph-loading-frame" aria-busy="true" aria-label="Đang tải KPH">
     <p className="sr-only" role="status">Đang tải KPH…</p>
     <StorePageHero className="store-kph-underlay">
-      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input disabled aria-label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" /></label><button disabled className="store-scan-trigger" aria-label="Tạo phiếu TP tươi sống"><Maximize size={20} aria-hidden="true" /></button></div>
+      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input disabled aria-label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" /></label>{!compact ? <button disabled className="store-scan-trigger" aria-label="Tạo phiếu TP tươi sống"><Maximize size={20} aria-hidden="true" /></button> : null}</div>
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled />)}</div></section>
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo">
       <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(kind => <button key={kind} disabled aria-pressed={kind === "TPTS"} className={kind === "TPTS" ? "is-active" : ""}>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}<small>{records.filter(record => record.kind === kind).length}</small></button>)}</div></StoreStickyTabs>
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{total} phiếu</span></div>
-        <div className="store-kph-list-toolbar"><KphSortButton disabled sort="newest" /><button disabled className="store-compact" aria-pressed="false"><ListChecks size={20} aria-hidden="true" /><span>Chọn</span></button><button disabled className="store-filter" aria-label="Lọc phiếu KPH"><SlidersHorizontal size={20} aria-hidden="true" /></button></div>
+        <div className="store-kph-list-toolbar">{!compact ? <KphSortButton disabled sort="newest" /> : null}<button disabled className="store-compact" aria-pressed="false"><ListChecks size={20} aria-hidden="true" /><span>Chọn</span></button><button disabled className="store-filter" aria-label="Lọc phiếu KPH"><SlidersHorizontal size={20} aria-hidden="true" /></button></div>
       </div>
       <StoreKphList desktop={desktop} visible={visible} totalByDate={totalByDate} loading />
       <StoreKphMore shown={visible.length} total={total} loading />

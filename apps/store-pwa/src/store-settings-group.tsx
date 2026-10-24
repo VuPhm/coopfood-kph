@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 import "./store-form-controls.css";
 
-export function StoreSettingsGroup({ label, children, columns = 1 }: { label: string; children: ReactNode; columns?: 1 | 2 }) {
-  return <section className="store-settings-group" aria-label={label} data-columns={columns}>{children}</section>;
+export function StoreSettingsGroup({ label, children, columns = 1, className = "" }: { label: string; children: ReactNode; columns?: 1 | 2; className?: string }) {
+  return <section className={`store-settings-group ${className}`} aria-label={label} data-columns={columns}>{children}</section>;
 }
 
 export function StoreSettingsRow({ label, value, icon, onClick, ariaLabel, valueId, badge }: {

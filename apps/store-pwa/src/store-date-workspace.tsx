@@ -8,6 +8,7 @@ import { KphCreateControl, type KphCreateHandle } from "./store-kph-create-contr
 import { KphCreateButton } from "./store-kph-create-button";
 import type { CreatedRecordDraft } from "./create-record-dialog";
 import { StoreSheet } from "./store-sheet";
+import { useStoreDensityValue } from "./store-density";
 import { figmaAsset } from "./figma-assets";
 import { addDays, formatDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
@@ -40,6 +41,7 @@ function remainingText(remaining: number | null) {
 }
 
 export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCreateKph, initialLotId }: { lots: MockDateLot[]; onLotsChange: (lots: MockDateLot[]) => void; today?: LocalDate; onCreateKph: (draft: CreatedRecordDraft) => Promise<string>; initialLotId?: string | undefined }) {
+  const compact = useStoreDensityValue() === "compact";
   const [query, setQuery] = useState(initialLotId ?? "");
   const [tab, setTab] = useState(initialLotId ? "tracking" : "alerts");
   const [status, setStatus] = useState<ActiveDateStatus>("open");
@@ -169,8 +171,8 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
       <section className="store-date-browser" aria-label="Danh sách lô DATE">
         <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Quản lý DATE">{[["alerts", "Cảnh báo", attentionLots.length], ["tracking", "Theo dõi DATE", trackedLots.length]].map(([key, label, n]) => <button key={key} aria-pressed={tab === key} className={tab === key ? "is-active" : ""} onClick={() => setTab(String(key))}>{label}<small>{n}</small></button>)}</div></StoreStickyTabs>
         <div className="store-date-list-controls">
-          <div className="store-date-list-heading"><div><h2>{tab === "alerts" ? "Cần xử lý" : "Theo dõi DATE"}</h2><p className="store-date-result-count">{visible.length} / {trackedLots.length} lô</p></div><button className="store-date-add" disabled title="Chức năng chưa sẵn sàng trong bản dùng thử" aria-describedby="store-date-add-help"><CalendarDays size={18} aria-hidden="true" />Thêm theo dõi</button></div>
-          <div className="store-date-toolbar"><StoreQuickSort value={sort} onChange={value => setSort(value as DateSort)} options={DATE_SORT_OPTIONS} title="Sắp xếp lô DATE" groupLabel="Thứ tự lô" /><button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button></div>
+          <div className="store-date-list-heading"><div><h2>{tab === "alerts" ? "Cần xử lý" : "Theo dõi DATE"}</h2><p className="store-date-result-count">{visible.length} / {trackedLots.length} lô</p></div>{!compact ? <button className="store-date-add" disabled title="Chức năng chưa sẵn sàng trong bản dùng thử" aria-describedby="store-date-add-help"><CalendarDays size={18} aria-hidden="true" />Thêm theo dõi</button> : null}</div>
+          <div className="store-date-toolbar">{!compact ? <StoreQuickSort value={sort} onChange={value => setSort(value as DateSort)} options={DATE_SORT_OPTIONS} title="Sắp xếp lô DATE" groupLabel="Thứ tự lô" /> : null}<button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button></div>
           <span className="sr-only" id={filterSummaryId}>{activeFilterCount ? `${activeFilterCount} tiêu chí lọc hoặc sắp xếp đang dùng` : "Đang dùng bộ lọc mặc định"}</span>
           <span className="sr-only" id="store-date-add-help">Chức năng chưa sẵn sàng trong bản dùng thử</span>
           {tab === "alerts" ? <div className="store-date-statuses">{Object.entries(statuses).map(([key, label]) => <button key={key} aria-pressed={status === key} className={status === key ? "is-selected" : ""} onClick={() => setStatus(key as ActiveDateStatus)}><span>{label}</span><small>{count(key as ActiveDateStatus)}</small></button>)}</div> : null}

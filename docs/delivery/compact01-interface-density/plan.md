@@ -1,9 +1,19 @@
 # COMPACT01 — Chế độ gọn tùy chọn
 
-Ngày lập:24/10/2026; revision2 **AWAITING_ACCEPTANCE** theo owner “tiếp tục thực hiện”.
+Ngày lập:24/10/2026; revision3 **VERIFYING** theo owner “tiếp tục thực hiện”.
 Triển khai solo trên cùng task. Base0a25730 ghép đúng FORM01d4f9d17 + header816
 vào nhánh Compact; main và nghiệm thu FORM01 giữ riêng. Dependency main-merge
 trong bản kế hoạch ban đầu được thay bằng task baseline này để tiến hành ngay.
+
+## Feedback revision3
+
+Owner nhận xét bản4342 mới giảm khoảng trống, yêu cầu size tokens chuẩn và
+lược cấu trúc, tham khảo Apple/UIUX. Scope tiếp tục cùng task: size roles
+Store-local; KPH/DATE bỏ shortcut/sort trùng ở toolbar (sort còn trong filter),
+report kỳ/lọc một hàng và gom count vào selection, form/bộ lọc phẳng. Không
+đổi workflow, default comfortable hoặc direct TPCN/TPTS. Nguồn và matrix ở
+[quy ước size](../../product/STORE_APP_SIZE_TOKENS.md). Evidence revision2 đã
+được lưu ởrevision2.md, không dùng để nghiệm thu cấu trúc mới.
 
 ## Mục tiêu và thứ tự ưu tiên
 
@@ -153,4 +163,4 @@ trong phạm vi này. Đóng vòng sau khi ghi candidate/evidence/owner decision
 giới hạn và cập nhật CURRENT_STATE/NEXT; không tự mở vòng tiếp theo.
 
 **Bước nhỏ tiếp theo:** technical PASS; đưa owner dùng thử hai mật
-độ tại4342; chưa merge main/push/deploy.
+độ tại4344; chưa merge main/push/deploy.

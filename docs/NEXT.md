@@ -1,6 +1,15 @@
 # Công việc kế tiếp
 
-**COMPACT01 — candidate24/10/2026:** thêm Chế độ gọn tại Tài khoản → Cài đặt
+**COMPACT01 revision3 — candidate24/10/2026:** theo feedback owner4342, chuyển
+từ giảm padding sang size roles và lược cấu trúc. KPH có Tạo TPCN/TPTS một
+hàng, bỏ shortcut tạo/sort trùng; DATE toolbar một hàng; report kỳ/lọc gộp và
+count vào selection; section form/filter phẳng. Comfortable và workflow giữ.
+[Size/nguồn Apple/W3C](product/STORE_APP_SIZE_TOKENS.md),
+[evidence](delivery/compact01-interface-density/technical.md). Preview mới
+<http://127.0.0.1:4344/#kph>; technical đang chốt, owner pending. Cùng task/base,
+main vẫnf77034d; chưa merge/push/deploy. Bước tiếp: kiểm production rồi owner xem.
+
+**COMPACT01 revision2 — lịch sử24/10/2026:** thêm Chế độ gọn tại Tài khoản → Cài đặt
 → Giao diện; mặc định tắt, nhớ theo thiết bị. Gọn chủ yếu search/CTA/bộ lọc/
 settings/form, item chỉ giảm đệm nhẹ; giữ state và mật độ mặc định. Nhánh riêng
 từ task base0a25730 gồm đúng FORM01d4f9d17 + header816; main vẫnf77034d, không

@@ -9,11 +9,12 @@ fs.mkdirSync(output, {recursive:true});
 process.env.STORE_KPH_COLORS_OUTPUT = `${output}/contrast`;
 const { audit } = require('./check-kph-colors.cjs');
 const viewports = [{width:390,height:844},{width:1440,height:1024},{width:320,height:844},{width:900,height:650},{width:844,height:390}];
+const reportSettings='.store-report-settings, .store-settings-group';
 const selectors = {
   home: ['.store-header','.store-page-hero','.store-home-features','.store-module'],
   kph: ['.store-header','.store-kph-underlay','.store-kph-toolbar','.store-create-cta','.store-kph-list-controls','[data-record-id]'],
   date: ['.store-header','.store-date-search-form','.store-date-list-controls','.store-date-lot'],
-  reports: ['.store-header','.report-composer-controls','.store-settings-group','.report-selection-bar'],
+  reports: ['.store-header','.report-composer-controls',reportSettings,'.report-selection-bar'],
   shelf: ['.store-header','.store-shelf-form','.store-shelf-result'],
   notifications: ['.store-header','.store-notification-section > summary','.store-notification-item'],
   login: ['.store-header','.store-login-form'],
@@ -24,7 +25,7 @@ async function settle(p) {
 async function route(p, url, screen) {
   await p.goto(`${url}/#${screen}`);
   if (screen === 'kph') await expect(p.locator('[data-record-id]').first()).toBeVisible();
-  else if (screen === 'reports') { await p.getByRole('button',{name:/^Báo cáo tổng hợp/}).click(); await expect(p.locator('.store-settings-group')).toBeVisible(); }
+  else if (screen === 'reports') { await p.getByRole('button',{name:/^Báo cáo tổng hợp/}).click(); await expect(p.locator(reportSettings)).toBeVisible(); }
   else await expect(p.locator(selectors[screen][0])).toBeVisible();
   await settle(p);
 }
@@ -79,28 +80,41 @@ async function touch(locator) { const b=await locator.boundingBox();expect(b.wid
         if(screen==='kph'){
           expect(compact['.store-kph-underlay'].height).toBeLessThan(comfortable['.store-kph-underlay'].height);
           const item='[data-record-id]';expect(compact[item].font).toBe(comfortable[item].font);expect(compact[item].height).toBeGreaterThanOrEqual(comfortable[item].height*.9);
-          await touch(p.locator('.create-tpcn'));await touch(p.locator('.store-scan-trigger'));
+          await touch(p.locator('.create-tpcn'));await touch(p.locator('.create-tpts'));
+          await expect(p.locator('.store-scan-trigger')).toHaveCount(0);await expect(p.locator('.store-kph-list-toolbar .store-quick-sort-trigger')).toHaveCount(0);
+          await expect(p.locator('.store-create-heading,.store-create-kind-label')).toHaveCount(0);
+          await expect(p.locator('.create-tpcn')).toContainText('Tạo TPCN');
           await p.getByRole('button',{name:'Lọc phiếu KPH',exact:true}).click();
           const totalHeight=page=>page.locator('.store-kph-filter-section').evaluateAll(nodes=>nodes.reduce((sum,n)=>sum+n.getBoundingClientRect().height,0));
           await ref.getByRole('button',{name:'Lọc phiếu KPH',exact:true}).click();
           row.kphFilterHeight={comfortable:await totalHeight(ref),compact:await totalHeight(p)};
+          await expect(p.locator('.store-kph-filter-section').first()).toHaveCSS('box-shadow','none');
+          await p.getByRole('group',{name:'Thứ tự phiếu'}).getByRole('button',{name:'Tên hàng',exact:true}).click();
+          await p.getByRole('group',{name:'Thứ tự phiếu'}).getByRole('button',{name:'Mới nhất',exact:true}).click();
           expect(row.kphFilterHeight.compact).toBeLessThan(row.kphFilterHeight.comfortable);await ref.keyboard.press('Escape');
           await bounds(p);await audit(p,'.store-kph-filter',`compact-filter-${viewport.width}`);await p.screenshot({path:`${output}/kph-filter-${viewport.width}.png`});await p.keyboard.press('Escape');
         }
         if(screen==='date'){
           await touch(p.locator('.store-date-search-form > .store-button'));
+          await expect(p.locator('.store-date-toolbar .store-quick-sort-trigger,.store-date-add')).toHaveCount(0);
           await p.getByRole('button',{name:'Lọc DATE',exact:true}).click();await bounds(p);await p.keyboard.press('Escape');
         }
         if(screen==='reports'){
-          expect(compact['.store-settings-group'].height).toBeLessThan(comfortable['.store-settings-group'].height);
+          await expect(p.locator('.store-settings-row')).toHaveCount(0);
+          await touch(p.locator('.store-report-filter-inline'));
+          const settingsGeometry=await p.locator('.store-report-settings-inline').evaluate(el=>{const a=el.querySelectorAll('button');return [...a].map(n=>{const b=n.getBoundingClientRect();return {y:b.y+b.height/2,h:b.height};});});
+          expect(Math.abs(settingsGeometry[0].y-settingsGeometry[1].y)).toBeLessThanOrEqual(1);
+          const face=await p.locator('.store-report-filter-inline').evaluate(el=>({face:parseFloat(getComputedStyle(el,'::before').width),hit:el.getBoundingClientRect().width}));
+          expect(face.hit).toBeGreaterThanOrEqual(44);expect(face.face).toBeLessThan(face.hit);
+          expect(compact[reportSettings].height).toBeLessThan(comfortable[reportSettings].height);
           await p.getByRole('button',{name:'Đổi mẫu báo cáo',exact:true}).click();
           const dialog=p.locator('.store-choice-sheet');await expect(dialog).toBeVisible();await touch(dialog.locator('.store-search-field > button').first().or(dialog.locator('.store-choice-actions button').first()).first());
           await bounds(p);await p.screenshot({path:`${output}/choice-${viewport.width}.png`});await p.keyboard.press('Escape');
         }
-        if(screen==='reports')await audit(p,'.store-settings-group',`settings-compact-${viewport.width}`);
+        if(screen==='reports')await audit(p,'.store-report-settings',`settings-compact-${viewport.width}`);
         await p.screenshot({path:`${output}/${screen}-${viewport.width}-compact.png`});
         // Screen rules must not affect print, including report outputs.
-        await p.emulateMedia({media:'print'});const printCompact=await metrics(p,screen);
+        await p.emulateMedia({media:'print'});await settle(p);const printCompact=await metrics(p,screen);
         await ref.emulateMedia({media:'print'});const printBase=await metrics(ref,screen);
         for(const selector of Object.keys(printBase))expect(printCompact[selector],`${screen} print geometry`).toEqual(printBase[selector]);
         await p.emulateMedia({media:'screen'});await ref.emulateMedia({media:'screen'});
@@ -131,7 +145,7 @@ async function touch(locator) { const b=await locator.boundingBox();expect(b.wid
 
       // Narrow viewports and enlarged text: controls grow instead of clipping.
       for(const factor of [1.5,2]){
-        await p.evaluate(factor=>{for(const el of document.querySelectorAll('.store-settings-row strong,.store-settings-row small,.report-selection-bar button')){if(!el.dataset.densityFont)el.dataset.densityFont=getComputedStyle(el).fontSize;el.style.fontSize=`${parseFloat(el.dataset.densityFont)*factor}px`;el.style.lineHeight='1.5';}},factor);
+        await p.evaluate(factor=>{for(const el of document.querySelectorAll('.store-report-period-inline span,.store-report-filter-context,.report-selection-bar button')){if(!el.dataset.densityFont)el.dataset.densityFont=getComputedStyle(el).fontSize;el.style.fontSize=`${parseFloat(el.dataset.densityFont)*factor}px`;el.style.lineHeight='1.5';}},factor);
         await bounds(p);
       }
       await p.getByRole('button',{name:'Tài khoản và cửa hàng',exact:true}).click();await p.getByRole('switch',{name:'Chế độ gọn'}).scrollIntoViewIfNeeded();await touch(p.getByRole('switch',{name:'Chế độ gọn'}));await bounds(p);

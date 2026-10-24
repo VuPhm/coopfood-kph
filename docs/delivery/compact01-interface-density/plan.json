@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
   "id": "compact01-interface-density",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Implement opt-in Compact in Store Fresh Settings: primarily compact functional controls, filters, settings groups and forms, with only light item spacing reductions; preserve approved workflow and Fresh Soft materials.",
+  "revision": 3,
+  "status": "VERIFYING",
+  "objective": "Standardize Store-local size tokens and simplify Compact functional composition using Apple HIG grouping/hierarchy/disclosure, preserving direct KPH actions and workflows.",
   "inScope": [
     "Account sheet Settings > Appearance > Compact switch; proposed default off, immediate change and device-local preference with safe storage fallback",
     "Store-local density scope shared by app and Radix portals, cleaned on leaving Store Fresh; comfortable preserves integrated baseline",
     "Functional areas first: KPH/DATE search, filters and actions; report settings, selection and dock; then forms, pickers and shelf-life lookup",
     "Light item padding/gap adjustment after functional areas, preserving primary typography, states and touch targets",
-    "Before/after geometry measurements and state, accessibility, output-isolation and affected-workflow verification in both modes"
+    "Before/after geometry measurements and state, accessibility, output-isolation and affected-workflow verification in both modes",
+    "Named size/spacing/icon/type/radius and hit-region tokens with real consumers; local product values informed by Apple HIG and WCAG, not claimed platform standards",
+    "Compact KPH inline direct-create actions, omit redundant current-type create shortcut and move standalone sort into existing filter; consolidate list toolbar",
+    "Compact DATE single toolbar, sort in existing filter, omit unavailable add action; report period/filter summary row and flat form/filter sections"
   ],
   "outOfScope": [
     "Agent delegation; execution is solo in this task worktree",
@@ -19,7 +22,7 @@
     "New dependencies, global palette/font tokens, root configuration/lockfile or packages/ui changes without a revised ownership scope"
   ],
   "baseSha": "0a257309ae0db1a45cc9d225207a8e0080a99206",
-  "candidateSha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
+  "candidateSha": "",
   "integrationOwner": "Current chat, sole writer in the COMPACT01 planning worktree; no shared UI ownership transferred from FORM01",
   "sharedPaths": [
     "docs/delivery/compact01-interface-density/**",
@@ -35,7 +38,17 @@
     "apps/store-pwa/src/store-page-hero.tsx",
     "apps/store-pwa/src/store-app-header.tsx",
     "docs/product/STORE_APP_DENSITY.md",
-    "e2e/scripts/check-store-page-kit.cjs"
+    "e2e/scripts/check-store-page-kit.cjs",
+    "apps/store-pwa/src/store-size-tokens.css",
+    "apps/store-pwa/src/store-kph-workspace.tsx",
+    "apps/store-pwa/src/store-kph-loading.tsx",
+    "apps/store-pwa/src/store-kph-create-button.tsx",
+    "apps/store-pwa/src/store-date-workspace.tsx",
+    "apps/store-pwa/src/store-date-report.tsx",
+    "apps/store-pwa/src/store-report-settings.tsx",
+    "apps/store-pwa/src/store-settings-group.tsx",
+    "apps/store-pwa/src/store-selection-bar.tsx",
+    "docs/product/STORE_APP_SIZE_TOKENS.md"
   ],
   "reviewLimit": 2,
   "reviewRound": 1,
@@ -45,28 +58,19 @@
       "id": "preference-state-isolation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
-      "evidence": "docs/delivery/compact01-interface-density/technical.md"
+      "status": "pending"
     },
     {
       "id": "density-geometry-accessibility",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
-      "evidence": "docs/delivery/compact01-interface-density/technical.md"
+      "status": "pending"
     },
     {
       "id": "integrated-regression-output-parity",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "a89d13c824638ab3993f636f211b73af8e1a9af3",
-      "evidence": "docs/delivery/compact01-interface-density/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner-compact-acceptance",
@@ -82,10 +86,17 @@
       "source": "Direct owner request24/10/2026 in this chat",
       "impact": "Runtime Compact implementation and verification; baseline integration and scoped files",
       "decision": "Integrate exact d4f9d17 into Compact task only at0a25730; maintain comfortable baseline, implement solo, no main merge. Prior planning dependency on main integration replaced by stacked task dependency; FORM01 acceptance is not inferred."
+    },
+    {
+      "revision": 3,
+      "request": "tạo các token size chuẩn, các cấu trúc lược bớt; hiện tại chỉ đơn thuần giảm khoảng trống; tham khảo Apple, chuẩn ngành UIUX",
+      "source": "Direct owner feedback while reviewing production4342",
+      "impact": "Compact composition and size roles across KPH/DATE/report/forms; old density browser/visual evidence invalidated",
+      "decision": "Continue same task/worktree, standardize Store-local tokens with Apple HIG/WCAG sources and implement structural simplification. Preserve comfortable baseline, direct TPCN/TPTS entry and business state. No agents/main merge/deploy."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner review production4342: Settings Compact toggle and both densities across KPH/DATE/reports/forms. Technical PASS342tests plus browser gates. No main merge/push/deploy until applicable owner decision.",
+  "nextAction": "Freeze revision3 source, verify production size/composition and business regressions, then owner preview4344. No main merge.",
   "authorization": {
     "date": "2026-10-24",
     "source": "Direct owner request in this chat",
