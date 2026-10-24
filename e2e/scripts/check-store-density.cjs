@@ -58,6 +58,20 @@ async function bounds(p) {
   }
 }
 async function touch(locator) { const b=await locator.boundingBox();expect(b.width).toBeGreaterThanOrEqual(44);expect(b.height).toBeGreaterThanOrEqual(44); }
+async function formTextReflow(p, form, width) {
+  for(const factor of [1.5,2]){
+    await form.evaluate((root,factor)=>{
+      const nodes=[...root.querySelectorAll('h3,label,legend,input:not(.sr-only),textarea,.choice-card span,button')].filter(n=>n instanceof HTMLElement&&n.getBoundingClientRect().width>1);
+      const values=nodes.map(n=>({n,font:parseFloat(getComputedStyle(n).fontSize),line:parseFloat(getComputedStyle(n).lineHeight)}));
+      for(const {n,font,line}of values){if(!n.dataset.reflowStyle)n.dataset.reflowStyle=JSON.stringify([n.style.fontSize,n.style.lineHeight]);n.style.fontSize=`${font*factor}px`;if(Number.isFinite(line))n.style.lineHeight=`${line*factor}px`;}
+    },factor);
+    await bounds(p);
+    const clipped=await form.evaluate(root=>[...root.querySelectorAll('h3,legend,.choice-card,button')].filter(n=>{const b=n.getBoundingClientRect();return b.width>1&&b.height>1&&n.scrollWidth>n.clientWidth+1}).map(n=>n.textContent));
+    expect(clipped,`Compact form text${factor*100} horizontal reflow`).toEqual([]);
+    await p.screenshot({path:`${output}/form-text${factor*100}-${width}.png`});
+    await form.evaluate(root=>{for(const n of root.querySelectorAll('[data-reflow-style]')){const [font,line]=JSON.parse(n.dataset.reflowStyle);n.style.fontSize=font;n.style.lineHeight=line;delete n.dataset.reflowStyle;}});
+  }
+}
 
 (async()=>{
   const browser=await chromium.launch();const results=[];
@@ -170,6 +184,7 @@ async function touch(locator) { const b=await locator.boundingBox();expect(b.wid
         await detail.getByRole('button',{name:'Xử lý',exact:true}).click();
         const form=p.locator('.store-create-screen');await expect(form.locator('#product-name')).toBeAttached();
         await expect(form).toHaveAttribute('data-kind',kind);await bounds(p);
+        if(kind==='tpcn')await formTextReflow(p,form,viewport.width);
         const quantity=form.getByRole('textbox',{name:'Số lượng',exact:true});await quantity.fill('0');
         await form.getByRole('button',{name:'Xem lại',exact:true}).click();await expect(quantity).toHaveAccessibleDescription('Số lượng phải lớn hơn 0');await expect(quantity).toBeFocused();
         await quantity.fill('1');await form.getByRole('button',{name:'Xem lại',exact:true}).click();await expect(form.locator('#kph-photo-feedback')).toBeFocused();

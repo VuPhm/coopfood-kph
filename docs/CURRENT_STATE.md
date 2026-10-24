@@ -6,8 +6,9 @@ hàng, bỏ shortcut tạo/sort trùng; DATE toolbar một hàng; report kỳ/l�
 count vào selection; section form/filter phẳng. Comfortable và workflow giữ.
 [Size/nguồn Apple/W3C](product/STORE_APP_SIZE_TOKENS.md),
 [evidence](delivery/compact01-interface-density/technical.md). Preview mới
-<http://127.0.0.1:4344/#kph>; technical đang chốt, owner pending. Cùng task/base,
-main vẫnf77034d; chưa merge/push/deploy. Bước tiếp: kiểm production rồi owner xem.
+<http://127.0.0.1:4344/#kph>; technical346tests + browser hai mật độ/5viewport, frame7màn/7viewport,
+scrollbar/dock và form text150/200 đạt; owner pending. Cùng task/base,
+main vẫnf77034d; chưa merge/push/deploy. Bước tiếp: owner xem size và cấu trúc mới trước nghiệm thu.
 
 **COMPACT01 revision2 — lịch sử24/10/2026:** thêm Chế độ gọn tại Tài khoản → Cài đặt
 → Giao diện; mặc định tắt, nhớ theo thiết bị. Gọn chủ yếu search/CTA/bộ lọc/
