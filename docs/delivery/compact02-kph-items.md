@@ -1,5 +1,9 @@
 # COMPACT02 — candidate item KPH
 
+Runtime/source checkpoint`c3f05c5d4679254733a82737fe6e35afcc302159`.
+Các lệnh kiểm ở dưới chạy trên đúng source này trước khi commit; bản ghi SHA
+sau đó chỉ đổi hồ sơ. Preview production4346 session1449, dev4345 session18061.
+
 Ngày25/10/2026; sole writer: chat hiện tại. Owner yêu cầu “ok thử đi” ngay
 sau đề xuất thử một candidate item KPH trước khi mở rộng list khác.
 Feedback tiếp: “đối với đã hoặc không duyệt nếu hết chỗ thì chỉ hiện icon hoặc
