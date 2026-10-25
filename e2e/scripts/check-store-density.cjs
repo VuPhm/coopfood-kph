@@ -93,7 +93,12 @@ async function formTextReflow(p, form, width) {
         expect(compact['.store-header'].height).toBe(comfortable['.store-header'].height);
         if(screen==='kph'){
           expect(compact['.store-kph-underlay'].height).toBeLessThan(comfortable['.store-kph-underlay'].height);
-          const item='[data-record-id]';expect(compact[item].font).toBe(comfortable[item].font);expect(compact[item].height).toBeGreaterThanOrEqual(comfortable[item].height*.9);
+          const item='[data-record-id]';expect(compact[item].font).toBe(comfortable[item].font);
+          // COMPACT02 permits secondary approval text to collapse. At900px this
+          // removes baseline wrapping, so a percentage of that tall row is stale.
+          // Keep the accepted two-line desktop floor and mobile readable-row floor;
+          // the interaction gate below still checks actual44px controls.
+          expect(compact[item].height).toBeGreaterThanOrEqual(viewport.width>=900?56:88);
           await touch(p.locator('.create-tpcn'));await touch(p.locator('.create-tpts'));
           await expect(p.locator('.store-scan-trigger')).toHaveCount(0);await expect(p.locator('.store-kph-list-toolbar .store-quick-sort-trigger')).toHaveCount(0);
           await expect(p.locator('.store-create-heading,.store-create-kind-label')).toHaveCount(0);

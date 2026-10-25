@@ -1,5 +1,16 @@
 # Công việc kế tiếp
 
+**COMPACT03 — candidate item DATE/Báo cáo/Thông báo,25/10/2026:** theo owner
+“ổn, tiếp” sau KPH4346. Compact giữ chip DATE làm tín hiệu chính, processing
+thành chữ/icon không pill; HSD/Tồn trong report là dòng dữ kiện không khung
+con; Thông báo bỏ khung nhóm, giữ header/count/description và native thu/mở.
+Không đổi DOM/data/workflow, %HSD24px, lịch nhắc hoặc KPH đã duyệt. Preview
+<http://127.0.0.1:4348/#date> → bật Chế độ gọn. Base`0b63982`, nhánh
+`store-app/compact03-date-report-items`; một writer, chưa merge main/push/deploy.
+[Scope/evidence/giới hạn](delivery/compact03-date-report-items.md). Technical346tests,
+mock build117precache và browser5viewport đạt; owner chưa nghiệm thu candidate này.
+Bước nhỏ tiếp: owner xem DATE, Báo cáo và Thông báo ở hai mật độ.
+
 **COMPACT02 — CLOSED,25/10/2026:** owner “ok thử đi” cho slice
 KPH đã đề xuất. Chỉ Compact: mobile đưa trạng thái duyệt ra khỏi strip, cạnh
 SKU/số lượng; giữ chip tình trạng và biện pháp dạng chữ/icon không nền.

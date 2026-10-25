@@ -22,6 +22,7 @@ import "./store-button-system.css";
 import "./store-chrome-soft.css";
 import "./store-size-tokens.css";
 import "./store-density.css";
+import "./store-record-items.css";
 
 export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {
   screen: StoreAppScreen; profile: StoreProfile; navigate: (screen: Screen) => void;

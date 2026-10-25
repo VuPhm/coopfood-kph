@@ -52,3 +52,24 @@ Account sheet có body cuộn riêng; màn thấp dùng header gọn để công
 focus rõ và forced-colors cue. Không thêm animation hoặc dependency.
 
 Kiểm chứng/candidate/giới hạn tại [technical](../delivery/compact01-interface-density/technical.md).
+
+## Candidate COMPACT03 — item DATE/Báo cáo/Thông báo,25/10/2026
+
+Owner chấp nhận item KPH4346 bằng “ổn, tiếp”, cho tiếp tục các list theo
+[đề xuất](../delivery/compact01-interface-density/list-items-next.md). Đây là
+candidate kế tiếp, chưa nghiệm thu hình ảnh hoặc cho phép merge main.
+
+- DATE: giữ tên/SKU/lô, NSX/HSD, %HSD24px, phase và lịch báo lại; processing
+  là chữ/icon có màu, không nền/viền pill. Không ẩn Mở/Đã ghi nhận hoặc ngày
+  nhắc. Không thay nhãn/timeline trong chi tiết.
+- Báo cáo: bỏ khung nền HSD/Tồn trong card, trình bày thành dòng dữ kiện;
+  processing thành chữ/icon. Giữ checkbox độc lập44px, toàn bộ dữ liệu thiếu
+  tồn, phase, selected/mixed và detail. Bảng desktop giữ cột và dữ liệu.
+- Thông báo: các nhóm phẳng, separator phân nhóm thay khung bao; bỏ gutter
+  lặp ở bên trong để item có thêm30px vùng đọc. Giữ phase/%HSD, header/count/
+  description, native thu/mở và mở đúng lô. Không loại thông tin lặp khỏi data.
+- `store-record-items.css` chỉ screen Compact. Comfortable và bản in/PDF/Excel
+  giữ quy tắc đã chốt; KPH của COMPACT02 không đổi. Các recipe dùng size tokens
+  hiện có, không thêm mode, dependency hoặc shared primitive.
+
+[Preview, số đo, kiểm tra và giới hạn](../delivery/compact03-date-report-items.md).

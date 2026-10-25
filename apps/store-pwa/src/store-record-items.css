@@ -1,0 +1,42 @@
+/* Compact list hierarchy. DATE remains the primary signal; processing is text.
+   Flatten report facts and notification groups without removing their content.
+   Comfortable, detail sheets, charts and printed documents keep their recipes. */
+@media screen {
+  html[data-store-density="compact"] .store-app :is(.store-date-lots, .date-report-catalog) [data-processing-status] {
+    border: 0;
+    border-radius: 0;
+    padding-inline: 0;
+    background: transparent;
+    font-weight: 500;
+  }
+  html[data-store-density="compact"] .store-app .store-date-lot-labels { gap: var(--store-space-2); }
+  html[data-store-density="compact"] .store-app .store-date-lot-footer { margin-top: 0; }
+
+  html[data-store-density="compact"] .store-app .date-report-card-dates {
+    justify-content: flex-start;
+    gap: var(--store-space-1) var(--store-space-4);
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+  }
+  html[data-store-density="compact"] .store-app .date-report-card-labels {
+    align-items: center;
+    gap: var(--store-space-2);
+    margin-top: 0;
+  }
+
+  html[data-store-density="compact"] .store-app .store-notification-section {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  html[data-store-density="compact"] .store-app .store-notification-section + .store-notification-section {
+    border-top: 1px solid var(--store-holder-edge);
+  }
+  html[data-store-density="compact"] .store-app .store-notification-section > summary {
+    border-radius: 0;
+    padding-inline: 0;
+  }
+  html[data-store-density="compact"] .store-app .store-notification-items { padding-inline: 0; }
+}
