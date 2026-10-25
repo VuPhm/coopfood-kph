@@ -73,3 +73,20 @@ candidate kế tiếp, chưa nghiệm thu hình ảnh hoặc cho phép merge mai
   hiện có, không thêm mode, dependency hoặc shared primitive.
 
 [Preview, số đo, kiểm tra và giới hạn](../delivery/compact03-date-report-items.md).
+
+## COMPACT03 revision2 — vùng phụ, candidate26/10/2026
+
+Theo owner yêu cầu tiếp phần bị ngắt và đồng nhất vùng chưa cover. Recipe chỉ
+áp screen Compact; comfortable và output giữ nguyên. Không đổi handler hoặc
+đưa dữ liệu nghiệp vụ vào preference.
+
+| Consumer bổ sung | Recipe |
+| --- | --- |
+| Chi tiết KPH | Summary không khung/nền lồng, separator nhẹ; hàng tối thiểu44px, chữ14px, section17px. Label/value được wrap khi phóng chữ; giữ đủ ảnh và CTA duyệt. |
+| Menu report/mẫu cá nhân/lịch sử | Hàng chức năng tối thiểu72px, icon phụ36px/20px, separator thay card/shadow; giữ màu icon, tên/mô tả/kỳ/count và quản lý mẫu44px riêng. |
+| Lịch sử Tra hạn | Hàng phẳng, chữ phụ từ11px thành12px, ngày vẫn dd/mm/yyyy; cột ngày có minimum theoem để co giãn khi chữ lớn. Giữ snapshot lúc tra,20lần và Tra lại44px. |
+| Tài khoản/Cài đặt | Store/settings rows phẳng, face36px, switch row≥56px, nút44px và inset/gap theo tokens; giữ hero, mô tả, persistence/fallback, body scroll và trả focus. |
+
+Không thay đổi Home brand modules, header/navigation, timeline/chart hoặc
+ảnh. [Coverage/phần hoãn](../delivery/compact03-date-report-items/assessment.md),
+[kế hoạch và giới hạn](../delivery/compact03-date-report-items/plan.json).

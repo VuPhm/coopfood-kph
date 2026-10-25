@@ -1,0 +1,89 @@
+/* Secondary Compact consumers share the same flat section/functional-row recipe.
+   Scope includes Fresh portals, never comfortable, print, charts or evidence. */
+@media screen {
+  html[data-store-density="compact"] .store-kph-detail .store-summary,
+  html[data-store-density="compact"] .store-account-sheet :is(.store-account-store, .store-density-switch) {
+    border: 0; border-radius: 0; box-shadow: none; background: transparent;
+  }
+  html[data-store-density="compact"] .store-kph-detail .store-summary > div {
+    min-height: var(--store-size-row-one); flex-wrap: wrap;
+    padding: var(--store-space-2) 0;
+    font-size: var(--store-type-control); line-height: var(--store-leading-control);
+  }
+  html[data-store-density="compact"] .store-kph-detail .store-summary dd { flex: 1 1 12ch; }
+  html[data-store-density="compact"] .store-kph-detail section h3 {
+    margin-bottom: var(--store-space-2);
+    font-size: var(--store-type-section); line-height: var(--store-leading-section);
+  }
+  html[data-store-density="compact"] .store-kph-detail .store-kph-detail-kind {
+    border-radius: 0; padding: 0 0 var(--store-space-3);
+    border-bottom: 1px solid var(--store-holder-edge); background: transparent;
+  }
+
+  html[data-store-density="compact"] .store-app .report-hub .report-type-list {
+    gap: 0; border-top: 1px solid var(--store-holder-edge);
+  }
+  html[data-store-density="compact"] .store-app .report-hub :is(.report-type-card, .report-history-card) {
+    grid-template-columns: var(--store-size-face-sm) minmax(0, 1fr) var(--store-size-icon-md);
+    min-height: var(--store-size-row-three); gap: var(--store-space-3);
+    border: 0; border-bottom: 1px solid var(--store-holder-edge); border-radius: 0;
+    padding: var(--store-space-3) 0; background: transparent; box-shadow: none;
+  }
+  html[data-store-density="compact"] .store-app .report-hub .report-custom-card {
+    border: 0; border-bottom: 1px solid var(--store-holder-edge); border-radius: 0;
+    background: transparent; box-shadow: none;
+  }
+  html[data-store-density="compact"] .store-app .report-hub .report-custom-card .report-type-card { border: 0; }
+  html[data-store-density="compact"] .store-app .report-hub .report-type-icon {
+    width: var(--store-size-face-sm); height: var(--store-size-face-sm);
+    box-shadow: none; background-image: none;
+  }
+  html[data-store-density="compact"] .store-app .report-hub .report-type-icon > svg {
+    width: var(--store-size-icon-md); height: var(--store-size-icon-md);
+  }
+  html[data-store-density="compact"] .store-app .report-hub :is(.report-type-card, .report-history-card):hover { background: var(--store-canvas); }
+  html[data-store-density="compact"] .store-app .report-hub .report-template-manage {
+    align-self: center; min-width: var(--store-size-hit-min); min-height: var(--store-size-hit-min);
+  }
+  html[data-store-density="compact"] .store-app .report-history-tools {
+    border: 0; border-bottom: 1px solid var(--store-holder-edge); border-radius: 0;
+    padding: 0 0 var(--store-space-3); background: transparent;
+  }
+
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-list { gap: 0; }
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-list > li {
+    --ui-list-marker-top: var(--store-space-3);
+    gap: var(--store-space-2); border: 0; border-bottom: 1px solid var(--store-holder-edge);
+    border-radius: 0; box-shadow: none;
+    padding: var(--store-space-2) 0 var(--store-space-3) var(--store-space-4);
+  }
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-list > li > .ui-list-item-marker { left: 0; }
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-list dl {
+    font-size: var(--store-type-caption);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7em), 1fr));
+  }
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-list :is(dt, dd small) {
+    font-size: var(--store-type-caption); line-height: var(--store-leading-caption);
+  }
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-list dl > div { min-width: 0; }
+  html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-recall { border-radius: var(--store-radius-control); }
+
+  html[data-store-density="compact"] .store-account-sheet .store-account-body {
+    gap: var(--store-space-3); padding: var(--store-space-4);
+  }
+  html[data-store-density="compact"] .store-account-sheet .store-account-store {
+    gap: var(--store-space-3); padding: 0 0 var(--store-space-3);
+    border-bottom: 1px solid var(--store-holder-edge);
+  }
+  html[data-store-density="compact"] .store-account-sheet .store-account-store-icon {
+    width: var(--store-size-face-sm); height: var(--store-size-face-sm); flex-basis: var(--store-size-face-sm);
+  }
+  html[data-store-density="compact"] .store-account-sheet .store-density-switch {
+    min-height: var(--store-size-row-two); padding: var(--store-space-2) 0;
+    border-bottom: 1px solid var(--store-holder-edge);
+  }
+  html[data-store-density="compact"] .store-account-sheet .store-density-switch:hover { background: var(--store-canvas); }
+  html[data-store-density="compact"] .store-account-sheet .store-account-actions button {
+    min-height: var(--store-size-hit-min); padding: var(--store-space-2) var(--store-space-3);
+  }
+}

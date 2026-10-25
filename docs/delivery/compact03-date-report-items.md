@@ -1,5 +1,9 @@
 # COMPACT03 — item DATE/Báo cáo/Thông báo
 
+Hồ sơ này giữ evidence revision1 tại checkpoint`236ce91`. Vòng đồng nhất
+revision2 theo owner26/10/2026 tiếp cùng task: [plan](compact03-date-report-items/plan.json),
+[technical hiện tại](compact03-date-report-items/technical.md).
+
 Ngày25/10/2026. Owner gửi trực tiếp “ổn, tiếp” sau candidate KPH4346; ghi
 nhận chấp nhận KPH runtime`c3f05c5`, tiếp tục theo đề xuất item list đã trình.
 Đây là slice trình bày có giới hạn, một writer (chat hiện tại), không dispatch

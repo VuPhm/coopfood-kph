@@ -1,6 +1,18 @@
 # Công việc kế tiếp
 
-**COMPACT03 — candidate item DATE/Báo cáo/Thông báo,25/10/2026:** theo owner
+**COMPACT03 revision2 — candidate đồng nhất Compact,26/10/2026:** resume đúng
+source`236ce91` và cùng worktree theo owner yêu cầu vòng tối ưu vùng chưa cover.
+Một lượt triển khai + một lượt tinh chỉnh có giới hạn: chi tiết KPH dùng section/
+summary phẳng; menu/mẫu/lịch sử report thành hàng chức năng với icon36px;
+lịch sử Tra hạn phẳng, caption12px và cột co giãn theo chữ; Tài khoản/Cài đặt
+bỏ khung lồng, giữ switch và hero. Bốn nhóm dùng size roles hiện có, target44px,
+giữ nội dung/handler và comfortable. Bản DATE/report catalog/Thông báo r1 giữ lại.
+Preview mới <http://127.0.0.1:4350/#reports>; baseline4348, dev4349. [Kế hoạch/gates](delivery/compact03-date-report-items/plan.json),
+[coverage](delivery/compact03-date-report-items/assessment.md), [evidence](delivery/compact03-date-report-items/technical.md).
+Một writer, không dispatch agent; owner chưa nghiệm thu bản tích hợp này.
+Chưa merge main/push/deploy. Bước tiếp: xem bốn nhóm ở hai mật độ và màn hẹp.
+
+**COMPACT03 revision1 — checkpoint kế thừa25/10/2026:** theo owner
 “ổn, tiếp” sau KPH4346. Compact giữ chip DATE làm tín hiệu chính, processing
 thành chữ/icon không pill; HSD/Tồn trong report là dòng dữ kiện không khung
 con; Thông báo bỏ khung nhóm, giữ header/count/description và native thu/mở.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "VERIFYING",
   "objective": "Complete one bounded Compact uniformity pass for KPH detail, report menu/history, shelf lookup history and account/settings, preserving comfortable and business behavior.",
   "inScope": [
     "Resume and checkpoint the interrupted revision1 DATE/report/notification candidate; retain existing source and evidence",
@@ -69,7 +69,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Capture baseline screenshots and dimensions for four uncovered families, implement one Compact-only recipe pass, verify and prepare owner preview.",
+  "nextAction": "Pass1 implementation and one bounded refinement completed. Verify final source/build and production preview4350; required user acceptance remains pending.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
