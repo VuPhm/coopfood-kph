@@ -28,7 +28,8 @@
     "docs/NEXT.md",
     "docs/product/STORE_APP_DENSITY.md",
     "docs/delivery/compact03-date-report-items.md",
-    "docs/delivery/compact03-date-report-items/**"
+    "docs/delivery/compact03-date-report-items/**",
+    "e2e/scripts/check-store-scrollbars.cjs"
   ],
   "reviewLimit": 2,
   "reviewRound": 0,
@@ -65,7 +66,7 @@
       "request": "tiếp đoạn bị ngắt, vào vòng lặp tối ưu đồng nhất phong cách mớ này cho các vùng chưa cover",
       "source": "Owner message26/10/2026, after interrupted COMPACT03",
       "impact": "Adds secondary utility/management surfaces; new visual/portal gates required. No prior acceptance inferred for COMPACT03.",
-      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch."
+      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch. Validation maintenance only: native-scrollbar gate supports host overlay bars and Compact preference, and requires thumb drag to advance beyond the wheel activation position."
     }
   ],
   "blockers": [],

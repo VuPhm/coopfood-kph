@@ -41,3 +41,23 @@ Keep accepted Home/header/navigation, charts/timeline and photo evidence outside
 this pass. Default comfortable and print/output must retain their recipes.
 Optional areas outside four families are deferred; do not keep auditing without
 a bounded scope revision. Owner acceptance for integrated r2 remains pending.
+
+## Native scrollbar gate on the resumed host
+
+The original gate assumed native bars always reserve positive layout width.
+At1440×1024 the current MacIntel Chromium reports bar0 on all seven routes
+while document range remains positive, identically on baseline4348 and4350.
+Disabling overlay-related flags did not change this host behavior. Initial
+logs `scrollbars.log` and `scrollbars-overlay.log` are retained.
+
+A wheel event reveals the auto-hiding thumb. The gate now accepts0–12px
+reserved width while still requiring computed thin native scrollbars and all
+existing page/body bounds, scroll-lock, header stability and drag checks. The
+drag assertion is stronger: scrollTop must advance beyond its position after
+the activation wheel, so wheel scrolling alone cannot pass. An optional
+STORE_UI_DENSITY=compact runs the same gate against the new recipes.
+
+The equivalent local diagnostic passed all five viewports before adopting
+this validation-only change (`scrollbars-activated.log`). No app styling or OS
+preferences were changed to make it pass. Runtime remains source767088a; the
+final candidate also includes this test maintenance and evidence ledger.

@@ -1,4 +1,5 @@
-// Headless Chromium normally hides scrollbars. Keep native bars visible in this gate.
+// Headless Chromium normally hides scrollbars. Enable native bars for this gate;
+// the host can still use overlay bars that reserve no layout width.
 const { chromium, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const base = process.env.STORE_PREVIEW_URL || 'http://127.0.0.1:4294';
@@ -24,10 +25,14 @@ async function scrollBody(page, dialog, selector, desktop) {
   if (before.range > 1) {
     if (desktop) {
       // Drag the actual scrollbar thumb; no application scroll simulation.
+      // A real wheel event reveals an auto-hiding overlay thumb before grabbing it.
+      await body.hover(); await page.mouse.wheel(0, 1);
+      await expect.poll(() => body.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      const dragStart = await body.evaluate(el => el.scrollTop);
       const box = await body.boundingBox();
       await page.mouse.move(box.x + box.width - 3, box.y + 20);
       await page.mouse.down(); await page.mouse.move(box.x + box.width - 3, box.y + Math.min(140, box.height - 20), { steps: 8 }); await page.mouse.up();
-      await expect.poll(() => body.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      await expect.poll(() => body.evaluate(el => el.scrollTop)).toBeGreaterThan(dragStart);
       expect(Math.abs((await header.boundingBox()).y - heading.y)).toBeLessThanOrEqual(1);
       expect(await dialog.evaluate(el => el.scrollTop)).toBe(0);
     }
@@ -47,13 +52,17 @@ async function scrollBody(page, dialog, selector, desktop) {
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1024 }, { width: 1280, height: 720 }, { width: 900, height: 650 }, { width: 1440, height: 500 }]) {
       const desktop = viewport.width >= 900;
       const page = await browser.newPage({ viewport, reducedMotion: 'reduce', serviceWorkers: 'block' });
+      if (process.env.STORE_UI_DENSITY === 'compact') await page.addInitScript(() => localStorage.setItem('coopfood.store-ui.density.v1', 'compact'));
       page.setDefaultTimeout(10000); const errors = [];
       page.on('pageerror', e => errors.push(e.message));
       for (const screen of ['home', 'kph', 'date', 'notifications', 'reports', 'shelf', 'login']) {
         await ready(page, screen); await fits(page);
         if (desktop && screen === 'kph') expect(await page.locator('.store-kph-table-wrap').evaluate(el => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
         const root = await page.evaluate(() => ({ bar: innerWidth - document.documentElement.clientWidth, height: document.documentElement.scrollHeight }));
-        if (desktop) { expect(root.bar).toBeGreaterThan(0); expect(root.bar).toBeLessThanOrEqual(12); }
+        if (desktop) {
+          expect(root.bar).toBeGreaterThanOrEqual(0); expect(root.bar).toBeLessThanOrEqual(12);
+          expect(await page.locator('html').evaluate(el => getComputedStyle(el).scrollbarWidth)).toBe('thin');
+        }
         const box = await page.locator(desktop && screen !== 'login' ? '.store-main-column' : '.store-page-layout').boundingBox();
         expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
         await page.mouse.move(viewport.width - 30, viewport.height / 2); await page.mouse.wheel(0, 500);
