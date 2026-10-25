@@ -21,7 +21,7 @@
   }
 
   html[data-store-density="compact"] .store-app .report-hub .report-type-list {
-    gap: 0; border-top: 1px solid var(--store-holder-edge);
+    row-gap: 0; column-gap: var(--store-space-4); border-top: 1px solid var(--store-holder-edge);
   }
   html[data-store-density="compact"] .store-app .report-hub :is(.report-type-card, .report-history-card) {
     grid-template-columns: var(--store-size-face-sm) minmax(0, 1fr) var(--store-size-icon-md);
