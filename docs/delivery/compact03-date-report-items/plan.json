@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "compact03-date-report-items",
+  "revision": 2,
+  "status": "EXECUTING",
+  "objective": "Complete one bounded Compact uniformity pass for KPH detail, report menu/history, shelf lookup history and account/settings, preserving comfortable and business behavior.",
+  "inScope": [
+    "Resume and checkpoint the interrupted revision1 DATE/report/notification candidate; retain existing source and evidence",
+    "Audit currently uncovered Store Fresh surfaces, then implement at most four consumer families: KPH detail, report menu/history including personal template rows, shelf history, account/settings body",
+    "Use existing Store size tokens and flat section/row hierarchy, retain primary type and status text; operational target at least44px; no new runtime state or dependency for style",
+    "Run one implementation pass and at most one consolidated repair pass; record further optional suggestions as deferred",
+    "Verify comfortable geometry/content parity, Compact portal focus/scroll/reflow and workflow, print/export isolation, runnable production preview"
+  ],
+  "outOfScope": [
+    "Agents or new user-owned threads; execution stays solo in the existing task worktree",
+    "Main integration, push, deployment or Pages; no implied FORM01 acceptance",
+    "Business/API/auth/store scope/data/schema changes, Admin/legacy/Pilot/login",
+    "Home brand module redesign, accepted app header/navigation, timeline/chart colors/geometry, image evidence size/order, scanner/OS/hardware flows",
+    "Blanket audit cleanup, unlimited design loops, new typography/palette or shared UI/root dependency/config changes"
+  ],
+  "baseSha": "236ce91198b5d0429afbfb2c55f2be12324af084",
+  "candidateSha": "",
+  "integrationOwner": "Current chat, sole writer in the existing COMPACT03 worktree",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-compact-surfaces.css",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/STORE_APP_DENSITY.md",
+    "docs/delivery/compact03-date-report-items.md",
+    "docs/delivery/compact03-date-report-items/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "comfortable-and-output-isolation",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "secondary-surface-hierarchy",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "workflow-and-accessibility",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-uniformity-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "tiếp đoạn bị ngắt, vào vòng lặp tối ưu đồng nhất phong cách mớ này cho các vùng chưa cover",
+      "source": "Owner message26/10/2026, after interrupted COMPACT03",
+      "impact": "Adds secondary utility/management surfaces; new visual/portal gates required. No prior acceptance inferred for COMPACT03.",
+      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Capture baseline screenshots and dimensions for four uncovered families, implement one Compact-only recipe pass, verify and prepare owner preview.",
+  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
+  "branch": "store-app/compact03-date-report-items",
+  "authorization": {
+    "date": "2026-10-26",
+    "source": "Direct user request in this chat",
+    "request": "tiếp đoạn bị ngắt, vào vòng lặp tối ưu đồng nhất phong cách mớ này cho các vùng chưa cover",
+    "scope": "Continue implementation and local verification; no merge/push/deploy."
+  },
+  "documents": {
+    "priorTechnical": "docs/delivery/compact03-date-report-items.md",
+    "assessment": "docs/delivery/compact03-date-report-items/assessment.md"
+  }
+}
