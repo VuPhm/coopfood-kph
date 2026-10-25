@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
   "revision": 2,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Complete one bounded Compact uniformity pass for KPH detail, report menu/history, shelf lookup history and account/settings, preserving comfortable and business behavior.",
   "inScope": [
     "Resume and checkpoint the interrupted revision1 DATE/report/notification candidate; retain existing source and evidence",
@@ -19,7 +19,7 @@
     "Blanket audit cleanup, unlimited design loops, new typography/palette or shared UI/root dependency/config changes"
   ],
   "baseSha": "236ce91198b5d0429afbfb2c55f2be12324af084",
-  "candidateSha": "",
+  "candidateSha": "24484813695d693cea6ae344cc9a041ce577aaed",
   "integrationOwner": "Current chat, sole writer in the existing COMPACT03 worktree",
   "sharedPaths": [
     "apps/store-pwa/src/store-app-frame.tsx",
@@ -32,26 +32,35 @@
     "e2e/scripts/check-store-scrollbars.cjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "comfortable-and-output-isolation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "24484813695d693cea6ae344cc9a041ce577aaed",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "secondary-surface-hierarchy",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "24484813695d693cea6ae344cc9a041ce577aaed",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "workflow-and-accessibility",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "24484813695d693cea6ae344cc9a041ce577aaed",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "owner-uniformity-acceptance",
@@ -66,11 +75,11 @@
       "request": "tiếp đoạn bị ngắt, vào vòng lặp tối ưu đồng nhất phong cách mớ này cho các vùng chưa cover",
       "source": "Owner message26/10/2026, after interrupted COMPACT03",
       "impact": "Adds secondary utility/management surfaces; new visual/portal gates required. No prior acceptance inferred for COMPACT03.",
-      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch. Validation maintenance only: native-scrollbar gate supports host overlay bars and Compact preference, and requires thumb drag to advance beyond the wheel activation position."
+      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch. Validation maintenance only: native-scrollbar gate supports host overlay bars and Compact preference, and requires thumb drag to advance beyond the wheel activation position. Final visual verification preserves16px between adjacent desktop report choices; no other audit scope added."
     }
   ],
   "blockers": [],
-  "nextAction": "Pass1 implementation and one bounded refinement completed. Verify final source/build and production preview4350; required user acceptance remains pending.",
+  "nextAction": "Owner reviews integrated production4350 in both densities across the four covered secondary families. Technical gates PASS; do not auto-start another audit or merge/push/deploy.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {

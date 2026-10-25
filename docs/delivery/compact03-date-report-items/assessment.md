@@ -20,3 +20,17 @@ This initial matrix is source-based. Baseline screenshots and measured results
 are captured before implementation and linked from technical evidence. Prior
 r1 evidence proves that checkpoint only; all affected secondary-surface gates
 start pending for revision2.
+
+## Final coverage and stop condition
+
+All four previously uncovered families are covered by one opt-in Store-local
+recipe file. KPH detail now uses flat44px rows with full-value wrap; report
+menu/personal/history use functional rows and36px decorative faces; shelf
+history is flat with12px captions and text-responsive columns; account/settings
+body uses flat rows while keeping the hero and operational switch.
+
+Technical source and evidence are pinned in plan.json/technical.md. Comfortable
+geometry/content is retained; integrated r1 items/flows remain. The next step
+is owner review of the integrated candidate, not another unrestricted audit.
+Accepted Home/header/navigation, charts/timeline, images, login/legacy/Admin and
+OS-specific scanner interaction stay deferred/out of this pass by design.
