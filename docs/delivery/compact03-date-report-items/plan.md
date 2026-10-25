@@ -1,20 +1,20 @@
-# COMPACT03 revision2 — bounded uniformity pass
+# COMPACT03 revision3 — shared Fresh and density loop
 
-Owner26/10 asks to resume and optimize uncovered areas. Continue the existing
-task; revision1 runtime checkpoint236ce91 and its evidence are retained.
-One writer, no agent dispatch; no acceptance or merge authority inferred.
+Explicit owner request26/10 authorizes agents and default Co.op Fresh work.
+Continue the existing task from clean reviewed2a3b574. Revision2 plan and
+evidence are preserved as revision2-*. Default geometry parity is no longer
+required inside newly authorized visual scopes; fields/semantics and chrome
+outer geometry/print/chart invariants remain.
 
-Pass1: inspect baseline source and screenshots at390×844 and1440×1024; cover
-KPH detail, report menu/history/personal rows, shelf history, account/settings.
-Reuse Store tokens and visual hierarchy: primary signal clear, secondary facts
-flat, sections separated by hairlines, controls operational44px and reflow.
-Preserve labels/values, pending/error/selected states and real action handlers.
+Three isolated writers: shared readability/targets CSS, default secondary-
+surface CSS, loading-state CSS. Root owns frame imports, tokens, documents
+and integration. See plan.json exact worktrees and allowed paths.
 
-Pass2 only if necessary: one consolidated list of failures/inconsistencies;
-fix required problems and rerun affected checks. Do not restart a broad audit
-after every change. Optional findings outside four families stay deferred.
+Loop: consolidate audit -> implement -> integrate -> independent review ->
+one consolidated repair if needed -> final technical gates. At most two
+review rounds; no unlimited cleanup. Reviewer excludes self-owned changes;
+root independently reviews loading. New user changes require a revision.
 
-Preview the integrated candidate, record technical readiness separately from
-owner acceptance. Run cycle acceptance check; close only after actual owner
-decision. Default comfortable, print/export, accepted Home/header/navigation,
-charts/timeline and images are outside this style pass. No main merge/deploy.
+Run scope checks on each agent worktree, review diffs before integration,
+then check integrated source. Technical PASS stays separate from owner
+acceptance. No main integration/push/deploy/Pages or external messages.
