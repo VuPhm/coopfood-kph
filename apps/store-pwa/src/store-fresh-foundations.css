@@ -1,0 +1,28 @@
+/* Shared operational roles in both densities. Keep emphasized comfortable
+   controls roomy; screen-only rules do not affect exported documents. */
+@media screen {
+  body:has(.store-app) .store-kph-filter .store-date-range input,
+  body:has(.store-app) .store-create-screen[data-kind] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):not(.sr-only) {
+    min-height: var(--store-size-control-md);
+    padding-block: var(--store-space-2);
+    font-size: var(--store-type-input);
+    line-height: var(--store-leading-input);
+  }
+  body:has(.store-app) .store-kph-filter .store-date-range {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    gap: var(--store-space-3);
+  }
+  body:has(.store-app) :is(.store-review-notice small, .store-quick-sort-options small, .store-filter-count),
+  .store-app :is(.store-shelf-history-list dt, .store-shelf-history-list dd small, .store-shelf-history-columns, .store-header-store),
+  .store-app .store-mobile-toolbar a,
+  .store-app .store-desktop-rail :is(.store-rail-label, .store-rail-store small) {
+    font-size: var(--store-type-caption);
+    line-height: var(--store-leading-caption);
+  }
+  /* Calendar launchers have their own hit region, including portal filters.
+     Calendar day cells retain the date picker's existing layout. */
+  body:has(.store-app) :is(.store-shelf-form, .store-kph-filter) .field-input-action.expiry-calendar-trigger {
+    width: var(--store-size-hit-min);
+    height: var(--store-size-hit-min);
+  }
+}
