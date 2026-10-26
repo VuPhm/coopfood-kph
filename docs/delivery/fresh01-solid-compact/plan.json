@@ -17,7 +17,7 @@
     "Main merge/push, protected Pages or inferred Cloudflare publication",
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
-  "baseSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150",
+  "baseSha": "ccdab5a46b6eac12db51e9021454ce7647a6f673",
   "candidateSha": "",
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
@@ -90,5 +90,6 @@
     "plan": "docs/delivery/fresh01-solid-compact/plan.md",
     "assessment": "docs/delivery/fresh01-solid-compact/assessment.md",
     "spec": "docs/product/STORE_APP_SOLID_COMPACT.md"
-  }
+  },
+  "sourceSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150"
 }
