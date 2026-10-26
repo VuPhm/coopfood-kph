@@ -112,3 +112,8 @@ thông thường. Bản kế hoạch không tự cho phép publication hoặc ng
 Bước1–4 đã hoàn tất trong phạm vi; review2/2,347tests và browser gates đạt.
 [Kết quả và giới hạn](technical.md). Bước tiếp owner xem candidate4362; không
 mở thêm audit/rollout hoặc suy acceptance khi chưa có phản hồi.
+
+Revision2 triển khai xong: runtime40b238f, candidate28415cb, technical PASS347tests
+và browser gates; CSS+627bytegzip. Preview4364, owner visual acceptance pending.
+Review2/2; không tiếp tục audit mới. Các bước/baseline4362 bên trên là provenance
+revision1 và phạm vi nghiệp vụ kế thừa, không là URL candidate hiện tại.
