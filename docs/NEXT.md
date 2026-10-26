@@ -1,12 +1,16 @@
 # Công việc kế tiếp
 
-**COMPACT03 revision8 — tiếp DATE/KPH + list chung26/10/2026:** owner giữ hướng
-list Compact và yêu cầu áp cả hai mật độ, sửa tag thứ hai. KPH/DATE dùng list
-gọn độc lập công tắc; Biện pháp KPH và processing DATE có lại nền/viền/icon.
-Công tắc vẫn đổi controls/forms; print giữ đầy đủ. Tiếp toàn bộ r7: hai tab
-food type dùng chung, unknown rõ ràng, card/table → sheet, filter/nhắc/KPH giữ
-nghiệp vụ. Root sole writer, preview4360 đang kiểm. [Scope](delivery/compact03-date-report-items/plan.json).
-Chưa merge/push/cập nhật Cloudflare; bước tiếp kiểm bản tích hợp rồi owner xem.
+**COMPACT03 revision8 — technical PASS, owner pending 26/10/2026:** DATE/KPH
+đều dùng list gọn ở hai mật độ; tag Biện pháp KPH và xử lý DATE giữ nền/viền/icon.
+DATE dùng hai tab thực phẩm chung với KPH live/loading, bộ lọc trạng thái riêng,
+mục Chưa phân loại rõ ràng; card/table mở cùng sheet, giữ nhắc và DATE→KPH.
+Một policy list cho màn hình, print giữ đầy đủ; controls/forms vẫn theo công tắc.
+352 tests, Playwright list/tag/print, DATE workflow, hai mật độ/chữ150–200%,
+30 ca controller, thông báo/loading và cuộn native đạt. Root sole writer.
+Preview mới <http://127.0.0.1:4360/#date>; [files/commands/evidence](delivery/compact03-date-report-items/technical.md).
+Chưa merge/push/cập nhật Cloudflare. Bước nhỏ tiếp: owner xem DATE/KPH ở hai
+chế độ và thử tab → lọc → mở lô → Ghi nhận/Xử lý tại4360.
+
 
 
 **COMPACT03 revision7 — DATE/KPH alignment candidate26/10/2026:** owner yêu cầu
