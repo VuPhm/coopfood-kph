@@ -1,5 +1,14 @@
 # Danh mục component Store App
 
+**FRESH01 candidate26/10/2026:** một screen layout, bỏ preference và old
+comfortable branches. [Store material](../../apps/store-pwa/src/store-material.css)
+sở hữu palette/edge/card roles; function/utility layout cùng size tokens dùng
+chung các màn. CTA KPH và report settings chỉ còn một composition. Sort nằm
+trong filter DATE/KPH; QuickSort popup và SettingsGroup/Row không còn consumer
+nên đã bỏ. useStorePrint giữ định dạng output, không phải UI mode.
+[Files/checks](../delivery/fresh01-solid-compact/technical.md).
+
+
 FORM01 revision4: [Button role/state tokens](../../apps/store-pwa/src/store-button-system.css)
 và [chrome boundary tokens](../../apps/store-pwa/src/store-chrome-soft.css) dùng
 cùng [quy chuẩn Fresh Soft](STORE_APP_SURFACE_STYLE.md). Shared Button xuất
@@ -7,7 +16,7 @@ metadata variant/size; chỉ Store-local CSS tiêu thụ, giữ component/defaul
 
 **Vật liệu/khối/viền — reference22/10/2026:**
 [STORE_APP_SURFACE_STYLE](STORE_APP_SURFACE_STYLE.md) ghi recipe thật và số đo
-Home, các token hiện có trong `store-glass.css`, cascade và cách áp có scope.
+Home, các token hiện có trong `store-material.css`, cascade và cách áp có scope.
 Dùng trước khi thêm card style khác. Không có primitive/card API mới ở lượt
 hệ thống hoá này; các đề xuất refactor trong catalog vẫn là đề xuất.
 
@@ -82,7 +91,6 @@ cho Button/Input/Dialog/CloseButton/Tag; chưa có file test riêng Field/Card/n
 | [StoreNotifications](../../apps/store-pwa/src/store-notifications.tsx) | Empty state theo quyết định owner, hero compact/nắp trắng; chưa có API/badge/push. |
 | [StorePageLayout/Hero/Surface](../../apps/store-pwa/src/store-page-hero.tsx) | Ba vị trí lắp chung: AppHeader, nội dung xanh, nội dung trắng. Layout100%/gradient/sticky/overlap 12/góc 24/gutter chung trong store-header.css; feature giữ nội dung, không density/title class/khung ngoài riêng. StoreReportPage compose kit cho menu; login cũng cùng kit, form một cột. [Quy tắc 22/10](STORE_APP_FRAME.md); owner cho merge, đã tích hợp main local ([hồ sơ](../delivery/header-style-rollout/merge-2026-10-22.md)). |
 | [StoreSheet + Summary](../../apps/store-pwa/src/store-sheet.tsx) | Sheet modal mobile/centered desktop; `dl` nhãn/giá trị. Caller giữ state/action; Radix giữ focus/dismiss. |
-| [StoreQuickSort + QuickSortButton](../../apps/store-pwa/src/store-quick-sort.tsx) | Đã dùng chung KPH/DATE và loading trigger. Non-modal, áp dụng ngay, Arrow/Home/End, Escape/outside/focus. [KPH adapter](../../apps/store-pwa/src/store-kph-sort.tsx) và DATE giữ options riêng. CSS chung còn ở file KPH. |
 | [StoreStickyTabs](../../apps/store-pwa/src/store-sticky-tabs.tsx) + [CSS](../../apps/store-pwa/src/store-sticky-tabs.css) | Follow-up 15/10: KPH/DATE và loading KPH dùng chung lớp tab trắng, native sticky theo safe-area khi nắp lên đỉnh. Giữ group/aria-pressed của caller; focus reveal chỉ đo khi focus. DATE desktop neo trong cột list. [Evidence](../delivery/figma-mobile-implementation/sticky-tabs.md); owner chấp nhận preview bằng “pass, merge” ngày 16/10, chưa xác minh thiết bị thật. |
 | Filter, count switch, choice KPH/DATE | Khung nhóm/check/badge/footer và hàng selected 44 px còn JSX/CSS lặp. KPH giữ ngày/approval/selection reset; DATE giữ status/query. `store-tabs` đang là group + aria-pressed, không phải ARIA tabs. |
 | Tìm/quét | Có thể dùng lại phần trình bày có label/icon/vùng chạm. KPH search lọc phiếu nhưng nút scan mở tạo phiếu theo loại; DATE scan tìm lô. Không đồng nhất callback. |
@@ -241,7 +249,7 @@ rows/đợt, snapshot/Excel/print đủ tập; không render mọi lô trên mà
 
 [API/ví dụ/contract](STORE_FORM_CONTROLS.md),
 [SearchField](../../apps/store-pwa/src/store-search-field.tsx),
-[SettingsGroup/Row](../../apps/store-pwa/src/store-settings-group.tsx),
+SettingsGroup/Row cũ (đã bỏ trong FRESH01),
 [ChoiceSheet](../../apps/store-pwa/src/store-choice-sheet.tsx),
 [CSS](../../apps/store-pwa/src/store-form-controls.css).
 

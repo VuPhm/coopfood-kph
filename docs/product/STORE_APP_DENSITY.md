@@ -1,146 +1,36 @@
-# Store Fresh — Chế độ gọn (COMPACT01)
+# Store Fresh — một mật độ màn hình
 
-> FRESH01 planning26/10/2026: owner yêu cầu một UI gọn duy nhất và tái dựng
-> vật liệu/màu/khuôn. [Đặc tả mới](STORE_APP_SOLID_COMPACT.md),
-> [kế hoạch](../delivery/fresh01-solid-compact/plan.md). Runtime chưa đổi trong
-> lượt kế hoạch; nội dung dưới là provenance hai-mode/Fresh Soft trước thay thế.
+FRESH01 candidate26/10/2026 thay thế cơ chế hai chế độ theo yêu cầu owner.
+Store Fresh chỉ có giao diện gọn; Tài khoản không còn công tắc Giao diện.
+Không còn preference/provider/document flag hoặc đọc/ghi key mật độ. Giá trị
+browser cũ không ảnh hưởng UI và không cần migration/key thay thế.
 
+## Cấu trúc
 
-Revision3 chốt tạm ngày24/10/2026 theo owner “tạm, đến đây chốt được”.
-Runtime`ca543e6`; [quyết định/phạm vi](../delivery/compact01-interface-density/acceptance-revision3.md). Base task0a25730 có Fresh Soft
-d4f9d17 và đúng header816b4e3; chưa merge main. [Hồ sơ](../delivery/compact01-interface-density/plan.json).
+- Một CTA hàng gọn cho mỗi loại KPH, chung giữa loading/live, có icon/chevron.
+- Một hàng thiết lập báo cáo, period/filter có accessible context riêng.
+- Sort DATE/KPH trong filter, không còn shortcut và card comfortable trùng.
+- List screen giữ approval KPH cạnh định danh, hai tag tình trạng/Biện pháp;
+  DATE giữ phase/processing/%HSD/ngày/lịch nhắc và bao tag thứ hai.
+- Filter/detail/form dùng section và khoảng cách thay card lồng. Loading cùng
+  footprint, giữ neutral labels trước khi feature tải xong.
 
-## Sử dụng
+## Kích thước và khoảng hở
 
-Tài khoản → Cài đặt → Giao diện → **Chế độ gọn**. Mặc định tắt; đổi có hiệu lực
-ngay, nhớ theo browser/device. Không đổi account/store hoặc quyền. Khóa
-`coopfood.store-ui.density.v1` chỉ nhận `comfortable`/`compact`; thiếu/sai/đọc
-lỗi dùng comfortable, ghi lỗi vẫn đổi trong phiên và có thông báo chưa lưu.
+Token tại store-size-tokens.css. Phần chính44px; nút phụ độc lập36px với khoảng
+cách12px ở toolbar; icon face32–36px; tag chỉ đọc20px với chữ12/16. Input16/24,
+auto-height theo chữ lớn. Khoảng giữa nhóm16–24px, không thu mọi padding/gap
+xuống cùng một cỡ. Cả hàng list vẫn bấm được, checkbox và keyboard còn rõ.
+[Token/khuôn/màu](STORE_APP_SOLID_COMPACT.md) và
+[quy tắc size](STORE_APP_SIZE_TOKENS.md) ghi giới hạn theo vai trò.
 
-Size roles/cấu trúc và nguồn Apple/W3C ở [quy ước size](STORE_APP_SIZE_TOKENS.md).
+## Output và ranh giới
 
-## Hình ảnh
+Print là đầu ra riêng: KPH đủ3labels, report giữ document/table/Excel/PDF.
+Hook useStorePrint chỉ theo media print, không phải một preference màn hình.
+Screen rules ở Store Fresh/login và portal của chúng, không áp online/Pilot/
+Admin. Flow, data state, API, date rules và authorization không thay đổi.
 
-Ưu tiên vùng chức năng; giữ font chính, màu và Co.op Fresh Soft. Header72px,
-sidebar/menu và nghiệp vụ giữ baseline. Item giảm nhẹ đệm, không ép chiều cao.
-
-| Consumer | Compact |
-| --- | --- |
-| Tìm kiếm KPH/DATE/Báo cáo, clear/scan | 44px; clear button vẫn44px, input16px |
-| Tạo phiếu KPH | Button một hàng44px Tạo TPCN/TPTS, accessible name đầy đủ; bỏ shortcut trùng |
-| Báo cáo kỳ/phạm vi | Một hàng kỳ + lọc44px, face icon36px/hit44px, có active context |
-| Bộ lọc | Section phẳng phân cách nhẹ, gap8/12px; sort nằm trong sheet |
-| Choice sheet | Option60px/padding dọc8px; header/search/footer vẫn riêng |
-| Form KPH | Section phẳng/padding dọc12px, heading gap8px, lựa chọn≥48px/input≥44px; ảnh không thu nhỏ |
-| Tra hạn | Gap8px, form chính inset12px, nút≥44px; kết quả và timeline giữ nguyên |
-| KPH mobile / DATE item | Padding dọc8px /10px; tag và tên không gộp |
-| KPH desktop | Minimum row hai tầng56px, padding dọc6px; nội dung dài được nở cao |
-| Thông báo | Nhóm20/12/8px theo tầng; summary≥56px; item≥92px |
-
-Token `--store-density-*` chỉ sống dưới `html[data-store-density="compact"]`
-khi `.store-app` active. CSS density chỉ nằm trong `@media screen`; không áp
-chart/timeline, print/PDF/Excel, login, legacy online/Pilot hoặc Admin. Chế độ
-mặc định không có override geometry. Không tái sử dụng `.store-compact` của
-selection KPH làm density flag.
-
-## Tương tác và accessibility
-
-Provider không remount workspace. Tìm kiếm/lọc/selection/group/collapse/draft
-được giữ. Frame và loading frame đặt cùng document attribute để Radix portal
-nhận đúng mật độ; ra login/unmount dọn scope. Mở tài khoản giữ vị trí đọc khi
-trigger còn nhìn thấy; focus từ portal không làm hero/header cuộn về đầu.
-Ở vị trí cuộn sâu, lớp trắng của page kit che header như baseline; người dùng
-cần cuộn lên để tới Tài khoản, không có nút settings ẩn trong form đang modal.
-
-Vùng chạm≥44px, input16px, chữ phụ≥12px. Chữ lớn được phép tăng chiều cao.
-Account sheet có body cuộn riêng; màn thấp dùng header gọn để công tắc và nút
-đóng vẫn tới được. Switch có label/description/aria-checked, dùng Space/Enter,
-focus rõ và forced-colors cue. Không thêm animation hoặc dependency.
-
-Kiểm chứng/candidate/giới hạn tại [technical](../delivery/compact01-interface-density/technical.md).
-
-## Candidate COMPACT03 — item DATE/Báo cáo/Thông báo,25/10/2026
-
-Owner chấp nhận item KPH4346 bằng “ổn, tiếp”, cho tiếp tục các list theo
-[đề xuất](../delivery/compact01-interface-density/list-items-next.md). Đây là
-candidate kế tiếp, chưa nghiệm thu hình ảnh hoặc cho phép merge main.
-
-- DATE: giữ tên/SKU/lô, NSX/HSD, %HSD24px, phase và lịch báo lại; processing
-  là chữ/icon có màu, không nền/viền pill. Không ẩn Mở/Đã ghi nhận hoặc ngày
-  nhắc. Không thay nhãn/timeline trong chi tiết.
-- Báo cáo: bỏ khung nền HSD/Tồn trong card, trình bày thành dòng dữ kiện;
-  processing thành chữ/icon. Giữ checkbox độc lập44px, toàn bộ dữ liệu thiếu
-  tồn, phase, selected/mixed và detail. Bảng desktop giữ cột và dữ liệu.
-- Thông báo: các nhóm phẳng, separator phân nhóm thay khung bao; bỏ gutter
-  lặp ở bên trong để item có thêm30px vùng đọc. Giữ phase/%HSD, header/count/
-  description, native thu/mở và mở đúng lô. Không loại thông tin lặp khỏi data.
-- `store-record-items.css` chỉ screen Compact. Comfortable và bản in/PDF/Excel
-  giữ quy tắc đã chốt; KPH của COMPACT02 không đổi. Các recipe dùng size tokens
-  hiện có, không thêm mode, dependency hoặc shared primitive.
-
-[Preview, số đo, kiểm tra và giới hạn](../delivery/compact03-date-report-items.md).
-
-## COMPACT03 revision2 — vùng phụ, candidate26/10/2026
-
-Theo owner yêu cầu tiếp phần bị ngắt và đồng nhất vùng chưa cover. Recipe chỉ
-áp screen Compact; comfortable và output giữ nguyên. Không đổi handler hoặc
-đưa dữ liệu nghiệp vụ vào preference.
-
-| Consumer bổ sung | Recipe |
-| --- | --- |
-| Chi tiết KPH | Summary không khung/nền lồng, separator nhẹ; hàng tối thiểu44px, chữ14px, section17px. Label/value được wrap khi phóng chữ; giữ đủ ảnh và CTA duyệt. |
-| Menu report/mẫu cá nhân/lịch sử | Hàng chức năng tối thiểu72px, icon phụ36px/20px, separator thay card/shadow; giữ màu icon, tên/mô tả/kỳ/count và quản lý mẫu44px riêng. |
-| Lịch sử Tra hạn | Hàng phẳng, chữ phụ từ11px thành12px, ngày vẫn dd/mm/yyyy; cột ngày có minimum theoem để co giãn khi chữ lớn. Giữ snapshot lúc tra,20lần và Tra lại44px. |
-| Tài khoản/Cài đặt | Store/settings rows phẳng, face36px, switch row≥56px, nút44px và inset/gap theo tokens; giữ hero, mô tả, persistence/fallback, body scroll và trả focus. |
-
-Không thay đổi Home brand modules, header/navigation, timeline/chart hoặc
-ảnh. [Coverage/phần hoãn](../delivery/compact03-date-report-items/assessment.md),
-[kế hoạch và giới hạn](../delivery/compact03-date-report-items/plan.json).
-
-## COMPACT03 revision4 — candidate DATE/Thông báo và Fresh chung
-
-Owner26/10 yêu cầu đồng dạng phần chức năng và áp Compact cho DATE/Thông báo.
-Cả hai mật độ dùng input16/24, caption12/18, calendar launcher44px; cặp ngày
-filter KPH tự xuống hàng khi hẹp. Thông báo đưa tên/định danh bên trái và
-%HSD24px bên phải, phase/lịch báo lại thành dòng toàn chiều ngang như DATE.
-Giữ native details/summary và mở đúng lô, không thêm filter giả.
-
-Compact DATE: filter/detail/reminder phân section bằng separator, heading17/24,
-processing nhẹ hơn phase, lựa chọn nhắc và footer≥44px; không đổi box timeline.
-Comfortable giữ nhóm mềm/thoáng; chi tiết KPH được wrap label/value khi chữ lớn,
-report facts bớt nền lồng và account settings cùng recipe. Đây là thay đổi mặc
-định được owner cho phép, thay quy tắc giữ nguyên comfortable geometry của các
-revision trước trong đúng phạm vi này. Screen-only; print/chart/legacy giữ riêng.
-
-[Scope, bản tích hợp và kiểm chứng](../delivery/compact03-date-report-items/plan.json).
-Technical readiness không thay thế nghiệm thu owner hoặc cho phép merge.
-
-## COMPACT03 revision5 — controller ổn định
-
-Tài khoản/Cài đặt là nơi điều khiển mật độ nên giữ cùng geometry ở hai mode.
-Không thu padding/icon/nút của chính panel này khi bấm công tắc: điều đó làm
-cửa sổ tự co và dịch control dưới con trỏ. Recipe shared tại store-density.css;
-Fresh/Compact consumer files không sở hữu account layout nữa. Checked/focus
-paint vẫn đổi, workspace phía sau vẫn áp Compact ngay và giữ state. Quyết định
-này thay recipe account Compact ở revision2/4 trong đúng phạm vi sửa lỗi.
-
-Text input có một owner auto-height/min44; scan/action có thể giữ44px. DATE
-filter section thuộc file DATE, generic density chỉ sở hữu KPH/report. Không
-khóa input44px bằng selector ưu tiên cao hơn rồi vá auto-height ở cuối file.
-[Review/kiểm chứng](../delivery/compact03-date-report-items/revision5-review.md).
-
-## COMPACT03 revision8 — list gọn là mặc định chung
-
-Owner26/10 xác nhận list Compact tốt và yêu cầu áp dụng cả DATE/KPH chưa
-Compact. Trên screen hai mật độ dùng cùng item/table composition và geometry:
-KPH approval cạnh SKU/số lượng, hai tag tình trạng/biện pháp ở strip; DATE giữ
-phase/%HSD/processing/ngày/lịch nhắc với padding gọn. **Tag thứ hai giữ nền,
-viền, padding và icon đầy đủ**: Biện pháp KPH, trạng thái xử lý DATE. Approval
-KPH final vẫn được rút icon khi thiếu chỗ, Pending giữ chữ.
-
-`useStoreListDensity` là presentation policy theo screen/print, không phải
-preference thứ ba. Công tắc vẫn đổi controls/forms/secondary sections; không
-remount list hoặc đổi dữ liệu. Print dùng composition đầy đủ trước đây. Một
-rule table row dùng chung cho KPH/DATE; record-list CSS áp độc lập preference,
-tránh hai bộ override song song. Report/Thông báo ngoài yêu cầu này giữ scope
-riêng. [Kiểm chứng](../delivery/compact03-date-report-items/plan.json).
+Owner chưa nghiệm thu candidate FRESH01; technical/readiness được ghi tại
+[hồ sơ](../delivery/fresh01-solid-compact/technical.md). Hồ sơ COMPACT01/02/03
+là provenance trước tái dựng, không phải chỉ dẫn bật/tắt còn hiệu lực.

@@ -1,9 +1,11 @@
 # Co.op Fresh Soft — khối mềm, viền nhẹ
 
-> FRESH01 planning26/10/2026: owner yêu cầu một UI gọn duy nhất và tái dựng
-> vật liệu/màu/khuôn. [Đặc tả mới](STORE_APP_SOLID_COMPACT.md),
-> [kế hoạch](../delivery/fresh01-solid-compact/plan.md). Runtime chưa đổi trong
-> lượt kế hoạch; nội dung dưới là provenance hai-mode/Fresh Soft trước thay thế.
+> FRESH01 candidate26/10/2026 đã thay vật liệu/hai-mode trong Store Fresh.
+> Một palette trắng/well/xanh/xanhđậm, cam nhấn; solid selected, cạnh mềm16%
+> và độ nổi card/sheet. [Đặc tả đang dùng](STORE_APP_SOLID_COMPACT.md),
+> [kết quả triển khai](../delivery/fresh01-solid-compact/technical.md).
+> Nội dung bên dưới là provenance Fresh Soft trước tái dựng, không yêu cầu
+> giữ pastel chia vùng hoặc khôi phục công tắc. Owner FRESH01 chưa nghiệm thu.
 
 
 Tên ngắn: **Co.op Fresh Soft**. Mã tham chiếu giữ **`coop-fresh-soft-v1`**.
@@ -143,7 +145,7 @@ Nút chuông Home dùng holder trắng/viền này, **không có bóng**.
 Nguồn: [StoreHomeContent](../../apps/store-pwa/src/store-home.tsx),
 [Home CSS](../../apps/store-pwa/src/store-home.css),
 [base Home rules](../../apps/store-pwa/src/store-app.css),
-[material](../../apps/store-pwa/src/store-glass.css),
+material cũ store-glass.css (đã thay bởi [Store material](../../apps/store-pwa/src/store-material.css)),
 [mobile refinements](../../apps/store-pwa/src/store-mobile-refinements.css).
 
 ### Thẻ tính năng

@@ -1,5 +1,15 @@
 # Store Fresh — size roles và Compact composition
 
+**FRESH01 candidate26/10/2026 — quy tắc đang triển khai:** một UI screen, không
+còn mapping --store-density-* hoặc comfortable layout. Token hiện ở
+store-size-tokens.css; role chính/input44px, secondary36px, icon face32px,
+passive tag20px/12–16. Gap toolbar12px, gap nhóm16–24px. Không dùng hit-min44
+cho mọi thứ hoặc làm hitbox chồng nhau. Print có formatting riêng.
+[Đặc tả mới](STORE_APP_SOLID_COMPACT.md),
+[hồ sơ triển khai](../delivery/fresh01-solid-compact/technical.md).
+Phần dưới là rationale/inventory của COMPACT01 trước khi thay hai-mode.
+
+
 COMPACT01 revision3, candidate24/10/2026. Source:
 `apps/store-pwa/src/store-size-tokens.css`; mappings và bố cục trong
 `store-density.css`. Một owner ở task Compact; không đổi tokens global của UI.

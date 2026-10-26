@@ -1,10 +1,9 @@
 # Store Fresh Solid — đặc tả tái dựng một chế độ
 
-**Candidate specification —26/10/2026, chưa triển khai runtime/chưa nghiệm thu.**
+**Candidate implementation —26/10/2026, technical PASS, owner chưa nghiệm thu.**
 Theo yêu cầu owner sau preview4360: bỏ chuyển chế độ, chỉ một UI gọn; tăng
 màu/solid, cạnh mềm/độ nổi và khoảng hở, giảm thành phần phụ, đúc khuôn trượt.
-Đặc tả này định hướng FRESH01, thay hướng hai chế độ và pastel chia vùng khi
-triển khai. Tài liệu cũ giữ làm provenance, không mặc định giữ paint cũ.
+FRESH01 đã triển khai đặc tả này, thay hướng hai chế độ và pastel chia vùng. Tài liệu cũ giữ làm provenance, không mặc định giữ paint cũ.
 [Kế hoạch và thứ tự](../delivery/fresh01-solid-compact/plan.md).
 
 ## 1. Phân bổ màu 60–30–10
@@ -20,13 +19,15 @@ triển khai. Tài liệu cũ giữ làm provenance, không mặc định giữ 
 **Bốn mức nền dùng chung:** trắng `#FFFFFF`; well `#F2F5F3`; brand `#007A52`;
 brand-deep `#00583D`. Không tạo màu nền riêng cho DATE/KPH/Báo cáo/Tra hạn.
 Cam `#C45108` là accent chức năng, được dùng trên điểm nhấn cụ thể, không làm
-mức nền chia vùng thứ năm. Hover/pressed dùng cùng token family, không một
+mức nền chia vùng thứ năm. Chữ accent trên well dùng role đậm#9c410b để
+giữ tương phản, không lấy màu cam của nút áp vào chữ nhỏ. Hover/pressed dùng
+cùng token family, không một
 palette pastel mới. Chữ chính `#183B2D`, chữ phụ `#52655D`; đảo trắng trên
 solid xanh/cam. Field trắng hoặc well, màu vùng selected có nghĩa rõ.
 
 Token names giữ convention Store-local hiện có; trước khi thêm declaration
 kiểm owner và tái dùng nếu cùng nghĩa. Giá trị trên là điểm xuất phát để dựng
-khuôn, được tinh chỉnh qua browser/owner review, không nhận là brand approved.
+khuôn, được tinh chỉnh qua browser/owner review, không nhận là brand approved. Kết quả runtime tại [technical](../delivery/fresh01-solid-compact/technical.md).
 
 Đã tính tương phản sRGB của cặp đề xuất (chưa phải chứng nhận UI runtime):
 trắng/xanh5.38:1; trắng/xanhđậm8.53:1; trắng/cam4.64:1;

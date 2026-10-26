@@ -2,12 +2,11 @@
 
 Ngày26/10/2026. Theo yêu cầu owner: bỏ công tắc và giao diện cũ; tái dựng có
 kế hoạch, tăng trọng số màu/solid, viền mềm/độ nổi, khoảng hở; giảm thành phần
-nhỏ và giữ cấu trúc trượt. **Lượt này hoàn tất kế hoạch và bản đặc tả, chưa sửa
-runtime.** Không cần một lượt xin phép nữa để triển khai phạm vi đã yêu cầu.
+nhỏ và giữ cấu trúc trượt. **Đã triển khai và kiểm tra tích hợp; technical PASS, owner acceptance pending.** Không cần một lượt xin phép nữa để triển khai phạm vi đã yêu cầu.
 
 Nhánh `store-app/fresh01-solid-compact`, worktree
 `/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact`.
-Nguồn kế thừa `c5a440b`; runtime thực chất5b65094, preview4360 giữ nguyên.
+Nguồn kế thừa `c5a440b`; candidate mới1c5182c tại4362, preview4360 giữ nguyên.
 Không dùng main cũ làm điểm xuất phát vì sẽ mất DATE/KPH vừa làm. Không xem
 hướng list được chấp nhận là nghiệm thu toàn bộ candidate COMPACT03.
 
@@ -96,5 +95,6 @@ thông thường. Bản kế hoạch không tự cho phép publication hoặc ng
   đo hình học không thay kiểm một tay trên máy thật. Không tuyên bố đã đạt.
 - Tỷ lệ màu là quyết định thiết kế, chưa có owner nghiệm thu palette candidate.
 
-Bước thực hiện kế tiếp: bắt đầu bước1 theo map, sau đó dựng mẫu DATE/KPH bằng
-các token ở đặc tả; không cần lập một kế hoạch khác khi resume.
+Bước1–4 đã hoàn tất trong phạm vi; review2/2,347tests và browser gates đạt.
+[Kết quả và giới hạn](technical.md). Bước tiếp owner xem candidate4362; không
+mở thêm audit/rollout hoặc suy acceptance khi chưa có phản hồi.

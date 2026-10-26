@@ -1,14 +1,17 @@
 # Trạng thái hiện tại
 
-**FRESH01 — kế hoạch tái dựng một UI duy nhất,26/10/2026:** owner yêu cầu bỏ
-công tắc Compact/giao diện cũ; tăng solid/màu nhấn60–30–10, ít mức nền, viền
-mềm/độ nổi, khoảng hở và giảm phần tử phụ; giữ cấu trúc trượt. Nhánh/worktree
-riêng `store-app/fresh01-solid-compact` từc5a440b, root sole writer. Đã hoàn tất
-[kế hoạch và map bước1](delivery/fresh01-solid-compact/plan.md),
-[đặc tả khuôn/token](product/STORE_APP_SOLID_COMPACT.md); runtime chưa đổi,
-4360 vẫn COMPACT03 và Cloudflare vẫnr4. Không suy nghiệm thu/merge/deploy.
-Bước tiếp: gỡ preference/comfortable branches theo map, rồi dựng DATE/KPH làm
-mẫu và rollout xuyên app; không cần lập kế hoạch hay xin phép routine lần nữa.
+**FRESH01 — technical PASS, owner pending26/10/2026:** đã dựng Store Fresh
+một UI gọn duy nhất, bỏ setting/preference/comfortable branches và code chết.
+Một palette trắng/well/xanh, cam nhấn; selected solid, cạnh mềm/độ nổi mạnh hơn,
+nhóm thoáng hơn, nút phụ36px/tag20px, main/field44px; giữ khuôn trượt/flow.
+Home/DATE/KPH/Thông báo/Báo cáo/Tra hạn/account/login dùng cùng role; print và
+nghiệp vụ giữ riêng. Runtime1c5182c, nhánh `store-app/fresh01-solid-compact`.
+347tests, Playwright7màn/5viewport, chữ150/200, loading, nhóm/chọn/nối, nhắc/
+DATE→KPH/output, contrast/focus/native scrollbar đạt. Root sole writer.
+Preview mới <http://127.0.0.1:4362/#home>; [files/commands/evidence](delivery/fresh01-solid-compact/technical.md).
+Chưa merge/push/cập nhật Cloudflare (vẫnr4). Bước tiếp: owner xem7màn, mở
+filter/detail/form và thử account không còn công tắc; chưa suy visual acceptance.
+
 
 
 **COMPACT03 revision8 — technical PASS, owner pending 26/10/2026:** DATE/KPH
