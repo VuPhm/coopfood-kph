@@ -251,3 +251,12 @@ Không kéo business state/authorization/persistence vào control. Query/pending
 chỉ tồn tại khi sheet mở, chỉ Apply phát ra ID. Native scrolling list giữ
 search/header/footer trong viewport. Đã có test contract và browser gate;
 chưa coi là primitive Admin hoặc rollout ngoài feature báo cáo.
+
+## DATE/KPH revision7 — tái sử dụng thật
+
+`StoreFoodKindTabs` ở `store-food-kind-tabs.tsx` dùng bởi KPH workspace, KPH
+loading và DATE; chứa cùng nhãn, pressed state, count và sticky wrapper. Mỗi
+feature sở hữu count/filter, không đưa domain selection vào component. DATE
+dùng lại `StoreQuickSort`, `StoreSheet`, `useStoreDesktopLayout` và KPH card/
+table/control style roles; không render RecordView giả hoặc tạo generic record
+platform. `dateLotKind` và KPH seed dùng chung catalog context0/1, giữ unknown.

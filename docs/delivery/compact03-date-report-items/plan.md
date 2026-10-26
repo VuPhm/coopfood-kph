@@ -1,11 +1,17 @@
-# COMPACT03 revision6 — quick tag / CTA / field follow-up
+# COMPACT03 revision7 — DATE/KPH alignment
 
-Three owner-requested fixes only: restore Biện pháp container; soft pastel create
-CTAs with visible chevrons and one-surface comfortable hierarchy; matte field
-material from existing Store tokens, informed by official Apple HIG.
+Owner explicitly replaces DATE major tabs with food kind and asks reuse. Root
+sole writer, same task/worktree from e4b1013. Shared StoreFoodKindTabs has three
+real consumers; existing sort/sticky/sheet/layout hook/table roles are reused.
+Keep DATE metrics/reminder/domain behavior; no fake DATE create/bulk/export.
 
-Root sole writer in same task, no audit/team dispatch. Preserve revision5 plan
-and technical evidence. No business/state/auth/API dependency changes. Verify
-actual390/1440/320 both modes, hover/pressed/focus/error, text enlargement and
-existing density/toggle/workflow/output gates. New local4356, no main merge or
-inferred Cloudflare update/visual acceptance.
+Kind from unique catalog metadata; unknown stays in a reachable auxiliary queue.
+Exact lookup/notification selects correct kind. Status/phase independent filters,
+attention a shortcut. Mobilecards and desktopfullwidthtable open the same sheet.
+Delete old tabs/statusgrid/masterdetail/breakpoint effect instead of stacking
+another replacement component. One bounded UI review/verification, up to two
+rounds for blockers; gates and exactscope in plan.json. No main merge/publish.
+
+Historical DATE geometry is intentionally changed; print/output and KPH/chrome
+regression remain required. Timeline remains responsive with unchanged rules and
+colors, inside the new sheet rather than a fixed previous desktop column.

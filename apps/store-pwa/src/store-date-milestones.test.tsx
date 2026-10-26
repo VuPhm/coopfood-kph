@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { useState } from "react";
 import { DateWorkspace } from "./store-date-workspace";
 import type { MockDateLot } from "./store-app-mock";
@@ -8,12 +8,14 @@ function Workspace({ initial = [expired] }: { initial?: MockDateLot[] }) {
   const [lots, setLots] = useState(initial);
   return <DateWorkspace lots={lots} onLotsChange={setLots} onCreateKph={async () => "synthetic-kph"} />;
 }
+beforeEach(() => vi.stubGlobal("matchMedia", () => ({matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn()})));
+afterEach(() => vi.unstubAllGlobals());
+
 describe("DATE milestones and processing are separate", () => {
   afterEach(() => vi.useRealTimers());
   function today() { vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(new Date("2026-10-12T00:00:00+07:00")); }
   it("keeps Hết HSD on an active lot and reuses the Tra hạn timeline with lot identity", () => {
     today(); render(<Workspace />);
-    fireEvent.click(screen.getByRole("button", { name: /Theo dõi DATE/ }));
     fireEvent.click(screen.getByRole("button", { name: /Lô hết hạn/ }));
     let dialog = screen.getByRole("dialog", { name: "Chi tiết lô DATE" });
     const milestones = within(dialog).getByRole("region", { name: "Mốc DATE của lô" });
@@ -35,7 +37,6 @@ describe("DATE milestones and processing are separate", () => {
   });
   it("filters DATE phase and restores all lots from an empty result", () => {
     today(); render(<Workspace initial={[expired, { ...expired, id: "LOT-02", name: "Lô còn hạn", date: "2026-12-30" }]} />);
-    fireEvent.click(screen.getByRole("button", { name: /Theo dõi DATE/ }));
     fireEvent.click(screen.getByRole("button", { name: "Lọc DATE" }));
     const group = screen.getByRole("group", { name: "Tình trạng DATE" });
     fireEvent.click(within(group).getByRole("button", { name: "Cảnh báo" }));

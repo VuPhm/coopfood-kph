@@ -13,7 +13,3 @@
 }
 /* Clip the resting plate to the cover's rounded edge without a scroll container. */
 .store-kph .store-ticket-list, .store-date-workspace { overflow: clip; }
-@media (min-width: 900px) {
-  /* DATE's tabs belong to the list column, clear of the detail column. */
-  .store-date-browser > .store-sticky-tabs { margin-right: -12px; padding-right: 12px; }
-}

@@ -27,7 +27,7 @@ Nhóm thu/mở native details/summary, mở mặc định; giữ keyboard/focus,
 chữ/icon cùng màu semantic. Item trắng, tên/SKU/lô và nhãn, % nếu đủ dữ liệu.
 Thiếu NSX/ngày lỗi không suy %. Thứ tự trong nhóm theo HSD hoặc ngày báo lại,
 tie theo ID. Mỗi item một button; mở DATE với query/selection chính xác của lô,
-mobile sheet/desktop detail. Query target chỉ dùng cho lần mở này, không bám
+sheet chi tiết trên mobile/desktop. Query target chỉ dùng cho lần mở này, không bám
 sang lần điều hướng DATE bình thường tiếp theo.
 
 Ghi nhận chọn1/7ngày: xác nhận mới ẩn thông báo đến ngày hẹn. Hủy giữ thông báo.
@@ -50,3 +50,7 @@ Source: [model](../../apps/store-pwa/src/store-notifications-model.ts),
 [browser gate](../../e2e/scripts/check-store-notifications.cjs).
 Owner đã cho phép merge23/10; [bàn giao](../delivery/date03-notifications.md)
 và [kiểm main](../delivery/header02-green-layer/merge-2026-10-23.md).
+
+Candidate DATE revision7: target notification tự chọn food kind explicit (hoặc
+Chưa phân loại) trước khi mở sheet, không suy loại từ tên và không để default
+TPTS che mất lô TPCN/unknown. Rule nhóm/nhắc/resolved không đổi.

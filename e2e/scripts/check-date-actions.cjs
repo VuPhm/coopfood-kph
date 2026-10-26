@@ -7,7 +7,7 @@ process.env.STORE_KPH_COLORS_OUTPUT=output;
 const {audit}=require('./check-kph-colors.cjs');
 fs.mkdirSync(output,{recursive:true});
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jf1sAAAAASUVORK5CYII=','base64');
-const dateDetail=(p,w)=>w>=900?p.getByRole('region',{name:'Chi tiết lô DATE'}):p.getByRole('dialog',{name:'Chi tiết lô DATE'});
+const dateDetail=(p,w)=>p.getByRole('dialog',{name:'Chi tiết lô DATE'});
 async function route(p,value){await p.evaluate(value=>{location.hash=value},value);}
 async function settle(scope){await scope.evaluate(async root=>Promise.all(root.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{}))));}
 (async()=>{
@@ -55,8 +55,8 @@ async function settle(scope){await scope.evaluate(async root=>Promise.all(root.g
     await record.locator('.store-ticket-open,.store-kph-row-open').click();await expect(p.getByRole('dialog',{name:'Chi tiết phiếu KPH',exact:true})).toContainText(id);
     expect(errors).toEqual([]);results.push({viewport,kind,reminderDays:[1,7],cancel:true,created:true,resolved:true});await p.close();
    }
-   const p=await browser.newPage({viewport,serviceWorkers:'block',reducedMotion:'reduce'});await p.goto(`${base}/#date`);await p.getByRole('textbox',{name:'Tìm SKU, barcode, tên hàng hoặc lô'}).fill('D24-090');await p.locator('.store-date-lot').click();await dateDetail(p,viewport.width).getByRole('button',{name:'Xử lý',exact:true}).click();
-   const choice=p.getByRole('dialog',{name:'Chọn loại phiếu KPH'});await expect(choice).toBeVisible();await expect(p.locator('.store-create-screen')).toHaveCount(0);await choice.getByRole('button',{name:'Đóng',exact:true}).click();await expect(choice).toBeHidden();if(viewport.width<900)await expect(p.locator('.store-date-lot')).toBeFocused();await p.locator('.store-date-lot').click();await dateDetail(p,viewport.width).getByRole('button',{name:'Xử lý',exact:true}).click();await choice.locator('.create-tpts').click();await expect(p.locator('.store-create-screen #product-name')).toHaveValue('Sản phẩm D');await expect(p.locator('.store-create-screen #barcode')).toHaveValue('');await p.close();
+   const p=await browser.newPage({viewport,serviceWorkers:'block',reducedMotion:'reduce'});await p.goto(`${base}/#date`);await p.getByRole('textbox',{name:'Tìm SKU, barcode, tên hàng hoặc lô'}).fill('D24-090');await p.locator('[data-date-lot-id]').click();await dateDetail(p,viewport.width).getByRole('button',{name:'Xử lý',exact:true}).click();
+   const choice=p.getByRole('dialog',{name:'Chọn loại phiếu KPH'});await expect(choice).toBeVisible();await expect(p.locator('.store-create-screen')).toHaveCount(0);await choice.getByRole('button',{name:'Đóng',exact:true}).click();await expect(choice).toBeHidden();if(viewport.width<900)await expect(p.locator('[data-date-lot-id]')).toBeFocused();await p.locator('[data-date-lot-id]').click();await dateDetail(p,viewport.width).getByRole('button',{name:'Xử lý',exact:true}).click();await choice.locator('.create-tpts').click();await expect(p.locator('.store-create-screen #product-name')).toHaveValue('Sản phẩm D');await expect(p.locator('.store-create-screen #barcode')).toHaveValue('');await p.close();
    console.log(`PASS DATE actions ${viewport.width}: reminder1/7days, due alerts/notifications, TPCN/TPTS prefill/cancel/review/save/single record/resolved, unknown kind choice`);
   }
   fs.writeFileSync(`${output}/results.json`,JSON.stringify(results,null,2));

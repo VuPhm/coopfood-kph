@@ -2,7 +2,7 @@
    Flatten report facts and notification groups without removing their content.
    Comfortable, detail sheets, charts and printed documents keep their recipes. */
 @media screen {
-  html[data-store-density="compact"] .store-app :is(.store-date-lots, .date-report-catalog) [data-processing-status] {
+  html[data-store-density="compact"] .store-app :is(.store-date-lots, .store-date-table, .date-report-catalog) [data-processing-status] {
     border: 0;
     border-radius: 0;
     padding-inline: 0;

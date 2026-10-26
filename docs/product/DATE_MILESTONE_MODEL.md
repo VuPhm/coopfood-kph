@@ -110,3 +110,29 @@ browser. Không thêm queue/Redis/microservice hoặc migration.
 Nghiệm thu owner và technical PASS giữ riêng; xem
 [bàn giao DATE02](../delivery/date02-soft-detail/technical.md) và
 [evidence kế thừa](../delivery/figma-mobile-implementation/date-compact-detail.md).
+
+## Revision7 — DATE đồng dạng KPH, candidate26/10/2026
+
+Theo owner, hai tab lớn Cảnh báo/Theo dõi DATE được thay bằng **TP khô & khác /
+TP tươi sống**. Bộ chọn dùng chung component với KPH live/loading. Mặc định
+TPTS khi có dữ liệu, fallback loại có dữ liệu; counts trên tập unresolved, không
+đổi theo filter. Loại lấy từ catalog metadata explicit theo SKU duy nhất, cùng
+lookup dùng cho seed KPH. Không suy loại từ tên/mã/đơn vị. Lô thiếu metadata
+ở mục phụ Chưa phân loại, vẫn tìm/mở/nhắc và chọn loại phiếu KPH được.
+
+Mặc định hiện tất cả lô chưa resolved trong loại; Mở/Đã ghi nhận và phase là
+filter độc lập. Cần chú ý là shortcut lô Mở có phase cần chú ý hoặc đã đến lịch
+nhắc; không đổi ngày/phase/trạng thái khi chỉ lọc. Exact SKU/barcode/lot lookup
+chọn đúng loại hoặc Chưa phân loại; tìm tên một phần theo nhóm đang chọn như
+KPH. Notification target tự mở đúng loại/lô, không bị tab mặc định che mất.
+
+Dùng lại sort/sticky tabs/sheet và list/table roles của KPH. Mobile card giữ tên,
+SKU/lô, NSX/HSD, phase/processing/reminder và24px%HSD; chỉ chevron để báo mở
+chi tiết. Desktop bảng toàn chiều ngang → cùng sheet chi tiết, bỏ cột detail
+trống cạnh list. Timeline vẫn cùng component/thuật toán/màu, tự co theo sheet
+mới; không giữ pixel-width của cột cũ. Ghi nhận1/7ngày, cancel/retry, DATE→KPH
+và resolved semantics giữ nguyên. CTA Thêm theo dõi chưa triển khai được bỏ
+khỏi toolbar; không tạo chức năng thêm lô giả hoặc bulk/export mới.
+
+Không còn big tabs Cảnh báo/Theo dõi, nút status ngoài list hoặc master-detail
+CSS. [Scope/kiểm chứng](../delivery/compact03-date-report-items/plan.json).

@@ -1,5 +1,5 @@
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
-import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
+import { revealBelowStickyTabs } from "./store-sticky-tabs";
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState, useLayoutEffect } from "react";
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
 import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
@@ -19,13 +19,14 @@ import { KphCreateControl, preloadKphCreateForm as preloadCreateForm, type KphCr
 import { kphRecordFromDraft } from "./store-kph-draft-record";
 import "./store-kph-create-forms.css";
 import { KphCreateButton } from "./store-kph-create-button";
+import { FOOD_KIND_LABELS, StoreFoodKindTabs } from "./store-food-kind-tabs";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 import { useStoreDensityValue } from "./store-density";
 
 function dateIso(value: string) { try { return parseDisplayDate(value); } catch { return null; } }
 const nameCollator = new Intl.Collator("vi");
 
-const labels: Record<KphKind, string> = { TPCN: "TP khô & khác", TPTS: "TP tươi sống" };
+const labels = FOOD_KIND_LABELS;
 export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChange, onNotice }: {
   records: RecordView[]; onRecordsChange: (records: RecordView[]) => void; onNotice: (message: string) => void;
 }) {
@@ -118,7 +119,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <KphCreateButton key={k} kind={k} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)} />)}</div></section>
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
-      <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div></StoreStickyTabs>
+      <StoreFoodKindTabs label="Loại phiếu" value={kind} counts={typeTotals} onChange={setKind} />
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{filtered.length} phiếu</span></div>
         <div className="store-kph-list-toolbar">{!compact ? <KphQuickSort sort={sort} onChange={setSort} /> : null}<button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} groupByDate={groupByDate} onGroupByDateChange={value => { setGroupByDate(value); setCollapsedDates([]); }} /></div>

@@ -1,5 +1,15 @@
 # Công việc kế tiếp
 
+**COMPACT03 revision7 — DATE/KPH alignment candidate26/10/2026:** owner yêu cầu
+hai tab loại thực phẩm thay Cảnh báo/Theo dõi, đồng dạng controls/list và reuse.
+Một shared food-kind selector dùng cả KPH live/loading/DATE; trạng thái/phase
+chuyển vào filter, shortcut Cần chú ý, unknown có mục riêng không suy loại.
+Mobile card/desktop table → cùng sheet; giữ %HSD/mốc/nhắc1/7ngày/DATE→KPH.
+Root sole writer, technical đang kiểm tại4358; [scope](delivery/compact03-date-report-items/plan.json).
+Cloudflare vẫnr4, chưa merge/push. Bước tiếp kiểm lookup/deep-link/unknown/filter
+và hai mật độ, rồi owner nghiệm thu.
+
+
 **COMPACT03 revision6 — technical PASS, owner pending26/10/2026:** theo owner sửa Biện pháp
 mất khung tag, thêm chevron/soft pastel cho hai CTA KPH Compact; CTA mặc định
 một mặt nền với hai tầng chữ, bỏ thanh màu lồng. Field chuyển matte/no-shadow,

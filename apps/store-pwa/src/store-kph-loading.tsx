@@ -1,5 +1,5 @@
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
-import { StoreStickyTabs } from "./store-sticky-tabs";
+import { StoreFoodKindTabs } from "./store-food-kind-tabs";
 import { KPH_OPTIONS, type KphKind } from "@coopfood-kph/kph-rules";
 import { getKphChoicePresentation, KphChoiceContent } from "./store-kph-choice";
 import { useMemo } from "react";
@@ -32,7 +32,7 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled />)}</div></section>
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo">
-      <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(kind => <button key={kind} disabled aria-pressed={kind === "TPTS"} className={kind === "TPTS" ? "is-active" : ""}>{kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}<small>{records.filter(record => record.kind === kind).length}</small></button>)}</div></StoreStickyTabs>
+      <StoreFoodKindTabs label="Loại phiếu" value="TPTS" disabled counts={{TPCN: records.filter(record => record.kind === "TPCN").length, TPTS: total}} />
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{total} phiếu</span></div>
         <div className="store-kph-list-toolbar">{!compact ? <KphSortButton disabled sort="newest" /> : null}<button disabled className="store-compact" aria-pressed="false"><ListChecks size={20} aria-hidden="true" /><span>Chọn</span></button><button disabled className="store-filter" aria-label="Lọc phiếu KPH"><SlidersHorizontal size={20} aria-hidden="true" /></button></div>

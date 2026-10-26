@@ -42,7 +42,7 @@ async function noClip(page) {
       await page.screenshot({ path: `${output}/groups-${viewport.width}.png`, fullPage: true });
       const notice = page.locator('[data-notification-lot="C24-118"]');
       await notice.focus(); await page.keyboard.press('Enter');
-      const detail = viewport.width >= 900 ? page.getByRole('region', { name: 'Chi tiết lô DATE' }) : page.getByRole('dialog', { name: 'Chi tiết lô DATE' });
+      const detail = page.getByRole('dialog', { name: 'Chi tiết lô DATE' });
       await expect(detail).toContainText('Lô C24-118');
       await expect(page.locator('[data-date-lot-id="C24-118"]')).toHaveAttribute('aria-pressed', 'true');
       await expect(detail.getByRole('button', { name: 'Ghi nhận', exact: true })).toBeEnabled();
@@ -66,7 +66,7 @@ async function noClip(page) {
       });
       await noClip(page); await page.screenshot({ path: `${output}/text150-${viewport.width}.png`, fullPage: true });
       await route(page, 'date');
-      await expect(page.locator('.store-date-statuses button')).toHaveCount(2);
+      await expect(page.getByRole('group', {name:'Loại thực phẩm'}).getByRole('button')).toHaveCount(2);
       await expect(page.getByRole('button', { name: /^Đã xử lý/ })).toHaveCount(0);
       await page.getByRole('button', { name: 'Lọc DATE', exact: true }).click();
       await expect(page.getByRole('dialog').getByRole('button', { name: 'Đã xử lý', exact: true })).toHaveCount(0);

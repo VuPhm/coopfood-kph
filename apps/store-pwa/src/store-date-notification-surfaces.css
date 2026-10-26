@@ -37,25 +37,25 @@
     min-height: var(--store-size-hit-min); padding-block: var(--store-space-2);
     font-size: var(--store-type-control); line-height: var(--store-leading-control);
   }
-  html[data-store-density="compact"] body:has(.store-app) :is(.store-date-detail, .store-date-lot-sheet) .store-date-lot-heading {
+  html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet .store-date-lot-heading {
     border: 0; border-bottom: 1px solid var(--store-holder-edge);
     border-radius: 0; box-shadow: none; background: transparent;
     padding: 0 0 var(--store-space-3);
   }
-  html[data-store-density="compact"] body:has(.store-app) :is(.store-date-detail, .store-date-lot-sheet) .store-date-lot-heading h3 {
+  html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet .store-date-lot-heading h3 {
     font-size: var(--store-type-section); line-height: var(--store-leading-section);
   }
-  html[data-store-density="compact"] body:has(.store-app) :is(.store-date-detail, .store-date-lot-sheet) .store-date-milestones {
+  html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet .store-date-milestones {
     border-color: transparent; border-radius: 0; background: transparent; box-shadow: none;
   }
-  html[data-store-density="compact"] body:has(.store-app) :is(.store-date-detail, .store-date-lot-sheet) .store-date-detail-metrics > p {
+  html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet .store-date-detail-metrics > p {
     border-radius: 0; padding: 0; background: transparent;
   }
-  html[data-store-density="compact"] body:has(.store-app) :is(.store-date-detail, .store-date-lot-sheet) [data-processing-status] {
+  html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet [data-processing-status] {
     border: 0; border-radius: 0; padding-inline: 0;
     background: transparent; font-weight: 500;
   }
-  html[data-store-density="compact"] body:has(.store-app) :is(.store-date-detail, .store-date-lot-sheet) .store-date-reminder-choices {
+  html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet .store-date-reminder-choices {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr));
     border: 0; border-top: 1px solid var(--store-holder-edge);
     border-radius: 0; padding: var(--store-space-3) 0 0;

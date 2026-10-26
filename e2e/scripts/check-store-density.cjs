@@ -180,12 +180,12 @@ async function formTextReflow(p, form, width) {
       for(const [id,kind]of[['A24-255','tpcn'],['C24-118','tpts']]){
         await p.getByRole('textbox',{name:'Tìm SKU, barcode, tên hàng hoặc lô'}).fill(id);
         const lot=p.locator(`[data-date-lot-id="${id}"]`);await lot.click();
-        const detail=viewport.width>=900?p.getByRole('region',{name:'Chi tiết lô DATE'}):p.getByRole('dialog',{name:'Chi tiết lô DATE'});
+        const detail=p.getByRole('dialog',{name:'Chi tiết lô DATE'});
         await detail.getByRole('button',{name:'Ghi nhận',exact:true}).click();
         await detail.getByRole('radio',{name:kind==='tpcn'?/1 ngày/:/1 tuần/}).check();
         await detail.getByRole('button',{name:'Hẹn báo lại',exact:true}).click();
         await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','acknowledged');
-        if(viewport.width<900)await lot.click();
+        await lot.click();
         await detail.getByRole('button',{name:'Xử lý',exact:true}).click();
         const form=p.locator('.store-create-screen');await expect(form.locator('#product-name')).toBeAttached();
         await expect(form).toHaveAttribute('data-kind',kind);await bounds(p);
