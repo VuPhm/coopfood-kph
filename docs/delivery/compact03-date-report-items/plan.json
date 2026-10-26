@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
   "revision": 4,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Unify Fresh/Compact operational foundations and apply Compact structural hierarchy to DATE management and notifications, preserving their workflows.",
   "inScope": [
     "Shared Store input16/24, caption12/18 and real44px operational targets in BOTH densities, targeted to confirmed audit findings",
@@ -20,7 +20,7 @@
     "Standalone user-owned chats or recurring/unattended automations; agents stay subtasks of this request"
   ],
   "baseSha": "2a3b574",
-  "candidateSha": "",
+  "candidateSha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
   "integrationOwner": "Root integrates shared files and takes over interrupted loading fix; foundations, surfaces and DATE agents have disjoint worktrees.",
   "sharedPaths": [
     "apps/store-pwa/src/store-app-frame.tsx",
@@ -35,7 +35,7 @@
     "apps/store-pwa/src/feature-loading.css"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [
     {
       "id": "foundations",
@@ -70,19 +70,28 @@
       "id": "shared-fresh-density-and-output-contract",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "operational-readability-and-targets",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "workflow-loading-and-accessibility",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "owner-fresh-uniformity-acceptance",
@@ -115,7 +124,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Finish recovered foundations/surfaces; implement DATE/notification structural recipe; integrate and verify both modes.",
+  "nextAction": "Owner compare DATE management and notifications at4352 in both densities, including filter/detail/reminder and exact-lot navigation; no main merge authority.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
@@ -126,6 +135,7 @@
   },
   "documents": {
     "priorTechnical": "docs/delivery/compact03-date-report-items.md",
-    "assessment": "docs/delivery/compact03-date-report-items/assessment.md"
+    "assessment": "docs/delivery/compact03-date-report-items/assessment.md",
+    "technical": "docs/delivery/compact03-date-report-items/technical.md"
   }
 }

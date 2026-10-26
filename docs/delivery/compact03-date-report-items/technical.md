@@ -1,142 +1,116 @@
-# COMPACT03 revision2 — technical PASS, owner pending
+# COMPACT03 revision4 — technical PASS, owner pending
 
-Date26/10/2026; candidate`24484813695d693cea6ae344cc9a041ce577aaed`.
-Runtime recipe checkpoint767088a; final candidate adds native-bar gate9d16c09
-and the isolated16px desktop report-column gutter fix2448481.
-Resume checkpoint236ce91 preserves r1 items and its evidence; no acceptance
-inferred. Owner explicitly authorized expanding the same task to uncovered
-surfaces. One writer, same worktree, no agent dispatch.
+Date26/10/2026. Candidate `9e5af0d649b31298d1eceb995c64fa4dc2732731`.
+Runtime/source tested `df369271bcc91a27bf61c1a458bca336aa0f9f96`.
+The only candidate delta is CURRENT_STATE/NEXT status text; app/test source and
+production4352 are byte-identical. Final docs check passes after that delta.
+Frozen4350 is revision2 baseline2a3b574; no main integration/push/deploy/Pages.
 
-## Scope and two bounded passes
+## Scope / files
 
-Pass1 source/screenshot audit at390×844/1440×1024 identified four families:
-KPH detail, report menu/personal rows/history, shelf history, account/settings.
-Before artifacts: `.local/compact03/r2/baseline/`; comfortable baseline:
-`.local/compact03/r2/baseline-comfortable/`. Both use frozen r1 build4348.
+Owner continued the interrupted agent loop for default Co.op Fresh too, then
+explicitly added DATE management, notifications and analogous functional flows.
+No prior COMPACT03 acceptance inferred. Previous revision evidence remains in
+revision2-technical.md and revision3-plan.json; new gates reference revision4.
 
-Pass1 implemented Store-local `store-compact-surfaces.css` and one frame import.
-No component tree, effect, state, handler, API, package/dependency/config changes.
-Flat summary/store/settings rows; report functional rows72px with36px faces;
-shelf rows flat and captions12px. Primary meanings, dates, snapshots, controls
-and brand/status colors retained.
+- `apps/store-pwa/src/store-fresh-foundations.css`: both densities input16/24,
+  captions12/18, calendar launchers44px; KPH filter dates reflow at narrow widths.
+- `store-fresh-surfaces.css` in the same directory: comfortable KPH detail wraps
+  label/value at200% text, section17px; softer secondary DATE/report processing,
+  report facts without nested fill and account/settings soft grouping.
+- `store-date-notification-surfaces.css`: notifications use DATE-like title,
+  identifier, full-width state/reminder and24px percent; Compact DATE filter,
+  detail and reminder become flat sections with consistent type/actions.
+  Timeline holder retains its box width/height. Native disclosure and exact-lot
+  navigation stay intact; no invented notification filters or unread state.
+- `feature-loading.css`: neutral paint on actual KPH label/icon/marker markup,
+  both densities; intrinsic boxes and aria lifecycle preserved.
+- `store-app-frame.tsx`: imports the three Store-local CSS recipes.
+- CURRENT_STATE/NEXT, product STORE_APP_DENSITY/STORE_APP_SURFACE_STYLE and this
+  delivery folder record scope, decisions, workflow and verification.
 
-One refinement pass: replace inherited48px KPH read-only row minimum with role44px;
-allow label/value wrapping and a text-relative value basis. Shelf date columns
-use7em minimum with auto-fit, responsive to type. No second broad audit.
+No JSX/component business changes, API/auth/store-scope/data changes, packages/ui,
+root config/lock/dependencies, Home composition or chart/timeline color changes.
 
-Dev QA passed four families, both densities390/1440; Compact320/900/844×390.
-Targeted150/200% text QA passed390/1440/320, including shelf date columns and
-portal content; title/description/value content remains in DOM. Debug probe:
-`.local/compact03/r2/audit.cjs`, logs/artifacts `pass1`, `narrow`, `reflow`.
+## Agent loop / review
 
-## Final evidence
+Reviewed base2a3b574, isolated worktrees, one writer each. Foundations agent failed
+service capacity before writing; root completed its scope and verified it.
+Interrupted loading CSS was recovered and reviewed by root. Agent commits:
+foundations4046c24 (integrated44881bd), surfaces5461c4d (8aa51e3), DATE d7e86b3
+(645b546). Scope checks PASS before each integration. Root integrates shared files.
 
-All required technical gates PASS. Local fixture/mock evidence, not remote CI.
+One integrated review round, two independent reviewers, no blockers:
+- `/root/surfaces_r4` reviews nonself foundations/loading/DATE/notifications.
+- `/root/date_notifications_r4` reviews nonself Fresh surfaces/foundations.
+Root additionally inspects source, actual notification screenshot and loading
+paint, and runs integrated behavior/output comparisons. No second repair pass
+was needed; no broader audit was opened. Review limit remains two rounds.
+Evidence `.local/compact03/r4/review-{surfaces,date}/findings.md`.
 
-- `VITEST_MAX_WORKERS=2 npm run verify`: PASS346tests (Store293/Admin16/API2/
-  rules19/UI16), docs/contracts/generated API/types/build/PWA. `r2/verify.log`.
+## Commands / results
+
+All commands run in this task worktree. Artifacts/logs are ignored under
+`.local/compact03/r4/`; synthetic fixtures only, no operating photos/workbooks.
+
+- `VITEST_MAX_WORKERS=2 npm run verify`: exit0,346tests (Store293/Admin16/API2/
+  rules19/UI16), docs/contracts/generated API/types/build/PWA. `verify.log`.
 - `VITE_STORE_APP_MOCK=true npm --workspace @coopfood-kph/store-pwa run build --
-  --outDir ../../.local/compact03/r2/build --emptyOutDir`: PASS117precache.
-  Final build includes the gutter fix; `r2/build-final.log`. ExcelJS large-chunk
-  warning remains baseline. No dependency or lock changes.
-- `UI_URL=http://127.0.0.1:4350 UI_OUTPUT=.local/compact03/r2/production
+  --outDir ../../.local/compact03/r4/build --emptyOutDir`: exit0,117precache.
+  `build.log`. Existing ExcelJS large-chunk warning remains.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4352 STORE_BASELINE_URL=http://127.0.0.1:4352
+  STORE_DENSITY_OUTPUT=.local/compact03/r4/density node e2e/scripts/check-store-density.cjs`:
+  exit0,390×844/1440×1024/320×844/900×650/844×390, real toggle/persistence,
+  malformed/denied storage, state/draft/filter/selection, portals, forced colors,
+  print and form150/200%. Compact actions390/1440 pass DATE1/7day reminders,
+  validation/photo/review/save TPCN/TPTS, KPH, report/history/Excel/PDF and shelf rules.
+  Baseline=self deliberately tests default→toggle→restore in this new design;
+  it does NOT claim historical comfortable geometry parity. `density.log`.
+- `UI_URL=http://127.0.0.1:4352 UI_OUTPUT=.local/compact03/r4/secondary
   UI_WIDTHS=390,1440,320,900,844 UI_MODES=comfortable,compact
-  node .local/compact03/r2/audit.cjs`: PASS10cases across five widths and both
-  densities. Real UI saves/opens a report and personal template, manages/cancels
-  template dialog with focus return, recalls shelf history without duplicate,
-  approves/rejects then restores synthetic KPH status, opens/closes account.
-  Target44px, full content and no page overflow; sampled text contrast≥5.04:1.
-- `UI_REFLOW=true` with same probe at390/1440/320: PASS150/200% targeted text,
-  including KPH label/value wrap and em-based shelf columns. Dev `r2/reflow.log`;
-  final desktop report-gutter recheck `r2/final-text1440.log`.
-- Final gutter/frame check at390/900/1440: PASS stacked layouts and actual16px
-  between coequal desktop choices; final report workflow probe
-  `r2/final-report-check.log`. Final comfortable probe at390/1440 and
-  `node .local/compact03/r2/check-parity.cjs`: PASS all six probe roots, all
-  field/row text and type, geometry within1px. `r2/parity.log`. No broad pixel
-  snapshots. Full Compact content matches baseline too.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4350 STORE_BASELINE_URL=http://127.0.0.1:4348
-  STORE_DENSITY_OUTPUT=.local/compact03/r2/density node e2e/scripts/check-store-density.cjs`:
-  PASS5viewport390×844/1440×1024/320×844/900×650/844×390; real toggle, persistence,
-  malformed/denied storage, anchor/query/selection/collapse/draft, portals,
-  comfortable/print parity and form text150/200. Actions390/1440 include DATE
-  reminders1/7, TPCN/TPTS photo/review/save, report/history/Excel/PDF and shelf
-  rules. `r2/density.log`.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4350 STORE_SCROLLBARS_OUTPUT=...
-  node e2e/scripts/check-store-scrollbars.cjs`, once default and once with
-  `STORE_UI_DENSITY=compact`: PASS7routes×5viewport in both densities plus
-  dialogs, actual thumb drag, page lock/restore, stable headers and no horizontal
-  overflow. `r2/scrollbars-comfortable.log`, `r2/scrollbars-compact.log`.
+  node .local/compact03/r2/audit.cjs`: exit0,10cases, KPH detail/approve/reject,
+  report personal/save/history/manage/cancel, shelf recall and account/focus.
+  Targets44px, no page overflow, sampled text contrast checked. `secondary.log`.
+- `UI_URL=http://127.0.0.1:4352 node .local/compact03/r4/foundations/probe.cjs`:
+  exit0,6cases, actual integrated CSS (no injection), input16px/min44, filter
+  dates fit usable canvas and calendar44×44. `foundations/integrated.log`.
+- `UI_URL=http://127.0.0.1:4352 node .local/compact03/r4/loading.cjs`: exit0,
+  delayed real KPH chunk390/1440 both modes, neutral labels/icons and loaded
+  semantic color restored; aria-hidden loading list. `loading-integrated.log`.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4352 STORE_NOTIFICATIONS_OUTPUT=...
+  node .local/compact03/r4/notification-modes.cjs`, once comfortable and once
+  `STORE_UI_DENSITY=compact`: exit0 both,390/1440/320, collapse/keyboard,
+  exact C24-118, suppress/remind/deduplicate, date changes,150% text, contrast.
+  Wrapper injects density into each page and runs the existing notification gate;
+  no source test relaxed. `notifications-{comfortable,compact}.log`.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4352 STORE_DATE_OUTPUT=.local/compact03/r4/date-actions
+  node e2e/scripts/check-date-actions.cjs`: exit0 default390/1440/320, reminder1/7,
+  cancel, due notifications, TPCN/TPTS prefill/photos/save/single pending record,
+  resolved removed and unknown-kind choice. `date-actions.log`.
+- `node .local/compact03/r4/parity.cjs`: exit0 against frozen4350,6cases
+  (390/1440/320 both modes) ×6routes, full page content equal, chrome/Home outer
+  metrics equal, print probes equal; DATE timeline track/holder width/height,
+  computed font/colors/background equal. `parity.log`. Intentional secondary
+  surface and notification geometry changes are excluded from historical parity.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4352 STORE_SCROLLBARS_OUTPUT=...
+  node e2e/scripts/check-store-scrollbars.cjs`, default and STORE_UI_DENSITY=compact:
+  exit0 both,7routes×5viewports plus dialogs, actual thumb drag, lock/restore,
+  stable header and no horizontal overflow. `scrollbars-{comfortable,compact}.log`.
+- `npm run check:docs` after final status text: exit0; `git diff --check`: clean.
 
-All artifacts under ignored `.local/compact03/r2/`. The fixture clock is6Oct2026
-for deterministic record/history content; all values are synthetic. No operating
-workbook/photos or external messages.
+Integrated independent reviews additionally verify actual KPH summary200% dates,
+notification/reminder150% at390/1440/320 (including focused320Compact reminder
+above footer), keyboard switch twice, preserved account hero and focus return.
+Agent injection evidence is supporting evidence, not substituted for actual build.
 
-### Final-source evidence reuse
+## Owner scenario / limits
 
-Verify, five-width audit, reflow and density suite ran on exact app source767088a.
-9d16c09 changes only test/ledger. 2448481 changes only report-list column-gap
-to16px, preserving stacked mobile rows and the app's other recipes. The final
-mock build, report workflows390/900/1440, horizontal-gutter check, full default
-parity390/1440 and desktop text150/200 run after that fix. Unit/domain/workflow,
-print/export and portal thumb evidence is reused because that sole layout rule
-is scoped to Compact report menu/personal rows, absent from composer/documents,
-account, KPH, shelf, print and business logic. No runtime changed after final
-checks; later commits only update this ledger.
-Preview4350; dev4349; frozen baseline4348. Source build for r1 was preserved
-when its preview process was restored after interruption; no baseline rebuild.
+Preview <http://127.0.0.1:4352/#date> and <http://127.0.0.1:4352/#notifications>.
+Turn on Chế độ gọn in Tài khoản → Cài đặt, compare both densities; open/filter a
+lot, choose Ghi nhận→1day/1week, and navigate from a notification to its exact lot.
+Owner acceptance is pending; technical PASS grants no merge/deploy authority.
 
-## Limits / deferred
-
-No main integration/push/deploy/Pages; no FORM01 acceptance inferred. Browser
-mock/fixtures only, not backend authority, Safari/OS or physical-device proof.
-Keep accepted Home/header/navigation, charts/timeline and photo evidence outside
-this pass. Default comfortable and print/output must retain their recipes.
-Optional areas outside four families are deferred; do not keep auditing without
-a bounded scope revision. Owner acceptance for integrated r2 remains pending.
-
-## Native scrollbar gate on the resumed host
-
-The original gate assumed native bars always reserve positive layout width.
-At1440×1024 the current MacIntel Chromium reports bar0 on all seven routes
-while document range remains positive, identically on baseline4348 and4350.
-Disabling overlay-related flags did not change this host behavior. Initial
-logs `scrollbars.log` and `scrollbars-overlay.log` are retained.
-
-A wheel event reveals the auto-hiding thumb. The gate now accepts0–12px
-reserved width while still requiring computed thin native scrollbars and all
-existing page/body bounds, scroll-lock, header stability and drag checks. The
-drag assertion is stronger: scrollTop must advance beyond its position after
-the activation wheel, so wheel scrolling alone cannot pass. An optional
-STORE_UI_DENSITY=compact runs the same gate against the new recipes.
-
-The equivalent local diagnostic passed all five viewports before adopting
-this validation-only change (`scrollbars-activated.log`). No app styling or OS
-preferences were changed to make it pass. Runtime at that native-bar check was767088a; the final gutter-only revision
-and its targeted rechecks are described above.
-
-## Measured effects / final review
-
-| Probe at390×844 | r1 baseline4348 | final4350 |
-| --- | ---: | ---: |
-| KPH read-only row |48px|44px|
-| First report menu row |82px|73px|
-| Report history card |106px|97px|
-| Shelf history row |174px|165px|
-| Account sheet |779px|703px|
-
-At1440×1024: menu88→73px, shelf history68→65px, account779→685px.
-Captions in shelf history increase11→12px rather than shrinking type. Long
-values/text enlargement can grow rows; these are measured fixture examples,
-not blanket compression promises. Primary Home/header/navigation and timelines
-remain outside this pass.
-
-One implementation pass, one bounded refinement (row44/wrap and safe desktop
-column gap), plus validation maintenance for the resumed host. No new broad
-audit after successful gates. Owner scenario: turn Compact on at4350 and view
-KPH detail, report menu/personal/history, shelf history after lookup, account
-settings; switch off to compare. No user acceptance inferred from this report.
-
-Production4350 session16735; dev4349 session34467; baseline4348 session36987.
-Main checked f77034d, clean, ahead47 of the unfetched remote reference; no
-main write/push/deploy. No backend/Safari/physical-device claim.
+Browser mock/memory-only, not backend, Safari/physical-device or production proof.
+Reminder/DATE source does not persist across reload or push while closed. No new
+platform/dependency/API/data behavior. Production4352 session25313; frozen4350
+session69302. Main remains f77034d, clean; remote refs not refreshed in this slice.
