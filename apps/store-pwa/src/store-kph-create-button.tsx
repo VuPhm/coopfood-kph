@@ -9,7 +9,7 @@ export function KphCreateButton({ kind, className = "", ...props }: ComponentPro
   const Icon = kind === "TPCN" ? PackagePlus : Leaf;
   const compact = useStoreDensityValue() === "compact";
   if (compact) return <button type="button" className={`store-create-cta store-create-inline create-${kind.toLowerCase()} ${className}`} aria-label={`Tạo phiếu ${label}`} title={`Tạo phiếu ${label}`} aria-haspopup="dialog" {...props}>
-    <Icon size={20} aria-hidden="true" /><span>Tạo {kind}</span>
+    <Icon size={20} aria-hidden="true" /><span>Tạo {kind}</span><ChevronRight className="store-create-chevron" size={16} aria-hidden="true" />
   </button>;
   return <button type="button" className={`store-create-cta create-${kind.toLowerCase()} ${className}`} aria-label={`Tạo phiếu ${label}`} aria-haspopup="dialog" {...props}>
     <span className="store-create-heading">

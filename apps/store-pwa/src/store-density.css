@@ -124,6 +124,9 @@
   }
   html[data-store-density="compact"] .store-app .store-create-inline > svg { flex: 0 0 var(--store-size-icon-md); color: var(--store-create-accent); }
   html[data-store-density="compact"] .store-app .store-create-inline > span { min-width: 0; overflow-wrap: anywhere; }
+  html[data-store-density="compact"] .store-app .store-create-inline > .store-create-chevron {
+    flex: 0 0 var(--store-size-icon-sm); width: var(--store-size-icon-sm); height: var(--store-size-icon-sm); margin-left: auto;
+  }
   html[data-store-density="compact"] .store-app .store-kph .store-kph-list-controls {
     display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--store-space-2);
   }

@@ -1,22 +1,23 @@
 {
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
-  "revision": 5,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "One bounded UI/CSS structure review and repair of reproduced jumps during Compact toggle, preserving real density composition and workflows.",
+  "revision": 6,
+  "status": "EXECUTING",
+  "objective": "Quick bounded fixes: restore KPH resolution tags, show soft clickable KPH create CTAs in both densities, and use matte text-field surfaces informed by Apple HIG.",
   "inScope": [
-    "Measure actual account switch/dialog/scroll movement while toggling both modes at390/1440/320 and short landscape, with pointer and keyboard",
-    "Repair confirmed unintended movement and any directly related CSS cascade contradictions; preserve intended workspace reflow, state/focus/reading anchor,44px actions and print",
-    "One independent read-only CSS/structure review, root sole writer; one consolidated repair and verification, no broad stylesheet rewrite"
+    "Restore resolution/Biện pháp tag container in Compact while keeping accepted approval fallback",
+    "Compact create CTA trailing chevron and pastel soft feedback; comfortable CTA clear two-line copy on one surface, same workflows",
+    "Existing Store field material tokens become matte/no outer lift, clearer quiet edge, preserve labels/focus/error/readonly and size roles",
+    "Targeted browser both densities390/1440/320 and large text, existing workflows/output and toggle stability regression; root sole writer, no agents"
   ],
   "outOfScope": [
     "Main merge/push or GitHub Pages; Cloudflare remains published revision4 until a new publication step is authorized",
     "Business/API/auth/data changes, redesign of Home/header/navigation, timeline/chart/photo changes",
     "Dependencies/packages/ui/root config changes, general CSS framework/cascade-layer rewrite or endless review"
   ],
-  "baseSha": "accccfe2b0e17dd53f5ed25361f84c8dbd04e083",
-  "candidateSha": "ef7c4f0247c6f4eba3b3402d7046ad7f506df3e3",
-  "integrationOwner": "Root sole writer in existing worktree; /root/compact_css_review_r5 is a read-only reviewer.",
+  "baseSha": "bce0f3a",
+  "candidateSha": "",
+  "integrationOwner": "Root sole writer, quick scoped follow-up; no new audit/agent loop.",
   "sharedPaths": [
     "apps/store-pwa/src/store-density.tsx",
     "apps/store-pwa/src/store-density.css",
@@ -30,32 +31,32 @@
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "docs/product/STORE_APP_DENSITY.md",
-    "docs/delivery/compact03-date-report-items/**"
+    "docs/delivery/compact03-date-report-items/**",
+    "apps/store-pwa/src/store-kph-items.css",
+    "apps/store-pwa/src/store-kph-create-button.tsx",
+    "apps/store-pwa/src/store-kph-fresh.css",
+    "apps/store-pwa/src/store-button-system.css",
+    "apps/store-pwa/src/store-form-soft.css",
+    "docs/product/STORE_APP_SURFACE_STYLE.md"
   ],
   "reviewLimit": 1,
-  "reviewRound": 1,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
-      "id": "toggle-dialog-and-reading-stability",
+      "id": "kph-tags-cta-and-field-states",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "ef7c4f0247c6f4eba3b3402d7046ad7f506df3e3",
-      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+      "status": "pending"
     },
     {
-      "id": "css-structure-and-workflow-regression",
+      "id": "density-workflow-and-output-regression",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "ef7c4f0247c6f4eba3b3402d7046ad7f506df3e3",
-      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+      "status": "pending"
     },
     {
-      "id": "owner-toggle-stability-acceptance",
+      "id": "owner-quick-fix-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending"
@@ -89,10 +90,17 @@
       "source": "Owner message26/10/2026 after Cloudflare mockup publication, ambient4352/home",
       "impact": "Reopens technical investigation and invalidates account/toggle stability evidence; revision4 source/evidence/publication preserved. Visual owner acceptance still pending.",
       "decision": "One bounded read-only review and root measurement; repair confirmed jump/cascade defect, preserve intentional density reflow. New local candidate, no inferred re-publication/main merge."
+    },
+    {
+      "revision": 6,
+      "request": "lỗi nhỏ fix nhanh: Biện pháp mất vùng tag; Compact2CTA thêm dấu hiệu clickable/soft Home và cân CTA mặc định; field đang lồi, tham khảo iOS27",
+      "source": "Direct owner message after4354 handoff26/10/2026",
+      "impact": "Changes tag paint, create CTA markup/paint and shared field material; resets affected technical gates, no prior visual acceptance inferred.",
+      "decision": "Minimal existing file/token changes; consult official Apple HIG text-fields/materials, matte content fields and soft actions. No backend/business/main merge/new publication."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner verify stable same-coordinate Compact toggle in account at4354; one review complete, no broader audit or new Cloudflare publication.",
+  "nextAction": "Finish scoped styles, inspect actual build and run targeted browser/workflow gates.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {

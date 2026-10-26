@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**COMPACT03 revision6 — quick follow-up26/10/2026:** theo owner sửa Biện pháp
+mất khung tag, thêm chevron/soft pastel cho hai CTA KPH Compact; CTA mặc định
+một mặt nền với hai tầng chữ, bỏ thanh màu lồng. Field chuyển matte/no-shadow,
+viền mảnh/radius12, giữ focus/error/readonly và size. Tham khảo Apple HIG text
+fields/materials và hướng đọc rõ iOS27. Candidate4356 đang kiểm; root sole writer,
+không mở audit mới. [Scope](delivery/compact03-date-report-items/plan.json).
+Cloudflare vẫn r4, chưa merge/push; bước tiếp owner xem tag/CTA/field ở hai mode.
+
+
 **COMPACT03 revision5 — technical PASS, owner pending26/10/2026:** owner yêu cầu đúng
 một vòng rà cấu trúc/CSS. Tái hiện Tài khoản tự co68–86px và công tắc dịch9–34px
 khi đổi mật độ; đây là lỗi controller, khác việc nội dung co lại theo thiết kế.

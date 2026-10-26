@@ -25,8 +25,8 @@
 .store-create-actions h2 { display: none; }
 .store-create-actions .store-two-col { gap: 12px; }
 .store-create-actions .store-create-cta { display: grid; grid-template-rows: auto minmax(24px, 1fr); align-items: stretch; gap: 6px; min-width: 0; min-height: 72px; border: 1px solid var(--store-surface); border-radius: 12px; padding: 8px; background: var(--store-surface); color: var(--store-ink); text-align: left; cursor: pointer; box-shadow: 0 3px 8px rgb(32 52 74 / 12%); transition: border-color 120ms ease-out, box-shadow 120ms ease-out; }
-.store-create-cta.create-tpcn { --store-create-accent: var(--store-action-orange); }
-.store-create-cta.create-tpts { --store-create-accent: var(--store-brand-action); }
+.store-create-cta.create-tpcn { --store-create-accent: var(--store-action-orange); --store-create-surface: #fff0e6; --store-create-hover: #ffe7d5; --store-create-pressed: #ffdbc0; }
+.store-create-cta.create-tpts { --store-create-accent: var(--store-brand-action); --store-create-surface: #e6f7f2; --store-create-hover: #d9f0e7; --store-create-pressed: #cce9dc; }
 .store-create-cta .store-create-heading { display: grid; grid-template-columns: 24px minmax(0, 1fr) 18px; align-items: center; gap: 6px; min-width: 0; }
 .store-create-cta .store-create-icon { display: grid; width: 24px; height: 24px; place-items: center; color: var(--store-create-accent); }
 .store-create-cta svg { display: block; flex-shrink: 0; stroke-width: 1.8; }
@@ -34,6 +34,12 @@
 .store-create-cta .store-create-chevron { position: static; width: 18px; height: 18px; color: var(--store-ink-muted); }
 .store-create-cta .store-create-kind-label { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 24px; border-radius: 8px; padding: 2px 6px; background: var(--store-create-accent); color: white; font-size: 14px; line-height: 20px; font-weight: 650; text-align: center; overflow-wrap: anywhere; }
 .store-create-actions .store-create-cta:hover { border-color: var(--store-create-accent); background: var(--store-surface); }
+@media screen {
+  /* One soft action surface, with a readable two-line hierarchy in comfortable.
+     Compact keeps its single row; both variants expose the same trailing cue. */
+  .store-create-actions .store-create-cta:not(.store-create-inline) { min-height: 80px; padding: 12px; }
+  .store-create-cta .store-create-kind-label { justify-content: flex-start; padding: 0; text-align: left; }
+}
 .store-create-actions .store-create-cta:active { box-shadow: inset 0 0 0 2px var(--store-create-accent); }
 .store-kph .store-ticket-list { display: grid; gap: 16px; }
 .store-kph-list-controls { display: grid; gap: 12px; min-width: 0; }

@@ -1,8 +1,7 @@
-/* Compact KPH hierarchy: one condition chip, quieter resolution/approval text.
+/* Compact KPH hierarchy: condition and resolution keep their tag containers.
    Approval stays with the identifier; only condition/resolution scroll on mobile.
    Comfortable and print retain the accepted three-label composition. */
 @media screen {
-  html[data-store-density="compact"] .store-kph-list [data-label-kind="resolution"],
   html[data-store-density="compact"] .store-kph-list [data-label-kind="approval"] {
     border: 0;
     border-radius: 0;

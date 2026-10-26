@@ -1,10 +1,10 @@
 /* Co.op Fresh Soft / coop-fresh-soft-v1: a form recipe, not a new app theme.
    Body scope reaches Store portals while keeping online/Pilot/Admin untouched. */
 body:has(.store-app, .store-login) {
-  --store-form-field-surface: #f0f7f3;
-  --store-form-field-edge: rgb(0 60 40 / 6%);
-  --store-form-control-radius: 16px;
-  --store-form-field-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 2px 5px rgb(0 60 40 / 5%);
+  --store-form-field-surface: #f3f6f4;
+  --store-form-field-edge: rgb(27 61 45 / 16%);
+  --store-form-control-radius: 12px;
+  --store-form-field-shadow: none;
 }
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
   :is(input, textarea, select, .ui-select-trigger):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not(.sr-only):not(.store-page-hero input) {
@@ -14,7 +14,7 @@ body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-s
   box-shadow: var(--store-form-field-shadow);
   transition: background-color 120ms ease-out, border-color 120ms ease-out;
 }
-/* Like Home pastel items, resting bounds are defined by fill and visible content.
+/* Fields sit within the content layer: matte fill, a quiet edge, no elevation.
    Fields keep visible labels/placeholders; focus/error states carry strong edges.
    Keep the 1px box to avoid shifts; reserve the contrasting edge for focus/errors. */
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)

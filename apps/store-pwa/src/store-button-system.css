@@ -82,8 +82,13 @@
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-login) :is(button[aria-pressed], .store-choices button, .unit-options span) { transition: none; }
   /* Preserve an existing semantic orange action and inverse-hero controls. */
   body:has(.store-app) .store-date-acknowledge { --store-button-primary-bg: #c24e00; --store-button-primary-top: #c24e00; --store-button-primary-bottom: #a63f00; --store-button-primary-hover: #a63f00; --store-button-primary-active: #913700; }
-  body:has(.store-app) .store-create-cta { --store-button-secondary-bg: #fff; --store-button-secondary-ink: #20344a; }
-  body:has(.store-app) .store-create-cta .store-create-kind-label { background-image: linear-gradient(150deg, transparent, rgb(0 40 25 / 10%)); box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%); }
+  body:has(.store-app) .store-create-cta {
+    --store-button-secondary-bg: var(--store-create-surface);
+    --store-button-secondary-hover: var(--store-create-hover);
+    --store-button-secondary-active: var(--store-create-pressed);
+    --store-button-secondary-ink: #20344a;
+  }
+  body:has(.store-app) .store-create-cta .store-create-kind-label { background: transparent; color: inherit; box-shadow: none; }
   body:has(.store-app) .store-page-hero { --store-button-focus: #fff; }
   body:has(.store-app) .store-date-search-form > [data-slot="button"] { --store-button-primary-bg: #fff; --store-button-primary-top: #fff; --store-button-primary-bottom: #f0f7f3; --store-button-on-primary: #00724e; --store-button-primary-hover: #f0f7f3; --store-button-primary-active: #e6f2eb; }
   body:has(.store-app, .store-login) [data-slot="button"][data-size="icon"] { border-radius: var(--store-button-radius-compact); }

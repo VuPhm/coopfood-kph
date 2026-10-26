@@ -368,3 +368,20 @@ cùng cách chia nhóm/sắp xếp/đặt lại/xong khi workflow thực sự t�
 Thông báo giữ native thu/mở và deep link, không ép thành workspace tìm/lọc.
 Loading KPH chỉ dùng paint trung tính, không hiện nhãn trạng thái nghiệp vụ
 trước khi workspace sẵn sàng. [Gates](../delivery/compact03-date-report-items/plan.json).
+
+## COMPACT03 revision6 — field và action khác vai trò
+
+Owner26/10 yêu cầu field bớt lồi và CTA giống Home soft. Text input/textarea/
+select dùng matte fill #f3f6f4, edge16%, radius12 và không bóng ngoài/sheen;
+focus vẫn trắng/edge xanh, lỗi đỏ, readonly/disabled phân biệt. Size và label/
+validation giữ nguyên. Hai CTA KPH dùng pastel cam/mint với hover/pressed,
+chevron; comfortable hai tầng chữ trên một mặt nền, Compact một hàng. Biện
+pháp giữ tag container; approval final vẫn có fallback icon đã chốt.
+
+Tham khảo [Apple Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields)
+về nhận diện/label/kích thước/nhập liệu và [Materials](https://developer.apple.com/design/human-interface-guidelines/materials)
+về phân cấp lớp chức năng/content; [iOS27](https://images.apple.com/os/ios/) nhấn
+mạnh readability/contrast. Đây là ứng dụng vào Co.op Fresh web, không tuyên bố
+sao chép pixel hay chuẩn bắt buộc của iOS. Rule mới thay field-elevation recipe
+FORM01 trong đúng phạm vi các Store consumers đang dùng; không đổi choice
+semantics, chrome, workflow hoặc palette chart.
