@@ -1,5 +1,14 @@
 # Store Fresh Solid — đặc tả tái dựng một chế độ
 
+**Revision3 — shared Home light và CTA lam,26/10/2026:** owner chấp nhận hướng
+revision2 rồi yêu cầu nhân rộng. Item/card/table nghiệp vụ và nhóm nút dùng
+chung ánh sáng/chuyển sắc/viền, giữ selected/disabled/labels riêng; field vẫn
+trắng. TPTS CTA lam#2465af, TPCN cam đậm, chữ trắng đủ tương phản cả gradient/
+hover/focus/press. Home vẫn bốn tông; không đưa màu launcher vào state palette.
+Shared ingredients tại store-material.css; không thêm theme/component/runtimeJS.
+[Kết quả/state matrix](../delivery/fresh01-solid-compact/technical.md).
+
+
 **Revision2 — Home reference và gradient,26/10/2026:** owner yêu cầu giữ Home
 cũc5a440b và tăng hiệu ứng. Home là ngoại lệ có chủ đích: mint/hồng/xanhdương/
 peach, icon tròn44px và ánh viền/chuyển sắc tĩnh. Workspace giữ palette chung;

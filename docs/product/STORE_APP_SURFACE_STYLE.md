@@ -1,5 +1,11 @@
 # Co.op Fresh Soft — khối mềm, viền nhẹ
 
+FRESH01 revision3: ánh sáng Home được tái dùng qua item/control/jewel roles
+trong store-material.css, tới list/card/table và button states; TPTS CTA dùng
+lam riêng, TPCN cam. Giữ field trắng/print/semantic colors và geometry.
+[Phạm vi và tương phản](../delivery/fresh01-solid-compact/technical.md).
+
+
 > FRESH01 revision2 candidate26/10/2026: giữ một UI, tăng gradient/ánh viền
 > theo Home cũ và Apple iOS27/HIG; Home bốn tông, field nhập sáng trắng.
 > Workspace trắng/well/xanh/xanhđậm, cam nhấn; selected chuyển sắc, cạnh mềm16%

@@ -1,16 +1,17 @@
 # Công việc kế tiếp
 
-**FRESH01 revision2 — technical PASS, owner pending26/10/2026:** theo owner giữ
-Home cũc5a440b: bốn tông mint/hồng/xanhdương/peach, icon tròn44px; tăng gradient/
-ánh viền tĩnh ở lớp chức năng theo Apple iOS27/HIG. Field editable trắng,
-readonly gần trắng, disabled riêng; gỡ override/cycle nền xám. Giữ một UI gọn,
-flow/size/print/API, không thêm JS runtime/library/asset hoặc blur/motion liên tục.
-Runtime40b238f, preview mới <http://127.0.0.1:4364/#home>;4362 giữ baseline.
-347tests, Playwright7màn×5viewport, field states, chữ150/200, tương phản gradient,
-workflow/output/native scroll đạt. CSS build tăng627bytegzip; CPU diagnostic
-không thay kiểm thiết bị thật. [Files/commands/evidence](delivery/fresh01-solid-compact/technical.md).
-Root sole writer, chưa merge/push/Cloudflare (vẫnr4). Bước tiếp owner xem Home
-và mở form KPH/DATE tại4364; chưa suy nghiệm thu candidate này.
+**FRESH01 revision3 — technical PASS, owner pending26/10/2026:** theo owner “ổn,
+phổ biến rộng hiệu ứng item Home/cả nút; CTA tươi sống màu khác”, đã chia sẻ
+ánh sáng Home cho item/card/table, icon chức năng và button roles. Home giữ
+bốn tông; các workspace dùng nền neutral/mint, không đổi màu nghiệp vụ. TPTS
+CTA lam#2465af, TPCN cam; chữ trắng min4.999/4.772:1, hover/focus/press/disabled
+được kiểm. Field trắng, kích thước/flow/print và một UI giữ nguyên.
+Runtime342ca66, preview mới <http://127.0.0.1:4366/#kph>;4364 giữ reference.
+347tests, Playwright7màn×5viewport, button states, loading, chữ lớn, workflow/
+output/notifications/native scroll đạt. CSS+435bytegzip, không thêm JS/asset/
+blur/motion liên tục. [Files/commands/evidence](delivery/fresh01-solid-compact/technical.md).
+Root sole writer, chưa merge/push/Cloudflare (vẫnr4). Bước tiếp owner xem item/
+nút và thử hai CTA ở4366; chưa suy nghiệm thu revision3.
 
 
 

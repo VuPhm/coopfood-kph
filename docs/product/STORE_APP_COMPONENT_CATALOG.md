@@ -1,5 +1,10 @@
 # Danh mục component Store App
 
+FRESH01 revision3 dùng chung light ingredients cho Home và consumer item/control
+thực, không thêm component. Button roles có rest/hover/pressed/disabled/focus;
+CTA TPTS lam, callback vẫn TPTS. [State matrix và checks](../delivery/fresh01-solid-compact/technical.md).
+
+
 FRESH01 revision2: Home launcher giữ bốn tông cũ và icon tròn44px; material/
 button/header dùng gradient CSS tĩnh. Form có token white/readonly/disabled
 độc lập, không tham chiếu vòng hoặc dùng nền xám chung cho editable.

@@ -1,5 +1,15 @@
 # FRESH01 — một giao diện gọn, màu rõ và khối nổi
 
+## Revision3 — triển khai xong, technical PASS
+
+Owner chấp nhận hướng R2 và yêu cầu mở rộng hiệu ứng item/nút, CTA TPTS màu khác.
+Tái dùng Home light cho item/card/table, functional icons và button states;
+TPTS lam/TPCN cam, giữ field trắng và business palette. Runtime342ca66/preview4366,
+347tests và browser gates đạt, CSS+435bytegzip. Review1/2, owner candidate R3
+pending. R2 plan/evidence archived; các đoạn4364 bên dưới là provenance.
+Bước tiếp owner xem các consumer và thử hai CTA, không mở audit mới.
+
+
 ## Revision2 — phản hồi owner sau4362
 
 Owner giữ Home cũc5a440b làm tham chiếu, yêu cầu tăng gradient theo iOS27 và
