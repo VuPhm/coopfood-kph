@@ -1,6 +1,6 @@
 /* Shared dense DATE lists retain both state tags. Report/notification recipes remain opt-in.
    Flatten report facts and notification groups without removing their content.
-   Comfortable, detail sheets, charts and printed documents keep their recipes. */
+   Detail sheets, charts and printed documents keep their own recipes. */
 @media screen {
   .store-app :is(.store-kph-list, .store-date-lots, .store-date-table, .date-report-catalog, .store-notification-item) .ui-list-label[data-tone] {
     min-height: 20px; padding-block: 1px; font-size: 12px; line-height: 16px; gap: 4px;

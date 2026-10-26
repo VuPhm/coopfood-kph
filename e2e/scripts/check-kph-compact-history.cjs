@@ -33,7 +33,7 @@ mockRecords.splice(0, mockRecords.length, ...Array.from({ length: 54 }, (_, i) =
   approvalStatus: i % 2 ? 'PENDING' : 'APPROVED'
 })));`;
 (async () => {
-  const browser = await chromium.launch(); const results = [];
+  const browser = await chromium.launch(); const results = []; let overflowScenarios = 0;
   try {
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1024 }, { width: 320, height: 844 }]) {
       const page = await browser.newPage({ viewport, hasTouch: viewport.width < 900, reducedMotion: 'reduce', serviceWorkers: 'block' });
@@ -66,7 +66,15 @@ mockRecords.splice(0, mockRecords.length, ...Array.from({ length: 54 }, (_, i) =
       if (!desktop) {
         const strip = page.locator('[data-record-id="mock-generated-tpts-2"] .store-ticket-tags');
         await strip.scrollIntoViewIfNeeded();
-        await expect.poll(() => strip.evaluate(el => el.scrollWidth - el.clientWidth)).toBeGreaterThan(1);
+        // Dense labels may fit at normal text size; exercise a real narrow/200% case too.
+        let previousTagStyles = null;
+        if (viewport.width === 320 && !(await strip.evaluate(el => el.scrollWidth > el.clientWidth + 1))) {
+          previousTagStyles = await strip.locator('.ui-list-label').evaluateAll(nodes => nodes.map(node => { const old=node.getAttribute('style'); const size=parseFloat(getComputedStyle(node).fontSize); const line=parseFloat(getComputedStyle(node).lineHeight); node.style.fontSize=size*2+'px';node.style.lineHeight=line*2+'px';return old; }));
+          await expect.poll(() => strip.evaluate(el => el.scrollWidth - el.clientWidth)).toBeGreaterThan(1);
+        }
+        if (await strip.evaluate(el => el.scrollWidth > el.clientWidth + 1)) {
+          overflowScenarios++;
+        await expect(strip).toHaveAttribute('tabindex', '0');
         expect(await strip.evaluate(el => getComputedStyle(el).scrollbarWidth)).toBe('none');
         await strip.focus(); await page.keyboard.press('ArrowRight');
         await expect.poll(() => strip.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
@@ -84,6 +92,11 @@ mockRecords.splice(0, mockRecords.length, ...Array.from({ length: 54 }, (_, i) =
         await expect(page.getByRole('dialog')).toHaveCount(0); await noOverflow(page);
         await page.screenshot({ path: `${output}/tag-scroll-${viewport.width}.png` });
         await cdp.detach();
+        } else {
+          await expect(strip).not.toHaveAttribute('tabindex', '0');
+          await expect(strip).not.toHaveAttribute('aria-description', /Vuốt/);
+        }
+        if (previousTagStyles) await strip.locator('.ui-list-label').evaluateAll((nodes,styles) => nodes.forEach((node,i) => { if(styles[i]===null)node.removeAttribute('style');else node.setAttribute('style',styles[i]); }), previousTagStyles);
       } else {
         const first = rows().first();
         await first.locator('.store-kph-quantity').click();
@@ -151,9 +164,10 @@ mockRecords.splice(0, mockRecords.length, ...Array.from({ length: 54 }, (_, i) =
       const box = await rows().first().boundingBox();
       if (viewport.width === 390) { expect(box.height).toBeGreaterThanOrEqual(88); expect(box.height).toBeLessThanOrEqual(130); }
       if (desktop) {
-        expect(box.height).toBeGreaterThanOrEqual(60);
+        // One-screen table role: 56px rows and 20px passive labels.
+        expect(box.height).toBeGreaterThanOrEqual(56);
         expect(await openers().first().evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(13);
-        expect(await page.locator('.ui-list-label').first().evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(26);
+        expect(await page.locator('.ui-list-label').first().evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(20);
       }
       await page.screenshot({ path: `${output}/list-${viewport.width}.png` });
       results.push({ viewport, firstItem: box, contrast: await audit(page, '.store-kph-list, .store-kph-more', `list-${viewport.width}`) });
@@ -170,6 +184,7 @@ mockRecords.splice(0, mockRecords.length, ...Array.from({ length: 54 }, (_, i) =
       await page.keyboard.press('Escape'); await expect(openers().first()).toBeFocused();
       if (process.env.STORE_KPH_SYNTHETIC_ROUTE === 'false') {
         expect(errors).toEqual([]); await page.close();
+        results.push({viewport,grouping:true,selectionCollapse:true,append:true,tagOverflowScenarios:overflowScenarios});
         console.log(`PASS build compact/history ${viewport.width}: density, append/unique IDs/focus, detail and touch`);
         continue;
       }
@@ -231,6 +246,7 @@ mockRecords.splice(0, mockRecords.length, ...Array.from({ length: 54 }, (_, i) =
       expect(errors).toEqual([]); await page.close();
       console.log(`PASS compact/history ${viewport.width}: density, append/focus, day partial selection, export eligibility, quick filters, long labels/large text`);
     }
+    expect(overflowScenarios, 'at least one actual narrow tag strip exercises scrolling').toBeGreaterThan(0);
     fs.writeFileSync(`${output}/results.json`, JSON.stringify(results, null, 2));
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -13,6 +13,7 @@ body:has(.store-app, .store-login) {
   --store-module-mint: var(--store-canvas);
   --store-module-orange: var(--store-canvas);
   --store-action-orange: #c45108;
+  --store-accent-ink: #9c410b;
   --store-action-orange-hover: #a44106;
   --store-action-green-hover: var(--store-brand-deep);
   --store-warning-ink: #884312;

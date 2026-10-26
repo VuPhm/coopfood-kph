@@ -289,8 +289,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .store-create-screen[data-slot="dialog-content"] { animation: none !important; } }
 
-/* KPH compact-controls experiment: preserve copy, type scale and record geometry.
-   The same rules cover the loading frame; remove this block to restore spacing. */
+/* Default KPH controls share spacing and geometry with their loading frame. */
 .store-kph .store-create-actions { margin-bottom: 12px; }
 .store-kph .store-create-actions .store-two-col { gap: 8px; }
 .store-kph .store-kph-toolbar { gap: 8px; margin-bottom: 12px; }

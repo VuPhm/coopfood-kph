@@ -10,7 +10,7 @@
   }
   .store-app .store-ticket-open { gap: var(--store-space-1); }
   .store-app .store-kph-list .store-ticket-body { gap: var(--store-space-1); padding-block: var(--store-space-2); }
-  .store-app .store-ticket-quick { column-gap: var(--store-space-2); }
+  .store-app .store-ticket-quick { column-gap: var(--store-space-3); }
   .store-app .store-ticket-quick > .store-ticket-approval {
     flex: 0 0 auto;
     margin-left: auto;

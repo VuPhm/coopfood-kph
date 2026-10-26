@@ -15,7 +15,7 @@
   --cf-color-border: var(--store-holder-edge);
   --cf-color-canvas: var(--store-canvas);
   --store-shelf-accent-surface: var(--store-canvas);
-  --store-shelf-accent-ink: var(--store-action-orange);
+  --store-shelf-accent-ink: var(--store-accent-ink);
   --store-result-radius: 20px;
   color: var(--cf-color-ink);
 }

@@ -36,7 +36,7 @@
 .store-date .store-tabs .is-active small { background: white; color: var(--store-brand-action); }
 .store-date-browser { display: grid; align-content: start; gap: 16px; min-width: 0; }
 .store-date-list-heading .store-date-result-count { color: var(--store-ink-muted); font-size: 13px; line-height: 20px; font-weight: 400; }
-.store-date .store-filter { display: grid; flex-shrink: 0; place-items: center; width: 44px; height: 44px; border-color: var(--store-control-line); color: var(--store-ink); }
+.store-date .store-filter { display: grid; flex-shrink: 0; place-items: center; width: var(--store-size-control-sm); height: var(--store-size-control-sm); padding: 0; border-color: var(--store-control-line); color: var(--store-ink); }
 .store-date .store-filter.is-filtered { position: relative; border-color: var(--store-brand-action); background: var(--store-brand-action); color: white; }
 .store-date-workspace { display: grid; gap: 24px; min-width: 0; }
 .store-date-lots { display: grid; grid-template-columns: 1fr; align-content: start; gap: 8px; min-width: 0; }

@@ -18,7 +18,6 @@
 .store-compact, .store-filter { display: grid; min-height: 36px; place-items: center; border: 1px solid var(--cf-color-border); border-radius: 12px; background: white; font-size: 13px; }
 .store-compact { position: relative; padding: 0 13px; }
 .store-filter { width: 40px; position: relative; }
-.store-filter::before, .store-compact::before { content: ""; position: absolute; inset: -4px 0; }
 .store-filter img { display: block; width: 18px; height: 18px; }
 .store-tabs { display: flex; gap: 4px; min-height: 40px; margin-bottom: 12px; border-radius: 14px; padding: 4px; background: var(--cf-color-surface-muted); }
 .store-tabs button { display: flex; min-height: 44px; flex: 1; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 11px; padding: 4px 6px; background: transparent; font-size: 12px; font-weight: 600; }
@@ -232,19 +231,6 @@
 .store-quick-panel .store-timeline { padding-top: 8px; }
 .store-quick-panel .store-timeline-track { height: 86px; }
 .store-quick-panel .store-shelf-placeholder { min-height: 238px; }
-/* Expand touch hit areas without changing the accepted visual control bounds. */
-@media (max-width: 899px) {
-  .store-app :is(.store-compact, .store-filter) { position: relative; }
-  .store-app :is(.store-compact, .store-filter, .store-known-toggle button, .expiry-calendar-trigger)::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: max(100%, 44px);
-    height: max(100%, 44px);
-    transform: translate(-50%, -50%);
-  }
-}
 .store-pagination button img { display: block; width: 18px; height: 18px; margin: auto; }
 .store-pagination button img.is-previous { transform: rotate(180deg); }
 
