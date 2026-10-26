@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "id": "compact03-date-report-items",
+  "revision": 6,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Quick bounded fixes: restore KPH resolution tags, show soft clickable KPH create CTAs in both densities, and use matte text-field surfaces informed by Apple HIG.",
+  "inScope": [
+    "Restore resolution/Biện pháp tag container in Compact while keeping accepted approval fallback",
+    "Compact create CTA trailing chevron and pastel soft feedback; comfortable CTA clear two-line copy on one surface, same workflows",
+    "Existing Store field material tokens become matte/no outer lift, clearer quiet edge, preserve labels/focus/error/readonly and size roles",
+    "Targeted browser both densities390/1440/320 and large text, existing workflows/output and toggle stability regression; root sole writer, no agents"
+  ],
+  "outOfScope": [
+    "Main merge/push or GitHub Pages; Cloudflare remains published revision4 until a new publication step is authorized",
+    "Business/API/auth/data changes, redesign of Home/header/navigation, timeline/chart/photo changes",
+    "Dependencies/packages/ui/root config changes, general CSS framework/cascade-layer rewrite or endless review"
+  ],
+  "baseSha": "bce0f3a",
+  "candidateSha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
+  "integrationOwner": "Root sole writer, quick scoped follow-up; no new audit/agent loop.",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-density.tsx",
+    "apps/store-pwa/src/store-density.css",
+    "apps/store-pwa/src/store-account-sheet.tsx",
+    "apps/store-pwa/src/store-compact-surfaces.css",
+    "apps/store-pwa/src/store-fresh-surfaces.css",
+    "apps/store-pwa/src/store-date-notification-surfaces.css",
+    "apps/store-pwa/src/store-density.test.tsx",
+    "e2e/scripts/check-store-density.cjs",
+    "e2e/scripts/check-store-density-stability.cjs",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/STORE_APP_DENSITY.md",
+    "docs/delivery/compact03-date-report-items/**",
+    "apps/store-pwa/src/store-kph-items.css",
+    "apps/store-pwa/src/store-kph-create-button.tsx",
+    "apps/store-pwa/src/store-kph-fresh.css",
+    "apps/store-pwa/src/store-button-system.css",
+    "apps/store-pwa/src/store-form-soft.css",
+    "docs/product/STORE_APP_SURFACE_STYLE.md"
+  ],
+  "reviewLimit": 1,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "kph-tags-cta-and-field-states",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 6,
+      "sha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+    },
+    {
+      "id": "density-workflow-and-output-regression",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 6,
+      "sha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+    },
+    {
+      "id": "owner-quick-fix-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "tiếp đoạn bị ngắt, vào vòng lặp tối ưu đồng nhất phong cách mớ này cho các vùng chưa cover",
+      "source": "Owner message26/10/2026, after interrupted COMPACT03",
+      "impact": "Adds secondary utility/management surfaces; new visual/portal gates required. No prior acceptance inferred for COMPACT03.",
+      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch. Validation maintenance only: native-scrollbar gate supports host overlay bars and Compact preference, and requires thumb drag to advance beyond the wheel activation position. Final visual verification preserves16px between adjacent desktop report choices; no other audit scope added."
+    },
+    {
+      "revision": 3,
+      "request": "tiếp cứ lặp lại agent loop work, cả fresh coop giao diện nữa",
+      "source": "Direct owner request in this chat26/10/2026, preview4350",
+      "impact": "Explicitly authorizes agent collaboration and default Co.op Fresh visual refinements, so revision2 historical comfortable-geometry parity is invalidated in changed scopes. All required technical gates reset; previous user gate remains unaccepted.",
+      "decision": "Continue same task/worktree with three disjoint isolated writers from reviewed2a3b574. Root integrates shared imports/tokens/docs, runs complete workflow/output gates and at most two bounded review/repair rounds; no merge/deploy."
+    },
+    {
+      "revision": 4,
+      "request": "tiếp, áp dụng triết lý compact cho phần quản lý date, thông báo; những phần đồng dạng được thì làm đồng dạng giữa các chức năng để đồng nhất flow",
+      "source": "Direct owner message26/10/2026",
+      "impact": "Adds DATE filter/detail/reminder and notification composition to previous interrupted scope. All integrated gates remain pending. Prior agents stopped; partial files are unverified input.",
+      "decision": "Resume same task, recover partial CSS, three bounded isolated writers and root loading takeover; max two review rounds, no business behavior changes."
+    },
+    {
+      "revision": 5,
+      "request": "1 round rà soát chuẩn cấu trúc giao diện, code css; bật chế độ thu gọn thì giao diện bị nhảy, không biết phải lỗi không",
+      "source": "Owner message26/10/2026 after Cloudflare mockup publication, ambient4352/home",
+      "impact": "Reopens technical investigation and invalidates account/toggle stability evidence; revision4 source/evidence/publication preserved. Visual owner acceptance still pending.",
+      "decision": "One bounded read-only review and root measurement; repair confirmed jump/cascade defect, preserve intentional density reflow. New local candidate, no inferred re-publication/main merge."
+    },
+    {
+      "revision": 6,
+      "request": "lỗi nhỏ fix nhanh: Biện pháp mất vùng tag; Compact2CTA thêm dấu hiệu clickable/soft Home và cân CTA mặc định; field đang lồi, tham khảo iOS27",
+      "source": "Direct owner message after4354 handoff26/10/2026",
+      "impact": "Changes tag paint, create CTA markup/paint and shared field material; resets affected technical gates, no prior visual acceptance inferred.",
+      "decision": "Minimal existing file/token changes; consult official Apple HIG text-fields/materials, matte content fields and soft actions. No backend/business/main merge/new publication."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner inspect restored tags, soft create CTAs and matte fields at4356 in both densities; no new audit/main merge/publication.",
+  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
+  "branch": "store-app/compact03-date-report-items",
+  "authorization": {
+    "date": "2026-10-26",
+    "source": "Direct user request in this chat",
+    "request": "Quick fix Biện pháp tag, Compact clickable soft CTAs/comfortable CTA, and matte input fields informed by iOS27",
+    "scope": "Local quick UI fixes and targeted verification only, root sole writer; no inferred visual acceptance/main merge/new publication."
+  },
+  "documents": {
+    "priorTechnical": "docs/delivery/compact03-date-report-items/revision5-technical.md",
+    "assessment": "docs/delivery/compact03-date-report-items/assessment.md",
+    "technical": "docs/delivery/compact03-date-report-items/technical.md",
+    "review": "docs/delivery/compact03-date-report-items/revision5-review.md"
+  }
+}

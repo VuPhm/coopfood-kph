@@ -1,68 +1,62 @@
 {
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
-  "revision": 6,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Quick bounded fixes: restore KPH resolution tags, show soft clickable KPH create CTAs in both densities, and use matte text-field surfaces informed by Apple HIG.",
+  "revision": 7,
+  "status": "EXECUTING",
+  "objective": "Align DATE workspace with KPH: shared food-kind tabs, analogous controls/card-table/detail flow, explicit unknown classification and minimal real component reuse.",
   "inScope": [
-    "Restore resolution/Biện pháp tag container in Compact while keeping accepted approval fallback",
-    "Compact create CTA trailing chevron and pastel soft feedback; comfortable CTA clear two-line copy on one surface, same workflows",
-    "Existing Store field material tokens become matte/no outer lift, clearer quiet edge, preserve labels/focus/error/readonly and size roles",
-    "Targeted browser both densities390/1440/320 and large text, existing workflows/output and toggle stability regression; root sole writer, no agents"
+    "Replace DATE alerts/tracking major tabs with TPCN/TPTS shared with KPH live/loading; unknown types remain explicitly reachable without guessing",
+    "DATE status/attention/phase filtering independent of food type, exact lookup/deep-link reveals correct kind; resolved stays excluded",
+    "Same full-width list flow as KPH: mobile cards/desktop table and shared sheet details, consistent functional controls; keep DATE metrics/timeline/reminders and KPH handoff",
+    "Reuse existing quick sort/sticky tabs/sheet/table styles, extract only real shared food-kind component for multiple consumers; remove obsolete DATE master-detail/tab CSS",
+    "Update product guidance and meaningful component/browser tests; root sole writer, no unrelated feature or CSS rollout"
   ],
   "outOfScope": [
-    "Main merge/push or GitHub Pages; Cloudflare remains published revision4 until a new publication step is authorized",
-    "Business/API/auth/data changes, redesign of Home/header/navigation, timeline/chart/photo changes",
-    "Dependencies/packages/ui/root config changes, general CSS framework/cascade-layer rewrite or endless review"
+    "Backend/API/auth/schema, assigning unknown food kind by name/SKU inference",
+    "New DATE creation, bulk selection/export or workflow not already supported",
+    "Main merge/push, protected GitHub Pages or inferred Cloudflare update",
+    "Dependencies/packages/ui/root config, Home/chrome/chart geometry or rules"
   ],
-  "baseSha": "bce0f3a",
-  "candidateSha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
+  "baseSha": "e4b1013",
+  "candidateSha": "",
   "integrationOwner": "Root sole writer, quick scoped follow-up; no new audit/agent loop.",
   "sharedPaths": [
-    "apps/store-pwa/src/store-density.tsx",
-    "apps/store-pwa/src/store-density.css",
-    "apps/store-pwa/src/store-account-sheet.tsx",
-    "apps/store-pwa/src/store-compact-surfaces.css",
-    "apps/store-pwa/src/store-fresh-surfaces.css",
-    "apps/store-pwa/src/store-date-notification-surfaces.css",
-    "apps/store-pwa/src/store-density.test.tsx",
+    "apps/store-pwa/src/**",
     "e2e/scripts/check-store-density.cjs",
-    "e2e/scripts/check-store-density-stability.cjs",
+    "e2e/scripts/check-store-notifications.cjs",
+    "e2e/scripts/check-date-actions.cjs",
+    "e2e/scripts/check-date-kph-parity.cjs",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
-    "docs/product/STORE_APP_DENSITY.md",
-    "docs/delivery/compact03-date-report-items/**",
-    "apps/store-pwa/src/store-kph-items.css",
-    "apps/store-pwa/src/store-kph-create-button.tsx",
-    "apps/store-pwa/src/store-kph-fresh.css",
-    "apps/store-pwa/src/store-button-system.css",
-    "apps/store-pwa/src/store-form-soft.css",
-    "docs/product/STORE_APP_SURFACE_STYLE.md"
+    "docs/product/DATE_MILESTONE_MODEL.md",
+    "docs/product/STORE_NOTIFICATIONS_DESIGN.md",
+    "docs/product/STORE_APP_COMPONENT_CATALOG.md",
+    "docs/delivery/compact03-date-report-items/**"
   ],
-  "reviewLimit": 1,
+  "reviewLimit": 2,
   "reviewRound": 0,
   "teams": [],
   "gates": [
     {
-      "id": "kph-tags-cta-and-field-states",
+      "id": "date-food-kind-and-unknown-scope",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 6,
-      "sha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
-      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+      "status": "pending"
     },
     {
-      "id": "density-workflow-and-output-regression",
+      "id": "date-kph-structure-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 6,
-      "sha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
-      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+      "status": "pending"
     },
     {
-      "id": "owner-quick-fix-acceptance",
+      "id": "cross-feature-density-and-output-regression",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-date-kph-alignment",
       "kind": "user",
       "required": true,
       "status": "pending"
@@ -103,17 +97,24 @@
       "source": "Direct owner message after4354 handoff26/10/2026",
       "impact": "Changes tag paint, create CTA markup/paint and shared field material; resets affected technical gates, no prior visual acceptance inferred.",
       "decision": "Minimal existing file/token changes; consult official Apple HIG text-fields/materials, matte content fields and soft actions. No backend/business/main merge/new publication."
+    },
+    {
+      "revision": 7,
+      "request": "Áp dụng triết lý KPH vào DATE, hai tab loại thực phẩm, chức năng/list đồng dạng, tái sử dụng code không tạo thành phần thừa",
+      "source": "Direct owner message after4356 handoff26/10/2026",
+      "impact": "Changes DATE navigation/screen composition and shared food tabs, invalidates DATE UI gates; business/date/reminder/KPH semantics preserved.",
+      "decision": "Shared tabs across3consumers, explicit unclassified queue, reuse existing sort/sheet/table patterns. One owner and bounded implementation/verification."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner inspect restored tags, soft create CTAs and matte fields at4356 in both densities; no new audit/main merge/publication.",
+  "nextAction": "Implement shared tabs and explicit classification, align DATE workspace, update relevant tests and verify two densities.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
     "date": "2026-10-26",
     "source": "Direct user request in this chat",
-    "request": "Quick fix Biện pháp tag, Compact clickable soft CTAs/comfortable CTA, and matte input fields informed by iOS27",
-    "scope": "Local quick UI fixes and targeted verification only, root sole writer; no inferred visual acceptance/main merge/new publication."
+    "request": "Áp dụng triết lý KPH vào DATE, hai tab loại thực phẩm, chức năng/list đồng dạng, tái sử dụng code không tạo thành phần thừa",
+    "scope": "Local DATE/KPH UI reuse implementation and verification; no inferred publication/main merge or visual acceptance."
   },
   "documents": {
     "priorTechnical": "docs/delivery/compact03-date-report-items/revision5-technical.md",
