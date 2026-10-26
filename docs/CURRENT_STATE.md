@@ -1,10 +1,11 @@
 # Trạng thái hiện tại
 
-**COMPACT03 revision6 — quick follow-up26/10/2026:** theo owner sửa Biện pháp
+**COMPACT03 revision6 — technical PASS, owner pending26/10/2026:** theo owner sửa Biện pháp
 mất khung tag, thêm chevron/soft pastel cho hai CTA KPH Compact; CTA mặc định
 một mặt nền với hai tầng chữ, bỏ thanh màu lồng. Field chuyển matte/no-shadow,
 viền mảnh/radius12, giữ focus/error/readonly và size. Tham khảo Apple HIG text
-fields/materials và hướng đọc rõ iOS27. Candidate4356 đang kiểm; root sole writer,
+fields/materials và hướng đọc rõ iOS27. Candidate <http://127.0.0.1:4356/#kph>;
+346tests, browser hai mode/3width/CTA200% và toggle/workflow/output đạt. Root sole writer,
 không mở audit mới. [Scope](delivery/compact03-date-report-items/plan.json).
 Cloudflare vẫn r4, chưa merge/push; bước tiếp owner xem tag/CTA/field ở hai mode.
 
