@@ -5,8 +5,8 @@
     --store-button-radius: 12px;
     --store-button-radius-compact: 10px;
     --store-button-primary-bg: var(--store-brand-action);
-    --store-button-primary-top: var(--store-brand-action);
-    --store-button-primary-bottom: var(--store-brand-action);
+    --store-button-primary-top: #087e58;
+    --store-button-primary-bottom: #005c40;
     --store-button-primary-hover: var(--store-brand-deep);
     --store-button-primary-active: var(--store-brand-deep);
     --store-button-on-primary: #fff;
@@ -45,7 +45,7 @@
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="primary"], .store-login-submit, .store-choice-confirm, .store-account-home, .store-notifications-body > button, .store-create-loading-body > button,.store-tabs button.is-active, .store-date-statuses button.is-selected, .store-choices button.is-selected, .store-compact[aria-pressed="true"], .store-filter.is-filtered, .store-quick-sort-options button[aria-pressed="true"], .store-kph-date-shortcuts button[aria-pressed="true"], .unit-options input:checked + span) {
     --store-button-fill: var(--store-button-primary-bg);
-    --store-button-image: none;
+    --store-button-image: linear-gradient(155deg, var(--store-button-primary-top), var(--store-button-primary-bg) 48%, var(--store-button-primary-bottom));
     --store-button-ink: var(--store-button-on-primary);
     --store-button-shadow: var(--store-button-primary-shadow);
   }
@@ -54,11 +54,13 @@
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="secondary"], .store-choice-cancel, .store-login-preview, .store-account-login, .store-reset-filter, .store-date-reset-filter, .store-kph-more button, .store-create-cta,.store-compact:not([aria-pressed="true"]), .store-filter:not(.is-filtered), .store-quick-sort-trigger, .store-selection-menu, .store-choices button:not(.is-selected), .store-kph-date-shortcuts button:not([aria-pressed="true"])) {
     --store-button-fill: var(--store-button-secondary-bg);
+    --store-button-image: var(--store-button-secondary-image, var(--store-material-sheen));
     --store-button-ink: var(--store-button-secondary-ink);
     --store-button-shadow: var(--store-button-secondary-shadow);
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="ghost"]) {
     --store-button-fill: transparent;
+    --store-button-image: none;
     --store-button-ink: var(--store-button-ghost-ink);
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="danger"]) {
@@ -83,6 +85,7 @@
   /* Preserve an existing semantic orange action and inverse-hero controls. */
   body:has(.store-app) .store-date-acknowledge { --store-button-primary-bg: #c24e00; --store-button-primary-top: #c24e00; --store-button-primary-bottom: #a63f00; --store-button-primary-hover: #a63f00; --store-button-primary-active: #913700; }
   body:has(.store-app) .store-create-cta {
+    --store-button-secondary-image: var(--store-create-gradient);
     --store-button-secondary-bg: var(--store-create-surface);
     --store-button-secondary-hover: var(--store-create-hover);
     --store-button-secondary-active: var(--store-create-pressed);

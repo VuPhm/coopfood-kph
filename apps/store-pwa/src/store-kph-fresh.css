@@ -5,8 +5,8 @@
 .store-create-actions h2 { display: none; }
 .store-create-actions .store-two-col { gap: 12px; }
 .store-create-actions .store-create-cta { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 44px; border: 1px solid rgb(255 255 255 / 26%); border-radius: 12px; padding: 8px 12px; text-align: left; cursor: pointer; }
-.store-create-cta.create-tpcn { --store-create-accent: #fff; --store-create-ink: #fff; --store-create-surface: var(--store-action-orange); --store-create-hover: var(--store-action-orange-hover); --store-create-pressed: #9c410b; }
-.store-create-cta.create-tpts { --store-create-accent: var(--store-brand-action); --store-create-ink: var(--store-brand-action); --store-create-surface: #fff; --store-create-hover: var(--store-canvas); --store-create-pressed: var(--store-canvas); }
+.store-create-cta.create-tpcn { --store-create-gradient: linear-gradient(155deg, #c45108, #a44106); --store-create-accent: #fff; --store-create-ink: #fff; --store-create-surface: var(--store-action-orange); --store-create-hover: var(--store-action-orange-hover); --store-create-pressed: #9c410b; }
+.store-create-cta.create-tpts { --store-create-gradient: var(--store-material-sheen); --store-create-accent: var(--store-brand-action); --store-create-ink: var(--store-brand-action); --store-create-surface: #fff; --store-create-hover: var(--store-canvas); --store-create-pressed: var(--store-canvas); }
 .store-create-cta svg { display: block; flex-shrink: 0; }
 .store-create-cta .store-create-chevron { margin-left: auto; width: 16px; height: 16px; }
 .store-kph .store-ticket-list { display: grid; gap: 16px; }
@@ -126,7 +126,6 @@
 .store-create-screen .form-section label, .store-create-screen .unit-fieldset legend, .store-create-screen .store-form-skeleton-label { color: var(--store-ink-muted); font-size: 12px; line-height: 20px; font-weight: 400; }
 .store-create-screen .form-section input:not([type="radio"]):not([type="file"]), .store-create-screen textarea, .store-create-screen .store-form-skeleton-input { height: 52px; border: 1px solid var(--store-line); border-radius: 14px; background: var(--store-surface); font-size: 16px; font-weight: 400; }
 .store-create-screen .store-form-skeleton-input { background: var(--cf-color-surface-strong); }
-.store-create-screen input[readonly] { background: var(--store-canvas) !important; }
 .store-create-screen .field-input-action { width: 44px; height: 44px; color: var(--store-brand-action); }
 .store-create-screen .field-input-action img { display: block; }
 .store-create-screen .expiry-calendar-trigger > img[data-kph-calendar-icon] { width: 20px; height: 20px; }

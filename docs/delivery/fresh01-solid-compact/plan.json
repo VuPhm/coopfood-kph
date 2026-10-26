@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "EXECUTING",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
     "Rebuild Store-local color/material/size/space roles with 60-30-10 visual emphasis and at most four background levels",
     "Preserve sliding frame/sheet flow; apply to DATE/KPH as reference then Home/notifications/reports/shelf/account/login",
     "Reduce auxiliary/display elements, test smaller secondary hit targets with spacing; preserve important action targets",
-    "Reuse real consumers, remove superseded CSS/code and adapt meaningful unit/browser gates"
+    "Reuse real consumers, remove superseded CSS/code and adapt meaningful unit/browser gates",
+    "Restore old Home feature identity (mint/pink/blue/peach, round dimensional icons) with stronger static decorative gradients",
+    "Apply bounded gradient/highlight roles to functional surfaces; keep data/status/timeline/print and one-screen layout intact",
+    "Make editable fields visibly white/active; distinguish readonly and disabled without cyclic token mappings; retain validation/focus"
   ],
   "outOfScope": [
     "Business/API/backend/auth/schema or date calculation changes",
@@ -17,8 +20,8 @@
     "Main merge/push, protected Pages or inferred Cloudflare publication",
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
-  "baseSha": "ccdab5a46b6eac12db51e9021454ce7647a6f673",
-  "candidateSha": "dfbebe65cf5220207ce6b55b21ceebbc079f66c9",
+  "baseSha": "2c7a949",
+  "candidateSha": "",
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -33,44 +36,32 @@
     "docs/delivery/fresh01-solid-compact/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
       "id": "single-interface-no-legacy-mode",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "dfbebe65cf5220207ce6b55b21ceebbc079f66c9",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "shared-solid-material-and-sliding-structure",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "dfbebe65cf5220207ce6b55b21ceebbc079f66c9",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "responsive-targets-focus-and-reflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "dfbebe65cf5220207ce6b55b21ceebbc079f66c9",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "preserved-workflows-print-and-outputs",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "dfbebe65cf5220207ce6b55b21ceebbc079f66c9",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner-integrated-visual-acceptance",
@@ -79,9 +70,17 @@
       "status": "pending"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Home cũ rất tốt, giữ lại/đẩy mạnh hiệu ứng; tăng gradient trang trí với chi phí thấp; tham chiếu mạnh iOS27; field xám giống disabled",
+      "source": "Direct owner message after4362 KPH handoff26/10/2026",
+      "impact": "Supersedes white-only Home cards and no-gradient decoration in revision1. Invalidates affected visual/material/field gates; prior evidence archived, no visual acceptance inferred.",
+      "decision": "Same branch/worktree, root sole writer. Use c5a440b Home as provenance; official Apple iOS27/HIG references. Static CSS gradients, no large blur, continuous animation, dependency or new UI mode. Max two bounded review/repair rounds."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Owner views integrated one-screen candidate4362 across Home/DATE/KPH/notifications/reports/shelf/account/login. Technical gates pass; visual acceptance pending. Stop broad audit; no inferred merge/push/publication.",
+  "nextAction": "Implement Home reference gradients and bright editable field states; verify contrast, roles, CPU-throttled scrolling and unchanged flows/outputs.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
   "branch": "store-app/fresh01-solid-compact",
   "authorization": {

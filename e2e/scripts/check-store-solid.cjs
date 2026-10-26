@@ -35,9 +35,9 @@ async function bounds(page) {
         expect(palette.brand).toBe('#007a52');expect(palette.well).toBe('#f2f5f3');
         await audit(page,route==='login'?'.store-login':'.store-app',`${route}-${viewport.width}`);
         if(route==='home') {
-          const cards=await page.locator('.store-module').evaluateAll(ns=>ns.map(n=>{const s=getComputedStyle(n),i=getComputedStyle(n.querySelector('.store-module-icon'));return{bg:s.backgroundColor,shadow:s.boxShadow,icon:i.backgroundColor}}));
-          expect(new Set(cards.map(c=>c.bg))).toEqual(new Set(['rgb(255, 255, 255)']));expect(cards.every(c=>c.shadow!=='none')).toBe(true);
-          expect(new Set(cards.map(c=>c.icon))).toEqual(new Set(['rgb(0, 122, 82)','rgb(196, 81, 8)']));
+          const cards=await page.locator('.store-module').evaluateAll(ns=>ns.map(n=>{const s=getComputedStyle(n),i=getComputedStyle(n.querySelector('.store-module-icon'));return{bg:s.backgroundColor,image:s.backgroundImage,shadow:s.boxShadow,icon:i.backgroundColor,iconImage:i.backgroundImage}}));
+          expect(new Set(cards.map(c=>c.bg)).size).toBe(4);expect(cards.every(c=>c.image.includes('gradient')&&c.iconImage.includes('gradient'))).toBe(true);expect(cards.every(c=>c.shadow!=='none')).toBe(true);
+          expect(new Set(cards.map(c=>c.icon)).size).toBe(4);
         }
         if(route==='kph'||route==='date') {
           if(route==='date')await page.getByRole('group',{name:'Loại thực phẩm'}).getByRole('button',{name:/TP khô/}).click();
