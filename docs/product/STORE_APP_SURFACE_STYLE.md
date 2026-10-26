@@ -354,3 +354,17 @@ Các số đo này mô tả reference, không phải tuyên bố toàn app đạ
 hay đã kiểm thiết bị thật. Acceptance và evidence đầy đủ ở
 [UI01](../delivery/ui01-mobile-perf/merge-2026-10-22.md) và
 [KPH02](../delivery/kph02-merge-2026-10-22.md).
+
+## COMPACT03 revision4 — phân cấp dùng chung giữa chức năng
+
+Candidate26/10 theo owner: đồng dạng dựa trên vai trò, không chỉ giảm đệm.
+Tên → định danh → tình trạng chính → xử lý/lịch nhắc → hành động giữ cùng
+thứ tự trong DATE/Thông báo và các list tương đương. %HSD dùng24px cho hai
+nguồn cùng dữ liệu; phase vẫn chữ/icon/màu, không suy nghiệp vụ từ hình ảnh.
+Compact dùng section phẳng, separator và face36px; comfortable giữ grouped
+well thoáng hơn. Section17/24, input16/24, caption12/18 và hit44px lấy từ
+Store-local size tokens; không tạo palette/mode/dependency mới. Các filter
+cùng cách chia nhóm/sắp xếp/đặt lại/xong khi workflow thực sự tương đương.
+Thông báo giữ native thu/mở và deep link, không ép thành workspace tìm/lọc.
+Loading KPH chỉ dùng paint trung tính, không hiện nhãn trạng thái nghiệp vụ
+trước khi workspace sẵn sàng. [Gates](../delivery/compact03-date-report-items/plan.json).

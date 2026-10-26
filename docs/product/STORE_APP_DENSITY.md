@@ -90,3 +90,21 @@ Theo owner yêu cầu tiếp phần bị ngắt và đồng nhất vùng chưa c
 Không thay đổi Home brand modules, header/navigation, timeline/chart hoặc
 ảnh. [Coverage/phần hoãn](../delivery/compact03-date-report-items/assessment.md),
 [kế hoạch và giới hạn](../delivery/compact03-date-report-items/plan.json).
+
+## COMPACT03 revision4 — candidate DATE/Thông báo và Fresh chung
+
+Owner26/10 yêu cầu đồng dạng phần chức năng và áp Compact cho DATE/Thông báo.
+Cả hai mật độ dùng input16/24, caption12/18, calendar launcher44px; cặp ngày
+filter KPH tự xuống hàng khi hẹp. Thông báo đưa tên/định danh bên trái và
+%HSD24px bên phải, phase/lịch báo lại thành dòng toàn chiều ngang như DATE.
+Giữ native details/summary và mở đúng lô, không thêm filter giả.
+
+Compact DATE: filter/detail/reminder phân section bằng separator, heading17/24,
+processing nhẹ hơn phase, lựa chọn nhắc và footer≥44px; không đổi box timeline.
+Comfortable giữ nhóm mềm/thoáng; chi tiết KPH được wrap label/value khi chữ lớn,
+report facts bớt nền lồng và account settings cùng recipe. Đây là thay đổi mặc
+định được owner cho phép, thay quy tắc giữ nguyên comfortable geometry của các
+revision trước trong đúng phạm vi này. Screen-only; print/chart/legacy giữ riêng.
+
+[Scope, bản tích hợp và kiểm chứng](../delivery/compact03-date-report-items/plan.json).
+Technical readiness không thay thế nghiệm thu owner hoặc cho phép merge.

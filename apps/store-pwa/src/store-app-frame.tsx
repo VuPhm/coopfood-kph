@@ -24,6 +24,9 @@ import "./store-size-tokens.css";
 import "./store-density.css";
 import "./store-record-items.css";
 import "./store-compact-surfaces.css";
+import "./store-fresh-foundations.css";
+import "./store-fresh-surfaces.css";
+import "./store-date-notification-surfaces.css";
 
 export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {
   screen: StoreAppScreen; profile: StoreProfile; navigate: (screen: Screen) => void;

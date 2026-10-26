@@ -39,7 +39,7 @@
   "teams": [
     {
       "id": "foundations",
-      "agent": "/root/token_audit",
+      "agent": "root takeover after foundations_r4 service capacity error",
       "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r3-foundations",
       "allowedPaths": [
         "apps/store-pwa/src/store-fresh-foundations.css"
@@ -48,7 +48,7 @@
     },
     {
       "id": "surfaces",
-      "agent": "/root/fresh_audit",
+      "agent": "/root/surfaces_r4",
       "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r3-surfaces",
       "allowedPaths": [
         "apps/store-pwa/src/store-fresh-surfaces.css"
@@ -57,7 +57,7 @@
     },
     {
       "id": "date-notifications",
-      "agent": "pending",
+      "agent": "/root/date_notifications_r4",
       "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r4-date-notifications",
       "allowedPaths": [
         "apps/store-pwa/src/store-date-notification-surfaces.css"

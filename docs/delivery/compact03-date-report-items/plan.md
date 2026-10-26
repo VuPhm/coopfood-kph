@@ -1,20 +1,24 @@
-# COMPACT03 revision3 — shared Fresh and density loop
+# COMPACT03 revision4 — DATE / notifications and shared Fresh hierarchy
 
-Explicit owner request26/10 authorizes agents and default Co.op Fresh work.
-Continue the existing task from clean reviewed2a3b574. Revision2 plan and
-evidence are preserved as revision2-*. Default geometry parity is no longer
-required inside newly authorized visual scopes; fields/semantics and chrome
-outer geometry/print/chart invariants remain.
+Owner26/10 continues the interrupted agent loop and adds DATE management,
+notifications and analogous functional flows. Keep revision2/3 evidence as
+history, never as proof of this integrated candidate. Reviewed base2a3b574.
 
-Three isolated writers: shared readability/targets CSS, default secondary-
-surface CSS, loading-state CSS. Root owns frame imports, tokens, documents
-and integration. See plan.json exact worktrees and allowed paths.
+Three isolated scopes: operational foundation roles, comfortable Fresh secondary
+surfaces, DATE/notification composition. Foundations agent failed service capacity
+before writing; root completed that worktree. Root also takes over recovered,
+unverified loading CSS. Two other agents implement/review independently. Exact
+ownership/paths and pending gates are in plan.json.
 
-Loop: consolidate audit -> implement -> integrate -> independent review ->
-one consolidated repair if needed -> final technical gates. At most two
-review rounds; no unlimited cleanup. Reviewer excludes self-owned changes;
-root independently reviews loading. New user changes require a revision.
+DATE/notification target: consistent title/identifier/phase/percent hierarchy,
+flat Compact filter/detail/reminder sections, 44px actions, full reminder dates,
+native notification disclosure and exact-lot navigation. Both densities share
+readability and information order; comfortable keeps roomier soft grouping.
+No new feature/workflow/data/API or changes to timeline/chart geometry/colors.
 
-Run scope checks on each agent worktree, review diffs before integration,
-then check integrated source. Technical PASS stays separate from owner
-acceptance. No main integration/push/deploy/Pages or external messages.
+Integrate scoped commits -> build production4352 -> independent review -> at
+most one consolidated repair -> final checks (two review rounds maximum).
+Technical readiness and owner acceptance stay separate. No main integration,
+push/deploy/Pages. Historical comfortable geometry parity is intentionally
+invalidated only in authorized scopes; content/state/print and chrome outer
+geometry still need evidence against frozen4350.
