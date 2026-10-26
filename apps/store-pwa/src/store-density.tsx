@@ -50,6 +50,13 @@ export function useStoreDensityValue() {
   return printing ? "comfortable" : preference?.density ?? initial;
 }
 
+// Lists use the accepted dense composition in either screen preference.
+// Printing keeps the original full label composition and never changes storage.
+export function useStoreListDensity(): StoreDensity {
+  const printing = useSyncExternalStore(subscribePrint, isPrinting, () => false);
+  return printing ? "comfortable" : "compact";
+}
+
 // The frame owns the lifetime; the document attribute also reaches Radix portals.
 // A loading frame outside the provider reads the same preference before paint.
 export function StoreDensityScope() {

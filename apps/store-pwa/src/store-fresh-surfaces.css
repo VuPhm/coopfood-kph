@@ -22,7 +22,7 @@
 
   /* DATE condition remains primary. Processing keeps its full text/icon/tone,
      but its softer fill and quieter weight no longer compete with that signal. */
-  html[data-store-density="comfortable"] .store-app :is(.store-date-lots, .store-date-table, .date-report-catalog) [data-processing-status] {
+  html[data-store-density="comfortable"] .store-app .date-report-catalog [data-processing-status] {
     border-color: transparent;
     background-color: var(--cf-label-surface);
     background-color: color-mix(in srgb, var(--cf-label-surface) 50%, var(--store-surface));
@@ -37,7 +37,7 @@
 
 }
 @media screen and (forced-colors: active) {
-  html[data-store-density="comfortable"] .store-app :is(.store-date-lots, .store-date-table, .date-report-catalog) [data-processing-status] {
+  html[data-store-density="comfortable"] .store-app .date-report-catalog [data-processing-status] {
     border-color: CanvasText; background-color: Canvas;
   }
 }

@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**COMPACT03 revision8 — tiếp DATE/KPH + list chung26/10/2026:** owner giữ hướng
+list Compact và yêu cầu áp cả hai mật độ, sửa tag thứ hai. KPH/DATE dùng list
+gọn độc lập công tắc; Biện pháp KPH và processing DATE có lại nền/viền/icon.
+Công tắc vẫn đổi controls/forms; print giữ đầy đủ. Tiếp toàn bộ r7: hai tab
+food type dùng chung, unknown rõ ràng, card/table → sheet, filter/nhắc/KPH giữ
+nghiệp vụ. Root sole writer, preview4360 đang kiểm. [Scope](delivery/compact03-date-report-items/plan.json).
+Chưa merge/push/cập nhật Cloudflare; bước tiếp kiểm bản tích hợp rồi owner xem.
+
+
 **COMPACT03 revision7 — DATE/KPH alignment candidate26/10/2026:** owner yêu cầu
 hai tab loại thực phẩm thay Cảnh báo/Theo dõi, đồng dạng controls/list và reuse.
 Một shared food-kind selector dùng cả KPH live/loading/DATE; trạng thái/phase

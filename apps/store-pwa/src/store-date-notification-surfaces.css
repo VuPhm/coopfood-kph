@@ -51,10 +51,6 @@
   html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet .store-date-detail-metrics > p {
     border-radius: 0; padding: 0; background: transparent;
   }
-  html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet [data-processing-status] {
-    border: 0; border-radius: 0; padding-inline: 0;
-    background: transparent; font-weight: 500;
-  }
   html[data-store-density="compact"] body:has(.store-app) .store-date-lot-sheet .store-date-reminder-choices {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr));
     border: 0; border-top: 1px solid var(--store-holder-edge);

@@ -8,6 +8,7 @@ import { StoreAppHeader } from "./store-app-header";
 import { KphCreateButton } from "./store-kph-create-button";
 import { StoreReportSettings } from "./store-report-settings";
 import { KphWorkspace } from "./store-kph-workspace";
+import { StoreKphList } from "./store-kph-list";
 import { mockRecords } from "./store-app-mock";
 
 // This Node runtime exposes an unavailable global Web Storage getter to jsdom.
@@ -163,5 +164,21 @@ describe("Store density preference", () => {
     act(()=>{printing=true;listeners.forEach(notify=>notify());});expect(screen.getByText("comfortable")).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Print draft" })).toBe(draft);
     act(()=>{printing=false;listeners.forEach(notify=>notify());});expect(screen.getByText("compact")).toBeInTheDocument();expect(draft).toHaveValue("Đang nhập");
+  });
+
+  it("keeps the accepted dense list in either screen preference and restores full labels for print", () => {
+    let printing=false; const listeners=new Set<() => void>();
+    vi.stubGlobal("matchMedia", () => ({get matches(){return printing;},addEventListener:(_type:string,listener:()=>void)=>listeners.add(listener),removeEventListener:(_type:string,listener:()=>void)=>listeners.delete(listener)}));
+    render(<StoreDensityProvider><StoreDensitySetting /><StoreKphList desktop={false} visible={[mockRecords[0]!]} /></StoreDensityProvider>);
+    const row=document.querySelector('[data-record-id]');
+    const labels=()=>document.querySelectorAll('.store-ticket-tags [data-label-kind]');
+    expect(document.querySelector('.store-ticket-quick [data-label-kind="approval"]')).not.toBeNull();
+    expect(labels()).toHaveLength(2);
+    fireEvent.click(screen.getByRole('switch',{name:'Chế độ gọn'}));
+    expect(document.querySelector('[data-record-id]')).toBe(row);expect(labels()).toHaveLength(2);
+    act(()=>{printing=true;listeners.forEach(notify=>notify());});
+    expect(labels()).toHaveLength(3);expect(document.querySelector('.store-ticket-quick [data-label-kind="approval"]')).toBeNull();
+    act(()=>{printing=false;listeners.forEach(notify=>notify());});
+    expect(document.querySelector('[data-record-id]')).toBe(row);expect(labels()).toHaveLength(2);
   });
 });

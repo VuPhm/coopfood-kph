@@ -122,3 +122,19 @@ Text input có một owner auto-height/min44; scan/action có thể giữ44px. D
 filter section thuộc file DATE, generic density chỉ sở hữu KPH/report. Không
 khóa input44px bằng selector ưu tiên cao hơn rồi vá auto-height ở cuối file.
 [Review/kiểm chứng](../delivery/compact03-date-report-items/revision5-review.md).
+
+## COMPACT03 revision8 — list gọn là mặc định chung
+
+Owner26/10 xác nhận list Compact tốt và yêu cầu áp dụng cả DATE/KPH chưa
+Compact. Trên screen hai mật độ dùng cùng item/table composition và geometry:
+KPH approval cạnh SKU/số lượng, hai tag tình trạng/biện pháp ở strip; DATE giữ
+phase/%HSD/processing/ngày/lịch nhắc với padding gọn. **Tag thứ hai giữ nền,
+viền, padding và icon đầy đủ**: Biện pháp KPH, trạng thái xử lý DATE. Approval
+KPH final vẫn được rút icon khi thiếu chỗ, Pending giữ chữ.
+
+`useStoreListDensity` là presentation policy theo screen/print, không phải
+preference thứ ba. Công tắc vẫn đổi controls/forms/secondary sections; không
+remount list hoặc đổi dữ liệu. Print dùng composition đầy đủ trước đây. Một
+rule table row dùng chung cho KPH/DATE; record-list CSS áp độc lập preference,
+tránh hai bộ override song song. Report/Thông báo ngoài yêu cầu này giữ scope
+riêng. [Kiểm chứng](../delivery/compact03-date-report-items/plan.json).

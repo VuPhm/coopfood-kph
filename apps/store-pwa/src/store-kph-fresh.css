@@ -44,8 +44,9 @@
 .store-kph .store-ticket-list { display: grid; gap: 16px; }
 .store-kph-list-controls { display: grid; gap: 12px; min-width: 0; }
 :is(.store-kph, .store-date) .store-list-heading { justify-content: flex-start; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-height: 24px; margin: 0; }
-.store-kph-list-toolbar { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.store-kph-list-toolbar .store-quick-sort-trigger { flex: 1; min-width: 0; width: 100%; }
+.store-kph-list-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.store-kph-list-toolbar .store-quick-sort-trigger { flex: 1 1 11em; min-width: 0; max-width: 100%; width: auto; }
+.store-kph-list-toolbar .store-quick-sort-trigger > span { min-width: 0; overflow-wrap: anywhere; }
 .store-kph-list-toolbar .store-compact { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; border-color: var(--store-control-line); cursor: pointer; }
 .store-kph-list-toolbar .store-compact svg { display: block; flex-shrink: 0; stroke-width: 1.8; }
 .store-kph-list-toolbar .store-compact[aria-pressed="true"] { border-color: var(--store-brand-action); background: var(--store-brand-action); color: white; }

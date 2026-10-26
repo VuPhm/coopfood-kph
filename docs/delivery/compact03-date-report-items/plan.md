@@ -1,17 +1,13 @@
-# COMPACT03 revision7 — DATE/KPH alignment
+# COMPACT03 revision8 — continue alignment, one dense list presentation
 
-Owner explicitly replaces DATE major tabs with food kind and asks reuse. Root
-sole writer, same task/worktree from e4b1013. Shared StoreFoodKindTabs has three
-real consumers; existing sort/sticky/sheet/layout hook/table roles are reused.
-Keep DATE metrics/reminder/domain behavior; no fake DATE create/bulk/export.
+Keep revision7 DATE/KPH shared food tabs, explicit unknown kinds and card/table
+→ shared sheet flow. Owner now asks dense list presentation in BOTH preferences
+and full second tags. One screen-list policy + shared table role, no new mode
+or duplicate UI. Print preserves full labels; forms/controls still honor setting.
 
-Kind from unique catalog metadata; unknown stays in a reachable auxiliary queue.
-Exact lookup/notification selects correct kind. Status/phase independent filters,
-attention a shortcut. Mobilecards and desktopfullwidthtable open the same sheet.
-Delete old tabs/statusgrid/masterdetail/breakpoint effect instead of stacking
-another replacement component. One bounded UI review/verification, up to two
-rounds for blockers; gates and exactscope in plan.json. No main merge/publish.
-
-Historical DATE geometry is intentionally changed; print/output and KPH/chrome
-regression remain required. Timeline remains responsive with unchanged rules and
-colors, inside the new sheet rather than a fixed previous desktop column.
+Root sole writer. Finish remaining large-text toolbar/percent reflow, then actual
+list geometry/tag/print parity, DATE workflow/deep-link and shared density/output
+checks. One final integrated candidate4360. Source/351tests and browser results
+before steering preserved in revision7-progress.md, not used as current proof.
+No inferred main merge/publication; owner acceptance remains scoped to actual
+messages. No broad additional audit after verification.

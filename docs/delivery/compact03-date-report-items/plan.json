@@ -18,7 +18,7 @@
     "Backend/API/auth/schema, assigning unknown food kind by name/SKU inference",
     "New DATE creation, bulk selection/export or workflow not already supported",
     "Main merge/push, protected GitHub Pages or inferred Cloudflare update",
-    "Dependencies/packages/ui/root config, Home/chrome/chart geometry or rules"
+    "Dependencies/packages/ui/root config, Home/chrome changes, date calculation or timeline/color recipe changes; responsive chart container follows the new sheet."
   ],
   "baseSha": "3f141a7",
   "candidateSha": "",
@@ -35,12 +35,19 @@
     "docs/product/STORE_NOTIFICATIONS_DESIGN.md",
     "docs/product/STORE_APP_COMPONENT_CATALOG.md",
     "docs/delivery/compact03-date-report-items/**",
-    "docs/product/STORE_APP_DENSITY.md"
+    "docs/product/STORE_APP_DENSITY.md",
+    "e2e/scripts/check-store-list-density.cjs"
   ],
   "reviewLimit": 2,
   "reviewRound": 0,
   "teams": [],
   "gates": [
+    {
+      "id": "shared-screen-list-and-second-tags",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
     {
       "id": "date-food-kind-and-unknown-scope",
       "kind": "technical",

@@ -5,7 +5,7 @@ import { figmaAsset } from "./figma-assets";
 import { ListItemMarker } from "@coopfood-kph/ui";
 import { getKphLabelPresentation, KphListLabel } from "./store-kph-label";
 import { KPH_BATCH_SIZE, kphDateRuns } from "./store-kph-history";
-import { useStoreDensityValue } from "./store-density";
+import { useStoreListDensity } from "./store-density";
 import "./store-kph-items.css";
 
 function DayHeading({ date, shown, total, checked, partial, disabled, selectionMode, expanded, contentId, onToggle, onChange }: {
@@ -101,7 +101,7 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
   setSelection?: (ids: string[]) => void; collapsedDates?: string[]; onToggleDate?: (date: string) => void; setActive?: (record: RecordView) => void; loading?: boolean;
 }) {
   const listId = useId();
-  const compact = useStoreDensityValue() === "compact";
+  const compact = useStoreListDensity() === "compact";
   const groups = useMemo(() => groupByDate ? kphDateRuns(visible) : visible.length ? [{ date: "", records: visible }] : [], [visible, groupByDate]);
   const byDate = useMemo(() => {
     const result = new Map<string, RecordView[]>();

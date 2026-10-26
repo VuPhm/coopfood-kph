@@ -101,8 +101,6 @@
   html[data-store-density="compact"] :is(.store-app, .store-quick-panel) .store-shelf-actions button { min-height: var(--store-density-control); }
 
   /* Light item adjustment, keeping text, tags, status hierarchy and 44px controls. */
-  html[data-store-density="compact"] .store-app .store-ticket-body { padding-block: var(--store-space-2); }
-  html[data-store-density="compact"] .store-app .store-date-lot { padding-block: calc(var(--store-space-1) * 2.5); }
   html[data-store-density="compact"] .store-app .report-composer .date-report-card { padding-block: var(--store-space-3); }
   html[data-store-density="compact"] .store-app .store-notification-groups { gap: var(--store-space-5); }
   html[data-store-density="compact"] .store-app .store-notification-module { gap: var(--store-space-3); }
@@ -178,9 +176,6 @@
   }
   html[data-store-density="compact"] .store-app .store-date-search-icon { top: 50%; transform: translateY(-50%); }
 
-  @media (min-width: 900px) {
-    html[data-store-density="compact"] .store-app .store-kph-table .store-kph-record-row td { height: var(--store-size-row-two); padding-block: calc(var(--store-space-1) * 1.5); }
-  }
 }
 @media screen and (forced-colors: active) {
   html[data-store-density="compact"] .store-app .store-report-filter-inline::before { border: 1px solid ButtonText; }

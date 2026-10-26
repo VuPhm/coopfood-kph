@@ -227,6 +227,7 @@
 .store-date .store-date-unclassified[aria-pressed="true"] { color: var(--store-brand-action); text-decoration: underline; text-underline-offset: 4px; font-weight: 600; }
 .store-date-lot-main > strong { font-size: 14px; line-height: 20px; }
 .store-date-table :is(td > small, td > strong) { display: block; }
+.store-date .store-date-table { table-layout: auto; }
 .store-date-table td > small { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
 .store-date-table td > strong:not(.store-date-percent) { font-weight: 500; font-size: 13px; line-height: 20px; }
 .store-date-table .store-date-percent { display: block; font-size: 24px; line-height: 28px; }

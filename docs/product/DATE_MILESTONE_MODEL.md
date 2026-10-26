@@ -136,3 +136,7 @@ khỏi toolbar; không tạo chức năng thêm lô giả hoặc bulk/export m�
 
 Không còn big tabs Cảnh báo/Theo dõi, nút status ngoài list hoặc master-detail
 CSS. [Scope/kiểm chứng](../delivery/compact03-date-report-items/plan.json).
+
+Revision8 owner tiếp: list gọn áp cả hai mật độ; processing tag thứ hai giữ
+container đầy đủ ở list/detail, không chỉ chữ/icon. Thay đổi này thay recipe
+Compact processing-plain trước đó. Controls/forms vẫn theo công tắc.

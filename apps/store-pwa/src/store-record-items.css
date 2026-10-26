@@ -1,16 +1,20 @@
-/* Compact list hierarchy. DATE remains the primary signal; processing is text.
+/* Shared dense DATE lists retain both state tags. Report/notification recipes remain opt-in.
    Flatten report facts and notification groups without removing their content.
    Comfortable, detail sheets, charts and printed documents keep their recipes. */
 @media screen {
-  html[data-store-density="compact"] .store-app :is(.store-date-lots, .store-date-table, .date-report-catalog) [data-processing-status] {
+  .store-app .store-date-lot { padding-block: 10px; }
+  @media (min-width: 900px) {
+    .store-app .store-kph-table .store-kph-record-row td { height: var(--store-size-row-two); padding-block: 6px; }
+  }
+  html[data-store-density="compact"] .store-app .date-report-catalog [data-processing-status] {
     border: 0;
     border-radius: 0;
     padding-inline: 0;
     background: transparent;
     font-weight: 500;
   }
-  html[data-store-density="compact"] .store-app .store-date-lot-labels { gap: var(--store-space-2); }
-  html[data-store-density="compact"] .store-app .store-date-lot-footer { margin-top: 0; }
+  .store-app .store-date-lot-labels { gap: var(--store-space-2); }
+  .store-app .store-date-lot-footer { margin-top: 0; }
 
   html[data-store-density="compact"] .store-app .date-report-card-dates {
     justify-content: flex-start;
