@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "fresh01-solid-compact",
+  "revision": 1,
+  "status": "PLANNING",
+  "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
+  "inScope": [
+    "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
+    "Rebuild Store-local color/material/size/space roles with 60-30-10 visual emphasis and at most four background levels",
+    "Preserve sliding frame/sheet flow; apply to DATE/KPH as reference then Home/notifications/reports/shelf/account/login",
+    "Reduce auxiliary/display elements, test smaller secondary hit targets with spacing; preserve important action targets",
+    "Reuse real consumers, remove superseded CSS/code and adapt meaningful unit/browser gates"
+  ],
+  "outOfScope": [
+    "Business/API/backend/auth/schema or date calculation changes",
+    "Online/Pilot/Admin and shared UI defaults, dependencies/root config/lockfile",
+    "Main merge/push, protected Pages or inferred Cloudflare publication",
+    "A new shell, extra theme option, invented domain abstraction or unrelated feature"
+  ],
+  "baseSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150",
+  "candidateSha": "",
+  "integrationOwner": "Root sole writer; no subagent dispatch.",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/STORE_APP_SOLID_COMPACT.md",
+    "docs/product/STORE_APP_DENSITY.md",
+    "docs/product/STORE_APP_SURFACE_STYLE.md",
+    "docs/product/STORE_APP_SIZE_TOKENS.md",
+    "docs/product/STORE_APP_COMPONENT_CATALOG.md",
+    "docs/delivery/fresh01-solid-compact/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "single-interface-no-legacy-mode",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "shared-solid-material-and-sliding-structure",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "responsive-targets-focus-and-reflow",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "preserved-workflows-print-and-outputs",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-integrated-visual-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "Remove Compact switch and old UI; rebuild from scratch with a plan, stronger solid accents/60-30-10, soft edges/elevation, more gaps/smaller elements and a unified sliding structure; begin.",
+      "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
+      "impact": "Replaces two-mode visual direction; COMPACT03 remains historical source/evidence, not FRESH01 verification or integrated visual acceptance.",
+      "decision": "New task/worktree from c5a440b retaining DATE/KPH behavior. Plan first; root sole writer, bounded rollout and at most two integrated review rounds."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Planning complete. Execute step1 removal map, then common tokens and DATE/KPH reference. Existing local authorization covers implementation; no routine re-approval. No FRESH01 runtime change yet.",
+  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
+  "branch": "store-app/fresh01-solid-compact",
+  "authorization": {
+    "date": "2026-10-26",
+    "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
+    "request": "Remove Compact switch and old UI; rebuild from scratch with a plan, stronger solid accents/60-30-10, soft edges/elevation, more gaps/smaller elements and a unified sliding structure; begin.",
+    "scope": "Local planning and implementation of requested Store visual rebuild; no inferred acceptance/merge/publication."
+  },
+  "documents": {
+    "plan": "docs/delivery/fresh01-solid-compact/plan.md",
+    "assessment": "docs/delivery/fresh01-solid-compact/assessment.md",
+    "spec": "docs/product/STORE_APP_SOLID_COMPACT.md"
+  }
+}

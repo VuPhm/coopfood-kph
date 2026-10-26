@@ -1,5 +1,11 @@
 # Store Fresh — Chế độ gọn (COMPACT01)
 
+> FRESH01 planning26/10/2026: owner yêu cầu một UI gọn duy nhất và tái dựng
+> vật liệu/màu/khuôn. [Đặc tả mới](STORE_APP_SOLID_COMPACT.md),
+> [kế hoạch](../delivery/fresh01-solid-compact/plan.md). Runtime chưa đổi trong
+> lượt kế hoạch; nội dung dưới là provenance hai-mode/Fresh Soft trước thay thế.
+
+
 Revision3 chốt tạm ngày24/10/2026 theo owner “tạm, đến đây chốt được”.
 Runtime`ca543e6`; [quyết định/phạm vi](../delivery/compact01-interface-density/acceptance-revision3.md). Base task0a25730 có Fresh Soft
 d4f9d17 và đúng header816b4e3; chưa merge main. [Hồ sơ](../delivery/compact01-interface-density/plan.json).

@@ -1,5 +1,16 @@
 # Công việc kế tiếp
 
+**FRESH01 — kế hoạch tái dựng một UI duy nhất,26/10/2026:** owner yêu cầu bỏ
+công tắc Compact/giao diện cũ; tăng solid/màu nhấn60–30–10, ít mức nền, viền
+mềm/độ nổi, khoảng hở và giảm phần tử phụ; giữ cấu trúc trượt. Nhánh/worktree
+riêng `store-app/fresh01-solid-compact` từc5a440b, root sole writer. Đã hoàn tất
+[kế hoạch và map bước1](delivery/fresh01-solid-compact/plan.md),
+[đặc tả khuôn/token](product/STORE_APP_SOLID_COMPACT.md); runtime chưa đổi,
+4360 vẫn COMPACT03 và Cloudflare vẫnr4. Không suy nghiệm thu/merge/deploy.
+Bước tiếp: gỡ preference/comfortable branches theo map, rồi dựng DATE/KPH làm
+mẫu và rollout xuyên app; không cần lập kế hoạch hay xin phép routine lần nữa.
+
+
 **COMPACT03 revision8 — technical PASS, owner pending 26/10/2026:** DATE/KPH
 đều dùng list gọn ở hai mật độ; tag Biện pháp KPH và xử lý DATE giữ nền/viền/icon.
 DATE dùng hai tab thực phẩm chung với KPH live/loading, bộ lọc trạng thái riêng,

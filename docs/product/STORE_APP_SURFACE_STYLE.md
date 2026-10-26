@@ -1,5 +1,11 @@
 # Co.op Fresh Soft — khối mềm, viền nhẹ
 
+> FRESH01 planning26/10/2026: owner yêu cầu một UI gọn duy nhất và tái dựng
+> vật liệu/màu/khuôn. [Đặc tả mới](STORE_APP_SOLID_COMPACT.md),
+> [kế hoạch](../delivery/fresh01-solid-compact/plan.md). Runtime chưa đổi trong
+> lượt kế hoạch; nội dung dưới là provenance hai-mode/Fresh Soft trước thay thế.
+
+
 Tên ngắn: **Co.op Fresh Soft**. Mã tham chiếu giữ **`coop-fresh-soft-v1`**.
 Ngày 22/10/2026; tên ngắn và recipe form bổ sung 24/10/2026. Đây là bộ quy tắc
 vật liệu/khối của **Co.op Fresh**, bổ sung [Visual DNA](STORE_APP_VISUAL_DNA.md),
