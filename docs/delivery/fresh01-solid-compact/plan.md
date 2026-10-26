@@ -127,3 +127,7 @@ Revision2 triển khai xong: runtime40b238f, candidate28415cb, technical PASS347
 và browser gates; CSS+627bytegzip. Preview4364, owner visual acceptance pending.
 Review2/2; không tiếp tục audit mới. Các bước/baseline4362 bên trên là provenance
 revision1 và phạm vi nghiệp vụ kế thừa, không là URL candidate hiện tại.
+
+Revision3 candidateb929e29 (runtime342ca66): technical gates PASS, review1/2;
+owner visual acceptance pending. Next: compare item/button roles and the two
+CTA colors at4366. No outstanding implementation work in this scoped revision.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
   "revision": 3,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
@@ -23,7 +23,7 @@
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
   "baseSha": "2730981",
-  "candidateSha": "",
+  "candidateSha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -38,32 +38,44 @@
     "docs/delivery/fresh01-solid-compact/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "single-interface-no-legacy-mode",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "shared-solid-material-and-sliding-structure",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "responsive-targets-focus-and-reflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "preserved-workflows-print-and-outputs",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "owner-integrated-visual-acceptance",
@@ -89,7 +101,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Implement shared light roles, broader item/button consumers and blue fresh CTA; verify all button states and unchanged workflow/fields/output.",
+  "nextAction": "Owner views broader item/button lighting and warm/blue CTA states at4366. Technical347tests/browser gates pass; CSS growth435bytes gzip. Visual acceptance pending; stop further rollout/audit, no inferred merge/publication.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
   "branch": "store-app/fresh01-solid-compact",
   "authorization": {
@@ -104,7 +116,7 @@
     "assessment": "docs/delivery/fresh01-solid-compact/assessment.md",
     "spec": "docs/product/STORE_APP_SOLID_COMPACT.md",
     "technical": "docs/delivery/fresh01-solid-compact/technical.md",
-    "priorTechnical": "docs/delivery/fresh01-solid-compact/revision1-technical.md"
+    "priorTechnical": "docs/delivery/fresh01-solid-compact/revision2-technical.md"
   },
   "sourceSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150",
   "initialDecision": {
