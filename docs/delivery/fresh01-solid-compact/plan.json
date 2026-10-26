@@ -67,15 +67,7 @@
       "status": "pending"
     }
   ],
-  "changes": [
-    {
-      "revision": 1,
-      "request": "Remove Compact switch and old UI; rebuild from scratch with a plan, stronger solid accents/60-30-10, soft edges/elevation, more gaps/smaller elements and a unified sliding structure; begin.",
-      "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
-      "impact": "Replaces two-mode visual direction; COMPACT03 remains historical source/evidence, not FRESH01 verification or integrated visual acceptance.",
-      "decision": "New task/worktree from c5a440b retaining DATE/KPH behavior. Plan first; root sole writer, bounded rollout and at most two integrated review rounds."
-    }
-  ],
+  "changes": [],
   "blockers": [],
   "nextAction": "Planning complete. Execute step1 removal map, then common tokens and DATE/KPH reference. Existing local authorization covers implementation; no routine re-approval. No FRESH01 runtime change yet.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
@@ -91,5 +83,12 @@
     "assessment": "docs/delivery/fresh01-solid-compact/assessment.md",
     "spec": "docs/product/STORE_APP_SOLID_COMPACT.md"
   },
-  "sourceSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150"
+  "sourceSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150",
+  "initialDecision": {
+    "revision": 1,
+    "request": "Remove Compact switch and old UI; rebuild from scratch with a plan, stronger solid accents/60-30-10, soft edges/elevation, more gaps/smaller elements and a unified sliding structure; begin.",
+    "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
+    "impact": "Replaces two-mode visual direction; COMPACT03 remains historical source/evidence, not FRESH01 verification or integrated visual acceptance.",
+    "decision": "New task/worktree from c5a440b retaining DATE/KPH behavior. Plan first; root sole writer, bounded rollout and at most two integrated review rounds."
+  }
 }
