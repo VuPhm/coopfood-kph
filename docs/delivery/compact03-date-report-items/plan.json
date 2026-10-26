@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
-  "revision": 7,
+  "revision": 8,
   "status": "EXECUTING",
-  "objective": "Align DATE workspace with KPH: shared food-kind tabs, analogous controls/card-table/detail flow, explicit unknown classification and minimal real component reuse.",
+  "objective": "Complete DATE/KPH alignment, apply dense list presentation in both modes and restore second-tag containers, with shared code and preserved workflows/print.",
   "inScope": [
     "Replace DATE alerts/tracking major tabs with TPCN/TPTS shared with KPH live/loading; unknown types remain explicitly reachable without guessing",
     "DATE status/attention/phase filtering independent of food type, exact lookup/deep-link reveals correct kind; resolved stays excluded",
     "Same full-width list flow as KPH: mobile cards/desktop table and shared sheet details, consistent functional controls; keep DATE metrics/timeline/reminders and KPH handoff",
     "Reuse existing quick sort/sticky tabs/sheet/table styles, extract only real shared food-kind component for multiple consumers; remove obsolete DATE master-detail/tab CSS",
-    "Update product guidance and meaningful component/browser tests; root sole writer, no unrelated feature or CSS rollout"
+    "Update product guidance and meaningful component/browser tests; root sole writer, no unrelated feature or CSS rollout",
+    "Owner now adopts dense/Compact DATE and KPH list presentation for BOTH preference modes; keep preference-specific controls/forms separate and print composition preserved",
+    "Restore full second-tag container for KPH resolution and DATE processing on screen, including DATE detail labels; approval final fallback remains explicit",
+    "Resolve the remaining large-text toolbar overflow and verify list parity across densities without adding components"
   ],
   "outOfScope": [
     "Backend/API/auth/schema, assigning unknown food kind by name/SKU inference",
@@ -17,7 +20,7 @@
     "Main merge/push, protected GitHub Pages or inferred Cloudflare update",
     "Dependencies/packages/ui/root config, Home/chrome/chart geometry or rules"
   ],
-  "baseSha": "e4b1013",
+  "baseSha": "3f141a7",
   "candidateSha": "",
   "integrationOwner": "Root sole writer, quick scoped follow-up; no new audit/agent loop.",
   "sharedPaths": [
@@ -31,7 +34,8 @@
     "docs/product/DATE_MILESTONE_MODEL.md",
     "docs/product/STORE_NOTIFICATIONS_DESIGN.md",
     "docs/product/STORE_APP_COMPONENT_CATALOG.md",
-    "docs/delivery/compact03-date-report-items/**"
+    "docs/delivery/compact03-date-report-items/**",
+    "docs/product/STORE_APP_DENSITY.md"
   ],
   "reviewLimit": 2,
   "reviewRound": 0,
@@ -104,10 +108,17 @@
       "source": "Direct owner message after4356 handoff26/10/2026",
       "impact": "Changes DATE navigation/screen composition and shared food tabs, invalidates DATE UI gates; business/date/reminder/KPH semantics preserved.",
       "decision": "Shared tabs across3consumers, explicit unclassified queue, reuse existing sort/sheet/table patterns. One owner and bounded implementation/verification."
+    },
+    {
+      "revision": 8,
+      "request": "Cả DATE và KPH: list Compact ok, áp dụng cả list chưa Compact; thẻ thứ2 mất bao tag",
+      "source": "Direct owner steering while DATE/KPH alignment is in progress26/10/2026",
+      "impact": "Keeps revision7 objective; expands dense list composition to comfortable and restores second tags. All integrated gates reset, historical default-list geometry intentionally changes.",
+      "decision": "Single shared screen-list policy, print-safe, no second preference or duplicated component; DATE/KPH second labels retain native tag containers. Preserve all DATE alignment work and finish remaining reflow blocker."
     }
   ],
   "blockers": [],
-  "nextAction": "Implement shared tabs and explicit classification, align DATE workspace, update relevant tests and verify two densities.",
+  "nextAction": "Implement common screen-list density and full second tags, finish reflow, then integrated checks.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
