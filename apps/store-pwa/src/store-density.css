@@ -31,6 +31,23 @@
 }
 
 @media screen {
+  /* The density controller must stay still while it changes the workspace.
+     One shared account recipe prevents a centered dialog or its focused switch
+     from moving under the pointer when the document density changes. */
+  body:has(.store-app) .store-account-sheet .store-account-body {
+    gap: var(--store-space-4); padding: var(--store-space-6);
+  }
+  body:has(.store-app) .store-account-sheet .store-account-store {
+    gap: var(--store-space-3); border: 1px solid var(--store-component-edge);
+    border-radius: var(--store-radius-group); padding: var(--store-space-4);
+    background: var(--store-component-well);
+  }
+  body:has(.store-app) .store-account-sheet .store-density-switch {
+    border-color: var(--store-component-edge); border-radius: var(--store-radius-group);
+    padding: var(--store-space-3); background-color: var(--store-component-well);
+  }
+  body:has(.store-app) .store-account-sheet .store-density-switch:hover { background-color: var(--store-component-hover); }
+
   html[data-store-density="compact"] body:has(.store-app) {
     --store-density-control: var(--store-size-control-md);
     --store-density-section-inset: var(--store-space-3);
@@ -44,17 +61,16 @@
 
   /* Functional areas first. Existing 44px tabs/actions retain their hit area. */
   html[data-store-density="compact"] .store-app .store-kph-underlay .store-kph-toolbar { margin-bottom: 4px; }
-  html[data-store-density="compact"] .store-app .store-kph-search input { height: var(--store-density-control); font-size: var(--store-type-input); }
+  html[data-store-density="compact"] .store-app .store-kph-search input { font-size: var(--store-type-input); }
   html[data-store-density="compact"] .store-app .store-scan-trigger { height: var(--store-density-control); }
   html[data-store-density="compact"] .store-app .store-create-actions .store-create-cta { min-height: var(--store-size-row-two); gap: 2px; padding-block: 2px; }
   html[data-store-density="compact"] .store-app .store-kph .store-ticket-list { gap: var(--store-density-section-gap); padding-top: var(--store-space-2); }
-  html[data-store-density="compact"] .store-app .store-date-search-panel :is(.store-date-search, .store-date-scan, .store-date-search-form > .store-button) { height: var(--store-density-control); }
-  html[data-store-density="compact"] .store-app .store-date-search-icon { top: 13px; }
+  html[data-store-density="compact"] .store-app .store-date-search-form { align-items: center; }
+  html[data-store-density="compact"] .store-app .store-date-search-panel :is(.store-date-scan, .store-date-search-form > .store-button) { height: var(--store-density-control); }
   html[data-store-density="compact"] .store-app .store-date-workspace { padding-top: var(--store-space-2); row-gap: var(--store-density-section-gap); }
   html[data-store-density="compact"] .store-app .store-date-browser { gap: var(--store-density-section-gap); }
   html[data-store-density="compact"] .store-app .store-date-product-heading { min-height: var(--store-size-control-lg); padding-block: calc(var(--store-space-1) * 1.5); }
 
-  html[data-store-density="compact"] .store-app .store-search-field > label > .store-search-input { height: var(--store-density-control); padding-block: var(--store-space-2); }
   html[data-store-density="compact"] .store-app .store-search-field > button { inset-block: 0; }
   html[data-store-density="compact"] .store-app .report-composer-controls :is(.report-change-template, .report-composer-info) { min-height: var(--store-density-control); }
   html[data-store-density="compact"] .store-app .report-composer .date-report.is-compose { gap: var(--store-density-section-gap); padding-top: var(--store-space-2); }
@@ -65,9 +81,8 @@
 
   /* Popup padding and fields: no outer geometry or scroll-owner changes. */
   html[data-store-density="compact"] :is(.store-kph-filter, .store-date-filter, .date-report-sheet) .store-modal-body { gap: var(--store-density-field-gap); }
-  html[data-store-density="compact"] :is(.store-kph-filter-section, .store-date-filter-section, .date-report-sheet .report-sheet-section) { padding: var(--store-density-section-inset); gap: var(--store-density-section-gap); }
+  html[data-store-density="compact"] :is(.store-kph-filter-section, .date-report-sheet .report-sheet-section) { padding: var(--store-density-section-inset); gap: var(--store-density-section-gap); }
   html[data-store-density="compact"] .store-choice-sheet.store-sheet > .store-modal-body { gap: var(--store-density-field-gap); padding-top: var(--store-density-section-inset); }
-  html[data-store-density="compact"] .store-choice-sheet .store-search-field > label > .store-search-input { height: var(--store-density-control); padding-block: var(--store-space-2); }
   html[data-store-density="compact"] .store-choice-sheet .store-search-field > button { inset-block: 0; }
   html[data-store-density="compact"] .store-choice-sheet.store-sheet .store-choice-option { min-height: calc(var(--store-size-row-two) + var(--store-space-1)); padding-block: var(--store-space-2); }
   html[data-store-density="compact"] .store-choice-sheet .store-choice-actions { padding-top: var(--store-space-3); }
@@ -78,7 +93,7 @@
   html[data-store-density="compact"] .store-create-screen[data-kind] .form-section > h3 { margin-bottom: var(--store-space-2); }
   html[data-store-density="compact"] .store-create-screen[data-kind] .kph-create-quantity { margin-top: 8px; padding-top: var(--store-space-2); }
   html[data-store-density="compact"] .store-create-screen[data-kind] .form-section .choice-card { min-height: calc(var(--store-size-control-md) + var(--store-space-1)); padding-block: var(--store-space-2); }
-  html[data-store-density="compact"] .store-create-screen[data-kind] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):not(.sr-only) { height: var(--store-density-control); font-size: var(--store-type-input); }
+  html[data-store-density="compact"] .store-create-screen[data-kind] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):not(.sr-only) { font-size: var(--store-type-input); }
   html[data-store-density="compact"] .store-create-screen[data-kind] .create-dialog-footer button { min-height: var(--store-density-control); }
 
   html[data-store-density="compact"] :is(.store-app, .store-quick-panel) .store-shelf-form { gap: var(--store-density-section-gap); }
@@ -153,11 +168,12 @@
   html[data-store-density="compact"] .store-app .store-report-filter-context { grid-column: 1 / -1; margin: 0; color: var(--store-ink-muted); font-size: var(--store-type-caption); line-height: var(--store-leading-caption); }
 
   /* Retain semantic sections and all choices; remove nested decorative card boxes. */
-  html[data-store-density="compact"] :is(.store-kph-filter-section, .store-date-filter-section, .date-report-sheet .report-sheet-section),
+  html[data-store-density="compact"] :is(.store-kph-filter-section, .date-report-sheet .report-sheet-section),
   html[data-store-density="compact"] .store-create-screen[data-kind] :is(.form-section, .store-review-section) {
     border: 0; border-bottom: 1px solid var(--store-holder-edge); border-radius: 0;
     box-shadow: none; background: transparent; padding: var(--store-space-3) 0;
   }
+  /* One height owner for text inputs. DATE scan/actions keep their own fixed face. */
   html[data-store-density="compact"] .store-app .store-kph-search input,
   html[data-store-density="compact"] .store-app .store-date-search,
   html[data-store-density="compact"] :is(.store-app, .store-choice-sheet) .store-search-field > label > .store-search-input,

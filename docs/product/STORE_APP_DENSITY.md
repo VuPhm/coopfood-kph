@@ -108,3 +108,17 @@ revision trước trong đúng phạm vi này. Screen-only; print/chart/legacy g
 
 [Scope, bản tích hợp và kiểm chứng](../delivery/compact03-date-report-items/plan.json).
 Technical readiness không thay thế nghiệm thu owner hoặc cho phép merge.
+
+## COMPACT03 revision5 — controller ổn định
+
+Tài khoản/Cài đặt là nơi điều khiển mật độ nên giữ cùng geometry ở hai mode.
+Không thu padding/icon/nút của chính panel này khi bấm công tắc: điều đó làm
+cửa sổ tự co và dịch control dưới con trỏ. Recipe shared tại store-density.css;
+Fresh/Compact consumer files không sở hữu account layout nữa. Checked/focus
+paint vẫn đổi, workspace phía sau vẫn áp Compact ngay và giữ state. Quyết định
+này thay recipe account Compact ở revision2/4 trong đúng phạm vi sửa lỗi.
+
+Text input có một owner auto-height/min44; scan/action có thể giữ44px. DATE
+filter section thuộc file DATE, generic density chỉ sở hữu KPH/report. Không
+khóa input44px bằng selector ưu tiên cao hơn rồi vá auto-height ở cuối file.
+[Review/kiểm chứng](../delivery/compact03-date-report-items/revision5-review.md).

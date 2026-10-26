@@ -1,5 +1,15 @@
 # Trạng thái hiện tại
 
+**COMPACT03 revision5 — kiểm lỗi nhảy Compact26/10/2026:** owner yêu cầu đúng
+một vòng rà cấu trúc/CSS. Tái hiện Tài khoản tự co68–86px và công tắc dịch9–34px
+khi đổi mật độ; đây là lỗi controller, khác việc nội dung co lại theo thiết kế.
+Root sửa một recipe account chung hai mật độ, dọn height/input cascade và để
+DATE sở hữu filter recipe. Một reviewer read-only, root sole writer; technical
+đang kiểm, owner pending. Bản đã public4352/r4 giữ nguyên Cloudflare; candidate
+local mới4354. [Scope/review](delivery/compact03-date-report-items/plan.json).
+Chưa merge/push; bước tiếp kiểm vị trí/focus/scroll và UI regression.
+
+
 **COMPACT03 revision4 — technical PASS, owner pending26/10/2026:** tiếp vòng agent bị ngắt,
 owner bổ sung Compact cho quản lý DATE/Thông báo và đồng nhất flow tương đương.
 Shared input16/24, caption12/18, target44px áp cả hai mật độ; Fresh mặc định

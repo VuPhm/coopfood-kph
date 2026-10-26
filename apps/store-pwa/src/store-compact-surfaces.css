@@ -1,8 +1,7 @@
 /* Secondary Compact consumers share the same flat section/functional-row recipe.
    Scope includes Fresh portals, never comfortable, print, charts or evidence. */
 @media screen {
-  html[data-store-density="compact"] .store-kph-detail .store-summary,
-  html[data-store-density="compact"] .store-account-sheet :is(.store-account-store, .store-density-switch) {
+  html[data-store-density="compact"] .store-kph-detail .store-summary {
     border: 0; border-radius: 0; box-shadow: none; background: transparent;
   }
   html[data-store-density="compact"] .store-kph-detail .store-summary > div {
@@ -68,22 +67,4 @@
   html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-list dl > div { min-width: 0; }
   html[data-store-density="compact"] .store-app.store-screen-shelf .store-shelf-history-recall { border-radius: var(--store-radius-control); }
 
-  html[data-store-density="compact"] .store-account-sheet .store-account-body {
-    gap: var(--store-space-3); padding: var(--store-space-4);
-  }
-  html[data-store-density="compact"] .store-account-sheet .store-account-store {
-    gap: var(--store-space-3); padding: 0 0 var(--store-space-3);
-    border-bottom: 1px solid var(--store-holder-edge);
-  }
-  html[data-store-density="compact"] .store-account-sheet .store-account-store-icon {
-    width: var(--store-size-face-sm); height: var(--store-size-face-sm); flex-basis: var(--store-size-face-sm);
-  }
-  html[data-store-density="compact"] .store-account-sheet .store-density-switch {
-    min-height: var(--store-size-row-two); padding: var(--store-space-2) 0;
-    border-bottom: 1px solid var(--store-holder-edge);
-  }
-  html[data-store-density="compact"] .store-account-sheet .store-density-switch:hover { background: var(--store-canvas); }
-  html[data-store-density="compact"] .store-account-sheet .store-account-actions button {
-    min-height: var(--store-size-hit-min); padding: var(--store-space-2) var(--store-space-3);
-  }
 }
