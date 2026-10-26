@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
   "revision": 5,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "One bounded UI/CSS structure review and repair of reproduced jumps during Compact toggle, preserving real density composition and workflows.",
   "inScope": [
     "Measure actual account switch/dialog/scroll movement while toggling both modes at390/1440/320 and short landscape, with pointer and keyboard",
@@ -15,7 +15,7 @@
     "Dependencies/packages/ui/root config changes, general CSS framework/cascade-layer rewrite or endless review"
   ],
   "baseSha": "accccfe2b0e17dd53f5ed25361f84c8dbd04e083",
-  "candidateSha": "",
+  "candidateSha": "ef7c4f0247c6f4eba3b3402d7046ad7f506df3e3",
   "integrationOwner": "Root sole writer in existing worktree; /root/compact_css_review_r5 is a read-only reviewer.",
   "sharedPaths": [
     "apps/store-pwa/src/store-density.tsx",
@@ -33,20 +33,26 @@
     "docs/delivery/compact03-date-report-items/**"
   ],
   "reviewLimit": 1,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "toggle-dialog-and-reading-stability",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "ef7c4f0247c6f4eba3b3402d7046ad7f506df3e3",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "css-structure-and-workflow-regression",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "ef7c4f0247c6f4eba3b3402d7046ad7f506df3e3",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "owner-toggle-stability-acceptance",
@@ -86,18 +92,19 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Measure baseline toggle, consolidate one review, repair reproducible defect and verify candidate.",
+  "nextAction": "Owner verify stable same-coordinate Compact toggle in account at4354; one review complete, no broader audit or new Cloudflare publication.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
     "date": "2026-10-26",
     "source": "Direct user request in this chat",
-    "request": "tiếp cứ lặp lại agent loop work, cả fresh coop giao diện nữa; tiếp, áp dụng triết lý compact cho quản lý date, thông báo và đồng nhất flow",
-    "scope": "Agent collaboration and local implementation/verification for BOTH Co.op Fresh comfortable and Compact; no main merge/push/deploy."
+    "request": "1 round rà soát chuẩn cấu trúc giao diện, code css; bật chế độ thu gọn giao diện bị nhảy",
+    "scope": "One bounded review, reproduce and repair UI/CSS stability on current task; no inferred owner acceptance/main merge/new publication."
   },
   "documents": {
-    "priorTechnical": "docs/delivery/compact03-date-report-items.md",
+    "priorTechnical": "docs/delivery/compact03-date-report-items/revision4-technical.md",
     "assessment": "docs/delivery/compact03-date-report-items/assessment.md",
-    "technical": "docs/delivery/compact03-date-report-items/technical.md"
+    "technical": "docs/delivery/compact03-date-report-items/technical.md",
+    "review": "docs/delivery/compact03-date-report-items/revision5-review.md"
   }
 }
