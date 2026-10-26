@@ -1,100 +1,55 @@
 {
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
-  "revision": 4,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Unify Fresh/Compact operational foundations and apply Compact structural hierarchy to DATE management and notifications, preserving their workflows.",
+  "revision": 5,
+  "status": "EXECUTING",
+  "objective": "One bounded UI/CSS structure review and repair of reproduced jumps during Compact toggle, preserving real density composition and workflows.",
   "inScope": [
-    "Shared Store input16/24, caption12/18 and real44px operational targets in BOTH densities, targeted to confirmed audit findings",
-    "Default Co.op Fresh secondary-surface hierarchy for KPH detail, DATE/report processing versus primary DATE state, report facts and account/settings; preserve roomier comfortable materials and Compact structural differences",
-    "KPH loading skeleton neutral paint for actual ui-list-label markup in both densities, preserving geometry and aria lifecycle",
-    "Three isolated agent implementation scopes followed by independent integrated review; at most two consolidated technical review rounds, no unlimited audit cleanup",
-    "Verify both modes content/state/date/selection/focus, primary header/navigation outer geometry, print/export/chart isolation, reflow and runnable preview. Historical comfortable geometry can intentionally change in these authorized consumer scopes.",
-    "DATE management and notifications: common item hierarchy and Compact filter/detail/reminder composition with existing size roles; retain primary phase, full processing/reminder text, 24px percent and native notification disclosure/deep links."
+    "Measure actual account switch/dialog/scroll movement while toggling both modes at390/1440/320 and short landscape, with pointer and keyboard",
+    "Repair confirmed unintended movement and any directly related CSS cascade contradictions; preserve intended workspace reflow, state/focus/reading anchor,44px actions and print",
+    "One independent read-only CSS/structure review, root sole writer; one consolidated repair and verification, no broad stylesheet rewrite"
   ],
   "outOfScope": [
-    "Main integration/push/deploy/Pages; no inferred FORM01 or COMPACT03 owner acceptance",
-    "Business/API/auth/store scope/data/schema changes, Admin/legacy/Pilot/login",
-    "Home brand module redesign or header/navigation composition changes, timeline/chart colors/geometry, photo size/order, scanner/OS/hardware flows",
-    "New dependencies, global font family/palette rewrite, packages/ui or root config/lock changes",
-    "Standalone user-owned chats or recurring/unattended automations; agents stay subtasks of this request"
+    "Main merge/push or GitHub Pages; Cloudflare remains published revision4 until a new publication step is authorized",
+    "Business/API/auth/data changes, redesign of Home/header/navigation, timeline/chart/photo changes",
+    "Dependencies/packages/ui/root config changes, general CSS framework/cascade-layer rewrite or endless review"
   ],
-  "baseSha": "2a3b574",
-  "candidateSha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
-  "integrationOwner": "Root integrates shared files and takes over interrupted loading fix; foundations, surfaces and DATE agents have disjoint worktrees.",
+  "baseSha": "accccfe2b0e17dd53f5ed25361f84c8dbd04e083",
+  "candidateSha": "",
+  "integrationOwner": "Root sole writer in existing worktree; /root/compact_css_review_r5 is a read-only reviewer.",
   "sharedPaths": [
-    "apps/store-pwa/src/store-app-frame.tsx",
-    "apps/store-pwa/src/store-size-tokens.css",
+    "apps/store-pwa/src/store-density.tsx",
+    "apps/store-pwa/src/store-density.css",
+    "apps/store-pwa/src/store-account-sheet.tsx",
+    "apps/store-pwa/src/store-compact-surfaces.css",
+    "apps/store-pwa/src/store-fresh-surfaces.css",
+    "apps/store-pwa/src/store-date-notification-surfaces.css",
+    "apps/store-pwa/src/store-density.test.tsx",
+    "e2e/scripts/check-store-density.cjs",
+    "e2e/scripts/check-store-density-stability.cjs",
     "docs/CURRENT_STATE.md",
     "docs/NEXT.md",
     "docs/product/STORE_APP_DENSITY.md",
-    "docs/product/STORE_APP_SURFACE_STYLE.md",
-    "docs/delivery/compact03-date-report-items/**",
-    "e2e/scripts/check-store-density.cjs",
-    "e2e/scripts/check-store-scrollbars.cjs",
-    "apps/store-pwa/src/feature-loading.css"
+    "docs/delivery/compact03-date-report-items/**"
   ],
-  "reviewLimit": 2,
-  "reviewRound": 1,
-  "teams": [
-    {
-      "id": "foundations",
-      "agent": "root takeover after foundations_r4 service capacity error",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r3-foundations",
-      "allowedPaths": [
-        "apps/store-pwa/src/store-fresh-foundations.css"
-      ],
-      "dependsOn": []
-    },
-    {
-      "id": "surfaces",
-      "agent": "/root/surfaces_r4",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r3-surfaces",
-      "allowedPaths": [
-        "apps/store-pwa/src/store-fresh-surfaces.css"
-      ],
-      "dependsOn": []
-    },
-    {
-      "id": "date-notifications",
-      "agent": "/root/date_notifications_r4",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r4-date-notifications",
-      "allowedPaths": [
-        "apps/store-pwa/src/store-date-notification-surfaces.css"
-      ],
-      "dependsOn": []
-    }
-  ],
+  "reviewLimit": 1,
+  "reviewRound": 0,
+  "teams": [],
   "gates": [
     {
-      "id": "shared-fresh-density-and-output-contract",
+      "id": "toggle-dialog-and-reading-stability",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
-      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+      "status": "pending"
     },
     {
-      "id": "operational-readability-and-targets",
+      "id": "css-structure-and-workflow-regression",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
-      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+      "status": "pending"
     },
     {
-      "id": "workflow-loading-and-accessibility",
-      "kind": "technical",
-      "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "9e5af0d649b31298d1eceb995c64fa4dc2732731",
-      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
-    },
-    {
-      "id": "owner-fresh-uniformity-acceptance",
+      "id": "owner-toggle-stability-acceptance",
       "kind": "user",
       "required": true,
       "status": "pending"
@@ -121,10 +76,17 @@
       "source": "Direct owner message26/10/2026",
       "impact": "Adds DATE filter/detail/reminder and notification composition to previous interrupted scope. All integrated gates remain pending. Prior agents stopped; partial files are unverified input.",
       "decision": "Resume same task, recover partial CSS, three bounded isolated writers and root loading takeover; max two review rounds, no business behavior changes."
+    },
+    {
+      "revision": 5,
+      "request": "1 round rà soát chuẩn cấu trúc giao diện, code css; bật chế độ thu gọn thì giao diện bị nhảy, không biết phải lỗi không",
+      "source": "Owner message26/10/2026 after Cloudflare mockup publication, ambient4352/home",
+      "impact": "Reopens technical investigation and invalidates account/toggle stability evidence; revision4 source/evidence/publication preserved. Visual owner acceptance still pending.",
+      "decision": "One bounded read-only review and root measurement; repair confirmed jump/cascade defect, preserve intentional density reflow. New local candidate, no inferred re-publication/main merge."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner compare DATE management and notifications at4352 in both densities, including filter/detail/reminder and exact-lot navigation; no main merge authority.",
+  "nextAction": "Measure baseline toggle, consolidate one review, repair reproducible defect and verify candidate.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
