@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
   "revision": 8,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Complete DATE/KPH alignment, apply dense list presentation in both modes and restore second-tag containers, with shared code and preserved workflows/print.",
   "inScope": [
     "Replace DATE alerts/tracking major tabs with TPCN/TPTS shared with KPH live/loading; unknown types remain explicitly reachable without guessing",
@@ -21,7 +21,7 @@
     "Dependencies/packages/ui/root config, Home/chrome changes, date calculation or timeline/color recipe changes; responsive chart container follows the new sheet."
   ],
   "baseSha": "3f141a7",
-  "candidateSha": "",
+  "candidateSha": "a5c9824afb16b874cedf310f96f553c0837cb993",
   "integrationOwner": "Root sole writer, quick scoped follow-up; no new audit/agent loop.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -39,32 +39,44 @@
     "e2e/scripts/check-store-list-density.cjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "shared-screen-list-and-second-tags",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "date-food-kind-and-unknown-scope",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "date-kph-structure-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "cross-feature-density-and-output-regression",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "owner-date-kph-alignment",
@@ -125,19 +137,19 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Implement common screen-list density and full second tags, finish reflow, then integrated checks.",
+  "nextAction": "Owner views DATE/KPH at4360 in both preferences, switches type/filter and opens lot/reminder/KPH. Technical pass; integrated visual acceptance pending. No further unsolicited audit or publication.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
     "date": "2026-10-26",
     "source": "Direct user request in this chat",
-    "request": "Áp dụng triết lý KPH vào DATE, hai tab loại thực phẩm, chức năng/list đồng dạng, tái sử dụng code không tạo thành phần thừa",
+    "request": "Keep DATE/KPH alignment; apply accepted Compact list composition in both preference modes and restore the second tag; continue after interruption.",
     "scope": "Local DATE/KPH UI reuse implementation and verification; no inferred publication/main merge or visual acceptance."
   },
   "documents": {
-    "priorTechnical": "docs/delivery/compact03-date-report-items/revision5-technical.md",
+    "priorTechnical": "docs/delivery/compact03-date-report-items/revision6-technical.md",
     "assessment": "docs/delivery/compact03-date-report-items/assessment.md",
     "technical": "docs/delivery/compact03-date-report-items/technical.md",
-    "review": "docs/delivery/compact03-date-report-items/revision5-review.md"
+    "review": "docs/delivery/compact03-date-report-items/technical.md"
   }
 }
