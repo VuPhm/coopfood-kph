@@ -118,7 +118,7 @@
   html[data-store-density="compact"] .store-app .store-create-actions .store-create-inline {
     display: flex; align-items: center; justify-content: flex-start;
     min-height: var(--store-size-control-md); height: auto;
-    gap: calc(var(--store-space-1) * 1.5); padding: var(--store-space-2) var(--store-space-3);
+    gap: calc(var(--store-space-1) * 1.5); padding: var(--store-space-2);
     border-radius: var(--store-radius-control); font-size: var(--store-type-control);
     line-height: var(--store-leading-control); font-weight: 650;
   }
