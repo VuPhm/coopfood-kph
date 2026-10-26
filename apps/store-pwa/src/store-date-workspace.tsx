@@ -8,14 +8,12 @@ import { KphCreateControl, type KphCreateHandle } from "./store-kph-create-contr
 import { KphCreateButton } from "./store-kph-create-button";
 import type { CreatedRecordDraft } from "./create-record-dialog";
 import { StoreSheet } from "./store-sheet";
-import { useStoreDensityValue } from "./store-density";
 import { StoreFoodKindTabs } from "./store-food-kind-tabs";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 import { figmaAsset } from "./figma-assets";
 import { addDays, formatDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
-import { StoreQuickSort } from "./store-quick-sort";
 import { assessDateLot, remainingShelfPercent, DATE_PHASE_LABELS, needsDateAttention, type DatePhase } from "./store-date-assessment";
 import { DateConditionLabel, DateProcessingLabel, getDatePhaseTone } from "./store-date-label";
 import { ShelfLifeTimeline } from "./store-shelf-timeline";
@@ -43,7 +41,6 @@ function remainingText(remaining: number | null) {
 }
 
 export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCreateKph, initialLotId }: { lots: MockDateLot[]; onLotsChange: (lots: MockDateLot[]) => void; today?: LocalDate; onCreateKph: (draft: CreatedRecordDraft) => Promise<string>; initialLotId?: string | undefined }) {
-  const compact = useStoreDensityValue() === "compact";
   const [query, setQuery] = useState(initialLotId ?? "");
   const [kind, setKind] = useState<KphKind | "unclassified">(() => {
     const selected = lots.find(lot => lot.id === initialLotId);
@@ -183,7 +180,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
         <div className="store-date-list-controls store-kph-list-controls">
           <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><span className="store-date-result-count">{visible.length} lô</span></div>
           <div className="store-date-toolbar store-kph-list-toolbar">
-            {!compact ? <StoreQuickSort value={sort} onChange={value => setSort(value as DateSort)} options={DATE_SORT_OPTIONS} title="Sắp xếp lô DATE" groupLabel="Thứ tự lô" /> : null}
+
             <button className="store-compact" aria-pressed={attentionOnly} onClick={() => { setAttentionOnly(!attentionOnly); setStatus("all"); }}><TriangleAlert size={20} aria-hidden="true" /><span>Cần chú ý</span><small>{attentionCount}</small></button>
             <button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button>
           </div>

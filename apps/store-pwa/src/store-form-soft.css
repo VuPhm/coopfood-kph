@@ -1,7 +1,7 @@
 /* Co.op Fresh Soft / coop-fresh-soft-v1: a form recipe, not a new app theme.
    Body scope reaches Store portals while keeping online/Pilot/Admin untouched. */
 body:has(.store-app, .store-login) {
-  --store-form-field-surface: #f3f6f4;
+  --store-form-field-surface: var(--store-canvas);
   --store-form-field-edge: rgb(27 61 45 / 16%);
   --store-form-control-radius: 12px;
   --store-form-field-shadow: none;
@@ -19,7 +19,7 @@ body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-s
    Keep the 1px box to avoid shifts; reserve the contrasting edge for focus/errors. */
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
   :is(input, textarea, select, .ui-select-trigger):hover:not(:disabled):not([readonly]):not([aria-invalid="true"]) {
-  --store-form-field-surface: #eaf4ee;
+  --store-form-field-surface: var(--store-canvas);
 }
 /* State changes alter material only; native labels, values and focus stay owned by controls. */
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
@@ -29,13 +29,13 @@ body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-s
 }
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
   :is(input, textarea)[readonly] {
-  --store-form-field-surface: #f0f5f2;
+  --store-form-field-surface: var(--store-canvas);
   /* The accepted KPH readonly rule uses this canvas with !important. */
   --store-canvas: var(--store-form-field-surface);
 }
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
   :is(input, textarea, select, .ui-select-trigger):is(:disabled, [aria-disabled="true"]) {
-  --store-form-field-surface: #f0f3f1;
+  --store-form-field-surface: var(--store-canvas);
   box-shadow: none;
 }
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
@@ -52,11 +52,11 @@ body:has(.store-login) .store-login .store-login-input {
   background: var(--store-form-field-surface);
   box-shadow: var(--store-form-field-shadow);
 }
-body:has(.store-login) .store-login .store-login-input:hover { background: #eaf4ee; }
+body:has(.store-login) .store-login .store-login-input:hover { background: var(--store-canvas); }
 body:has(.store-login) .store-login .store-login-input:focus-within { border-color: #00724e; background: white; }
 body:has(.store-login) .store-login .store-login-input input { border-radius: var(--store-form-control-radius); }
 body:has(.store-login) .store-login .store-login-input input::placeholder { color: var(--login-muted); opacity: 1; }
-body:has(.store-app, .store-login) .store-create-screen .unit-options { border-radius: 16px; background: #eef5f1; }
+body:has(.store-app, .store-login) .store-create-screen .unit-options { border-radius: 16px; background: var(--store-canvas); }
 body:has(.store-app, .store-login) .store-create-screen .unit-options label span { border-radius: 12px; }
 /* Keep semantic KPH option colors and checked indicator; a single edge replaces the double stroke. */
 body:has(.store-app, .store-login) .store-create-screen[data-kind] .form-section .choice-card:has(input:checked) {

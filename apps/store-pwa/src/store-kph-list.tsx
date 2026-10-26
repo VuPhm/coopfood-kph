@@ -5,7 +5,7 @@ import { figmaAsset } from "./figma-assets";
 import { ListItemMarker } from "@coopfood-kph/ui";
 import { getKphLabelPresentation, KphListLabel } from "./store-kph-label";
 import { KPH_BATCH_SIZE, kphDateRuns } from "./store-kph-history";
-import { useStoreListDensity } from "./store-density";
+import { useStorePrint } from "./use-store-print";
 import "./store-kph-items.css";
 
 function DayHeading({ date, shown, total, checked, partial, disabled, selectionMode, expanded, contentId, onToggle, onChange }: {
@@ -36,7 +36,7 @@ export function StoreKphMore({ shown, total, loading = false, onMore }: {
   </div>;
 }
 
-function KphTagStrip({ record, compact }: { record: RecordView; compact: boolean }) {
+function KphTagStrip({ record, screenLayout }: { record: RecordView; screenLayout: boolean }) {
   const strip = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ overflow: false, back: false, more: false });
   const measure = () => {
@@ -52,24 +52,24 @@ function KphTagStrip({ record, compact }: { record: RecordView; compact: boolean
     const observer = new ResizeObserver(measure);
     observer.observe(strip.current);
     return () => observer.disconnect();
-  }, [record.condition, record.resolution, record.approvalStatus, compact]);
+  }, [record.condition, record.resolution, record.approvalStatus, screenLayout]);
   return <div className="store-ticket-tag-shell" data-back={edges.back || undefined} data-more={edges.more || undefined}>
     <div ref={strip} className="store-ticket-tags" role="group" aria-label={`Nhãn phiếu ${record.productName}`} aria-description={edges.overflow ? "Vuốt ngang hoặc dùng phím mũi tên để xem thêm nhãn" : undefined} tabIndex={edges.overflow ? 0 : undefined} onScroll={measure}>
       <KphListLabel kind="condition" value={record.condition} />
       <KphListLabel kind="resolution" value={record.resolution} />
-      {!compact ? <KphListLabel kind="approval" value={approvalLabels[record.approvalStatus]} className={`chip-${record.approvalStatus === "APPROVED" ? "safe" : record.approvalStatus === "PENDING" ? "warning" : "neutral"}`} /> : null}
+      {!screenLayout ? <KphListLabel kind="approval" value={approvalLabels[record.approvalStatus]} className={`chip-${record.approvalStatus === "APPROVED" ? "safe" : record.approvalStatus === "PENDING" ? "warning" : "neutral"}`} /> : null}
     </div>
   </div>;
 }
 
-function KphTicketMeta({ record, identifier, groupByDate, compact, approvalId }: {
-  record: RecordView; identifier: string; groupByDate: boolean; compact: boolean; approvalId: string;
+function KphTicketMeta({ record, identifier, groupByDate, screenLayout, approvalId }: {
+  record: RecordView; identifier: string; groupByDate: boolean; screenLayout: boolean; approvalId: string;
 }) {
   const quick = useRef<HTMLSpanElement>(null);
   const [iconOnly, setIconOnly] = useState(false);
   useLayoutEffect(() => {
     const element = quick.current;
-    if (!element || !compact || record.approvalStatus === "PENDING") { setIconOnly(false); return; }
+    if (!element || !screenLayout || record.approvalStatus === "PENDING") { setIconOnly(false); return; }
     const measure = () => {
       if (!element.clientWidth) return;
       const approval = element.querySelector<HTMLElement>(".store-ticket-approval");
@@ -92,8 +92,8 @@ function KphTicketMeta({ record, identifier, groupByDate, compact, approvalId }:
     observer?.observe(element);
     for (const child of Array.from(element.children)) observer?.observe(child);
     return () => observer?.disconnect();
-  }, [compact, groupByDate, record, identifier]);
-  return <span ref={quick} className="store-ticket-quick"><span className="store-ticket-sku">{identifier}</span><span className="store-ticket-meta">{record.quantity}</span>{!groupByDate ? <span className="store-ticket-date"><CalendarDays size={13} aria-hidden="true" /><span className="sr-only">Ngày phát hiện: </span>{record.detectedDate}</span> : null}{compact ? <KphListLabel id={approvalId} kind="approval" value={approvalLabels[record.approvalStatus]} className={`store-ticket-approval${iconOnly ? " is-icon-only" : ""}`} /> : null}</span>;
+  }, [screenLayout, groupByDate, record, identifier]);
+  return <span ref={quick} className="store-ticket-quick"><span className="store-ticket-sku">{identifier}</span><span className="store-ticket-meta">{record.quantity}</span>{!groupByDate ? <span className="store-ticket-date"><CalendarDays size={13} aria-hidden="true" /><span className="sr-only">Ngày phát hiện: </span>{record.detectedDate}</span> : null}{screenLayout ? <KphListLabel id={approvalId} kind="approval" value={approvalLabels[record.approvalStatus]} className={`store-ticket-approval${iconOnly ? " is-icon-only" : ""}`} /> : null}</span>;
 }
 
 export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true, selectionMode = false, selection = [], setSelection = () => {}, collapsedDates = [], onToggleDate = () => {}, setActive = () => {}, loading = false }: {
@@ -101,7 +101,8 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
   setSelection?: (ids: string[]) => void; collapsedDates?: string[]; onToggleDate?: (date: string) => void; setActive?: (record: RecordView) => void; loading?: boolean;
 }) {
   const listId = useId();
-  const compact = useStoreListDensity() === "compact";
+  const printing = useStorePrint();
+  const screenLayout = !printing;
   const groups = useMemo(() => groupByDate ? kphDateRuns(visible) : visible.length ? [{ date: "", records: visible }] : [], [visible, groupByDate]);
   const byDate = useMemo(() => {
     const result = new Map<string, RecordView[]>();
@@ -157,11 +158,11 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     return <section className="store-kph-day" key={group.records[0]!.id} aria-label={groupByDate ? `Ngày phát hiện ${group.date}` : undefined}>
     {groupByDate ? heading(group.date, contentId, expanded) : null}<div className="store-kph-day-items" id={contentId} hidden={!expanded}>{expanded ? group.records.map(record => <div key={record.id} className="store-ticket" data-record-id={record.id}>
       {marker(record)}{selectionMode ? selector(record, "store-ticket-selector") : null}
-      <div className="store-ticket-body"><button className="store-ticket-open" aria-label={`Mở phiếu ${record.productName}`} aria-describedby={compact ? `${listId}-${record.id}-approval` : undefined} disabled={loading} onClick={() => setActive(record)}>
+      <div className="store-ticket-body"><button className="store-ticket-open" aria-label={`Mở phiếu ${record.productName}`} aria-describedby={screenLayout ? `${listId}-${record.id}-approval` : undefined} disabled={loading} onClick={() => setActive(record)}>
         <strong title={record.productName}><span>{record.productName}</span></strong>
-        <KphTicketMeta record={record} identifier={identifier(record)} groupByDate={groupByDate} compact={compact} approvalId={`${listId}-${record.id}-approval`} />
+        <KphTicketMeta record={record} identifier={identifier(record)} groupByDate={groupByDate} screenLayout={screenLayout} approvalId={`${listId}-${record.id}-approval`} />
         <img className="store-ticket-chevron" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" />
-      </button><KphTagStrip record={record} compact={compact} /></div>
+      </button><KphTagStrip record={record} screenLayout={screenLayout} /></div>
     </div>) : null}</div>
   </section>;
   })}</div>}</div>;

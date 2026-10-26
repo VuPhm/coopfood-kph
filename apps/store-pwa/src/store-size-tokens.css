@@ -1,7 +1,5 @@
-/* Store-local size contract. Product decisions informed by HIG/WCAG, in CSS px.
-   Visual faces can be smaller; the operational hit region remains at least 44px.
-   Tokens alone never change comfortable geometry or shared UI defaults. */
-body:has(.store-app) {
+/* Store roles: compact elements, distinct spacing, full primary/field targets. */
+body:has(.store-app, .store-login) {
   --store-space-1: 4px;
   --store-space-2: 8px;
   --store-space-3: 12px;
@@ -11,7 +9,9 @@ body:has(.store-app) {
   --store-size-icon-sm: 16px;
   --store-size-icon-md: 20px;
   --store-size-icon-lg: 24px;
-  --store-size-face-sm: 36px;
+  --store-size-face-sm: 32px;
+  --store-size-control-sm: 36px;
+  --store-size-icon-passive: 14px;
   --store-size-control-md: 44px;
   --store-size-control-lg: 52px;
   --store-size-hit-min: 44px;
@@ -23,7 +23,7 @@ body:has(.store-app) {
   --store-radius-group: 16px;
   --store-radius-sheet: 24px;
   --store-type-caption: 12px;
-  --store-leading-caption: 18px;
+  --store-leading-caption: 16px;
   --store-type-control: 14px;
   --store-leading-control: 20px;
   --store-type-input: 16px;

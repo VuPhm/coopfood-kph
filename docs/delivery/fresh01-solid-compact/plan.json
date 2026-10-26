@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
   "revision": 1,
-  "status": "PLANNING",
+  "status": "EXECUTING",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
@@ -69,7 +69,7 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Planning complete. Execute step1 removal map, then common tokens and DATE/KPH reference. Existing local authorization covers implementation; no routine re-approval. No FRESH01 runtime change yet.",
+  "nextAction": "Remove legacy mode and rebuild material/layout roles, then verify integrated preview.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
   "branch": "store-app/fresh01-solid-compact",
   "authorization": {

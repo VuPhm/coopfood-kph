@@ -1,0 +1,56 @@
+/* Shared section and functional-card roles; screen only, including Store portals. */
+@media screen {
+  body:has(.store-app) .store-kph-detail .store-summary {
+    border: 0; border-radius: 0; box-shadow: none; background: transparent;
+  }
+  body:has(.store-app) .store-kph-detail .store-summary > div {
+    min-height: var(--store-size-row-one); flex-wrap: wrap;
+    padding: var(--store-space-2) 0;
+    font-size: var(--store-type-control); line-height: var(--store-leading-control);
+  }
+  body:has(.store-app) .store-kph-detail .store-summary dd { flex: 1 1 12ch; }
+  body:has(.store-app) .store-kph-detail section h3 {
+    margin-bottom: var(--store-space-2);
+    font-size: var(--store-type-section); line-height: var(--store-leading-section);
+  }
+  body:has(.store-app) .store-kph-detail .store-kph-detail-kind {
+    border-radius: 0; padding: 0 0 var(--store-space-3);
+    border-bottom: 1px solid var(--store-holder-edge); background: transparent;
+  }
+
+  body:has(.store-app) .report-hub .report-type-list { gap: 16px; border: 0; }
+  body:has(.store-app) .report-hub :is(.report-type-card, .report-history-card) {
+    grid-template-columns: 32px minmax(0, 1fr) 18px; min-height: 72px; gap: 12px;
+    border: 1px solid var(--store-soft-edge); border-radius: 12px;
+    padding: 12px; background: white; box-shadow: var(--store-soft-card-shadow);
+  }
+  body:has(.store-app) .report-hub .report-custom-card { border: 1px solid var(--store-soft-edge); border-radius: 12px; background: white; box-shadow: var(--store-soft-card-shadow); }
+  body:has(.store-app) .report-hub .report-custom-card .report-type-card { border: 0; box-shadow: none; }
+  body:has(.store-app) .report-hub .report-type-icon { width: 32px; height: 32px; border-radius: 10px; background: var(--store-brand-action); color: white; }
+  body:has(.store-app) .report-hub .report-type-icon > svg { width: 18px; height: 18px; }
+  body:has(.store-app) .report-hub :is(.report-type-card, .report-history-card):hover { background: var(--store-canvas); }
+  body:has(.store-app) .report-hub .report-template-manage { align-self: center; min-width: 36px; min-height: 36px; }
+  body:has(.store-app) .store-app .report-history-tools {
+    border: 0; border-bottom: 1px solid var(--store-holder-edge); border-radius: 0;
+    padding: 0 0 var(--store-space-3); background: transparent;
+  }
+
+  body:has(.store-app) .store-app.store-screen-shelf .store-shelf-history-list { gap: 0; }
+  body:has(.store-app) .store-app.store-screen-shelf .store-shelf-history-list > li {
+    --ui-list-marker-top: var(--store-space-3);
+    gap: var(--store-space-2); border: 0; border-bottom: 1px solid var(--store-holder-edge);
+    border-radius: 0; box-shadow: none;
+    padding: var(--store-space-2) 0 var(--store-space-3) var(--store-space-4);
+  }
+  body:has(.store-app) .store-app.store-screen-shelf .store-shelf-history-list > li > .ui-list-item-marker { left: 0; }
+  body:has(.store-app) .store-app.store-screen-shelf .store-shelf-history-list dl {
+    font-size: var(--store-type-caption);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7em), 1fr));
+  }
+  body:has(.store-app) .store-app.store-screen-shelf .store-shelf-history-list :is(dt, dd small) {
+    font-size: var(--store-type-caption); line-height: var(--store-leading-caption);
+  }
+  body:has(.store-app) .store-app.store-screen-shelf .store-shelf-history-list dl > div { min-width: 0; }
+  body:has(.store-app) .store-app.store-screen-shelf .store-shelf-history-recall { border-radius: var(--store-radius-control); }
+
+}

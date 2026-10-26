@@ -1,0 +1,62 @@
+/* Store Fresh Solid: one palette, one set of material roles, no theme switch.
+   Body scope reaches Radix portals; online/Pilot/Admin do not load these roles. */
+body:has(.store-app, .store-login) {
+  --store-brand-start: #007a52;
+  --store-brand-end: #007a52;
+  --store-brand-action: #007a52;
+  --store-brand-deep: #00583d;
+  --store-surface: #fff;
+  --store-canvas: #f2f5f3;
+  --store-ink: #183b2d;
+  --store-ink-muted: #52655d;
+  --store-line: #cedbd4;
+  --store-module-mint: var(--store-canvas);
+  --store-module-orange: var(--store-canvas);
+  --store-action-orange: #c45108;
+  --store-action-orange-hover: #a44106;
+  --store-action-green-hover: var(--store-brand-deep);
+  --store-warning-ink: #884312;
+  --store-error-ink: #b42318;
+  --store-error-soft: #fef3f2;
+  --store-control-line: #718578;
+  --store-focus: var(--store-brand-deep);
+  --store-soft-edge: rgb(0 70 45 / 16%);
+  --store-holder-edge: var(--store-soft-edge);
+  --store-holder-surface: #fff;
+  --store-page-canvas: #fff;
+  --store-material-surface: #fff;
+  --store-material-dock: #fff;
+  --store-material-sheen: none;
+  --store-soft-card-shadow: inset 0 1px 0 rgb(255 255 255 / 85%), 0 3px 8px rgb(0 60 40 / 8%), 0 8px 18px rgb(0 60 40 / 8%);
+  --store-material-shadow: var(--store-soft-card-shadow);
+}
+@media screen {
+  .store-app .store-page-layout > .store-page-surface { background: var(--store-page-canvas); }
+  .store-app :is(.store-ticket, .store-date-lot:not(.is-active)) { border-color: var(--store-soft-edge); box-shadow: var(--store-soft-card-shadow); }
+  .store-app .store-mobile-toolbar,
+  .store-app .store-action-dock[data-floating="true"] {
+    border-color: var(--store-soft-edge); background: white;
+    background-image: none; box-shadow: var(--store-material-shadow);
+  }
+  .store-app .store-quick-fab { background: var(--store-action-orange); color: white; border-color: rgb(255 255 255 / 25%); box-shadow: var(--store-material-shadow); }
+  .store-app .store-quick-fab:hover { background: var(--store-action-orange-hover); }
+  .store-app .store-mobile-toolbar a:not([aria-current="page"]) { color: var(--store-brand-action); }
+  .store-app .store-mobile-toolbar a[aria-current="page"] { background: var(--store-brand-action); color: white; }
+  .store-app .store-page-hero :is(.store-kph-search input, .store-date-search, .store-search-input) { border-color: transparent; background: white; box-shadow: none; }
+  .store-app .store-page-hero :is(.store-date-scan, .report-change-template, .report-composer-info) { background: white; color: var(--store-brand-action); box-shadow: var(--store-soft-card-shadow); }
+  .store-app .store-profile-avatar { background: white; color: var(--store-brand-action); }
+  .store-app :is(.store-kph-list-toolbar, .store-date-toolbar) button:not([aria-pressed="true"]):not(.is-filtered) > svg { color: var(--store-brand-action); }
+  body:has(.store-app) .store-account-store { border-bottom: 1px solid var(--store-holder-edge); border-radius: 0; padding: 0 0 20px; background: transparent; }
+  body:has(.store-app) .store-account-store-icon { width: 36px; height: 36px; background: var(--store-brand-action); color: white; }
+  .store-app .store-page-hero input::placeholder { color: var(--store-ink-muted); opacity: 1; }
+}
+@media screen and (min-width: 900px) {
+  .store-app .store-desktop-rail { background: white; border-right-color: var(--store-soft-edge); }
+  .store-app .store-desktop-rail nav a { color: var(--store-brand-action); }
+  .store-app .store-desktop-rail nav a[aria-current="page"] { background: var(--store-brand-action); color: white; }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  body:has(.store-app, .store-login) { --store-soft-edge: CanvasText; --store-holder-edge: CanvasText; --store-soft-card-shadow: none; --store-material-shadow: none; }
+  .store-app :is(.store-mobile-toolbar, .store-action-dock[data-floating="true"]) { background: Canvas; }
+  .store-app :is(.store-mobile-toolbar, .store-desktop-rail) a[aria-current="page"] { outline: 2px solid Highlight; outline-offset: -3px; }
+}

@@ -1,12 +1,12 @@
 /* Shared Store chrome only: page/portal headers, never chart or business-status colors. */
 .store-app, .store-login, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-scanner-screen {
-  --store-chrome-base: #006b4b;
-  --store-chrome-background: linear-gradient(115deg, #006b4b, #007a52);
+  --store-chrome-base: #007a52;
+  --store-chrome-background: #007a52;
   --cf-modal-header: var(--store-chrome-background);
 }
 /* Page kit: a single coordinate system, green underlay and white cover. */
 .store-page-layout {
-  --store-header-gutter: 22px;
+  --store-header-gutter: 16px;
   --store-header-control-top: 14px;
   --store-cover-overlap: 12px;
   --store-cover-radius: 24px;

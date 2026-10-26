@@ -4,7 +4,6 @@ import { StoreAppHeader } from "./store-app-header";
 import { storeScreens, type Screen, type StoreAppScreen } from "./store-app-routes";
 import { StoreNavigation } from "./store-navigation";
 import type { StoreProfile } from "./store-profile";
-import { StoreDensityScope } from "./store-density";
 import "./store-app.css";
 import "./store-frame-canvas.css";
 import "./store-app-frame.css";
@@ -13,7 +12,7 @@ import "./store-kph-fresh.css";
 import "./store-date-fresh.css";
 import "./store-sticky-tabs.css";
 import "./store-navigation.css";
-import "./store-glass.css";
+import "./store-material.css";
 import "./store-mobile-refinements.css";
 import "./store-scrollbars.css";
 import "./store-form-soft.css";
@@ -21,11 +20,10 @@ import "./store-component-soft.css";
 import "./store-button-system.css";
 import "./store-chrome-soft.css";
 import "./store-size-tokens.css";
-import "./store-density.css";
+import "./store-functional-layout.css";
 import "./store-record-items.css";
-import "./store-compact-surfaces.css";
+import "./store-utility-layout.css";
 import "./store-fresh-foundations.css";
-import "./store-fresh-surfaces.css";
 import "./store-date-notification-surfaces.css";
 
 export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {
@@ -38,7 +36,6 @@ export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account,
     account={account} hideCopy={screen === "home"} onHome={() => navigate("home")}
     {...(options.onBack ? { parent: { label: definition.title, onNavigate: options.onBack } } : {})} {...options} />;
   return <div className={`store-app store-screen-${screen}`}>
-    <StoreDensityScope />
     <a className="sr-only focus:not-sr-only" href="#store-page-content" onClick={event => { event.preventDefault(); document.getElementById("store-page-content")?.focus(); }}>Đến nội dung</a>
     <StoreNavigation screen={screen} profile={profile} navigate={navigate} onKphIntent={onKphIntent} hidden={quickOpen} />
     <section className="store-main-column"><div className="store-frame-canvas">

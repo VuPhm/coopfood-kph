@@ -1,5 +1,4 @@
-/* Shared operational roles in both densities. Keep emphasized comfortable
-   controls roomy; screen-only rules do not affect exported documents. */
+/* Shared operational roles; screen-only rules do not affect exported documents. */
 @media screen {
   body:has(.store-app) .store-kph-filter .store-date-range input,
   body:has(.store-app) .store-create-screen[data-kind] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):not(.sr-only) {

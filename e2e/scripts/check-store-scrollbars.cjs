@@ -52,7 +52,6 @@ async function scrollBody(page, dialog, selector, desktop) {
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1024 }, { width: 1280, height: 720 }, { width: 900, height: 650 }, { width: 1440, height: 500 }]) {
       const desktop = viewport.width >= 900;
       const page = await browser.newPage({ viewport, reducedMotion: 'reduce', serviceWorkers: 'block' });
-      if (process.env.STORE_UI_DENSITY === 'compact') await page.addInitScript(() => localStorage.setItem('coopfood.store-ui.density.v1', 'compact'));
       page.setDefaultTimeout(10000); const errors = [];
       page.on('pageerror', e => errors.push(e.message));
       for (const screen of ['home', 'kph', 'date', 'notifications', 'reports', 'shelf', 'login']) {

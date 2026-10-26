@@ -1,19 +1,4 @@
 /* Co.op Fresh DATE. Shared roles come from the accepted Fresh frame stylesheet. */
-.store-date-sheet {
-  --store-brand-action: #00724e;
-  --store-action-orange: #c24e00;
-  --store-action-orange-hover: #a63f00;
-  --store-surface: #fff;
-  --store-canvas: #f6faf8;
-  --store-ink: #20344a;
-  --store-ink-muted: #596b7d;
-  --store-warning-ink: #884312;
-  --store-error-ink: #b42318;
-  --store-line: #dce9e3;
-  --store-module-mint: #e6f7f2;
-  --store-control-line: #718578;
-  --store-focus: #20344a;
-}
 .store-date { display: grid; color: var(--store-ink); }
 .store-date h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 650; }
 .store-date h3, .store-date-sheet h3 { margin: 0; font-size: 15px; line-height: 22px; font-weight: 650; }

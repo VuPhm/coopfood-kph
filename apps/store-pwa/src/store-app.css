@@ -3,9 +3,6 @@
 .store-app, .store-sheet, .store-create-screen {
   --store-control-radius: 14px;
   --store-result-radius: 18px;
-  --store-module-kph: #8e555b;
-  --store-module-shelf: #2f6650;
-  --store-module-date: #8a6732;
   font-family: var(--cf-font-family);
   color: var(--cf-color-ink);
   font-weight: 400;
@@ -15,14 +12,6 @@
 .store-app button:active, .store-sheet button:active { filter: brightness(.94); }
 .store-app :where(button, a, input):focus-visible, .store-sheet :where(button, input):focus-visible, .store-create-screen :where(button, input, label:has(input)):focus-visible { outline: 3px solid var(--cf-color-focus); outline-offset: 3px; }
 .store-app #store-content { min-width: 0; margin: 0; padding: 0; }
-.store-launcher { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 12px 16px; }
-.store-module { display: flex; min-height: 116px; flex-direction: column; justify-content: center; align-items: flex-start; gap: 8px; border: 0; border-radius: 14px; padding: 14px; color: white; text-align: left; box-shadow: 0 4px 4px rgb(0 0 0 / 14%), 0 1px .5px rgb(0 0 0 / 18%), inset 0 1px 1px rgb(255 255 255 / 13%); }
-.store-module strong { font-size: 17px; line-height: 21px; font-weight: 600; }
-.module-kph { background: var(--store-module-kph); }
-.module-shelf { background: var(--store-module-shelf); }
-.module-date { background: var(--store-module-date); }
-.store-module-icon { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 12px; background: white; }
-.store-module-icon img { display: block; }
 .store-two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .store-list-heading { display: flex; min-height: 40px; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .store-list-heading > div { display: flex; align-items: center; gap: 8px; }
@@ -206,8 +195,6 @@
 .store-review-notice small { display: block; margin-top: 2px; color: var(--cf-color-ink-muted); font-size: 11px; }
 .store-review-notice.is-error { background: var(--cf-color-danger-soft); color: var(--cf-color-danger); }
 @media (min-width: 760px) {
-  .store-launcher { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 24px; }
-  .store-module { min-height: 148px; }
   .store-shelf { padding: 24px; }
   .store-screen-shelf .store-shelf { padding-block: 16px; }
   .store-shelf { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
@@ -221,9 +208,6 @@
 /* KPH presentation is owned by store-kph-fresh.css. */
 
 /* R2 app shell and responsive composition. */
-.store-module.module-lookup { background: var(--cf-home-lookup); }
-.module-date { background: var(--cf-home-date); }
-.store-module.module-shelf { background: var(--cf-home-lookup); }
 .store-known-toggle { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; color: var(--cf-color-brand); font-size: 13px; }
 .store-known-toggle button { position: relative; width: 44px; height: 24px; flex: 0 0 44px; border: 0; border-radius: 999px; padding: 3px; background: #a7b2a9; }
 .store-known-toggle button[aria-checked="true"] { background: var(--cf-color-brand); }
@@ -310,31 +294,6 @@
 }
 
 /* Home: owner reference, green welcome and fresh-food campaign composition. */
-.store-screen-home .store-launcher { position: relative; z-index: 1; }
-.store-screen-home .store-module { position: relative; min-height: 172px; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 14px; border: 1px solid transparent; border-radius: 18px; padding: 18px 16px; background: #e6f7f2; color: #20344a; box-shadow: none; transition: border-color var(--cf-motion-fast) ease, transform var(--cf-motion-fast) ease; }
-.store-screen-home .store-module:hover { border-color: #00865b; transform: translateY(-2px); }
-.store-screen-home .store-module:active { transform: translateY(0); }
-.store-screen-home .module-kph { background: #fce9f0; }
-.store-screen-home .module-shelf { background: #fff0e6; }
-.store-screen-home .store-module-icon { display: grid; width: 54px; height: 54px; flex: 0 0 54px; place-items: center; border: 0; border-radius: 50%; background: #009c70; color: white; }
-.store-screen-home .module-kph .store-module-icon { background: #f24468; }
-.store-screen-home .module-shelf .store-module-icon { background: #ff8c32; }
-.store-module-copy { display: grid; min-width: 0; gap: 6px; }
-.store-screen-home .store-module strong { font-size: 16px; line-height: 22px; font-weight: 650; }
-.store-module-copy small { color: #596b7d; font-size: 12px; line-height: 18px; }
-@media (min-width: 500px) and (max-width: 899px) {
-  .store-screen-home .store-module { flex-direction: row; align-items: center; min-height: 145px; }
-}
-@media (min-width: 900px) {
-  .store-screen-home .store-module-icon { width: 64px; height: 64px; flex-basis: 64px; }
-}
-@media (max-width: 359px) {
-  .store-screen-home .store-module { padding: 16px 12px; }
-  .store-screen-home .store-module strong { font-size: 15px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .store-screen-home .store-module { transition: none; }
-}
 
 /* Account hero is the visual reference for shared modal headers. */
 .store-account-sheet { inset: auto 0 0; transform: none; translate: none; display: block; width: 100%; max-width: none; max-height: calc(100dvh - 24px); overflow-y: auto; border: 0; border-radius: var(--cf-modal-radius) var(--cf-modal-radius) 0 0; padding: 0 0 env(safe-area-inset-bottom); background: white; color: #20344a; font-family: var(--cf-font-family); box-shadow: var(--cf-shadow-overlay); }

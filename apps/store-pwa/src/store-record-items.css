@@ -2,11 +2,14 @@
    Flatten report facts and notification groups without removing their content.
    Comfortable, detail sheets, charts and printed documents keep their recipes. */
 @media screen {
+  .store-app :is(.store-kph-list, .store-date-lots, .store-date-table, .date-report-catalog, .store-notification-item) .ui-list-label[data-tone] {
+    min-height: 20px; padding-block: 1px; font-size: 12px; line-height: 16px; gap: 4px;
+  }
   .store-app .store-date-lot { padding-block: 10px; }
   @media (min-width: 900px) {
     .store-app .store-kph-table .store-kph-record-row td { height: var(--store-size-row-two); padding-block: 6px; }
   }
-  html[data-store-density="compact"] .store-app .date-report-catalog [data-processing-status] {
+  body:has(.store-app) .store-app .date-report-catalog [data-processing-status] {
     border: 0;
     border-radius: 0;
     padding-inline: 0;
@@ -16,7 +19,7 @@
   .store-app .store-date-lot-labels { gap: var(--store-space-2); }
   .store-app .store-date-lot-footer { margin-top: 0; }
 
-  html[data-store-density="compact"] .store-app .date-report-card-dates {
+  body:has(.store-app) .store-app .date-report-card-dates {
     justify-content: flex-start;
     gap: var(--store-space-1) var(--store-space-4);
     border: 0;
@@ -24,23 +27,23 @@
     padding: 0;
     background: transparent;
   }
-  html[data-store-density="compact"] .store-app .date-report-card-labels {
+  body:has(.store-app) .store-app .date-report-card-labels {
     align-items: center;
     gap: var(--store-space-2);
     margin-top: 0;
   }
 
-  html[data-store-density="compact"] .store-app .store-notification-section {
+  body:has(.store-app) .store-app .store-notification-section {
     border: 0;
     border-radius: 0;
     background: transparent;
   }
-  html[data-store-density="compact"] .store-app .store-notification-section + .store-notification-section {
+  body:has(.store-app) .store-app .store-notification-section + .store-notification-section {
     border-top: 1px solid var(--store-holder-edge);
   }
-  html[data-store-density="compact"] .store-app .store-notification-section > summary {
+  body:has(.store-app) .store-app .store-notification-section > summary {
     border-radius: 0;
     padding-inline: 0;
   }
-  html[data-store-density="compact"] .store-app .store-notification-items { padding-inline: 0; }
+  body:has(.store-app) .store-app .store-notification-items { padding-inline: 0; }
 }

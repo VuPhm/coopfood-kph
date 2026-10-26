@@ -2,10 +2,6 @@
 @media (max-width: 899px) {
   .store-app .store-home-features { padding-top: 16px; }
   .store-app .store-home-section-heading { margin-bottom: 12px; }
-  .store-app.store-screen-home .store-launcher-grid .store-module {
-    min-height: 164px; gap: 10px; padding: 14px 16px;
-  }
-  .store-app.store-screen-home .store-launcher-grid .store-module-icon { width: 48px; height: 48px; flex-basis: 48px; }
   .store-app .store-home-attention { margin-top: 16px; }
   .store-app .store-home-attention > button { min-height: 48px; padding-block: 8px; }
   .store-app .store-kph-underlay .store-kph-toolbar { margin-bottom: 6px; }
