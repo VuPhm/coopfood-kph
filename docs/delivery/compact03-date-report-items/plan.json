@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "compact03-date-report-items",
   "revision": 6,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Quick bounded fixes: restore KPH resolution tags, show soft clickable KPH create CTAs in both densities, and use matte text-field surfaces informed by Apple HIG.",
   "inScope": [
     "Restore resolution/Biện pháp tag container in Compact while keeping accepted approval fallback",
@@ -16,7 +16,7 @@
     "Dependencies/packages/ui/root config changes, general CSS framework/cascade-layer rewrite or endless review"
   ],
   "baseSha": "bce0f3a",
-  "candidateSha": "",
+  "candidateSha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
   "integrationOwner": "Root sole writer, quick scoped follow-up; no new audit/agent loop.",
   "sharedPaths": [
     "apps/store-pwa/src/store-density.tsx",
@@ -47,13 +47,19 @@
       "id": "kph-tags-cta-and-field-states",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 6,
+      "sha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "density-workflow-and-output-regression",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 6,
+      "sha": "cddd729c5f46f241f07e162a8a31751166eaccc2",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
     },
     {
       "id": "owner-quick-fix-acceptance",
@@ -100,17 +106,17 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Finish scoped styles, inspect actual build and run targeted browser/workflow gates.",
+  "nextAction": "Owner inspect restored tags, soft create CTAs and matte fields at4356 in both densities; no new audit/main merge/publication.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
   "branch": "store-app/compact03-date-report-items",
   "authorization": {
     "date": "2026-10-26",
     "source": "Direct user request in this chat",
-    "request": "1 round rà soát chuẩn cấu trúc giao diện, code css; bật chế độ thu gọn giao diện bị nhảy",
-    "scope": "One bounded review, reproduce and repair UI/CSS stability on current task; no inferred owner acceptance/main merge/new publication."
+    "request": "Quick fix Biện pháp tag, Compact clickable soft CTAs/comfortable CTA, and matte input fields informed by iOS27",
+    "scope": "Local quick UI fixes and targeted verification only, root sole writer; no inferred visual acceptance/main merge/new publication."
   },
   "documents": {
-    "priorTechnical": "docs/delivery/compact03-date-report-items/revision4-technical.md",
+    "priorTechnical": "docs/delivery/compact03-date-report-items/revision5-technical.md",
     "assessment": "docs/delivery/compact03-date-report-items/assessment.md",
     "technical": "docs/delivery/compact03-date-report-items/technical.md",
     "review": "docs/delivery/compact03-date-report-items/revision5-review.md"
