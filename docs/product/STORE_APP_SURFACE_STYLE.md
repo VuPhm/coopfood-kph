@@ -1,7 +1,8 @@
 # Co.op Fresh Soft — khối mềm, viền nhẹ
 
-> FRESH01 candidate26/10/2026 đã thay vật liệu/hai-mode trong Store Fresh.
-> Một palette trắng/well/xanh/xanhđậm, cam nhấn; solid selected, cạnh mềm16%
+> FRESH01 revision2 candidate26/10/2026: giữ một UI, tăng gradient/ánh viền
+> theo Home cũ và Apple iOS27/HIG; Home bốn tông, field nhập sáng trắng.
+> Workspace trắng/well/xanh/xanhđậm, cam nhấn; selected chuyển sắc, cạnh mềm16%
 > và độ nổi card/sheet. [Đặc tả đang dùng](STORE_APP_SOLID_COMPACT.md),
 > [kết quả triển khai](../delivery/fresh01-solid-compact/technical.md).
 > Nội dung bên dưới là provenance Fresh Soft trước tái dựng, không yêu cầu

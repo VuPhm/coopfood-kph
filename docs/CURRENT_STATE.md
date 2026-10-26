@@ -1,16 +1,16 @@
 # Trạng thái hiện tại
 
-**FRESH01 — technical PASS, owner pending26/10/2026:** đã dựng Store Fresh
-một UI gọn duy nhất, bỏ setting/preference/comfortable branches và code chết.
-Một palette trắng/well/xanh, cam nhấn; selected solid, cạnh mềm/độ nổi mạnh hơn,
-nhóm thoáng hơn, nút phụ36px/tag20px, main/field44px; giữ khuôn trượt/flow.
-Home/DATE/KPH/Thông báo/Báo cáo/Tra hạn/account/login dùng cùng role; print và
-nghiệp vụ giữ riêng. Runtime1c5182c, nhánh `store-app/fresh01-solid-compact`.
-347tests, Playwright7màn/5viewport, chữ150/200, loading, nhóm/chọn/nối, nhắc/
-DATE→KPH/output, contrast/focus/native scrollbar đạt. Root sole writer.
-Preview mới <http://127.0.0.1:4362/#home>; [files/commands/evidence](delivery/fresh01-solid-compact/technical.md).
-Chưa merge/push/cập nhật Cloudflare (vẫnr4). Bước tiếp: owner xem7màn, mở
-filter/detail/form và thử account không còn công tắc; chưa suy visual acceptance.
+**FRESH01 revision2 — technical PASS, owner pending26/10/2026:** theo owner giữ
+Home cũc5a440b: bốn tông mint/hồng/xanhdương/peach, icon tròn44px; tăng gradient/
+ánh viền tĩnh ở lớp chức năng theo Apple iOS27/HIG. Field editable trắng,
+readonly gần trắng, disabled riêng; gỡ override/cycle nền xám. Giữ một UI gọn,
+flow/size/print/API, không thêm JS runtime/library/asset hoặc blur/motion liên tục.
+Runtime40b238f, preview mới <http://127.0.0.1:4364/#home>;4362 giữ baseline.
+347tests, Playwright7màn×5viewport, field states, chữ150/200, tương phản gradient,
+workflow/output/native scroll đạt. CSS build tăng627bytegzip; CPU diagnostic
+không thay kiểm thiết bị thật. [Files/commands/evidence](delivery/fresh01-solid-compact/technical.md).
+Root sole writer, chưa merge/push/Cloudflare (vẫnr4). Bước tiếp owner xem Home
+và mở form KPH/DATE tại4364; chưa suy nghiệm thu candidate này.
 
 
 

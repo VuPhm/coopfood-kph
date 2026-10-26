@@ -1,5 +1,11 @@
 # Danh mục component Store App
 
+FRESH01 revision2: Home launcher giữ bốn tông cũ và icon tròn44px; material/
+button/header dùng gradient CSS tĩnh. Form có token white/readonly/disabled
+độc lập, không tham chiếu vòng hoặc dùng nền xám chung cho editable.
+[Source, Apple references và chi phí CSS](../delivery/fresh01-solid-compact/technical.md).
+
+
 **FRESH01 candidate26/10/2026:** một screen layout, bỏ preference và old
 comfortable branches. [Store material](../../apps/store-pwa/src/store-material.css)
 sở hữu palette/edge/card roles; function/utility layout cùng size tokens dùng

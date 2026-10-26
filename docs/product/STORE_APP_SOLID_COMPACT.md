@@ -1,5 +1,14 @@
 # Store Fresh Solid — đặc tả tái dựng một chế độ
 
+**Revision2 — Home reference và gradient,26/10/2026:** owner yêu cầu giữ Home
+cũc5a440b và tăng hiệu ứng. Home là ngoại lệ có chủ đích: mint/hồng/xanhdương/
+peach, icon tròn44px và ánh viền/chuyển sắc tĩnh. Workspace giữ palette chung;
+functional surfaces dùng gradient nhẹ, không thêm theme hoặc blur lớn. Field
+editable trắng, readonly#f9fbfa, disabled#e4ece7; lỗi/focus còn rõ. Tài liệu
+Apple iOS27/HIG là tham chiếu ánh sáng/phân lớp/readability; recipe CSS là
+cách diễn giải cho web. Kết quả và nguồn tại technical của revision2.
+
+
 **Candidate implementation —26/10/2026, technical PASS, owner chưa nghiệm thu.**
 Theo yêu cầu owner sau preview4360: bỏ chuyển chế độ, chỉ một UI gọn; tăng
 màu/solid, cạnh mềm/độ nổi và khoảng hở, giảm thành phần phụ, đúc khuôn trượt.
@@ -17,13 +26,15 @@ FRESH01 đã triển khai đặc tả này, thay hướng hai chế độ và pa
 | 10 — cam nhấn | CTA cần ưu tiên hoặc icon điểm nhấn | Tập trung vào ít điểm; không tô mọi nút/icon thành cam, không cam xen xanh ngẫu nhiên |
 
 **Bốn mức nền dùng chung:** trắng `#FFFFFF`; well `#F2F5F3`; brand `#007A52`;
-brand-deep `#00583D`. Không tạo màu nền riêng cho DATE/KPH/Báo cáo/Tra hạn.
+brand-deep `#00583D`. Workspace không tạo màu nền riêng cho DATE/KPH/Báo cáo/Tra hạn. Home giữ bốn
+nhóm màu launcher từ bản cũ theo yêu cầu revision2, không dùng làm state palette.
 Cam `#C45108` là accent chức năng, được dùng trên điểm nhấn cụ thể, không làm
 mức nền chia vùng thứ năm. Chữ accent trên well dùng role đậm#9c410b để
 giữ tương phản, không lấy màu cam của nút áp vào chữ nhỏ. Hover/pressed dùng
 cùng token family, không một
 palette pastel mới. Chữ chính `#183B2D`, chữ phụ `#52655D`; đảo trắng trên
-solid xanh/cam. Field trắng hoặc well, màu vùng selected có nghĩa rõ.
+solid xanh/cam. Field editable luôn trắng; readonly gần trắng, disabled mới có nền xám xanh.
+Màu vùng selected có nghĩa rõ.
 
 Token names giữ convention Store-local hiện có; trước khi thêm declaration
 kiểm owner và tái dùng nếu cùng nghĩa. Giá trị trên là điểm xuất phát để dựng
@@ -48,7 +59,7 @@ KPH/DATE tag thứ hai giữ container, không lặp lại lỗi mất bao tag.
 | Role | Cạnh/nền | Độ nổi ứng viên | Áp dụng |
 | --- | --- | --- | --- |
 | Canvas/section | Trắng, khoảng cách và heading | Không bóng | Vùng đọc, nhóm facts, list header; không quây mọi section |
-| Field | Well hoặc trắng; cạnh xanhđen14–18%; focus rõ | Không bóng ngoài | Input/select/textarea; cảm giác vùng nhập, không giống button lồi |
+| Field | Trắng khi editable; readonly/disabled riêng; cạnh xanhđen24%, focus rõ | Không bóng ngoài | Input/select/textarea; cảm giác vùng nhập, không giống button lồi |
 | Card/action | Trắng hoặc solid đúng role; border1px xanhđen12–16%, mép sáng phía trên | inset0 1px 0 trắng85%; 0 3px 8px xanhđen8%; 0 8px 18px xanhđen8% | List item, action card, holder thật sự cần tách mặt |
 | Sheet/popover | Cạnh mềm liên tục, nền đặc | inset0 1px 0 trắng90%; 0 12px 32px xanhđen18% | Lớp nổi, dropdown/modal; cao hơn card |
 

@@ -1,5 +1,19 @@
 # FRESH01 — một giao diện gọn, màu rõ và khối nổi
 
+## Revision2 — phản hồi owner sau4362
+
+Owner giữ Home cũc5a440b làm tham chiếu, yêu cầu tăng gradient theo iOS27 và
+sửa field xám. Scope được mở lại trên2c7a949: Home có ngoại lệ bốn tông/icon
+tròn, shared functional gradients tĩnh, field editable sáng rõ, readonly và
+disabled tách token. Một writer, không thêm mode/library/filter lớn hoặc motion
+liên tục. Gate visual/material/contrast/field được reset; preserved business
+vẫn phải có evidence rõ. Revision1 đã lưu ở revision1-plan/technical.
+
+Apple iOS27, Materials và Text fields chính thức đã đọc; kiểm Home reference,
+field states thực/disabled attribute probe, contrast cả chồng gradient, chữ lớn,
+workflow/output và payload CSS. Tối đa hai lượt review/repair có giới hạn.
+
+
 Ngày26/10/2026. Theo yêu cầu owner: bỏ công tắc và giao diện cũ; tái dựng có
 kế hoạch, tăng trọng số màu/solid, viền mềm/độ nổi, khoảng hở; giảm thành phần
 nhỏ và giữ cấu trúc trượt. **Đã triển khai và kiểm tra tích hợp; technical PASS, owner acceptance pending.** Không cần một lượt xin phép nữa để triển khai phạm vi đã yêu cầu.

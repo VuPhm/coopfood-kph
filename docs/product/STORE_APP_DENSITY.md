@@ -18,7 +18,7 @@ browser cũ không ảnh hưởng UI và không cần migration/key thay thế.
 ## Kích thước và khoảng hở
 
 Token tại store-size-tokens.css. Phần chính44px; nút phụ độc lập36px với khoảng
-cách12px ở toolbar; icon face32–36px; tag chỉ đọc20px với chữ12/16. Input16/24,
+cách12px ở toolbar; icon chức năng32–36px, icon Home44px; tag chỉ đọc20px với chữ12/16. Input16/24,
 auto-height theo chữ lớn. Khoảng giữa nhóm16–24px, không thu mọi padding/gap
 xuống cùng một cỡ. Cả hàng list vẫn bấm được, checkbox và keyboard còn rõ.
 [Token/khuôn/màu](STORE_APP_SOLID_COMPACT.md) và

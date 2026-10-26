@@ -1,107 +1,107 @@
-# FRESH01 — one compact Store screen, technical PASS
+# FRESH01 revision2 — Home depth, gradients and bright fields
 
-26/10/2026. Runtime source `1c5182c9c6c856490ff6573316254a6d9d01c989`.
-Branch `store-app/fresh01-solid-compact`; root sole writer, no subagent dispatch.
-Preview <http://127.0.0.1:4362/#home>, <http://127.0.0.1:4362/#date> and
-<http://127.0.0.1:4362/#kph>. Integrated visual acceptance remains pending.
-No merge/push/publication. Mainf77034d is clean; Cloudflare stillCOMPACT03r4.
+26/10/2026. Runtime `40b238fe988734711538a122a9fef15cf1613fe5`.
+Preview <http://127.0.0.1:4364/#home> / <http://127.0.0.1:4364/#kph>.
+Technical PASS; integrated visual owner acceptance pending. Same branch/worktree,
+root sole writer. Revision1 source1c5182c/evidence and plan are archived in
+revision1-technical.md / revision1-plan.json. Frozen4362 remains for comparison.
 
-## Changes / files
+## Owner direction and implementation
 
-- Removed `store-density.tsx/css/test`, provider/scope/account setting and storage
-  preference. StoreApp/Frame/account and six consumers have one screen composition;
-  no hidden comfortable branch or constant flag preserving duplicate JSX.
-  Old localStorage values are ignored, never read/written/migrated by this UI.
-- `use-store-print.ts` only observes print media. `store-kph-list.tsx` retains
-  the same dense screen row, approval by identifier, two tags and conditional
-  final approval fallback. Print restores all3labels on the same row DOM.
-- `store-kph-create-button.tsx`, `store-report-settings.tsx`: one direct CTA per
-  KPH type with icon/chevron, one period/filter row. Removed unused SettingsGroup/
-  Row and QuickSort popup/adapters; sort options remain in feature filters.
-- `store-material.css` replaces the old glass layer: white/well/brand/deep
-  backgrounds, green#007a52, orange accent#c45108, dark readable ink, one soft
-  card edge/shadow role. Floating nav/action surfaces are opaque, selected nav
-  is solid green. No per-feature pastel palette or new theme preference.
-- Button/component/chrome/form owners use stronger soft edges and tiered
-  elevation; fields keep matte fill/no outer shadow. `store-home.css` owns Home
-  white cards and green/orange icon faces; obsolete Home paint from inherited
-  app/mobile layers is removed. Report menu/history/template, notifications,
-  shelf/history, account and login use the same roles; semantic state colors,
-  timeline/date rules and output stay separate.
-- `store-functional-layout.css`, `store-utility-layout.css`, size/record roles:
-  larger16–24px group rhythm, toolbar gap12, secondary36px targets, primary/
-  field44px, icon face32–36, passive labels20px with12/16 text. DATE and KPH
-  filter controls share size. Removed old invisible44px pseudo hitboxes, so
-  smaller auxiliary controls do not create overlapping invisible targets.
-- `store-screen-layout.test.tsx` replaces obsolete preference tests with current
-  account/no-switch, direct CTA callbacks, filter sort, report context and
-  same-node print behavior. Retired density comparison scripts are replaced by
-  `check-store-solid`, `check-store-actions`, `check-store-loading` and
-  `check-store-reflow`; DATE parity and KPH history gates follow current UI.
-- Product density/material/size/component docs and CURRENT_STATE/NEXT describe
-  the one-screen candidate. No packages/ui/root config/lockfile/dependency,
-  backend/API/auth/schema/domain or online/Pilot/Admin implementation changed.
+Owner after4362 asks to retain the old Home reference, intensify its effects,
+add decorative gradients with limited cost, strongly reference iOS27 and fix
+fields looking disabled. This supersedes white-only Home/no-gradient paint,
+while retaining the single compact UI, structure and all business interactions.
 
-## Commands / actual results
+- `store-home.css`: reviewed actual c5a440b Home source and its390 screenshot.
+  Restored mint/pink/blue/peach launcher identity. Round44px icons have bounded
+  radial/linear shading, highlight edges and depth; cards retain airy spacing,
+  existing click handlers and responsive2/4columns. Shared size roles remain.
+- `store-material.css`, `store-button-system.css`, `store-header.css`: static
+  light gradients on functional surfaces/nav/hero/actions; white content and
+  business labels/timelines stay readable. Colored KPH CTA has its own darker
+  ramp rather than a white wash over white text. Header text is white and the
+  store context uses a darker tint to retain contrast at every gradient stop.
+- `store-form-soft.css`, `store-kph-fresh.css`: editable fields white with a
+  clearer resting edge; hover/focus retain white, readonly#f9fbfa/full opacity,
+  disabled#e4ece7 and error#fef3f2. Removed the old readonly !important override
+  and circular canvas↔field token mapping. No field outer shadow; active inputs
+  remain16px and grow with text. Native semantics/labels/validation unchanged.
+- `check-kph-colors.cjs` now composes a conservative gradient-stop envelope for
+  every linear/radial layer and alpha combination; all possible sampled stop
+  combinations must pass, rather than skipping complex backgrounds. This is
+  stricter than position-only single-linear sampling and is scoped evidence,
+  not a full WCAG certification or pixel-perfect gradient raster model.
+- `check-store-solid.cjs` adopts the explicitly requested four-tone Home instead
+  of its superseded white-card assertion. New `check-store-material.cjs` checks
+  field states, decoration constraints, CSS payload and diagnostic scrolling.
+  Product/current-state docs record this refinement. No new runtime JS, DOM
+  structure, library, dependency, image asset, mode, API or domain change.
 
-Commands run in this worktree. Browser commands use
-`STORE_PREVIEW_URL=http://127.0.0.1:4362`, headless Chromium, synthetic fixtures;
-raw logs/results/screenshots under ignored `.local/fresh01/`.
+## Official references and web interpretation
 
-| Command / output | Result |
+Read [Apple iOS27](https://www.apple.com/os/ios/), especially design refinements
+and legibility, plus official [Materials](https://developer.apple.com/design/human-interface-guidelines/materials)
+and [Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields).
+HIG Markdown was read from Apple's corresponding .md endpoints because the web
+reader does not support text/markdown. Files remain outside the repository.
+
+The material reference separates floating functional controls from content and
+encourages selective use. Text field guidance emphasizes clear purpose, labels
+and spacing. We interpret those cues as static highlights/shading, dimensional
+icons, clear fields and readable state changes. Exact native Liquid Glass
+refraction is not claimed. Native appearance controls are not added to this app.
+
+## Actual verification
+
+Commands run in this worktree. All browser commands use
+`STORE_PREVIEW_URL=http://127.0.0.1:4364`; synthetic fixtures only. Raw ignored
+logs/screenshots/JSON in `.local/fresh01/r2/`.
+
+| Command / artifact | Result |
 | --- | --- |
-| `VITEST_MAX_WORKERS=2 npm run verify` → verify-final.log | exit0; docs/contracts/generated API/types,347tests: Store294/Admin16/API2/rules19/UI16, full builds/PWA |
-| `VITE_STORE_APP_MOCK=true npm --workspace @coopfood-kph/store-pwa run build -- --outDir ../../.local/fresh01/build --emptyOutDir` → build-final.log | exit0,117precache; frozen final UI now committed1c5182c |
-| `node e2e/scripts/check-store-solid.cjs`, STORE_SOLID_OUTPUT=.local/fresh01/solid-final | exit0,7routes×5viewports; shared palette/edge/depth, labels, secondary bounds, sheet focus, print, no horizontal overflow/mode; four stale-key cases unchanged/unwritten |
-| `node e2e/scripts/check-date-kph-parity.cjs`, STORE_DATE_PARITY_OUTPUT=.local/fresh01/parity-final | exit0,4viewports; types/unknown/exact lookup/independent filter, deep link, sheet/focus/account state, explicit unknown KPH choice, text150/200 |
-| `node e2e/scripts/check-store-reflow.cjs`, STORE_REFLOW_OUTPUT=.local/fresh01/reflow | exit0,Home/reports/shelf×390/1440/320, both150% and200%; no clipped buttons/text or page overflow |
-| `node e2e/scripts/check-store-loading.cjs`, STORE_LOADING_OUTPUT=.local/fresh01/loading | exit0,390/1440; delayed feature neutral labels, same CTA geometry on release, live semantic colors, no mode flag |
-| `node e2e/scripts/check-kph-compact-history.cjs`, STORE_KPH_SYNTHETIC_ROUTE=false, STORE_KPH_COMPACT_OUTPUT=.local/fresh01/kph-history | exit0,390/1440/320; real mock grouping/selection/collapse, append29unique/focus/detail; native keyboard/touch tag scrolling in narrow200% case and no fake scroll affordance when labels fit |
-| `node e2e/scripts/check-store-notifications.cjs`, STORE_NOTIFICATIONS_OUTPUT=.local/fresh01/notifications | exit0,390/1440/320; groups/collapse, exact lot, reminder/suppression/deduplication, contrast/text150 |
-| `node e2e/scripts/check-date-actions.cjs`, STORE_DATE_OUTPUT=.local/fresh01/date-actions | exit0,390/1440/320;1/7day reminders/cancel/due, TPCN/TPTS prefill/validation/photo/review/save/single record/resolved; explicit unknown choice |
-| `node e2e/scripts/check-store-actions.cjs`, STORE_ACTIONS_OUTPUT=.local/fresh01/actions | exit0,390/1440; real zero/photo validation/focus/review/save, form150/200, KPH handoff, report Excel structure/PDF7rows/history and shelf rule |
-| `node e2e/scripts/check-store-scrollbars.cjs`, STORE_SCROLLBARS_OUTPUT=.local/fresh01/scrollbars-final | exit0,7routes×5viewports plus dialogs; native wheel/thumb drag, lock/restore, overflow |
+| `VITEST_MAX_WORKERS=2 npm run verify` → verify.log | exit0,347tests (Store294/Admin16/API2/rules19/UI16), docs/contracts/generated API/types/build/PWA |
+| `VITE_STORE_APP_MOCK=true npm --workspace @coopfood-kph/store-pwa run build -- --outDir ../../.local/fresh01/r2/build --emptyOutDir` → build-final.log | exit0,117precache, exact final CSS source40b238f |
+| `node e2e/scripts/check-store-solid.cjs`, STORE_SOLID_OUTPUT=.local/fresh01/r2/solid | exit0,7routes×5viewports; Home identity/gradients, shared palette/contrast, tags, focus, print, no mode/overflow and stale-key independence |
+| `node e2e/scripts/check-store-material.cjs`, STORE_MATERIAL_OUTPUT=.local/fresh01/r2/material | exit0,390/1440/320: Home static light, no backdrop blur/animation/will-change on decoration, white editable/hover/focus, actual readonly, native-disabled style probe, real quantity0 validation/error/focus and screenshots |
+| `node e2e/scripts/check-store-reflow.cjs`, STORE_REFLOW_OUTPUT=.local/fresh01/r2/reflow | exit0,Home/reports/shelf×390/1440/320;150% and200%, no button/text/page clipping |
+| `node e2e/scripts/check-store-actions.cjs`, STORE_ACTIONS_OUTPUT=.local/fresh01/r2/actions | exit0,390/1440; DATE reminder1/7, TPCN/TPTS validation/photo/review/save, KPH handoff, form150/200, report Excel/PDF7rows/history and shelf rule |
+| `node e2e/scripts/check-store-scrollbars.cjs`, STORE_SCROLLBARS_OUTPUT=.local/fresh01/r2/scrollbars | exit0,7routes×5viewports/dialogs; native wheel/thumb drag, locks/focus/overflow |
+| `npm run check:docs`, `git diff --check` | pass |
 
-Source search also confirms no retired density mechanism in Store runtime.
-347 replaces352 because preference-specific behavior was removed and replaced
-with meaningful single-screen/output tests; no business/integrity test was waived.
-Existing schema format and ExcelJS large-chunk warnings remain.
+347unit/contracts/build evidence precedes the final CSS-only CTA/header contrast
+repair. Runtime TS/domain/output and unit sources are identical; unit coverage
+is reused. Final mock build, full solid/contrast and material gates run after
+those changes. Actions/scrollbar/reflow evidence covers unchanged geometry and
+business semantics; the last header repair changes text/background color only.
+Final documentation/ledger commits contain no runtime change after40b238f.
 
-Full verify and transaction/output evidence are from7e5f623. Subsequent runtime
-changes are CSS-only: darker shelf accent text, common36px DATE filter,12px
-metadata gap and removal of obsolete pseudo hitboxes. Final mock build, solid/
-DATE parity/reflow/KPH history/loading cover those repairs. Business functions,
-React transaction/state/print code, shared packages and output logic are unchanged;
-347unit/contract and transaction evidence is reused for these unchanged scopes.
-Final record/document commits add no runtime change after1c5182c.
+Root inspected old Home and current390 Home/form plus viewport matrices. Review
+is bounded2/2; no outstanding technical blocker or new unsolicited audit.
+Initial contrast checker rejected layered radial paint as unsupported; the
+checker was extended with conservative composition. Subsequent checks found
+mint header copy at4.351:1 and the bright store pill at4.310:1. Both were fixed
+with readable text/tint; thresholds were preserved. Failed diagnostic logs
+are retained separately. These were not waived as aesthetic exceptions.
 
-## Review and repairs
+## Performance boundary
 
-Bounded root review2/2, no unresolved technical blocker or new audit loop.
-Root inspected mobile Home/KPH/DATE/reports/notifications, form200% and final
-1440 DATE/shelf screenshots. Confirmed both tags retain their containers.
+Compare gzip sums of all built CSS files to frozen revision1:
+56476bytes →57103bytes, **+627bytes gzip** (budget<4096). No production JS logic,
+asset or dependency added. Gradient layers are static, confined to finite
+surfaces; no new backdrop/filter blur, continuous animation or persistent
+will-change. Main content/fields remain opaque and scroll ownership is unchanged.
 
-- Shelf count orange on the new well measured4.225:1, below the gate4.5. Added
-  a darker accent-ink role#9c410b; solid gate now passes all pages/viewports.
-- Large-text gate caught the old invisible44px target extension behind36px
-  filter controls. Removed that retired pseudo layer; current reflow passes.
-- Legacy KPH visual gate assumed all3labels always overflow and rows/labels
-  were60/26px. Current explicit roles are56/20; tests use those thresholds,
-  retain44px real openers, and verify actual overflow/keyboard/touch at narrow
-  200% plus non-focusable fitting strips. Sort/create selectors follow the
-  current actions. Workflow assertions remain intact.
-- A preview stopped during the deliberate turn interruption; connection-refused
-  attempts are environment failures. Same frozen4362 build was restarted and
-  affected gates rerun; raw connection-refused logs retained separately.
+A diagnostic390 KPH scroll with4×CPU throttling,45rAF samples and normal motion
+preference recorded median16.6ms/p9517.8ms. No infinite running animation was
+present after settling. This is one headless/emulated scenario, not a claim
+about frame rate or energy use on physical iPhones/Safari. Payload/paint design
+bounds are stronger evidence here than treating that timing as a device benchmark.
 
-## Handoff / limits
+## Handoff
 
-At4362 open Home → DATE/KPH → filter/detail/form; open Tài khoản and confirm
-there is no appearance switch. Compare stronger accents, soft card edges/depth,
-smaller auxiliary controls and larger group gaps across features. Next small
-step: owner visual review of this integrated candidate, not another broad audit.
-
-No main merge/push/Cloudflare update. Data remains the existing mock session;
-reload resets session changes, browser report history keeps its existing behavior.
-Headless/emulated touch evidence does not establish Safari or physical-device
-one-hand usability. User acceptance remains separate from technical PASS.
+At4364 compare Home with its old reference; open KPH/DATE form and type quantity/
+dates/notes to assess the brighter active fields and state distinction. The
+next small step is owner review of this local candidate. No main merge/push or
+Cloudflare update; public demo remainsCOMPACT03r4. Mock session/reset and report
+history limits remain as before. Technical PASS is separate from visual approval.
