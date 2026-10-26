@@ -25,7 +25,7 @@ describe("Store App session and route ownership", () => {
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
     await screen.findByText("3 cảnh báo đang mở");
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
-    await screen.findByRole("heading", { name: "Lô đang theo dõi" });
+    await screen.findByRole("heading", { name: "Lô DATE" });
     expect(document.querySelector('[data-date-lot-id="C24-118"] [data-processing-status]')).toHaveAttribute('data-processing-status','acknowledged');
     fireEvent.click(screen.getByRole("button", {name:"Lọc DATE"}));
     fireEvent.click(within(screen.getByRole("group", {name:"Trạng thái xử lý"})).getByRole("button", {name:"Đã ghi nhận"}));
@@ -121,7 +121,7 @@ describe("Store App session and route ownership", () => {
     fireEvent(window, new HashChangeEvent("hashchange"));
     await screen.findByText("Cần chú ý hôm nay");
     fireEvent.click(within(document.querySelector('.store-launcher-grid') as HTMLElement).getByRole("button", { name: "Quản lý DATE" }));
-    await screen.findByRole("heading", { name: "Lô đang theo dõi" });
+    await screen.findByRole("heading", { name: "Lô DATE" });
     open();
     expect(quick().getByRole("textbox", { name: "HSD (Số ngày)" })).toHaveValue("10");
     expect(quick().getByRole("region", { name: "Kết quả tra hạn lùi" }).querySelector(".store-result-date")).toHaveTextContent("08/10/2026");

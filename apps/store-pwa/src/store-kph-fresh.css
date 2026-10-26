@@ -43,7 +43,7 @@
 .store-create-actions .store-create-cta:active { box-shadow: inset 0 0 0 2px var(--store-create-accent); }
 .store-kph .store-ticket-list { display: grid; gap: 16px; }
 .store-kph-list-controls { display: grid; gap: 12px; min-width: 0; }
-.store-kph .store-list-heading { justify-content: flex-start; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-height: 24px; margin: 0; }
+:is(.store-kph, .store-date) .store-list-heading { justify-content: flex-start; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-height: 24px; margin: 0; }
 .store-kph-list-toolbar { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .store-kph-list-toolbar .store-quick-sort-trigger { flex: 1; min-width: 0; width: 100%; }
 .store-kph-list-toolbar .store-compact { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; border-color: var(--store-control-line); cursor: pointer; }
@@ -343,8 +343,8 @@
 .store-kph .store-kph-toolbar { gap: 8px; margin-bottom: 12px; }
 .store-kph .store-tabs { padding: 0; gap: 8px; }
 .store-kph .store-ticket-list { gap: 12px; }
-.store-kph .store-kph-list-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.store-kph .store-list-heading { flex: 1 1 12rem; }
+:is(.store-kph, .store-date) .store-kph-list-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+:is(.store-kph, .store-date) .store-list-heading { flex: 1 1 12rem; }
 .store-kph .store-kph-list-toolbar { flex: 1 1 18rem; }
 /* The cover starts at the type switch; only the controls above it stay behind.
    Keep native document scrolling and reveal covered controls on keyboard focus. */

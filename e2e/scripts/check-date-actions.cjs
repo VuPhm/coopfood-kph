@@ -24,7 +24,7 @@ async function settle(scope){await scope.evaluate(async root=>Promise.all(root.g
     await detail.getByRole('button',{name:'Hủy',exact:true}).click();await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','open');
     await detail.getByRole('button',{name:'Ghi nhận',exact:true}).click();
     await detail.getByRole('radio',{name:days===1?/1 ngày/:/1 tuần/}).check();
-    await audit(p,viewport.width>=900?'.store-date-detail':'.store-date-lot-sheet',`reminder-${days}-${viewport.width}`);
+    await audit(p,'.store-date-lot-sheet',`reminder-${days}-${viewport.width}`);
     await p.screenshot({path:`${output}/reminder-${days}-${viewport.width}.png`,fullPage:true});
     await detail.getByRole('button',{name:'Hẹn báo lại',exact:true}).click();await expect(lot.locator('[data-processing-status]')).toHaveAttribute('data-processing-status','acknowledged');
     await expect(lot).toContainText(`Báo lại ${due}`);await route(p,'notifications');await expect(p.getByRole('region',{name:'Danh sách thông báo'})).toBeVisible();await expect(p.locator('[data-notification-lot="A24-255"]')).toHaveCount(0);

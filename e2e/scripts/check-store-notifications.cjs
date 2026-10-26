@@ -44,7 +44,7 @@ async function noClip(page) {
       await notice.focus(); await page.keyboard.press('Enter');
       const detail = page.getByRole('dialog', { name: 'Chi tiết lô DATE' });
       await expect(detail).toContainText('Lô C24-118');
-      await expect(page.locator('[data-date-lot-id="C24-118"]')).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('[data-date-lot-id="C24-118"]')).toHaveAttribute(viewport.width>=900?'aria-selected':'aria-pressed', 'true');
       await expect(detail.getByRole('button', { name: 'Ghi nhận', exact: true })).toBeEnabled();
       await detail.getByRole('button', { name: 'Ghi nhận', exact: true }).click();
       await detail.getByRole('button', { name: 'Hẹn báo lại', exact: true }).click();
@@ -72,7 +72,7 @@ async function noClip(page) {
       await expect(page.getByRole('dialog').getByRole('button', { name: 'Đã xử lý', exact: true })).toHaveCount(0);
       await page.keyboard.press('Escape');
       expect(errors).toEqual([]); results.push({ viewport, groups: true, exactLot: true, remindSuppressAndDue: true, text150: true, noResolvedDateGroup: true });
-      console.log(`PASS notifications ${viewport.width}: groups/collapse, exact DATE target, reminder/suppression/deduplication, DATE two statuses, contrast/text150`);
+      console.log(`PASS notifications ${viewport.width}: groups/collapse, exact DATE target, reminder/suppression/deduplication, DATE food tabs/no completed group, contrast/text150`);
       await page.close();
     }
     fs.writeFileSync(`${output}/results.json`, JSON.stringify(results, null, 2));

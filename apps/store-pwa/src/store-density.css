@@ -128,17 +128,11 @@
     flex: 0 0 var(--store-size-icon-sm); width: var(--store-size-icon-sm); height: var(--store-size-icon-sm); margin-left: auto;
   }
   html[data-store-density="compact"] .store-app :is(.store-kph, .store-date) .store-kph-list-controls {
-    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--store-space-2);
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--store-space-2);
   }
-  html[data-store-density="compact"] .store-app :is(.store-kph, .store-date) .store-list-heading { display: grid; gap: 0; align-items: start; }
-  html[data-store-density="compact"] .store-app :is(.store-kph, .store-date) .store-kph-list-toolbar { flex: initial; }
+  html[data-store-density="compact"] .store-app :is(.store-kph, .store-date) .store-list-heading { display: grid; flex: 1 0 max-content; gap: 0; align-items: start; }
+  html[data-store-density="compact"] .store-app :is(.store-kph, .store-date) .store-kph-list-toolbar { flex: 0 1 auto; max-width: 100%; }
   html[data-store-density="compact"] .store-app :is(.store-kph-list-controls h2, .store-date-list-heading h2) { font-size: var(--store-type-section); line-height: var(--store-leading-section); }
-  html[data-store-density="compact"] .store-app .store-date-list-controls {
-    display: grid; grid-template-columns: minmax(0, 1fr) var(--store-size-hit-min); gap: var(--store-space-2); align-items: center;
-  }
-  html[data-store-density="compact"] .store-app .store-date-list-heading { grid-column: 1; flex: initial; }
-  html[data-store-density="compact"] .store-app .store-date-toolbar { grid-column: 2; flex: initial; }
-  html[data-store-density="compact"] .store-app .store-date-toolbar > .store-filter { flex: 0 0 var(--store-size-hit-min); }
 
   html[data-store-density="compact"] .store-app .store-report-settings-inline { display: grid; grid-template-columns: minmax(0, 1fr) var(--store-size-hit-min); align-items: center; gap: var(--store-space-2); }
   html[data-store-density="compact"] .store-app .store-report-settings-inline button {

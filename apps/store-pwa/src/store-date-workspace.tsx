@@ -181,7 +181,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
       <section className="store-date-browser" aria-label="Danh sách lô DATE">
         <StoreFoodKindTabs value={kind} counts={typeTotals} onChange={setKind} />
         <div className="store-date-list-controls store-kph-list-controls">
-          <div className="store-date-list-heading store-list-heading"><h2>Lô đang theo dõi</h2><span className="store-date-result-count">{visible.length} lô</span></div>
+          <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><span className="store-date-result-count">{visible.length} lô</span></div>
           <div className="store-date-toolbar store-kph-list-toolbar">
             {!compact ? <StoreQuickSort value={sort} onChange={value => setSort(value as DateSort)} options={DATE_SORT_OPTIONS} title="Sắp xếp lô DATE" groupLabel="Thứ tự lô" /> : null}
             <button className="store-compact" aria-pressed={attentionOnly} onClick={() => { setAttentionOnly(!attentionOnly); setStatus("all"); }}><TriangleAlert size={20} aria-hidden="true" /><span>Cần chú ý</span><small>{attentionCount}</small></button>

@@ -67,9 +67,9 @@
 .store-date-lot-labels { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
 .store-date-lot-main > .store-date-lot-dates { display: flex; flex-wrap: wrap; gap: 2px 12px; grid-column: 1 / -1; grid-row: 3; min-width: 0; }
 .store-date-lot-dates > span { white-space: nowrap; }
-.store-date-lot-end > strong { display: grid; align-content: start; justify-items: end; grid-column: 2; grid-row: 1 / 3; align-self: start; max-width: 96px; color: var(--store-ink-muted); font-size: 13px; font-weight: 600; line-height: 20px; text-align: right; overflow-wrap: anywhere; }
+.store-date-lot-end > strong { display: grid; align-content: start; justify-items: end; grid-column: 2; grid-row: 1 / 3; align-self: start; max-width: 6em; color: var(--store-ink-muted); font-size: 13px; font-weight: 600; line-height: 20px; text-align: right; overflow-wrap: anywhere; }
 .store-date-percent-caption { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; font-weight: 400; }
-.store-date-percent-value { font-size: 24px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.store-date-percent-value { font-size: 24px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .store-date-lot-end .is-danger { color: var(--store-error-ink); }
 .store-date-lot-end .is-warning { color: var(--store-warning-ink); }
 .store-date-lot-action { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; color: var(--store-brand-action); font-size: 12px; line-height: 18px; font-weight: 650; }
