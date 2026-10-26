@@ -1,14 +1,17 @@
 # Trạng thái hiện tại
 
-**COMPACT03 revision4 — candidate đang kiểm26/10/2026:** tiếp vòng agent bị ngắt,
+**COMPACT03 revision4 — technical PASS, owner pending26/10/2026:** tiếp vòng agent bị ngắt,
 owner bổ sung Compact cho quản lý DATE/Thông báo và đồng nhất flow tương đương.
 Shared input16/24, caption12/18, target44px áp cả hai mật độ; Fresh mặc định
 nhóm mềm/thoáng, Compact phẳng. DATE filter/detail/reminder dùng section roles,
 Thông báo thống nhất tên/SKU/lô/phase/%HSD24px và native thu/mở. Giữ rule, lịch
 1/7ngày, exact-lot và DATE→KPH; không đổi API/chart/timeline/print. Root tích hợp
-hai agent độc lập, nhận phần foundation/loading dở; technical và owner pending.
-Preview mới dự kiến4352, frozen4350 giữ baseline. [Scope/gates](delivery/compact03-date-report-items/plan.json).
-Chưa merge main/push/deploy. Bước tiếp: kiểm bản tích hợp rồi owner xem hai mật độ.
+hai agent độc lập, nhận phần foundation/loading dở. Technical346tests, browser
+hai mật độ/5viewport, DATE/Thông báo/chữ lớn/output/scrollbar PASS; review
+không blocker. Owner chưa nghiệm thu. Preview <http://127.0.0.1:4352/#date>,
+frozen4350 giữ baseline. [Scope/gates](delivery/compact03-date-report-items/plan.json).
+Chưa merge main/push/deploy. Bước tiếp: owner xem DATE/Thông báo và thử báo lại
+1/7ngày ở hai mật độ; [evidence/files](delivery/compact03-date-report-items/technical.md).
 
 
 **COMPACT03 revision2 — candidate đồng nhất Compact,26/10/2026:** resume đúng
