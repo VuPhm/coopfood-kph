@@ -114,3 +114,11 @@ Browser mock/memory-only, not backend, Safari/physical-device or production proo
 Reminder/DATE source does not persist across reload or push while closed. No new
 platform/dependency/API/data behavior. Production4352 session25313; frozen4350
 session69302. Main remains f77034d, clean; remote refs not refreshed in this slice.
+
+## Publication follow-up
+
+After this technical handoff, owner explicitly requested Cloudflare mockup
+publication. Exact4352 build is now published to the existing demo project;
+public mobile/desktop checks pass both densities. [Authorization, deployment,
+rollback point and evidence](cloudflare-mockup-2026-10-26.md). This does not grant
+main merge authority or UI acceptance and does not alter revision4 runtime/gates.
