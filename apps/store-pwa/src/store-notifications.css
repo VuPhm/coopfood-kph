@@ -5,7 +5,7 @@
 .store-notification-module-heading > div { flex: 1; min-width: 0; }
 .store-notifications .store-notification-module-heading h2 { font-size: 17px; line-height: 24px; }
 .store-notifications .store-notification-module-heading p { max-width: none; font-size: 13px; line-height: 20px; }
-.store-notification-module-icon { display: grid; flex-shrink: 0; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--store-brand-action); color: white; }
+.store-notification-module-icon { display: grid; flex-shrink: 0; place-items: center; width: 44px; height: 44px; border-radius: 14px; background-color: var(--store-brand-action); background-image: var(--store-jewel-image); color: white; box-shadow: var(--store-jewel-shadow); }
 .store-notification-total { display: grid; place-items: center; min-width: 20px; min-height: 20px; padding: 1px 6px; border-radius: 999px; background: var(--store-brand-action); color: white; font-size: 12px; font-weight: 650; }
 .store-notification-sections { display: grid; gap: 12px; min-width: 0; }
 .store-notification-section { min-width: 0; border: 1px solid var(--store-holder-edge); border-radius: 16px; background: var(--store-holder-surface); }

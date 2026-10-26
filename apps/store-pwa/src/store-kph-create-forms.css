@@ -38,7 +38,7 @@
 .store-create-screen[data-kind] .choice-indicator { border-color: var(--store-control-line); }
 .store-create-screen[data-kind] .photo-picker { transition: background-color var(--cf-motion-fast) ease, border-color var(--cf-motion-fast) ease; }
 .store-create-screen[data-kind] .photo-picker:hover { transform: none; box-shadow: none; }
-.store-create-screen[data-kind] .form-section .photo-picker { background-image: var(--store-material-sheen); border-color: transparent; box-shadow: var(--store-soft-card-shadow); }
+.store-create-screen[data-kind] .form-section .photo-picker { background-image: var(--store-item-image); border-color: transparent; box-shadow: var(--store-soft-card-shadow); }
 .store-create-screen[data-kind] .photo-preview { animation: none; }
 .store-create-screen[data-kind] .photo-preview-remove { width: 44px; height: 44px; top: 2px; right: 2px; }
 .store-create-screen[data-kind] .photo-picker:has(input:focus-visible) { outline: 3px solid var(--store-focus); outline-offset: 3px; }

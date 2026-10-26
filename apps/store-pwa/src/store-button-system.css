@@ -5,7 +5,7 @@
     --store-button-radius: 12px;
     --store-button-radius-compact: 10px;
     --store-button-primary-bg: var(--store-brand-action);
-    --store-button-primary-top: #087e58;
+    --store-button-primary-top: #00724e;
     --store-button-primary-bottom: #005c40;
     --store-button-primary-hover: var(--store-brand-deep);
     --store-button-primary-active: var(--store-brand-deep);
@@ -27,7 +27,7 @@
     --store-button-icon-hover: var(--store-canvas);
     --store-button-inverse-edge: rgb(255 255 255 / 18%);
     --store-button-inverse-hover: rgb(255 255 255 / 16%);
-    --store-button-primary-shadow: inset 0 1px 0 rgb(255 255 255 / 28%), 0 2px 6px rgb(0 60 40 / 14%);
+    --store-button-primary-shadow: inset 0 1px 0 rgb(255 255 255 / 48%), inset 0 -1px 1px rgb(0 30 20 / 12%), 0 3px 8px rgb(0 60 40 / 16%);
     --store-button-secondary-shadow: inset 0 0 0 1px var(--store-button-edge), inset 0 1px 0 rgb(255 255 255 / 90%), 0 3px 8px rgb(0 60 40 / 10%);
     --store-button-pressed-shadow: inset 0 1px 2px rgb(0 40 25 / 14%);
   }
@@ -45,7 +45,7 @@
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="primary"], .store-login-submit, .store-choice-confirm, .store-account-home, .store-notifications-body > button, .store-create-loading-body > button,.store-tabs button.is-active, .store-date-statuses button.is-selected, .store-choices button.is-selected, .store-compact[aria-pressed="true"], .store-filter.is-filtered, .store-quick-sort-options button[aria-pressed="true"], .store-kph-date-shortcuts button[aria-pressed="true"], .unit-options input:checked + span) {
     --store-button-fill: var(--store-button-primary-bg);
-    --store-button-image: linear-gradient(155deg, var(--store-button-primary-top), var(--store-button-primary-bg) 48%, var(--store-button-primary-bottom));
+    --store-button-image: var(--store-control-light), linear-gradient(155deg, var(--store-button-primary-top), var(--store-button-primary-top) 48%, var(--store-button-primary-bottom));
     --store-button-ink: var(--store-button-on-primary);
     --store-button-shadow: var(--store-button-primary-shadow);
   }
@@ -54,7 +54,7 @@
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="secondary"], .store-choice-cancel, .store-login-preview, .store-account-login, .store-reset-filter, .store-date-reset-filter, .store-kph-more button, .store-create-cta,.store-compact:not([aria-pressed="true"]), .store-filter:not(.is-filtered), .store-quick-sort-trigger, .store-selection-menu, .store-choices button:not(.is-selected), .store-kph-date-shortcuts button:not([aria-pressed="true"])) {
     --store-button-fill: var(--store-button-secondary-bg);
-    --store-button-image: var(--store-button-secondary-image, var(--store-material-sheen));
+    --store-button-image: var(--store-button-secondary-image, var(--store-item-image));
     --store-button-ink: var(--store-button-secondary-ink);
     --store-button-shadow: var(--store-button-secondary-shadow);
   }
@@ -65,7 +65,7 @@
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="danger"]) {
     --store-button-fill: var(--store-button-danger-bg);
-    --store-button-image: linear-gradient(150deg, var(--store-button-danger-bg), var(--store-button-danger-hover));
+    --store-button-image: var(--store-control-light), linear-gradient(150deg, var(--store-button-danger-bg), var(--store-button-danger-hover));
     --store-button-ink: #fff;
     --store-button-shadow: var(--store-button-primary-shadow);
   }
@@ -79,12 +79,13 @@
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="primary"], .store-login-submit, .store-choice-confirm, .store-account-home, .store-notifications-body > button, .store-create-loading-body > button, [data-slot="button"][data-variant="secondary"], .store-choice-cancel, .store-login-preview, .store-account-login, .store-reset-filter, .store-date-reset-filter, .store-kph-more button, .store-create-cta, [data-slot="button"][data-variant="ghost"], [data-slot="button"][data-variant="danger"], .store-tabs button.is-active, .store-date-statuses button.is-selected, .store-choices button.is-selected, .store-compact[aria-pressed="true"], .store-filter.is-filtered, .store-quick-sort-options button[aria-pressed="true"], .store-kph-date-shortcuts button[aria-pressed="true"], .unit-options input:checked + span, .store-compact:not([aria-pressed="true"]), .store-filter:not(.is-filtered), .store-quick-sort-trigger, .store-selection-menu, .store-choices button:not(.is-selected), .store-kph-date-shortcuts button:not([aria-pressed="true"])):disabled { --store-button-fill: var(--store-button-disabled-bg); --store-button-image: none; --store-button-ink: var(--store-button-disabled-ink); --store-button-border: transparent; --store-button-shadow: none; opacity: 1; transition: none; }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-login) :is(.store-login-reveal, .field-input-action, .expiry-calendar-trigger) { border-radius: var(--store-button-radius-compact); filter: none; }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-login) :is(.store-login-reveal, .field-input-action, .expiry-calendar-trigger):hover:not(:disabled) { background-color: var(--store-button-icon-hover); }
-  body:has(.store-app) :is(.store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet) > [data-slot="dialog-close"] { border-color: var(--store-button-inverse-edge); filter: none; }
+  body:has(.store-app) :is(.store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet) > [data-slot="dialog-close"] { border-color: var(--store-button-inverse-edge); background-image: var(--store-control-light); box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%); filter: none; }
   body:has(.store-app) :is(.store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet) > [data-slot="dialog-close"]:hover { background-color: var(--store-button-inverse-hover); }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-login) :is(button[aria-pressed], .store-choices button, .unit-options span) { transition: none; }
   /* Preserve an existing semantic orange action and inverse-hero controls. */
-  body:has(.store-app) .store-date-acknowledge { --store-button-primary-bg: #c24e00; --store-button-primary-top: #c24e00; --store-button-primary-bottom: #a63f00; --store-button-primary-hover: #a63f00; --store-button-primary-active: #913700; }
+  body:has(.store-app) .store-date-acknowledge { --store-button-primary-bg: #c24e00; --store-button-primary-top: #b34705; --store-button-primary-bottom: #a63f00; --store-button-primary-hover: #a63f00; --store-button-primary-active: #913700; }
   body:has(.store-app) .store-create-cta {
+    --store-button-border: rgb(255 255 255 / 75%);
     --store-button-secondary-image: var(--store-create-gradient);
     --store-button-secondary-bg: var(--store-create-surface);
     --store-button-secondary-hover: var(--store-create-hover);

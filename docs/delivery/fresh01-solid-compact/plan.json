@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 3,
+  "status": "EXECUTING",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
@@ -12,7 +12,9 @@
     "Reuse real consumers, remove superseded CSS/code and adapt meaningful unit/browser gates",
     "Restore old Home feature identity (mint/pink/blue/peach, round dimensional icons) with stronger static decorative gradients",
     "Apply bounded gradient/highlight roles to functional surfaces; keep data/status/timeline/print and one-screen layout intact",
-    "Make editable fields visibly white/active; distinguish readonly and disabled without cyclic token mappings; retain validation/focus"
+    "Make editable fields visibly white/active; distinguish readonly and disabled without cyclic token mappings; retain validation/focus",
+    "Extend the accepted Home item light/gradient/edge recipe to similar list/cards, functional icons and button roles without changing geometry or state semantics",
+    "Give fresh-food TPTS CTA an accessible distinct blue gradient with verified default/hover/pressed/disabled/focus states; retain dry-food warm contrast"
   ],
   "outOfScope": [
     "Business/API/backend/auth/schema or date calculation changes",
@@ -20,8 +22,8 @@
     "Main merge/push, protected Pages or inferred Cloudflare publication",
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
-  "baseSha": "2c7a949",
-  "candidateSha": "28415cb6bd90831847a4ba1a8a9b5ad9036cdac1",
+  "baseSha": "2730981",
+  "candidateSha": "",
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -36,44 +38,32 @@
     "docs/delivery/fresh01-solid-compact/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
       "id": "single-interface-no-legacy-mode",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "28415cb6bd90831847a4ba1a8a9b5ad9036cdac1",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "shared-solid-material-and-sliding-structure",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "28415cb6bd90831847a4ba1a8a9b5ad9036cdac1",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "responsive-targets-focus-and-reflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "28415cb6bd90831847a4ba1a8a9b5ad9036cdac1",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "preserved-workflows-print-and-outputs",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "28415cb6bd90831847a4ba1a8a9b5ad9036cdac1",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner-integrated-visual-acceptance",
@@ -89,10 +79,17 @@
       "source": "Direct owner message after4362 KPH handoff26/10/2026",
       "impact": "Supersedes white-only Home cards and no-gradient decoration in revision1. Invalidates affected visual/material/field gates; prior evidence archived, no visual acceptance inferred.",
       "decision": "Same branch/worktree, root sole writer. Use c5a440b Home as provenance; official Apple iOS27/HIG references. Static CSS gradients, no large blur, continuous animation, dependency or new UI mode. Max two bounded review/repair rounds."
+    },
+    {
+      "revision": 3,
+      "request": "Ổn, phổ biến rộng hiệu ứng item Home và cả các nút; CTA tươi sống màu khác đủ tương phản, lục không được thì lam",
+      "source": "Direct owner message on4364 KPH26/10/2026",
+      "impact": "Accepts revision2 visual direction; expands effect consumers and changes TPTS CTA palette. Resets affected paint/contrast/state/browser gates; no merge/publication implied.",
+      "decision": "One shared Home light ingredient and item/control material roles; default neutral/mint for business items, semantic states/white fields/print preserved. Choose distinct blue for TPTS. Same task/worktree, root sole writer, max two bounded reviews."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner views restored Home colors/depth and bright editable field states at4364. Technical pass347tests/browser gates, CSS growth627bytes gzip. Visual acceptance pending; stop broad audit, no inferred merge/publication.",
+  "nextAction": "Implement shared light roles, broader item/button consumers and blue fresh CTA; verify all button states and unchanged workflow/fields/output.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
   "branch": "store-app/fresh01-solid-compact",
   "authorization": {
