@@ -1,0 +1,44 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "found": true,
+    "manual": true,
+    "duplicate": true,
+    "notifications": true,
+    "exactBatchAndBarcode": true,
+    "kphSeed": true,
+    "recovery": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "found": true,
+    "manual": true,
+    "duplicate": true,
+    "notifications": true,
+    "exactBatchAndBarcode": true,
+    "kphSeed": true,
+    "recovery": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "found": true,
+    "manual": true,
+    "duplicate": true,
+    "notifications": true,
+    "exactBatchAndBarcode": true,
+    "kphSeed": true,
+    "recovery": true,
+    "text200": true
+  }
+]

@@ -186,11 +186,12 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
       {message ? <p className="store-date-message" role="status">{message}</p> : null}
 
         <div className="store-date-list-controls store-kph-list-controls">
-          <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><button ref={intakeTrigger} type="button" className="store-date-add" onClick={() => setIntakeOpen(true)}><Plus size={18} aria-hidden="true" /><span>Thêm theo dõi</span></button><span className="store-date-result-count">{visible.length} lô</span></div>
-          <div className="store-date-toolbar store-kph-list-toolbar">
+          <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><span className="store-date-result-count">{visible.length} lô</span></div>
+          <div className="store-date-toolbar store-kph-list-toolbar" role="group" aria-label="Thao tác DATE">
 
             <button className="store-compact" aria-pressed={attentionOnly} onClick={() => { setAttentionOnly(!attentionOnly); setStatus("all"); }}><TriangleAlert size={20} aria-hidden="true" /><span>Cần chú ý</span><small>{attentionCount}</small></button>
             <button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button>
+            <Button asChild className="store-button store-date-add"><button ref={intakeTrigger} type="button" aria-label="Thêm theo dõi" title="Thêm theo dõi" onClick={() => setIntakeOpen(true)}><Plus size={18} aria-hidden="true" /><span className="store-date-add-copy">Thêm theo dõi</span></button></Button>
           </div>
           <span className="sr-only" id={filterSummaryId}>{activeFilterCount ? `${activeFilterCount} tiêu chí lọc hoặc sắp xếp đang dùng` : "Đang dùng bộ lọc mặc định"}</span>
         </div>

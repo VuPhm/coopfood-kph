@@ -1,5 +1,11 @@
 # Nhập sản phẩm/lô vào theo dõi DATE — đề xuất28/10/2026
 
+**DATE04 revision2 candidate28/10:** owner yêu cầu bottom panel và chọn tự nhập
+ngay. Form neo đáy, footer giữ yên; entry+ ở toolbar DATE thay vì trong heading.
+Tự nhập không cần lookup trước, giữ provenance MANUAL/barcode riêng; lookup
+FOUND/NOT_FOUND/unavailable và validation/duplicate V1 giữ. [Kiểm tra r2](../delivery/date04-intake/technical.md), owner pending.
+
+
 **DATE04 V1 candidate28/10/2026:** owner “làm” đã mở implementation mock.
 Form hiện yêu cầu SKU/tên/NSX/HSD, batch tùy chọn, chưa quantity/thiếu NSX mới;
 trùng chặn bảo thủ, không gộp. Dùng StoreSheet full viewport mobile/dialog desktop

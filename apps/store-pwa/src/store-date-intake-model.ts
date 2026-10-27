@@ -26,6 +26,6 @@ export function makeTrackedDateLot(input: DateIntakeValues, snapshot: DateProduc
   const nsx = parseDisplayDate(value.manufactured), hsd = parseDisplayDate(value.expiry);
   calculateShelfLife(nsx, hsd, nsx);
   return { id, name: value.name, sku: value.sku, manufactured: value.manufactured.trim(), date: hsd,
-    batchCode: value.batchCode || null, status: "open", productSnapshot: { ...snapshot, kind: value.kind === "unclassified" ? null : value.kind } };
+    batchCode: value.batchCode || null, status: "open", productSnapshot: { ...snapshot, barcode: snapshot.barcode.trim(), kind: value.kind === "unclassified" ? null : value.kind } };
 }
 export { findDuplicateDateLot, DateLotDuplicateError, appendTrackedDateLot } from "./store-date-lot";

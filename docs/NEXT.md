@@ -1,5 +1,16 @@
 # Công việc kế tiếp
 
+**DATE04 revision2 — candidate28/10/2026:** theo feedback bottom panel/tự nhập/
+nút chắp vá, form neo đáy ở mọi viewport, chừa khoảng trên, footer giữ yên.
+Entry+ vào cùng toolbar Cần chú ý/Lọc, heading trở lại tên/count. Hai cách
+Tra mã hàng/Tự nhập có ngay từ đầu; direct manual giữ provenance MANUAL,
+barcode riêng/giữ số0 đầu, rules V1 không đổi. TypeScript/15tests/mock build,
+Playwright panel4viewport + workflow390/1440/320, chữ200/contrast đạt.
+Preview <http://127.0.0.1:4390/#date>; [file/checks/giới hạn](delivery/date04-intake/technical.md).
+Cùng branch/worktree/root writer, owner r2 pending; chưa merge/push/deploy.
+Bước tiếp owner bấm+ và thử Tự nhập trong bottom panel.
+
+
 **DATE04 — candidate nhập theo dõi28/10/2026:** owner “làm” sau preparation.
 Đã có form mock tìm/quét/nhập tay → NSX/HSD/mã lô → mốc → lưu vào DATE chung;
 ID/batch tách riêng, chặn trùng/retry, metadata explicit sang KPH, Thông báo/

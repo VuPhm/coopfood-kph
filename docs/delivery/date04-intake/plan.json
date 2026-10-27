@@ -1,20 +1,21 @@
 {
   "schemaVersion": 1,
   "id": "date04-intake",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "VERIFYING",
   "objective": "Implement mock DATE lot intake, exact identity, shared tracking/notification/report integration and recoverable validated entry.",
   "inScope": [
     "FOUND/NOT_FOUND/unavailable lookup and explicit manual identity",
     "Required SKU/name/NSX/HSD, optional batch code, duplicate/retry protection",
-    "Shared DATE/notification/report/KPH metadata and browser QA390/1440"
+    "Shared DATE/notification/report/KPH metadata and browser QA390/1440",
+    "Owner revision2: bottom-anchored panel, immediate manual input and integrated DATE toolbar entry"
   ],
   "outOfScope": [
     "Quantity, Excel/OCR, missing-NSX creation",
     "Online DATE API/persistence/security policy, merge/push/deploy"
   ],
   "baseSha": "a286a6c8b5597cf0b3586b13312c5d1961e43c96",
-  "candidateSha": "f899c9c72db3875564d8fdfca36447d50c95a1e7",
+  "candidateSha": "",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -22,17 +23,14 @@
     "docs/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "f899c9c72db3875564d8fdfca36447d50c95a1e7",
-      "evidence": "docs/delivery/date04-intake/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner-intake",
@@ -41,7 +39,15 @@
       "status": "pending"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Dùng bottom panel, cho tùy chọn tự nhập; nút lắp chắp vá",
+      "source": "Owner feedback at4388/#date,28/10/2026",
+      "impact": "Intake presentation/manual entry, toolbar composition and related tests; V1 date/duplicate/persistence rules unchanged",
+      "decision": "Continue same DATE04 task. Required affected gates reset; bounded review up to2rounds for new revision."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Owner thử DATE → Thêm theo dõi → SKU0008421 → NSX/HSD/mã lô → lưu, đối chiếu Thông báo tại4388. Chờ nghiệm thu V1; không merge/push/deploy."
+  "nextAction": "Commit tested revision2, record technical gate and show bottom-panel preview4390."
 }

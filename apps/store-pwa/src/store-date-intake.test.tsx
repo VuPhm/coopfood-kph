@@ -7,6 +7,17 @@ const lookup = vi.mocked(mockBarcodeLookup);
 function form(onSave = vi.fn()) { render(<DateIntake today="2026-10-28" onSave={onSave} onCancel={vi.fn()} onOpenExisting={vi.fn()} />); return onSave; }
 function type(label: string, value: string) { fireEvent.change(screen.getByRole("textbox", { name: label }), { target: { value } }); }
 describe("DATE entry recovery", () => {
+  it("opens direct manual entry without making a catalog miss or lookup", async () => {
+    lookup.mockReset(); const save = form();
+    fireEvent.click(screen.getByRole("button", { name: "Tự nhập" }));
+    expect(screen.getByRole("button", { name: "Tự nhập" })).toHaveAttribute("aria-pressed", "true");
+    type("SKU", "0000018"); type("Tên sản phẩm", "Hàng tự nhập"); type("Barcode (nếu có)", " 00001234 ");
+    type("Ngày sản xuất (NSX)", "01/10/2026"); type("Hạn sử dụng (HSD)", "31/10/2026");
+    fireEvent.click(screen.getByRole("button", { name: "Thêm vào theo dõi" }));
+    await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+    expect(lookup).not.toHaveBeenCalled();
+    expect(save.mock.calls[0]![0]).toMatchObject({ sku: "0000018", productSnapshot: { lookupStatus: "MANUAL", barcode: "00001234", kind: null } });
+  });
   it("ignores stale lookup results after the operator changes the code", async () => {
     let resolve!: (result: Awaited<ReturnType<typeof mockBarcodeLookup>>) => void;
     lookup.mockImplementationOnce(() => new Promise(r => { resolve = r; })); form();

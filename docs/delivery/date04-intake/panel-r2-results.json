@@ -1,0 +1,150 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "entry": {
+      "inToolbar": true,
+      "inHeading": false,
+      "width": 44,
+      "height": 44,
+      "color": "rgb(255, 255, 255)",
+      "icon": "rgb(255, 255, 255)"
+    },
+    "panel": {
+      "rect": {
+        "x": 0,
+        "y": 135.046875,
+        "width": 390,
+        "height": 708.953125,
+        "top": 135.046875,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "radius": [
+        "24px",
+        "24px",
+        "0px",
+        "0px"
+      ]
+    },
+    "fixedFooter": true,
+    "directManual": true,
+    "notifications": true,
+    "text200": true,
+    "reducedMotion": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "entry": {
+      "inToolbar": true,
+      "inHeading": false,
+      "width": 142.609375,
+      "height": 44,
+      "color": "rgb(255, 255, 255)",
+      "icon": "rgb(255, 255, 255)"
+    },
+    "panel": {
+      "rect": {
+        "x": 340,
+        "y": 204,
+        "width": 760,
+        "height": 820,
+        "top": 204,
+        "right": 1100,
+        "bottom": 1024,
+        "left": 340
+      },
+      "radius": [
+        "24px",
+        "24px",
+        "0px",
+        "0px"
+      ]
+    },
+    "fixedFooter": true,
+    "directManual": true,
+    "notifications": true,
+    "text200": true,
+    "reducedMotion": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "entry": {
+      "inToolbar": true,
+      "inHeading": false,
+      "width": 44,
+      "height": 44,
+      "color": "rgb(255, 255, 255)",
+      "icon": "rgb(255, 255, 255)"
+    },
+    "panel": {
+      "rect": {
+        "x": 0,
+        "y": 118.40625,
+        "width": 320,
+        "height": 621.59375,
+        "top": 118.40625,
+        "right": 320,
+        "bottom": 740,
+        "left": 0
+      },
+      "radius": [
+        "24px",
+        "24px",
+        "0px",
+        "0px"
+      ]
+    },
+    "fixedFooter": true,
+    "directManual": true,
+    "notifications": true,
+    "text200": true,
+    "reducedMotion": true
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "entry": {
+      "inToolbar": true,
+      "inHeading": false,
+      "width": 44,
+      "height": 44,
+      "color": "rgb(255, 255, 255)",
+      "icon": "rgb(255, 255, 255)"
+    },
+    "panel": {
+      "rect": {
+        "x": 42,
+        "y": 62.40625,
+        "width": 760,
+        "height": 327.59375,
+        "top": 62.40625,
+        "right": 802,
+        "bottom": 390,
+        "left": 42
+      },
+      "radius": [
+        "24px",
+        "24px",
+        "0px",
+        "0px"
+      ]
+    },
+    "fixedFooter": true,
+    "directManual": true,
+    "notifications": true,
+    "text200": true,
+    "reducedMotion": true
+  }
+]
