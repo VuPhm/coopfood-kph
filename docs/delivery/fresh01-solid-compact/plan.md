@@ -1,3 +1,12 @@
+## Revision4 — nhịp list và phản hồi tương tác,27/10/2026
+
+Owner “ổn, tiếp tục tối ưu” khi xem4366 Thông báo. Giữ hướng revision3; ưu tiên
+item Thông báo có khoảng cách/đệm rõ, nhóm native thu/mở nhận biết được; dùng
+chung hover/press/focus tại chỗ cho card/chọn tương đương. Không đổi dữ liệu,
+nhắc1/7ngày, navigation, CTA lam/cam hoặc field trắng. Root sole writer, cùng
+worktree; tối đa hai lượt review. Kiểm Playwright390×844/1440×1024 và320px,
+chữ lớn, contrast, chọn/thu/mở/mở đúng lô và flow/output liên quan.
+
 # FRESH01 — một giao diện gọn, màu rõ và khối nổi
 
 ## Revision3 — triển khai xong, technical PASS

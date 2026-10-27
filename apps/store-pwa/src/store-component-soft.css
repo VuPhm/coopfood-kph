@@ -24,11 +24,11 @@
   }
   /* A single state edge, existing check/label and native semantics suffice. */
   body:has(.store-app) :is(.store-sheet .store-choices .is-selected, .store-date-lot.is-active, .store-kph-date-shortcuts button[aria-pressed="true"], .ui-select-trigger[data-state="open"]) { box-shadow: none; }
-  body:has(.store-app) :is(.store-kph-filter-section, .store-date-filter-section, .report-sheet-section, .store-settings-group, .store-date-reminder-choices, .store-notification-section) {
+  body:has(.store-app) :is(.store-kph-filter-section, .store-date-filter-section, .report-sheet-section, .store-settings-group, .store-date-reminder-choices) {
     border-color: var(--store-component-edge);
     box-shadow: var(--store-component-shadow);
   }
-  body:has(.store-app) :is(.store-settings-row + .store-settings-row, .store-choice-actions, .store-choice-option, .store-summary > div, .store-notification-item, .store-shelf-history-list > li) { border-color: var(--store-component-edge); }
+  body:has(.store-app) :is(.store-settings-row + .store-settings-row, .store-choice-actions, .store-choice-option, .store-summary > div, .store-shelf-history-list > li) { border-color: var(--store-component-edge); }
   body:has(.store-app) .store-date-reminder-choices label:not(:has(input:checked)) {
     border-color: var(--store-component-edge); background-color: var(--store-component-well); background-image: var(--store-item-image);
   }

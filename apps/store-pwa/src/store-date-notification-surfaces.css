@@ -1,28 +1,7 @@
-/* DATE and its notifications share the same name / identifier / state hierarchy.
+/* DATE filter/detail composition; notification hierarchy lives in its own stylesheet.
    Native disclosure, exact-lot navigation and reminder controls keep their semantics.
    All recipes are Store-local and screen-only; timeline geometry is untouched. */
 @media screen {
-  body:has(.store-app) .store-notification-item {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: var(--store-space-1) var(--store-space-3);
-  }
-  body:has(.store-app) .store-notification-item-copy { display: contents; }
-  body:has(.store-app) .store-notification-item-copy > strong { grid-column: 1; grid-row: 1; }
-  body:has(.store-app) .store-notification-item-copy > small { grid-column: 1; grid-row: 2; }
-  body:has(.store-app) .store-notification-item-state {
-    grid-column: 1 / -1; grid-row: 3;
-    gap: var(--store-space-2);
-  }
-  body:has(.store-app) .store-notification-item-end {
-    grid-column: 2; grid-row: 1 / 3;
-    align-self: start;
-  }
-  body:has(.store-app) .store-notification-percent strong { font-size: 24px; line-height: 28px; }
-  body:has(.store-app) .store-notification-item:hover { background: var(--store-canvas); }
-  body:has(.store-app) .store-notification-item:active { background: var(--store-module-mint); }
-
   /* Compact sections use the same flat grouping as KPH/report filters and details.
      Retain the timeline holder's box dimensions so its rail and labels do not move. */
   body:has(.store-app) .store-date-filter .store-date-filter-section {
@@ -68,12 +47,4 @@
   }
   body:has(.store-app) .store-date-reminder-choices label > span { min-width: 0; }
   body:has(.store-app) .store-date-reminder-choices small { overflow-wrap: anywhere; }
-  body:has(.store-app) .store-notification-section { box-shadow: none; }
-  body:has(.store-app) .store-notification-module-icon {
-    width: var(--store-size-face-sm); height: var(--store-size-face-sm);
-    border-radius: var(--store-radius-control);
-  }
-  body:has(.store-app) .store-notification-module-icon > svg {
-    width: var(--store-size-icon-md); height: var(--store-size-icon-md);
-  }
 }

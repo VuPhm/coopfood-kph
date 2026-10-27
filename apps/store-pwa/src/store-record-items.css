@@ -1,5 +1,5 @@
-/* Shared dense DATE lists retain both state tags. Report/notification recipes remain opt-in.
-   Flatten report facts and notification groups without removing their content.
+/* Shared dense DATE lists retain both state tags. Report facts keep their own recipe.
+   Notification composition is owned by store-notifications.css.
    Detail sheets, charts and printed documents keep their own recipes. */
 @media screen {
   .store-app :is(.store-kph-list, .store-date-lots, .store-date-table, .date-report-catalog, .store-notification-item) .ui-list-label[data-tone] {
@@ -33,17 +33,4 @@
     margin-top: 0;
   }
 
-  body:has(.store-app) .store-app .store-notification-section {
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-  }
-  body:has(.store-app) .store-app .store-notification-section + .store-notification-section {
-    border-top: 1px solid var(--store-holder-edge);
-  }
-  body:has(.store-app) .store-app .store-notification-section > summary {
-    border-radius: 0;
-    padding-inline: 0;
-  }
-  body:has(.store-app) .store-app .store-notification-items { padding-inline: 0; }
 }

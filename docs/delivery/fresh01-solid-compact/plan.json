@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
-  "revision": 3,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 4,
+  "status": "EXECUTING",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
@@ -14,7 +14,8 @@
     "Apply bounded gradient/highlight roles to functional surfaces; keep data/status/timeline/print and one-screen layout intact",
     "Make editable fields visibly white/active; distinguish readonly and disabled without cyclic token mappings; retain validation/focus",
     "Extend the accepted Home item light/gradient/edge recipe to similar list/cards, functional icons and button roles without changing geometry or state semantics",
-    "Give fresh-food TPTS CTA an accessible distinct blue gradient with verified default/hover/pressed/disabled/focus states; retain dry-food warm contrast"
+    "Give fresh-food TPTS CTA an accessible distinct blue gradient with verified default/hover/pressed/disabled/focus states; retain dry-food warm contrast",
+    "Polish notification list spacing and group disclosure; unify non-shifting hover/press/focus feedback on existing functional cards and selectable rows using shared material roles"
   ],
   "outOfScope": [
     "Business/API/backend/auth/schema or date calculation changes",
@@ -22,8 +23,8 @@
     "Main merge/push, protected Pages or inferred Cloudflare publication",
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
-  "baseSha": "2730981",
-  "candidateSha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
+  "baseSha": "8665066d1360436d99b2b9deef28f0264ecc1316",
+  "candidateSha": null,
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -38,44 +39,32 @@
     "docs/delivery/fresh01-solid-compact/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
       "id": "single-interface-no-legacy-mode",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "shared-solid-material-and-sliding-structure",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "responsive-targets-focus-and-reflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "preserved-workflows-print-and-outputs",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "b929e292c289828152e4cc9f4d31b67d76f91cec",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner-integrated-visual-acceptance",
@@ -98,10 +87,17 @@
       "source": "Direct owner message on4364 KPH26/10/2026",
       "impact": "Accepts revision2 visual direction; expands effect consumers and changes TPTS CTA palette. Resets affected paint/contrast/state/browser gates; no merge/publication implied.",
       "decision": "One shared Home light ingredient and item/control material roles; default neutral/mint for business items, semantic states/white fields/print preserved. Choose distinct blue for TPTS. Same task/worktree, root sole writer, max two bounded reviews."
+    },
+    {
+      "revision": 4,
+      "request": "Ổn, tiếp tục tối ưu",
+      "source": "Direct owner message on4366 notifications27/10/2026",
+      "impact": "Accepts revision3 visual direction and authorizes a bounded next refinement. Recheck affected spacing/interaction/contrast/reflow gates; preserve business states and accepted blue/warm CTA.",
+      "decision": "Same worktree/root sole writer. Prioritize notification rows/disclosure, then shared interaction feedback on equivalent cards. One implementation and at most two review/repair rounds; no new features, merge or publication."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner views broader item/button lighting and warm/blue CTA states at4366. Technical347tests/browser gates pass; CSS growth435bytes gzip. Visual acceptance pending; stop further rollout/audit, no inferred merge/publication.",
+  "nextAction": "Implement revision4 notification rhythm and shared interaction feedback, then targeted Playwright at390/1440 plus narrow/large text and relevant technical gates.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
   "branch": "store-app/fresh01-solid-compact",
   "authorization": {
@@ -116,7 +112,7 @@
     "assessment": "docs/delivery/fresh01-solid-compact/assessment.md",
     "spec": "docs/product/STORE_APP_SOLID_COMPACT.md",
     "technical": "docs/delivery/fresh01-solid-compact/technical.md",
-    "priorTechnical": "docs/delivery/fresh01-solid-compact/revision2-technical.md"
+    "priorTechnical": "docs/delivery/fresh01-solid-compact/revision3-technical.md"
   },
   "sourceSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150",
   "initialDecision": {

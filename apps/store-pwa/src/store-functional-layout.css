@@ -53,11 +53,6 @@
 
   /* Light item adjustment, keeping text, tags, status hierarchy and 44px controls. */
   body:has(.store-app) .store-app .report-composer .date-report-card { padding-block: var(--store-space-3); }
-  body:has(.store-app) .store-app .store-notification-groups { gap: var(--store-space-5); }
-  body:has(.store-app) .store-app .store-notification-module { gap: var(--store-space-3); }
-  body:has(.store-app) .store-app .store-notification-sections { gap: var(--store-space-2); }
-  body:has(.store-app) .store-app .store-notification-section > summary { min-height: var(--store-size-row-two); padding-block: var(--store-space-2); }
-  body:has(.store-app) .store-app .store-notification-item { min-height: 92px; padding-block: calc(var(--store-space-1) * 2.5); }
   body:has(.store-app) .store-app .store-home-features { padding-top: var(--store-space-3); }
   body:has(.store-app) .store-app .store-home-section-heading { margin-bottom: var(--store-space-2); }
   body:has(.store-app) .store-app .store-home-attention { margin-top: var(--store-space-3); }
