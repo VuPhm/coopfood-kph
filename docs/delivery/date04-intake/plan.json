@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "date04-intake",
   "revision": 2,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Implement mock DATE lot intake, exact identity, shared tracking/notification/report integration and recoverable validated entry.",
   "inScope": [
     "FOUND/NOT_FOUND/unavailable lookup and explicit manual identity",
@@ -15,7 +15,7 @@
     "Online DATE API/persistence/security policy, merge/push/deploy"
   ],
   "baseSha": "a286a6c8b5597cf0b3586b13312c5d1961e43c96",
-  "candidateSha": "",
+  "candidateSha": "7a73658fbdc5821853876906b95b2d6eedeffc41",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -30,7 +30,10 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 2,
+      "sha": "7a73658fbdc5821853876906b95b2d6eedeffc41",
+      "evidence": "docs/delivery/date04-intake/technical.md"
     },
     {
       "id": "owner-intake",
@@ -49,5 +52,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Commit tested revision2, record technical gate and show bottom-panel preview4390."
+  "nextAction": "Owner thử nút+ trong toolbar DATE và Tự nhập trong bottom panel tại4390; chờ nghiệm thu r2. Không merge/push/deploy."
 }

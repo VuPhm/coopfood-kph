@@ -68,3 +68,6 @@ Mock trong phiên; reload mất lô mới, chưa backend/API DATE hoặc camera/
 thiết bị thật. Test viewport ngắn/chữ lớn không thay real-device QA. Không thêm
 quantity, nhập Excel hoặc thay luật NSX/HSD. Bước nhỏ tiếp: mở nút+ trên DATE,
 chọn Tự nhập ngay trong bottom panel, nhập một lô và xem vị trí thao tác mới.
+
+Candidate revision2 `7a73658fbdc5821853876906b95b2d6eedeffc41`: commit nguyên trạng source đã build/test ở
+working tree trên; sau đó chỉ ghi receipt/plan trong cycle, runtime giữ nguyên.
