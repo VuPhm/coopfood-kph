@@ -1,5 +1,13 @@
 # Thông báo cửa hàng — nhóm DATE, 23/10/2026
 
+**NOTIF01 candidate28/10/2026:** presentation theo KPH/DATE mới: tên và %14px
+ở trên, SKU/phase/HSD gom dưới và tự wrap; mã lô giữ accessible/detail và target
+ID. HSD giúp phân biệt lô cùng SKU. Nhắc ngày giữ dòng riêng; header nhóm44px,
+hướng dẫn cùng dòng khi đủ chỗ. Native details, rules nguồn/count/order/empty
+không đổi. Route motion kế thừa MOTION01 accepted, không thêm stagger theo item.
+[Kiểm tra/preview](../delivery/notif01-compact-items/technical.md); owner pending.
+
+
 Theo owner: bỏ phần Đã xử lý của DATE vì đã là KPH; triển khai Thông báo theo
 nhóm, đầu tiên cho cảnh báo DATE và để thêm nguồn thông báo khác ở lượt sau.
 UI prototype Store Fresh; authority ngày theo [DATE](DATE_MILESTONE_MODEL.md).

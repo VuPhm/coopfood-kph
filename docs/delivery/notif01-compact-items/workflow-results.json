@@ -1,0 +1,35 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "groups": true,
+    "exactLot": true,
+    "remindSuppressAndDue": true,
+    "text150": true,
+    "noResolvedDateGroup": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "groups": true,
+    "exactLot": true,
+    "remindSuppressAndDue": true,
+    "text150": true,
+    "noResolvedDateGroup": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 844
+    },
+    "groups": true,
+    "exactLot": true,
+    "remindSuppressAndDue": true,
+    "text150": true,
+    "noResolvedDateGroup": true
+  }
+]

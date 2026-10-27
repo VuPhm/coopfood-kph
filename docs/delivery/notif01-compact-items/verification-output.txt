@@ -1,0 +1,27 @@
+/tmp/notif01/unit.log
+
+> @coopfood-kph/store-pwa@0.0.0 test
+> vitest run src/store-notifications.test.tsx src/store-notifications-model.test.ts src/store-date-workflow.test.tsx --maxWorkers=2
+
+
+ RUN  v4.1.10 /Users/vup/.codex/worktrees/notif01-compact-items/coopfood-kph/apps/store-pwa
+
+
+ Test Files  3 passed (3)
+      Tests  10 passed (10)
+   Start at  01:50:28
+   Duration  5.19s (transform 702ms, setup 844ms, import 1.24s, tests 2.93s, environment 2.81s)
+
+
+
+/tmp/notif01/workflow.log
+PASS notifications 390: groups/collapse, exact DATE target, reminder/suppression/deduplication, DATE food tabs/no completed group, contrast/text150
+PASS notifications 1440: groups/collapse, exact DATE target, reminder/suppression/deduplication, DATE food tabs/no completed group, contrast/text150
+PASS notifications 320: groups/collapse, exact DATE target, reminder/suppression/deduplication, DATE food tabs/no completed group, contrast/text150
+
+
+/tmp/notif01/layout.log
+PASS compact notifications 390: geometry, hit targets, text200/long name, stable feedback, native group, bounded/reduced motion
+PASS compact notifications 1440: geometry, hit targets, text200/long name, stable feedback, native group, bounded/reduced motion
+PASS compact notifications 320: geometry, hit targets, text200/long name, stable feedback, native group, bounded/reduced motion
+PASS compact notifications 844: geometry, hit targets, text200/long name, stable feedback, native group, bounded/reduced motion

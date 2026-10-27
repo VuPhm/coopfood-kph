@@ -22,7 +22,7 @@ export function StoreNotifications({ navigate, lots, today, onOpenDateLot }: {
         <header className="store-notification-module-heading">
           <span className="store-notification-module-icon"><CalendarDays size={22} aria-hidden="true" /></span>
           <div><h2 id="notification-date-title">DATE</h2><p>Cảnh báo hạn dùng và lịch báo lại</p></div>
-          <span className="store-notification-total">{count}<span className="sr-only"> lô cần chú ý</span></span>
+          <span className="store-notification-total">{count} lô<span className="sr-only"> cần chú ý</span></span>
         </header>
         <div className="store-notification-sections">{groups.map(group => <details key={group.id} open className="store-notification-section" data-notification-group={group.id}>
           <summary><div><h3>{group.title}<span>{group.items.length}</span></h3><p>{group.description}</p></div><ChevronDown size={18} aria-hidden="true" /></summary>
@@ -30,10 +30,15 @@ export function StoreNotifications({ navigate, lots, today, onOpenDateLot }: {
             const percent = remainingShelfPercent(assessment);
             return <button key={lot.id} className="store-notification-item ui-list-marker-card" data-notification-lot={lot.id} onClick={() => onOpenDateLot(lot.id)}>
               <ListItemMarker variant="bar" tone={getDatePhaseTone(assessment.phase)} />
-              <span className="store-notification-item-copy"><strong>{lot.name}</strong><small>SKU {lot.sku} · Lô {lot.id}</small>
-                <span className="store-notification-item-state"><DateConditionLabel phase={assessment.phase} />{group.id === "reminder" ? <small>Đến lịch báo lại {formatDisplayDate(lot.remindOn!)}</small> : null}</span>
+              <span className="store-notification-item-copy"><strong>{lot.name}</strong>
+                <span className="store-notification-item-meta">
+                  <small><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {lot.id}</span></small>
+                  <DateConditionLabel phase={assessment.phase} />
+                  <small className="store-notification-expiry">HSD {formatDisplayDate(lot.date)}</small>
+                </span>
+                {group.id === "reminder" ? <small className="store-notification-reminder">Đến lịch báo lại {formatDisplayDate(lot.remindOn!)}</small> : null}
               </span>
-              <span className="store-notification-item-end">{percent !== null ? <span className="store-notification-percent" data-tone={getDatePhaseTone(assessment.phase)}><small>Còn </small><strong>{percent}%</strong><span className="sr-only"> HSD</span></span> : null}<ChevronRight size={18} aria-hidden="true" /></span>
+              <span className="store-notification-item-end">{percent !== null ? <span className="store-notification-percent" data-tone={getDatePhaseTone(assessment.phase)}><span className="sr-only">Còn </span><strong>{percent}%</strong><span className="sr-only"> HSD</span></span> : null}<ChevronRight size={18} aria-hidden="true" /></span>
             </button>;
           })}</div>
         </details>)}</div>

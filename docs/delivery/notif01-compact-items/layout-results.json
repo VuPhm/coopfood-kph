@@ -1,0 +1,222 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "arrival": {
+      "peak": 1,
+      "remaining": 0
+    },
+    "geometry": [
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 221,
+        "endY": 221,
+        "metaY": 245,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 291,
+        "endY": 291,
+        "metaY": 315,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": null,
+        "nameY": 361,
+        "endY": 361,
+        "metaY": 385,
+        "hsd": "HSD 12/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 431,
+        "endY": 431,
+        "metaY": 455,
+        "hsd": "HSD 18/10/2026",
+        "lotHidden": false
+      }
+    ],
+    "text200": true,
+    "stableFeedback": true,
+    "reducedMotion": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "arrival": {
+      "peak": 1,
+      "remaining": 0
+    },
+    "geometry": [
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 229,
+        "endY": 229,
+        "metaY": 253,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 299,
+        "endY": 299,
+        "metaY": 323,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": null,
+        "nameY": 369,
+        "endY": 369,
+        "metaY": 393,
+        "hsd": "HSD 12/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 439,
+        "endY": 439,
+        "metaY": 463,
+        "hsd": "HSD 18/10/2026",
+        "lotHidden": false
+      }
+    ],
+    "text200": true,
+    "stableFeedback": true,
+    "reducedMotion": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "arrival": {
+      "peak": 1,
+      "remaining": 0
+    },
+    "geometry": [
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 221,
+        "endY": 221,
+        "metaY": 245,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 291,
+        "endY": 291,
+        "metaY": 315,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": null,
+        "nameY": 361,
+        "endY": 361,
+        "metaY": 385,
+        "hsd": "HSD 12/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 431,
+        "endY": 431,
+        "metaY": 455,
+        "hsd": "HSD 18/10/2026",
+        "lotHidden": false
+      }
+    ],
+    "text200": true,
+    "stableFeedback": true,
+    "reducedMotion": true
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "arrival": {
+      "peak": 1,
+      "remaining": 0
+    },
+    "geometry": [
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 221,
+        "endY": 221,
+        "metaY": 245,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 291,
+        "endY": 291,
+        "metaY": 315,
+        "hsd": "HSD 07/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": null,
+        "nameY": 361,
+        "endY": 361,
+        "metaY": 385,
+        "hsd": "HSD 12/10/2026",
+        "lotHidden": false
+      },
+      {
+        "height": 62,
+        "nameSize": "14px",
+        "percentSize": "14px",
+        "nameY": 431,
+        "endY": 431,
+        "metaY": 455,
+        "hsd": "HSD 18/10/2026",
+        "lotHidden": false
+      }
+    ],
+    "text200": true,
+    "stableFeedback": true,
+    "reducedMotion": true
+  }
+]

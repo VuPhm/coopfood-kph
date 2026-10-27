@@ -1,14 +1,25 @@
 # Trạng thái hiện tại
 
-**MOTION01 — candidate28/10/2026:** owner yêu cầu thêm chuyển động xuất hiện/
+**NOTIF01 — candidate28/10/2026:** tiếp phần Thông báo sau khi owner chấp nhận
+MOTION01. Item hai hàng như KPH/DATE: tên/%14px, metadata SKU/phase/HSD tự wrap;
+mã lô accessible và exact target giữ. Nhắc lịch có dòng ngày riêng, summary
+nhóm gọn/min44, count plain. Mẫu390px92→62px; không thêm effect/listener/dependency.
+TypeScript/10tests/build và Playwright workflow390/1440/320, layout4viewport/
+text200/contrast đạt. Preview <http://127.0.0.1:4386/#notifications>;
+[files/checks/giới hạn](delivery/notif01-compact-items/technical.md).
+Nhánh/worktree riêng từc9dbbba, root sole writer; owner NOTIF01 pending, chưa
+merge/push/deploy. Bước tiếp owner xem nhóm/list và mở đúng lô tại4386.
+
+
+**MOTION01 — CLOSED28/10/2026:** owner yêu cầu thêm chuyển động xuất hiện/
 đổi Home và chức năng, ưu tiên hiệu năng. Nắp trắng vào16px/220ms, về Home
 −10px/280ms; hero fade nhẹ, header/nav/FAB đứng yên. Shared lazy clock tránh
 replay; ngắt khi tương tác, reduced-motion/print/hidden có fallback. Không thêm
 per-frame JS/dependency, fixed dock chỉ fade. Nhánh/worktree riêng từ2692c28,
 root sole writer; giữ header xanh sau COLOR01 revert. Preview mock
 <http://127.0.0.1:4384/#home>; [scope/checks/lab](delivery/motion01-page-transitions/technical.md).
-Owner motion pending; chưa merge/push/deploy. Bước tiếp owner xem Home→KPH→DATE→
-Báo cáo→Home, thử cuộn/focus ngay lúc vừa vào.
+Owner28/10: “giao diện ổn, tiếp tục phần thông báo”; accepted17bf18d, cycle CLOSED.
+Chưa merge/push/deploy. Bước tiếp NOTIF01 bên trên.
 
 
 **COLOR01 — REJECTED/REVERTED28/10/2026:** owner “xấu, trả lại”. Đã revert

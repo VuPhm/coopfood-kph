@@ -11,6 +11,7 @@ describe("Store notifications", () => {
     expect(within(group).getByRole("heading", { name: /Hết HSD/ })).toBeInTheDocument();
     const item = within(group).getByRole("button", { name: /Lô hết hạn/ });
     expect(item).toHaveTextContent("SKU 00001 · Lô LOT-01");expect(item).toHaveTextContent("Còn 0% HSD");
+    expect(item).toHaveTextContent("HSD 10/10/2026");
     fireEvent.click(item);expect(open).toHaveBeenCalledWith("LOT-01");
   });
   it("shows the empty state only when no actionable group remains", () => {
