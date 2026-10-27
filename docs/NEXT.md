@@ -1,5 +1,15 @@
 # Công việc kế tiếp
 
+**LIST01 tiếp DATE — candidate27/10/2026:** owner yêu cầu tiếp list DATE.
+Bỏ mã lô trực quan, SKU cùng nhãn như KPH; tên + %14px/chevron trên cùng,
+NSX/HSD đầy đủ gom một dòng. Item mẫu390px114→83px, desktop tên/SKU cột riêng.
+Giữ rule, ID/accessibility/exact lookup/detail và DATE→KPH; không sửa báo cáo.
+Cùng nhánh/worktree LIST01; technical22tests/typecheck/build và Playwright
+390/1440/320/900, chữ150–200% đạt. Preview <http://127.0.0.1:4374/#date>.
+[Files/checks/giới hạn](delivery/list01-kph-layout.md). Owner visual pending;
+chưa merge/push/deploy. Bước tiếp owner xem nhịp DATE ba hàng tại4374.
+
+
 **LIST01 — candidate KPH hai hàng,27/10/2026:** theo yêu cầu mới bỏ dòng
 metadata riêng: SL/đơn vị cạnh tên; SKU cùng tình trạng/biện pháp và duyệt ở dưới.
 Giữ Fresh Solid; Chờ duyệt có chữ, quyết định cuối icon/accessible description;

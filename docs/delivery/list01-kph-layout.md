@@ -65,3 +65,39 @@ Build có cảnh báo chunk Excel lớn đã có; không thêm dependency/assets
 
 Bước nhỏ tiếp: owner xem nhịp hai hàng và vị trí SKU/SL/duyệt tại4372,
 rồi quyết định tinh chỉnh KPH hay chuyển list tiếp theo.
+
+## Tiếp DATE —27/10/2026
+
+Owner tiếp cùng series list: bỏ lô trực quan, gom hai ngày NSX/HSD, giảm %
+và số hàng, tên/SKU đồng dạng KPH. Giữ task/worktree/writer/base như trên,
+checkpoint KPH trước phần này `b6719bd`; không suy nghiệm thu KPH từ “tiếp”.
+Preview mới chứa KPH + DATE: <http://127.0.0.1:4374/#date>.
+
+Mobile: hàng1 tên + %14px/chevron (trước24px + chữ Còn riêng); hàng2 SKU +
+hai nhãn; hàng3 NSX/HSD cùng dòng ở cỡ12/16. Không hiện tiền tố SKU hoặc mã
+lô trên mặt list; screen reader vẫn phân biệt chính xác lô. Hai ngày giữ đủ
+`dd/mm/yyyy`, không bỏ năm hoặc suy NSX khi thiếu. Chữ lớn/nội dung dài tự
+wrap, không khóa chiều cao. Item Cải thìa ở390px giảm114 →83px.
+
+Desktop tách Hàng hóa / SKU giống KPH; bỏ lô khỏi cột ngày, NSX/HSD một dòng
+khi đủ chỗ, %14px; row thường vẫn56px. Giữ chính xác ID, tìm theo lô, chọn
+đúng lô khi mở detail, màu/rule tính %, timeline, lịch nhắc và DATE→KPH.
+Chi tiết và báo cáo/print export không thuộc thay đổi này.
+
+Files thêm: `store-date-workspace.tsx`, `store-date-fresh.css` và binding
+padding DATE tại `store-record-items.css`; cập nhật hướng product
+`docs/product/DATE_MILESTONE_MODEL.md`. Không thêm asset/dependency/JS observer.
+
+Kiểm tra DATE:
+
+- `npm run check --workspace @coopfood-kph/store-pwa` — PASS.
+- `npm run test --workspace @coopfood-kph/store-pwa -- src/store-date-lookup.test.tsx src/store-date-workspace.test.tsx src/store-date-milestones.test.tsx src/store-date-workflow.test.tsx` — PASS22tests.
+- `VITE_STORE_APP_MOCK=true npm run build --workspace @coopfood-kph/store-pwa` — PASS117precache; warning Excel chunk lớn kế thừa.
+- `STORE_PREVIEW_URL=http://127.0.0.1:4374 STORE_DATE_PARITY_OUTPUT=/tmp/list01/date-production node e2e/scripts/check-date-kph-parity.cjs` — PASS390×844/1440×1024/320×844/900×650; types/unknown/exact barcode+lot/filter/detail+focus/150–200% text/no overflow. Dev4371 cũng PASS cùng gate trước chỉnh thứ tự DOM theo visual rows.
+- `npm run check:docs`, `git diff --check` — PASS.
+
+Evidence `/tmp/list01/date-before.png`, `date-after-390.png`,
+`date-after-1440.png`, `date-parity/` và `date-production/`.
+Technical PASS, owner visual pending; chưa merge/push/deploy. Giới hạn prototype
+memory-only và thiết bị thật giữ nguyên. Bước nhỏ tiếp: xem DATE4374, đặc biệt
+ba lô cùng SKU và nhãn trạng thái dài, trước quyết định list tiếp theo.

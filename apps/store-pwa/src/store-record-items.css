@@ -5,7 +5,7 @@
   .store-app :is(.store-kph-list, .store-date-lots, .store-date-table, .date-report-catalog, .store-notification-item) .ui-list-label[data-tone] {
     min-height: 20px; padding-block: 1px; font-size: 12px; line-height: 16px; gap: 4px;
   }
-  .store-app .store-date-lot { padding-block: 10px; }
+  .store-app .store-date-lot { padding-block: var(--store-space-2); }
   @media (min-width: 900px) {
     .store-app .store-kph-table .store-kph-record-row td { height: var(--store-size-row-two); padding-block: 6px; }
   }

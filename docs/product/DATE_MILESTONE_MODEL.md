@@ -1,5 +1,14 @@
 # DATE quản lý theo mốc Tra hạn — hướng triển khai 12/10/2026
 
+**LIST01 candidate27/10/2026:** owner yêu cầu tiếp list gọn. List mobile bỏ
+mã lô trực quan; tên + %14px/chevron, SKU + hai nhãn, NSX/HSD cùng một hàng.
+Ngày vẫn `dd/mm/yyyy`, thiếu NSX không suy dữ liệu; list tự wrap khi cần.
+Desktop tách SKU, bỏ lô khỏi cột ngày và giảm %14px. Mã lô vẫn dùng trong
+accessible name, tìm kiếm, exact-lot handler và chi tiết. Thay recipe list24px
+bên dưới trong candidate này; không đổi %/mốc/nghiệp vụ hoặc detail/report.
+[Scope và kiểm tra](../delivery/list01-kph-layout.md). Owner visual pending.
+
+
 Owner yêu cầu bỏ bar trong danh sách và chuyển DATE thành kết quả Tra hạn gắn
 thêm mã hàng, sản phẩm và lô để quản lý. Đây là hướng product cho prototype
 Store Fresh; không tự tạo contract API DATE hoặc đổi rule đã accepted.
