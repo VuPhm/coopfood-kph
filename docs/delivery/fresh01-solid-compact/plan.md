@@ -155,3 +155,9 @@ source699413a, preview4368. Technical PASS294Store tests/types/build, browser
 gates. One review plus focused repair,2/2. Owner acceptance pending; no further
 audit, merge/push/publication. See technical.md for actual commands and reused
 unaffected coverage.
+
+Revision5 accepted candidate `951e5861f7dea5ed74c7b230645a0912351d95f9`,
+main integration sourcead85c66, preview4370. All347tests/full verify and
+integrated browser gates pass; owner direct merge request supplies acceptance.
+UI cycle CLOSED. One authorized main push and read-only remote receipt remain
+the final delivery operation; no new visual scope or deployment.

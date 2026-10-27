@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
   "revision": 5,
-  "status": "EXECUTING",
+  "status": "CLOSED",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
@@ -25,7 +25,7 @@
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
   "baseSha": "268be705da737147f63dc3793b0c452a8684df9a",
-  "candidateSha": null,
+  "candidateSha": "951e5861f7dea5ed74c7b230645a0912351d95f9",
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -40,38 +40,55 @@
     "docs/delivery/fresh01-solid-compact/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "single-interface-no-legacy-mode",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "951e5861f7dea5ed74c7b230645a0912351d95f9",
+      "evidence": "docs/delivery/fresh01-solid-compact/integration-2026-10-27.md"
     },
     {
       "id": "shared-solid-material-and-sliding-structure",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "951e5861f7dea5ed74c7b230645a0912351d95f9",
+      "evidence": "docs/delivery/fresh01-solid-compact/integration-2026-10-27.md"
     },
     {
       "id": "responsive-targets-focus-and-reflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "951e5861f7dea5ed74c7b230645a0912351d95f9",
+      "evidence": "docs/delivery/fresh01-solid-compact/integration-2026-10-27.md"
     },
     {
       "id": "preserved-workflows-print-and-outputs",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "951e5861f7dea5ed74c7b230645a0912351d95f9",
+      "evidence": "docs/delivery/fresh01-solid-compact/integration-2026-10-27.md"
     },
     {
       "id": "owner-integrated-visual-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "951e5861f7dea5ed74c7b230645a0912351d95f9",
+      "evidence": "docs/delivery/fresh01-solid-compact/integration-2026-10-27.md",
+      "acceptedBy": "Owner, direct request in this chat27/10/2026",
+      "decisionRef": "docs/delivery/fresh01-solid-compact/integration-2026-10-27.md"
     }
   ],
   "changes": [
@@ -105,9 +122,9 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Consolidate reviewed neighboring UI branches, merge main, run full verify and integrated browser gates, then exactly one main push.",
-  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
-  "branch": "store-app/fresh01-solid-compact",
+  "nextAction": "UI integration CLOSED by direct owner merge request; execute exactly one authorized main push, verify remote SHA read-only and stop. No new UI cycle, hosting or other ref push.",
+  "worktree": "/Users/vup/Documents/coopfood-kph",
+  "branch": "main",
   "authorization": {
     "date": "2026-10-26",
     "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
@@ -121,7 +138,8 @@
     "assessment": "docs/delivery/fresh01-solid-compact/assessment.md",
     "spec": "docs/product/STORE_APP_SOLID_COMPACT.md",
     "technical": "docs/delivery/fresh01-solid-compact/technical.md",
-    "priorTechnical": "docs/delivery/fresh01-solid-compact/revision3-technical.md"
+    "priorTechnical": "docs/delivery/fresh01-solid-compact/revision3-technical.md",
+    "integration": "docs/delivery/fresh01-solid-compact/integration-2026-10-27.md"
   },
   "sourceSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150",
   "initialDecision": {
