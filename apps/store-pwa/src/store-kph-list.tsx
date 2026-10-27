@@ -62,38 +62,10 @@ function KphTagStrip({ record, screenLayout }: { record: RecordView; screenLayou
   </div>;
 }
 
-function KphTicketMeta({ record, identifier, groupByDate, screenLayout, approvalId }: {
-  record: RecordView; identifier: string; groupByDate: boolean; screenLayout: boolean; approvalId: string;
+function KphTicketMeta({ record, identifier, groupByDate }: {
+  record: RecordView; identifier: string; groupByDate: boolean;
 }) {
-  const quick = useRef<HTMLSpanElement>(null);
-  const [iconOnly, setIconOnly] = useState(false);
-  useLayoutEffect(() => {
-    const element = quick.current;
-    if (!element || !screenLayout || record.approvalStatus === "PENDING") { setIconOnly(false); return; }
-    const measure = () => {
-      if (!element.clientWidth) return;
-      const approval = element.querySelector<HTMLElement>(".store-ticket-approval");
-      const text = approval?.querySelector<HTMLElement>(".ui-list-label-text");
-      const icon = approval?.querySelector<HTMLElement>(".ui-list-label-icon");
-      if (!approval || !text || !icon) return;
-      const textWidth = (node: Element) => {
-        const range = document.createRange(); range.selectNodeContents(node);
-        return Array.from(range.getClientRects()).reduce((width, rect) => width + rect.width, 0);
-      };
-      const metadata = Array.from(element.children).filter(child => child !== approval);
-      const required = metadata.reduce((width, child) => width + (child.classList.contains("store-ticket-sku") ? textWidth(child) : child.getBoundingClientRect().width), 0)
-        + textWidth(text) + icon.getBoundingClientRect().width
-        + (parseFloat(getComputedStyle(element).columnGap) || 0) * metadata.length
-        + (parseFloat(getComputedStyle(element).getPropertyValue("--store-space-1")) || 0);
-      setIconOnly(required > element.clientWidth + 1);
-    };
-    measure();
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
-    observer?.observe(element);
-    for (const child of Array.from(element.children)) observer?.observe(child);
-    return () => observer?.disconnect();
-  }, [screenLayout, groupByDate, record, identifier]);
-  return <span ref={quick} className="store-ticket-quick"><span className="store-ticket-sku">{identifier}</span><span className="store-ticket-meta">{record.quantity}</span>{!groupByDate ? <span className="store-ticket-date"><CalendarDays size={13} aria-hidden="true" /><span className="sr-only">Ngày phát hiện: </span>{record.detectedDate}</span> : null}{screenLayout ? <KphListLabel id={approvalId} kind="approval" value={approvalLabels[record.approvalStatus]} className={`store-ticket-approval${iconOnly ? " is-icon-only" : ""}`} /> : null}</span>;
+  return <span className="store-ticket-quick"><span className="store-ticket-sku">{identifier}</span><span className="store-ticket-meta">{record.quantity}</span>{!groupByDate ? <span className="store-ticket-date"><CalendarDays size={13} aria-hidden="true" /><span className="sr-only">Ngày phát hiện: </span>{record.detectedDate}</span> : null}</span>;
 }
 
 export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true, selectionMode = false, selection = [], setSelection = () => {}, collapsedDates = [], onToggleDate = () => {}, setActive = () => {}, loading = false }: {
@@ -158,11 +130,17 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     return <section className="store-kph-day" key={group.records[0]!.id} aria-label={groupByDate ? `Ngày phát hiện ${group.date}` : undefined}>
     {groupByDate ? heading(group.date, contentId, expanded) : null}<div className="store-kph-day-items" id={contentId} hidden={!expanded}>{expanded ? group.records.map(record => <div key={record.id} className="store-ticket" data-record-id={record.id}>
       {marker(record)}{selectionMode ? selector(record, "store-ticket-selector") : null}
-      <div className="store-ticket-body"><button className="store-ticket-open" aria-label={`Mở phiếu ${record.productName}`} aria-describedby={screenLayout ? `${listId}-${record.id}-approval` : undefined} disabled={loading} onClick={() => setActive(record)}>
+      <div className={`store-ticket-body${screenLayout ? " store-ticket-screen" : ""}`}><button className="store-ticket-open" aria-label={`Mở phiếu ${record.productName}`} aria-describedby={screenLayout ? `${listId}-${record.id}-quantity ${listId}-${record.id}-facts ${listId}-${record.id}-approval` : undefined} disabled={loading} onClick={() => setActive(record)}>
         <strong title={record.productName}><span>{record.productName}</span></strong>
-        <KphTicketMeta record={record} identifier={identifier(record)} groupByDate={groupByDate} screenLayout={screenLayout} approvalId={`${listId}-${record.id}-approval`} />
-        <img className="store-ticket-chevron" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" />
-      </button><KphTagStrip record={record} screenLayout={screenLayout} /></div>
+        {screenLayout ? <span className="store-ticket-trailing"><span className="store-ticket-meta" id={`${listId}-${record.id}-quantity`}><span className="sr-only">Số lượng: </span>{record.quantity}</span><img className="store-ticket-chevron" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></span> : <>
+          <KphTicketMeta record={record} identifier={identifier(record)} groupByDate={groupByDate} />
+          <img className="store-ticket-chevron" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" />
+        </>}
+      </button>{screenLayout ? <div className="store-ticket-foot">
+        <span className="store-ticket-identity" id={`${listId}-${record.id}-facts`}><span className="store-ticket-sku"><span className="sr-only">Mã hàng: </span>{identifier(record)}</span>{!groupByDate ? <span className="store-ticket-date"><CalendarDays size={13} aria-hidden="true" /><span className="sr-only">Ngày phát hiện: </span>{record.detectedDate}</span> : null}</span>
+        <KphTagStrip record={record} screenLayout />
+        <KphListLabel id={`${listId}-${record.id}-approval`} kind="approval" value={approvalLabels[record.approvalStatus]} className={`store-ticket-approval${record.approvalStatus !== "PENDING" ? " is-icon-only" : ""}`} />
+      </div> : <KphTagStrip record={record} screenLayout={false} />}</div>
     </div>) : null}</div>
   </section>;
   })}</div>}</div>;

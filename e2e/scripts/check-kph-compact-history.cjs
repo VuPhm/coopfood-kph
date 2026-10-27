@@ -162,7 +162,8 @@ mockRecords.splice(0, mockRecords.length, ...Array.from({ length: 54 }, (_, i) =
       }
       await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
       const box = await rows().first().boundingBox();
-      if (viewport.width === 390) { expect(box.height).toBeGreaterThanOrEqual(88); expect(box.height).toBeLessThanOrEqual(130); }
+      // Two-row mobile composition; the whole card remains at least 56px.
+      if (viewport.width === 390) { expect(box.height).toBeGreaterThanOrEqual(56); expect(box.height).toBeLessThanOrEqual(130); }
       if (desktop) {
         // One-screen table role: 56px rows and 20px passive labels.
         expect(box.height).toBeGreaterThanOrEqual(56);

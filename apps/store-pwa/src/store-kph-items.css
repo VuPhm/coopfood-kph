@@ -1,5 +1,6 @@
 /* Shared dense KPH screen hierarchy: condition and resolution keep their tag containers.
-   Approval stays with the identifier; only condition/resolution scroll on mobile.
+   Mobile uses a title/quantity row and a SKU/tags/approval row.
+   Only condition/resolution scroll; identifiers and decisions stay visible.
    Print retains the original three-label composition. */
 @media screen {
   .store-app .store-kph-list [data-label-kind="approval"] {
@@ -8,19 +9,47 @@
     padding-inline: 0;
     background: transparent;
   }
-  .store-app .store-ticket-open { gap: var(--store-space-1); }
-  .store-app .store-kph-list .store-ticket-body { gap: var(--store-space-1); padding-block: var(--store-space-2); }
-  .store-app .store-ticket-quick { column-gap: var(--store-space-3); }
-  .store-app .store-ticket-quick > .store-ticket-approval {
+  .store-app .store-ticket-screen .store-ticket-open {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) fit-content(42%);
+    align-items: start;
+    gap: var(--store-space-2);
+    min-height: 44px;
+    /* Reserve the footer inside the 44px opener; multi-line titles add height.
+       The scroll strip sits above this area and consumes its own gestures. */
+    padding-bottom: 24px;
+    margin-bottom: -24px;
+  }
+  .store-app .store-ticket-screen .store-ticket-open > strong { padding-right: 0; }
+  .store-app .store-ticket-trailing { display: inline-flex; align-items: center; gap: var(--store-space-2); min-height: 20px; }
+  .store-app .store-ticket-trailing .store-ticket-meta { white-space: normal; overflow-wrap: anywhere; }
+  .store-app .store-ticket-trailing .store-ticket-chevron { position: static; flex: 0 0 16px; }
+  .store-app .store-ticket-foot {
+    position: relative;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: var(--store-space-2);
+    min-width: 0;
+  }
+  .store-app .store-ticket-identity { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: 0 var(--store-space-2); min-width: 0; max-width: 40%; }
+  .store-app .store-ticket-identity .store-ticket-sku { line-height: 16px; }
+  .store-app .store-ticket-foot .store-ticket-tag-shell { flex: 1 1 0; pointer-events: auto; }
+  .store-app .store-ticket-foot > .store-ticket-approval {
     flex: 0 0 auto;
-    margin-left: auto;
-    min-height: 22px;
+    min-height: 20px;
     gap: var(--store-space-1);
-    padding-block: 2px;
     font-size: var(--store-type-caption);
     line-height: 16px;
     white-space: nowrap;
   }
+  .store-app .store-ticket-screen { container-type: inline-size; }
+  @container (max-width: 15em) {
+    .store-app .store-ticket-foot { flex-wrap: wrap; }
+    .store-app .store-ticket-identity { flex: 1 1 50%; max-width: none; }
+    .store-app .store-ticket-foot .store-ticket-tag-shell { flex-basis: 100%; order: 1; }
+  }
+  .store-app .store-kph-list .store-ticket-body { gap: var(--store-space-1); padding-block: var(--store-space-2); }
   .store-app .store-ticket-approval.is-icon-only { gap: 0; }
   .store-app .store-ticket-approval.is-icon-only .ui-list-label-text {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;

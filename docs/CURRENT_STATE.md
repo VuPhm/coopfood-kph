@@ -1,5 +1,16 @@
 # Trạng thái hiện tại
 
+**LIST01 — candidate KPH hai hàng,27/10/2026:** theo yêu cầu mới bỏ dòng
+metadata riêng: SL/đơn vị cạnh tên; SKU cùng tình trạng/biện pháp và duyệt ở dưới.
+Giữ Fresh Solid; Chờ duyệt có chữ, quyết định cuối icon/accessible description;
+container hẹp/chữ lớn tự nở, print/table và workflow giữ semantics.
+Nhánh `store-app/list01-kph-layout`, base04f7c4a, root sole writer/worktree riêng.
+Technical PASS25tests/typecheck/online+mock build, Playwright390/1440/320,
+chữ150–200%, grouping/selection/append/detail/focus/tag scroll/print.
+Preview <http://127.0.0.1:4372/#kph>; [files/checks/giới hạn](delivery/list01-kph-layout.md).
+Owner visual pending; chưa merge/push/deploy. Bước tiếp owner xem KPH candidate.
+
+
 **FRESH01 revision5 — CLOSED, tích hợp27/10/2026:** owner yêu cầu merge các
 nhánh lân cận và cho phép1lần push. Main local đã merge candidate4368 cùng
 lịch sử12nhánh UI; sourcead85c66, runtime khớp bản đã xem. Compact01–03,
