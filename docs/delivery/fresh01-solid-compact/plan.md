@@ -140,3 +140,10 @@ revision1 và phạm vi nghiệp vụ kế thừa, không là URL candidate hi�
 Revision3 candidateb929e29 (runtime342ca66): technical gates PASS, review1/2;
 owner visual acceptance pending. Next: compare item/button roles and the two
 CTA colors at4366. No outstanding implementation work in this scoped revision.
+
+Revision4 candidate `7e6cec1256bf2b48b21271081a8f743580d29adb`, production
+source699413a, preview4368. Technical PASS294Store tests/types/build, browser
+7routes×5viewports and targeted notification/card/text200/output/native-scroll
+gates. One review plus focused repair,2/2. Owner acceptance pending; no further
+audit, merge/push/publication. See technical.md for actual commands and reused
+unaffected coverage.

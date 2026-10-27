@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
   "revision": 4,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
@@ -24,7 +24,7 @@
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
   "baseSha": "8665066d1360436d99b2b9deef28f0264ecc1316",
-  "candidateSha": null,
+  "candidateSha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -39,32 +39,44 @@
     "docs/delivery/fresh01-solid-compact/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "single-interface-no-legacy-mode",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "shared-solid-material-and-sliding-structure",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "responsive-targets-focus-and-reflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "preserved-workflows-print-and-outputs",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
+      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
     },
     {
       "id": "owner-integrated-visual-acceptance",
@@ -97,7 +109,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Implement revision4 notification rhythm and shared interaction feedback, then targeted Playwright at390/1440 plus narrow/large text and relevant technical gates.",
+  "nextAction": "Owner reviews notification spacing/disclosure and shared card feedback at4368; technical294Store tests/types/build/browser gates pass, CSS+61bytes gzip. Stop broad audit; no inferred merge/publication.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
   "branch": "store-app/fresh01-solid-compact",
   "authorization": {
