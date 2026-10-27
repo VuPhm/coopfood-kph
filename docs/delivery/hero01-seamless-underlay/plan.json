@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "hero01-seamless-underlay",
   "revision": 1,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Present a continuous shared green underlay and white sliding cover without incidental scroll or layout jumps.",
   "inScope": [
     "Shared hero spacing/measure/seam and native focus reveal across seven Store routes",
@@ -14,7 +14,7 @@
     "New gestures, scroll animation engines, dependencies, merge/push/deploy"
   ],
   "baseSha": "82d7a5e9d82c77f55285ea2f684fbf5ac8916342",
-  "candidateSha": "",
+  "candidateSha": "565dde25979bc43966ec6df525e9d23158ccdd0b",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -29,7 +29,10 @@
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "565dde25979bc43966ec6df525e9d23158ccdd0b",
+      "evidence": "docs/delivery/hero01-seamless-underlay/technical.md"
     },
     {
       "id": "owner-visual",
@@ -40,5 +43,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Complete production geometry/loading check, record technical evidence; await owner visual acceptance at4380."
+  "nextAction": "Owner visual acceptance of the seamless green/white composition and scrolling at http://127.0.0.1:4380/#home; no merge/push/deploy authorized."
 }

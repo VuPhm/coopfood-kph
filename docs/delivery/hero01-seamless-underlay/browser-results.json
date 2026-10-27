@@ -1,0 +1,2492 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "route": "home",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 150,
+        "bottom": 150
+      },
+      "cap": {
+        "x": 0,
+        "y": 138,
+        "width": 390,
+        "height": 844,
+        "bottom": 982
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 138,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 122,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 106,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 74,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 42,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 10,
+        "heroY": 0
+      },
+      {
+        "scroll": 138,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "route": "kph",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 0,
+        "y": 180,
+        "width": 390,
+        "height": 2452,
+        "bottom": 2632
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 180,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 164,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 148,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 116,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 20,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "route": "date",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 140,
+        "bottom": 140
+      },
+      "cap": {
+        "x": 0,
+        "y": 128,
+        "width": 390,
+        "height": 844,
+        "bottom": 972
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 128,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 112,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 96,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 64,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 32,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "route": "reports",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 390,
+        "height": 844,
+        "bottom": 928
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "route": "notifications",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 390,
+        "height": 844,
+        "bottom": 928
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "route": "shelf",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 390,
+        "height": 1022,
+        "bottom": 1106
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": -12,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": -44,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -76,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "route": "login",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 196,
+        "bottom": 196
+      },
+      "cap": {
+        "x": 0,
+        "y": 184,
+        "width": 390,
+        "height": 844,
+        "bottom": 1028
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 184,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 168,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 152,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 120,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 88,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 56,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 24,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "route": "home",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 150,
+        "bottom": 150
+      },
+      "cap": {
+        "x": 248,
+        "y": 138,
+        "width": 1192,
+        "height": 1024,
+        "bottom": 1162
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 138,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 122,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 106,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 74,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 42,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 10,
+        "heroY": 0
+      },
+      {
+        "scroll": 138,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "route": "kph",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 248,
+        "y": 180,
+        "width": 1192,
+        "height": 1991,
+        "bottom": 2171
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 180,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 164,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 148,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 116,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 20,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "route": "date",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 140,
+        "bottom": 140
+      },
+      "cap": {
+        "x": 248,
+        "y": 128,
+        "width": 1192,
+        "height": 1024,
+        "bottom": 1152
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 128,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 112,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 96,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 64,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 32,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "route": "reports",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 248,
+        "y": 84,
+        "width": 1192,
+        "height": 1024,
+        "bottom": 1108
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "route": "notifications",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 248,
+        "y": 84,
+        "width": 1192,
+        "height": 1024,
+        "bottom": 1108
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "route": "shelf",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 248,
+        "y": 84,
+        "width": 1192,
+        "height": 1024,
+        "bottom": 1108
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "route": "login",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 1429,
+        "height": 168,
+        "bottom": 168
+      },
+      "cap": {
+        "x": 0,
+        "y": 156,
+        "width": 1429,
+        "height": 1024,
+        "bottom": 1180
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 1429,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 156,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 140,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 124,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 92,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 60,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 28,
+        "heroY": 0
+      },
+      {
+        "scroll": 156,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "route": "home",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 150,
+        "bottom": 150
+      },
+      "cap": {
+        "x": 0,
+        "y": 138,
+        "width": 320,
+        "height": 752,
+        "bottom": 890
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 138,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 122,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 106,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 74,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 42,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 10,
+        "heroY": 0
+      },
+      {
+        "scroll": 150,
+        "capY": -12,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "route": "kph",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 0,
+        "y": 180,
+        "width": 320,
+        "height": 2452,
+        "bottom": 2632
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 180,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 164,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 148,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 116,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 20,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "route": "date",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 0,
+        "y": 180,
+        "width": 320,
+        "height": 740,
+        "bottom": 920
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 180,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 164,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 148,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 116,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 20,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "route": "reports",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 320,
+        "height": 740,
+        "bottom": 824
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "route": "notifications",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 320,
+        "height": 776,
+        "bottom": 860
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": -12,
+        "heroY": 0
+      },
+      {
+        "scroll": 120,
+        "capY": -36,
+        "heroY": 0
+      },
+      {
+        "scroll": 120,
+        "capY": -36,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "route": "shelf",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 320,
+        "height": 1146,
+        "bottom": 1230
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": -12,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": -44,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -76,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "route": "login",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 196,
+        "bottom": 196
+      },
+      "cap": {
+        "x": 0,
+        "y": 184,
+        "width": 320,
+        "height": 740,
+        "bottom": 924
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 184,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 168,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 152,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 120,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 88,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 56,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 24,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 900,
+      "height": 650
+    },
+    "route": "home",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 150,
+        "bottom": 150
+      },
+      "cap": {
+        "x": 248,
+        "y": 138,
+        "width": 652,
+        "height": 664,
+        "bottom": 802
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 138,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 122,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 106,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 74,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 42,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 10,
+        "heroY": 0
+      },
+      {
+        "scroll": 152,
+        "capY": -14,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 900,
+      "height": 650
+    },
+    "route": "kph",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 248,
+        "y": 180,
+        "width": 652,
+        "height": 1991,
+        "bottom": 2171
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 180,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 164,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 148,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 116,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 20,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 900,
+      "height": 650
+    },
+    "route": "date",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 140,
+        "bottom": 140
+      },
+      "cap": {
+        "x": 248,
+        "y": 128,
+        "width": 652,
+        "height": 650,
+        "bottom": 778
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 128,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 112,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 96,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 64,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 32,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 900,
+      "height": 650
+    },
+    "route": "reports",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 248,
+        "y": 84,
+        "width": 652,
+        "height": 650,
+        "bottom": 734
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 900,
+      "height": 650
+    },
+    "route": "notifications",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 248,
+        "y": 84,
+        "width": 652,
+        "height": 656,
+        "bottom": 740
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 90,
+        "capY": -6,
+        "heroY": 0
+      },
+      {
+        "scroll": 90,
+        "capY": -6,
+        "heroY": 0
+      },
+      {
+        "scroll": 90,
+        "capY": -6,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 900,
+      "height": 650
+    },
+    "route": "shelf",
+    "geometry": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 248,
+        "y": 84,
+        "width": 652,
+        "height": 908,
+        "bottom": 992
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 652,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": -12,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": -44,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -76,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 900,
+      "height": 650
+    },
+    "route": "login",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 900,
+        "height": 168,
+        "bottom": 168
+      },
+      "cap": {
+        "x": 0,
+        "y": 156,
+        "width": 900,
+        "height": 650,
+        "bottom": 806
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 900,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 156,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 140,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 124,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 92,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 60,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 28,
+        "heroY": 0
+      },
+      {
+        "scroll": 156,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "route": "home",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 150,
+        "bottom": 150
+      },
+      "cap": {
+        "x": 0,
+        "y": 138,
+        "width": 844,
+        "height": 732,
+        "bottom": 870
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 138,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 122,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 106,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 74,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 42,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 10,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -22,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "route": "kph",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 0,
+        "y": 180,
+        "width": 844,
+        "height": 2452,
+        "bottom": 2632
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 180,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 164,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 148,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 116,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": 20,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "route": "date",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 140,
+        "bottom": 140
+      },
+      "cap": {
+        "x": 0,
+        "y": 128,
+        "width": 844,
+        "height": 467,
+        "bottom": 595
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 128,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 112,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 96,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 64,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 32,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -32,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "route": "reports",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 844,
+        "height": 390,
+        "bottom": 474
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      },
+      {
+        "scroll": 84,
+        "capY": 0,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "route": "notifications",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 844,
+        "height": 732,
+        "bottom": 816
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": -12,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": -44,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -76,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "route": "shelf",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 96,
+        "bottom": 96
+      },
+      "cap": {
+        "x": 0,
+        "y": 84,
+        "width": 844,
+        "height": 992,
+        "bottom": 1076
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 84,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 68,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 52,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 20,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": -12,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": -44,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -76,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "route": "login",
+    "geometry": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 168,
+        "bottom": 168
+      },
+      "cap": {
+        "x": 0,
+        "y": 156,
+        "width": 844,
+        "height": 613.5,
+        "bottom": 769.5
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "nativeTrace": [
+      {
+        "scroll": 0,
+        "capY": 156,
+        "heroY": 0
+      },
+      {
+        "scroll": 16,
+        "capY": 140,
+        "heroY": 0
+      },
+      {
+        "scroll": 32,
+        "capY": 124,
+        "heroY": 0
+      },
+      {
+        "scroll": 64,
+        "capY": 92,
+        "heroY": 0
+      },
+      {
+        "scroll": 96,
+        "capY": 60,
+        "heroY": 0
+      },
+      {
+        "scroll": 128,
+        "capY": 28,
+        "heroY": 0
+      },
+      {
+        "scroll": 160,
+        "capY": -4,
+        "heroY": 0
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "loadingParity": true,
+    "loading": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 0,
+        "y": 180,
+        "width": 390,
+        "height": 2452,
+        "bottom": 2632
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "ready": {
+      "hero": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 0,
+        "y": 180,
+        "width": 390,
+        "height": 2452,
+        "bottom": 2632
+      },
+      "bar": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    }
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "loadingParity": true,
+    "loading": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 248,
+        "y": 180,
+        "width": 1192,
+        "height": 1991,
+        "bottom": 2171
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    },
+    "ready": {
+      "hero": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 192,
+        "bottom": 192
+      },
+      "cap": {
+        "x": 248,
+        "y": 180,
+        "width": 1192,
+        "height": 1991,
+        "bottom": 2171
+      },
+      "bar": {
+        "x": 248,
+        "y": 0,
+        "width": 1192,
+        "height": 72,
+        "bottom": 72
+      },
+      "scroll": 0
+    }
+  }
+]
