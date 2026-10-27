@@ -1,0 +1,26 @@
+[
+  {
+    "url": "http://127.0.0.1:4380",
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "cpuThrottle": 1,
+    "frameP95Ms": 16.800000000000182,
+    "firstFrameP95Ms": 16.500000002980414,
+    "maxFrameMs": 33.29999999999973,
+    "frames": 221
+  },
+  {
+    "url": "http://127.0.0.1:4384",
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "cpuThrottle": 1,
+    "frameP95Ms": 16.800000000000182,
+    "firstFrameP95Ms": 16.300000000000182,
+    "maxFrameMs": 33.40000000000009,
+    "frames": 216
+  }
+]

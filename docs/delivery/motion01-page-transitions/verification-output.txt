@@ -1,0 +1,47 @@
+/tmp/motion01-optimized.log
+PASS motion 390: routes, interruption, reduced motion, rapid nav, fixed dock, no replay
+PASS motion 1440: routes, interruption, reduced motion, rapid nav, fixed dock, no replay
+PASS CPU4x 390: baseline/candidate p95 frame 16.7/16.8ms; median/max task 216/190, 224/236ms; CLS 0.00017672443830885916; heap delta 452588
+PASS CPU4x 1440: baseline/candidate p95 frame 16.7/16.8ms; median/max task 166/148, 193/201ms; CLS 0; heap delta 506008
+
+
+/tmp/motion01-optimized-underlay.log
+PASS underlay 390: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 1440: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 320: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 900: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 844: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS loading parity 390: hero/cover delta0
+PASS loading parity 1440: hero/cover delta0
+
+
+/tmp/motion01-page-kit.log
+PASS page kit 390x844: seven routes, identical bar/green/surface, anchors, scroll/focus, report and login
+PASS page kit 1440x1024: seven routes, identical bar/green/surface, anchors, scroll/focus, report and login
+PASS page kit 1920x1080: seven routes, identical bar/green/surface, anchors, scroll/focus, report and login
+PASS page kit 2560x1440: seven routes, identical bar/green/surface, anchors, scroll/focus, report and login
+PASS page kit 320x740: seven routes, identical bar/green/surface, anchors, scroll/focus, report and login
+PASS page kit 768x1024: seven routes, identical bar/green/surface, anchors, scroll/focus, report and login
+PASS page kit 844x390: seven routes, identical bar/green/surface, anchors, scroll/focus, report and login
+
+
+/tmp/motion01-reports.log
+PASS report management 390×844
+PASS report management 1440×1024
+PASS report management 320×844
+
+
+/tmp/motion01-repair-tests.log
+
+> @coopfood-kph/store-pwa@0.0.0 test
+> vitest run src/store-shelf-life.test.tsx src/store-app-frame.test.tsx src/store-screen-layout.test.tsx --maxWorkers=2
+
+
+ RUN  v4.1.10 /Users/vup/.codex/worktrees/motion01-page-transitions/coopfood-kph/apps/store-pwa
+
+
+ Test Files  3 passed (3)
+      Tests  35 passed (35)
+   Start at  01:35:07
+   Duration  5.13s (transform 689ms, setup 861ms, import 1.50s, tests 3.66s, environment 2.53s)
+

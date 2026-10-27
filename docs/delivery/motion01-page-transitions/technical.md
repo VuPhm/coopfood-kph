@@ -7,7 +7,7 @@ kiểm vì đây là local UI slice. Giữ bản xanh sau COLOR01 rejected/rever
 không suy quyền merge/push/deploy hoặc nghiệm thu từ các vòng trước.
 
 Preview mock/synthetic <http://127.0.0.1:4384/#home>, dev4383.
-Technical evidence đang hoàn thiện; owner motion pending.
+Candidate `17bf18d1603f43edcdcf86761797d7a70f0726fe`, revision1 — technical PASS; owner motion pending.
 
 ## Recipe và file
 
@@ -50,7 +50,7 @@ không suy đây là FPS trên thiết bị thật. Không thêm layer thường
 - `STORE_PREVIEW_URL=http://127.0.0.1:4384 node e2e/scripts/check-store-page-kit.cjs`
   — PASS7routes×7viewports, gồm390×844/1440×1024; geometry/anchors/focus/scroll/
   login/report. Reduced-motion là một phần gate này.
-- `STORE_PREVIEW_URL=http://127.0.0.1:4384 STORE_UNDERLAY_OUTPUT=/tmp/motion01/underlay
+- `STORE_PREVIEW_URL=http://127.0.0.1:4384 STORE_UNDERLAY_OUTPUT=/tmp/motion01/optimized-underlay
   STORE_UNDERLAY_LOADING=true node e2e/scripts/check-store-underlay.cjs` — PASS
   7routes×5viewports390/1440/320/900/844landscape; native scroll trace, minimum
   focus reveal, modal anchor, report history/document/print DOM, text200, DATE
@@ -58,6 +58,30 @@ không suy đây là FPS trên thiết bị thật. Không thêm layer thường
 - `STORE_PREVIEW_URL=http://127.0.0.1:4384 STORE_REPORT_OUTPUT=/tmp/motion01/reports
   node e2e/scripts/check-report-management.cjs` — PASS390/1440/320; create/name,
   history/reuse/template/filter/selection/focus. Gate không tải Excel/render PDF.
+
+- Candidate gate: `STORE_PREVIEW_URL=http://127.0.0.1:4384
+  STORE_MOTION_OUTPUT=/tmp/motion01/optimized node e2e/scripts/check-store-motion.cjs`
+  — PASS390/1440: effect budget/properties, header/nav anchors, finish cleanup,
+  wheel/touch/focus/scroll/beforeprint interruption, runtime reduced-motion,
+  rapid routes, composer mounted during arrival keeps fixed dock untransformed,
+  account no-replay, WAAPI fallback, lazy slow/fast clock, delayed icon decode.
+  Final underlay rerun on this candidate — PASS7routes×5viewports + loading parity.
+- `npm run check:docs`, `git diff --check` — PASS.
+
+Full294Store tests và page-kit/report-management chạy trước reserve icon trên
+cùng motion implementation; targeted35tests và final cold-icon/underlay gate
+xác nhận phần đổi sau đó. Unit suite chạy trước tối ưu bỏ opacity của cover; không đổi JSX/workflow.
+Final browser gate kiểm lại keyframes/interaction/performance trên candidate mới.
+Gate fast-load nhận đúng trường hợp decode vượt220ms:
+phải skip replay. Nếu kịp trong cửa sổ, gate vẫn kiểm offset tiếp tục clock.
+Một lượt trước trên cùng clock implementation đã bắt resumed offset79.9→209ms sau129ms;
+không suy fast branch luôn xảy ra trên mọi host.
+
+Log [verification-output.txt](verification-output.txt), số đo
+[browser-results.json](browser-results.json), hình học
+[underlay-results.json](underlay-results.json). Screenshot local
+`/tmp/motion01/optimized/`, `/tmp/motion01/optimized-underlay/`; đã xem DATE mid/end,
+report dock390 và Home/KPH qua page kit. Không commit ảnh vận hành thật.
 
 ## Số đo và giới hạn
 
@@ -75,6 +99,18 @@ CLS không tăng so baseline; không claim toàn app CLS0 vì nhãn nav đổi t
 để kết luận. Gate cuối chạy riêng, bốn vòng40route, xét p95 frame/median long task
 và vẫn ghi max/heap/DOM; giữ ngưỡng max task500ms, không che outlier.
 
+
+| Viewport | p95 frame cũ/mới | Median long task cũ/mới | Max long task cũ/mới | CLS cũ/mới | Heap delta mới |
+|---|---|---|---|---|---|
+| 390×844 | 16.7/16.8ms | 216/190ms | 224/236ms | 0.0017691/0.0001767 | 452588bytes |
+| 1440×1024 | 16.7/16.8ms | 166/148ms | 193/201ms | 0.0000702/0.0000000 | 506008bytes |
+
+40route/mỗi bản/mỗi viewport, CPU4x, cache warm. DOM trở lại cùng số node mỗi
+vòng; sau40route không còn arrival marker/effect, heap delta sau forced GC<2MB.
+Tổng JS gzip khoảng+1KB, CSS gzip+83byte so HERO01 build local; không dependency mới.
+
 Owner thử Home→KPH→DATE→Báo cáo→Home, đổi nhanh, cuộn/focus ngay khi vừa vào.
 Kỳ vọng nhịp nhẹ, dùng được ngay, toolbar/FAB đứng yên. Chờ quyết định thật;
 không tự đóng cycle. Bước tiếp nhỏ: owner xem cảm giác chuyển màn trên4384.
+
+Bổ sung CPU1 desktop: `node /tmp/motion01/normal-lab.cjs` (source lưu trong [normal-lab-source.txt](normal-lab-source.txt)), Chromium headless cùng host, warm cache, 10route/mỗi bản. [Số đo](normal-performance.json); p95 baseline/candidate16.8/16.8ms, first frame16.5/16.3ms.
