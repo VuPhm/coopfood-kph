@@ -1,5 +1,16 @@
 # Công việc kế tiếp
 
+**DATE04 — chuẩn bị28/10/2026:** owner yêu cầu chuẩn bị nhập sản phẩm/lô mới
+vào theo dõi DATE. Đã rà hiện trạng và soạn [đề xuất luồng/trường/rules/slice](product/DATE_INTAKE_PROPOSAL.md):
+quét/nhập mã → xác nhận sản phẩm → nhập lô/NSX/HSD → xem mốc → thêm vào nguồn
+DATE chung. Đề xuất V1 từng lô, giữ kiểu form mới; ghi rõ nhánh thiếu NSX,
+quantity, duplicate và policy online chưa chốt. Đây là docs preparation, chưa
+có nút/form lưu mới, không API/schema/persistence mới. Nhánh/worktree riêng từ
+c4c7da2, root sole writer; [phạm vi/kiểm tra](delivery/date04-intake-prep/technical.md).
+NOTIF01 vẫn pending owner; MOTION01 CLOSED. Bước tiếp chốt lựa chọn V1 rồi dựng
+form mock; không cần chờ backend để làm UI. Chưa merge/push/deploy.
+
+
 **NOTIF01 — candidate28/10/2026:** tiếp phần Thông báo sau khi owner chấp nhận
 MOTION01. Item hai hàng như KPH/DATE: tên/%14px, metadata SKU/phase/HSD tự wrap;
 mã lô accessible và exact target giữ. Nhắc lịch có dòng ngày riêng, summary

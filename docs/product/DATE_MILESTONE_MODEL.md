@@ -1,5 +1,11 @@
 # DATE quản lý theo mốc Tra hạn — hướng triển khai 12/10/2026
 
+**DATE04 preparation28/10/2026:** owner yêu cầu chuẩn bị nhập sản phẩm/lô mới
+vào theo dõi. [Đề xuất nhập DATE](DATE_INTAKE_PROPOSAL.md) ghi luồng form,
+trường dữ liệu, nhận dạng/trùng/retry và các quyết định còn mở. Chưa bật tạo lô,
+chưa đổi model/API/nghiệp vụ accepted; các mô tả prototype hiện tại vẫn có hiệu lực.
+
+
 **LIST01 candidate27/10/2026:** owner yêu cầu tiếp list gọn. List mobile bỏ
 mã lô trực quan; tên + %14px/chevron, SKU + hai nhãn, NSX/HSD cùng một hàng.
 Ngày vẫn `dd/mm/yyyy`, thiếu NSX không suy dữ liệu; list tự wrap khi cần.
