@@ -80,7 +80,7 @@ export data. Không dependency/asset/root config/packages/ui mới.
    Chặn chunk KPH ở390/1440: loading→ready hero/cap delta0.
 8. `npm run check:docs`, `git diff --check` — PASS.
 
-Log production lưu tại [production.log](production.log); metrics native trace
+Log production lưu tại [production-output.txt](production-output.txt); metrics native trace
 và geometry tại [browser-results.json](browser-results.json). Screenshot local
 `/tmp/hero01/final/`, page kit `.local/store-page-kit/`, report workflow tại
 `/tmp/hero01/report-management/`. Đã xem Home/KPH/DATE/history/document/200%.

@@ -1,0 +1,7 @@
+PASS underlay 390: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 1440: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 320: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 900: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS underlay 844: seven routes, native scroll trace, minimum focus reveal, modal anchor, subreport hierarchy/print, text200/reduced motion
+PASS loading parity 390: hero/cover delta0
+PASS loading parity 1440: hero/cover delta0
