@@ -66,3 +66,6 @@ và workflow liên quan, không chạy lại toàn bộ backend/root suite khôn
 
 Technical PASS, owner visual pending. Bước nhỏ tiếp: xem list Thông báo ở4386,
 thu/mở nhóm và mở một lô để kiểm độ dễ quét/đối chiếu HSD.
+
+Candidate source `942b31c95bfb78b78519bf45490da51cbbd70aab`. Các kiểm tra trên chạy với working tree runtime
+được commit nguyên trạng tại SHA này; sau đó chỉ ghi receipt, không đổi runtime.
