@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "fresh01-solid-compact",
-  "revision": 4,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 5,
+  "status": "EXECUTING",
   "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
   "inScope": [
     "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
@@ -15,16 +15,17 @@
     "Make editable fields visibly white/active; distinguish readonly and disabled without cyclic token mappings; retain validation/focus",
     "Extend the accepted Home item light/gradient/edge recipe to similar list/cards, functional icons and button roles without changing geometry or state semantics",
     "Give fresh-food TPTS CTA an accessible distinct blue gradient with verified default/hover/pressed/disabled/focus states; retain dry-food warm contrast",
-    "Polish notification list spacing and group disclosure; unify non-shifting hover/press/focus feedback on existing functional cards and selectable rows using shared material roles"
+    "Polish notification list spacing and group disclosure; unify non-shifting hover/press/focus feedback on existing functional cards and selectable rows using shared material roles",
+    "Consolidate neighboring UI branch histories, merge the accepted current Store candidate into local main, verify integrated source and perform exactly one explicit origin main push"
   ],
   "outOfScope": [
     "Business/API/backend/auth/schema or date calculation changes",
     "Online/Pilot/Admin and shared UI defaults, dependencies/root config/lockfile",
-    "Main merge/push, protected Pages or inferred Cloudflare publication",
+    "Protected Pages, tags, Cloudflare deployment and unrelated backend/Pilot branches",
     "A new shell, extra theme option, invented domain abstraction or unrelated feature"
   ],
-  "baseSha": "8665066d1360436d99b2b9deef28f0264ecc1316",
-  "candidateSha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
+  "baseSha": "268be705da737147f63dc3793b0c452a8684df9a",
+  "candidateSha": null,
   "integrationOwner": "Root sole writer; no subagent dispatch.",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -39,44 +40,32 @@
     "docs/delivery/fresh01-solid-compact/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
       "id": "single-interface-no-legacy-mode",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "shared-solid-material-and-sliding-structure",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "responsive-targets-focus-and-reflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "preserved-workflows-print-and-outputs",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "7e6cec1256bf2b48b21271081a8f743580d29adb",
-      "evidence": "docs/delivery/fresh01-solid-compact/technical.md"
+      "status": "pending"
     },
     {
       "id": "owner-integrated-visual-acceptance",
@@ -106,10 +95,17 @@
       "source": "Direct owner message on4366 notifications27/10/2026",
       "impact": "Accepts revision3 visual direction and authorizes a bounded next refinement. Recheck affected spacing/interaction/contrast/reflow gates; preserve business states and accepted blue/warm CTA.",
       "decision": "Same worktree/root sole writer. Prioritize notification rows/disclosure, then shared interaction feedback on equivalent cards. One implementation and at most two review/repair rounds; no new features, merge or publication."
+    },
+    {
+      "revision": 5,
+      "request": "Merge các nhánh lân cận, cho phép1lần push",
+      "source": "Direct owner message after4368 DATE preview27/10/2026",
+      "impact": "Explicitly accepts integration of the current UI direction and authorizes main merge plus a single push. No new visual work or Cloudflare/Pages release.",
+      "decision": "Consolidate Compact/form/header and neighboring UI history. Preserve current code for patch-equivalent or superseded branches and closed acceptance records. Merge missing documentation normally. Verify main then push only main once; no automatic retry."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner reviews notification spacing/disclosure and shared card feedback at4368; technical294Store tests/types/build/browser gates pass, CSS+61bytes gzip. Stop broad audit; no inferred merge/publication.",
+  "nextAction": "Consolidate reviewed neighboring UI branches, merge main, run full verify and integrated browser gates, then exactly one main push.",
   "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
   "branch": "store-app/fresh01-solid-compact",
   "authorization": {
@@ -117,7 +113,8 @@
     "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
     "request": "Remove Compact switch and old UI; rebuild from scratch with a plan, stronger solid accents/60-30-10, soft edges/elevation, more gaps/smaller elements and a unified sliding structure; begin.",
     "scope": "Local planning and implementation of requested Store visual rebuild; no inferred acceptance/merge/publication.",
-    "executionConfirmation": "Direct owner message: làm, after reviewing this plan in the same chat."
+    "executionConfirmation": "Direct owner message: làm, after reviewing this plan in the same chat.",
+    "integrationConfirmation": "Direct owner27/10/2026: merge các nhánh lân cận, cho phép1lần push. Exactly one explicit main push; no force/tags/other refs."
   },
   "documents": {
     "plan": "docs/delivery/fresh01-solid-compact/plan.md",

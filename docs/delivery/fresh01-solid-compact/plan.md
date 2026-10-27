@@ -1,3 +1,11 @@
+## Revision5 — tích hợp và một lần push,27/10/2026
+
+Owner cho phép merge các nhánh lân cận và1lần push. Không mở thêm UI scope.
+Gom lịch sử nhánh UI đã kiểm, giữ bản mới cho patch tương đương/superseded và
+record đã CLOSED; nhận docs còn thiếu. Merge main, kiểm npm run verify/build
+và Playwright trên bản tích hợp, rồi push duy nhất main một lần, không retry
+tự động. Không Cloudflare/Pages/tag hoặc nhánh backend/Pilot khác.
+
 ## Revision4 — nhịp list và phản hồi tương tác,27/10/2026
 
 Owner “ổn, tiếp tục tối ưu” khi xem4366 Thông báo. Giữ hướng revision3; ưu tiên
