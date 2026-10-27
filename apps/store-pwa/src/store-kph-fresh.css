@@ -1,9 +1,9 @@
 /* Co.op Fresh v1. Loaded with the frame so lazy KPH and its skeleton share geometry. */
 .store-kph { color: var(--store-ink); }
 .store-kph h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 650; }
-.store-create-actions { margin-bottom: 24px; }
+.store-create-actions { margin: 0; }
 .store-create-actions h2 { display: none; }
-.store-create-actions .store-two-col { gap: 12px; }
+.store-create-actions .store-two-col { gap: 8px; }
 .store-create-actions .store-create-cta { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 44px; border: 1px solid rgb(255 255 255 / 26%); border-radius: 12px; padding: 8px 12px; text-align: left; cursor: pointer; }
 .store-create-cta.create-tpcn { --store-create-gradient: var(--store-control-light), linear-gradient(155deg, var(--store-create-top, var(--store-create-surface)), var(--store-create-pressed)); --store-create-accent: #fff; --store-create-ink: #fff; --store-create-surface: #b34705; --store-create-hover: #9f3d04; --store-create-pressed: #873304; }
 .store-create-cta.create-tpts { --store-create-gradient: var(--store-control-light), linear-gradient(155deg, var(--store-create-top, var(--store-create-surface)), var(--store-create-pressed)); --store-create-accent: #fff; --store-create-ink: #fff; --store-create-surface: #2465af; --store-create-hover: #1e5391; --store-create-pressed: #17467d; }
@@ -32,7 +32,7 @@
 .store-kph .store-tabs button.is-active::after { content: ""; position: absolute; bottom: 3px; left: 50%; width: 24px; height: 3px; transform: translateX(-50%); border-radius: 2px; background: white; }
 .store-kph .store-tabs small { color: var(--store-ink-muted); }
 .store-kph .store-tabs .is-active small { background: white; color: var(--store-brand-action); font-weight: 600; }
-.store-kph-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 10px; align-items: center; margin-bottom: 16px; }
+.store-kph-toolbar { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: center; margin: 0; }
 .store-scan-trigger { display: grid; width: 44px; height: 48px; place-items: center; border: 0; border-radius: 14px; background: var(--store-module-mint); }
 .store-scan-trigger > svg { display: block; width: 20px; height: 20px; color: var(--store-brand-action); stroke-width: 1.8; }
 .store-kph .store-result-count { margin: 0; border-radius: 0; padding: 0; background: transparent; color: var(--store-ink-muted); font-size: 13px; line-height: 20px; font-weight: 400; }
@@ -226,9 +226,9 @@
   .store-create-screen.create-dialog-content { inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: min(880px, calc(100vw - 48px)); height: min(840px, calc(100dvh - 48px)); max-height: calc(100dvh - 48px); border-radius: var(--cf-modal-radius); }
 }
 @media (min-width: 900px) {
-  .store-create-actions .store-two-col { max-width: 640px; }
+  .store-create-actions .store-two-col { max-width: var(--store-hero-measure); }
   .store-kph .store-tabs { width: fit-content; min-width: 380px; }
-  .store-kph-toolbar { max-width: 640px; }
+  .store-kph-toolbar { max-width: var(--store-hero-measure); }
   .store-tickets { display: none; }
   .store-kph-table-wrap { display: block; overflow: auto; border: 1px solid var(--store-line); border-radius: 18px; background: var(--store-surface); }
   .store-kph-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 13px; }
@@ -287,9 +287,6 @@
 @media (prefers-reduced-motion: reduce) { .store-create-screen[data-slot="dialog-content"] { animation: none !important; } }
 
 /* Default KPH controls share spacing and geometry with their loading frame. */
-.store-kph .store-create-actions { margin-bottom: 12px; }
-.store-kph .store-create-actions .store-two-col { gap: 8px; }
-.store-kph .store-kph-toolbar { gap: 8px; margin-bottom: 12px; }
 .store-kph .store-tabs { padding: 0; gap: 8px; }
 .store-kph .store-ticket-list { gap: 12px; }
 :is(.store-kph, .store-date) .store-kph-list-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
@@ -298,9 +295,7 @@
 /* The cover starts at the type switch; only the controls above it stay behind.
    Keep native document scrolling and reveal covered controls on keyboard focus. */
 .store-kph { --store-kph-gutter: var(--store-header-gutter); padding: 0; }
-.store-kph-underlay .store-kph-toolbar { margin-bottom: 8px; }
-.store-kph-underlay .store-create-actions { margin-bottom: 0; }
-.store-kph .store-ticket-list { position: relative; z-index: 1; align-content: start; min-height: 100dvh; margin-top: -12px; padding: 12px var(--store-kph-gutter) 24px; border-radius: 24px 24px 0 0; background: var(--store-surface); box-shadow: 0 -8px 24px rgb(0 60 40 / 8%); }
+.store-kph .store-ticket-list { align-content: start; padding: 12px var(--store-kph-gutter) 24px; }
 @media (min-width: 900px) {
   .store-kph .store-ticket-list { padding-bottom: 28px; }
 }

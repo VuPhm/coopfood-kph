@@ -1,5 +1,5 @@
 import { StoreReportPage } from "./store-page-hero";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Button, Input, Select } from "@coopfood-kph/ui";
 import { Check, ChevronRight, FileCheck2, FileText, History, Layers3, MoreHorizontal, Search, TriangleAlert } from "lucide-react";
 import { DateReportWorkspace } from "./store-date-report";
@@ -28,7 +28,7 @@ export function ReportHub({ lots }: { lots: MockDateLot[] }) {
   const [notice, setNotice] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   const manageSaveRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => { heading.current?.focus(); window.scrollTo({ top: 0, behavior: "instant" }); }, [view]);
+  useLayoutEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); heading.current?.focus({ preventScroll: true }); }, [view]);
   function openTemplate(template: ReportTemplate) {
     setNotice("");
     setDraft({ template: { ...template, filter: { ...template.filter }, selectedIds: template.selectedIds === null ? null : [...template.selectedIds] } });
@@ -63,7 +63,7 @@ export function ReportHub({ lots }: { lots: MockDateLot[] }) {
       {workspace}
     </>;
   }
-  if (view === "history") return <ReportSurface onDismiss={() => setView("menu")} hero={<><header className="date-report-heading"><div><h2 ref={heading} tabIndex={-1}>Lịch sử báo cáo</h2><span>Dữ liệu mẫu · Trên trình duyệt này</span></div><History size={28} aria-hidden="true" /></header><p className="report-history-hero-count">{library.history.length} báo cáo đã lưu</p></>}>
+  if (view === "history") return <ReportSurface onDismiss={() => setView("menu")} header={{ title: "Lịch sử báo cáo", subtitle: "Báo cáo DATE", onBack: () => setView("menu"), backLabel: "Về danh sách báo cáo", titleRef: heading }} hero={<div className="report-history-overview"><p className="report-history-hero-count">{library.history.length} báo cáo đã lưu</p><small>Dữ liệu mẫu · Trên trình duyệt này</small></div>}>
     <div className="date-report report-hub report-history-body">
       {library.error ? <p className="report-library-error" role="status">{library.error}</p> : null}
 

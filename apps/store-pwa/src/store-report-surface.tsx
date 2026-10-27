@@ -1,4 +1,4 @@
-import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
+import { StorePageHero, StorePageLayout, StorePageSurface, type StorePageHeaderOptions } from "./store-page-hero";
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import "./store-report-surface.css";
@@ -8,8 +8,8 @@ export function shouldDismissReportPull(distance: number, velocity: number): boo
 }
 
 /** A page surface, not a modal. Native page scroll remains the primary gesture. */
-export function ReportSurface({ hero, children, onDismiss, dismissLabel = "Về menu báo cáo", pullToDismiss = true, className = "" }: {
-  hero: ReactNode; children: ReactNode; onDismiss: () => void; dismissLabel?: string; pullToDismiss?: boolean; className?: string;
+export function ReportSurface({ hero, header, children, onDismiss, dismissLabel = "Về menu báo cáo", pullToDismiss = true, className = "" }: {
+  hero: ReactNode; header?: StorePageHeaderOptions; children: ReactNode; onDismiss: () => void; dismissLabel?: string; pullToDismiss?: boolean; className?: string;
 }) {
   const capRef = useRef<HTMLElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
@@ -82,23 +82,21 @@ export function ReportSurface({ hero, children, onDismiss, dismissLabel = "Về 
     const pointerEnd = (event: PointerEvent) => { if (start?.pointer === event.pointerId) end(event.type === "pointercancel"); };
     const click = (event: MouseEvent) => { if (performance.now() < suppressUntil) { event.preventDefault(); event.stopPropagation(); } };
     const transitionEnd = (event: TransitionEvent) => { if (event.target === cap && event.propertyName === "transform") finishTransition(); };
-    const animationEnd = (event: AnimationEvent) => { if (event.target === cap && cap.dataset.phase === "entering") finishTransition(); };
     cap.addEventListener("touchstart", touchStart, { passive: true });
     cap.addEventListener("touchmove", touchMove, { passive: false });
     cap.addEventListener("touchend", touchEnd); cap.addEventListener("touchcancel", touchCancel);
-    cap.addEventListener("click", click, true); cap.addEventListener("transitionend", transitionEnd); cap.addEventListener("animationend", animationEnd);
+    cap.addEventListener("click", click, true); cap.addEventListener("transitionend", transitionEnd);
     handle.addEventListener("pointerdown", pointerDown); handle.addEventListener("pointermove", pointerMove); handle.addEventListener("pointerup", pointerEnd); handle.addEventListener("pointercancel", pointerEnd);
-    if (reduce.matches) complete(); else timer = window.setTimeout(finishTransition, 220);
     return () => {
       cancelAnimationFrame(frame); stopTimer(); closeRef.current = () => {};
       cap.removeEventListener("touchstart", touchStart); cap.removeEventListener("touchmove", touchMove); cap.removeEventListener("touchend", touchEnd); cap.removeEventListener("touchcancel", touchCancel);
-      cap.removeEventListener("click", click, true); cap.removeEventListener("transitionend", transitionEnd); cap.removeEventListener("animationend", animationEnd);
+      cap.removeEventListener("click", click, true); cap.removeEventListener("transitionend", transitionEnd);
       handle.removeEventListener("pointerdown", pointerDown); handle.removeEventListener("pointermove", pointerMove); handle.removeEventListener("pointerup", pointerEnd); handle.removeEventListener("pointercancel", pointerEnd);
     };
   }, [pullToDismiss]);
   return <StorePageLayout className={`report-stage ${className}`}>
-    <StorePageHero className="report-stage-hero">{hero}</StorePageHero>
-    <StorePageSurface ref={capRef} className="report-sliding-cap" data-phase={pullToDismiss ? "entering" : "idle"} data-pull-enabled={pullToDismiss} aria-label="Nội dung báo cáo">
+    <StorePageHero className="report-stage-hero" {...(header ? { header } : {})}>{hero}</StorePageHero>
+    <StorePageSurface ref={capRef} className="report-sliding-cap" data-phase="idle" data-pull-enabled={pullToDismiss} aria-label="Nội dung báo cáo">
       {pullToDismiss ? <button ref={handleRef} type="button" className="report-cap-handle" aria-label={dismissLabel} title="Kéo xuống để chọn loại báo cáo" onClick={() => closeRef.current()}><span aria-hidden="true" /></button> : <nav className="report-cap-navigation" aria-label="Điều hướng mẫu báo cáo"><button type="button" aria-label={dismissLabel} onClick={onDismiss}><ArrowLeft size={18} aria-hidden="true" /><span>Chọn mẫu khác</span></button></nav>}
       {children}
     </StorePageSurface>

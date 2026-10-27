@@ -16,7 +16,7 @@ async function inspect(page, state, width) {
  if(await page.locator('.report-sliding-cap').count()) await expect(page.locator('.report-sliding-cap')).toHaveAttribute('data-phase','idle');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${state}: overflow`).toBe(true);
   await audit(page, '.report-composer, .date-report, .date-report-sheet', `${state}-${width}`);
-  const targets = await page.locator('.date-report button, .date-report-sheet button').evaluateAll(nodes => nodes.filter(e => e.getBoundingClientRect().width).map(e => ({text:e.textContent,h:e.getBoundingClientRect().height,w:e.getBoundingClientRect().width})));
+  const targets = await page.locator('.date-report button, .date-report-sheet button').evaluateAll(nodes => nodes.filter(e => e.getBoundingClientRect().width && !e.closest('[aria-hidden="true"], [inert]')).map(e => ({text:e.textContent,h:e.getBoundingClientRect().height,w:e.getBoundingClientRect().width})));
   expect(targets.filter(target => target.h < 43 || target.w < 43), `${state}: touch targets`).toEqual([]);
   await page.screenshot({ path: `${output}/${state}-${width}.png`, fullPage: true });
 }

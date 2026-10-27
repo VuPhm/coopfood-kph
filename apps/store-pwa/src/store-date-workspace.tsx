@@ -171,14 +171,15 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
         <StoreSearchField className="store-date-search-wrap" label="Tìm SKU, barcode, tên hàng hoặc lô" placeholder="Tìm mã hàng, lô" value={query} onValueChange={changeQuery} clearLabel="Xóa tìm kiếm DATE" />
         <div className="store-date-search-actions">
         <button type="button" className="store-date-scan" aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></button>
-        <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}>{busy ? "Tìm…" : "Tìm"}</Button></div>
+        <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}><span className="store-date-submit-copy"><span aria-hidden={busy}>Tìm</span><span aria-hidden={!busy}>Tìm…</span></span></Button></div>
       </form>
-      {message ? <p className="store-date-message" role="status">{message}</p> : null}
     </StorePageHero>
     <StorePageSurface className="store-date-workspace" onFocusCapture={revealBelowStickyTabs}>
 
       <section className="store-date-browser" aria-label="Danh sách lô DATE">
         <StoreFoodKindTabs value={kind} counts={typeTotals} onChange={setKind} />
+      {message ? <p className="store-date-message" role="status">{message}</p> : null}
+
         <div className="store-date-list-controls store-kph-list-controls">
           <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><span className="store-date-result-count">{visible.length} lô</span></div>
           <div className="store-date-toolbar store-kph-list-toolbar">

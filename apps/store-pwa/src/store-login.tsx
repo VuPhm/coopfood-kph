@@ -23,7 +23,7 @@ export function StoreLogin({ busy, error, onSubmit, onPreview }: {
   return <main className="store-login" aria-labelledby={`${id}-title`}>
     <StorePageLayout className="store-login-layout">
       <StorePageHero className="store-login-brand" contentLabel="Co.op Food" appHeader={<StoreAppHeader leading="brand" title="Đăng nhập" titleId={`${id}-title`} subtitle="Tài khoản cửa hàng" />}>
-        <div className="store-login-brand-copy"><span>CO.OP FOOD STORE APP</span><h2>Vận hành cửa hàng<br />hiệu quả mỗi ngày.</h2><p>An toàn · Tiện lợi · Tươi ngon</p></div>
+        <div className="store-login-brand-copy"><span>CO.OP FOOD STORE APP</span><h2>Vận hành cửa hàng hiệu quả mỗi ngày.</h2><p>An toàn · Tiện lợi · Tươi ngon</p></div>
       </StorePageHero>
       <StorePageSurface className="store-login-card"><div className="store-login-form-column">
 

@@ -1,5 +1,5 @@
 import { StorePageHero, StorePageLayout, StorePageSurface, StoreReportPage } from "./store-page-hero";
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
 import { History } from "lucide-react";
 import { FeatureLoadBoundary, FeatureLoadError, KphLoadingSkeleton } from "./feature-loading";
@@ -113,11 +113,12 @@ export function StoreApp() {
     }
   }, []);
   useEffect(() => {
-    const sync = () => { const next = readScreen(); if (window.location.hash === "#lookup") window.history.replaceState(null, "", "#date"); setScreen(next); setLoginPreviewError(""); setNotice(""); setQuickOpen(false); window.scrollTo(0, 0); };
+    const sync = () => { const next = readScreen(); if (window.location.hash === "#lookup") window.history.replaceState(null, "", "#date"); setScreen(next); setLoginPreviewError(""); setNotice(""); setQuickOpen(false); };
     if (window.location.hash === "#lookup") window.history.replaceState(null, "", "#date");
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
   }, []);
+  useLayoutEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [screen]);
   useEffect(() => { if (screen === "date") setDateTarget(undefined); }, [screen]);
   const openDateLot = (id: string) => { setDateTarget(id); window.location.hash = "date"; };
   const navigate = (next: Screen) => { window.location.hash = next; };

@@ -1,7 +1,7 @@
 /* Shared Store chrome only: page/portal headers, never chart or business-status colors. */
 .store-app, .store-login, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-scanner-screen {
   --store-chrome-base: #007a52;
-  --store-chrome-background: linear-gradient(120deg, #005f43, #007a52 58%, #00805a);
+  --store-chrome-background: linear-gradient(90deg, #005f43, #007a52 58%, #00805a);
   --cf-modal-header: var(--store-chrome-background);
 }
 /* Page kit: a single coordinate system, green underlay and white cover. */
@@ -10,11 +10,14 @@
   --store-header-control-top: 14px;
   --store-cover-overlap: 12px;
   --store-cover-radius: 24px;
+  --store-hero-gap: 8px;
+  --store-hero-rest: 12px;
+  --store-hero-measure: 800px;
   --store-hero-background: var(--store-chrome-background);
   position: relative; isolation: isolate; width: 100%; min-width: 0; max-width: none; margin: 0; padding: 0;
   background: var(--store-hero-background); color: #20344a;
 }
-.store-page-hero { position: sticky; top: 0; z-index: 0; width: 100%; min-width: 0; padding: 0 0 calc(var(--store-cover-overlap) + 8px); background: var(--store-hero-background); color: white; }
+.store-page-hero { position: sticky; top: 0; z-index: 0; width: 100%; min-width: 0; padding: 0 0 calc(var(--store-cover-overlap) + var(--store-hero-rest)); background: var(--store-hero-background); color: white; }
 .store-header { min-width: 0; margin: 0; padding: var(--store-header-control-top) var(--store-header-gutter); border: 0; background: transparent; color: white; }
 .store-appbar-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; width: 100%; min-width: 0; min-height: 44px; }
 .store-header-brand, .store-back { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 10px; background: transparent; color: white; }
@@ -39,12 +42,13 @@
 .store-header .store-profile-meta { display: none; }
 .store-header :where(button):focus-visible { outline: 3px solid white; outline-offset: 3px; }
 .store-header h1[tabindex="-1"]:focus { outline: none; }
-.store-page-hero-content { min-width: 0; padding: 0 var(--store-header-gutter) 0; }
+.store-page-hero-content { display: grid; gap: var(--store-hero-gap); min-width: 0; padding: 0 var(--store-header-gutter); }
+.store-page-hero-content > * { width: 100%; max-width: var(--store-hero-measure); min-width: 0; }
 .store-page-layout > .store-page-surface { position: relative; z-index: 1; width: 100%; min-width: 0; min-height: 100dvh; margin: calc(-1 * var(--store-cover-overlap)) 0 0; border-radius: var(--store-cover-radius) var(--store-cover-radius) 0 0; background: white; box-shadow: 0 -3px 12px rgb(0 60 40 / 6%); }
-.store-home-welcome { padding: 4px 0 8px; }
+.store-home-welcome { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 0; }
 .store-home-welcome > span { color: white; font-size: 14px; line-height: 20px; }
-.store-home-welcome h2 { margin: 2px 0 0; color: white; font-size: 25px; font-weight: 650; line-height: 32px; letter-spacing: -.025em; }
-.store-home-welcome p { margin: 5px 0 0; color: white; font-size: 12px; line-height: 18px; }
+.store-home-welcome h2 { margin: 0; min-width: 0; color: white; font-size: 24px; font-weight: 650; line-height: 32px; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.store-home-welcome p { flex-basis: 100%; margin: 0; color: white; font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
 @media (max-width: 359px) { .store-page-layout { --store-header-gutter: 16px; } }
 @media (min-width: 900px) { .store-page-layout { --store-header-gutter: 36px; } .store-header-store { display: inline-flex; flex-shrink: 0; max-width: 40%; } }
 @media print { body .store-app, body .store-login { background: white; } .store-page-layout { background: white; } .store-page-hero { position: static; padding: 0; background: white; } .store-page-layout > .store-page-surface { margin: 0; border-radius: 0; box-shadow: none; min-height: 0; } }

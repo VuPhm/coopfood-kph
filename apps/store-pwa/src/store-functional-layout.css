@@ -13,7 +13,6 @@
   }
 
   /* Functional areas first. Existing 44px tabs/actions retain their hit area. */
-  body:has(.store-app) .store-app .store-kph-underlay .store-kph-toolbar { margin-bottom: 4px; }
   body:has(.store-app) .store-app .store-create-actions .store-create-cta { min-height: var(--store-size-row-two); gap: 2px; padding-block: 2px; }
   body:has(.store-app) .store-app .store-kph .store-ticket-list { gap: var(--store-layout-section-gap); padding-top: var(--store-space-2); }
   body:has(.store-app) .store-app .store-date-search-form { align-items: center; }
@@ -55,7 +54,6 @@
   body:has(.store-app) .store-app .store-home-attention { margin-top: var(--store-space-3); }
 
   /* Composition: one functional row instead of repeated captions and card layers. */
-  body:has(.store-app) .store-app .store-kph-toolbar { grid-template-columns: minmax(0, 1fr); }
   body:has(.store-app) .store-app .store-create-actions .store-create-inline {
     display: flex; align-items: center; justify-content: flex-start;
     min-height: var(--store-size-control-md); height: auto;

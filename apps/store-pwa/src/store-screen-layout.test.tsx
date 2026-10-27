@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { createPortal } from "react-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { StorePageHero } from "./store-page-hero";
+import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { StoreAppHeader } from "./store-app-header";
 import { KphCreateButton } from "./store-kph-create-button";
 import { StoreReportSettings } from "./store-report-settings";
@@ -14,14 +14,22 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("Store single screen layout", () => {
   it("keeps account and portal focus from resetting the reading position, while revealing other hero controls", () => {
-    const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    const scroll = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    vi.stubGlobal("scrollY", 100);
     const account = <><button className="store-account">Tài khoản</button>{createPortal(<button>Cài đặt popup</button>, document.body)}</>;
-    render(<StorePageHero appHeader={<StoreAppHeader title="KPH" subtitle="KPH" account={account} onHome={() => {}} />}><input aria-label="Tìm hàng" /></StorePageHero>);
+    render(<StorePageLayout><StorePageHero appHeader={<StoreAppHeader title="KPH" subtitle="KPH" account={account} onHome={() => {}} />}><input aria-label="Tìm hàng" /></StorePageHero><StorePageSurface /></StorePageLayout>);
+    const input = screen.getByRole("textbox", { name: "Tìm hàng" });
+    const cover = document.querySelector(".store-page-surface")!;
+    vi.spyOn(input, "getBoundingClientRect").mockReturnValue({ bottom: 120 } as DOMRect);
+    const coverBounds = vi.spyOn(cover, "getBoundingClientRect").mockReturnValue({ top: 160 } as DOMRect);
     fireEvent.focus(screen.getByRole("button", { name: "Tài khoản" }));
     fireEvent.focus(screen.getByRole("button", { name: "Cài đặt popup" }));
+    fireEvent.focus(input);
     expect(scroll).not.toHaveBeenCalled();
-    fireEvent.focus(screen.getByRole("textbox", { name: "Tìm hàng" }));
-    expect(scroll).toHaveBeenCalledWith({ top: 0, behavior: "instant" });
+    coverBounds.mockReturnValue({ top: 80 } as DOMRect);
+    fireEvent.focus(input);
+    expect(scroll).toHaveBeenCalledOnce();
+    expect(scroll).toHaveBeenCalledWith({ top: -48, behavior: "instant" });
   });
 
 
@@ -78,10 +86,10 @@ describe("Store single screen layout", () => {
     render(<StoreKphList desktop={false} visible={[mockRecords[0]!]} />);
     const row=document.querySelector('[data-record-id]');
     const labels=()=>document.querySelectorAll('.store-ticket-tags [data-label-kind]');
-    expect(document.querySelector('.store-ticket-quick [data-label-kind="approval"]')).not.toBeNull();
+    expect(document.querySelector('.store-ticket-foot [data-label-kind="approval"]')).not.toBeNull();
     expect(labels()).toHaveLength(2);
     act(()=>{printing=true;listeners.forEach(notify=>notify());});
-    expect(labels()).toHaveLength(3);expect(document.querySelector('.store-ticket-quick [data-label-kind="approval"]')).toBeNull();
+    expect(labels()).toHaveLength(3);expect(document.querySelector('.store-ticket-foot [data-label-kind="approval"]')).toBeNull();
     act(()=>{printing=false;listeners.forEach(notify=>notify());});
     expect(document.querySelector('[data-record-id]')).toBe(row);expect(labels()).toHaveLength(2);
   });

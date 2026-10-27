@@ -1,5 +1,5 @@
 .report-stage { position: relative; isolation: isolate; min-width: 0; color: var(--store-ink); }
-.report-stage-hero > .store-page-hero-content { display: grid; gap: 12px; color: white; }
+.report-stage-hero > .store-page-hero-content { color: white; }
 .report-stage-hero .date-report-heading h2 { color: white; font-size: 20px; line-height: 28px; font-weight: 650; }
 .report-stage-hero .date-report-heading span { color: white; }
 .report-stage-hero .date-report-info, .report-stage-hero .date-report-back { display: grid; place-items: center; flex: 0 0 44px; width: 44px; min-height: 44px; border: 1px solid rgb(255 255 255 / 60%); border-radius: 12px; background: transparent; color: white; }
@@ -27,11 +27,9 @@
 .report-cap-handle:active { cursor: grabbing; }
 .report-sliding-cap > .date-report { padding-top: 0; padding-bottom: calc(var(--store-mobile-toolbar-height, 0px) + 28px); }
 .report-sliding-cap:not([data-phase="idle"]) { will-change: transform; }
-.report-sliding-cap[data-phase="entering"] { animation: report-cap-in 180ms ease-out both; }
 .report-sliding-cap[data-phase="dragging"], .report-sliding-cap[data-phase="settling"], .report-sliding-cap[data-phase="closing"] { transform: translate3d(0, 0, 0); }
 .report-sliding-cap[data-phase="settling"], .report-sliding-cap[data-phase="closing"] { transition: transform 160ms ease-out; }
 .report-sliding-cap:not([data-phase="idle"]) .store-action-dock[data-floating="true"] { visibility: hidden; }
-@keyframes report-cap-in { from { transform: translate3d(0, 24px, 0); opacity: .7; } to { transform: translate3d(0, 0, 0); opacity: 1; } }
 html:has(.report-stage) { overscroll-behavior-y: contain; }
 .report-stage .report-hub { max-width: none; margin: 0; }
 .report-history-hero-count { display: flex; align-items: center; gap: 8px; min-height: 24px; color: white; font-size: 13px; line-height: 20px; }
@@ -64,3 +62,12 @@ html:has(.report-stage) { overscroll-behavior-y: contain; }
 @media print { .report-cap-navigation { display: none; } }
 
 @media print { .report-stage-hero > .store-page-hero-content { padding: 0; } }
+
+/* Header owns the page title/back; the green slot contains only its context. */
+.report-history-overview { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
+.report-history-overview small { color: white; font-size: 12px; line-height: 18px; }
+.report-document-overview { display: flex; align-items: start; gap: 12px; }
+.report-stage-hero .date-report-document-meta { flex: 1; min-width: 0; border: 0; border-radius: 0; padding: 0; gap: 4px; }
+.report-stage-hero .date-report-document-meta > strong { font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.report-document-facts { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.report-document-facts p { margin: 0; font-size: 12px; line-height: 18px; }

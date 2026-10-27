@@ -1,5 +1,18 @@
 # Trạng thái hiện tại
 
+**HERO01 — candidate27/10/2026:** owner yêu cầu trình bày lại toàn bộ nền
+xanh dưới lớp trượt, liền mạch/không giật. Một recipe gap8/rest12/measure800,
+bar72/overlap12/radius24; gradient ngang không đổi theo chiều cao. Home/login
+gọn context, history/document báo cáo bỏ title/Back trùng. Một owner focus
+minimum-reveal, reset route/view trước paint, không animation vào trang báo cáo.
+DATE feedback vào trắng, reserve chữ Tìm…; loading→ready mép khung delta0.
+Technical294Store tests,24tests sau sửa DATE, online/mock build; browser7màn×7
+viewport, native traces5viewport, reports/history/print và chữ200% đạt.
+Preview <http://127.0.0.1:4380/#home>; [scope/checks](delivery/hero01-seamless-underlay/technical.md).
+Nhánh/worktree HERO01 từ82d7a5e, root sole writer; owner pending, chưa merge/
+push/deploy. Bước tiếp owner cuộn/đổi màn tại4380 và xem nhịp nền xanh mới.
+
+
 **SEARCH01 — candidate27/10/2026:** owner chốt tạm LIST01 rồi yêu cầu đồng
 bộ tìm kiếm. KPH live/loading, DATE, Báo cáo và picker dùng StoreSearchField;
 white matte/radius12/icon18/text16/min44, clear và focus không đổi geometry.

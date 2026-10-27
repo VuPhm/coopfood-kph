@@ -18,8 +18,18 @@ export function StorePageHero({ children, className = "", contentLabel, header, 
   return <div className={`store-page-hero ${className}`} onFocusCapture={event => {
     // React portal focus bubbles through this component although its DOM is outside.
     if (!event.currentTarget.contains(event.target)) return;
-    // Account/settings opens above the current work; preserve its scroll anchor.
-    if (!(event.target instanceof Element && event.target.closest(".store-account"))) window.scrollTo({ top: 0, behavior: "instant" });
+    // Reveal only the covered part; pointer/keyboard focus on an exposed control
+    // must not reset the page. Portal and account focus retain their own anchors.
+    const target = event.target;
+    if (!(target instanceof HTMLElement) || target.closest(".store-account")) return;
+    const cover = event.currentTarget.nextElementSibling;
+    if (!(cover instanceof HTMLElement) || !cover.classList.contains("store-page-surface")) return;
+    const reveal = () => {
+      const hidden = target.getBoundingClientRect().bottom + 8 - cover.getBoundingClientRect().top;
+      if (hidden > 1 && window.scrollY > 0) window.scrollBy({ top: -Math.min(window.scrollY, Math.ceil(hidden)), behavior: "instant" });
+    };
+    reveal();
+    window.requestAnimationFrame(() => { if (target.isConnected && document.activeElement === target) reveal(); });
   }}>
     {appHeader ?? renderHeader?.(header)}
     {children ? <div className="store-page-hero-content" role={contentLabel ? "region" : undefined} aria-label={contentLabel}>{children}</div> : null}

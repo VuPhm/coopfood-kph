@@ -1,5 +1,17 @@
 # Khung trang xuyên suốt Store App — 22/10/2026
 
+**HERO01 candidate27/10/2026:** trình bày lại toàn bộ phần xanh theo owner.
+Một gutter, gap8 giữa nhóm, nghỉ12 trước nắp trắng, chiều dài control/context
+max800px. Bar72/overlap12/radius24 giữ; gradient ngang cùng palette để màu
+không phụ thuộc chiều cao slot. Home lời chào hai hàng, login bỏ xuống dòng
+cứng. History/document dùng header title/Back chung, hero chỉ chứa context;
+không animation entry tự chạy, giữ pull-to-dismiss đã có.
+Focus hero chỉ cuộn đủ khi cover che target, account/portal giữ anchor. Route/
+report view reset trước paint; DATE feedback ở trắng và reserve nhãn busy,
+không đẩy mép xanh/trắng. Thay các recipe cũ dưới đây cho candidate này.
+[Phạm vi/kiểm tra](../delivery/hero01-seamless-underlay/technical.md), owner pending.
+
+
 Owner chưa đạt các bản trước và yêu cầu có một nền xanh/khung CSS để lắp các
 thành phần đồng bộ cho toàn app. Bản hiện tại thay các cấu trúc welcome/
 spacious/compact riêng bằng **một page kit** cho Home, Tra hạn, DATE, KPH,

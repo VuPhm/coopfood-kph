@@ -23,7 +23,7 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    expect(h.y).toBe(0);expect(h.y+h.height-s.y).toBe(12);expect(bar.y).toBe(14);expect(bar.height).toBe(44);
    const header=page.locator('.store-header');expect((await bounds(header)).height).toBe(72);
    await expect(header.locator('h1')).toHaveCSS('font-size','20px');await expect(header.locator('h1')).toHaveCSS('line-height','26px');
-   await expect(hero).toHaveCSS('background-image','linear-gradient(115deg, rgb(0, 107, 75), rgb(0, 122, 82))');
+   await expect(hero).toHaveCSS('background-image','linear-gradient(90deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
    await expect(surface).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(surface).toHaveCSS('border-top-left-radius','24px');
    if(route!=='login'){
     const a=await bounds(page.locator('.store-account'));expect(a.x+a.width).toBe(bar.x+bar.width);expect(a.y).toBe(bar.y);
@@ -46,7 +46,7 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
     expect(await page.locator('.store-header h1').getAttribute('title')).toBe(await page.locator('.store-header h1').textContent());
    }
    await page.locator('.store-header').evaluate(el=>[...el.querySelectorAll('button')].find(b=>b.getBoundingClientRect().width>0)?.focus());
-   if(route!=='login')await expect.poll(()=>page.evaluate(()=>scrollY)).toBe(0);
+   if(route!=='login')expect(await page.evaluate(()=>document.querySelector('.store-page-surface').getBoundingClientRect().top>=document.activeElement.getBoundingClientRect().bottom+7)).toBe(true);
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }
   await page.goto(`${base}/#reports`);await page.getByRole('button',{name:/^Báo cáo tổng hợp/}).click();

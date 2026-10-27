@@ -1,8 +1,8 @@
 /* Sign-in uses the same page kit; only form content is specific. */
 .store-login { --login-brand: var(--store-brand-action); --login-ink: var(--store-ink); --login-muted: var(--store-ink-muted); min-height: 100dvh; margin: 0; padding: env(safe-area-inset-top) 0 0; background: var(--store-chrome-base, #006b4b); color: var(--login-ink); font-family: var(--cf-font-family); }
-.store-login-brand-copy { padding: 4px 0 8px; color: white; }
-.store-login-brand-copy > span { font-size: 10px; font-weight: 600; letter-spacing: .12em; }
-.store-login-brand-copy h2 { margin: 6px 0; font-size: 25px; line-height: 32px; font-weight: 650; }
+.store-login-brand-copy { display: grid; gap: 4px; padding: 0; color: white; }
+.store-login-brand-copy > span { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .08em; }
+.store-login-brand-copy h2 { margin: 0; font-size: 22px; line-height: 28px; font-weight: 650; }
 .store-login-brand-copy p { margin: 0; font-size: 13px; line-height: 20px; }
 .store-login-card { padding: 28px var(--store-header-gutter) 48px; }
 .store-login-form-column { width: min(100%, 480px); margin-inline: auto; }

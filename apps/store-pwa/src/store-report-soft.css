@@ -57,7 +57,6 @@
   .store-screen-reports .date-report-footnote { margin-top: 12px; padding-inline: 0; border-color: var(--report-soft-edge); }
   .store-screen-reports .date-report-empty { border: 1px solid var(--report-soft-edge); border-radius: 16px; background: var(--report-soft-inset); }
   .store-screen-reports .report-stage-hero :is(.date-report-info,.date-report-back) { border-color: rgb(255 255 255 / 20%); background: rgb(255 255 255 / 8%); border-radius: 14px; }
-  .store-screen-reports .report-stage-hero .date-report-document-meta { border-color: rgb(255 255 255 / 16%); background: rgb(255 255 255 / 8%); }
   .date-report-sheet.store-sheet, .report-template-picker.store-sheet { --store-canvas: #f2f5f3; --store-line: var(--report-soft-edge); }
   .date-report-sheet.store-sheet :is(.report-sheet-section,.store-summary) { border-color: var(--report-soft-edge); background: var(--report-soft-inset); border-radius: 16px; }
   .date-report-sheet.store-sheet .report-sheet-section .store-summary { background: transparent; }

@@ -4,7 +4,6 @@
   .store-app .store-home-section-heading { margin-bottom: 12px; }
   .store-app .store-home-attention { margin-top: 16px; }
   .store-app .store-home-attention > button { min-height: 48px; padding-block: 8px; }
-  .store-app .store-kph-underlay .store-kph-toolbar { margin-bottom: 6px; }
   .store-app .store-create-actions .store-create-cta { min-height: 64px; gap: 4px; padding: 6px 8px; }
   .store-app .store-kph .store-ticket-list { gap: 10px; }
   .store-app .store-kph .store-kph-list-controls { gap: 6px 8px; }
