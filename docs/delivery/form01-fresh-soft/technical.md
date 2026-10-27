@@ -5,6 +5,12 @@ yêu cầu làm tổng thể token nút rồi áp tiếp vào mép khối trư�
 [Revision 3](revision3.md) là lịch sử; form revision 2 đã được owner chấp nhận,
 revision 4 còn chờ owner xem. Không suy technical PASS thành nghiệm thu.
 
+## Checkpoint
+
+Candidate `d4f9d17d14ab6abbccaeb930c04ac5592cae8069` chứa source/test/docs đã kiểm trên production mock artifact.
+Technical PASS revision4; owner pending. Sau checkpoint chỉ cập nhật ledger,
+không đổi runtime. Build và QA ở trên chạy đúng source của checkpoint này.
+
 ## Phạm vi và quyết định
 
 - Cùng nhánh `store-app/form01-fresh-soft`, một writer tại
@@ -119,3 +125,10 @@ Memory-only/browser-local; chưa xác minh backend, Safari/Windows hay thiết b
 thật. Audit contrast có mục tiêu, không suy thành chứng nhận toàn bộ WCAG.
 Owner xem4306: nút xanh Xem lại/Xong/Tạo báo cáo/Tra cứu, chọn filter, mở sheet,
 so mép khối/sidebar/menu mobile và thử focus/disabled. Chưa merge main/push/deploy.
+
+## Chuẩn bị tích hợp và vòng kế tiếp — 24/10/2026
+
+Theo yêu cầu mới, [gói merge cùng816b4e3](merge-preparation-2026-10-24.md) đã
+preflight sạch, không đổi runtime hoặc main. [Compact tùy chọn trong Cài đặt](compact-next-round.md)
+là phạm vi chuẩn bị cho vòng sau, mặc định tắt; chưa triển khai hoặc đổi token
+mật độ ở candidate này. Owner gate vẫn pending; không tự ghi nghiệm thu.
