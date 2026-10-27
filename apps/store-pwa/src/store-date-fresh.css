@@ -219,3 +219,8 @@
 .store-date-submit-copy { display: grid; }
 .store-date-submit-copy > span { grid-area: 1 / 1; }
 .store-date-submit-copy > [aria-hidden="true"] { visibility: hidden; }
+
+/* Intake entry is visible before its lazy form/CSS loads. */
+.store-date-add { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; border: 0; border-radius: 12px; padding: 8px 10px; color: var(--store-brand-action); background: var(--store-module-mint); font-size: 13px; line-height: 20px; font-weight: 600; }
+.store-date .store-date-list-heading { flex-wrap: wrap; }
+.store-date .store-date-add { order: 3; }

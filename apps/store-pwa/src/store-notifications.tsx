@@ -1,3 +1,4 @@
+import { dateLotBatchLabel } from "./store-date-lot";
 import { useMemo } from "react";
 import { Bell, CalendarDays, ChevronDown, ChevronRight } from "lucide-react";
 import { ListItemMarker } from "@coopfood-kph/ui";
@@ -32,7 +33,7 @@ export function StoreNotifications({ navigate, lots, today, onOpenDateLot }: {
               <ListItemMarker variant="bar" tone={getDatePhaseTone(assessment.phase)} />
               <span className="store-notification-item-copy"><strong>{lot.name}</strong>
                 <span className="store-notification-item-meta">
-                  <small><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {lot.id}</span></small>
+                  <small><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {dateLotBatchLabel(lot)}</span></small>
                   <DateConditionLabel phase={assessment.phase} />
                   <small className="store-notification-expiry">HSD {formatDisplayDate(lot.date)}</small>
                 </span>

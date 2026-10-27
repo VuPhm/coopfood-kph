@@ -1,3 +1,4 @@
+import { dateLotBatchLabel } from "./store-date-lot";
 import { addDays, formatDisplayDate, type LocalDate } from "@coopfood-kph/kph-rules";
 import type { CreateRecordSeed } from "./create-record-dialog";
 import { assessDateLot } from "./store-date-assessment";
@@ -17,18 +18,19 @@ function dateLotCatalog(lot: MockDateLot) {
   return { product, metadata };
 }
 export function dateLotKind(lot: MockDateLot) {
-  return dateLotCatalog(lot).metadata?.kphKind ?? null;
+  return lot.productSnapshot ? lot.productSnapshot.kind : dateLotCatalog(lot).metadata?.kphKind ?? null;
 }
 export function dateLotKphSeed(lot: MockDateLot, today: LocalDate) {
   const { product, metadata } = dateLotCatalog(lot);
+  const snapshot = lot.productSnapshot;
   const phase = assessDateLot(lot, today).phase;
   let expiry: string;
   try { expiry = formatDisplayDate(lot.date); } catch { expiry = lot.date; }
   const seed: CreateRecordSeed = {
-    barcode: product?.barcode ?? "", skuCode: lot.sku, productName: product?.name ?? lot.name,
-    supplier: product?.primarySupplier.name ?? "", unit: metadata?.unit ?? "EA",
-    note: `Lô DATE ${lot.id}; NSX: ${lot.manufactured ?? "Chưa có"}; HSD: ${expiry}`,
+    barcode: snapshot?.barcode ?? product?.barcode ?? "", skuCode: lot.sku, productName: snapshot ? lot.name : product?.name ?? lot.name,
+    supplier: snapshot?.supplier ?? (snapshot ? "" : product?.primarySupplier.name ?? ""), unit: snapshot?.unit ?? (snapshot ? "EA" : metadata?.unit ?? "EA"),
+    note: `Lô DATE ${dateLotBatchLabel(lot)}; NSX: ${lot.manufactured ?? "Chưa có"}; HSD: ${expiry}`,
     ...(phase === "EXPIRED" ? { condition: "EXPIRED" } : phase === "WARNING" || phase === "DANGER" ? { condition: "NEAR_EXPIRY" } : {}),
   };
-  return { kind: metadata?.kphKind ?? null, seed };
+  return { kind: dateLotKind(lot), seed };
 }

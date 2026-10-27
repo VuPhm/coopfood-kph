@@ -24,8 +24,8 @@ Code đang chạy là bằng chứng implementation, không tự trở thành co
 | Pilot boundary | ADR-0002 cho IndexedDB làm authority riêng trên từng thiết bị Pages; đây không phải contract của Store App online. | [ADR-0002](../adr/0002-local-only-pilot-pwa.md), [Pilot persistence test](../../apps/store-pwa/src/record-store.test.ts), [Pages baseline](../STORE_APP_BASELINE.md) | Pages cutover riêng; không mặc định migrate Pilot data. |
 
 Chuẩn bị nhập lô DATE theo yêu cầu28/10/2026: [DATE intake proposal](DATE_INTAKE_PROPOSAL.md)
-là bản đề xuất luồng/field/duplicate policy, chưa là contract accepted hoặc API
-đã triển khai. Các bất biến trong bảng trên giữ nguyên.
+là bản đề xuất luồng/field/duplicate policy; đã có [candidate mock nhập lô](../delivery/date04-intake/technical.md),
+chưa là contract accepted hoặc API online đã triển khai. Các bất biến trong bảng trên giữ nguyên.
 
 Khi một API đổi, cập nhật OpenAPI, example và generated client cùng slice. Khi
 rule đổi, cập nhật fixture độc lập ngôn ngữ và test backend/frontend tương ứng.

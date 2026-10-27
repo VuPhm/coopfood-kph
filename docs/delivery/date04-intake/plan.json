@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "date04-intake",
+  "revision": 1,
+  "status": "VERIFYING",
+  "objective": "Implement mock DATE lot intake, exact identity, shared tracking/notification/report integration and recoverable validated entry.",
+  "inScope": [
+    "FOUND/NOT_FOUND/unavailable lookup and explicit manual identity",
+    "Required SKU/name/NSX/HSD, optional batch code, duplicate/retry protection",
+    "Shared DATE/notification/report/KPH metadata and browser QA390/1440"
+  ],
+  "outOfScope": [
+    "Quantity, Excel/OCR, missing-NSX creation",
+    "Online DATE API/persistence/security policy, merge/push/deploy"
+  ],
+  "baseSha": "a286a6c8b5597cf0b3586b13312c5d1961e43c96",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/**",
+    "docs/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 2,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-intake",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Commit tested candidate, record gates and show mock preview4388; await owner intake acceptance."
+}

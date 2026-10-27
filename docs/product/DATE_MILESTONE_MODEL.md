@@ -1,5 +1,14 @@
 # DATE quản lý theo mốc Tra hạn — hướng triển khai 12/10/2026
 
+**DATE04 V1 candidate28/10/2026:** owner “làm” đã mở implementation mock.
+Form hiện yêu cầu SKU/tên/NSX/HSD, batch tùy chọn, chưa quantity/thiếu NSX mới;
+trùng chặn bảo thủ, không gộp. Dùng StoreSheet full viewport mobile/dialog desktop
+thay page form ưu tiên của proposal, giữ primitive/chrome/focus đã có. Lưu chung
+DATE/Thông báo/Báo cáo và metadata đi tiếp KPH. [Runtime và kiểm tra](../delivery/date04-intake/technical.md).
+Chưa API/persistence online hoặc nghiệm thu V1; các đoạn preparation bên dưới là
+nguồn proposal trước triển khai, các quyết định online còn mở.
+
+
 **DATE04 preparation28/10/2026:** owner yêu cầu chuẩn bị nhập sản phẩm/lô mới
 vào theo dõi. [Đề xuất nhập DATE](DATE_INTAKE_PROPOSAL.md) ghi luồng form,
 trường dữ liệu, nhận dạng/trùng/retry và các quyết định còn mở. Chưa bật tạo lô,

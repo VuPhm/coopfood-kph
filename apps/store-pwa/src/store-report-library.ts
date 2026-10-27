@@ -66,7 +66,7 @@ const filterSchema = z.object({
   processing: z.enum(["all", "open", "acknowledged", "resolved"]), search: z.literal(""),
 });
 const templateSchema = z.object({ id: z.string().min(1), title: z.string().trim().min(1).max(80), filter: filterSchema, selectedIds: z.array(z.string()).nullable() });
-const lotSchema = z.object({ id: z.string(), sku: z.string(), name: z.string(), date: z.string().transform(value => value as LocalDate), manufactured: z.string().optional(), status: z.enum(["open", "acknowledged", "resolved"]) });
+const lotSchema = z.object({ id: z.string(), sku: z.string(), name: z.string(), date: z.string().transform(value => value as LocalDate), manufactured: z.string().optional(), batchCode: z.string().nullable().optional(), status: z.enum(["open", "acknowledged", "resolved"]) });
 const savedSchema = z.object({
   id: z.string().min(1), title: z.string().min(1).max(120), asOf: businessDate,
   period: z.object({ start: businessDate, end: businessDate }).refine(value => value.start <= value.end),
@@ -83,7 +83,7 @@ export function readReportLibrary(storage: Pick<Storage, "getItem">, storeCode: 
     if (!raw) return empty;
     const data = librarySchema.parse(JSON.parse(raw));
     if (data.storeCode !== storeCode) throw new Error("Store mismatch");
-    return { ...empty, templates: data.templates, history: data.history.map(report => ({ ...report, rows: report.rows.map(({ manufactured, ...base }) => { const lot = manufactured === undefined ? base : { ...base, manufactured }; return { ...lot, assessment: assessDateLot(lot, report.asOf) }; }) })) };
+    return { ...empty, templates: data.templates, history: data.history.map(report => ({ ...report, rows: report.rows.map(({ manufactured, batchCode, ...base }) => { const lot = { ...base, ...(manufactured === undefined ? {} : { manufactured }), ...(batchCode === undefined ? {} : { batchCode }) }; return { ...lot, assessment: assessDateLot(lot, report.asOf) }; }) })) };
   } catch {
     // Do not overwrite unreadable/foreign data with an empty library.
     return { ...empty, writable: false, error: "Không đọc được dữ liệu đã lưu. Báo cáo mới chỉ giữ trong phiên này." };

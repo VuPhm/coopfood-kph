@@ -1,3 +1,4 @@
+import { dateLotBatchLabel } from "./store-date-lot";
 import { addDays, formatDisplayDate, parseDisplayDate, type LocalDate } from "@coopfood-kph/kph-rules";
 import { assessDateLot, DATE_PHASE_LABELS, needsDateAttention, type DatePhase } from "./store-date-assessment";
 import type { MockDateLot, MockDateLotStatus } from "./store-app-mock";
@@ -34,10 +35,10 @@ export const filterLabel = (filter: ReportFilter) => [phaseOptions.find(option =
 export function selectDateReport(lots: readonly MockDateLot[], asOf: LocalDate, period: ReportPeriod, filter: ReportFilter): DateReportRow[] {
   if (asOf < period.start || asOf > period.end) return [];
   const needle = filter.search.trim().toLocaleLowerCase("vi");
-  return lots.map(lot => ({ ...lot, assessment: assessDateLot(lot, asOf) }))
+  return lots.map(lot => ({ ...lot, ...(lot.productSnapshot ? { productSnapshot: { ...lot.productSnapshot } } : {}), assessment: assessDateLot(lot, asOf) }))
     .filter(row => (filter.phase === "all" || (filter.phase === "attention" ? needsDateAttention(row.assessment) : row.assessment.phase === filter.phase)) &&
       (filter.processing === "all" || row.status === filter.processing) &&
-      (!needle || `${row.sku} ${row.name} ${row.id}`.toLocaleLowerCase("vi").includes(needle)))
+      (!needle || `${row.sku} ${row.name} ${dateLotBatchLabel(row)}`.toLocaleLowerCase("vi").includes(needle)))
     .sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
 }
 export function createDateReport(lots: readonly MockDateLot[], asOf: LocalDate, period: ReportPeriod, filter: ReportFilter, store: string, createdAt: string, selectedIds: readonly string[] | null = null): DateReport {

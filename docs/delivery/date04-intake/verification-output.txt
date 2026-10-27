@@ -1,0 +1,60 @@
+/tmp/date04-tests-final.log
+
+> @coopfood-kph/store-pwa@0.0.0 test
+> vitest run --maxWorkers=2
+
+
+ RUN  v4.1.10 /Users/vup/.codex/worktrees/date04-intake-prep/coopfood-kph/apps/store-pwa
+
+(node:51898) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  43 passed (43)
+      Tests  300 passed (300)
+   Start at  02:13:37
+   Duration  48.69s (transform 1.66s, setup 7.10s, import 9.99s, tests 44.20s, environment 22.12s)
+
+
+
+/tmp/date04-targeted.log
+
+> @coopfood-kph/store-pwa@0.0.0 test
+> vitest run src/store-date-intake-model.test.ts src/store-date-intake.test.tsx src/store-date-report-model.test.ts src/store-report-library.test.ts --maxWorkers=2
+
+
+ RUN  v4.1.10 /Users/vup/.codex/worktrees/date04-intake-prep/coopfood-kph/apps/store-pwa
+
+
+ Test Files  4 passed (4)
+      Tests  14 passed (14)
+   Start at  02:26:04
+   Duration  3.94s (transform 419ms, setup 1.01s, import 925ms, tests 1.49s, environment 2.94s)
+
+
+
+/tmp/date04-check.log
+
+> @coopfood-kph/store-pwa@0.0.0 check
+> tsc --noEmit
+
+
+
+/tmp/date04-final.log
+PASS DATE intake 390: found/manual, dates, duplicate, shared alerts, exact identity, KPH seed, discard/recovery/text200
+PASS DATE intake 1440: found/manual, dates, duplicate, shared alerts, exact identity, KPH seed, discard/recovery/text200
+PASS DATE intake 320: found/manual, dates, duplicate, shared alerts, exact identity, KPH seed, discard/recovery/text200
+
+
+/tmp/date04-actions.log
+PASS DATE actions 390: reminder1/7days, due alerts/notifications, TPCN/TPTS prefill/cancel/review/save/single record/resolved, unknown kind choice
+PASS DATE actions 1440: reminder1/7days, due alerts/notifications, TPCN/TPTS prefill/cancel/review/save/single record/resolved, unknown kind choice
+PASS DATE actions 320: reminder1/7days, due alerts/notifications, TPCN/TPTS prefill/cancel/review/save/single record/resolved, unknown kind choice
+
+
+/tmp/date04-reports.log
+PASS report management 390×844
+PASS report management 1440×1024
+PASS report management 320×844
+
+
+PASS lazy intake: no form chunk on DATE arrival, loaded only after entry click. Same lazy boundary retained after manual-barcode UI clarification.

@@ -1,5 +1,14 @@
 # Nhập sản phẩm/lô vào theo dõi DATE — đề xuất28/10/2026
 
+**DATE04 V1 candidate28/10/2026:** owner “làm” đã mở implementation mock.
+Form hiện yêu cầu SKU/tên/NSX/HSD, batch tùy chọn, chưa quantity/thiếu NSX mới;
+trùng chặn bảo thủ, không gộp. Dùng StoreSheet full viewport mobile/dialog desktop
+thay page form ưu tiên của proposal, giữ primitive/chrome/focus đã có. Lưu chung
+DATE/Thông báo/Báo cáo và metadata đi tiếp KPH. [Runtime và kiểm tra](../delivery/date04-intake/technical.md).
+Chưa API/persistence online hoặc nghiệm thu V1; các đoạn preparation bên dưới là
+nguồn proposal trước triển khai, các quyết định online còn mở.
+
+
 Trạng thái: **chuẩn bị để triển khai**, chưa là contract nghiệp vụ/API accepted.
 Yêu cầu owner: “chuẩn bị cho phần nhập theo dõi date mới để nhập sản phẩm date
 vào theo dõi”. Vòng này chuẩn bị luồng, dữ liệu và tiêu chí kiểm; chưa thêm chức

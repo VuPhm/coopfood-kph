@@ -1,9 +1,10 @@
+import { appendTrackedDateLot, dateLotBatchLabel } from "./store-date-lot";
 import { StoreSearchField } from "./store-search-field";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { revealBelowStickyTabs } from "./store-sticky-tabs";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button, ListItemMarker } from "@coopfood-kph/ui";
-import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, SlidersHorizontal, TriangleAlert } from "lucide-react";
+import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, Plus, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import { acknowledgeDateLot, dateLotKphSeed, dateLotKind } from "./store-date-actions";
 import { KphCreateControl, type KphCreateHandle } from "./store-kph-create-control";
 import { KphCreateButton } from "./store-kph-create-button";
@@ -20,6 +21,8 @@ import { DateConditionLabel, DateProcessingLabel, getDatePhaseTone } from "./sto
 import { ShelfLifeTimeline } from "./store-shelf-timeline";
 import { mockBarcodeLookup, mockCatalogProducts, mockProductMetadata, mockProfile, type MockDateLot, type MockDateLotStatus } from "./store-app-mock";
 
+const DateIntake = lazy(() => import("./store-date-intake").then(module => ({ default: module.DateIntake })));
+
 type ActiveDateStatus = Exclude<MockDateLotStatus, "resolved">;
 const statuses: Record<ActiveDateStatus, string> = { open: "Mở", acknowledged: "Đã ghi nhận" };
 const DATE_SORT_OPTIONS = [
@@ -33,7 +36,7 @@ const normalize = (value: string) => value.trim().toLocaleLowerCase("vi");
 function findProduct(query: string, lots: MockDateLot[]) {
   const term = normalize(query);
   if (!term) return undefined;
-  const lot = lots.find(item => normalize(item.id) === term);
+  const lot = lots.find(item => (normalize(item.id) === term || normalize(dateLotBatchLabel(item)) === term));
   return mockCatalogProducts.find(item => item.barcode === term || item.skuCode === term || normalize(item.name) === term || item.skuCode === lot?.sku);
 }
 function remainingText(remaining: number | null) {
@@ -56,6 +59,8 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
   const filterSummaryId = useId();
   const activeFilterCount = Number(status !== "all") + Number(attentionOnly) + Number(sort !== "default") + Number(phaseFilter !== "all");
   const [activeId, setActiveId] = useState(initialLotId ?? "");
+  const [intakeOpen, setIntakeOpen] = useState(false);
+  const intakeTrigger = useRef<HTMLButtonElement>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -86,7 +91,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
   const needle = normalize(query);
   const visible = kindLots.filter(lot => (!attentionOnly || (lot.status === "open" && requiresAttention(lot))) &&
     (status === "all" || lot.status === status) && (phaseFilter === "all" || assessments.get(lot.id)!.phase === phaseFilter) &&
-    (!needle || `${lot.name} ${lot.sku} ${lot.id}`.toLocaleLowerCase("vi").includes(needle) || (product?.barcode === needle && lot.sku === product.skuCode)))
+    (!needle || `${lot.name} ${lot.sku} ${lot.id} ${lot.batchCode ?? ""} ${lot.productSnapshot?.barcode ?? ""}`.toLocaleLowerCase("vi").includes(needle) || (product?.barcode === needle && lot.sku === product.skuCode)))
     .sort((a, b) => sort === "expiry" ? a.date.localeCompare(b.date) : sort === "name" ? a.name.localeCompare(b.name, "vi") : 0);
 
   function changeQuery(value: string) {
@@ -94,7 +99,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
     setQuery(value); setMessage(""); setBusy(false);
     if (value.trim()) {
       setAttentionOnly(false); setStatus("all");
-      const exactLot = lots.find(lot => normalize(lot.id) === normalize(value) || lot.sku === value.trim());
+      const exactLot = lots.find(lot => (normalize(lot.id) === normalize(value) || normalize(dateLotBatchLabel(lot)) === normalize(value)) || lot.sku === value.trim() || lot.productSnapshot?.barcode === value.trim());
       const exactProduct = findProduct(value, lots);
       if (exactLot) setKind(dateLotKind(exactLot) ?? "unclassified");
       else if (exactProduct) setKind(mockProductMetadata[exactProduct.id]?.kphKind ?? "unclassified");
@@ -105,7 +110,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
     changeQuery(term);
     if (!term) { setMessage("Nhập SKU, barcode, tên hàng hoặc số lô cần tìm."); return; }
     const exactProduct = findProduct(term, lots);
-    if (!exactProduct && lots.some(lot => `${lot.name} ${lot.sku} ${lot.id}`.toLocaleLowerCase("vi").includes(normalize(term)))) return;
+    if (!exactProduct && lots.some(lot => `${lot.name} ${lot.sku} ${lot.id} ${lot.batchCode ?? ""} ${lot.productSnapshot?.barcode ?? ""}`.toLocaleLowerCase("vi").includes(normalize(term)))) return;
     const current = ++requestId.current;
     setBusy(true);
     try {
@@ -150,7 +155,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
     const result = assessment.result;
     const percent = remainingShelfPercent(assessment);
     return <>
-      <section className="store-date-lot-heading" aria-label="Thông tin lô"><h3>{lot.name}</h3><p><span>SKU {lot.sku}</span><span>Lô {lot.id}</span></p></section>
+      <section className="store-date-lot-heading" aria-label="Thông tin lô"><h3>{lot.name}</h3><p><span>SKU {lot.sku}</span><span>Lô {dateLotBatchLabel(lot)}</span></p></section>
       <section className="store-date-milestones" aria-label="Mốc DATE của lô">
         <div className="store-date-detail-state"><div className="store-date-milestone-labels"><DateConditionLabel phase={assessment.phase} /><DateProcessingLabel status={lot.status} /></div></div><div className="store-date-detail-metrics"><p className={`store-date-remaining${assessment.phase === "EXPIRED" ? " is-expired" : ""}`}><span>Hạn sử dụng</span><strong>{remainingText(assessment.remainingDays)}</strong></p><p className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}><span>HSD còn lại</span><strong>{percent === null ? "Chưa đủ dữ liệu" : `${percent}%`}</strong></p></div><div className="store-date-timeline-content">
         {result && assessment.nsx ? <>
@@ -181,7 +186,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
       {message ? <p className="store-date-message" role="status">{message}</p> : null}
 
         <div className="store-date-list-controls store-kph-list-controls">
-          <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><span className="store-date-result-count">{visible.length} lô</span></div>
+          <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><button ref={intakeTrigger} type="button" className="store-date-add" onClick={() => setIntakeOpen(true)}><Plus size={18} aria-hidden="true" /><span>Thêm theo dõi</span></button><span className="store-date-result-count">{visible.length} lô</span></div>
           <div className="store-date-toolbar store-kph-list-toolbar">
 
             <button className="store-compact" aria-pressed={attentionOnly} onClick={() => { setAttentionOnly(!attentionOnly); setStatus("all"); }}><TriangleAlert size={20} aria-hidden="true" /><span>Cần chú ý</span><small>{attentionCount}</small></button>
@@ -204,7 +209,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
                 setActiveId(lot.id);
               }
             }}>
-              <td className="store-kph-leading-cell"><ListItemMarker variant="bar" tone={getDatePhaseTone(assessment.phase)} /><button className="store-kph-row-open" aria-label={`Mở lô ${lot.name} ${lot.id}`} onClick={() => setActiveId(lot.id)}><span>{lot.name}</span></button></td>
+              <td className="store-kph-leading-cell"><ListItemMarker variant="bar" tone={getDatePhaseTone(assessment.phase)} /><button className="store-kph-row-open" aria-label={`Mở lô ${lot.name} ${dateLotBatchLabel(lot)}`} onClick={() => setActiveId(lot.id)}><span>{lot.name}</span></button></td>
               <td>{lot.sku}</td>
               <td><small>{lot.manufactured ? `NSX ${lot.manufactured} · ` : ""}HSD {displayDate(lot.date)}</small></td>
               <td><strong className="store-date-percent-value store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}>{percent === null ? "Chưa đủ dữ liệu" : `${percent}%`}</strong></td>
@@ -229,7 +234,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
               <ChevronRight size={16} aria-hidden="true" />
             </span>
             <span className="store-date-lot-footer">
-              <small className="store-date-lot-identifiers"><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {lot.id}</span></small>
+              <small className="store-date-lot-identifiers"><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {dateLotBatchLabel(lot)}</span></small>
               <span className="store-date-lot-labels">
                 <DateConditionLabel phase={assessment.phase} />
                 {lot.remindOn && lot.status !== "resolved" ? <span className="store-date-remind-label">Báo lại {formatDisplayDate(lot.remindOn)}</span> : null}
@@ -260,6 +265,13 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
       <p className="store-muted">Thay đổi áp dụng ngay trên các lô phù hợp với mã đang tìm.</p>
       <div className="store-date-filter-footer"><button className="store-date-reset-filter" onClick={() => { setStatus("all"); setAttentionOnly(false); setSort("default"); setPhaseFilter("all"); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setFilterOpen(false)}>Xong</Button></div>
     </StoreSheet>
+    {intakeOpen ? <Suspense fallback={<p role="status">Đang mở form theo dõi…</p>}><DateIntake today={today} onCancel={() => { setIntakeOpen(false); requestAnimationFrame(() => intakeTrigger.current?.focus()); }} onOpenExisting={lot => {
+      setKind(dateLotKind(lot) ?? "unclassified"); setQuery(""); setAttentionOnly(false); setStatus("all"); setPhaseFilter("all"); setActiveId(lot.id); setIntakeOpen(false);
+    }} onSave={lot => {
+      const next = appendTrackedDateLot(latestLots.current, lot); latestLots.current = next; onLotsChange(next);
+      setKind(dateLotKind(lot) ?? "unclassified"); setQuery(""); setAttentionOnly(false); setStatus("all"); setPhaseFilter("all"); setSort("default"); setActiveId(lot.id); setIntakeOpen(false);
+      setActionNotice("Đã thêm lô vào theo dõi trong phiên này.");
+    }} /></Suspense> : null}
     <StoreSheet className="store-date-sheet store-date-lot-sheet" open={!!active} onOpenChange={open => { if (!open) setActiveId(""); }} title="Chi tiết lô DATE" description="Ngày và trạng thái xử lý của lô">{active ? detail(active) : null}</StoreSheet>
   </StorePageLayout>;
 }

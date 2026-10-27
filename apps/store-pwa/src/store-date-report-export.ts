@@ -1,3 +1,4 @@
+import { dateLotBatchLabel } from "./store-date-lot";
 import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import { DATE_PHASE_LABELS } from "./store-date-assessment";
 import { filterLabel, periodLabel, processingLabels, type DateReport } from "./store-date-report-model";
@@ -17,7 +18,7 @@ export async function createDateReportWorkbook(report: DateReport & { title?: st
   const header = sheet.addRow(["SKU", "Tên sản phẩm", "Lô", "NSX", "HSD", "Tồn", "Đơn vị", "DATE", "Xử lý"]);
   header.font = { bold: true, color: { argb: "FFFFFFFF" } };
   header.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF00724E" } };
-  for (const row of report.rows) sheet.addRow([row.sku, row.name, row.id, row.manufactured ?? "Chưa có", formatDisplayDate(row.date), "Chưa có", "Chưa có", DATE_PHASE_LABELS[row.assessment.phase], processingLabels[row.status]]);
+  for (const row of report.rows) sheet.addRow([row.sku, row.name, dateLotBatchLabel(row), row.manufactured ?? "Chưa có", formatDisplayDate(row.date), "Chưa có", "Chưa có", DATE_PHASE_LABELS[row.assessment.phase], processingLabels[row.status]]);
   sheet.columns.forEach((column, index) => { column.width = index === 1 ? 38 : 24; });
   sheet.getColumn(1).numFmt = "@";
   sheet.autoFilter = { from: { row: header.number, column: 1 }, to: { row: header.number + report.rows.length, column: 9 } };

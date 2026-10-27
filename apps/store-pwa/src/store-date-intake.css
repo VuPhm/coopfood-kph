@@ -1,0 +1,33 @@
+.store-date-intake-sheet[data-slot="dialog-content"] { width: min(100% - 24px, 680px); height: min(90dvh, 900px); max-height: 90dvh; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+.store-date-intake-sheet .store-modal-body { display: flex; flex-direction: column; padding: 0; overflow: hidden; gap: 0; min-height: 0; }
+.date-intake-form { flex: 1; display: grid; align-content: start; gap: 20px; min-height: 0; overflow-y: auto; padding: 16px; scroll-padding: 16px; }
+.date-intake-form p { margin: 0; }
+.date-intake-intro, .date-intake-helper { color: var(--store-ink-muted); font-size: 13px; line-height: 20px; }
+.date-intake-intro:focus { outline: none; }
+.date-intake-section { display: grid; gap: 12px; min-width: 0; }
+.date-intake-section h3 { margin: 0; color: var(--store-ink); font-size: 15px; line-height: 22px; font-weight: 650; }
+.date-intake-lookup { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.date-intake-lookup .store-search-field { flex: 1 1 210px; min-width: 0; }
+.date-intake-scan { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--store-module-mint); color: var(--store-brand-action); }
+.date-intake-product { display: grid; gap: 4px; border-radius: 12px; padding: 12px; background: var(--store-canvas); }
+.date-intake-product strong { font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.date-intake-product :is(span,small) { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.date-intake-dates { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.date-intake-form .store-field { display: grid; gap: 6px; min-width: 0; }
+.date-intake-form label { font-size: 13px; line-height: 20px; font-weight: 600; }
+.date-intake-form select { min-height: 44px; width: 100%; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 10px 12px; font-size: 16px; background: white; }
+.date-intake-error { color: var(--store-error-ink); font-size: 13px; line-height: 20px; }
+.date-intake-recovery { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: var(--store-canvas); color: var(--store-ink); font-size: 13px; line-height: 20px; }
+.date-intake-preview { border-radius: 12px; padding: 12px; background: var(--store-canvas); }
+.date-intake-preview dl { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; font-size: 13px; line-height: 20px; }
+.date-intake-preview dt { color: var(--store-ink-muted); }
+.date-intake-preview dd { margin: 0; font-weight: 600; }
+.date-intake-footer { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); flex-shrink: 0; gap: 8px; border-top: 1px solid var(--store-soft-edge); padding: 12px 16px max(12px,env(safe-area-inset-bottom)); background: white; }
+:is(.date-intake-footer,.date-intake-lookup,.date-intake-section,.date-intake-recovery) > .store-button { min-height: 44px; height: auto; border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 20px; }
+.store-date-intake-sheet :is(button,input,select):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 2px; }
+@media(max-width: 480px) { .store-date-intake-sheet[data-slot="dialog-content"] { width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; } .date-intake-dates { grid-template-columns: 1fr; } }
+
+.store-date-intake-sheet > [data-slot="dialog-close"] { z-index: 2; }
+
+.date-intake-barcode-choice { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.date-intake-barcode-choice input[type="checkbox"] { flex: 0 0 20px; width: 20px; height: 20px; accent-color: var(--store-brand-action); }

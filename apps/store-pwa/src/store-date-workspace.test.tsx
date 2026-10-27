@@ -28,13 +28,13 @@ describe("DATE food-kind workspace", () => {
     expect(screen.queryByRole("button", {name:/Cải thìa/})).not.toBeInTheDocument();
   });
 
-  it("uses the two food kinds as primary tabs and leaves unsupported creation out of the toolbar", () => {
+  it("uses food-kind tabs and exposes the new DATE intake entry", () => {
     render(<DateWorkspace />);
     const tabs=screen.getByRole("group", {name:"Loại thực phẩm"});
     expect(within(tabs).getAllByRole("button")).toHaveLength(2);
     expect(within(tabs).getByRole("button", {name:/TP tươi sống/})).toHaveAttribute("aria-pressed","true");
     expect(within(tabs).getByRole("button", {name:/TP khô & khác/})).toHaveTextContent("3");
-    expect(screen.queryByRole("button", {name:/Theo dõi DATE|Thêm theo dõi/})).not.toBeInTheDocument();
+    expect(screen.getByRole("button", {name:"Thêm theo dõi"})).toBeEnabled();
   });
 
   it("does not silently classify unknown lots or discard them from the workspace", () => {
