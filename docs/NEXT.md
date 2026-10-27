@@ -1,5 +1,16 @@
 # Công việc kế tiếp
 
+**MOTION01 — candidate28/10/2026:** owner yêu cầu thêm chuyển động xuất hiện/
+đổi Home và chức năng, ưu tiên hiệu năng. Nắp trắng vào16px/220ms, về Home
+−10px/280ms; hero fade nhẹ, header/nav/FAB đứng yên. Shared lazy clock tránh
+replay; ngắt khi tương tác, reduced-motion/print/hidden có fallback. Không thêm
+per-frame JS/dependency, fixed dock chỉ fade. Nhánh/worktree riêng từ2692c28,
+root sole writer; giữ header xanh sau COLOR01 revert. Preview mock
+<http://127.0.0.1:4384/#home>; [scope/checks/lab](delivery/motion01-page-transitions/technical.md).
+Owner motion pending; chưa merge/push/deploy. Bước tiếp owner xem Home→KPH→DATE→
+Báo cáo→Home, thử cuộn/focus ngay lúc vừa vào.
+
+
 **COLOR01 — REJECTED/REVERTED28/10/2026:** owner “xấu, trả lại”. Đã revert
 trọn commit9af5d5c, khôi phục đúng runtime HERO01/SEARCH01/LIST01 tạiffb4e37:
 header/underlay và sheet trở về xanh chung, Home giữ bốn màu launcher cũ.

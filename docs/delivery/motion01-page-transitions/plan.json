@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "motion01-page-transitions",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Add restrained arrival/route motion to Home and Store features while preserving responsiveness, native scroll and green header geometry.",
+  "inScope": [
+    "Finite incoming cover/hero effects, a shared loading/ready timeline and reduced-motion fallback",
+    "Native scroll/focus/print interruption and fixed-dock safety",
+    "Measured browser performance at390/1440 with CPU throttling, rapid navigation and lazy-load tests"
+  ],
+  "outOfScope": [
+    "Feature header colors (rejected COLOR01)",
+    "Business rules/API/data, new gestures/dependencies, exit delays/snapshot transitions",
+    "Merge/push/deploy"
+  ],
+  "baseSha": "2692c28b9ea7a25dc314ce9a0265f8d626a62ef1",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/**",
+    "docs/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-motion",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Implement one finite motion layer, verify animation/performance/interaction, then show owner preview."
+}

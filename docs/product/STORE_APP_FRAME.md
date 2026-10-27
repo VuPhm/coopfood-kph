@@ -1,5 +1,16 @@
 # Khung trang xuyên suốt Store App — 22/10/2026
 
+**MOTION01 candidate28/10/2026:** theo yêu cầu mới, bổ sung arrival hữu hạn
+cho Home/các chức năng trên page kit HERO01. Vào feature: cover+16→0px/220ms;
+về Home:−10→0px/280ms; hero content fade160ms. Chỉ transform/opacity, tối đa
+hai effect, header/navigation/FAB giữ yên. Một route clock dùng chung skeleton
+và ready; thay lazy không replay. Surface có fixed action dock chỉ fade.
+Ngắt ngay khi cuộn/touch/focus control, hidden/print/reduced-motion; không WAAPI
+hoặc reduced-motion thì vào resting state. Không per-frame JS, page snapshot,
+exit delay, dependency hoặc will-change thường trực. Thay nguyên tắc “không entry
+animation” của candidate HERO01; giữ native scroll và pull-to-dismiss Báo cáo.
+[Recipe/kiểm tra/giới hạn](../delivery/motion01-page-transitions/technical.md), owner pending.
+
 **HERO01 candidate27/10/2026:** trình bày lại toàn bộ phần xanh theo owner.
 Một gutter, gap8 giữa nhóm, nghỉ12 trước nắp trắng, chiều dài control/context
 max800px. Bar72/overlap12/radius24 giữ; gradient ngang cùng palette để màu

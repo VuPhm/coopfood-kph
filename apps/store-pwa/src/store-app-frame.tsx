@@ -1,3 +1,4 @@
+import { StorePageMotionProvider } from "./store-page-motion";
 import type { ReactNode } from "react";
 import { StorePageHeaderContext, type StorePageHeaderOptions } from "./store-page-hero";
 import { StoreAppHeader } from "./store-app-header";
@@ -39,7 +40,7 @@ export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account,
     <a className="sr-only focus:not-sr-only" href="#store-page-content" onClick={event => { event.preventDefault(); document.getElementById("store-page-content")?.focus(); }}>Đến nội dung</a>
     <StoreNavigation screen={screen} profile={profile} navigate={navigate} onKphIntent={onKphIntent} hidden={quickOpen} />
     <section className="store-main-column"><div className="store-frame-canvas">
-      <main id="store-content" tabIndex={-1}><StorePageHeaderContext.Provider value={renderHeader}>{children}</StorePageHeaderContext.Provider></main>
+      <main id="store-content" tabIndex={-1}><StorePageHeaderContext.Provider value={renderHeader}><StorePageMotionProvider screen={screen}>{children}</StorePageMotionProvider></StorePageHeaderContext.Provider></main>
     </div></section>
     {footer}
   </div>;

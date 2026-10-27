@@ -1,12 +1,15 @@
-import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
+import { useStorePageMotion } from "./store-page-motion";
+import { createContext, useContext, useImperativeHandle, type ComponentProps, type ReactNode } from "react";
 import type { StorePageHeaderOptions } from "./store-app-header";
 export type { StorePageHeaderOptions } from "./store-app-header";
 
 export const StorePageHeaderContext = createContext<((options?: StorePageHeaderOptions) => ReactNode) | null>(null);
 
 /** Common canvas with three slots: app bar, green content, white surface. */
-export function StorePageLayout({ className = "", ...props }: ComponentProps<"div">) {
-  return <div className={`store-page-layout ${className}`} {...props} />;
+export function StorePageLayout({ className = "", ref, ...props }: ComponentProps<"div">) {
+  const page = useStorePageMotion();
+  useImperativeHandle(ref, () => page.current!);
+  return <div ref={page} className={`store-page-layout ${className}`} {...props} />;
 }
 export function StorePageSurface({ className = "", ...props }: ComponentProps<"section">) {
   return <section id="store-page-content" tabIndex={-1} className={`store-page-surface ${className}`} {...props} />;
