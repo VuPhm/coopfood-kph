@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "motion01-page-transitions",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Add restrained arrival/route motion to Home and Store features while preserving responsiveness, native scroll and green header geometry.",
   "inScope": [
     "Finite incoming cover/hero effects, a shared loading/ready timeline and reduced-motion fallback",
@@ -39,10 +39,15 @@
       "id": "owner-motion",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "17bf18d1603f43edcdcf86761797d7a70f0726fe",
+      "acceptedBy": "Project owner",
+      "decisionRef": "User message28/10/2026: giao diện ổn, tiếp tục phần thông báo",
+      "evidence": "docs/delivery/motion01-page-transitions/technical.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Owner thử Home→KPH→DATE→Báo cáo→Home, đổi nhanh/cuộn/focus tại http://127.0.0.1:4384/#home; chờ nghiệm thu chuyển động. Không merge/push/deploy."
+  "nextAction": "MOTION01 accepted. Continue notification UI in a separate task; no merge/push/deploy authorization."
 }

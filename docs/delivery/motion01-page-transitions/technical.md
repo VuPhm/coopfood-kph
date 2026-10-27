@@ -114,3 +114,9 @@ Kỳ vọng nhịp nhẹ, dùng được ngay, toolbar/FAB đứng yên. Chờ q
 không tự đóng cycle. Bước tiếp nhỏ: owner xem cảm giác chuyển màn trên4384.
 
 Bổ sung CPU1 desktop: `node /tmp/motion01/normal-lab.cjs` (source lưu trong [normal-lab-source.txt](normal-lab-source.txt)), Chromium headless cùng host, warm cache, 10route/mỗi bản. [Số đo](normal-performance.json); p95 baseline/candidate16.8/16.8ms, first frame16.5/16.3ms.
+
+## Owner acceptance28/10/2026
+
+User tại preview4384/#kph: “giao diện ổn, tiếp tục phần thông báo”.
+Đây là nghiệm thu giao diện/chuyển động của candidate17bf18d và yêu cầu task
+Thông báo kế tiếp. Đóng MOTION01, không suy quyền merge/push/deploy.
