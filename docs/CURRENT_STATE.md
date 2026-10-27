@@ -1,5 +1,18 @@
 # Trạng thái hiện tại
 
+**FRESH01 revision4 — technical PASS, owner pending27/10/2026:** owner “ổn,
+tiếp tục tối ưu” tại4366 Thông báo. Item có gap8px/đệm/viền đầy đủ, nhóm native
+thu/mở có hover/press/focus; card DATE/Báo cáo/Home attention dùng chung phản
+hồi tại chỗ. Bỏ color transition nav tránh chữ tương phản thấp lúc đổi tab.
+Gom composition Thông báo về stylesheet riêng, xóa override rải ở4file; chữ
+lớn chuyển phần trăm xuống hàng khi thiếu chỗ. Field/CTA lam-cam/rule giữ nguyên.
+Runtime699413a, preview <http://127.0.0.1:4368/#notifications>;4366 giữ reference.
+294Store tests, typecheck/build và browser7màn×5viewport, states/contrast,
+notifications150–200%, workflow/output/native scroll đạt. CSS+61bytegzip,
+không thêm runtimeJS/asset/dependency. [Files/commands/coverage](delivery/fresh01-solid-compact/technical.md).
+Root sole writer, chưa merge/push/Cloudflare. Bước tiếp owner xem nhịp list,
+thu/mở nhóm và feedback card tại4368; chưa suy nghiệm thu revision4.
+
 **FRESH01 revision3 — technical PASS, owner pending26/10/2026:** theo owner “ổn,
 phổ biến rộng hiệu ứng item Home/cả nút; CTA tươi sống màu khác”, đã chia sẻ
 ánh sáng Home cho item/card/table, icon chức năng và button roles. Home giữ

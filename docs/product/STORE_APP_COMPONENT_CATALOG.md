@@ -1,5 +1,11 @@
 # Danh mục component Store App
 
+FRESH01 revision4: StoreNotifications sở hữu composition trong stylesheet của
+nó, xóa override rải ở4file. Giữ native details/summary/button, không tạo wrapper
+hoặc component mới. Item/card dùng shared hover/press shadow tokens; container
+query dựa không gian chữ để chuyển %HSD xuống khi hẹp/chữ lớn.
+[Kiểm tra](../delivery/fresh01-solid-compact/technical.md).
+
 FRESH01 revision3 dùng chung light ingredients cho Home và consumer item/control
 thực, không thêm component. Button roles có rest/hover/pressed/disabled/focus;
 CTA TPTS lam, callback vẫn TPTS. [State matrix và checks](../delivery/fresh01-solid-compact/technical.md).

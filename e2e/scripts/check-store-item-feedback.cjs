@@ -91,7 +91,10 @@ async function noClip(page) {
         states.push(await feedback(page, lot, 'date', width));
       }
       for (const scale of [1.5, 2]) {
-        await page.goto(base + '/#notifications'); await rows.first().waitFor();
+        await page.goto(base + '/#notifications');
+        // A same-fragment navigation can keep the previous inline scaling.
+        // Reload the fixture so each sample starts at 100%, rather than compounding.
+        await page.reload(); await rows.first().waitFor();
         await page.locator('.store-notification-groups').evaluate((root, scale) => {
           const entries = [root, ...root.querySelectorAll('*')].map(el => {
             const s = getComputedStyle(el); return { el, font: parseFloat(s.fontSize), line: parseFloat(s.lineHeight) };

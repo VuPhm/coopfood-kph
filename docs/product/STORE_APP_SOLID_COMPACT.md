@@ -1,5 +1,14 @@
 # Store Fresh Solid — đặc tả tái dựng một chế độ
 
+**Revision4 — nhịp list và phản hồi card,27/10/2026:** Thông báo có gap8px,
+đệm nội dung/viền item đầy đủ; native summary có hover/pressed/focus. Khi thiếu
+không gian chữ (container nhỏ hơn18em), %HSD chuyển xuống hàng dưới để tên
+không bị ép hẹp. Composition nằm tại store-notifications.css thay override từ
+record/functional/DATE/component files. Card DATE/Báo cáo/Home attention tái dùng
+hover/pressed shadow tokens của Home, không translate. Nav đổi foreground ngay
+cùng solid selected background; giữ transition nền. Không đổi mode/flow/CTA/field.
+[Kết quả và giới hạn](../delivery/fresh01-solid-compact/technical.md).
+
 **Revision3 — shared Home light và CTA lam,26/10/2026:** owner chấp nhận hướng
 revision2 rồi yêu cầu nhân rộng. Item/card/table nghiệp vụ và nhóm nút dùng
 chung ánh sáng/chuyển sắc/viền, giữ selected/disabled/labels riêng; field vẫn

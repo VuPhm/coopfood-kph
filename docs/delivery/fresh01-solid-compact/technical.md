@@ -1,90 +1,95 @@
-# FRESH01 revision3 — shared Home lighting and blue fresh CTA
+# FRESH01 revision4 — notification rhythm and card feedback
 
-26/10/2026. Runtime `342ca66a4fe5592bd29d3c393c372a6f2ad854ff`.
-Preview <http://127.0.0.1:4366/#kph>. Technical PASS; owner acceptance of this
-integrated revision pending. Same task/branch/worktree, root sole writer.
-Revision2 plan/evidence archived separately;4364 retained as the accepted visual
-reference. Owner “ổn” accepts that direction and requests wider item/button use;
-it does not authorize main merge or publication.
+27/10/2026. Production source `699413ab76a68be5a849c557bb446f6dff7f7900`.
+Preview <http://127.0.0.1:4368/#notifications>, frozen mock build in
+`.local/fresh01/r4/build`;4366 keeps revision3. Technical PASS; owner acceptance
+of this integrated revision pending. Owner “ổn, tiếp tục tối ưu” accepts the
+revision3 visual direction and authorizes this bounded refinement. Same task,
+branch/worktree and root sole writer; no new agent dispatch.
 
 ## Changes / files
 
-- `store-material.css`: extracts the accepted Home light as shared item/control
-  ingredients. Neutral/mint light gradients extend to KPH/DATE cards and tables,
-  report catalog, notifications and Home attention rows. Checked/active items
-  retain their state recipes; business labels/phase colors stay separate.
-- `store-home.css`: consumes the shared light without changing its four tints,
-  circle icons, geometry or handlers. No wider per-feature rainbow palette.
-- `store-utility-layout.css`, `store-notifications.css`: report/template/history
-  cards, shelf history and functional icons reuse the material. Avoid double
-  paint on nested template cards. No extra wrapper or feature component.
-- `store-button-system.css`, `store-component-soft.css`: primary/secondary/danger,
-  toolbar/filter/choice/cancel/reset/login and inverse close controls receive
-  matching light/edges/depth. Pressed recedes to inset shading; disabled stays
-  flat. Rest/hover secondary recipes exclude active state so they cannot hide
-  the pressed feedback. Fields remain bright white; high contrast drops decor.
-- `store-kph-fresh.css`: warm TPCN and distinct blue TPTS ramps, white text/icons,
-  light contour; blue base#2465af / hover#1e5391 / pressed#17467d. Warm CTA is
-  darkened enough for the shared highlight. Hover uses its own ramp; press is
-  inset with no gradient. No resize/translate across states.
-- `store-kph-create-forms.css`: photo actions reuse item light, retaining native
-  controls and image workflow. No changes to runtime TS/DOM, business rules,
-  API/security/data, packages/ui, root config/dependencies or assets.
-- New `check-store-effects.cjs` exercises real mouse/keyboard states and actual
-  type-specific form opens. Product/state docs record the broader rollout.
+- `store-notifications.css`: single owner for notification composition, flat
+  grouping, native summary states, full item edge/padding and8px row gap. Keep
+  phase marker, name/SKU/lot/labels and24px percentage. A18em container query
+  moves percentage/chevron to a lower row when text has insufficient width.
+- Remove superseded notification layout/paint declarations from
+  `store-record-items.css`, `store-functional-layout.css`,
+  `store-date-notification-surfaces.css`, `store-component-soft.css`.
+  No new wrapper, component or runtime state.
+- `store-material.css`, `store-home.css`, `store-utility-layout.css`: shared Home
+  hover/pressed shadow tokens; equivalent notification/DATE/report/Home attention
+  actions use stable hover/pressed/focus feedback. Selected DATE/checked KPH and
+  nested KPH controls retain their own state recipes. Reports keep existing card
+  geometry and template composition.
+- `store-navigation.css`: stop animating foreground color across the immediate
+  solid selected background change, preventing transient dim text. Background
+  transition remains; no navigation/DOM/label change.
+- `e2e/scripts/check-store-item-feedback.cjs`: native mouse-held press, keyboard
+  focus/disclosure, exact lot open, stable boxes,8px gaps, readable nav and
+  text150/200. It checks usable name width in addition to overflow and verifies
+  forced colors/reduced motion. Each text sample explicitly reloads so scaling
+  does not compound during same-fragment navigation.
+- Product docs and CURRENT_STATE/NEXT record the new scope. Runtime TS, API,
+  business rules/authorization, photos/export code, packages/ui, dependencies,
+  assets and CTA/field palettes are unchanged.
 
-## Verification / commands
+## Actual checks
 
-Worktree commands; browser common env
-`STORE_PREVIEW_URL=http://127.0.0.1:4366`. Synthetic mock data only, raw ignored
-artifacts in `.local/fresh01/r3/`.
+Commands run in this worktree. Browser common environment
+`STORE_PREVIEW_URL=http://127.0.0.1:4368`; synthetic mock data only.
+Raw ignored evidence lives in `.local/fresh01/r4/`, test log at
+`.local/fresh01/r4-tests.log`, build log at `.local/fresh01/r4-build.log`.
 
-| Command / output | Actual result |
+| Command / output | Result |
 | --- | --- |
-| `VITEST_MAX_WORKERS=2 npm run verify` → verify.log | exit0,347tests (Store294/Admin16/API2/rules19/UI16), docs/contracts/API generation/types/full builds/PWA |
-| `VITE_STORE_APP_MOCK=true npm --workspace @coopfood-kph/store-pwa run build -- --outDir ../../.local/fresh01/r3/build --emptyOutDir` → build.log | exit0,117precache; frozen runtime342ca66 |
-| `node e2e/scripts/check-store-solid.cjs`, STORE_SOLID_OUTPUT=.local/fresh01/r3/solid | exit0,7routes×5viewports, material/contrast/geometry/focus/tag/print/no-mode/overflow and stale-key checks |
-| `node e2e/scripts/check-store-effects.cjs`, STORE_EFFECTS_OUTPUT=.local/fresh01/r3/effects | exit0,390/1440/320: default/hover/keyboard-only focus/real mouse-down/disabled CTA states, stable boxes, readable paint and correct TPCN/TPTS form opens; item/icon/button light present, fields white |
-| `node e2e/scripts/check-store-material.cjs`, STORE_MATERIAL_OUTPUT=.local/fresh01/r3/material, STORE_MATERIAL_BASELINE_BUILD=.local/fresh01/r2/build, STORE_MATERIAL_BUILD=.local/fresh01/r3/build | exit0,3widths, field states/validation/focus, static decor constraints, payload budget and diagnostic scroll |
-| `node e2e/scripts/check-store-actions.cjs`, STORE_ACTIONS_OUTPUT=.local/fresh01/r3/actions | exit0,390/1440: reminder1/7, validation/photo/review/save, KPH handoff, form150/200, Excel/PDF7rows/history and shelf calculation |
-| `node e2e/scripts/check-store-reflow.cjs`, STORE_REFLOW_OUTPUT=.local/fresh01/r3/reflow | exit0,Home/reports/shelf×390/1440/320 at150/200%, no clipping/overflow |
-| `node e2e/scripts/check-store-loading.cjs`, STORE_LOADING_OUTPUT=.local/fresh01/r3/loading | exit0,390/1440: neutral loading/live labels and same shared CTA geometry; disabled skeleton remains neutral |
-| `node e2e/scripts/check-store-notifications.cjs`, STORE_NOTIFICATIONS_OUTPUT=.local/fresh01/r3/notifications | exit0,390/1440/320: collapse, exact lot, reminders/suppression/deduplication, contrast/text150 |
-| `node e2e/scripts/check-store-scrollbars.cjs`, STORE_SCROLLBARS_OUTPUT=.local/fresh01/r3/scrollbars | exit0,7routes×5viewports and portals; native wheel/thumb drag, locks/focus/overflow |
+| `VITEST_MAX_WORKERS=2 npm --workspace @coopfood-kph/store-pwa test` | exit0,41files/294tests |
+| `npm --workspace @coopfood-kph/store-pwa run check` | exit0,TypeScript |
+| `VITE_STORE_APP_MOCK=true npm --workspace @coopfood-kph/store-pwa run build -- --outDir ../../.local/fresh01/r4/build --emptyOutDir` | exit0,117precache |
+| `node e2e/scripts/check-store-item-feedback.cjs`, STORE_FEEDBACK_OUTPUT=.local/fresh01/r4/feedback | exit0,390×844/1440×1024/320×844; stable card/summary press/hover/focus, native collapse, exact lot, gap, nav, text150/200 readable measure/contrast, system preferences |
+| `node e2e/scripts/check-store-notifications.cjs`, STORE_NOTIFICATIONS_OUTPUT=.local/fresh01/r4/notifications | exit0,3widths, phase/date groups, exact-lot open, reminder/suppression/deduplication, no resolved group, contrast/text150 |
+| `node e2e/scripts/check-store-solid.cjs`, STORE_SOLID_OUTPUT=.local/fresh01/r4/solid | exit0,7routes×5viewports390/1440/320/900/844landscape; palette/cards/tags/focus/print/no-mode/overflow |
+| `node e2e/scripts/check-store-effects.cjs`, STORE_EFFECTS_OUTPUT=.local/fresh01/r4/effects | exit0,3widths, CTA rest/hover/focus/press/disabled, stable geometry, white fields and correct TPTS/TPCN callbacks, item/icon light |
+| `node e2e/scripts/check-store-actions.cjs`, STORE_ACTIONS_OUTPUT=.local/fresh01/r4/actions | exit0,390/1440, reminder1/7, validation/photo/review/save, DATE→KPH, report Excel/PDF/history and shelf calculation |
+| `node e2e/scripts/check-store-scrollbars.cjs`, STORE_SCROLLBARS_OUTPUT=.local/fresh01/r4/scrollbars | exit0,7routes×5viewports plus dialogs, native wheel/thumb drag, lock/focus restore/no horizontal overflow |
 | `npm run check:docs`, `git diff --check` | pass |
 
-Conservative contrast includes every gradient-stop/alpha combination. CTA text
-minimums, same at all tested widths:
+Final production source699413a contains the last notification container-query
+repair. Notification/feedback/solid checks were rerun against that exact build.
+Effects/actions/scrollbar checks ran earlier in revision4; the only subsequent
+production change was the notification18em layout query. Their CTA/form/output/
+non-notification scroll coverage is reused because no corresponding source or
+layout changed. The final notification/solid/feedback gates cover the changed
+list at normal and enlarged text sizes.
 
-| CTA | Default | Hover | Keyboard focus, pointer away | Pressed |
-| --- | --- | --- | --- | --- |
-| TPCN | 4.772:1 | 5.679:1 | 4.772:1 | 8.382:1 |
-| TPTS | 4.999:1 | 6.379:1 | 4.999:1 | 9.508:1 |
+Revision3 source342ca66 and archived technical evidence provide unaffected
+Admin16/API2/rules19/UI16 unit gates, field-state/material performance constraints,
+loading and Home/report/shelf large-text coverage. Those sources, callbacks and
+sizes did not change; Home/report shared shadows only change paint. This round
+ran294Store tests, not a fresh full347test verification. No old result is
+presented as a new full verification.
 
-No contrast threshold was lowered. Main and hover/pressed boxes match exactly;
-native disabled is a style probe restored before testing real callbacks.
-Root visually reviewed390 KPH/DATE/reports/notifications with the shared effect.
-One bounded integrated review,1/2, no unresolved blocker or new broad audit.
-Existing schema-format and ExcelJS bundle warnings remain unchanged.
+## Review, cost and limits
 
-## Cost and limits
+One bounded implementation review plus a focused repair pass. Initial review
+caught negative summary margin expanding group scrollWidth; the margin was
+removed. Visual review found percentages squeezing names under enlarged text;
+container layout now stacks the end region. Test inspection also caught a
+same-fragment reset issue compounding150×200 into300%; explicit reload fixes
+measurement. No threshold was reduced. Root viewed final390 and320/text200
+screenshots, with native text selection cleared after mouse-down probes.
 
-Built CSS gzip sums: revision2 57103bytes → revision3 57538bytes, **+435bytes**,
-under the4096byte budget. No new runtime JS, library, image asset, blur/filter,
-continuous animation or persistent will-change. Existing input and state roles
-are not decorated into buttons. Static gradients still have paint cost.
-
-A diagnostic390 KPH scroll at4×CPU,45samples, normal motion preference recorded
-median16.7ms/p9518.8ms; no infinite running animation after settling. This is a
-headless observation, not a controlled device benchmark or battery/FPS guarantee.
-Geometry/semantics are unchanged and output is verified; actual Safari/one-hand
-use remains for owner/device testing.
+Built CSS gzip sums57538→57599bytes, **+61bytes**. No runtimeJS, asset,
+dependency, blur, continuous animation or translated geometry added. Static
+paint still has cost; no new device performance claim. Contrast checks include
+conservative gradient-stop/alpha combinations, not a WCAG certification.
+Existing bundle/schema-format warnings remain; no new error.
 
 ## Handoff
 
-At4366 compare item/button light across DATE/KPH/reports/notifications; compare
-warm TPCN and blue TPTS, hover/press/focus and open each form. Next small step is
-owner visual review; stop further unsolicited rollout. Mainf77034d clean, no
-merge/push/Cloudflare update (public stillCOMPACT03r4). Existing mock/reset and
-report history limitations remain. Documentation/ledger commits after342ca66
-contain no runtime change; evidence applies to that same frozen code.
+At4368 inspect notification rhythm, collapse/open groups, open a lot; compare
+card hover/press in DATE and reports, and the selected mobile navigation label.
+Owner visual acceptance is the next small step. Stop further unsolicited audit.
+Main remainsf77034d; no merge/push/Cloudflare update (public stillCOMPACT03r4).
+Mock state remains memory-only; reload resets operating data. Safari/real-device
+use and production/backend behavior are outside this browser-mock evidence.

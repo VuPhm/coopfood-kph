@@ -1,5 +1,10 @@
 # Co.op Fresh Soft — khối mềm, viền nhẹ
 
+FRESH01 revision4: hover/pressed shadow của Home là token dùng chung cho
+whole-card actions; focus rõ, nhấn tại chỗ. Thông báo gap8px/đệm/viền đủ và nhóm
+thu/mở có feedback. Native nav foreground chuyển ngay khi đổi selected state.
+Không thêm vật liệu/màu/animation mới. [Checks](../delivery/fresh01-solid-compact/technical.md).
+
 FRESH01 revision3: ánh sáng Home được tái dùng qua item/control/jewel roles
 trong store-material.css, tới list/card/table và button states; TPTS CTA dùng
 lam riêng, TPCN cam. Giữ field trắng/print/semantic colors và geometry.
