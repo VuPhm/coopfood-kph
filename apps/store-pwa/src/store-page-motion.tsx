@@ -36,7 +36,7 @@ export function useStorePageMotion() {
     // Keep this consumer as a fade; its dock stays anchored to the viewport.
     const slides = !surface.querySelector(".store-action-anchor");
     const frames: Keyframe[] = slides
-      ? [{ transform: `translateY(${arrival.distance}px)`, opacity: .94 }, { transform: "translateY(0px)", opacity: 1 }]
+      ? [{ transform: `translateY(${arrival.distance}px)` }, { transform: "translateY(0px)" }]
       : [{ opacity: .94 }, { opacity: 1 }];
     const active = [surface.animate(frames, { duration: arrival.duration, easing: "cubic-bezier(.2,.8,.2,1)" })];
     const content = root.querySelector<HTMLElement>(":scope > .store-page-hero > .store-page-hero-content");

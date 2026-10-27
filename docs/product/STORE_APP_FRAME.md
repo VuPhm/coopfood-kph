@@ -3,7 +3,7 @@
 **MOTION01 candidate28/10/2026:** theo yêu cầu mới, bổ sung arrival hữu hạn
 cho Home/các chức năng trên page kit HERO01. Vào feature: cover+16→0px/220ms;
 về Home:−10→0px/280ms; hero content fade160ms. Chỉ transform/opacity, tối đa
-hai effect, header/navigation/FAB giữ yên. Một route clock dùng chung skeleton
+hai effect; cover đang trượt giữ trắng đặc để giảm chi phí vẽ, header/navigation/FAB giữ yên. Một route clock dùng chung skeleton
 và ready; thay lazy không replay. Surface có fixed action dock chỉ fade.
 Ngắt ngay khi cuộn/touch/focus control, hidden/print/reduced-motion; không WAAPI
 hoặc reduced-motion thì vào resting state. Không per-frame JS, page snapshot,

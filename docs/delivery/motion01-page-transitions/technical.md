@@ -13,8 +13,8 @@ Technical evidence đang hoàn thiện; owner motion pending.
 
 - `apps/store-pwa/src/store-page-motion.tsx`: một route clock cấp cho loading
   và ready. Vào feature, nắp trắng đi lên16px/220ms; về Home đi xuống10px/280ms;
-  Home lần đầu đi lên16px. Ease-out `cubic-bezier(.2,.8,.2,1)`, opacity94→100%;
-  hero content fade160ms. Tối đa hai effect hữu hạn, chỉ transform/opacity.
+  Home lần đầu đi lên16px. Ease-out `cubic-bezier(.2,.8,.2,1)`;
+  cover trượt giữ trắng đặc, hero content opacity94→100%/160ms. Tối đa hai effect hữu hạn, chỉ transform/opacity.
 - `store-app-frame.tsx` cấp context không thêm DOM; `store-page-hero.tsx` dùng
   hook trên canvas hiện có và giữ ref của consumer. Header/navigation/FAB không
   trượt; không giữ trang cũ hoặc trì hoãn route để đợi animation.
@@ -32,6 +32,11 @@ Technical evidence đang hoàn thiện; owner motion pending.
 - `e2e/scripts/check-store-motion.cjs`: gate riêng cho motion, interruptions,
   lazy clock, fixed dock, fallback và số đo lab. Không đổi rules/API/date/store
   scope, search/list recipe hoặc exporter.
+
+Sửa hiệu năng có mục tiêu: bản fade cả cover cho p95 desktop CPU1≈33.3ms;
+bỏ opacity của cover đang trượt, giữ hero fade và fallback fade-only cho fixed
+dock. Kiểm lại cùng host CPU1: p95 cũ/mới16.8/16.8ms, first-frame16.5/16.3ms;
+không suy đây là FPS trên thiết bị thật. Không thêm layer thường trực.
 
 ## Kiểm tra
 
