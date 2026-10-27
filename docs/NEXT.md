@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**LIST01 DATE revision2 — candidate27/10/2026:** Mở/Đã ghi nhận sang mép
+phải hàng SKU/tình trạng; bỏ nền/viền như approval KPH. Mobile Mở giữ icon/chữ,
+Đã ghi nhận chỉ icon xanhdương; accessible text/detail đầy đủ, không đổi meaning.
+Technical22tests/TypeScript+build và Playwright390/1440/320/900, chữ150–200%,
+right alignment/plain style/detail đạt. Preview <http://127.0.0.1:4376/#date>.
+[Scope/checks](delivery/list01-kph-layout.md). Cùng task/worktree, owner pending,
+chưa merge/push/deploy. Bước tiếp owner xem vị trí và cách trình bày trạng thái.
+
+
 **LIST01 tiếp DATE — candidate27/10/2026:** owner yêu cầu tiếp list DATE.
 Bỏ mã lô trực quan, SKU cùng nhãn như KPH; tên + %14px/chevron trên cùng,
 NSX/HSD đầy đủ gom một dòng. Item mẫu390px114→83px, desktop tên/SKU cột riêng.

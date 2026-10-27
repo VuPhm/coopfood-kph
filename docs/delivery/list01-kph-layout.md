@@ -101,3 +101,21 @@ Evidence `/tmp/list01/date-before.png`, `date-after-390.png`,
 Technical PASS, owner visual pending; chưa merge/push/deploy. Giới hạn prototype
 memory-only và thiết bị thật giữ nguyên. Bước nhỏ tiếp: xem DATE4374, đặc biệt
 ba lô cùng SKU và nhãn trạng thái dài, trước quyết định list tiếp theo.
+
+## DATE revision2 — trạng thái mép phải,27/10/2026
+
+Theo owner: Mở/Đã ghi nhận đưa phải, trình bày như duyệt KPH. Mobile giữ SKU
+và condition bên trái; processing ở mép phải, plain icon/chữ không pill. Mở
+hiện đủ chữ; Đã ghi nhận chỉ icon, text giữ screen-reader/title và detail.
+Giữ tone warning/info riêng, không suy ghi nhận thành được duyệt. Desktop cột
+Xử lý giữ chữ/icon đầy đủ và bỏ pill. Không đổi lịch báo lại, handler, rule,
+chi tiết hoặc report. Các rule mới chỉ screen-scoped trong `store-record-items.css`;
+composition chỉ `store-date-workspace.tsx`. Preview <http://127.0.0.1:4376/#date>.
+
+22 DATE tests PASS sau khi test phát hiện edit ban đầu chạm nhãn detail và
+đã khôi phục nguyên trạng nhãn tại detail. TypeScript/mock build117precache PASS.
+Gate `check-date-kph-parity.cjs` PASS390/1440/320/900, text150–200%; Playwright
+bổ sung xác minh processing cách mép phải13px, background transparent, mở
+detail còn trạng thái đầy đủ. Screenshot `/tmp/list01/date-status-right.png`,
+evidence gate `/tmp/list01/date-status/`. Check docs/diff PASS. Root sole writer,
+owner visual pending; bước nhỏ tiếp owner xem vị trí trạng thái tại4376.

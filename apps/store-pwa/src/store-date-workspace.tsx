@@ -228,9 +228,10 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
             <span className="store-date-lot-footer">
               <small className="store-date-lot-identifiers"><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {lot.id}</span></small>
               <span className="store-date-lot-labels">
-                <DateConditionLabel phase={assessment.phase} /><DateProcessingLabel status={lot.status} />
+                <DateConditionLabel phase={assessment.phase} />
                 {lot.remindOn && lot.status !== "resolved" ? <span className="store-date-remind-label">Báo lại {formatDisplayDate(lot.remindOn)}</span> : null}
               </span>
+              <span className="store-date-lot-processing"><DateProcessingLabel status={lot.status} /></span>
             </span>
             <small className="store-date-lot-dates">{lot.manufactured ? <span>NSX {lot.manufactured}</span> : null}<span>HSD {displayDate(lot.date)}</span></small>
           </button>;
