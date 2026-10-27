@@ -6,14 +6,14 @@
 .store-home-section-heading > button { display: grid; place-items: center; width: 36px; min-height: 36px; flex-shrink: 0; border: 1px solid var(--store-soft-edge); border-radius: 10px; background: white; color: var(--store-brand-action); box-shadow: var(--store-soft-card-shadow); }
 .store-screen-home .store-launcher-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 0; }
 .store-screen-home .store-launcher-grid .store-module { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; min-height: 160px; gap: 14px; padding: 16px; border: 1px solid rgb(255 255 255 / 70%); border-radius: 20px; background-color: var(--home-tint); background-image: var(--store-item-light), linear-gradient(155deg, var(--home-tint-top), var(--home-tint)); color: var(--store-ink); box-shadow: var(--store-soft-card-shadow); text-align: left; }
-.store-screen-home .store-launcher-grid .store-module:hover { border-color: var(--home-icon-bottom); box-shadow: var(--store-item-hover-shadow); }
+.store-screen-home .store-launcher-grid .store-module:hover { border-color: var(--store-feature-bottom); box-shadow: var(--store-item-hover-shadow); }
 .store-screen-home .store-launcher-grid .store-module:active { box-shadow: var(--store-item-pressed-shadow); }
-.store-screen-home .store-module-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 1px solid rgb(255 255 255 / 35%); border-radius: 50%; background-color: var(--home-icon-bottom); background-image: radial-gradient(circle at 28% 10%, rgb(255 255 255 / 18%), transparent 58%), linear-gradient(145deg, var(--home-icon-top), var(--home-icon-bottom)); color: white; box-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), inset 0 -2px 3px rgb(0 30 20 / 12%), 0 4px 8px rgb(0 40 25 / 20%); }
-/* Colors identify Home launchers only; business/status colors remain independent. */
-.store-screen-home .module-date { --home-tint: #d9f2e9; --home-tint-top: #f0fbf6; --home-icon-top: #008660; --home-icon-bottom: #006c4c; }
-.store-screen-home .module-kph { --home-tint: #f9dfe9; --home-tint-top: #fff4f8; --home-icon-top: #d7355c; --home-icon-bottom: #b52750; }
-.store-screen-home .module-reports { --home-tint: #dceafa; --home-tint-top: #f0f7ff; --home-icon-top: #286f9e; --home-icon-bottom: #1c537d; }
-.store-screen-home .module-shelf { --home-tint: #ffe8d6; --home-tint-top: #fff6ed; --home-icon-top: #bf590f; --home-icon-bottom: #9e4309; }
+.store-screen-home .store-module-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 1px solid rgb(255 255 255 / 35%); border-radius: 50%; background-color: var(--store-feature-bottom); background-image: radial-gradient(circle at 28% 10%, rgb(255 255 255 / 18%), transparent 58%), linear-gradient(145deg, var(--store-feature-top), var(--store-feature-bottom)); color: white; box-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), inset 0 -2px 3px rgb(0 30 20 / 12%), 0 4px 8px rgb(0 40 25 / 20%); }
+/* Pastels belong to Home; shared feature header/icon tones live in store-feature-colors.css. */
+.store-screen-home .module-date { --home-tint: #d9f2e9; --home-tint-top: #f0fbf6; }
+.store-screen-home .module-kph { --home-tint: #f9dfe9; --home-tint-top: #fff4f8; }
+.store-screen-home .module-reports { --home-tint: #dceafa; --home-tint-top: #f0f7ff; }
+.store-screen-home .module-shelf { --home-tint: #ffe8d6; --home-tint-top: #fff6ed; }
 .store-screen-home .store-module-icon svg { width: 24px; height: 24px; }
 .store-screen-home .store-module-copy { display: grid; gap: 6px; min-width: 0; }
 .store-screen-home .store-module strong { font-size: 15px; line-height: 20px; font-weight: 650; }

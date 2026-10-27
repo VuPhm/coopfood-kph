@@ -23,7 +23,8 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    expect(h.y).toBe(0);expect(h.y+h.height-s.y).toBe(12);expect(bar.y).toBe(14);expect(bar.height).toBe(44);
    const header=page.locator('.store-header');expect((await bounds(header)).height).toBe(72);
    await expect(header.locator('h1')).toHaveCSS('font-size','20px');await expect(header.locator('h1')).toHaveCSS('line-height','26px');
-   await expect(hero).toHaveCSS('background-image','linear-gradient(90deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
+   const theme={date:'linear-gradient(90deg, rgb(0, 108, 76), rgb(0, 134, 96))',kph:'linear-gradient(90deg, rgb(181, 39, 80), rgb(215, 53, 92))',reports:'linear-gradient(90deg, rgb(28, 83, 125), rgb(40, 111, 158))',shelf:'linear-gradient(90deg, rgb(158, 67, 9), rgb(191, 89, 15))'};
+   await expect(hero).toHaveCSS('background-image',theme[route]||'linear-gradient(90deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
    await expect(surface).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(surface).toHaveCSS('border-top-left-radius','24px');
    if(route!=='login'){
     const a=await bounds(page.locator('.store-account'));expect(a.x+a.width).toBe(bar.x+bar.width);expect(a.y).toBe(bar.y);
