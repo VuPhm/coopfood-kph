@@ -2,7 +2,7 @@
 
 Yêu cầu tiếp preparation: owner “làm”. Branch/worktree giữ nguyên task
 `store-app/date04-intake-prep`, `/Users/vup/.codex/worktrees/date04-intake-prep/coopfood-kph`;
-base a286a6c, root sole writer, không dispatch team. Remote freshness không kiểm
+base a286a6c, candidate `f899c9c72db3875564d8fdfca36447d50c95a1e7`, root sole writer, không dispatch team. Remote freshness không kiểm
 vì đây là mock UI slice local. Preview <http://127.0.0.1:4388/#date>.
 
 ## Kết quả và lựa chọn V1
@@ -100,3 +100,6 @@ Technical PASS; owner form/business V1 pending. Scenario nhỏ tiếp: DATE → 
 Theo dõi → nhập SKU0008421 hoặc barcode8936000123456 → mã lô mới/NSX/HSD → Thêm;
 đối chiếu lô trong DATE/Thông báo. NOTIF01 vẫn chưa có owner acceptance riêng;
 MOTION01 accepted được giữ. Chưa merge/push/deploy.
+
+Candidate f899c9c commit nguyên trạng runtime đã build/kiểm ở working tree trên;
+sau đó chỉ ghi receipt/plan trong thư mục cycle, không đổi runtime.
