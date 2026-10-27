@@ -8,7 +8,6 @@ import "./store-app.css";
 import "./store-frame-canvas.css";
 import "./store-app-frame.css";
 import "./store-header.css";
-import "./store-feature-colors.css";
 import "./store-kph-fresh.css";
 import "./store-date-fresh.css";
 import "./store-sticky-tabs.css";

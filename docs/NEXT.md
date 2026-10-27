@@ -1,15 +1,5 @@
 # Công việc kế tiếp
 
-**COLOR01 — candidate28/10/2026:** owner yêu cầu màu header theo chức năng.
-Dùng chung nguồn màu icon Home: DATE xanh lá/KPH hồng/Báo cáo xanh dương/Tra
-hạn cam, liền qua header/underlay và sheet liên quan. Giữ status/action/nav,
-geometry/scroll của HERO01. White contrast min4.515:1; build/PWA118 và browser
-7màn×7viewport, production390/1440/320 so geometry/semantic palette với4380 đạt.
-Preview <http://127.0.0.1:4382/#kph>; [files/checks](delivery/color01-feature-headers.md).
-Nhánh/worktree COLOR01 từffb4e37, root sole writer; owner pending, chưa merge/
-push/deploy. Bước tiếp xem header bốn màu tại4382.
-
-
 **HERO01 — candidate27/10/2026:** owner yêu cầu trình bày lại toàn bộ nền
 xanh dưới lớp trượt, liền mạch/không giật. Một recipe gap8/rest12/measure800,
 bar72/overlap12/radius24; gradient ngang không đổi theo chiều cao. Home/login

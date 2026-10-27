@@ -1,14 +1,5 @@
 # Khung trang xuyên suốt Store App — 22/10/2026
 
-**COLOR01 candidate28/10/2026:** theo owner, header nhận màu chức năng từ
-icon Home: DATE xanh lá, KPH hồng, Báo cáo xanh dương, Tra hạn cam. Nguồn
-`store-feature-colors.css` dùng chung icon/header/underlay và sheet explicit;
-KPH mở từ DATE vẫn hồng. Home/Thông báo/account/login giữ brand green. Không
-đổi geometry/HERO01 hoặc màu status/action/nav. Ngoại lệ header này thay
-ràng buộc một gradient xanh cho mọi chức năng ở các bản cũ bên dưới.
-[Scope/checks](../delivery/color01-feature-headers.md), owner visual pending.
-
-
 **HERO01 candidate27/10/2026:** trình bày lại toàn bộ phần xanh theo owner.
 Một gutter, gap8 giữa nhóm, nghỉ12 trước nắp trắng, chiều dài control/context
 max800px. Bar72/overlap12/radius24 giữ; gradient ngang cùng palette để màu
