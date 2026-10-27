@@ -142,10 +142,13 @@ async function lab(browser, url, viewport) {
     await fast.route(/assets\/store-kph-workspace-[^/]+\.js/, async route => { await fastGate; await route.continue(); });
     await fast.goto(base + '/#kph', { waitUntil: 'domcontentloaded' }); await fast.locator('.kph-loading-frame').waitFor();
     await fast.waitForTimeout(30); unblock(); await fast.locator('.store-kph:not(.kph-loading-frame)').waitFor();
-    const clocks = await fast.evaluate(() => __arrivals.filter(e => e.target.matches('.store-page-surface')).map(e => ({ at: e.at, offset: e.offset, connected: e.target.isConnected })));
-    expect(clocks.length).toBeGreaterThan(1);
+    const fastState = await fast.evaluate(() => ({ now: performance.now(), active: document.querySelectorAll('[data-store-entering]').length, clocks: __arrivals.filter(e => e.target.matches('.store-page-surface')).map(e => ({ at: e.at, offset: e.offset, connected: e.target.isConnected })) }));
+    const { clocks } = fastState; expect(clocks.length).toBeGreaterThan(0);
+    // Host scheduling may finish decode after the window even with a30ms hold.
+    // That valid case must skip replay; a replacement within the window resumes.
+    if (clocks.length === 1) { expect(fastState.now - clocks[0].at + clocks[0].offset).toBeGreaterThanOrEqual(220); expect(fastState.active).toBe(0); }
     for (const clock of clocks.slice(1)) expect(clock.offset).toBeGreaterThanOrEqual(Math.min(220, clock.at - clocks[0].at) - 5);
-    results.loading.push({ fast: true, clocks }); await fast.close();
+    results.loading.push({ fast: true, ...fastState }); await fast.close();
     // Cold icon decode must not move the Tra hạn actions during arrival.
     const icons = await browser.newPage({ viewport: viewports[0], serviceWorkers: 'block' });
     let releaseIcons; const iconGate = new Promise(resolve => { releaseIcons = resolve; });
