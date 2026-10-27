@@ -1,5 +1,19 @@
 # Trạng thái hiện tại
 
+**FRESH01 revision5 — CLOSED, tích hợp27/10/2026:** owner yêu cầu merge các
+nhánh lân cận và cho phép1lần push. Main local đã merge candidate4368 cùng
+lịch sử12nhánh UI; sourcead85c66, runtime khớp bản đã xem. Compact01–03,
+FORM01/Home/header, DATE/Thông báo và các refinement liên quan đã được gom;
+patch tương đương giữ code mới, record CLOSED giữ quyết định mới hơn.
+`npm run verify` tuần tự PASS347tests/contracts/API/types/build/PWA; browser
+7màn×5viewport, card/CTA states, chữ150–200%, workflow/Excel/PDF đạt trên main.
+Preview tích hợp <http://127.0.0.1:4370/#date>.
+[SHA/nhánh/quyết định/commands và giới hạn push](delivery/fresh01-solid-compact/integration-2026-10-27.md).
+Chỉ một push explicit của main được cho phép, không force/tag/ref khác; receipt
+thực được xác minh bằng remote SHA trong chat sau lệnh. Cloudflare và Pages
+giữ nguyên. Các pending bên dưới là lịch sử; không mở vòng UI mới, chờ yêu cầu
+mới sau khi hoàn tất push được chỉ định.
+
 **FRESH01 revision4 — technical PASS, owner pending27/10/2026:** owner “ổn,
 tiếp tục tối ưu” tại4366 Thông báo. Item có gap8px/đệm/viền đầy đủ, nhóm native
 thu/mở có hover/press/focus; card DATE/Báo cáo/Home attention dùng chung phản

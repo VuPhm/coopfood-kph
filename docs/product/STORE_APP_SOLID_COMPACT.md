@@ -1,5 +1,10 @@
 # Store Fresh Solid — đặc tả tái dựng một chế độ
 
+**Tích hợp27/10/2026:** owner yêu cầu merge các nhánh UI lân cận và cho phép
+1lần push. Bản FRESH01 một UI hiện tại đã được nhận vào main local, source
+ad85c66. Các revision/candidate bên dưới là lịch sử. [Quyết định/phạm vi và
+kiểm tích hợp](../delivery/fresh01-solid-compact/integration-2026-10-27.md).
+
 **Revision4 — nhịp list và phản hồi card,27/10/2026:** Thông báo có gap8px,
 đệm nội dung/viền item đầy đủ; native summary có hover/pressed/focus. Khi thiếu
 không gian chữ (container nhỏ hơn18em), %HSD chuyển xuống hàng dưới để tên

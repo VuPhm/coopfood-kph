@@ -1,5 +1,10 @@
 # Danh mục component Store App
 
+**Tích hợp27/10/2026:** owner yêu cầu merge các nhánh UI lân cận và cho phép
+1lần push. Bản FRESH01 một UI hiện tại đã được nhận vào main local, source
+ad85c66. Các revision/candidate bên dưới là lịch sử. [Quyết định/phạm vi và
+kiểm tích hợp](../delivery/fresh01-solid-compact/integration-2026-10-27.md).
+
 FRESH01 revision4: StoreNotifications sở hữu composition trong stylesheet của
 nó, xóa override rải ở4file. Giữ native details/summary/button, không tạo wrapper
 hoặc component mới. Item/card dùng shared hover/press shadow tokens; container

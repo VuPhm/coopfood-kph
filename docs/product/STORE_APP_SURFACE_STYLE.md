@@ -1,5 +1,10 @@
 # Co.op Fresh Soft — khối mềm, viền nhẹ
 
+**Tích hợp27/10/2026:** owner yêu cầu merge các nhánh UI lân cận và cho phép
+1lần push. Bản FRESH01 một UI hiện tại đã được nhận vào main local, source
+ad85c66. Các revision/candidate bên dưới là lịch sử. [Quyết định/phạm vi và
+kiểm tích hợp](../delivery/fresh01-solid-compact/integration-2026-10-27.md).
+
 FRESH01 revision4: hover/pressed shadow của Home là token dùng chung cho
 whole-card actions; focus rõ, nhấn tại chỗ. Thông báo gap8px/đệm/viền đủ và nhóm
 thu/mở có feedback. Native nav foreground chuyển ngay khi đổi selected state.

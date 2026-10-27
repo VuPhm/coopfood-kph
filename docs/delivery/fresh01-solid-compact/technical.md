@@ -1,5 +1,9 @@
 # FRESH01 revision4 — notification rhythm and card feedback
 
+Revision4 evidence retained as provenance. Owner authorized neighboring UI
+integration and one main push on27/10/2026; current merged-source verification
+and acceptance are recorded in [revision5 integration](integration-2026-10-27.md).
+
 27/10/2026. Production source `699413ab76a68be5a849c557bb446f6dff7f7900`.
 Preview <http://127.0.0.1:4368/#notifications>, frozen mock build in
 `.local/fresh01/r4/build`;4366 keeps revision3. Technical PASS; owner acceptance
