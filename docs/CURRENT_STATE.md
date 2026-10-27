@@ -1,5 +1,13 @@
 # Trạng thái hiện tại
 
+**COLOR01 — REJECTED/REVERTED28/10/2026:** owner “xấu, trả lại”. Đã revert
+trọn commit9af5d5c, khôi phục đúng runtime HERO01/SEARCH01/LIST01 tạiffb4e37:
+header/underlay và sheet trở về xanh chung, Home giữ bốn màu launcher cũ.
+Không đổi bố cục/list/search. Preview reference <http://127.0.0.1:4380/#kph>;
+4382 cũng được build lại về bản xanh. Build/PWA118 và Playwright390/1440
+đạt; apps/e2e trùng ffb4e37. Đóng thử nghiệm màu; chờ yêu cầu mới.
+
+
 **HERO01 — candidate27/10/2026:** owner yêu cầu trình bày lại toàn bộ nền
 xanh dưới lớp trượt, liền mạch/không giật. Một recipe gap8/rest12/measure800,
 bar72/overlap12/radius24; gradient ngang không đổi theo chiều cao. Home/login
