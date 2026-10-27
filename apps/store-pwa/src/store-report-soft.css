@@ -35,8 +35,7 @@
   .store-screen-reports .report-history-entry:hover { background: var(--report-soft-selected); }
   .store-screen-reports .report-custom-card > .report-template-manage:hover { background: rgb(255 255 255 / 45%); }
   .store-screen-reports .report-history-tools { padding: 12px; border: 1px solid var(--report-soft-edge); border-radius: 16px; background: var(--report-soft-surface); }
-  .store-screen-reports .report-history-tools :is(.store-search-input, .ui-select-trigger) { border-color: var(--store-control-line); background: var(--report-soft-inset); }
-  .store-screen-reports .report-composer-hero .store-search-field > label > .store-search-input { border-color: rgb(255 255 255 / 20%); }
+  .store-screen-reports .report-history-tools .ui-select-trigger { border-color: var(--store-control-line); background: var(--report-soft-inset); }
   .store-screen-reports .report-selection-bar { margin-bottom: 12px; border: 1px solid transparent; border-radius: 14px; background: var(--report-soft-inset); }
   .store-screen-reports .report-selection-bar .store-selection-menu { border-color: var(--report-soft-edge); }
   .store-screen-reports .date-report-cards { gap: 8px; padding: 0; }
@@ -70,7 +69,7 @@
   .report-template-picker.store-sheet .store-choice-option { border: 1px solid var(--report-soft-edge); border-radius: 14px; background: white; }
   .report-template-picker.store-sheet .store-choice-option:has(input:checked) { border-color: #cfe2d8; background: var(--report-soft-selected); }
   .report-template-picker.store-sheet .store-choice-option:hover { background: var(--report-soft-inset); }
-  .report-template-picker.store-sheet :is(.store-search-input,.store-choice-cancel) { border-color: var(--store-control-line); background: var(--report-soft-inset); }
+  .report-template-picker.store-sheet .store-choice-cancel { border-color: var(--store-control-line); background: var(--report-soft-inset); }
 }
 @media screen and (min-width: 900px) {
   .store-screen-reports :is(.report-type-card[data-report-tone], .report-custom-card .report-type-card) { grid-template-columns: 54px minmax(0,1fr) 18px; gap: 14px; }

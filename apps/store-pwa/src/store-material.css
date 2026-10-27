@@ -71,7 +71,6 @@ body:has(.store-app, .store-login) {
   .store-app .store-quick-fab:hover { background: var(--store-action-orange-hover); }
   .store-app .store-mobile-toolbar a:not([aria-current="page"]) { color: var(--store-brand-action); }
   .store-app .store-mobile-toolbar a[aria-current="page"] { background: linear-gradient(155deg, #087e58, #005c40); color: white; box-shadow: inset 0 1px 0 rgb(255 255 255 / 32%), 0 2px 5px rgb(0 60 40 / 16%); }
-  .store-app .store-page-hero :is(.store-kph-search input, .store-date-search, .store-search-input) { border-color: transparent; background: white; box-shadow: none; }
   .store-app .store-page-hero :is(.store-date-scan, .report-change-template, .report-composer-info) { background: white; background-image: var(--store-item-image); color: var(--store-brand-action); box-shadow: var(--store-soft-card-shadow); }
   .store-app .store-home-section-heading > button { background-image: var(--store-item-image); }
   .store-app .store-home-attention > button { background-image: var(--store-item-image); }

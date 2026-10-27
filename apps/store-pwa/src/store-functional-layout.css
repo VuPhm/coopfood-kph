@@ -14,16 +14,14 @@
 
   /* Functional areas first. Existing 44px tabs/actions retain their hit area. */
   body:has(.store-app) .store-app .store-kph-underlay .store-kph-toolbar { margin-bottom: 4px; }
-  body:has(.store-app) .store-app .store-kph-search input { font-size: var(--store-type-input); }
   body:has(.store-app) .store-app .store-create-actions .store-create-cta { min-height: var(--store-size-row-two); gap: 2px; padding-block: 2px; }
   body:has(.store-app) .store-app .store-kph .store-ticket-list { gap: var(--store-layout-section-gap); padding-top: var(--store-space-2); }
   body:has(.store-app) .store-app .store-date-search-form { align-items: center; }
-  body:has(.store-app) .store-app .store-date-search-panel :is(.store-date-scan, .store-date-search-form > .store-button) { height: var(--store-layout-control); }
+  body:has(.store-app) .store-app .store-date-search-panel :is(.store-date-scan, .store-date-search-actions > .store-button) { height: auto; min-height: var(--store-size-hit-min); }
   body:has(.store-app) .store-app .store-date-workspace { padding-top: var(--store-space-2); row-gap: var(--store-layout-section-gap); }
   body:has(.store-app) .store-app .store-date-browser { gap: var(--store-layout-section-gap); }
   body:has(.store-app) .store-app .store-date-product-heading { min-height: var(--store-size-control-lg); padding-block: calc(var(--store-space-1) * 1.5); }
 
-  body:has(.store-app) .store-app .store-search-field > button { inset-block: 0; }
   body:has(.store-app) .store-app .report-composer-controls :is(.report-change-template, .report-composer-info) { min-height: var(--store-layout-control); }
   body:has(.store-app) .store-app .report-composer .date-report.is-compose { gap: var(--store-layout-section-gap); padding-top: var(--store-space-2); }
   body:has(.store-app) .store-app .report-composer .date-report-catalog-heading { padding-bottom: var(--store-space-1); }
@@ -34,7 +32,6 @@
   body:has(.store-app) :is(.store-kph-filter, .store-date-filter, .date-report-sheet) .store-modal-body { gap: var(--store-layout-field-gap); }
   body:has(.store-app) :is(.store-kph-filter-section, .date-report-sheet .report-sheet-section) { padding: var(--store-layout-section-inset); gap: var(--store-layout-section-gap); }
   body:has(.store-app) .store-choice-sheet.store-sheet > .store-modal-body { gap: var(--store-layout-field-gap); padding-top: var(--store-layout-section-inset); }
-  body:has(.store-app) .store-choice-sheet .store-search-field > button { inset-block: 0; }
   body:has(.store-app) .store-choice-sheet.store-sheet .store-choice-option { min-height: calc(var(--store-size-row-two) + var(--store-space-1)); padding-block: var(--store-space-2); }
   body:has(.store-app) .store-choice-sheet .store-choice-actions { padding-top: var(--store-space-3); }
   body:has(.store-app) .store-choice-sheet .store-choice-actions > button { min-height: var(--store-layout-control); padding-block: var(--store-space-2); }
@@ -113,13 +110,9 @@
     box-shadow: none; background: transparent; padding: var(--store-space-3) 0;
   }
   /* One height owner for text inputs. DATE scan/actions keep their own fixed face. */
-  body:has(.store-app) .store-app .store-kph-search input,
-  body:has(.store-app) .store-app .store-date-search,
-  body:has(.store-app) :is(.store-app, .store-choice-sheet) .store-search-field > label > .store-search-input,
   body:has(.store-app) .store-create-screen[data-kind] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):not(.sr-only) {
     height: auto; min-height: var(--store-size-hit-min); padding-block: var(--store-space-2); line-height: var(--store-leading-input);
   }
-  body:has(.store-app) .store-app .store-date-search-icon { top: 50%; transform: translateY(-50%); }
 
 }
 @media screen and (forced-colors: active) {

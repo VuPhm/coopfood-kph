@@ -1,12 +1,4 @@
 /* Store PWA reference controls. Portals need an explicit Fresh surface. */
-.store-search-field { position: relative; min-width: 0; color: var(--store-ink); }
-.store-search-field > label { display: block; }
-.store-search-field > label > svg { position: absolute; top: 50%; left: 14px; transform: translateY(-50%); color: var(--store-ink-muted); pointer-events: none; }
-.store-search-field > label > .store-search-input { width: 100%; height: 48px; min-width: 0; border: 1px solid var(--store-control-line); border-radius: 14px; padding: 10px 44px 10px 42px; background: var(--store-canvas); color: var(--store-ink); font-size: 16px; }
-.store-search-field input::placeholder { color: var(--store-ink-muted); opacity: 1; }
-.store-search-field > button { position: absolute; inset: 2px 2px 2px auto; display: grid; place-items: center; width: 44px; min-height: 44px; border-radius: 12px; color: var(--store-brand-action); }
-.store-search-field :is(input,button):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 3px; }
-.store-search-field > button:focus-visible { outline-offset: -3px; }
 .store-choice-sheet.store-sheet { display: flex; flex-direction: column; overflow: hidden; max-height: min(calc(100dvh - 24px),760px); color: var(--store-ink); }
 .store-choice-sheet > [data-slot="dialog-header"] { flex-shrink: 0; }
 .store-choice-sheet.store-sheet > .store-modal-body { display: grid; grid-template-rows: auto minmax(0,1fr) auto; min-height: 0; overflow: hidden; gap: 16px; padding: 20px 24px calc(20px + env(safe-area-inset-bottom)); }

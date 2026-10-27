@@ -5,10 +5,7 @@
 .report-composer-info { display: grid; place-items: center; width: 44px; min-height: 44px; border: 1px solid var(--store-module-mint); border-radius: 12px; background: var(--store-module-mint); color: var(--store-brand-action); }
 .report-composer-controls :is(.report-change-template, .report-composer-info) { min-height: 48px; }
 .report-composer-controls :is(.report-change-template, .report-composer-info):hover { background: white; }
-.report-composer-hero :is(button, input):focus-visible { outline: 3px solid white; outline-offset: 3px; }
-.report-composer-hero .store-search-field > label > .store-search-input { border-color: var(--store-line); }
-.report-composer-hero .store-search-field input:focus-visible { outline-color: white; }
-.report-composer-hero .store-search-field > button:focus-visible { outline-color: var(--store-focus); }
+.report-composer-hero :is(button):not(.store-search-field button):focus-visible { outline: 3px solid white; outline-offset: 3px; }
 .report-composer-cap { min-width: 0; }
 .report-composer .date-report.is-compose { gap: 16px; padding: 12px var(--store-header-gutter) calc(var(--store-mobile-toolbar-height, 0px) + 24px); }
 @media (max-width: 359px) { .report-composer-controls .report-change-template { padding-inline: 0; } .report-composer-controls .report-change-template > span { display: none; } }

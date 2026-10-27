@@ -73,7 +73,8 @@ async function audit(page, selector, state) {
         text(node.parentElement, node.textContent, [...range.getClientRects()]);
       }
       for (const input of root.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]):not([type="file"]), textarea, select')) {
-        const rect = input.getBoundingClientRect(); if (!rect.width || input.disabled) continue;
+        // Modal background fields are inert/aria-hidden, outside the active UI.
+        const rect = input.getBoundingClientRect(); if (!rect.width || input.disabled || input.closest('[aria-hidden="true"], [inert]')) continue;
         text(input, input.value || input.placeholder || input.tagName, [rect], input.value || !input.placeholder ? undefined : '::placeholder');
         const style = getComputedStyle(input), point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
         // Compose a translucent edge over the field fill before measuring it;

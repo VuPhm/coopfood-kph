@@ -1,5 +1,15 @@
 # Store PWA — các cụm điều khiển tham khảo
 
+**SEARCH01 candidate27/10/2026:** StoreSearchField nay dùng ở KPH live/loading,
+DATE, report composer/history và picker mẫu; một recipe trắng matte/radius12,
+icon18/text16/24/min44, tự nở với chữ lớn. Clear giữ chỗ sẵn,44px hit và trả
+focus input; focus xanh inset, không thay geometry. Thêm `disabled?: boolean`
+cho loading. CSS search riêng tại `store-search-field.css`, choice sheet tự
+sở hữu CSS còn lại. DATE group scan/Tìm riêng, native wrap theo chỗ còn lại.
+Thay thông số48px bên dưới cho candidate này; không đổi query/lookup/selection.
+[Phạm vi và kiểm tra](../delivery/search01-consistent-fields.md), owner pending.
+
+
 **FORM01 revision4 — candidate24/10:** hệ token nút bao gồm primary xanh,
 secondary/ghost/danger, selected/disabled/focus và native command. Vật liệu mép
 khối trượt/sidebar/menu dùng token layer riêng, không đổi geometry/navigation.

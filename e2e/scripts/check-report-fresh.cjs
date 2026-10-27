@@ -37,7 +37,7 @@ async function bulk(page, name) {
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(`${base}/#date`);await expect(page.locator('.store-date')).toBeVisible();
   const heading=await props(page.locator('.store-date h2').first(),['fontSize','lineHeight','fontWeight']);
-  const search=await props(page.locator('.store-date-search'),['height','borderRadius','borderColor','backgroundColor']);
+  const search=await props(page.locator('.store-date-search-wrap input'),['height','borderRadius','borderColor','backgroundColor']);
   await page.getByRole('button',{name:'Lọc DATE',exact:true}).click();
   const choices=await props(page.locator('.store-date-filter .store-choices .is-selected').first(),['backgroundColor','color','fontSize','minHeight']);
   await page.keyboard.press('Escape');

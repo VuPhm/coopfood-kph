@@ -4,15 +4,13 @@
 .store-date h3, .store-date-sheet h3 { margin: 0; font-size: 15px; line-height: 22px; font-weight: 650; }
 .store-date p { margin: 0; }
 .store-date-search-panel { min-width: 0; }
-.store-date-search-form { display: grid; grid-template-columns: minmax(0, 1fr) 44px auto; gap: 8px; }
-.store-date-search-wrap { position: relative; min-width: 0; }
-.store-date-search-icon { position: absolute; z-index: 1; top: 15px; left: 14px; color: var(--store-ink-muted); pointer-events: none; }
-.store-date-search { width: 100%; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; padding: 0 12px 0 42px; background: var(--store-canvas); font-size: 16px; color: var(--store-ink); }
-.store-date-search::placeholder { color: var(--store-ink-muted); opacity: 1; }
-.store-date-scan { display: grid; place-items: center; width: 44px; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; background: var(--store-module-mint); }
+.store-date-search-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.store-date-search-wrap { flex: 1 1 12rem; }
+.store-date-search-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.store-date-scan { display: grid; place-items: center; width: 44px; min-height: 44px; border: 1px solid var(--store-control-line); border-radius: 12px; background: var(--store-module-mint); }
 .store-date-scan-icon { width: 20px; height: 20px; }
 :is(.store-date, .store-date-sheet) .store-button { min-height: 44px; border: 0; border-radius: 12px; background: var(--store-brand-action); color: white; font-size: 14px; }
-.store-date .store-date-search-form > .store-button { min-width: 56px; height: 48px; padding-inline: 12px; font-size: 13px; line-height: 20px; font-weight: 600; }
+.store-date .store-date-search-actions > .store-button { min-width: 56px; min-height: 44px; height: auto; padding-inline: 12px; font-size: 13px; line-height: 20px; font-weight: 600; }
 :is(.store-date, .store-date-sheet) .store-button:hover { background: #005e40; }
 .store-date-message { padding: 14px 16px; border: 1px solid var(--store-line); border-radius: 14px; background: var(--store-canvas); font-size: 14px; line-height: 21px; }
 .store-date-product { min-width: 0; border: 1px solid var(--store-line); border-radius: 14px; background: var(--store-surface); }
@@ -127,11 +125,10 @@
 .store-date { --store-date-gutter: var(--store-header-gutter); max-width: none; margin: 0; padding: 0; gap: 0; }
 .store-date-search-panel > .store-page-hero-content { display: grid; gap: 8px; }
 .store-date-search-form, .store-date-search-panel .store-date-message { width: 100%; max-width: 640px; }
-.store-date-search-panel .store-date-search { border-color: var(--store-line); }
 .store-date-search-panel .store-date-scan { border-color: var(--store-module-mint); }
-.store-date-search-panel .store-date-search-form > .store-button { background: var(--store-surface); color: var(--store-brand-action); }
-.store-date-search-panel .store-date-search-form > .store-button:hover { background: var(--store-module-mint); }
-.store-date .store-date-search-panel :is(button, input):focus-visible { outline-color: white; }
+.store-date-search-panel .store-date-search-actions > .store-button { background: var(--store-surface); color: var(--store-brand-action); }
+.store-date-search-panel .store-date-search-actions > .store-button:hover { background: var(--store-module-mint); }
+.store-date .store-date-search-actions :is(button):focus-visible { outline: 3px solid var(--store-focus); outline-offset: -3px; }
 .store-date-workspace { position: relative; z-index: 1; align-content: start; gap: 12px 24px; min-height: 100dvh; margin-top: -12px; border-radius: 24px 24px 0 0; padding: 12px var(--store-date-gutter) 24px; background: var(--store-surface); box-shadow: 0 -8px 24px rgb(0 60 40 / 8%); }
 .store-date-browser { gap: 12px; }
 .store-date .store-tabs { padding: 0; gap: 8px; }

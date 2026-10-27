@@ -1,9 +1,10 @@
+import { StoreSearchField } from "./store-search-field";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { StoreFoodKindTabs } from "./store-food-kind-tabs";
 import { KPH_OPTIONS, type KphKind } from "@coopfood-kph/kph-rules";
 import { getKphChoicePresentation, KphChoiceContent } from "./store-kph-choice";
 import { useMemo } from "react";
-import { ListChecks, Search, SlidersHorizontal } from "lucide-react";
+import { ListChecks, SlidersHorizontal } from "lucide-react";
 import { KphCreateButton } from "./store-kph-create-button";
 import type { RecordView } from "./record-view";
 import { figmaAsset } from "./figma-assets";
@@ -25,7 +26,7 @@ export function KphWorkspaceSkeleton({ records }: { records: RecordView[] }) {
   return <StorePageLayout className="store-kph kph-loading-frame" aria-busy="true" aria-label="Đang tải KPH">
     <p className="sr-only" role="status">Đang tải KPH…</p>
     <StorePageHero className="store-kph-underlay">
-      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input disabled aria-label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" /></label></div>
+      <div className="store-kph-toolbar"><StoreSearchField className="store-kph-search" label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" value="" onValueChange={() => {}} disabled /></div>
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled />)}</div></section>
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo">

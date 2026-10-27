@@ -1,0 +1,21 @@
+/* One search recipe for pages and choice sheets. No geometry changes on focus/query. */
+.store-search-field { position: relative; min-width: 0; color: var(--store-ink); }
+.store-search-field > label { display: block; border-radius: 12px; background: var(--store-form-field-surface, white); }
+.store-search-field > label > svg { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); color: var(--store-ink-muted); pointer-events: none; }
+.store-search-field > label > .store-search-input {
+  width: 100%; height: auto; min-height: 44px; min-width: 0;
+  border: 1px solid var(--store-form-field-edge, var(--store-control-line)); border-radius: 12px;
+  padding: 8px 44px 8px 40px; background: var(--store-form-field-surface, white); box-shadow: none;
+  color: var(--store-ink); font-size: 16px; line-height: 24px;
+}
+.store-search-field input::placeholder { color: var(--store-ink-muted); opacity: 1; }
+.store-search-field > button {
+  position: absolute; inset: 0 0 0 auto; display: grid; place-items: center;
+  width: 44px; min-height: 44px; border: 0; border-radius: 12px;
+  background: transparent; color: var(--store-brand-action); box-shadow: none;
+}
+/* A smaller hover face leaves the input focus edge visible; hit area stays44px. */
+.store-search-field > button::before { content: ""; position: absolute; inset: 4px; border-radius: 8px; pointer-events: none; }
+.store-search-field > button > svg { position: relative; }
+.store-search-field > button:hover::before, .store-search-field > button:active::before { background: var(--store-canvas); }
+body:has(.store-app) :is(.store-app, .store-choice-sheet) .store-search-field :is(input,button):focus-visible { outline: 3px solid var(--store-focus); outline-offset: -3px; }

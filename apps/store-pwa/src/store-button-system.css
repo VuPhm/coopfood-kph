@@ -94,7 +94,7 @@
   }
   body:has(.store-app) .store-create-cta .store-create-kind-label { background: transparent; color: inherit; box-shadow: none; }
   body:has(.store-app) .store-page-hero { --store-button-focus: #fff; }
-  body:has(.store-app) .store-date-search-form > [data-slot="button"] { --store-button-primary-bg: #fff; --store-button-primary-top: #fff; --store-button-primary-bottom: var(--store-surface); --store-button-on-primary: var(--store-brand-action); --store-button-primary-hover: var(--store-surface); --store-button-primary-active: var(--store-canvas); }
+  body:has(.store-app) .store-date-search-actions > [data-slot="button"] { --store-button-primary-bg: #fff; --store-button-primary-top: #fff; --store-button-primary-bottom: var(--store-surface); --store-button-on-primary: var(--store-brand-action); --store-button-primary-hover: var(--store-surface); --store-button-primary-active: var(--store-canvas); }
   body:has(.store-app, .store-login) [data-slot="button"][data-size="icon"] { border-radius: var(--store-button-radius-compact); }
 }
 @media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {

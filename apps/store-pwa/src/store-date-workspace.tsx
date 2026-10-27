@@ -1,8 +1,9 @@
+import { StoreSearchField } from "./store-search-field";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { revealBelowStickyTabs } from "./store-sticky-tabs";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { Button, Input, ListItemMarker } from "@coopfood-kph/ui";
-import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, Search, SlidersHorizontal, TriangleAlert } from "lucide-react";
+import { Button, ListItemMarker } from "@coopfood-kph/ui";
+import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import { acknowledgeDateLot, dateLotKphSeed, dateLotKind } from "./store-date-actions";
 import { KphCreateControl, type KphCreateHandle } from "./store-kph-create-control";
 import { KphCreateButton } from "./store-kph-create-button";
@@ -167,9 +168,10 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
   return <StorePageLayout className="store-date">
     <StorePageHero className="store-date-search-panel" contentLabel="Tra mã hàng">
       <form className="store-date-search-form" onSubmit={event => { event.preventDefault(); void search(); }}>
-        <label className="store-date-search-wrap"><Search className="store-date-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm SKU, barcode, tên hàng hoặc lô</span><Input className="store-date-search" placeholder="Mã hàng, lô" autoComplete="off" value={query} onChange={event => changeQuery(event.target.value)} /></label>
+        <StoreSearchField className="store-date-search-wrap" label="Tìm SKU, barcode, tên hàng hoặc lô" placeholder="Tìm mã hàng, lô" value={query} onValueChange={changeQuery} clearLabel="Xóa tìm kiếm DATE" />
+        <div className="store-date-search-actions">
         <button type="button" className="store-date-scan" aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></button>
-        <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}>{busy ? "Tìm…" : "Tìm"}</Button>
+        <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}>{busy ? "Tìm…" : "Tìm"}</Button></div>
       </form>
       {message ? <p className="store-date-message" role="status">{message}</p> : null}
     </StorePageHero>

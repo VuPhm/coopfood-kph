@@ -1,5 +1,16 @@
 # Trạng thái hiện tại
 
+**SEARCH01 — candidate27/10/2026:** owner chốt tạm LIST01 rồi yêu cầu đồng
+bộ tìm kiếm. KPH live/loading, DATE, Báo cáo và picker dùng StoreSearchField;
+white matte/radius12/icon18/text16/min44, clear và focus không đổi geometry.
+DATE giữ scan/Tìm, native wrap khi thiếu chỗ. Dọn recipe cũ rải ở các feature.
+Nhánh/worktree riêng từdf77179; root sole writer. Technical40tests/type/build,
+Playwright5ngữcảnh×390/1440/320, chữ200% và picker63mục/150% đạt.
+Preview <http://127.0.0.1:4378/#kph>; [files/checks/giới hạn](delivery/search01-consistent-fields.md).
+Owner visual pending; chưa merge/push/deploy. Bước tiếp xem search/clear/DATE
+wrap và popup mẫu trên candidate mới.
+
+
 **LIST01 DATE revision2 — candidate27/10/2026:** Mở/Đã ghi nhận sang mép
 phải hàng SKU/tình trạng; bỏ nền/viền như approval KPH. Mobile Mở giữ icon/chữ,
 Đã ghi nhận chỉ icon xanhdương; accessible text/detail đầy đủ, không đổi meaning.

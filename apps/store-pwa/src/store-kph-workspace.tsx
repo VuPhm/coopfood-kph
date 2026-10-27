@@ -1,3 +1,4 @@
+import { StoreSearchField } from "./store-search-field";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { revealBelowStickyTabs } from "./store-sticky-tabs";
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState, useLayoutEffect } from "react";
@@ -14,7 +15,7 @@ import { EvidenceImageViewer } from "./image-viewer";
 import { KPH_BATCH_SIZE, KPH_DATE_SHORTCUTS, kphDateRange } from "./store-kph-history";
 import { StoreKphMore, StoreKphList } from "./store-kph-list";
 import { KPH_SORT_OPTIONS } from "./store-kph-sort";
-import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, SlidersHorizontal } from "lucide-react";
 import { KphCreateControl, preloadKphCreateForm as preloadCreateForm, type KphCreateHandle } from "./store-kph-create-control";
 import { kphRecordFromDraft } from "./store-kph-draft-record";
 import "./store-kph-create-forms.css";
@@ -113,7 +114,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
 
   return <StorePageLayout className="store-kph">
     <StorePageHero className="store-kph-underlay">
-      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label></div>
+      <div className="store-kph-toolbar"><StoreSearchField className="store-kph-search" label="Tìm tên hàng hoặc SKU" placeholder="Tìm tên hàng hoặc SKU" value={query} onValueChange={setQuery} clearLabel="Xóa tìm kiếm KPH" /></div>
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <KphCreateButton key={k} kind={k} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)} />)}</div></section>
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
