@@ -4,6 +4,7 @@ import { StoreApp } from "./store-app";
 
 describe("Store App session and route ownership", () => {
   beforeEach(() => {
+    vi.stubGlobal("matchMedia", () => ({matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn()}));
     sessionStorage.clear();
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-06T12:00:00+07:00"));
@@ -11,7 +12,7 @@ describe("Store App session and route ownership", () => {
     vi.spyOn(window, "scrollTo").mockImplementation(() => {});
     HTMLElement.prototype.scrollIntoView = vi.fn();
   });
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
   it("retains DATE updates across Home navigation and updates the Home summary", async () => {
     render(<StoreApp />);
@@ -24,9 +25,11 @@ describe("Store App session and route ownership", () => {
     fireEvent.click(screen.getByRole("button", { name: "Về trang chủ" }));
     await screen.findByText("3 cảnh báo đang mở");
     fireEvent.click(home().getByRole("button", { name: "Quản lý DATE" }));
-    await screen.findByRole("heading", { name: "Cần xử lý" });
-    expect(screen.queryByRole("button", { name: /Cải thìa/ })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Đã ghi nhận 4/ }));
+    await screen.findByRole("heading", { name: "Lô DATE" });
+    expect(document.querySelector('[data-date-lot-id="C24-118"] [data-processing-status]')).toHaveAttribute('data-processing-status','acknowledged');
+    fireEvent.click(screen.getByRole("button", {name:"Lọc DATE"}));
+    fireEvent.click(within(screen.getByRole("group", {name:"Trạng thái xử lý"})).getByRole("button", {name:"Đã ghi nhận"}));
+    fireEvent.click(screen.getByRole("button", {name:"Xong"}));
     expect(screen.getByRole("button", { name: /Cải thìa/ })).toBeInTheDocument();
   });
 
@@ -118,7 +121,7 @@ describe("Store App session and route ownership", () => {
     fireEvent(window, new HashChangeEvent("hashchange"));
     await screen.findByText("Cần chú ý hôm nay");
     fireEvent.click(within(document.querySelector('.store-launcher-grid') as HTMLElement).getByRole("button", { name: "Quản lý DATE" }));
-    await screen.findByRole("heading", { name: "Cần xử lý" });
+    await screen.findByRole("heading", { name: "Lô DATE" });
     open();
     expect(quick().getByRole("textbox", { name: "HSD (Số ngày)" })).toHaveValue("10");
     expect(quick().getByRole("region", { name: "Kết quả tra hạn lùi" }).querySelector(".store-result-date")).toHaveTextContent("08/10/2026");

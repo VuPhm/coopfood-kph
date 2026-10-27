@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "id": "fresh01-solid-compact",
+  "revision": 5,
+  "status": "EXECUTING",
+  "objective": "Rebuild Store Fresh as one compact interface: remove the old preference/UI, use stronger coherent accents, soft edges/elevation, more group spacing, smaller auxiliary elements and one shared sliding structure.",
+  "inScope": [
+    "Plan and implement one screen UI; remove density preference, setting, old comfortable branches and dead CSS without retaining hidden modes",
+    "Rebuild Store-local color/material/size/space roles with 60-30-10 visual emphasis and at most four background levels",
+    "Preserve sliding frame/sheet flow; apply to DATE/KPH as reference then Home/notifications/reports/shelf/account/login",
+    "Reduce auxiliary/display elements, test smaller secondary hit targets with spacing; preserve important action targets",
+    "Reuse real consumers, remove superseded CSS/code and adapt meaningful unit/browser gates",
+    "Restore old Home feature identity (mint/pink/blue/peach, round dimensional icons) with stronger static decorative gradients",
+    "Apply bounded gradient/highlight roles to functional surfaces; keep data/status/timeline/print and one-screen layout intact",
+    "Make editable fields visibly white/active; distinguish readonly and disabled without cyclic token mappings; retain validation/focus",
+    "Extend the accepted Home item light/gradient/edge recipe to similar list/cards, functional icons and button roles without changing geometry or state semantics",
+    "Give fresh-food TPTS CTA an accessible distinct blue gradient with verified default/hover/pressed/disabled/focus states; retain dry-food warm contrast",
+    "Polish notification list spacing and group disclosure; unify non-shifting hover/press/focus feedback on existing functional cards and selectable rows using shared material roles",
+    "Consolidate neighboring UI branch histories, merge the accepted current Store candidate into local main, verify integrated source and perform exactly one explicit origin main push"
+  ],
+  "outOfScope": [
+    "Business/API/backend/auth/schema or date calculation changes",
+    "Online/Pilot/Admin and shared UI defaults, dependencies/root config/lockfile",
+    "Protected Pages, tags, Cloudflare deployment and unrelated backend/Pilot branches",
+    "A new shell, extra theme option, invented domain abstraction or unrelated feature"
+  ],
+  "baseSha": "268be705da737147f63dc3793b0c452a8684df9a",
+  "candidateSha": null,
+  "integrationOwner": "Root sole writer; no subagent dispatch.",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/**",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/STORE_APP_SOLID_COMPACT.md",
+    "docs/product/STORE_APP_DENSITY.md",
+    "docs/product/STORE_APP_SURFACE_STYLE.md",
+    "docs/product/STORE_APP_SIZE_TOKENS.md",
+    "docs/product/STORE_APP_COMPONENT_CATALOG.md",
+    "docs/delivery/fresh01-solid-compact/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "single-interface-no-legacy-mode",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "shared-solid-material-and-sliding-structure",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "responsive-targets-focus-and-reflow",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "preserved-workflows-print-and-outputs",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-integrated-visual-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Home cũ rất tốt, giữ lại/đẩy mạnh hiệu ứng; tăng gradient trang trí với chi phí thấp; tham chiếu mạnh iOS27; field xám giống disabled",
+      "source": "Direct owner message after4362 KPH handoff26/10/2026",
+      "impact": "Supersedes white-only Home cards and no-gradient decoration in revision1. Invalidates affected visual/material/field gates; prior evidence archived, no visual acceptance inferred.",
+      "decision": "Same branch/worktree, root sole writer. Use c5a440b Home as provenance; official Apple iOS27/HIG references. Static CSS gradients, no large blur, continuous animation, dependency or new UI mode. Max two bounded review/repair rounds."
+    },
+    {
+      "revision": 3,
+      "request": "Ổn, phổ biến rộng hiệu ứng item Home và cả các nút; CTA tươi sống màu khác đủ tương phản, lục không được thì lam",
+      "source": "Direct owner message on4364 KPH26/10/2026",
+      "impact": "Accepts revision2 visual direction; expands effect consumers and changes TPTS CTA palette. Resets affected paint/contrast/state/browser gates; no merge/publication implied.",
+      "decision": "One shared Home light ingredient and item/control material roles; default neutral/mint for business items, semantic states/white fields/print preserved. Choose distinct blue for TPTS. Same task/worktree, root sole writer, max two bounded reviews."
+    },
+    {
+      "revision": 4,
+      "request": "Ổn, tiếp tục tối ưu",
+      "source": "Direct owner message on4366 notifications27/10/2026",
+      "impact": "Accepts revision3 visual direction and authorizes a bounded next refinement. Recheck affected spacing/interaction/contrast/reflow gates; preserve business states and accepted blue/warm CTA.",
+      "decision": "Same worktree/root sole writer. Prioritize notification rows/disclosure, then shared interaction feedback on equivalent cards. One implementation and at most two review/repair rounds; no new features, merge or publication."
+    },
+    {
+      "revision": 5,
+      "request": "Merge các nhánh lân cận, cho phép1lần push",
+      "source": "Direct owner message after4368 DATE preview27/10/2026",
+      "impact": "Explicitly accepts integration of the current UI direction and authorizes main merge plus a single push. No new visual work or Cloudflare/Pages release.",
+      "decision": "Consolidate Compact/form/header and neighboring UI history. Preserve current code for patch-equivalent or superseded branches and closed acceptance records. Merge missing documentation normally. Verify main then push only main once; no automatic retry."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Consolidate reviewed neighboring UI branches, merge main, run full verify and integrated browser gates, then exactly one main push.",
+  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/fresh01-solid-compact",
+  "branch": "store-app/fresh01-solid-compact",
+  "authorization": {
+    "date": "2026-10-26",
+    "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
+    "request": "Remove Compact switch and old UI; rebuild from scratch with a plan, stronger solid accents/60-30-10, soft edges/elevation, more gaps/smaller elements and a unified sliding structure; begin.",
+    "scope": "Local planning and implementation of requested Store visual rebuild; no inferred acceptance/merge/publication.",
+    "executionConfirmation": "Direct owner message: làm, after reviewing this plan in the same chat.",
+    "integrationConfirmation": "Direct owner27/10/2026: merge các nhánh lân cận, cho phép1lần push. Exactly one explicit main push; no force/tags/other refs."
+  },
+  "documents": {
+    "plan": "docs/delivery/fresh01-solid-compact/plan.md",
+    "assessment": "docs/delivery/fresh01-solid-compact/assessment.md",
+    "spec": "docs/product/STORE_APP_SOLID_COMPACT.md",
+    "technical": "docs/delivery/fresh01-solid-compact/technical.md",
+    "priorTechnical": "docs/delivery/fresh01-solid-compact/revision3-technical.md"
+  },
+  "sourceSha": "c5a440b7d3c4ec31c2975ba35293633e8166d150",
+  "initialDecision": {
+    "revision": 1,
+    "request": "Remove Compact switch and old UI; rebuild from scratch with a plan, stronger solid accents/60-30-10, soft edges/elevation, more gaps/smaller elements and a unified sliding structure; begin.",
+    "source": "Direct owner request in this chat after4360 DATE/KPH handoff",
+    "impact": "Replaces two-mode visual direction; COMPACT03 remains historical source/evidence, not FRESH01 verification or integrated visual acceptance.",
+    "decision": "New task/worktree from c5a440b retaining DATE/KPH behavior. Plan first; root sole writer, bounded rollout and at most two integrated review rounds."
+  }
+}

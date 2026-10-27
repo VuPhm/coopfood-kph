@@ -25,6 +25,9 @@ async function reviewKph() {
 }
 beforeEach(()=>{vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date("2026-11-16T08:00:00+07:00"));vi.mocked(processEvidencePhoto).mockResolvedValue({blob:new Blob(["stamped"],{type:"image/jpeg"}),capturedAt:new Date(),width:1,height:1});});
 afterEach(()=>vi.useRealTimers());
+beforeEach(() => vi.stubGlobal("matchMedia", () => ({matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn()})));
+afterEach(() => vi.unstubAllGlobals());
+
 describe("DATE actions use real KPH form",()=>{
   it("does not acknowledge before a reminder is confirmed and supports a week",()=>{
     const save=vi.fn();render(<Workspace save={save}/>);
@@ -33,7 +36,7 @@ describe("DATE actions use real KPH form",()=>{
     fireEvent.click(screen.getByRole("button",{name:"Hủy"}));
     expect(document.querySelector('.store-date-lot [data-processing-status]')).toHaveAttribute('data-processing-status','open');
     fireEvent.click(screen.getByRole("button",{name:"Ghi nhận"}));fireEvent.click(screen.getByRole("radio",{name:/1 tuần/}));fireEvent.click(screen.getByRole("button",{name:"Hẹn báo lại"}));
-    fireEvent.click(screen.getByRole("button",{name:/Đã ghi nhận 1/}));
+
     expect(screen.getByRole("button",{name:/Báo lại 23\/11\/2026/})).toBeInTheDocument();expect(save).not.toHaveBeenCalled();
   });
   it("cancelling a seeded form leaves DATE open and saves nothing",async()=>{
@@ -48,7 +51,7 @@ describe("DATE actions use real KPH form",()=>{
     await reviewKph();fireEvent.click(screen.getByRole('button',{name:'Gửi phiếu'}));
     expect(await screen.findByRole('alert')).toHaveTextContent('Lưu chưa thành công');expect(document.querySelector('.store-date-lot [data-processing-status]')).toHaveAttribute('data-processing-status','open');
     fireEvent.click(screen.getByRole('button',{name:'Gửi phiếu'}));await waitFor(()=>expect(document.querySelector('.store-create-screen')).not.toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button',{name:/Theo dõi DATE/}));expect(screen.queryByRole('button',{name:/Bánh quy/})).not.toBeInTheDocument();expect(screen.getByLabelText('Trạng thái lô nguồn')).toHaveTextContent('resolved');
+    expect(screen.queryByRole('button',{name:/Bánh quy/})).not.toBeInTheDocument();expect(screen.getByLabelText('Trạng thái lô nguồn')).toHaveTextContent('resolved');
     expect(save.mock.calls[0]?.[0]).toMatchObject({skuCode:'0008421',kind:'TPCN',photos:[expect.any(Object)]});
   });
   it("rejects a different product instead of resolving the source lot",async()=>{

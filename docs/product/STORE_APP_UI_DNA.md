@@ -1,5 +1,17 @@
 # Store App UI DNA
 
+**FORM01 revision4 — candidate24/10:** hệ token nút bao gồm primary xanh,
+secondary/ghost/danger, selected/disabled/focus và native command. Vật liệu mép
+khối trượt/sidebar/menu dùng token layer riêng, không đổi geometry/navigation.
+[Giá trị và binding theo vai trò](STORE_APP_SURFACE_STYLE.md#token-nút-và-mép-chrome--form01-revision-4).
+
+**Owner visual principle — 2026-10-24:** Co.op Fresh Soft:
+background and spacing establish groups; resting edges recede; meaningful states
+remain explicit. Accepted forms are the reference; owner authorized extension
+after integrating exact header816b4e3. Apply the role/state recipes in
+[Surface Style](STORE_APP_SURFACE_STYLE.md), preserving semantic colors, focus,
+labels and operational geometry. Store Fresh only; no automatic Admin/Pilot rollout.
+
 Reference triển khai khối/viền cho round tiếp theo:
 [Co.op Fresh — khối mềm, viền nhẹ](STORE_APP_SURFACE_STYLE.md)
 (`coop-fresh-soft-v1`, 22/10/2026). Dùng Home làm mẫu, phân biệt pastel card,

@@ -1,4 +1,5 @@
-// Headless Chromium normally hides scrollbars. Keep native bars visible in this gate.
+// Headless Chromium normally hides scrollbars. Enable native bars for this gate;
+// the host can still use overlay bars that reserve no layout width.
 const { chromium, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const base = process.env.STORE_PREVIEW_URL || 'http://127.0.0.1:4294';
@@ -8,7 +9,7 @@ async function ready(page, screen) {
   await page.goto(`${base}/#${screen}`);
   if (screen === 'login') await expect(page.locator('.store-login-form')).toBeVisible();
   else await expect(page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true })).toBeEnabled();
-  if (screen === 'kph') await expect(page.locator('.kph-loading-frame')).toHaveCount(0);
+  if (screen === 'kph') await expect(page.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
   if (screen === 'reports') await expect(page.locator('.report-type-card').first()).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
 }
@@ -24,10 +25,14 @@ async function scrollBody(page, dialog, selector, desktop) {
   if (before.range > 1) {
     if (desktop) {
       // Drag the actual scrollbar thumb; no application scroll simulation.
+      // A real wheel event reveals an auto-hiding overlay thumb before grabbing it.
+      await body.hover(); await page.mouse.wheel(0, 1);
+      await expect.poll(() => body.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      const dragStart = await body.evaluate(el => el.scrollTop);
       const box = await body.boundingBox();
       await page.mouse.move(box.x + box.width - 3, box.y + 20);
       await page.mouse.down(); await page.mouse.move(box.x + box.width - 3, box.y + Math.min(140, box.height - 20), { steps: 8 }); await page.mouse.up();
-      await expect.poll(() => body.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      await expect.poll(() => body.evaluate(el => el.scrollTop)).toBeGreaterThan(dragStart);
       expect(Math.abs((await header.boundingBox()).y - heading.y)).toBeLessThanOrEqual(1);
       expect(await dialog.evaluate(el => el.scrollTop)).toBe(0);
     }
@@ -53,7 +58,10 @@ async function scrollBody(page, dialog, selector, desktop) {
         await ready(page, screen); await fits(page);
         if (desktop && screen === 'kph') expect(await page.locator('.store-kph-table-wrap').evaluate(el => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
         const root = await page.evaluate(() => ({ bar: innerWidth - document.documentElement.clientWidth, height: document.documentElement.scrollHeight }));
-        if (desktop) { expect(root.bar).toBeGreaterThan(0); expect(root.bar).toBeLessThanOrEqual(12); }
+        if (desktop) {
+          expect(root.bar).toBeGreaterThanOrEqual(0); expect(root.bar).toBeLessThanOrEqual(12);
+          expect(await page.locator('html').evaluate(el => getComputedStyle(el).scrollbarWidth)).toBe('thin');
+        }
         const box = await page.locator(desktop && screen !== 'login' ? '.store-main-column' : '.store-page-layout').boundingBox();
         expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
         await page.mouse.move(viewport.width - 30, viewport.height / 2); await page.mouse.wheel(0, 500);
@@ -70,6 +78,22 @@ async function scrollBody(page, dialog, selector, desktop) {
           await expect(rail.locator('.store-rail-store')).toBeInViewport();
           await rail.evaluate(el => { el.scrollTop = 0; });
         }
+        // Hash navigation can retain scroll position; start with the thumb at the top.
+        // Let any preceding wheel/scroll anchoring finish before placing the thumb.
+        // A pair of equal samples can fall between compositor wheel frames.
+        // Require a continuous quiet period before resetting this test precondition.
+        await page.evaluate(() => new Promise((resolve, reject) => {
+          const start = performance.now(); let lastTop = scrollY; let quietSince = start;
+          const check = now => {
+            if (scrollY !== lastTop) { lastTop = scrollY; quietSince = now; }
+            if (now - quietSince >= 300) resolve();
+            else if (now - start > 5000) reject(new Error('Root wheel scrolling did not settle'));
+            else requestAnimationFrame(check);
+          };
+          requestAnimationFrame(check);
+        }));
+        await page.evaluate(() => scrollTo(0, 0));
+        await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
         await page.mouse.move(viewport.width - 3, 20); await page.mouse.down();
         await page.mouse.move(viewport.width - 3, 160, { steps: 8 }); await page.mouse.up();
         await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);

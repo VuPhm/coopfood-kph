@@ -1,0 +1,94 @@
+/* Store Fresh Solid: one palette, one set of material roles, no theme switch.
+   Body scope reaches Radix portals; online/Pilot/Admin do not load these roles. */
+body:has(.store-app, .store-login) {
+  --store-brand-start: #007a52;
+  --store-brand-end: #007a52;
+  --store-brand-action: #007a52;
+  --store-brand-deep: #00583d;
+  --store-surface: #fff;
+  --store-canvas: #f2f5f3;
+  --store-ink: #183b2d;
+  --store-ink-muted: #52655d;
+  --store-line: #cedbd4;
+  --store-module-mint: var(--store-canvas);
+  --store-module-orange: var(--store-canvas);
+  --store-action-orange: #c45108;
+  --store-accent-ink: #9c410b;
+  --store-action-orange-hover: #a44106;
+  --store-action-green-hover: var(--store-brand-deep);
+  --store-warning-ink: #884312;
+  --store-error-ink: #b42318;
+  --store-error-soft: #fef3f2;
+  --store-control-line: #718578;
+  --store-focus: var(--store-brand-deep);
+  --store-soft-edge: rgb(0 70 45 / 16%);
+  --store-holder-edge: var(--store-soft-edge);
+  --store-holder-surface: #fff;
+  --store-page-canvas: #fff;
+  --store-material-surface: #fff;
+  --store-material-dock: #fff;
+  --store-item-light: radial-gradient(ellipse at 8% 0%, rgb(255 255 255 / 85%), transparent 65%);
+  --store-control-light: radial-gradient(ellipse at 12% 0%, rgb(255 255 255 / 8%), transparent 70%);
+  --store-item-image: var(--store-item-light), linear-gradient(155deg, #fbfefd, #eaf5ef);
+  --store-item-hover-image: var(--store-item-light), linear-gradient(155deg, #f7fcfa, #dcefe4);
+  --store-item-hover-shadow: inset 0 1px 0 white, 0 5px 12px rgb(0 60 40 / 12%), 0 12px 24px rgb(0 60 40 / 10%);
+  --store-item-pressed-shadow: inset 0 1px 3px rgb(0 60 40 / 14%);
+  --store-jewel-image: var(--store-control-light), linear-gradient(145deg, #00724e, #00583d);
+  --store-jewel-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), inset 0 -2px 3px rgb(0 30 20 / 12%), 0 3px 6px rgb(0 40 25 / 16%);
+  --store-material-sheen: linear-gradient(155deg, rgb(255 255 255 / 80%), rgb(255 255 255 / 12%) 46%, rgb(0 72 48 / 4%));
+  --store-soft-card-shadow: inset 0 1px 0 rgb(255 255 255 / 85%), 0 3px 8px rgb(0 60 40 / 8%), 0 8px 18px rgb(0 60 40 / 8%);
+  --store-material-shadow: var(--store-soft-card-shadow);
+}
+@media screen {
+  .store-app .store-page-layout > .store-page-surface { background: var(--store-page-canvas); }
+  .store-app :is(.store-ticket, .store-date-lot:not(.is-active)) { border-color: var(--store-soft-edge); box-shadow: var(--store-soft-card-shadow); }
+  /* The accepted Home light is reused without assigning business-state colors. */
+  .store-app :is(.store-ticket:not(:has(input:checked)), .store-date-lot:not(.is-active), .date-report-card:not(:has(input:checked)), .store-notification-item) { background-image: var(--store-item-image); }
+  .store-app :is(.store-ticket:not(:has(input:checked)), .store-date-lot:not(.is-active), .date-report-card:not(:has(input:checked)), .store-notification-item):hover { background-image: var(--store-item-hover-image); }
+  .store-app .store-kph-table .store-kph-record-row:not([aria-selected="true"]):not(:has(input:checked)) { background-image: var(--store-item-image); }
+  .store-app .store-kph-table .store-kph-record-row:not([aria-selected="true"]):not(:has(input:checked)):hover { background-image: var(--store-item-hover-image); }
+  .store-app .store-notification-item { border-radius: var(--store-radius-control); box-shadow: inset 0 1px 0 rgb(255 255 255 / 90%); }
+  /* Whole-card actions share feedback; nested KPH controls keep their own press.
+     Selected rows retain their stronger state edge and native checked semantics. */
+  body:has(.store-app) :is(.store-notification-item, .store-date-lot:not(.is-active), .report-type-card, .report-history-card, .store-home-attention > button):hover:not(:active) {
+    background-image: var(--store-item-hover-image);
+    border-color: var(--store-control-line);
+    box-shadow: var(--store-item-hover-shadow);
+  }
+  body:has(.store-app) :is(.store-notification-item, .store-date-lot:not(.is-active), .report-type-card, .report-history-card, .store-home-attention > button):active {
+    background-color: var(--store-canvas); background-image: none;
+    box-shadow: var(--store-item-pressed-shadow);
+  }
+  body:has(.store-app) :is(.store-notification-item, .store-date-lot, .report-type-card, .report-history-card, .store-home-attention > button):focus-visible {
+    outline: 3px solid var(--store-focus); outline-offset: 3px;
+  }
+  .store-app .store-mobile-toolbar,
+  .store-app .store-action-dock[data-floating="true"] {
+    border-color: var(--store-soft-edge); background: white;
+    background-image: var(--store-material-sheen); box-shadow: var(--store-material-shadow);
+  }
+  .store-app .store-quick-fab { background: linear-gradient(155deg, #c45108, #a44106); color: white; border-color: rgb(255 255 255 / 25%); box-shadow: var(--store-material-shadow); }
+  .store-app .store-quick-fab:hover { background: var(--store-action-orange-hover); }
+  .store-app .store-mobile-toolbar a:not([aria-current="page"]) { color: var(--store-brand-action); }
+  .store-app .store-mobile-toolbar a[aria-current="page"] { background: linear-gradient(155deg, #087e58, #005c40); color: white; box-shadow: inset 0 1px 0 rgb(255 255 255 / 32%), 0 2px 5px rgb(0 60 40 / 16%); }
+  .store-app .store-page-hero :is(.store-kph-search input, .store-date-search, .store-search-input) { border-color: transparent; background: white; box-shadow: none; }
+  .store-app .store-page-hero :is(.store-date-scan, .report-change-template, .report-composer-info) { background: white; background-image: var(--store-item-image); color: var(--store-brand-action); box-shadow: var(--store-soft-card-shadow); }
+  .store-app .store-home-section-heading > button { background-image: var(--store-item-image); }
+  .store-app .store-home-attention > button { background-image: var(--store-item-image); }
+  .store-app .store-profile-avatar { background: white; color: var(--store-brand-action); }
+  .store-app :is(.store-kph-list-toolbar, .store-date-toolbar) button:not([aria-pressed="true"]):not(.is-filtered) > svg { color: var(--store-brand-action); }
+  body:has(.store-app) .store-account-store { border-bottom: 1px solid var(--store-holder-edge); border-radius: 0; padding: 0 0 20px; background: transparent; }
+  body:has(.store-app) .store-account-store-icon { width: 36px; height: 36px; background-color: var(--store-brand-action); background-image: var(--store-jewel-image); color: white; box-shadow: var(--store-jewel-shadow); }
+  .store-app .store-page-hero input::placeholder { color: var(--store-ink-muted); opacity: 1; }
+}
+@media screen and (min-width: 900px) {
+  .store-app .store-desktop-rail { background: white; border-right-color: var(--store-soft-edge); }
+  .store-app .store-desktop-rail nav a { color: var(--store-brand-action); }
+  .store-app .store-desktop-rail nav a[aria-current="page"] { background: linear-gradient(155deg, #087e58, #005c40); color: white; }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  body:has(.store-app, .store-login) { --store-soft-edge: CanvasText; --store-holder-edge: CanvasText; --store-soft-card-shadow: none; --store-material-shadow: none; --store-item-image: none; --store-item-hover-image: none; --store-item-hover-shadow: none; --store-item-pressed-shadow: none; --store-jewel-image: none; }
+  .store-app :is(.store-mobile-toolbar, .store-action-dock[data-floating="true"]) { background: Canvas; background-image: none; }
+  .store-app :is(.store-ticket, .store-date-lot, .date-report-card, .store-notification-item, .store-kph-record-row) { background-image: none; }
+  .store-app :is(.store-mobile-toolbar, .store-desktop-rail) a[aria-current="page"] { outline: 2px solid Highlight; outline-offset: -3px; }
+}

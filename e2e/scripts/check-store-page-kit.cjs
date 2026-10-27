@@ -28,7 +28,7 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    if(route!=='login'){
     const a=await bounds(page.locator('.store-account'));expect(a.x+a.width).toBe(bar.x+bar.width);expect(a.y).toBe(bar.y);
     if(accountAnchor)expect(a).toEqual(accountAnchor);else accountAnchor=a;
-    if(route!=='home'){const b=await bounds(page.locator('.store-back'));expect(b.x).toBe(bar.x);expect(b.y).toBe(bar.y);if(backAnchor)expect(b).toEqual(backAnchor);else backAnchor=b;}
+    if(route!=='home'&&viewport.width<900){const b=await bounds(page.locator('.store-back'));expect(b.x).toBe(bar.x);expect(b.y).toBe(bar.y);if(backAnchor)expect(b).toEqual(backAnchor);else backAnchor=b;}
    }else{await expect(page.locator('.store-account,.store-desktop-rail,.store-mobile-toolbar')).toHaveCount(0);}
    await audit(page,'.store-header',`page-kit-${route}-${viewport.width}`);
    if([390,1920].includes(viewport.width))await page.screenshot({path:`${output}/${route}-${viewport.width}.png`});
@@ -36,12 +36,16 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    const scrolled=await bounds(hero);expect(scrolled.y).toBe(0);expect(scrolled.x).toBe(l.x);expect(scrolled.width).toBe(l.width);
    if([390,1440].includes(viewport.width)){
     await page.locator('.store-header h1').evaluate(el=>{el.style.fontSize='30px';el.style.lineHeight='39px'});
-    await page.locator('.store-header p').evaluate(el=>{el.style.fontSize='18px';el.style.lineHeight='24px'});
-    const large=await bounds(page.locator('.store-header-account')),leading=await bounds(page.locator('.store-header-brand,.store-back'));
-    expect(large.y).toBe(leading.y);expect(large.x).toBeGreaterThan(leading.x+leading.width);
+    if(await page.locator('.store-header p').count())await page.locator('.store-header p').evaluate(el=>{el.style.fontSize='18px';el.style.lineHeight='24px'});
+    const large=await bounds(page.locator('.store-header-account')),leading=await bounds(page.locator(viewport.width>=900&&route!=='home'&&route!=='login'?'.store-header-location':'.store-header-brand,.store-back'));
+    // Login has no account control; its empty grid slot is not an alignment anchor.
+    // With enlarged copy the baseline logo remains 44px, centered in the taller row.
+    if(route!=='login'&&(viewport.width<900||route==='home'))expect(large.y).toBe(leading.y);
+    if(route==='login'){expect(leading.width).toBe(44);expect(leading.height).toBe(44);}
+    expect(large.x).toBeGreaterThan(leading.x+leading.width);
     expect(await page.locator('.store-header h1').getAttribute('title')).toBe(await page.locator('.store-header h1').textContent());
    }
-   await page.locator('.store-header').evaluate(el=>el.querySelector('button')?.focus());
+   await page.locator('.store-header').evaluate(el=>[...el.querySelectorAll('button')].find(b=>b.getBoundingClientRect().width>0)?.focus());
    if(route!=='login')await expect.poll(()=>page.evaluate(()=>scrollY)).toBe(0);
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }

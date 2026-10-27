@@ -30,22 +30,28 @@ async function audit(page, selector, state) {
     const blend = (a, b) => a.slice(0, 3).map((v, i) => v * a[3] + b[i] * (1 - a[3]));
     const lum = rgb => rgb.slice(0, 3).map(v => v / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
     const ratio = (a, b) => (Math.max(lum(a), lum(b)) + .05) / (Math.min(lum(a), lum(b)) + .05);
-    function background(el, point) {
-      if (!el) return [255, 255, 255];
-      const s = getComputedStyle(el), base = blend(rgba(s.backgroundColor), background(el.parentElement, point));
-      if (s.backgroundImage === 'none') return base;
-      // KPH chrome uses the accepted two-color 115deg linear gradient.
-      const match = s.backgroundImage.match(/^linear-gradient\(([\d.]+)deg,/);
-      if (!match) throw new Error(`Unsupported background: ${s.backgroundImage}`);
-      const stops = [...s.backgroundImage.matchAll(/rgba?\([^)]+\)(?:\s+[\d.]+%)?/g)].map(m => ({ color: rgba(m[0].match(/rgba?\([^)]+\)/)[0]), pos: m[0].match(/([\d.]+)%/)?.[1] }));
-      stops.forEach((s, i) => s.pos = s.pos === undefined ? i / (stops.length - 1) : Number(s.pos) / 100);
-      const r = el.getBoundingClientRect(), angle = Number(match[1]) * Math.PI / 180, dx = Math.sin(angle), dy = -Math.cos(angle);
-      const t = Math.max(0, Math.min(1, .5 + ((point.x - r.x - r.width / 2) * dx + (point.y - r.y - r.height / 2) * dy) / (r.width * Math.abs(dx) + r.height * Math.abs(dy))));
-      let left = stops[0], right = stops.at(-1);
-      for (let i = 1; i < stops.length; i++) if (t <= stops[i].pos) { left = stops[i - 1]; right = stops[i]; break; }
-      const f = right.pos === left.pos ? 0 : Math.max(0, Math.min(1, (t - left.pos) / (right.pos - left.pos)));
-      return blend(left.color.map((v, i) => v + (right.color[i] - v) * f), base);
+    // Conservative stop envelope: every layer/alpha combination must pass.
+    // This supports static linear/radial stacks without silently skipping complex paint.
+    const backgroundCache = new WeakMap();
+    const unique = colors => [...new Map(colors.map(c => [c.map(v => Math.round(v * 1000)).join(','), c])).values()];
+    function layers(value) {
+      const list=[]; let depth=0, start=0;
+      for(let i=0;i<value.length;i++){if(value[i]==='(')depth++;else if(value[i]===')')depth--;else if(value[i]===','&&depth===0){list.push(value.slice(start,i).trim());start=i+1;}}
+      list.push(value.slice(start).trim());return list;
     }
+    function backgrounds(el) {
+      if (!el) return [[255, 255, 255]];
+      if (backgroundCache.has(el)) return backgroundCache.get(el);
+      const style=getComputedStyle(el);let colors=unique(backgrounds(el.parentElement).map(bg=>blend(rgba(style.backgroundColor),bg)));
+      if(style.backgroundImage!=='none')for(const layer of layers(style.backgroundImage).reverse()){
+        if(!/^(linear|radial)-gradient\(/.test(layer))throw new Error(`Unsupported background: ${style.backgroundImage}`);
+        const stops=[...layer.matchAll(/rgba?\([^)]+\)|color\([^)]+\)/g)].map(m=>rgba(m[0]));
+        if(stops.length<2)throw new Error(`Unresolved gradient stops: ${layer}`);
+        colors=unique(colors.flatMap(bg=>stops.map(color=>blend(color,bg))));
+      }
+      backgroundCache.set(el,colors);return colors;
+    }
+    const minimum = values => Math.min(...values);
     const samples = [], borders = [], indicators = [];
     function text(el, content, rects, pseudo) {
       if (el.closest('[disabled], [aria-hidden="true"], .sr-only')) return;
@@ -53,8 +59,7 @@ async function audit(page, selector, state) {
       if (style.visibility !== 'visible') return;
       for (const rect of rects) {
         if (rect.width < 1 || rect.height < 1) continue;
-        const points = [{ x: rect.left, y: rect.top }, { x: rect.right, y: rect.bottom }];
-        const checks = points.map(point => { const bg = background(el, point); return { ratio: ratio(blend(rgba(style.color), bg), bg), background: bg }; });
+        const checks = backgrounds(el).map(bg => ({ ratio: ratio(blend(rgba(style.color), bg), bg), background: bg }));
         const worst = checks.sort((a, b) => a.ratio - b.ratio)[0];
         samples.push({ text: content.trim().slice(0, 70), color: style.color, ...worst });
       }
@@ -71,10 +76,24 @@ async function audit(page, selector, state) {
         const rect = input.getBoundingClientRect(); if (!rect.width || input.disabled) continue;
         text(input, input.value || input.placeholder || input.tagName, [rect], input.value || !input.placeholder ? undefined : '::placeholder');
         const style = getComputedStyle(input), point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-        // A translucent edge paints over the field fill. That composed contour,
-        // rather than the border's uncomposited RGB, must separate it from the page.
-        const contour = blend(rgba(style.borderTopColor), background(input, point));
-        borders.push({ name: input.id || input.getAttribute('aria-label'), ratio: ratio(contour, background(input.parentElement, point)) });
+        // Compose a translucent edge over the field fill before measuring it;
+        // the identifying-cue check below distinguishes decoration from a boundary.
+        const contours = backgrounds(input).map(bg => blend(rgba(style.borderTopColor), bg));
+        const visible = el => {
+          const r = el.getBoundingClientRect(), s = getComputedStyle(el);
+          return r.width > 1 && r.height > 1 && s.visibility === 'visible' && s.display !== 'none' && !el.closest('.sr-only, [hidden], [aria-hidden="true"]');
+        };
+        const labels = [...(input.labels || [])];
+        const visibleLabel = labels.some(label => visible(label) && label.textContent.trim());
+        const content = (input.tagName === 'SELECT' ? input.selectedOptions[0]?.textContent : input.value || input.placeholder || '').trim();
+        const named = labels.some(label => label.textContent.trim()) || !!input.getAttribute('aria-label')?.trim() || !!input.getAttribute('aria-labelledby')?.trim();
+        const icon = input.closest('label')?.querySelector('svg');
+        const visibleIcon = icon && visible(icon) && minimum(backgrounds(icon).map(bg => ratio(blend(rgba(getComputedStyle(icon).color), bg), bg))) >= 3;
+        // Quiet decoration need not be the sole identifying cue. Require a named
+        // field, contrasting content and a visible label or meaningful search icon.
+        // Empty/unlabeled fields still need a contrasting boundary. Focus and
+        // selection are independently required to meet 3:1 below (WCAG 1.4.11).
+        borders.push({ name: input.id || input.getAttribute('aria-label'), ratio: minimum(contours.flatMap(contour => backgrounds(input.parentElement).map(bg => ratio(contour, bg)))), visibleLabel, visibleIcon: !!visibleIcon, visibleContent: !!content, identifiedByText: !!named && (visibleLabel || !!visibleIcon) && !!content });
       }
     }
     for (const root of roots) for (const el of root.querySelectorAll(':focus-visible, .choice-card:has(input:checked), .store-choices .is-selected, .store-tabs [aria-pressed="true"], .store-quick-sort-options [aria-pressed="true"], .store-date-statuses [aria-pressed="true"]')) {
@@ -82,20 +101,20 @@ async function audit(page, selector, state) {
       const style = getComputedStyle(el), point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
       const focus = el.matches(':focus-visible');
       if (el.matches('.store-tabs [aria-pressed="true"], .store-quick-sort-options [aria-pressed="true"], .store-date-statuses [aria-pressed="true"]')) {
-        indicators.push({ name: el.textContent.trim(), kind: el.closest('.store-tabs') ? 'selected-tab-surface' : el.closest('.store-date-statuses') ? 'selected-status-surface' : 'selected-sort-surface', ratio: ratio(background(el, point), background(el.parentElement, point)) });
+        indicators.push({ name: el.textContent.trim(), kind: el.closest('.store-tabs') ? 'selected-tab-surface' : el.closest('.store-date-statuses') ? 'selected-status-surface' : 'selected-sort-surface', ratio: minimum(backgrounds(el).flatMap(color => backgrounds(el.parentElement).map(bg => ratio(color, bg)))) });
         if (!focus) continue;
       }
-      indicators.push({ name: el.textContent.trim().slice(0, 50) || el.id, kind: focus ? 'focus' : 'selected', ratio: ratio(rgba(focus ? style.outlineColor : style.borderTopColor), background(el.parentElement, point)) });
+      indicators.push({ name: el.textContent.trim().slice(0, 50) || el.id, kind: focus ? 'focus' : 'selected', ratio: minimum(backgrounds(el.parentElement).map(bg => ratio(rgba(focus ? style.outlineColor : style.borderTopColor), bg))) });
     }
     return { samples, borders, indicators };
   });
   expect(result.samples.length, `${state} has runtime samples`).toBeGreaterThan(0);
   const failures = result.samples.filter(s => !Number.isFinite(s.ratio) || s.ratio < 4.5);
   const indicatorFailures = result.indicators.filter(s => !Number.isFinite(s.ratio) || s.ratio < 3);
-  const borderFailures = result.borders.filter(s => !Number.isFinite(s.ratio) || s.ratio < 3);
+  const borderFailures = result.borders.filter(s => !Number.isFinite(s.ratio) || (s.ratio < 3 && !s.identifiedByText));
   fs.writeFileSync(`${output}/${state}.json`, JSON.stringify(result, null, 2));
   expect(failures, `${state} text >=4.5:1`).toEqual([]);
-  expect(borderFailures, `${state} input boundaries >=3:1`).toEqual([]);
+  expect(borderFailures, `${state} input boundary >=3:1 or visible label + contrasting field content`).toEqual([]);
   expect(indicatorFailures, `${state} focus/selection indicators >=3:1`).toEqual([]);
   return { state, samples: result.samples.length, minimumText: Math.min(...result.samples.map(s => s.ratio)), minimumBorder: result.borders.length ? Math.min(...result.borders.map(s => s.ratio)) : null };
 }
@@ -160,6 +179,6 @@ if (require.main === module) (async () => {
       await page.close();
     }
     fs.writeFileSync(`${output}/results.json`, JSON.stringify(results, null, 2));
-    console.log(`PASS KPH contrast: ${results.length} rendered states, text >=4.5, input boundaries >=3, CTA/tab focus and selected tab surface.`);
+    console.log(`PASS KPH contrast: ${results.length} rendered states, text >=4.5, input affordances and CTA/tab focus and selected tab surface.`);
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

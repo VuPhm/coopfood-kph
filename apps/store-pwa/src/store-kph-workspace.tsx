@@ -1,5 +1,5 @@
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
-import { StoreStickyTabs, revealBelowStickyTabs } from "./store-sticky-tabs";
+import { revealBelowStickyTabs } from "./store-sticky-tabs";
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState, useLayoutEffect } from "react";
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@coopfood-kph/ui";
 import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
@@ -13,18 +13,19 @@ import { formatBusinessDate } from "./business-date";
 import { EvidenceImageViewer } from "./image-viewer";
 import { KPH_BATCH_SIZE, KPH_DATE_SHORTCUTS, kphDateRange } from "./store-kph-history";
 import { StoreKphMore, StoreKphList } from "./store-kph-list";
-import { KphQuickSort, KPH_SORT_OPTIONS } from "./store-kph-sort";
-import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, Maximize, Search, SlidersHorizontal } from "lucide-react";
+import { KPH_SORT_OPTIONS } from "./store-kph-sort";
+import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, Search, SlidersHorizontal } from "lucide-react";
 import { KphCreateControl, preloadKphCreateForm as preloadCreateForm, type KphCreateHandle } from "./store-kph-create-control";
 import { kphRecordFromDraft } from "./store-kph-draft-record";
 import "./store-kph-create-forms.css";
 import { KphCreateButton } from "./store-kph-create-button";
+import { FOOD_KIND_LABELS, StoreFoodKindTabs } from "./store-food-kind-tabs";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 
 function dateIso(value: string) { try { return parseDisplayDate(value); } catch { return null; } }
 const nameCollator = new Intl.Collator("vi");
 
-const labels: Record<KphKind, string> = { TPCN: "TP khô & khác", TPTS: "TP tươi sống" };
+const labels = FOOD_KIND_LABELS;
 export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChange, onNotice }: {
   records: RecordView[]; onRecordsChange: (records: RecordView[]) => void; onNotice: (message: string) => void;
 }) {
@@ -112,14 +113,14 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
 
   return <StorePageLayout className="store-kph">
     <StorePageHero className="store-kph-underlay">
-      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label><button className="store-scan-trigger" aria-label={`Tạo phiếu ${labels[kind]}`} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(kind)}><Maximize size={20} aria-hidden="true" /></button></div>
+      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label></div>
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <KphCreateButton key={k} kind={k} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)} />)}</div></section>
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
-      <StoreStickyTabs><div className="store-tabs" role="group" aria-label="Loại phiếu">{(["TPCN", "TPTS"] as const).map(k => <button key={k} aria-pressed={kind === k} className={kind === k ? "is-active" : ""} onClick={() => setKind(k)}>{labels[k]}<small>{typeTotals[k]}</small></button>)}</div></StoreStickyTabs>
+      <StoreFoodKindTabs label="Loại phiếu" value={kind} counts={typeTotals} onChange={setKind} />
       <div className="store-kph-list-controls">
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{filtered.length} phiếu</span></div>
-        <div className="store-kph-list-toolbar"><KphQuickSort sort={sort} onChange={setSort} /><button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} groupByDate={groupByDate} onGroupByDateChange={value => { setGroupByDate(value); setCollapsedDates([]); }} /></div>
+        <div className="store-kph-list-toolbar"><button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} groupByDate={groupByDate} onGroupByDateChange={value => { setGroupByDate(value); setCollapsedDates([]); }} /></div>
       </div>
       {selectionMode ? <div className="store-batch"><label><input type="checkbox" aria-label="Chọn tất cả" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
         const visibleIds = new Set(visible.map(r => r.id));

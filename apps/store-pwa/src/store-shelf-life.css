@@ -1,53 +1,53 @@
 /* Home Visual DNA, scoped to the shelf utility. Shared tokens retain their defaults. */
 .store-app.store-screen-shelf,
 .store-quick-panel:has(.store-shelf) {
-  --cf-color-brand: #00724e;
-  --cf-color-brand-hover: #00724e;
-  --cf-color-brand-active: #006846;
-  --cf-color-brand-soft: #e6f7f2;
-  --cf-color-ink: #20344a;
+  --cf-color-brand: var(--store-brand-action);
+  --cf-color-brand-hover: var(--store-brand-deep);
+  --cf-color-brand-active: var(--store-brand-deep);
+  --cf-color-brand-soft: var(--store-canvas);
+  --cf-color-ink: var(--store-ink);
   --cf-color-success: #00724e;
   --cf-color-amber: #884312;
   --cf-color-danger: #b42318;
   --cf-color-danger-soft: #fef3f2;
-  --cf-color-ink-muted: #596b7d;
-  --cf-color-surface-muted: #f5f8fa;
-  --cf-color-border: #d6e3df;
-  --cf-color-canvas: #f4f8f6;
-  --store-shelf-peach: #fff0e6;
-  --store-shelf-peach-ink: #8b4b1f;
+  --cf-color-ink-muted: var(--store-ink-muted);
+  --cf-color-surface-muted: var(--store-canvas);
+  --cf-color-border: var(--store-holder-edge);
+  --cf-color-canvas: var(--store-canvas);
+  --store-shelf-accent-surface: var(--store-canvas);
+  --store-shelf-accent-ink: var(--store-accent-ink);
   --store-result-radius: 20px;
   color: var(--cf-color-ink);
 }
 
 .store-shelf-page { max-width: 1160px; margin-inline: auto; }
 
-:is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle { border-radius: 14px; padding-inline: 10px; background: var(--store-shelf-peach); color: var(--cf-color-ink); }
+:is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle { border-radius: 14px; padding-inline: 0; background: white; border-bottom: 1px solid var(--store-holder-edge); border-radius: 0; color: var(--cf-color-ink); }
 :is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle strong { display: flex; min-width: 0; align-items: center; gap: 8px; font-weight: 650; }
-.store-shelf-mode-icon { display: grid; width: 28px; height: 28px; flex: 0 0 28px; place-items: center; border-radius: 50%; background: white; color: var(--store-shelf-peach-ink); }
+.store-shelf-mode-icon { display: grid; width: 28px; height: 28px; flex: 0 0 28px; place-items: center; border-radius: 50%; background: white; color: var(--store-shelf-accent-ink); }
 /* A 44px control keeps the compact 24px switch track and thumb. */
 :is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle button { height: 44px; background: transparent; }
 :is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle button::before { content: ""; position: absolute; inset: 10px 0; border-radius: 999px; background: #8c9f9a; }
 :is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle button[aria-checked="true"]::before { background: var(--cf-color-brand); }
 :is(.store-app, .store-quick-panel) .store-shelf .store-known-toggle button span { position: absolute; top: 13px; left: 3px; }
 :is(.store-app, .store-quick-panel) .store-shelf .store-field label { color: var(--cf-color-ink-muted); font-weight: 500; }
-:is(.store-app, .store-quick-panel) .store-shelf .store-field input { background: #fbfdfc; color: var(--cf-color-ink); }
+:is(.store-app, .store-quick-panel) .store-shelf .store-field input { background: var(--store-canvas); color: var(--cf-color-ink); }
 :is(.store-app, .store-quick-panel) .store-shelf .store-field input::placeholder { color: var(--cf-color-ink-muted); }
 :is(.store-app, .store-quick-panel) .store-shelf .store-field input:focus { border-color: var(--cf-color-brand); }
 :is(.store-app, .store-quick-panel) .store-shelf .store-shelf-actions .store-secondary { background: var(--cf-color-brand-soft); border-color: transparent; color: #00724e; }
 :is(.store-app, .store-quick-panel) .store-shelf .store-shelf-actions button { font-weight: 650; }
-:is(.store-app, .store-quick-panel) .store-shelf .store-shelf-placeholder-icon { border-radius: 50%; background: var(--store-shelf-peach); color: var(--store-shelf-peach-ink); }
+:is(.store-app, .store-quick-panel) .store-shelf .store-shelf-placeholder-icon { border-radius: 50%; background: var(--store-shelf-accent-surface); color: var(--store-shelf-accent-ink); }
 :is(.store-app, .store-quick-panel) .store-shelf .store-shelf-placeholder[data-state="invalid"] .store-shelf-placeholder-icon { background: var(--cf-color-danger-soft); color: var(--cf-color-danger); }
 :is(.store-app, .store-quick-panel) .store-shelf .store-shelf-placeholder h3 { font-weight: 650; }
 
 
 .store-app.store-screen-shelf .store-shelf-history { border-radius: 20px; }
 .store-app.store-screen-shelf .store-shelf-history h2 { color: var(--cf-color-ink); font-weight: 650; }
-.store-app.store-screen-shelf .store-shelf-history h2 svg { width: 32px; height: 32px; padding: 7px; border-radius: 50%; background: var(--store-shelf-peach); color: var(--store-shelf-peach-ink); }
-.store-app.store-screen-shelf .store-shelf-history h2 span { background: var(--store-shelf-peach); color: var(--store-shelf-peach-ink); }
-.store-app.store-screen-shelf .store-shelf-history-empty > svg { width: 48px; height: 48px; padding: 12px; border-radius: 50%; background: var(--cf-color-brand-soft); color: #00724e; }
-.store-app.store-screen-shelf .store-shelf-history-recall { background: var(--store-shelf-peach); color: var(--store-shelf-peach-ink); }
-.store-app.store-screen-shelf .store-shelf-history-recall:hover { background: #ffe5d3; }
+.store-app.store-screen-shelf .store-shelf-history h2 svg { width: 32px; height: 32px; padding: 7px; border-radius: 50%; background: var(--store-shelf-accent-surface); color: var(--store-shelf-accent-ink); }
+.store-app.store-screen-shelf .store-shelf-history h2 span { background: var(--store-shelf-accent-surface); color: var(--store-shelf-accent-ink); }
+.store-app.store-screen-shelf .store-shelf-history-empty > svg { width: 32px; height: 32px; padding: 6px; border-radius: 10px; background: var(--store-brand-action); color: white; }
+.store-app.store-screen-shelf .store-shelf-history-recall { background: var(--store-shelf-accent-surface); color: var(--store-shelf-accent-ink); }
+.store-app.store-screen-shelf .store-shelf-history-recall:hover { background: var(--store-canvas); }
 
 @media (max-width: 359px) {
   :is(.store-app, .store-quick-panel) .store-shelf .store-shelf-mode-icon { display: none; }
@@ -92,7 +92,7 @@
 }
 :is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-known-toggle {
   border: 1px solid transparent; border-radius: 14px;
-  background-image: var(--store-glass-sheen); box-shadow: var(--store-soft-card-shadow);
+  background-image: var(--store-material-sheen); box-shadow: var(--store-soft-card-shadow);
 }
 :is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-known-toggle strong { font-size: 13px; line-height: 20px; }
 :is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) .store-shelf .store-field input:focus { border-color: #00724e; }
@@ -115,9 +115,9 @@
 .store-quick-panel[data-slot="dialog-content"] .store-shelf .store-result-date { font-size: 26px; line-height: 32px; }
 .store-app.store-screen-shelf .store-shelf-history { margin: 20px 0 0; border: 0; border-radius: 0; padding: 0; background: white; }
 .store-app.store-screen-shelf .store-shelf-history > header { gap: 8px; margin-bottom: 12px; }
-.store-app.store-screen-shelf .store-shelf-history-empty { padding: 20px 12px; background: #fafbfc; }
+.store-app.store-screen-shelf .store-shelf-history-empty { padding: 20px 12px; background: var(--store-canvas); }
 .store-app.store-screen-shelf .store-shelf-history-list > li { border-color: var(--store-holder-edge); background: white; }
-.store-app.store-screen-shelf .store-shelf-history-recall { background-image: var(--store-glass-sheen); }
+.store-app.store-screen-shelf .store-shelf-history-recall { background-image: var(--store-material-sheen); }
 @media (max-width: 1199px) {
   .store-app.store-screen-shelf .store-shelf-history-list > li { box-shadow: var(--store-soft-card-shadow); }
 }
@@ -125,5 +125,5 @@
   .store-app.store-screen-shelf .store-shelf { grid-template-columns: minmax(340px, .95fr) minmax(0, 1.05fr); gap: 20px; align-items: start; }
 }
 @media (prefers-contrast: more), (forced-colors: active) {
-  :is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) :is(.store-shelf-form,.store-shelf-result,.store-known-toggle) { border-color: #718578; }
+  :is(.store-app.store-screen-shelf, .store-quick-panel[data-slot="dialog-content"]) :is(.store-shelf-form,.store-shelf-result) { border-color: #718578; }
 }

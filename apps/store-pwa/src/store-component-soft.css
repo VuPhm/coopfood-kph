@@ -1,0 +1,55 @@
+/* Co.op Fresh Soft: decoration recedes; meaningful state remains explicit.
+   Local Store presentation only. No geometry, native checks or chart changes. */
+@media screen {
+  body:has(.store-app, .store-login) {
+    --store-component-edge: var(--store-button-edge);
+    --store-component-well: var(--store-button-secondary-bg);
+    --store-component-hover: var(--store-button-secondary-hover);
+    --store-component-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 3px 8px rgb(0 60 40 / 10%);
+    --store-component-popup-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 12px 32px rgb(0 60 40 / 18%);
+  }
+  /* Label/icon identifies the action; the edge is decorative at rest. */
+  body:has(.store-app, .store-login) :is(.store-compact, .store-filter, .store-quick-sort-trigger, .store-selection-menu, .store-kph-more button, .store-reset-filter, .store-date-reset-filter, .store-choice-cancel, .store-choices button, .store-kph-date-shortcuts button, .store-date-reminder-cancel, .store-login-preview):not([aria-pressed="true"], [aria-expanded="true"], [data-state="open"], .is-selected, .is-active, .is-filtered, :active, :disabled) {
+    border-color: var(--store-component-edge);
+    background-color: var(--store-component-well);
+    background-image: var(--store-item-image);
+    box-shadow: var(--store-component-shadow);
+  }
+  body:has(.store-app, .store-login) :is(.store-compact, .store-filter, .store-quick-sort-trigger, .store-selection-menu, .store-kph-more button, .store-reset-filter, .store-date-reset-filter, .store-choice-cancel, .store-choices button, .store-kph-date-shortcuts button, .store-date-reminder-cancel, .store-login-preview):hover:not([aria-pressed="true"], [aria-expanded="true"], [data-state="open"], .is-selected, .is-active, .is-filtered, :active, :disabled) {
+    background-color: var(--store-component-hover);
+    background-image: var(--store-item-hover-image);
+  }
+  body:has(.store-app, .store-login) :is(.store-compact, .store-filter, .store-selection-menu, .store-kph-more button, .store-reset-filter, .store-date-reset-filter, .store-choice-cancel, .store-choices button, .store-kph-date-shortcuts button, .store-date-reminder-cancel, .store-login-preview):active:not([aria-pressed="true"], .is-selected, .is-filtered, :disabled) {
+    background-image: none; box-shadow: var(--store-button-pressed-shadow);
+  }
+  /* A single state edge, existing check/label and native semantics suffice. */
+  body:has(.store-app) :is(.store-sheet .store-choices .is-selected, .store-date-lot.is-active, .store-kph-date-shortcuts button[aria-pressed="true"], .ui-select-trigger[data-state="open"]) { box-shadow: none; }
+  body:has(.store-app) :is(.store-kph-filter-section, .store-date-filter-section, .report-sheet-section, .store-settings-group, .store-date-reminder-choices) {
+    border-color: var(--store-component-edge);
+    box-shadow: var(--store-component-shadow);
+  }
+  body:has(.store-app) :is(.store-settings-row + .store-settings-row, .store-choice-actions, .store-choice-option, .store-summary > div, .store-shelf-history-list > li) { border-color: var(--store-component-edge); }
+  body:has(.store-app) .store-date-reminder-choices label:not(:has(input:checked)) {
+    border-color: var(--store-component-edge); background-color: var(--store-component-well); background-image: var(--store-item-image);
+  }
+  body:has(.store-app) .store-choice-sheet .store-choice-option:not(:has(input:checked)) { border-color: var(--store-component-edge); background-image: var(--store-item-image); }
+  body:has(.store-app) :is(.store-settings-row, .store-choice-option, .store-quick-sort-options button):hover:not(:has(input:checked)):not([aria-pressed="true"]) { background-color: var(--store-component-well); }
+  body:has(.store-app) .store-date-lot:hover:not(.is-active) { border-color: var(--store-holder-edge); }
+  body:has(.store-app) :is(.store-quick-sort-popup, .ui-dropdown-surface.store-dropdown, .expiry-calendar) {
+    border-color: var(--store-component-edge); box-shadow: var(--store-component-popup-shadow);
+  }
+  body:has(.store-app) .store-dropdown { --dropdown-line: var(--store-component-edge); }
+  body:has(.store-app) .ui-select-trigger[data-state="open"] { --store-form-field-edge: var(--store-brand-action, #00724e); --store-form-field-surface: #fff; }
+}
+@media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {
+  body:has(.store-app, .store-login) { --store-component-shadow: none; --store-component-popup-shadow: none; }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  body:has(.store-app, .store-login) {
+    --store-component-edge: CanvasText;
+    --store-component-well: Canvas;
+    --store-component-hover: Canvas;
+    --store-component-shadow: none;
+    --store-component-popup-shadow: none;
+  }
+}

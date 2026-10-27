@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "header03-context-nav",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Simplify Home header, unbox mobile Back, use desktop contextual breadcrumbs alongside existing sidebar.",
+  "inScope": [
+    "Home visible header copy removal with accessible page heading preserved",
+    "Unboxed mobile Back; desktop ancestor navigation in AppHeader",
+    "Report custom-title parent action, shared header reflow/focus and regression checks"
+  ],
+  "outOfScope": [
+    "Feature workflows/API/domain/data/auth, chart colors, shared packages",
+    "Sidebar/mobile navigation redesign, non-AppHeader modal navigation",
+    "Merge/push/deploy without owner authorization"
+  ],
+  "baseSha": "f77034d9c14b88f5ae6359e31cfd23b4e3e6b0d8",
+  "candidateSha": "816b4e33d27ef9512af05e5968511e6a29690536",
+  "integrationOwner": "Current chat sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-app-header.tsx",
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-header.css",
+    "apps/store-pwa/src/store-app-frame.test.tsx",
+    "e2e/scripts/check-store-page-kit.cjs",
+    "e2e/scripts/check-store-chrome.cjs",
+    "e2e/scripts/check-header-context.cjs",
+    "e2e/scripts/check-report-header.cjs",
+    "docs/product/STORE_APP_FRAME.md",
+    "docs/product/STORE_NAVIGATION_DESIGN.md",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/delivery/header03-context-nav/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 1,
+      "sha": "816b4e33d27ef9512af05e5968511e6a29690536",
+      "evidence": "docs/delivery/header03-context-nav/technical.md"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Owner review Home/mobile plain Back/desktop ancestors at http://127.0.0.1:4331/#home; await actual acceptance before integration.",
+  "authorization": "24/10/2026 owner: bỏ Trang chủ/Cửa hàng hiện tại; nút quay lại không đường bao; desktop điều hướng khác không dùng nút quay lại."
+}

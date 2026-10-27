@@ -10,10 +10,17 @@ export function acknowledgeDateLot(lot: MockDateLot, today: LocalDate, days: 1 |
 export function reactivateDueDateLots(lots: MockDateLot[], today: LocalDate): MockDateLot[] {
   return lots.map(lot => lot.status === "acknowledged" && lot.remindOn && lot.remindOn <= today ? { ...lot, status: "open" } : lot);
 }
-export function dateLotKphSeed(lot: MockDateLot, today: LocalDate) {
+function dateLotCatalog(lot: MockDateLot) {
   const matches = mockCatalogProducts.filter(product => product.skuCode === lot.sku);
   const product = matches.length === 1 ? matches[0] : undefined;
   const metadata = product ? mockProductMetadata[product.id] : undefined;
+  return { product, metadata };
+}
+export function dateLotKind(lot: MockDateLot) {
+  return dateLotCatalog(lot).metadata?.kphKind ?? null;
+}
+export function dateLotKphSeed(lot: MockDateLot, today: LocalDate) {
+  const { product, metadata } = dateLotCatalog(lot);
   const phase = assessDateLot(lot, today).phase;
   let expiry: string;
   try { expiry = formatDisplayDate(lot.date); } catch { expiry = lot.date; }

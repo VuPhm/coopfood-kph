@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "id": "compact03-date-report-items",
+  "revision": 8,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Complete DATE/KPH alignment, apply dense list presentation in both modes and restore second-tag containers, with shared code and preserved workflows/print.",
+  "inScope": [
+    "Replace DATE alerts/tracking major tabs with TPCN/TPTS shared with KPH live/loading; unknown types remain explicitly reachable without guessing",
+    "DATE status/attention/phase filtering independent of food type, exact lookup/deep-link reveals correct kind; resolved stays excluded",
+    "Same full-width list flow as KPH: mobile cards/desktop table and shared sheet details, consistent functional controls; keep DATE metrics/timeline/reminders and KPH handoff",
+    "Reuse existing quick sort/sticky tabs/sheet/table styles, extract only real shared food-kind component for multiple consumers; remove obsolete DATE master-detail/tab CSS",
+    "Update product guidance and meaningful component/browser tests; root sole writer, no unrelated feature or CSS rollout",
+    "Owner now adopts dense/Compact DATE and KPH list presentation for BOTH preference modes; keep preference-specific controls/forms separate and print composition preserved",
+    "Restore full second-tag container for KPH resolution and DATE processing on screen, including DATE detail labels; approval final fallback remains explicit",
+    "Resolve the remaining large-text toolbar overflow and verify list parity across densities without adding components"
+  ],
+  "outOfScope": [
+    "Backend/API/auth/schema, assigning unknown food kind by name/SKU inference",
+    "New DATE creation, bulk selection/export or workflow not already supported",
+    "Main merge/push, protected GitHub Pages or inferred Cloudflare update",
+    "Dependencies/packages/ui/root config, Home/chrome changes, date calculation or timeline/color recipe changes; responsive chart container follows the new sheet."
+  ],
+  "baseSha": "3f141a7",
+  "candidateSha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+  "integrationOwner": "Root sole writer, quick scoped follow-up; no new audit/agent loop.",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/check-store-density.cjs",
+    "e2e/scripts/check-store-notifications.cjs",
+    "e2e/scripts/check-date-actions.cjs",
+    "e2e/scripts/check-date-kph-parity.cjs",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/DATE_MILESTONE_MODEL.md",
+    "docs/product/STORE_NOTIFICATIONS_DESIGN.md",
+    "docs/product/STORE_APP_COMPONENT_CATALOG.md",
+    "docs/delivery/compact03-date-report-items/**",
+    "docs/product/STORE_APP_DENSITY.md",
+    "e2e/scripts/check-store-list-density.cjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "shared-screen-list-and-second-tags",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+    },
+    {
+      "id": "date-food-kind-and-unknown-scope",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+    },
+    {
+      "id": "date-kph-structure-and-workflow",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+    },
+    {
+      "id": "cross-feature-density-and-output-regression",
+      "kind": "technical",
+      "required": true,
+      "status": "pass",
+      "revision": 8,
+      "sha": "a5c9824afb16b874cedf310f96f553c0837cb993",
+      "evidence": "docs/delivery/compact03-date-report-items/technical.md"
+    },
+    {
+      "id": "owner-date-kph-alignment",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "tiếp đoạn bị ngắt, vào vòng lặp tối ưu đồng nhất phong cách mớ này cho các vùng chưa cover",
+      "source": "Owner message26/10/2026, after interrupted COMPACT03",
+      "impact": "Adds secondary utility/management surfaces; new visual/portal gates required. No prior acceptance inferred for COMPACT03.",
+      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch. Validation maintenance only: native-scrollbar gate supports host overlay bars and Compact preference, and requires thumb drag to advance beyond the wheel activation position. Final visual verification preserves16px between adjacent desktop report choices; no other audit scope added."
+    },
+    {
+      "revision": 3,
+      "request": "tiếp cứ lặp lại agent loop work, cả fresh coop giao diện nữa",
+      "source": "Direct owner request in this chat26/10/2026, preview4350",
+      "impact": "Explicitly authorizes agent collaboration and default Co.op Fresh visual refinements, so revision2 historical comfortable-geometry parity is invalidated in changed scopes. All required technical gates reset; previous user gate remains unaccepted.",
+      "decision": "Continue same task/worktree with three disjoint isolated writers from reviewed2a3b574. Root integrates shared imports/tokens/docs, runs complete workflow/output gates and at most two bounded review/repair rounds; no merge/deploy."
+    },
+    {
+      "revision": 4,
+      "request": "tiếp, áp dụng triết lý compact cho phần quản lý date, thông báo; những phần đồng dạng được thì làm đồng dạng giữa các chức năng để đồng nhất flow",
+      "source": "Direct owner message26/10/2026",
+      "impact": "Adds DATE filter/detail/reminder and notification composition to previous interrupted scope. All integrated gates remain pending. Prior agents stopped; partial files are unverified input.",
+      "decision": "Resume same task, recover partial CSS, three bounded isolated writers and root loading takeover; max two review rounds, no business behavior changes."
+    },
+    {
+      "revision": 5,
+      "request": "1 round rà soát chuẩn cấu trúc giao diện, code css; bật chế độ thu gọn thì giao diện bị nhảy, không biết phải lỗi không",
+      "source": "Owner message26/10/2026 after Cloudflare mockup publication, ambient4352/home",
+      "impact": "Reopens technical investigation and invalidates account/toggle stability evidence; revision4 source/evidence/publication preserved. Visual owner acceptance still pending.",
+      "decision": "One bounded read-only review and root measurement; repair confirmed jump/cascade defect, preserve intentional density reflow. New local candidate, no inferred re-publication/main merge."
+    },
+    {
+      "revision": 6,
+      "request": "lỗi nhỏ fix nhanh: Biện pháp mất vùng tag; Compact2CTA thêm dấu hiệu clickable/soft Home và cân CTA mặc định; field đang lồi, tham khảo iOS27",
+      "source": "Direct owner message after4354 handoff26/10/2026",
+      "impact": "Changes tag paint, create CTA markup/paint and shared field material; resets affected technical gates, no prior visual acceptance inferred.",
+      "decision": "Minimal existing file/token changes; consult official Apple HIG text-fields/materials, matte content fields and soft actions. No backend/business/main merge/new publication."
+    },
+    {
+      "revision": 7,
+      "request": "Áp dụng triết lý KPH vào DATE, hai tab loại thực phẩm, chức năng/list đồng dạng, tái sử dụng code không tạo thành phần thừa",
+      "source": "Direct owner message after4356 handoff26/10/2026",
+      "impact": "Changes DATE navigation/screen composition and shared food tabs, invalidates DATE UI gates; business/date/reminder/KPH semantics preserved.",
+      "decision": "Shared tabs across3consumers, explicit unclassified queue, reuse existing sort/sheet/table patterns. One owner and bounded implementation/verification."
+    },
+    {
+      "revision": 8,
+      "request": "Cả DATE và KPH: list Compact ok, áp dụng cả list chưa Compact; thẻ thứ2 mất bao tag",
+      "source": "Direct owner steering while DATE/KPH alignment is in progress26/10/2026",
+      "impact": "Keeps revision7 objective; expands dense list composition to comfortable and restores second tags. All integrated gates reset, historical default-list geometry intentionally changes.",
+      "decision": "Single shared screen-list policy, print-safe, no second preference or duplicated component; DATE/KPH second labels retain native tag containers. Preserve all DATE alignment work and finish remaining reflow blocker."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner views DATE/KPH at4360 in both preferences, switches type/filter and opens lot/reminder/KPH. Technical pass; integrated visual acceptance pending. No further unsolicited audit or publication.",
+  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
+  "branch": "store-app/compact03-date-report-items",
+  "authorization": {
+    "date": "2026-10-26",
+    "source": "Direct user request in this chat",
+    "request": "Keep DATE/KPH alignment; apply accepted Compact list composition in both preference modes and restore the second tag; continue after interruption.",
+    "scope": "Local DATE/KPH UI reuse implementation and verification; no inferred publication/main merge or visual acceptance."
+  },
+  "documents": {
+    "priorTechnical": "docs/delivery/compact03-date-report-items/revision6-technical.md",
+    "assessment": "docs/delivery/compact03-date-report-items/assessment.md",
+    "technical": "docs/delivery/compact03-date-report-items/technical.md",
+    "review": "docs/delivery/compact03-date-report-items/technical.md"
+  }
+}

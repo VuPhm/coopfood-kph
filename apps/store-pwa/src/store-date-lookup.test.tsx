@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { DateWorkspace } from "./store-date-workspace";
 import { mockDateLots } from "./store-app-mock";
 import { useState } from "react";
@@ -7,6 +7,9 @@ function StoreLookupWorkspace() {
   const [lots, setLots] = useState(mockDateLots);
   return <DateWorkspace lots={lots} onLotsChange={setLots} onCreateKph={async () => "synthetic-kph"} />;
 }
+
+beforeEach(() => vi.stubGlobal("matchMedia", () => ({matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn()})));
+afterEach(() => vi.unstubAllGlobals());
 
 describe("DATE unified product and lot lookup", () => {
   afterEach(() => vi.useRealTimers());

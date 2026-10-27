@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@coopfood-kph/ui";
 import { ChevronDown } from "lucide-react";
 import { updateSelection, type SelectionAction } from "./store-selection";
 import "./store-controls.css";
 
-export function StoreSelectionBar({ value, eligibleIds, visibleIds, onChange, itemLabel = "mục" }: {
+export function StoreSelectionBar({ value, eligibleIds, visibleIds, onChange, itemLabel = "mục", contextLabel }: {
   value: readonly string[] | null; eligibleIds: readonly string[]; visibleIds: readonly string[];
-  onChange: (value: string[] | null) => void; itemLabel?: string;
+  onChange: (value: string[] | null) => void; itemLabel?: string; contextLabel?: ReactNode;
 }) {
   const master = useRef<HTMLInputElement>(null);
   const chosen = new Set(value ?? eligibleIds);
@@ -17,7 +17,7 @@ export function StoreSelectionBar({ value, eligibleIds, visibleIds, onChange, it
   useEffect(() => { if (master.current) master.current.indeterminate = mixed; }, [mixed]);
   const apply = (action: SelectionAction) => onChange(updateSelection(value, eligibleIds, visibleIds, action));
   return <div className="store-selection-bar">
-    <label className="store-selection-master"><input ref={master} type="checkbox" aria-label={`Chọn tất cả ${itemLabel} đang hiển thị`} aria-checked={mixed ? "mixed" : allVisible} checked={allVisible} disabled={!visibleIds.length} onChange={() => apply(allVisible ? "clear-visible" : "select-visible")} /><span><strong aria-live="polite">Đã chọn {selectedCount} / {eligibleIds.length} {itemLabel}</strong><small>{visibleIds.length === eligibleIds.length ? "Toàn danh mục" : `${visibleIds.length} ${itemLabel} đang hiển thị`}</small></span></label>
+    <label className="store-selection-master"><input ref={master} type="checkbox" aria-label={`Chọn tất cả ${itemLabel} đang hiển thị`} aria-checked={mixed ? "mixed" : allVisible} checked={allVisible} disabled={!visibleIds.length} onChange={() => apply(allVisible ? "clear-visible" : "select-visible")} /><span><strong aria-live="polite">Đã chọn {selectedCount} / {eligibleIds.length} {itemLabel}</strong><small>{contextLabel ?? (visibleIds.length === eligibleIds.length ? "Toàn danh mục" : `${visibleIds.length} ${itemLabel} đang hiển thị`)}</small></span></label>
     <DropdownMenu modal={false}><DropdownMenuTrigger className="store-selection-menu" aria-label={`Tùy chọn chọn ${itemLabel}`}>Lựa chọn<ChevronDown size={16} aria-hidden="true" /></DropdownMenuTrigger>
       <DropdownMenuContent className="store-dropdown" aria-label={`Thao tác chọn ${itemLabel}`}>
         <DropdownMenuLabel>Đang hiển thị · {visibleIds.length} {itemLabel}</DropdownMenuLabel>

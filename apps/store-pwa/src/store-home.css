@@ -1,19 +1,33 @@
-/* All available capabilities share one responsive launcher and one loading layout. */
+/* Restore c5a440b Home identity: four fresh tints, round jewel icons, stronger static light. */
 .store-home-features { position: relative; z-index: 1; padding: 24px var(--store-header-gutter) 0; scroll-margin-top: 16px; }
-.store-home-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-.store-home-section-heading h2, .store-home-attention h2 { margin: 0; color: #20344a; font-size: 17px; line-height: 24px; font-weight: 650; }
-.store-home-section-heading p { margin: 3px 0 0; color: #596b7d; font-size: 13px; line-height: 20px; }
-.store-home-section-heading > button { display: grid; place-items: center; width: 44px; min-height: 44px; flex-shrink: 0; border: 1px solid #dce9e3; border-radius: 14px; background: #f5f9f7; color: #00724e; }
-.store-screen-home .store-launcher-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; }
-.store-screen-home .store-launcher-grid .store-module { display: flex; grid-column: auto; flex-direction: column; align-items: flex-start; justify-content: flex-start; min-height: 200px; gap: 14px; padding: 18px 16px; }
-.store-screen-home .store-launcher-grid .module-reports { background: #e3efff; }
-.store-screen-home .store-launcher-grid .module-reports .store-module-icon { background: #286a9c; }
-.store-screen-home .store-launcher-grid .store-module strong { font-size: 16px; line-height: 22px; }
-.store-screen-home .store-launcher-grid .store-module-icon { width: 54px; height: 54px; flex-basis: 54px; }
-.store-home-attention { position: relative; z-index: 1; display: grid; gap: 8px; margin: 24px var(--store-header-gutter) 0; }
-.store-home-attention h2 { margin-bottom: 4px; }
-.store-home-attention > button { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 14px; border: 1px solid #dce9e3; border-radius: 14px; background: #f6faf8; text-align: left; }
-.store-home-attention-kind { min-width: 42px; color: #00724e; font-size: 12px; line-height: 18px; font-weight: 650; }
-.store-home-attention strong { flex: 1; color: #20344a; font-size: 13px; line-height: 20px; font-weight: 500; }
-.store-home-attention svg { flex-shrink: 0; color: #00724e; }
-@media (min-width: 1280px) { .store-screen-home .store-launcher-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
+.store-home-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.store-home-section-heading h2, .store-home-attention h2 { margin: 0; color: var(--store-ink); font-size: 17px; line-height: 24px; font-weight: 650; }
+.store-home-section-heading p { margin: 4px 0 0; color: var(--store-ink-muted); font-size: 12px; line-height: 16px; }
+.store-home-section-heading > button { display: grid; place-items: center; width: 36px; min-height: 36px; flex-shrink: 0; border: 1px solid var(--store-soft-edge); border-radius: 10px; background: white; color: var(--store-brand-action); box-shadow: var(--store-soft-card-shadow); }
+.store-screen-home .store-launcher-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 0; }
+.store-screen-home .store-launcher-grid .store-module { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; min-height: 160px; gap: 14px; padding: 16px; border: 1px solid rgb(255 255 255 / 70%); border-radius: 20px; background-color: var(--home-tint); background-image: var(--store-item-light), linear-gradient(155deg, var(--home-tint-top), var(--home-tint)); color: var(--store-ink); box-shadow: var(--store-soft-card-shadow); text-align: left; }
+.store-screen-home .store-launcher-grid .store-module:hover { border-color: var(--home-icon-bottom); box-shadow: var(--store-item-hover-shadow); }
+.store-screen-home .store-launcher-grid .store-module:active { box-shadow: var(--store-item-pressed-shadow); }
+.store-screen-home .store-module-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border: 1px solid rgb(255 255 255 / 35%); border-radius: 50%; background-color: var(--home-icon-bottom); background-image: radial-gradient(circle at 28% 10%, rgb(255 255 255 / 18%), transparent 58%), linear-gradient(145deg, var(--home-icon-top), var(--home-icon-bottom)); color: white; box-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), inset 0 -2px 3px rgb(0 30 20 / 12%), 0 4px 8px rgb(0 40 25 / 20%); }
+/* Colors identify Home launchers only; business/status colors remain independent. */
+.store-screen-home .module-date { --home-tint: #d9f2e9; --home-tint-top: #f0fbf6; --home-icon-top: #008660; --home-icon-bottom: #006c4c; }
+.store-screen-home .module-kph { --home-tint: #f9dfe9; --home-tint-top: #fff4f8; --home-icon-top: #d7355c; --home-icon-bottom: #b52750; }
+.store-screen-home .module-reports { --home-tint: #dceafa; --home-tint-top: #f0f7ff; --home-icon-top: #286f9e; --home-icon-bottom: #1c537d; }
+.store-screen-home .module-shelf { --home-tint: #ffe8d6; --home-tint-top: #fff6ed; --home-icon-top: #bf590f; --home-icon-bottom: #9e4309; }
+.store-screen-home .store-module-icon svg { width: 24px; height: 24px; }
+.store-screen-home .store-module-copy { display: grid; gap: 6px; min-width: 0; }
+.store-screen-home .store-module strong { font-size: 15px; line-height: 20px; font-weight: 650; }
+.store-screen-home .store-module-copy small { color: var(--store-ink-muted); font-size: 12px; line-height: 16px; }
+.store-home-attention { position: relative; z-index: 1; display: grid; gap: 12px; margin: 28px var(--store-header-gutter) 0; }
+.store-home-attention h2 { margin-bottom: 8px; }
+.store-home-attention > button { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px; border: 1px solid var(--store-soft-edge); border-radius: 12px; background: white; box-shadow: var(--store-soft-card-shadow); text-align: left; }
+.store-home-attention-kind { min-width: 42px; color: var(--store-brand-action); font-size: 12px; line-height: 16px; font-weight: 700; }
+.store-home-attention strong { flex: 1; color: var(--store-ink); font-size: 14px; line-height: 20px; font-weight: 500; }
+.store-home-attention svg { flex-shrink: 0; color: var(--store-brand-action); }
+.store-home-page :is(button,a):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 3px; }
+@media (min-width: 1280px) { .store-screen-home .store-launcher-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; } }
+
+@media (forced-colors: active) {
+  .store-screen-home .store-launcher-grid .store-module { background: Canvas; border-color: ButtonText; box-shadow: none; }
+  .store-screen-home .store-module-icon { background: ButtonText; color: Canvas; border-color: ButtonText; box-shadow: none; }
+}

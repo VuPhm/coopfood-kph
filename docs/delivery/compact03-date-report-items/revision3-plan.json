@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "id": "compact03-date-report-items",
+  "revision": 3,
+  "status": "EXECUTING",
+  "objective": "Run a bounded agent audit/implementation/review loop to unify operational readability and Co.op Fresh surface hierarchy in BOTH comfortable and Compact.",
+  "inScope": [
+    "Shared Store input16/24, caption12/18 and real44px operational targets in BOTH densities, targeted to confirmed audit findings",
+    "Default Co.op Fresh secondary-surface hierarchy for KPH detail, DATE/report processing versus primary DATE state, report facts and account/settings; preserve roomier comfortable materials and Compact structural differences",
+    "KPH loading skeleton neutral paint for actual ui-list-label markup in both densities, preserving geometry and aria lifecycle",
+    "Three isolated agent implementation scopes followed by independent integrated review; at most two consolidated technical review rounds, no unlimited audit cleanup",
+    "Verify both modes content/state/date/selection/focus, primary header/navigation outer geometry, print/export/chart isolation, reflow and runnable preview. Historical comfortable geometry can intentionally change in these authorized consumer scopes."
+  ],
+  "outOfScope": [
+    "Main integration/push/deploy/Pages; no inferred FORM01 or COMPACT03 owner acceptance",
+    "Business/API/auth/store scope/data/schema changes, Admin/legacy/Pilot/login",
+    "Home brand module redesign or header/navigation composition changes, timeline/chart colors/geometry, photo size/order, scanner/OS/hardware flows",
+    "New dependencies, global font family/palette rewrite, packages/ui or root config/lock changes",
+    "Standalone user-owned chats or recurring/unattended automations; agents stay subtasks of this request"
+  ],
+  "baseSha": "2a3b574",
+  "candidateSha": "",
+  "integrationOwner": "Root chat owns integration, frame imports, shared tokens/docs and final verification; three agents write disjoint isolated scopes.",
+  "sharedPaths": [
+    "apps/store-pwa/src/store-app-frame.tsx",
+    "apps/store-pwa/src/store-size-tokens.css",
+    "docs/CURRENT_STATE.md",
+    "docs/NEXT.md",
+    "docs/product/STORE_APP_DENSITY.md",
+    "docs/product/STORE_APP_SURFACE_STYLE.md",
+    "docs/delivery/compact03-date-report-items/**",
+    "e2e/scripts/check-store-density.cjs",
+    "e2e/scripts/check-store-scrollbars.cjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [
+    {
+      "id": "foundations",
+      "agent": "/root/token_audit",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r3-foundations",
+      "allowedPaths": [
+        "apps/store-pwa/src/store-fresh-foundations.css"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "surfaces",
+      "agent": "/root/fresh_audit",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r3-surfaces",
+      "allowedPaths": [
+        "apps/store-pwa/src/store-fresh-surfaces.css"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "loading",
+      "agent": "/root/density_audit",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-r3-loading",
+      "allowedPaths": [
+        "apps/store-pwa/src/feature-loading.css"
+      ],
+      "dependsOn": []
+    }
+  ],
+  "gates": [
+    {
+      "id": "shared-fresh-density-and-output-contract",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "operational-readability-and-targets",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "workflow-loading-and-accessibility",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-fresh-uniformity-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "tiếp đoạn bị ngắt, vào vòng lặp tối ưu đồng nhất phong cách mớ này cho các vùng chưa cover",
+      "source": "Owner message26/10/2026, after interrupted COMPACT03",
+      "impact": "Adds secondary utility/management surfaces; new visual/portal gates required. No prior acceptance inferred for COMPACT03.",
+      "decision": "Resume same worktree/branch; checkpoint revision1 at236ce91, preserve its evidence as baseline, implement four bounded consumer families with at most one repair pass. No agent dispatch. Validation maintenance only: native-scrollbar gate supports host overlay bars and Compact preference, and requires thumb drag to advance beyond the wheel activation position. Final visual verification preserves16px between adjacent desktop report choices; no other audit scope added."
+    },
+    {
+      "revision": 3,
+      "request": "tiếp cứ lặp lại agent loop work, cả fresh coop giao diện nữa",
+      "source": "Direct owner request in this chat26/10/2026, preview4350",
+      "impact": "Explicitly authorizes agent collaboration and default Co.op Fresh visual refinements, so revision2 historical comfortable-geometry parity is invalidated in changed scopes. All required technical gates reset; previous user gate remains unaccepted.",
+      "decision": "Continue same task/worktree with three disjoint isolated writers from reviewed2a3b574. Root integrates shared imports/tokens/docs, runs complete workflow/output gates and at most two bounded review/repair rounds; no merge/deploy."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Dispatch three narrowly scoped implementations, integrate commits, then independent review of BOTH density variants and targeted repair.",
+  "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/compact03-date-report-items",
+  "branch": "store-app/compact03-date-report-items",
+  "authorization": {
+    "date": "2026-10-26",
+    "source": "Direct user request in this chat",
+    "request": "tiếp cứ lặp lại agent loop work, cả fresh coop giao diện nữa",
+    "scope": "Agent collaboration and local implementation/verification for BOTH Co.op Fresh comfortable and Compact; no main merge/push/deploy."
+  },
+  "documents": {
+    "priorTechnical": "docs/delivery/compact03-date-report-items.md",
+    "assessment": "docs/delivery/compact03-date-report-items/assessment.md"
+  }
+}

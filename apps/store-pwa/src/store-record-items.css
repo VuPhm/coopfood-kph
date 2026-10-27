@@ -1,0 +1,36 @@
+/* Shared dense DATE lists retain both state tags. Report facts keep their own recipe.
+   Notification composition is owned by store-notifications.css.
+   Detail sheets, charts and printed documents keep their own recipes. */
+@media screen {
+  .store-app :is(.store-kph-list, .store-date-lots, .store-date-table, .date-report-catalog, .store-notification-item) .ui-list-label[data-tone] {
+    min-height: 20px; padding-block: 1px; font-size: 12px; line-height: 16px; gap: 4px;
+  }
+  .store-app .store-date-lot { padding-block: 10px; }
+  @media (min-width: 900px) {
+    .store-app .store-kph-table .store-kph-record-row td { height: var(--store-size-row-two); padding-block: 6px; }
+  }
+  body:has(.store-app) .store-app .date-report-catalog [data-processing-status] {
+    border: 0;
+    border-radius: 0;
+    padding-inline: 0;
+    background: transparent;
+    font-weight: 500;
+  }
+  .store-app .store-date-lot-labels { gap: var(--store-space-2); }
+  .store-app .store-date-lot-footer { margin-top: 0; }
+
+  body:has(.store-app) .store-app .date-report-card-dates {
+    justify-content: flex-start;
+    gap: var(--store-space-1) var(--store-space-4);
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+  }
+  body:has(.store-app) .store-app .date-report-card-labels {
+    align-items: center;
+    gap: var(--store-space-2);
+    margin-top: 0;
+  }
+
+}

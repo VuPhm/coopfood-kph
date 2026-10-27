@@ -1,7 +1,7 @@
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Button, Input, ListItemMarker, Select } from "@coopfood-kph/ui";
-import { ArrowLeft, CalendarDays, Check, CircleCheck, ChevronDown, ChevronRight, FileDown, Info, Package, Save, Printer, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, CalendarDays, Check, CircleCheck, ChevronRight, FileDown, Info, Package, Save, Printer } from "lucide-react";
 import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
 import { CalendarInput } from "./calendar-input";
@@ -17,7 +17,7 @@ import { flushSync } from "react-dom";
 import { DATE_PHASE_LABELS } from "./store-date-assessment";
 import { ReportSurface } from "./store-report-surface";
 import { StoreSearchField } from "./store-search-field";
-import { StoreSettingsGroup, StoreSettingsRow } from "./store-settings-group";
+import { StoreReportSettings } from "./store-report-settings";
 import { ReportTemplatePicker } from "./store-report-template-picker";
 import "./store-report-composer.css";
 import "./store-date-report.css";
@@ -147,17 +147,15 @@ export function DateReportWorkspace({ lots, template, savedReport, templates, ed
     setSearch(""); setNotice("");
     onChooseTemplate(next);
   }
+  const catalogSummary = `${skuCount} mã hàng · ${shownRows.length === eligible.length ? `${eligible.length} lô` : `${shownRows.length} / ${eligible.length} lô đang hiện`}`;
   const searchField = <StoreSearchField className="report-composer-search" inputRef={searchRef} label="Tìm mã hàng hoặc lô báo cáo" placeholder="Tìm mã hàng, lô" clearLabel="Xóa tìm kiếm báo cáo" title="Tìm chỉ thu gọn danh sách; giữ các lô đã chọn" value={search} onValueChange={setSearch} />;
   const documentHero = <><header className="date-report-heading"><button className="date-report-back" aria-label="Về lịch sử báo cáo" onClick={onBack}><ArrowLeft size={20} aria-hidden="true" /></button><div><h2 ref={report ? headingRef : undefined} tabIndex={-1}>Bản báo cáo DATE</h2><span>Dữ liệu mẫu</span></div><button className="date-report-info" aria-label="Thông tin dữ liệu báo cáo" onClick={() => setSourceOpen(true)}><Info size={20} aria-hidden="true" /></button></header>{report ? <section className="date-report-document-meta" aria-label="Phạm vi bản báo cáo"><strong>{report.title}</strong><p>{report.store}</p><p>{periodSummary}</p><p>{filterLabel(report.filter)}</p></section> : null}</>;
   const content = <div className={`date-report${report ? " is-document" : " is-compose"}`} data-printing={printing}>
-    {!report ? <StoreSettingsGroup label="Thiết lập báo cáo" columns={2}>
-      <StoreSettingsRow label="Kỳ báo cáo" value={periodLabel(period)} icon={<CalendarDays size={20} aria-hidden="true" />} onClick={openPeriod} ariaLabel="Chọn kỳ báo cáo" />
-      <StoreSettingsRow label="Phạm vi" value={filterLabel(filter)} valueId="report-filter-summary" icon={<SlidersHorizontal size={20} aria-hidden="true" />} onClick={() => setFilterOpen(true)} ariaLabel="Lọc danh mục báo cáo" badge={activeFilterCount} />
-    </StoreSettingsGroup> : null}
+    {!report ? <StoreReportSettings period={periodLabel(period)} scope={filterLabel(filter)} filterCount={activeFilterCount} onPeriod={openPeriod} onFilter={() => setFilterOpen(true)} /> : null}
     <section className="date-report-catalog" aria-label="Danh mục báo cáo DATE">
-      <div className="date-report-catalog-heading"><div><h3>Danh mục tồn</h3><p aria-live="polite">{skuCount} mã hàng · {report ? rows.length : eligible.length} lô</p></div></div>
+      {report ? <div className="date-report-catalog-heading"><div><h3>Danh mục tồn</h3><p aria-live="polite">{skuCount} mã hàng · {report ? rows.length : eligible.length} lô</p></div></div> : <h3 className="sr-only">Danh mục tồn</h3>}
       {!report ? <div className="report-selection-bar" aria-label="Lựa chọn lô báo cáo">
-        <StoreSelectionBar value={selectedIds} eligibleIds={eligible.map(row => row.id)} visibleIds={shownRows.map(row => row.id)} onChange={setSelectedIds} itemLabel="lô" />
+        <StoreSelectionBar value={selectedIds} eligibleIds={eligible.map(row => row.id)} visibleIds={shownRows.map(row => row.id)} onChange={setSelectedIds} itemLabel="lô" contextLabel={catalogSummary} />
         {hiddenSelected ? <small>{hiddenSelected} lô đã chọn ngoài kết quả tìm</small> : null}
         {missingTemplateItems ? <small>{missingTemplateItems} lô trong mẫu không còn trong danh mục</small> : null}
       </div> : null}

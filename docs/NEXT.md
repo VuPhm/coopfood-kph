@@ -1,5 +1,193 @@
 # Công việc kế tiếp
 
+**FRESH01 revision4 — technical PASS, owner pending27/10/2026:** owner “ổn,
+tiếp tục tối ưu” tại4366 Thông báo. Item có gap8px/đệm/viền đầy đủ, nhóm native
+thu/mở có hover/press/focus; card DATE/Báo cáo/Home attention dùng chung phản
+hồi tại chỗ. Bỏ color transition nav tránh chữ tương phản thấp lúc đổi tab.
+Gom composition Thông báo về stylesheet riêng, xóa override rải ở4file; chữ
+lớn chuyển phần trăm xuống hàng khi thiếu chỗ. Field/CTA lam-cam/rule giữ nguyên.
+Runtime699413a, preview <http://127.0.0.1:4368/#notifications>;4366 giữ reference.
+294Store tests, typecheck/build và browser7màn×5viewport, states/contrast,
+notifications150–200%, workflow/output/native scroll đạt. CSS+61bytegzip,
+không thêm runtimeJS/asset/dependency. [Files/commands/coverage](delivery/fresh01-solid-compact/technical.md).
+Root sole writer, chưa merge/push/Cloudflare. Bước tiếp owner xem nhịp list,
+thu/mở nhóm và feedback card tại4368; chưa suy nghiệm thu revision4.
+
+**FRESH01 revision3 — technical PASS, owner pending26/10/2026:** theo owner “ổn,
+phổ biến rộng hiệu ứng item Home/cả nút; CTA tươi sống màu khác”, đã chia sẻ
+ánh sáng Home cho item/card/table, icon chức năng và button roles. Home giữ
+bốn tông; các workspace dùng nền neutral/mint, không đổi màu nghiệp vụ. TPTS
+CTA lam#2465af, TPCN cam; chữ trắng min4.999/4.772:1, hover/focus/press/disabled
+được kiểm. Field trắng, kích thước/flow/print và một UI giữ nguyên.
+Runtime342ca66, preview mới <http://127.0.0.1:4366/#kph>;4364 giữ reference.
+347tests, Playwright7màn×5viewport, button states, loading, chữ lớn, workflow/
+output/notifications/native scroll đạt. CSS+435bytegzip, không thêm JS/asset/
+blur/motion liên tục. [Files/commands/evidence](delivery/fresh01-solid-compact/technical.md).
+Root sole writer, chưa merge/push/Cloudflare (vẫnr4). Bước tiếp owner xem item/
+nút và thử hai CTA ở4366; chưa suy nghiệm thu revision3.
+
+
+
+**COMPACT03 revision8 — technical PASS, owner pending 26/10/2026:** DATE/KPH
+đều dùng list gọn ở hai mật độ; tag Biện pháp KPH và xử lý DATE giữ nền/viền/icon.
+DATE dùng hai tab thực phẩm chung với KPH live/loading, bộ lọc trạng thái riêng,
+mục Chưa phân loại rõ ràng; card/table mở cùng sheet, giữ nhắc và DATE→KPH.
+Một policy list cho màn hình, print giữ đầy đủ; controls/forms vẫn theo công tắc.
+352 tests, Playwright list/tag/print, DATE workflow, hai mật độ/chữ150–200%,
+30 ca controller, thông báo/loading và cuộn native đạt. Root sole writer.
+Preview mới <http://127.0.0.1:4360/#date>; [files/commands/evidence](delivery/compact03-date-report-items/technical.md).
+Chưa merge/push/cập nhật Cloudflare. Bước nhỏ tiếp: owner xem DATE/KPH ở hai
+chế độ và thử tab → lọc → mở lô → Ghi nhận/Xử lý tại4360.
+
+
+
+**COMPACT03 revision7 — DATE/KPH alignment candidate26/10/2026:** owner yêu cầu
+hai tab loại thực phẩm thay Cảnh báo/Theo dõi, đồng dạng controls/list và reuse.
+Một shared food-kind selector dùng cả KPH live/loading/DATE; trạng thái/phase
+chuyển vào filter, shortcut Cần chú ý, unknown có mục riêng không suy loại.
+Mobile card/desktop table → cùng sheet; giữ %HSD/mốc/nhắc1/7ngày/DATE→KPH.
+Root sole writer, technical đang kiểm tại4358; [scope](delivery/compact03-date-report-items/plan.json).
+Cloudflare vẫnr4, chưa merge/push. Bước tiếp kiểm lookup/deep-link/unknown/filter
+và hai mật độ, rồi owner nghiệm thu.
+
+
+**COMPACT03 revision6 — technical PASS, owner pending26/10/2026:** theo owner sửa Biện pháp
+mất khung tag, thêm chevron/soft pastel cho hai CTA KPH Compact; CTA mặc định
+một mặt nền với hai tầng chữ, bỏ thanh màu lồng. Field chuyển matte/no-shadow,
+viền mảnh/radius12, giữ focus/error/readonly và size. Tham khảo Apple HIG text
+fields/materials và hướng đọc rõ iOS27. Candidate <http://127.0.0.1:4356/#kph>;
+346tests, browser hai mode/3width/CTA200% và toggle/workflow/output đạt. Root sole writer,
+không mở audit mới. [Scope](delivery/compact03-date-report-items/plan.json).
+Cloudflare vẫn r4, chưa merge/push; bước tiếp owner xem tag/CTA/field ở hai mode.
+
+
+**COMPACT03 revision5 — technical PASS, owner pending26/10/2026:** owner yêu cầu đúng
+một vòng rà cấu trúc/CSS. Tái hiện Tài khoản tự co68–86px và công tắc dịch9–34px
+khi đổi mật độ; đây là lỗi controller, khác việc nội dung co lại theo thiết kế.
+Root sửa một recipe account chung hai mật độ, dọn height/input cascade và để
+DATE sở hữu filter recipe. Một reviewer read-only, root sole writer; technical
+PASS346tests,30ca toggle/5viewport với controllerΔ0, DATE200% lên66px,
+state/output/parity/scrollbar đạt; owner pending. Bản đã public4352/r4 giữ nguyên
+Cloudflare; candidate local <http://127.0.0.1:4354/#home>. [Scope/review](delivery/compact03-date-report-items/plan.json).
+Chưa merge/push/cập nhật Cloudflare; bước tiếp owner bật/tắt cùng một vị trí tại4354
+để nghiệm thu. [Evidence/files](delivery/compact03-date-report-items/technical.md).
+
+
+**COMPACT03 revision4 — technical PASS, owner pending26/10/2026:** tiếp vòng agent bị ngắt,
+owner bổ sung Compact cho quản lý DATE/Thông báo và đồng nhất flow tương đương.
+Shared input16/24, caption12/18, target44px áp cả hai mật độ; Fresh mặc định
+nhóm mềm/thoáng, Compact phẳng. DATE filter/detail/reminder dùng section roles,
+Thông báo thống nhất tên/SKU/lô/phase/%HSD24px và native thu/mở. Giữ rule, lịch
+1/7ngày, exact-lot và DATE→KPH; không đổi API/chart/timeline/print. Root tích hợp
+hai agent độc lập, nhận phần foundation/loading dở. Technical346tests, browser
+hai mật độ/5viewport, DATE/Thông báo/chữ lớn/output/scrollbar PASS; review
+không blocker. Owner chưa nghiệm thu. Preview <http://127.0.0.1:4352/#date>,
+frozen4350 giữ baseline. [Scope/gates](delivery/compact03-date-report-items/plan.json).
+Chưa merge main/push/deploy. Bước tiếp: owner xem DATE/Thông báo và thử báo lại
+1/7ngày ở hai mật độ; [evidence/files](delivery/compact03-date-report-items/technical.md).
+
+
+**COMPACT03 revision2 — candidate đồng nhất Compact,26/10/2026:** resume đúng
+source`236ce91` và cùng worktree theo owner yêu cầu vòng tối ưu vùng chưa cover.
+Một lượt triển khai + một lượt tinh chỉnh có giới hạn: chi tiết KPH dùng section/
+summary phẳng; menu/mẫu/lịch sử report thành hàng chức năng với icon36px;
+lịch sử Tra hạn phẳng, caption12px và cột co giãn theo chữ; Tài khoản/Cài đặt
+bỏ khung lồng, giữ switch và hero. Bốn nhóm dùng size roles hiện có, target44px,
+giữ nội dung/handler và comfortable. Bản DATE/report catalog/Thông báo r1 giữ lại.
+Preview mới <http://127.0.0.1:4350/#reports>; baseline4348, dev4349. [Kế hoạch/gates](delivery/compact03-date-report-items/plan.json),
+[coverage](delivery/compact03-date-report-items/assessment.md), [evidence](delivery/compact03-date-report-items/technical.md).
+Một writer, không dispatch agent; owner chưa nghiệm thu bản tích hợp này.
+Chưa merge main/push/deploy. Bước tiếp: xem bốn nhóm ở hai mật độ và màn hẹp.
+
+**COMPACT03 revision1 — checkpoint kế thừa25/10/2026:** theo owner
+“ổn, tiếp” sau KPH4346. Compact giữ chip DATE làm tín hiệu chính, processing
+thành chữ/icon không pill; HSD/Tồn trong report là dòng dữ kiện không khung
+con; Thông báo bỏ khung nhóm, giữ header/count/description và native thu/mở.
+Không đổi DOM/data/workflow, %HSD24px, lịch nhắc hoặc KPH đã duyệt. Preview
+<http://127.0.0.1:4348/#date> → bật Chế độ gọn. Base`0b63982`, nhánh
+`store-app/compact03-date-report-items`; một writer, chưa merge main/push/deploy.
+[Scope/evidence/giới hạn](delivery/compact03-date-report-items.md). Technical346tests,
+mock build117precache và browser5viewport đạt; owner chưa nghiệm thu candidate này.
+Bước nhỏ tiếp: owner xem DATE, Báo cáo và Thông báo ở hai mật độ.
+
+**COMPACT02 — CLOSED,25/10/2026:** owner “ok thử đi” cho slice
+KPH đã đề xuất. Chỉ Compact: mobile đưa trạng thái duyệt ra khỏi strip, cạnh
+SKU/số lượng; giữ chip tình trạng và biện pháp dạng chữ/icon không nền.
+Desktop giữ bảng, lược vỏ nhãn phụ. Theo feedback tiếp, Đã/Không duyệt
+rút còn icon khi thiếu chỗ; Chờ duyệt giữ chữ, accessible text/detail vẫn đủ.
+Giữ màu/meaning, tên/định danh, chọn/nhóm/nối25, comfortable và print.
+Nhánh `store-app/compact02-kph-items`, base`e0054c7` từ COMPACT01 đã chốt tạm;
+không suy acceptance FORM01 hoặc tích hợp main. Preview production
+<http://127.0.0.1:4346/#kph> → bật Chế độ gọn;4344 giữ bản chốt trước.
+[Scope/evidence/giới hạn](delivery/compact02-kph-items.md). Owner xác nhận
+“ổn, tiếp” trong chat này, chấp nhận candidate KPH runtime`c3f05c5` và cho
+tiếp tục list khác. Chưa merge/push/deploy. Bước tiếp: slice Compact cho
+item Báo cáo/DATE/Thông báo theo đề xuất trước, trên nhánh riêng.
+
+**COMPACT01 revision3 — CLOSED, chốt tạm24/10/2026:** owner xác nhận
+“tạm, đến đây chốt được. cân nhắc tiếp cho các item list” sau khi xem preview4344.
+Chốt phạm vi token size và cấu trúc Compact hiện tại, runtime`ca543e6`;
+không coi đây là nghiệm thu thiết kế item mới hoặc FORM01/main integration.
+Technical346tests và production browser đã PASS;
+[quyết định/giới hạn](delivery/compact01-interface-density/acceptance-revision3.md).
+Main vẫn`f77034d`, chưa merge/push/deploy. Đã rà source và ghi
+[đề xuất item list](delivery/compact01-interface-density/list-items-next.md):
+KPH trước, sau đó Báo cáo/DATE/Thông báo; mới là đánh giá, chưa đổi runtime.
+Bước nhỏ tiếp theo: một candidate item KPH Compact có phân cấp nhãn rõ hơn,
+giữ đủ thông tin/chọn/nhóm ngày; chờ yêu cầu triển khai vòng riêng.
+
+**COMPACT01 revision2 — lịch sử24/10/2026:** thêm Chế độ gọn tại Tài khoản → Cài đặt
+→ Giao diện; mặc định tắt, nhớ theo thiết bị. Gọn chủ yếu search/CTA/bộ lọc/
+settings/form, item chỉ giảm đệm nhẹ; giữ state và mật độ mặc định. Nhánh riêng
+từ task base0a25730 gồm đúng FORM01d4f9d17 + header816; main vẫnf77034d, không
+suy acceptance FORM01. Preview <http://127.0.0.1:4342/#kph>.
+[Scope/kiểm tra/giới hạn](delivery/compact01-interface-density/technical.md),
+[quy tắc](product/STORE_APP_DENSITY.md). Technical342tests + production browser hai mật độ/5viewport, frame7màn/7viewport,
+native scrollbar và report dock đạt; owner xem cả hai chế độ. Chưa merge/
+push/deploy. Bước tiếp: owner dùng thử và quyết định nghiệm thu Compact.
+
+**FORM01 revision 4 — candidate24/10/2026:** owner yêu cầu đủ mọi nút, đặc biệt
+nút xanh; làm tổng thể token nút và mép khối trượt/sidebar/menu bar. Dùng một
+role/state matrix cho primary/secondary/ghost/danger/selected/disabled và native
+command; primary có gradient/mép sáng/bóng thấp, pressed tại chỗ. Chrome dùng
+edge/elevation token, giữ canvas trắng và header816b4e3. Shared Button chỉ thêm
+metadata cho binding Store-local; không đổi global UI palette/API.
+[Token/triết lý](product/STORE_APP_SURFACE_STYLE.md),
+[scope/evidence](delivery/form01-fresh-soft/technical.md).
+Technical PASS: 334 tests và Playwright nút/chrome/native scrollbar.
+Preview <http://127.0.0.1:4306/#kph>; owner xem bản mới, chưa merge main/push/deploy.
+
+**FORM01 revision 3 — candidate24/10/2026:** owner chấp nhận hướng form bằng
+“ổn, làm tiếp”, yêu cầu mở rộng và ghi triết lý. Đã tích hợp đúng header
+`816b4e3` vào nhánh task, base hợp nhất `568c8cd`; không đổi main. Mở rộng
+**Co.op Fresh Soft** cho nút phụ/toolbar, filter choices, nhóm thông tin, picker/
+popup và divider: nền tạo khối, mép nghỉ nhẹ, selected/focus/error rõ.
+[Triết lý và role/state recipe](product/STORE_APP_SURFACE_STYLE.md),
+[scope/acceptance/checks](delivery/form01-fresh-soft/technical.md).
+Preview <http://127.0.0.1:4304/#home>. Chưa merge main/push/deploy; owner xem
+các màn và trạng thái mới. Các candidate cũ dưới đây là lịch sử.
+
+**FORM01 — candidate revision 2, 24/10/2026:** theo owner làm mềm form;
+feedback viền còn dày, tham khảo item Home và iOS 27.
+Dùng tên **Co.op Fresh Soft** cho `coop-fresh-soft-v1`; input/date/select/textarea
+fill nhẹ/radius 16/mép nghỉ 6%; label/content nhận diện, focus/error/selection
+rõ; Số lượng có placeholder khi trống. Giữ semantic/check, nhóm/
+footer mềm hơn. Giữ rule/validation/readonly/disabled/focus và kích thước control;
+không đổi packages/ui, API, header/nav/list/chart. Nhánh `store-app/form01-fresh-soft`
+từ `f77034d`; preview <http://127.0.0.1:4302/#kph>. Chưa merge/push/deploy;
+[phạm vi, kiểm tra và giới hạn](delivery/form01-fresh-soft/technical.md).
+Bước tiếp theo: owner xem KPH form/bộ lọc, Báo cáo, Tra hạn và đăng nhập.
+
+**HEADER03 — candidate24/10/2026:** Home bỏ copy “Trang chủ / Cửa hàng
+hiện tại” khỏi hình, giữ heading accessible/lời chào. Back mobile chỉ mũi tên,
+không nền/viền; desktop dùng sidebar + ancestor `Trang chủ › màn`, mẫu báo cáo
+thêm cấp Báo cáo. Giữ72px/44px/focus, palette/header và nghiệp vụ. Technical334tests/build/PWA,
+7màn×7viewport, context/contrast/chart parity PASS. Preview
+<http://127.0.0.1:4331/#home>; [scope và evidence](delivery/header03-context-nav/technical.md).
+Nhánh `store-app/header03-context-nav` từ mainf77034d; chưa merge/push/deploy.
+Bước tiếp: owner xem Home/mobile arrow/desktop đường dẫn tại preview4331.
+Các pending bên dưới là lịch sử.
+
 **UI02 + RPT02 — CLOSED,23/10/2026:** owner “merge với `0757b6d`” cho bản
 scrollbar đang xem tại4295 và report checkpoint0757b6d. Merge main local
 `e5628ab` gồm scrollbar`e2c2ab5` + report đúng0757b6d; source hợp nhất không sửa
@@ -15,7 +203,7 @@ soát hết”. Desktop dùng native scrollbar mảnh; popup cuộn trong body, 
 close/bo góc, form và tiện ích có bar kéo được. Choice sheet chỉ cuộn results;
 khóa/mở cuộn giữ layout và nút nổi. Mobile tags giữ bar ẩn. Build/Playwright với
 scrollbars thật ở390×844/1440×1024/1280×720/900×650/1440×500, high contrast,
-KPH/chrome regression đạt. Nhánh`store-app/ui02-scrollbars` từ`3b0da6c`, chưa
+KPH/chrome regression đạt. Nhánh `store-app/ui02-scrollbars` từ `3b0da6c`, chưa
 merge/push/deploy. Preview <http://127.0.0.1:4295/#kph>;
 [phạm vi, files, lệnh kiểm và giới hạn](delivery/ui02-scrollbars.md).
 Bước tiếp: owner xem thanh cuộn trang và các popup trên desktop thực.
@@ -135,7 +323,7 @@ bên dưới là lịch sử trước nghiệm thu. Đóng task, chờ yêu cầ
 lọc trả về bật. Trong Chọn, checkbox ngày có vùng44×44px riêng; phần ngày/count/
 chevron vẫn thu/mở, giữ selection và collapse khi vào/thoát Chọn. Tắt nhóm: ngày
 mobile nằm cùng cụm SKU/số lượng căn trái. Nền trắng revision4 và UX click hàng/
-OTHER/tag scroll/lọc nhanh/nối25 giữ nguyên. Cùng task từ`982c04c`, online/API
+OTHER/tag scroll/lọc nhanh/nối25 giữ nguyên. Cùng task từ `982c04c`, online/API
 không đổi. Xem <http://127.0.0.1:4262/#kph>; chưa commit/merge/push/deploy,
 owner pending. [Bàn giao/phạm vi/checks](delivery/kph02-compact-history.md).
 

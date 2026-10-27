@@ -16,10 +16,16 @@
 .store-bootstrap-canvas { min-height: 100dvh; background: white; }
 .store-bootstrap-canvas[data-home="true"] { background: #00865b; }
 .kph-loading-frame button:disabled { opacity: 1; cursor: wait; }
-.store-kph-list-loading .store-ticket-open :is(strong, .store-ticket-sku, .store-ticket-meta, .store-chip) { color: transparent; border-radius: 6px; background: var(--cf-color-surface-strong); }
+.store-kph-list-loading .store-ticket-open :is(strong, .store-ticket-sku, .store-ticket-meta, .ui-list-label) { color: transparent; border-radius: 6px; background: var(--cf-color-surface-strong); }
 .store-kph-list-loading .store-ticket-chevron { visibility: hidden; }
 .store-kph-list-loading .store-kph-table td { color: transparent; background: linear-gradient(var(--cf-color-surface-strong), var(--cf-color-surface-strong)) 8px center / calc(100% - 16px) 14px no-repeat; }
-.store-kph-list-loading .store-kph-table td :is(button, .store-chip) { color: transparent; background: transparent; }
+.store-kph-list-loading .store-kph-table td :is(button, .ui-list-label) { color: transparent; background: transparent; }
+/* Tags live outside the mobile opener; Compact approval lives inside it.
+   Mask semantic paint in both locations without changing their intrinsic boxes. */
+.store-app .store-kph-list-loading .ui-list-label[data-label-kind] { color: transparent; border-color: transparent; }
+.store-app .store-kph-list-loading .store-ticket .ui-list-label[data-label-kind] { background: var(--cf-color-surface-strong); }
+.store-app .store-kph-list-loading .ui-list-label[data-label-kind] .ui-list-label-icon { visibility: hidden; }
+.store-app .store-kph-list-loading .ui-list-item-marker[data-variant="bar"] { background: var(--cf-color-surface-strong); }
 .store-form-skeleton-label { color: var(--cf-color-ink-muted); font-size: 12px; font-weight: 400; }
 .store-form-skeleton-input { height: 52px; border: 1px solid var(--cf-color-border); border-radius: 14px; background: var(--cf-color-surface-strong); }
 .store-form-skeleton-input.is-note { height: 96px; }

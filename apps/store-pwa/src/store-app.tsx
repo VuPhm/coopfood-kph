@@ -64,10 +64,6 @@ function DeferredReportHub(props: ComponentProps<ReportHubComponent>) {
 }
 
 export function StoreApp() {
-  return <StoreAppContent />;
-}
-
-function StoreAppContent() {
   const [screen, setScreen] = useState<Screen>(readScreen);
   const [loginPreviewError, setLoginPreviewError] = useState("");
   const [quickOpen, setQuickOpen] = useState(false);

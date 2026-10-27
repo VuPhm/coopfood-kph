@@ -1,0 +1,50 @@
+/* DATE filter/detail composition; notification hierarchy lives in its own stylesheet.
+   Native disclosure, exact-lot navigation and reminder controls keep their semantics.
+   All recipes are Store-local and screen-only; timeline geometry is untouched. */
+@media screen {
+  /* Compact sections use the same flat grouping as KPH/report filters and details.
+     Retain the timeline holder's box dimensions so its rail and labels do not move. */
+  body:has(.store-app) .store-date-filter .store-date-filter-section {
+    border: 0; border-bottom: 1px solid var(--store-holder-edge);
+    border-radius: 0; box-shadow: none; background: transparent;
+    padding: var(--store-space-3) 0; gap: var(--store-space-2);
+  }
+  body:has(.store-app) .store-date-filter .store-date-filter-section h3 {
+    font-size: var(--store-type-section); line-height: var(--store-leading-section);
+  }
+  body:has(.store-app) .store-date-filter .store-date-filter-footer :is(button, .store-button) {
+    min-height: var(--store-size-hit-min); padding-block: var(--store-space-2);
+    font-size: var(--store-type-control); line-height: var(--store-leading-control);
+  }
+  body:has(.store-app) .store-date-lot-sheet .store-date-lot-heading {
+    border: 0; border-bottom: 1px solid var(--store-holder-edge);
+    border-radius: 0; box-shadow: none; background: transparent;
+    padding: 0 0 var(--store-space-3);
+  }
+  body:has(.store-app) .store-date-lot-sheet .store-date-lot-heading h3 {
+    font-size: var(--store-type-section); line-height: var(--store-leading-section);
+  }
+  body:has(.store-app) .store-date-lot-sheet .store-date-milestones {
+    border-color: transparent; border-radius: 0; background: transparent; box-shadow: none;
+  }
+  body:has(.store-app) .store-date-lot-sheet .store-date-detail-metrics > p {
+    border-radius: 0; padding: 0; background: transparent;
+  }
+  body:has(.store-app) .store-date-lot-sheet .store-date-reminder-choices {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr));
+    border: 0; border-top: 1px solid var(--store-holder-edge);
+    border-radius: 0; padding: var(--store-space-3) 0 0;
+    background: transparent; box-shadow: none;
+  }
+  body:has(.store-app) .store-date-reminder-choices legend {
+    padding-inline: 0;
+    font-size: var(--store-type-control); line-height: var(--store-leading-control);
+  }
+  body:has(.store-app) .store-date-reminder-choices label {
+    min-width: 0; min-height: var(--store-size-hit-min);
+    padding: var(--store-space-2);
+    font-size: var(--store-type-control); line-height: var(--store-leading-control);
+  }
+  body:has(.store-app) .store-date-reminder-choices label > span { min-width: 0; }
+  body:has(.store-app) .store-date-reminder-choices small { overflow-wrap: anywhere; }
+}
