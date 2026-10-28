@@ -71,7 +71,7 @@ it("approves and filters records outside the rendered batch", async () => {
   fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
   fireEvent.click(screen.getByRole("button", { name: "Duyệt 1000 phiếu" }));
   await waitFor(() => expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0"));
-  fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" }));
+  fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp" }));
   const dialog = within(screen.getByRole("dialog", { name: "Lọc & sắp xếp" }));
   fireEvent.click(dialog.getByRole("button", { name: "Lọc Chờ duyệt" }));
   expect(document.querySelector(".history-total-count")).toHaveTextContent("0");

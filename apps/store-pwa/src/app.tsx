@@ -5,6 +5,8 @@ import { type KeyboardEvent, type MouseEvent, memo, useCallback, useEffect, useM
 
 import { assetUrl } from "./asset-url";
 import { formatBusinessDate } from "./business-date";
+import { HistoryDateControls } from "./history-date-controls";
+import { EMPTY_HISTORY_DATE_RANGE, matchesHistoryDateRange, parseHistoryDateRange, type HistoryDateRange } from "./history-date-filter";
 import { CreateRecordDialog, type CreatedRecordDraft } from "./create-record-dialog";
 import { buildSkuMemory, type SkuMemory } from "./sku-memory";
 import { DEMO_RECORDS, type DemoApprovalStatus, type DemoPhoto, type DemoRecord } from "./demo-records";
@@ -149,6 +151,7 @@ export function App() {
   const [expandedMobileRecords, setExpandedMobileRecords] = useState<ReadonlySet<string>>(new Set());
   const [approvalByRecord, setApprovalByRecord] = useState<Record<string, DemoApprovalStatus>>(() => initialApproval);
   const [approvalFilter, setApprovalFilter] = useState<ApprovalFilter>("ALL");
+  const [dateRange, setDateRange] = useState<HistoryDateRange>(EMPTY_HISTORY_DATE_RANGE);
   const [recordSort, setRecordSort] = useState<RecordSort | null>(null);
   const [notice, setNotice] = useState("");
   const [deletedIds, setDeletedIds] = useState<ReadonlySet<string>>(new Set());
@@ -165,10 +168,12 @@ export function App() {
   const [storageError, setStorageError] = useState("");
   const [historyWindow, setHistoryWindow] = useState({ view: "", limit: HISTORY_BATCH_SIZE });
   const visibleRecords = useMemo(() => {
-    const scopedRecords = records.filter(({ kind, id, approvalStatus }) => {
+    const parsedRange = parseHistoryDateRange(dateRange);
+    const scopedRecords = records.filter(({ kind, id, approvalStatus, detectedDate }) => {
       const currentApproval = approvalByRecord[id] ?? approvalStatus;
       const hasExpectedDeletionState = trashMode ? deletedIds.has(id) : !deletedIds.has(id);
-      return kind === activeKind && hasExpectedDeletionState && (approvalFilter === "ALL" || currentApproval === approvalFilter);
+      return kind === activeKind && hasExpectedDeletionState && (approvalFilter === "ALL" || currentApproval === approvalFilter)
+        && matchesHistoryDateRange(detectedDate, parsedRange);
     });
 
     if (!recordSort) return scopedRecords;
@@ -183,8 +188,8 @@ export function App() {
         : recordCollator.compare(String(leftValue), String(rightValue));
       return recordSort.direction === "ascending" ? comparison : -comparison;
     });
-  }, [activeKind, approvalByRecord, approvalFilter, deletedIds, recordSort, records, trashMode]);
-  const historyView = `${activeKind}|${trashMode}|${approvalFilter}|${recordSort?.key ?? ""}|${recordSort?.direction ?? ""}`;
+  }, [activeKind, approvalByRecord, approvalFilter, dateRange, deletedIds, recordSort, records, trashMode]);
+  const historyView = `${activeKind}|${trashMode}|${approvalFilter}|${dateRange.from}|${dateRange.to}|${recordSort?.key ?? ""}|${recordSort?.direction ?? ""}`;
   const historyLimit = historyWindow.view === historyView ? historyWindow.limit : HISTORY_BATCH_SIZE;
   const renderedRecords = useMemo(() => visibleRecords.slice(0, historyLimit), [visibleRecords, historyLimit]);
   useEffect(() => { setHistoryWindow({ view: historyView, limit: HISTORY_BATCH_SIZE }); }, [historyView]);
@@ -194,6 +199,9 @@ export function App() {
   );
   const allVisibleSelected = visibleRecords.length > 0 && visibleRecords.every(({ id }) => selected.has(id));
   const allVisibleExpanded = visibleRecords.length > 0 && visibleRecords.every(({ id }) => expandedMobileRecords.has(id));
+  const emptyHistoryMessage = !storageReady ? "Đang mở dữ liệu trên thiết bị…"
+    : dateRange.from || dateRange.to || approvalFilter !== "ALL" ? "Không có phiếu phù hợp bộ lọc."
+    : trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.";
 
   // App is mounted by PinGate only after unlock. Include store changes made
   // in Settings so the next session is attributed to the updated store.
@@ -297,6 +305,11 @@ export function App() {
     setSelected(new Set());
   }
 
+  function changeDateRange(range: HistoryDateRange) {
+    setDateRange(range);
+    setSelected(new Set());
+  }
+
   function toggleRecordSort(key: RecordSortKey) {
     setRecordSort((current) => current?.key === key
       ? { key, direction: current.direction === "ascending" ? "descending" : "ascending" }
@@ -351,6 +364,7 @@ export function App() {
     setSelected(new Set());
     setExpandedMobileRecords(new Set());
     setApprovalFilter("ALL");
+    setDateRange(EMPTY_HISTORY_DATE_RANGE);
     setRecordSort(null);
   }
 
@@ -445,6 +459,7 @@ export function App() {
     setRecords((current) => [record, ...current]);
     setApprovalByRecord((current) => ({ ...current, [id]: "PENDING" }));
     setActiveKind(draft.kind);
+    if (!matchesHistoryDateRange(record.detectedDate, parseHistoryDateRange(dateRange))) setDateRange(EMPTY_HISTORY_DATE_RANGE);
     setSelected(new Set([id]));
     setNotice(`Đã tạo phiếu ${id} và lưu trên thiết bị này.`);
     // Storage telemetry must not delay saving or turn an already committed
@@ -533,7 +548,7 @@ export function App() {
                 {trashMode ? "Phiếu đã xoá" : "Phiếu đã khai báo"}
               </h2>
               <div className="history-title-actions">
-                <MobileHistoryControls filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
+                <MobileHistoryControls dateRange={dateRange} onDateRangeChange={changeDateRange} filter={approvalFilter} onFilterChange={changeApprovalFilter} onSort={cycleMobileRecordSort} onSortReset={() => setRecordSort(null)} sort={recordSort} />
                 <button
                   type="button"
                   className="trash-mode-toggle"
@@ -600,6 +615,7 @@ export function App() {
             </div>
           </header>
 
+          {dateRange.from || dateRange.to ? <p className="history-date-summary" role="status">Ngày phát hiện: {dateRange.from || "Từ đầu"} – {dateRange.to || "Không giới hạn"}</p> : null}
           <div className="overflow-x-auto desktop-history">
             <table className="w-full min-w-[1160px] text-left text-sm">
               <thead className="text-xs uppercase tracking-wide text-ink-muted">
@@ -618,7 +634,7 @@ export function App() {
               </thead>
               <tbody>{visibleRecords.length > 0
                 ? renderedRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)
-                : <tr><td className="empty-history-cell" colSpan={10}>{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</td></tr>}
+                : <tr><td className="empty-history-cell" colSpan={10}>{emptyHistoryMessage}</td></tr>}
               </tbody>
             </table>
           </div>
@@ -626,7 +642,7 @@ export function App() {
           <div className="grid gap-3 mobile-history">
             {visibleRecords.length > 0
               ? renderedRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
-              : <p className="empty-history-card">{storageReady ? (trashMode ? "Thùng rác đang trống." : "Chưa có phiếu nào được lưu trên thiết bị này.") : "Đang mở dữ liệu trên thiết bị…"}</p>}
+              : <p className="empty-history-card">{emptyHistoryMessage}</p>}
           </div>
           {visibleRecords.length > HISTORY_BATCH_SIZE ? <div className="history-load-more">
             <p role="status">Đang hiển thị {renderedRecords.length}/{visibleRecords.length} phiếu</p>
@@ -685,6 +701,8 @@ export function App() {
 }
 
 type HistoryControlsContentProps = {
+  dateRange: HistoryDateRange;
+  onDateRangeChange: (range: HistoryDateRange) => void;
   filter: ApprovalFilter;
   idPrefix: string;
   onFilterChange: (filter: ApprovalFilter) => void;
@@ -711,13 +729,13 @@ function HistoryControlsTrigger({ active, className, controls, expanded, label, 
   </button>;
 }
 
-function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, sort }: Omit<HistoryControlsContentProps, "idPrefix">) {
+function MobileHistoryControls({ dateRange, onDateRangeChange, filter, onFilterChange, onSort, onSortReset, sort }: Omit<HistoryControlsContentProps, "idPrefix">) {
   const [open, setOpen] = useState(false);
-  const active = filter !== "ALL" || sort !== null;
+  const active = filter !== "ALL" || sort !== null || Boolean(dateRange.from || dateRange.to);
 
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogTrigger asChild>
-      <HistoryControlsTrigger active={active} className="history-controls-mobile" label="Mở lọc và sắp xếp trên mobile" />
+      <HistoryControlsTrigger active={active} className="history-controls-mobile" label="Mở lọc và sắp xếp" />
     </DialogTrigger>
     <DialogContent className="mobile-history-dialog" aria-describedby="mobile-history-dialog-description">
       <header className="mobile-history-dialog-header">
@@ -728,12 +746,12 @@ function MobileHistoryControls({ filter, onFilterChange, onSort, onSortReset, so
         </div>
       </header>
 
-      <HistoryControlsContent filter={filter} idPrefix="mobile" onFilterChange={onFilterChange} onSort={onSort} onSortReset={onSortReset} sort={sort} />
+      <HistoryControlsContent dateRange={dateRange} onDateRangeChange={onDateRangeChange} filter={filter} idPrefix="mobile" onFilterChange={onFilterChange} onSort={onSort} onSortReset={onSortReset} sort={sort} />
     </DialogContent>
   </Dialog>;
 }
 
-function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSortReset, showSort = true, sort }: HistoryControlsContentProps) {
+function HistoryControlsContent({ dateRange, onDateRangeChange, filter, idPrefix, onFilterChange, onSort, onSortReset, showSort = true, sort }: HistoryControlsContentProps) {
   function toggleFilter(event: MouseEvent<HTMLButtonElement>, nextFilter: DemoApprovalStatus) {
     const clearing = filter === nextFilter;
     onFilterChange(clearing ? "ALL" : nextFilter);
@@ -741,6 +759,7 @@ function HistoryControlsContent({ filter, idPrefix, onFilterChange, onSort, onSo
   }
 
   return <div className="mobile-history-dialog-body">
+        <HistoryDateControls range={dateRange} onChange={onDateRangeChange} />
         <section className="mobile-history-section" aria-labelledby={`${idPrefix}-filter-title`}>
           <header className="mobile-history-section-header">
             <h3 id={`${idPrefix}-filter-title`}>Trạng thái duyệt</h3>

@@ -153,7 +153,7 @@ describe("Store workspace", () => {
   it("toggles mobile approval filters and sort direction from radio-style grids", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
-    const filterTrigger = screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" });
+    const filterTrigger = screen.getByRole("button", { name: "Mở lọc và sắp xếp" });
     expect(filterTrigger.querySelector(".history-controls-icon > .lucide-list-filter")).not.toBeNull();
     expect(filterTrigger.querySelector(".history-controls-indicator")).toBeNull();
     fireEvent.click(filterTrigger);
@@ -194,7 +194,60 @@ describe("Store workspace", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Đóng" }));
 
     expect(screen.getByRole("button", { name: "Sắp xếp theo NCC" }).closest("th")).toHaveAttribute("aria-sort", "none");
-    expect(screen.getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" })).not.toHaveClass("is-active");
+    expect(screen.getByRole("button", { name: "Mở lọc và sắp xếp" })).not.toHaveClass("is-active");
+  });
+
+  it("filters detected dates with shortcuts, combines approval and clears hidden selections", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-15T03:00:00Z"));
+    render(<App />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn tất cả" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp" }));
+    const dialog = screen.getByRole("dialog", { name: "Lọc & sắp xếp" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Hôm qua" }));
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
+    expect(document.querySelector(".selection-count")).toHaveTextContent("Đã chọn 0");
+    expect(within(dialog).getByLabelText("Từ ngày")).toHaveValue("14/08/2026");
+    expect(within(dialog).getByLabelText("Đến ngày")).toHaveValue("14/08/2026");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Hôm nay" }));
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Lọc Đã duyệt" }));
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bỏ lọc trạng thái duyệt" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Tuần này" }));
+    expect(within(dialog).getByLabelText("Từ ngày")).toHaveValue("10/08/2026");
+    expect(within(dialog).getByLabelText("Đến ngày")).toHaveValue("16/08/2026");
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Đóng" }));
+    fireEvent.click(screen.getByRole("tab", { name: /TP Tươi sống/i }));
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
+    expect(screen.getByRole("status")).toHaveTextContent("10/08/2026 – 16/08/2026");
+    fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp" }));
+    fireEvent.click(screen.getByRole("button", { name: "Bỏ lọc ngày" }));
+    fireEvent.click(screen.getByRole("button", { name: "Đóng" }));
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mở lọc và sắp xếp" })).not.toHaveClass("is-active");
+  });
+
+  it("keeps the last valid range while typing invalid or reversed dates and supports open bounds", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Mở lọc và sắp xếp" }));
+    const from = screen.getByLabelText("Từ ngày");
+    const to = screen.getByLabelText("Đến ngày");
+    fireEvent.change(from, { target: { value: "15082026" } });
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
+    fireEvent.change(to, { target: { value: "14082026" } });
+    expect(screen.getByRole("alert")).toHaveTextContent("Đến ngày phải bằng hoặc sau Từ ngày");
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
+    fireEvent.change(to, { target: { value: "31022026" } });
+    expect(screen.getByRole("alert")).toHaveTextContent("Nhập ngày hợp lệ");
+    fireEvent.change(to, { target: { value: "15082026" } });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    fireEvent.change(from, { target: { value: "" } });
+    fireEvent.change(to, { target: { value: "14082026" } });
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("0");
+    fireEvent.click(screen.getByRole("button", { name: "Bỏ lọc ngày" }));
+    expect(document.querySelector(".history-total-count")).toHaveTextContent("1");
   });
 
   it("selects only the records in the active food type", () => {
@@ -316,7 +369,7 @@ describe("Store workspace", () => {
 
     const titleRow = document.querySelector(".history-title-row") as HTMLElement;
     const titleActions = within(titleRow).getAllByRole("button");
-    const filterButton = within(titleRow).getByRole("button", { name: "Mở lọc và sắp xếp trên mobile" });
+    const filterButton = within(titleRow).getByRole("button", { name: "Mở lọc và sắp xếp" });
     const trashToggle = within(titleRow).getByRole("button", { name: "Mở thùng rác, có 1 phiếu" });
     expect(titleRow).toHaveClass("pr-3");
     expect(trashToggle).toHaveTextContent("Phiếu đã xoá");
