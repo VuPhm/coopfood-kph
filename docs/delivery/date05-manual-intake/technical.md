@@ -1,6 +1,6 @@
 # DATE05 — nhập thủ công và vùng tap KPH
 
-Technical PASS; owner acceptance pending. Candidate SHA được ghi trong
+Technical PASS; owner acceptance pending. Runtime source `ffecd38434d8071da729c0d0ae3dfba35b897600`;
 [plan](plan.json). Preview <http://127.0.0.1:4398/#date> và
 <http://127.0.0.1:4398/#kph>. Nhánh `store-app/date05-manual-intake`, worktree
 `/Users/vup/.codex/worktrees/date05-manual-intake/coopfood-kph`, base

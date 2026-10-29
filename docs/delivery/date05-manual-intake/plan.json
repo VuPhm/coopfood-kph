@@ -2,13 +2,14 @@
   "schemaVersion": 1,
   "id": "date05-manual-intake",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Optimize DATE manual entry with scan, existing two-kind choice, immediate date milestones/remaining percentage; close KPH tag/bottom hit gaps.",
   "inScope": [
     "Default manual entry; compact identity/dates; barcode scan without erasing draft",
     "Existing Select choice for exactly two food kinds, required for newly tracked products",
     "Immediate shared DATE assessment and inclusive remaining percentage independent of product completion",
-    "KPH tags/bottom open detail in normal mode and toggle in selection mode, native strip scrolling"
+    "KPH tags/bottom open detail in normal mode and toggle in selection mode, native strip scrolling",
+    "Repair pointer-focus scroll that moves KPH tap targets; keep keyboard reveal, and fit scanner recovery controls in landscape"
   ],
   "outOfScope": [
     "DATE backend/persistence/API, changes to KPH stamped upload",
@@ -16,7 +17,7 @@
     "Merge/push/deploy"
   ],
   "baseSha": "f9e60d33e5b4d0323ee4b99325628f7a758de506",
-  "candidateSha": "",
+  "candidateSha": "ffecd38434d8071da729c0d0ae3dfba35b897600",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -26,14 +27,17 @@
     "docs/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "ffecd38434d8071da729c0d0ae3dfba35b897600",
+      "evidence": "docs/delivery/date05-manual-intake/technical.md"
     },
     {
       "id": "owner",
@@ -42,7 +46,15 @@
       "status": "pending"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "Tap tag và vùng đệm dưới cũng mở phiếu ở chế độ xem KPH; DATE ưu tiên tự nhập, vẫn quét, chọn1trong2loại và hiện ngay mốc/% sau nhập ngày.",
+      "source": "Owner feedback trong chat tại4396/#date và4396/#kph,30/10/2026",
+      "impact": "DATE input/choice/preview/scanner layout và KPH tap/focus browser gates; backend/API không đổi.",
+      "decision": "Tiếp tục DATE05/root sole writer, technical đạt, owner pending."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Implement bounded UI refinement and targeted browser checks in both KPH modes and DATE manual/lookup/scanner."
+  "nextAction": "Owner thử tap tag/Duyệt/đệm dưới KPH ở cả hai chế độ và DATE nhập ngày trước sản phẩm tại4398; chờ nghiệm thu. Không merge/push/deploy."
 }
