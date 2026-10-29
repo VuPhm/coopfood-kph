@@ -1,5 +1,19 @@
 # Nhập sản phẩm/lô vào theo dõi DATE — đề xuất28/10/2026
 
+**DATE05 candidate30/10/2026:** owner yêu cầu ưu tiên nhập thủ công, vẫn quét;
+loại hàng dùng choice có sẵn và chọn đúng một trong hai loại. Form mặc định
+**Tự nhập**, SKU/barcode chung hàng, tên riêng; dùng shared Select với hai lựa
+chọn **TP khô & khác / TP tươi sống**, không chọn sẵn và không suy loại từ mã.
+Lô mới phải chọn loại; lô lịch sử chưa phân loại giữ nguyên. Nút quét luôn có:
+ở nhánh tự nhập chỉ điền barcode và giữ SKU/tên/loại/ngày; nhánh Tra mã hàng
+vẫn exact lookup và recovery cũ. Khi NSX/HSD hợp lệ, hiện mốc cảnh báo/hạn lùi
+và % HSD còn ngay, không đợi nhập xong sản phẩm. Dùng `assessDateLot` và
+`remainingShelfPercent` chung; ngày sai không hiện kết quả cũ. Mã lô tùy chọn
+thu trong Thông tin lô bổ sung. Bản này vẫn mock trong phiên, chưa tạo contract
+online; [kiểm tra và giới hạn](../delivery/date05-manual-intake/technical.md),
+owner pending. Các proposal cũ về nhập lô mới Chưa phân loại được thay thế bởi
+yêu cầu chọn một trong hai loại của vòng này.
+
 **DATE04 revision2 candidate28/10:** owner yêu cầu bottom panel và chọn tự nhập
 ngay. Form neo đáy, footer giữ yên; entry+ ở toolbar DATE thay vì trong heading.
 Tự nhập không cần lookup trước, giữ provenance MANUAL/barcode riêng; lookup

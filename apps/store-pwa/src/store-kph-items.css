@@ -26,7 +26,6 @@
   .store-app .store-ticket-trailing .store-ticket-chevron { position: static; flex: 0 0 16px; }
   .store-app .store-ticket-foot {
     position: relative;
-    pointer-events: none;
     display: flex;
     align-items: center;
     gap: var(--store-space-2);

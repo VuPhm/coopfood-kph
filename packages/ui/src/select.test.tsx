@@ -16,4 +16,9 @@ describe("Select application values", () => {
     expect(screen.getByRole("combobox", { name: "Mã hàng" })).toBeDisabled();
     expect(new FormData(screen.getByRole("form", { name: "Khóa" }) as HTMLFormElement).has("sku")).toBe(false);
   });
+  it("shows a placeholder for an unchosen value without adding a third option",()=>{
+    render(<Select aria-label="Loại hàng" value="unclassified" placeholder="Chọn loại hàng" onValueChange={()=>{}} options={[{value:"TPCN",label:"TP khô & khác"},{value:"TPTS",label:"TP tươi sống"}]} />);
+    expect(screen.getByRole("combobox",{name:"Loại hàng"})).toHaveTextContent("Chọn loại hàng");
+  });
+
 });

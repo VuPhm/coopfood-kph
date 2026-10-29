@@ -130,7 +130,11 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     const contentId = `${listId}-${group.records[0]!.id}`;
     return <section className="store-kph-day" key={group.records[0]!.id} aria-label={groupByDate ? `Ngày phát hiện ${group.date}` : undefined}>
     {groupByDate ? heading(group.date, contentId, expanded) : null}<div className="store-kph-day-items" id={contentId} hidden={!expanded}>{expanded ? group.records.map(record => <div key={record.id} className="store-ticket" data-record-id={record.id} data-selection-mode={selectionMode || undefined} onClick={event => {
-      if (selectionMode && !loading && event.target instanceof Element && !event.target.closest("button, input, label")) selectRecords([record], !selection.includes(record.id));
+      if (!loading && event.target instanceof Element && !event.target.closest("button, input, label")) {
+        event.currentTarget.querySelector<HTMLButtonElement>(".store-ticket-open")?.focus({ preventScroll: true });
+        if (selectionMode) selectRecords([record], !selection.includes(record.id));
+        else setActive(record);
+      }
     }}>
       {marker(record)}{selectionMode ? selector(record, "store-ticket-selector") : null}
       <div className={`store-ticket-body${screenLayout ? " store-ticket-screen" : ""}`}><button className="store-ticket-open" aria-label={`${selectionMode ? "Chọn phiếu" : "Mở phiếu"} ${record.productName}`} aria-pressed={selectionMode ? selection.includes(record.id) : undefined} aria-describedby={screenLayout ? `${listId}-${record.id}-quantity ${listId}-${record.id}-facts ${listId}-${record.id}-approval` : undefined} disabled={loading} onClick={() => selectionMode ? selectRecords([record], !selection.includes(record.id)) : setActive(record)}>

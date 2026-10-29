@@ -399,7 +399,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation 
 
           {/* Error state */}
           {status === "error" && (
-            <div className="absolute inset-0 bg-neutral-950 p-6 flex flex-col items-center justify-center text-center text-white z-10" role="alert">
+            <div className="barcode-scanner-error absolute inset-0 bg-neutral-950 p-6 flex flex-col items-center justify-center text-center text-white z-10" role="alert">
               <div className="rounded-full bg-red-500/20 p-3 mb-3 text-red-400">
                 <TriangleAlert size={32} />
               </div>

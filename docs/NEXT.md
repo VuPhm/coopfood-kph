@@ -1,5 +1,17 @@
 # Công việc kế tiếp
 
+**DATE05 — candidate30/10/2026:** ưu tiên nhập DATE thủ công, vẫn có quét
+mã giữ draft; shared choice đúng hai loại, bắt buộc chọn khi tạo mới. NSX/HSD
+hợp lệ hiện ngay mốc và % còn lại, không đợi SKU/tên/loại; dùng rule chung.
+KPH tap tag/thông tin/đệm dưới mở chi tiết trong chế độ xem; chế độ Chọn cùng
+vùng chọn/bỏ chọn một lần, vuốt tag giữ cuộn ngang. Sửa scanner landscape
+để lỗi camera không che nút quay về nhập tay. Preview
+<http://127.0.0.1:4398/#date> và <http://127.0.0.1:4398/#kph>;
+[files/checks/giới hạn](delivery/date05-manual-intake/technical.md).
+Nhánh/worktree DATE05 riêng từf9e60d3, root sole writer. Owner pending;
+DATE mới vẫn chỉ trong phiên, chưa API/persistence. Bước tiếp owner thử tap tag
+và đệm dưới ở KPH, nhập ngày trước thông tin sản phẩm ở DATE.
+
 **KPH04 revision2 — checkpoint30/10/2026:** theo owner cho đóng dấu frontend
 cả online và sửa vùng chọn. API nhận optional stampedPhotos theo ordinal cùng
 original, giữ đúng bytes JPEG frontend/private/original, validate MIME/kích thước/

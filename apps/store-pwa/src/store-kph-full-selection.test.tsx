@@ -17,4 +17,15 @@ describe("KPH full-item selection",()=>{
     fireEvent.click(metadata);expect(checkbox).not.toBeChecked();
     expect(active).not.toHaveBeenCalled();
   });
+  it("opens a mobile record from condition, resolution and bottom padding in view mode",()=>{
+    const active=vi.fn(),record=mockRecords[0]!;
+    const view=render(<StoreKphList desktop={false} visible={[record]} groupByDate={false} setActive={active}/>);
+    const row=view.container.querySelector('[data-record-id]')!;
+    fireEvent.click(row.querySelector('[data-label-kind="condition"]')!);
+    fireEvent.click(row.querySelector('[data-label-kind="resolution"]')!);
+    fireEvent.click(row);
+    expect(active).toHaveBeenCalledTimes(3);
+    expect(active).toHaveBeenLastCalledWith(record);
+  });
+
 });

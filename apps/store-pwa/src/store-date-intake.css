@@ -21,7 +21,6 @@
 .date-intake-dates { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
 .date-intake-form .store-field { display: grid; gap: 6px; min-width: 0; }
 .date-intake-form label { font-size: 13px; line-height: 20px; font-weight: 600; }
-.date-intake-form select { min-height: 44px; width: 100%; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 10px 12px; font-size: 16px; background: white; }
 .date-intake-error { color: var(--store-error-ink); font-size: 13px; line-height: 20px; }
 .date-intake-recovery { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: var(--store-canvas); color: var(--store-ink); font-size: 13px; line-height: 20px; }
 .date-intake-preview { border-radius: 12px; padding: 12px; background: var(--store-canvas); }
@@ -31,10 +30,24 @@
 .date-intake-footer { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); flex-shrink: 0; gap: 8px; border-top: 1px solid var(--store-soft-edge); padding: 12px 16px max(12px,env(safe-area-inset-bottom)); background: white; }
 :is(.date-intake-footer,.date-intake-lookup,.date-intake-section,.date-intake-recovery) > .store-button { min-height: 44px; height: auto; border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 20px; }
 .store-date-intake-sheet :is(button,input,select):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 2px; }
-@media(max-width: 480px) { .date-intake-dates { grid-template-columns: 1fr; } }
 @media(prefers-reduced-motion: reduce) { .store-date-intake-sheet[data-slot="dialog-content"] { animation: none; } }
 
 .store-date-intake-sheet > [data-slot="dialog-close"] { z-index: 2; }
 
 .date-intake-barcode-choice { display: flex; align-items: center; gap: 8px; min-height: 44px; }
 .date-intake-barcode-choice input[type="checkbox"] { flex: 0 0 20px; width: 20px; height: 20px; accent-color: var(--store-brand-action); }
+
+.date-intake-entry-tools { display: flex; align-items: center; gap: 8px; }
+.date-intake-entry-tools .date-intake-method { flex: 1; min-width: 0; }
+.date-intake-entry-tools .date-intake-scan { flex: 0 0 44px; }
+.date-intake-identity { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; gap: 12px; }
+.date-intake-preview-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+.date-intake-percent { color: var(--store-ink); font-size: 14px; line-height: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.date-intake-extra { border-top: 1px solid var(--store-holder-edge); font-size: 13px; line-height: 20px; }
+.date-intake-extra summary { min-height: 44px; align-content: center; cursor: pointer; color: var(--store-ink-muted); }
+.date-intake-extra[open] summary { margin-bottom: 8px; }
+
+@media(max-width: 359px) { .date-intake-dates, .date-intake-identity { grid-template-columns: 1fr; } }
+
+.date-intake-form input:not([type="checkbox"]) { min-height: 44px; height: auto; padding-block: 8px; line-height: 24px; }
+.date-intake-preview dl > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px; }

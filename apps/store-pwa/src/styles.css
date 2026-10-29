@@ -873,14 +873,40 @@ html[data-focus-modality="keyboard"] .expiry-calendar > header button:focus, htm
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
 }
 
+.barcode-scanner-dialog-content:not(.store-scanner-screen) {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
 .barcode-scanner-header {
+  flex: 0 0 auto;
   padding: 24px 68px 24px 24px;
   background: var(--cf-modal-header);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .barcode-scanner-view-container {
-  min-height: 15rem;
+  min-height: 0;
+}
+
+.barcode-scanner-dialog-content:not(.store-scanner-screen) .barcode-scanner-view-container {
+  flex: 1 1 auto;
+}
+
+.barcode-scanner-footer {
+  flex: 0 0 auto;
+}
+
+.barcode-scanner-error {
+  overflow-y: auto;
+  justify-content: safe center;
+}
+
+@media (max-height: 500px) {
+  .barcode-scanner-dialog-content:not(.store-scanner-screen) .barcode-scanner-header {
+    padding-block: 12px;
+  }
 }
 
 .barcode-scanner-laser {

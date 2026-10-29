@@ -4,11 +4,12 @@ export function StoreStickyTabs({ children }: { children: ReactNode }) {
   return <div className="store-sticky-tabs">{children}</div>;
 }
 
-// Only measure on focus: document scrolling and pinning remain native CSS.
+// Reveal keyboard focus without moving a pointer target during a tap.
+// Document scrolling and pinning remain native CSS.
 export function revealBelowStickyTabs(event: FocusEvent<HTMLElement>) {
   const target = event.target;
   const tabs = event.currentTarget.querySelector<HTMLElement>(".store-sticky-tabs");
-  if (!(target instanceof HTMLElement) || !tabs || !event.currentTarget.contains(target) || tabs.contains(target)) return;
+  if (!(target instanceof HTMLElement) || !target.matches(":focus-visible") || !tabs || !event.currentTarget.contains(target) || tabs.contains(target)) return;
   if (!(tabs.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING)) return;
   const reveal = () => {
     if (!target.isConnected || document.activeElement !== target) return;

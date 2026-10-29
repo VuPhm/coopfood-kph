@@ -16,7 +16,8 @@ describe("DATE intake", () => {
     expect(dateLotBatchLabel(lot)).toBe("LO-001"); expect(dateLotKind(lot)).toBe("TPTS");
     expect(dateLotKphSeed(lot, "2026-10-28").seed).toMatchObject({ skuCode: "0000042", productName: input.name, barcode: "00000042", condition: "EXPIRED" });
     expect(dateLotKphSeed(lot, "2026-10-28").seed.note).not.toContain("internal-uuid");
-    expect(dateLotKind(makeTrackedDateLot({ ...input, kind: "unclassified" }, snapshot, "x"))).toBeNull();
+    expect(dateIntakeSchema.safeParse({ ...input, kind: "unclassified" }).success).toBe(false);
+    expect(dateLotKind({ ...lot, productSnapshot: {...lot.productSnapshot!, kind:null} })).toBeNull();
   });
   it("validates real dates and the inclusive10-day boundary with the existing calculator", () => {
     for (const expiry of ["31/02/2026", "01/10/2026", "30/09/2026", ""]) expect(dateIntakeSchema.safeParse({ ...input, expiry }).success).toBe(false);

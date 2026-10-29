@@ -5,7 +5,7 @@ import type { MockDateLot } from "./store-app-mock";
 export const dateIntakeSchema = z.object({
   sku: z.string().trim().min(1, "Nhập SKU của sản phẩm."),
   name: z.string().trim().min(1, "Nhập tên sản phẩm."),
-  kind: z.enum(["TPCN", "TPTS", "unclassified"]),
+  kind: z.enum(["TPCN", "TPTS", "unclassified"]).refine((value): boolean => value !== "unclassified", "Chọn một trong hai loại hàng."),
   batchCode: z.string().trim(),
   manufactured: z.string().min(1, "Nhập ngày sản xuất."),
   expiry: z.string().min(1, "Nhập hạn sử dụng."),

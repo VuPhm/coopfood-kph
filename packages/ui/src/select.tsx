@@ -7,15 +7,15 @@ import "./dropdown.css";
 export type SelectOption = { value: string; label: string; disabled?: boolean };
 export type SelectProps = Omit<ComponentProps<typeof SelectPrimitive.Trigger>, "value" | "onChange"> & {
   value: string; onValueChange: (value: string) => void; options: readonly SelectOption[];
-  contentClassName?: string; name?: string;
+  contentClassName?: string; name?: string; placeholder?: string;
 };
 
 // Prefix every value so an empty application value (e.g. All months) remains a valid item.
-export function Select({ value, onValueChange, options, className, contentClassName, name, disabled, ...props }: SelectProps) {
-  return <SelectPrimitive.Root value={`value:${value}`} onValueChange={next => onValueChange(next.slice(6))} {...(disabled !== undefined ? { disabled } : {})}>
+export function Select({ value, onValueChange, options, className, contentClassName, name, disabled, placeholder, ...props }: SelectProps) {
+  return <SelectPrimitive.Root value={options.some(option => option.value === value) ? `value:${value}` : ""} onValueChange={next => onValueChange(next.slice(6))} {...(disabled !== undefined ? { disabled } : {})}>
     {name ? <input type="hidden" name={name} value={value} disabled={disabled} /> : null}
     <SelectPrimitive.Trigger data-value={value} className={cn("ui-select-trigger", className)} {...props}>
-      <SelectPrimitive.Value />
+      <SelectPrimitive.Value placeholder={placeholder} />
       <SelectPrimitive.Icon className="ui-select-chevron"><ChevronDown size={18} aria-hidden="true" /></SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
     <SelectPrimitive.Portal><SelectPrimitive.Content className={cn("ui-dropdown-surface ui-select-content", contentClassName)} position="popper" sideOffset={6} collisionPadding={12}>
