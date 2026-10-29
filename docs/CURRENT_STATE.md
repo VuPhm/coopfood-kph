@@ -1,5 +1,18 @@
 # Trạng thái hiện tại
 
+**KPH04 — candidate30/10/2026:** nối pipeline ảnh Pilot vào form Store Fresh
+đang dùng thử: chụp/chọn1–3ảnh → resize/nén JPEG/tem giờ-ngày-cửa hàng →
+xem/soi/xóa ảnh nháp → xem lại/gửi → gallery chi tiết chỉ đọc → Excel giữ đúng
+bytes/thứ tự ảnh stamped. Thu đúng tỷ lệ/no-upscale, bỏ kết quả xử lý sau hủy,
+cleanup bitmap/canvas/URL; original tách riêng trong bộ nhớ, online vẫn gửi gốc
+và backend đóng tem.304tests +11targeted, online/mock build, Playwright4viewport
+và cold form6ca CPU6x đạt. Preview <http://127.0.0.1:4394/#kph>;
+[file/commands/giới hạn](delivery/kph04-evidence-photos/technical.md).
+Nhánh/worktree KPH04 riêng từc2ac210, root sole writer; owner pending. HEIC
+tùy decoder thiết bị; ảnh/phiếu mock mất khi reload; chưa merge/push/deploy.
+Bước tiếp thử ảnh ngang/dọc, mở xem tem và xuất Excel. Không suy nghiệm thu
+KPH03/DATE04r2/NOTIF01 từ yêu cầu chuyển ảnh này.
+
 **KPH03 — candidate30/10/2026:** sửa lệch đơn vị8px về cùng44px với số lượng,
 skeleton khớp form thật. Thanh chọn rõ phạm vi/count và checkbox mixed; hộp Excel
 có số xuất/bỏ qua, nội dung cuộn/footer giữ yên, chữ200% không cắt hàng. Nhãn

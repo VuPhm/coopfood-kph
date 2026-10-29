@@ -81,7 +81,7 @@ export const KphCreateControl = memo(function KphCreateControl({ ref, onSaved }:
     <DialogDescription id="kph-create-description" className="sr-only">Tạo phiếu hàng không phù hợp; trường có dấu sao là bắt buộc.</DialogDescription>
     {readySession !== session && !failed ? <p className="sr-only" role="status">Đang tải biểu mẫu tạo phiếu…</p> : null}
     {/* Keep the body intact through the close animation; each open starts a new draft. */}
-    {Form && readySession === session ? <Form key={session} embedded onReviewingChange={setReviewing} initialScrollTop={initialScroll.current} initialValues={initialValues} kind={kind} open onOpenChange={changeOpen} onSaved={onSaved} onBarcodeLookup={mockBarcodeLookup} profile={mockProfile} actorReadOnly onlineMode presentation="screen" />
+    {Form && readySession === session ? <Form key={session} embedded onReviewingChange={setReviewing} initialScrollTop={initialScroll.current} initialValues={initialValues} kind={kind} open onOpenChange={changeOpen} onSaved={onSaved} onBarcodeLookup={mockBarcodeLookup} profile={mockProfile} actorReadOnly presentation="screen" />
       : failed ? <div className="store-create-loading-body"><p role="alert">Chưa tải được biểu mẫu. Kiểm tra kết nối rồi tải lại ứng dụng.</p><button type="button" className="store-button" onClick={() => window.location.reload()}>Tải lại ứng dụng</button><button type="button" onClick={() => changeOpen(false)}>Hủy mở phiếu</button></div>
       : <KphFormSkeleton kind={kind} onCancel={() => changeOpen(false)} />}
   </DialogContent></Dialog>;

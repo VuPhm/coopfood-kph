@@ -176,7 +176,7 @@
 .store-scan-guide { position: absolute; z-index: 1; }
 .store-scanner-screen .barcode-scanner-footer { justify-content: center; border: 0; background: transparent; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
 .store-scanner-screen .barcode-scanner-footer > button { min-height: 48px; margin: 0; border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; font-size: 14px; }
-.store-evidence-screen.evidence-viewer-content { display: grid; grid-template-rows: 60px minmax(0, 1fr) 56px; gap: 16px; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: 100dvh; translate: none; transform: none; border: 0; padding: calc(8px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); background: #101b14; color: white; }
+.store-evidence-screen.evidence-viewer-content { display: grid; grid-template-rows: minmax(60px, auto) minmax(0, 1fr) minmax(56px, auto); gap: 16px; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: 100dvh; translate: none; transform: none; border: 0; padding: calc(8px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); background: #101b14; color: white; }
 .store-evidence-screen > [data-slot="dialog-close"] { display: none; }
 .store-viewer-header, .store-viewer-navigation { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .store-viewer-header > div { display: flex; flex-direction: column; gap: 2px; align-items: center; }
@@ -187,7 +187,7 @@
 .store-viewer-navigation button:disabled { opacity: .42; }
 .store-viewer-navigation span { font-size: 12px; font-weight: 600; }
 .store-evidence-screen .evidence-viewer-stage { display: flex; align-items: center; justify-content: center; min-height: 0; width: 100%; height: 100%; overflow: hidden; border: 1px solid rgb(255 255 255 / 12%); border-radius: 18px; background: rgb(255 255 255 / 7%); }
-.store-evidence-screen .evidence-viewer-image { width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
+.store-evidence-screen .evidence-viewer-image { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
 .store-review-notice { display: flex; align-items: flex-start; gap: 12px; margin: 0; border-radius: 14px; padding: 12px; background: var(--cf-color-brand-soft); color: var(--cf-color-brand); }
 .store-review-notice img { display: block; flex-shrink: 0; }
 .store-review-notice strong { display: block; font-size: 13px; font-weight: 600; }

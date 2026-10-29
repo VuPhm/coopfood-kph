@@ -52,6 +52,7 @@ export function EvidenceImageViewer({ image, onOpenChange, open, presentation = 
   useEffect(() => {
     naturalSize.current = null;
     setFrame(null);
+    hideLens();
   }, [image?.src]);
 
   function updateLens(event: PointerEvent<HTMLImageElement>, touch: boolean) {

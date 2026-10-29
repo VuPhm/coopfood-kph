@@ -50,6 +50,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState("");
   const [image, setImage] = useState<{ src: string; alt: string } | null>(null);
+  const imageIndex = active?.photos.findIndex(photo => photo.src === image?.src) ?? -1;
   // Record URLs outlive workspace navigation. StoreApp owns the records in memory.
   const latestRecords = useRef(records); latestRecords.current = records;
   useEffect(() => { setSelection([]); setCollapsedDates([]); setShownCount(KPH_BATCH_SIZE); setActive(null); }, [kind, approval, from, to, sort, query]);
@@ -156,7 +157,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
     <StoreSheet className="store-kph-sheet store-kph-detail" open={active !== null} onOpenChange={open => { if (!open) setActive(null); }} title="Chi tiết phiếu KPH" description="Nội dung và trạng thái phiếu trong dữ liệu mẫu">
       {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "Thực phẩm khô & khác" : "Thực phẩm tươi sống"} · {active.id}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["SKU", active.sku || "—"], ["UPC", active.barcode || "—"], ["Nhà cung cấp", active.supplier || "—"], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Biện pháp", active.resolution], ["Trạng thái duyệt", approvalLabels[active.approvalStatus]]]} /></section><section><h3>Ghi nhận</h3><Summary rows={[["Ghi chú", active.note || "Không có"]]} /><p className="store-evidence-count">Ảnh minh chứng · {active.photos.length}/3</p><div className="store-review-photos">{active.photos.map((p, index) => <button key={p.id} aria-label={`Xem ảnh minh chứng ${index + 1}`} onClick={() => setImage(p)}><img src={p.src} alt={p.alt} /><span>{index + 1}</span></button>)}</div>{!active.photos.length ? <p className="store-muted">Phiếu mẫu chưa có ảnh minh chứng.</p> : null}</section><div className="store-sheet-actions"><Button variant="ghost" onClick={() => review("REJECTED")}>Không duyệt</Button><Button className="store-button" onClick={() => review("APPROVED")}>Duyệt phiếu</Button></div></> : null}
     </StoreSheet>
-    <EvidenceImageViewer image={image} open={image !== null} onOpenChange={open => { if (!open) setImage(null); }} />
+    <EvidenceImageViewer image={image} open={image !== null} onOpenChange={open => { if (!open) setImage(null); }} presentation="screen" index={Math.max(0, imageIndex)} total={active?.photos.length ?? 0} onPrevious={() => { if (active && imageIndex > 0) setImage(active.photos[imageIndex - 1]!); }} onNext={() => { if (active && imageIndex < active.photos.length - 1) setImage(active.photos[imageIndex + 1]!); }} />
   </StorePageLayout>;
 });
 

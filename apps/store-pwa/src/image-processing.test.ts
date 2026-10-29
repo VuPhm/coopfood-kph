@@ -73,6 +73,7 @@ describe("evidence image envelope", () => {
     expect(result.blob.type).toBe("image/jpeg");
     expect(fillText.mock.calls.some(([text]) => String(text).includes("0123 - Cống Quỳnh"))).toBe(true);
     expect(close).toHaveBeenCalledOnce();
+    expect([canvas.width, canvas.height]).toEqual([0, 0]);
   });
 
   it("keeps the stamp geometry valid for a very small image without upscaling", async () => {

@@ -542,7 +542,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
               </Field>
               <div className="mt-3">
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
-                <p id="kph-photo-help" className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.</p>
+                <p id="kph-photo-help" className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.{!onlineMode ? " Tự đóng dấu giờ, ngày và cửa hàng lên ảnh." : ""}</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <PhotoPicker invalid={Boolean(photoError)} accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, "imgFeatherCamera")} alt="" /> : <Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
                   <PhotoPicker invalid={Boolean(photoError)} accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, "imgFeatherImage")} alt="" /> : <Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />

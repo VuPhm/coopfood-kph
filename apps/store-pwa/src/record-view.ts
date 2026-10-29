@@ -31,6 +31,9 @@ export type EvidencePhotoView = {
   alt: string;
   blob?: Blob;
   fileName?: string;
+  /** Private, memory-only evidence in the Store prototype; never an upload replacement. */
+  originalFile?: File;
+  capturedAt?: string;
 };
 
 export const approvalLabels: Record<ApprovalStatus, string> = {

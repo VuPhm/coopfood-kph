@@ -9,6 +9,6 @@ export function kphRecordFromDraft(draft: CreatedRecordDraft): RecordView {
       quantity: `${draft.quantity} ${draft.unit}`, quantityValue: draft.quantity, unit: draft.unit,
       condition: draft.condition, resolution: draft.resolution, treatmentDate: draft.treatmentDate,
       approvalStatus: "PENDING", note: draft.note,
-      photos: draft.photos.map((p, i) => ({ id: p.id, blob: p.blob, fileName: p.fileName, src: URL.createObjectURL(p.blob), alt: `Ảnh minh chứng ${i + 1}` })),
+      photos: draft.photos.map((p, i) => ({ id: p.id, blob: p.blob, originalFile: p.originalFile, capturedAt: p.capturedAt.toISOString(), fileName: p.fileName, src: URL.createObjectURL(p.blob), alt: `Ảnh minh chứng ${i + 1}` })),
   };
 }
