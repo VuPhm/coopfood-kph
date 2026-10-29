@@ -106,20 +106,22 @@ describe("Create KPH record", () => {
     expect(screen.getByAltText("Ảnh minh chứng evidence.jpg đã đóng tem")).toHaveAttribute("src", "blob:stamped-photo");
   });
 
-  it("keeps online JPEG bytes as the upload and leaves stamping to the backend", async () => {
+  it("stamps online previews on the frontend and keeps the original separately", async () => {
     Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn().mockReturnValue("blob:original-photo") });
+    const stamped = new Blob(["frontend-stamped"], {type:"image/jpeg"});
+    vi.mocked(processEvidencePhoto).mockResolvedValue({blob:stamped,capturedAt:new Date("2026-10-30T01:00:00Z"),width:600,height:400});
     const onSaved = renderDialog("TPCN", vi.fn(), { ...DEFAULT_STORE_PROFILE, storeName: "Cống Quỳnh", storeCode: "0123", fullName: "Nguyễn Văn Demo" }, undefined, true);
     const file = new File(["original-online-bytes"], "evidence.jpg", { type: "image/jpeg" });
     const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
 
     fireEvent.change(picker!, { target: { files: [file] } });
     expect(await screen.findByText(/Đã xử lý 1\/3 ảnh/)).toBeVisible();
-    expect(processEvidencePhoto).not.toHaveBeenCalled();
+    expect(processEvidencePhoto).toHaveBeenCalledWith(file, {storeCode:"0123",storeName:"Cống Quỳnh"});
     fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Hàng online" } });
     fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
 
     await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({
-      photos: [expect.objectContaining({ originalFile: file, blob: file })],
+      photos: [expect.objectContaining({ originalFile: file, blob: stamped })],
     })));
   });
 

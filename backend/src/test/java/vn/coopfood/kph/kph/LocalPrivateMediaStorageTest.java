@@ -119,6 +119,34 @@ class LocalPrivateMediaStorageTest {
                 .hasMessageContaining("no larger than 10 MiB");
     }
 
+    @Test
+    void keepsValidatedFrontendDerivativeBytesWithoutRestamping() throws Exception {
+        LocalPrivateMediaStorage storage = new LocalPrivateMediaStorage(mediaRoot.toString());
+        byte[] original = image(1600, 900, "png"), stamped = image(1280, 720, "jpg");
+        var stored = storage.store(UUID.randomUUID(), 1,
+                new MockMultipartFile("photos", "original.png", "image/png", original),
+                new MockMultipartFile("stampedPhotos", "stamped.jpg", "image/jpeg", stamped),
+                STORE_CODE, STORE_NAME, SERVER_NOW, SERVER_NOW);
+        assertThat(Files.readAllBytes(mediaRoot.resolve(stored.photo().originalStorageKey()))).containsExactly(original);
+        assertThat(Files.readAllBytes(mediaRoot.resolve(stored.photo().stampedStorageKey()))).containsExactly(stamped);
+        assertThat(stored.photo().stampedSha256()).isEqualTo(sha256(stamped));
+    }
+
+    @Test
+    void rejectsInvalidFrontendDerivativeWithoutWritingEvidence() throws Exception {
+        LocalPrivateMediaStorage storage = new LocalPrivateMediaStorage(mediaRoot.toString());
+        var original = new MockMultipartFile("photos", "original.png", "image/png", image(600, 400, "png"));
+        for (byte[] bytes : new byte[][] { image(600, 400, "png"), image(600, 600, "jpg"), image(1280, 720, "jpg"), image(1400, 900, "jpg") }) {
+            assertThatThrownBy(() -> storage.store(UUID.randomUUID(), 1, original,
+                    new MockMultipartFile("stampedPhotos", "invalid.jpg", "image/jpeg", bytes),
+                    STORE_CODE, STORE_NAME, SERVER_NOW, SERVER_NOW))
+                    .isInstanceOf(vn.coopfood.kph.foundation.web.ApiProblemException.class);
+        }
+        assertThatThrownBy(() -> storage.readStampedUpload(new MockMultipartFile("stampedPhotos", "large.jpg", "image/jpeg", new byte[1024 * 1024 + 1])))
+                .hasMessageContaining("no larger than 1 MiB");
+        try (var files = Files.walk(mediaRoot)) { assertThat(files.filter(Files::isRegularFile).toList()).isEmpty(); }
+    }
+
     private static byte[] image(int width, int height, String format) throws Exception {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         image.setRGB(0, 0, Color.RED.getRGB());

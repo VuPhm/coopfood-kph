@@ -57,10 +57,11 @@ class KphController {
     ResponseEntity<KphRecordResponse> create(@PathVariable UUID storeId,
             @Valid @RequestPart("payload") KphCreateRequest payload,
             @RequestPart("photos") List<MultipartFile> photos,
+            @RequestPart(value = "stampedPhotos", required = false) List<MultipartFile> stampedPhotos,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(service.create(storeId, payload, photos, idempotencyKey, authentication));
+                .body(service.create(storeId, payload, photos, stampedPhotos, idempotencyKey, authentication));
     }
 
     @PutMapping("/{recordId}/approval")

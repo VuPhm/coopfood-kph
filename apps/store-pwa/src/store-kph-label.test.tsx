@@ -53,8 +53,9 @@ describe("KPH list labels", () => {
     expect(screen.getByTitle("Trạng thái duyệt: Đã duyệt")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("checkbox", { name: `Chọn ${record.productName}` }));
     expect(select).toHaveBeenCalledWith([record.id]);
-    fireEvent.click(screen.getByRole("button", { name: desktop ? `Mở phiếu ${record.productName}` : new RegExp(record.productName) }));
-    expect(open).toHaveBeenCalledWith(record);
+    fireEvent.click(screen.getByRole("button", { name: `Chọn phiếu ${record.productName}` }));
+    expect(select).toHaveBeenCalledTimes(2);
+    expect(open).not.toHaveBeenCalled();
   });
 });
 
@@ -62,12 +63,13 @@ describe("KPH list labels", () => {
 it("opens a desktop record from any data cell and keeps selection separate", () => {
   const record = mockRecords[0]!;
   const open = vi.fn(), select = vi.fn();
-  const { container } = render(<StoreKphList desktop visible={[record]} selectionMode setActive={open} setSelection={select} />);
+  const { container, rerender } = render(<StoreKphList desktop visible={[record]} setActive={open} setSelection={select} />);
   fireEvent.click(screen.getByText(record.quantity));
   expect(open).toHaveBeenCalledTimes(1);
   expect(open).toHaveBeenCalledWith(record);
   fireEvent.click(screen.getByTitle(`Tình trạng: ${record.condition}`));
   expect(open).toHaveBeenCalledTimes(2);
+  rerender(<StoreKphList desktop visible={[record]} selectionMode setActive={open} setSelection={select} />);
   fireEvent.click(screen.getByRole("checkbox", { name: `Chọn ${record.productName}` }));
   expect(select).toHaveBeenCalledWith([record.id]);
   expect(open).toHaveBeenCalledTimes(2);

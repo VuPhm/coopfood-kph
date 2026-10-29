@@ -174,14 +174,16 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     };
     const form = new FormData();
     form.append("payload", new Blob([JSON.stringify(payload)], { type: "application/json" }));
-    for (const { originalFile } of draft.photos) {
+    for (const { originalFile, blob, id } of draft.photos) {
       // Rebuild the multipart part from the exact bytes so cross-realm File objects
       // (for example, an iOS/webview File handed to a fetch implementation) keep
       // their bytes and filename without relying on File prototype identity.
       const originalBytes = await readFileBytes(originalFile);
       form.append("photos", new Blob([originalBytes], { type: originalFile.type }), originalFile.name);
+      const stampedBytes = await readFileBytes(blob);
+      form.append("stampedPhotos", new Blob([stampedBytes], { type: "image/jpeg" }), `${id}.jpg`);
     }
-    const signature = await createRequestSignature(storeId, payload, draft.photos.map(({ originalFile }) => originalFile));
+    const signature = await createRequestSignature(storeId, payload, draft.photos.flatMap(({ originalFile, blob }) => [originalFile, blob]));
     const suppliedKey = draft.idempotencyKey?.trim();
     const pendingKey = pendingCreates.get(signature);
     const suppliedKeySignature = suppliedKey ? keySignatures.get(suppliedKey) : undefined;
@@ -283,7 +285,7 @@ function newIdempotencyKey() {
 async function createRequestSignature(
   storeId: string,
   payload: components["schemas"]["KphCreateRequest"],
-  photos: readonly File[],
+  photos: readonly Blob[],
 ) {
   const encoder = new TextEncoder();
   const chunks: Uint8Array[] = [encoder.encode(storeId), encoder.encode(JSON.stringify(payload))];
@@ -305,7 +307,7 @@ async function createRequestSignature(
   return fallbackHash(input);
 }
 
-async function readFileBytes(file: File): Promise<ArrayBuffer> {
+async function readFileBytes(file: Blob): Promise<ArrayBuffer> {
   if (typeof file.arrayBuffer === "function") return file.arrayBuffer();
   if (typeof FileReader !== "undefined") {
     return new Promise<ArrayBuffer>((resolve, reject) => {

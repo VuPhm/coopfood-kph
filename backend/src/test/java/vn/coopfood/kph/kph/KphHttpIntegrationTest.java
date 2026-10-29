@@ -129,6 +129,48 @@ class KphHttpIntegrationTest {
     }
 
     @Test
+    void acceptsFrontendStampedPairWithPrivateOriginalAndIdempotency() throws Exception {
+        Login login = login();
+        byte[] original = png(32, 16), derivative = jpeg(32, 16);
+        var originalPart = new MockMultipartFile("photos", "original.png", "image/png", original);
+        var stampedPart = new MockMultipartFile("stampedPhotos", "stamped.jpg", "image/jpeg", derivative);
+        MvcResult created = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .file(payload(null, "Frontend stamped")).file(originalPart).file(stampedPart)
+                        .session(login.session()).header("X-CSRF-TOKEN", login.csrfToken())
+                        .header("Idempotency-Key", "frontend-stamp-key-0001"))
+                .andExpect(status().isCreated()).andReturn();
+        JsonNode body = objectMapper.readTree(created.getResponse().getContentAsByteArray());
+        String recordId = body.path("id").asText(), path = body.path("photos").get(0).path("stampedContentPath").asText();
+        var stored = database.fetchOne("SELECT original_storage_key, stamped_storage_key FROM kph_photos WHERE kph_record_id = ?", UUID.fromString(recordId));
+        assertThat(Files.readAllBytes(mediaRoot.resolve(stored.get("original_storage_key", String.class)))).containsExactly(original);
+        assertThat(Files.readAllBytes(mediaRoot.resolve(stored.get("stamped_storage_key", String.class)))).containsExactly(derivative);
+        assertThat(mockMvc.perform(get(path).session(login.session())).andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", containsString("private"))).andReturn().getResponse().getContentAsByteArray()).containsExactly(derivative);
+        mockMvc.perform(get(path)).andExpect(status().isUnauthorized());
+        mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .file(payload(null, "Frontend stamped")).file(originalPart).file(stampedPart)
+                        .session(login.session()).header("X-CSRF-TOKEN", login.csrfToken())
+                        .header("Idempotency-Key", "frontend-stamp-key-0001"))
+                .andExpect(status().isCreated());
+        mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .file(payload(null, "Frontend stamped")).file(originalPart)
+                        .file(new MockMultipartFile("stampedPhotos", "changed.jpg", "image/jpeg", jpeg(16, 8)))
+                        .session(login.session()).header("X-CSRF-TOKEN", login.csrfToken())
+                        .header("Idempotency-Key", "frontend-stamp-key-0001"))
+                .andExpect(status().isConflict());
+        mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID)
+                        .file(payload(null, "Cross-store")).file(originalPart).file(stampedPart)
+                        .session(login.session()).header("X-CSRF-TOKEN", login.csrfToken())
+                        .header("Idempotency-Key", "frontend-stamp-key-0002"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
+                        .file(payload(null, "Mismatched pairs")).file(originalPart).file(stampedPart).file(stampedPart)
+                        .session(login.session()).header("X-CSRF-TOKEN", login.csrfToken())
+                        .header("Idempotency-Key", "frontend-stamp-key-0003"))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
     void createsStoreScopedSnapshotAndPrivateStampedPhoto() throws Exception {
         insertCatalog("001234");
         Login login = login();

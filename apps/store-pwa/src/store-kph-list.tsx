@@ -111,14 +111,15 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     const contentId = `${listId}-${group.records[0]!.id}`;
     return <Fragment key={group.records[0]!.id}>
       {groupByDate ? <tbody className="store-kph-day-header"><tr><th colSpan={widths.length} scope="rowgroup">{heading(group.date, contentId, expanded)}</th></tr></tbody> : null}
-      <tbody id={contentId} hidden={!expanded}>{expanded ? group.records.map(record => <tr key={record.id} data-record-id={record.id} className="store-kph-record-row" onClick={loading ? undefined : event => {
+      <tbody id={contentId} hidden={!expanded}>{expanded ? group.records.map(record => <tr key={record.id} data-record-id={record.id} data-selection-mode={selectionMode || undefined} className="store-kph-record-row" onClick={loading ? undefined : event => {
         if (event.target instanceof Element && !event.target.closest("button, input, label, [data-selection-cell]")) {
           event.currentTarget.querySelector<HTMLButtonElement>(".store-kph-row-open")?.focus({ preventScroll: true });
-          setActive(record);
+          if (selectionMode) selectRecords([record], !selection.includes(record.id));
+          else setActive(record);
         }
       }}>
-        {selectionMode ? <td className="store-kph-leading-cell" data-selection-cell>{marker(record)}{selector(record, "store-kph-table-selector")}</td> : null}
-        <td className={selectionMode ? undefined : "store-kph-leading-cell"}>{!selectionMode ? marker(record) : null}<button className="store-kph-row-open" aria-label={`Mở phiếu ${record.productName}`} disabled={loading} onClick={() => setActive(record)}><span>{record.productName}</span></button></td>
+        {selectionMode ? <td className="store-kph-leading-cell" data-selection-cell onClick={event => { if (!loading && event.target instanceof Element && !event.target.closest("input, label")) selectRecords([record], !selection.includes(record.id)); }}>{marker(record)}{selector(record, "store-kph-table-selector")}</td> : null}
+        <td className={selectionMode ? undefined : "store-kph-leading-cell"}>{!selectionMode ? marker(record) : null}<button className="store-kph-row-open" aria-label={`${selectionMode ? "Chọn phiếu" : "Mở phiếu"} ${record.productName}`} aria-pressed={selectionMode ? selection.includes(record.id) : undefined} disabled={loading} onClick={() => selectionMode ? selectRecords([record], !selection.includes(record.id)) : setActive(record)}><span>{record.productName}</span></button></td>
         <td>{identifier(record)}</td>{!groupByDate ? <td className="store-kph-record-date">{record.detectedDate}</td> : null}<td className="store-kph-quantity">{record.quantity}</td>
         <td><KphListLabel kind="condition" value={record.condition} /></td><td><KphListLabel kind="resolution" value={record.resolution} /></td><td><KphListLabel kind="approval" value={approvalLabels[record.approvalStatus]} className={`chip-${record.approvalStatus === "APPROVED" ? "safe" : record.approvalStatus === "PENDING" ? "warning" : "neutral"}${record.approvalStatus !== "PENDING" ? " is-final" : ""}`} /></td>
         <td className="store-kph-chevron-cell"><img className="store-kph-row-chevron" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></td>
@@ -128,9 +129,11 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     const expanded = !groupByDate || !collapsedDates.includes(group.date);
     const contentId = `${listId}-${group.records[0]!.id}`;
     return <section className="store-kph-day" key={group.records[0]!.id} aria-label={groupByDate ? `Ngày phát hiện ${group.date}` : undefined}>
-    {groupByDate ? heading(group.date, contentId, expanded) : null}<div className="store-kph-day-items" id={contentId} hidden={!expanded}>{expanded ? group.records.map(record => <div key={record.id} className="store-ticket" data-record-id={record.id}>
+    {groupByDate ? heading(group.date, contentId, expanded) : null}<div className="store-kph-day-items" id={contentId} hidden={!expanded}>{expanded ? group.records.map(record => <div key={record.id} className="store-ticket" data-record-id={record.id} data-selection-mode={selectionMode || undefined} onClick={event => {
+      if (selectionMode && !loading && event.target instanceof Element && !event.target.closest("button, input, label")) selectRecords([record], !selection.includes(record.id));
+    }}>
       {marker(record)}{selectionMode ? selector(record, "store-ticket-selector") : null}
-      <div className={`store-ticket-body${screenLayout ? " store-ticket-screen" : ""}`}><button className="store-ticket-open" aria-label={`Mở phiếu ${record.productName}`} aria-describedby={screenLayout ? `${listId}-${record.id}-quantity ${listId}-${record.id}-facts ${listId}-${record.id}-approval` : undefined} disabled={loading} onClick={() => setActive(record)}>
+      <div className={`store-ticket-body${screenLayout ? " store-ticket-screen" : ""}`}><button className="store-ticket-open" aria-label={`${selectionMode ? "Chọn phiếu" : "Mở phiếu"} ${record.productName}`} aria-pressed={selectionMode ? selection.includes(record.id) : undefined} aria-describedby={screenLayout ? `${listId}-${record.id}-quantity ${listId}-${record.id}-facts ${listId}-${record.id}-approval` : undefined} disabled={loading} onClick={() => selectionMode ? selectRecords([record], !selection.includes(record.id)) : setActive(record)}>
         <strong title={record.productName}><span>{record.productName}</span></strong>
         {screenLayout ? <span className="store-ticket-trailing"><span className="store-ticket-meta" id={`${listId}-${record.id}-quantity`}><span className="sr-only">Số lượng: </span>{record.quantity}</span><img className="store-ticket-chevron" src={figmaAsset("main-2", "imgFeatherChevronRight")} alt="" /></span> : <>
           <KphTicketMeta record={record} identifier={identifier(record)} groupByDate={groupByDate} />

@@ -1,5 +1,19 @@
 # Trạng thái hiện tại
 
+**KPH04 revision2 — checkpoint30/10/2026:** theo owner cho đóng dấu frontend
+cả online và sửa vùng chọn. API nhận optional stampedPhotos theo ordinal cùng
+original, giữ đúng bytes JPEG frontend/private/original, validate MIME/kích thước/
+no-upscale/tỷ lệ/count và fingerprint cả hai; client cũ vẫn server fallback.
+Chế độ Chọn phủ toàn item/hàng, không mở nhầm chi tiết hoặc toggle hai lần;
+Xong trở lại mở phiếu.307tests Store,68backend tests PostgreSQL, types/contracts/
+build đạt; browser online thật390/1440 đối chiếu bytes/reload, selection3viewport,
+ảnh/Excel4viewport đạt. Preview mới <http://127.0.0.1:4396/#kph>;
+[files/checks/checkpoint](delivery/kph04-evidence-photos/technical.md).
+Cùng KPH04/root writer, review2; owner visual pending. Bản xem vẫn mock trong
+phiên, HEIC tùy thiết bị; không merge/push/deploy. Hoàn tất phạm vi checkpoint,
+dừng ở đây; bước tiếp owner thử chọn cả item và xem tem. Các mục cũ bên dưới
+là lịch sử, không suy acceptance từ checkpoint.
+
 **KPH04 — candidate30/10/2026:** nối pipeline ảnh Pilot vào form Store Fresh
 đang dùng thử: chụp/chọn1–3ảnh → resize/nén JPEG/tem giờ-ngày-cửa hàng →
 xem/soi/xóa ảnh nháp → xem lại/gửi → gallery chi tiết chỉ đọc → Excel giữ đúng

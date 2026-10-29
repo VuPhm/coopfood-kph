@@ -108,6 +108,11 @@ class LocalPrivateMediaStorage {
      */
     StoredMedia store(UUID recordId, int ordinal, MultipartFile upload,
             String storeCode, String storeName, Instant fallbackCapturedAt, Instant serverNow) {
+        return store(recordId, ordinal, upload, null, storeCode, storeName, fallbackCapturedAt, serverNow);
+    }
+
+    StoredMedia store(UUID recordId, int ordinal, MultipartFile upload, MultipartFile stampedUpload,
+            String storeCode, String storeName, Instant fallbackCapturedAt, Instant serverNow) {
         byte[] original = readBounded(upload);
         try {
             Metadata metadata = readMetadata(original);
@@ -115,8 +120,19 @@ class LocalPrivateMediaStorage {
             Instant capturedAt = captureInstant(metadata)
                     .or(() -> Optional.ofNullable(fallbackCapturedAt))
                     .orElse(serverNow);
-            BufferedImage stamped = stamp(image.image(), storeCode, storeName, capturedAt);
-            byte[] stampedBytes = encodeJpeg(stamped);
+            byte[] stampedBytes;
+            if (stampedUpload == null) {
+                stampedBytes = encodeJpeg(stamp(image.image(), storeCode, storeName, capturedAt));
+            } else {
+                stampedBytes = readStampedUpload(stampedUpload);
+                BufferedImage derivative = decode(stampedBytes, readMetadata(stampedBytes), true).image();
+                int originalWidth = image.image().getWidth(), originalHeight = image.image().getHeight();
+                if (derivative.getWidth() > originalWidth || derivative.getHeight() > originalHeight
+                        || Math.abs((long) derivative.getWidth() * originalHeight
+                                - (long) derivative.getHeight() * originalWidth) > 3L * (originalWidth + originalHeight)) {
+                    throw invalidImage();
+                }
+            }
             String extension = "image/png".equals(image.contentType()) ? ".png" : ".jpg";
             String base = "records/" + recordId + "/" + ordinal + "-" + UUID.randomUUID();
             String originalKey = base + ".original" + extension;
@@ -154,13 +170,22 @@ class LocalPrivateMediaStorage {
      * Reads a multipart part with a hard byte bound before any metadata or image
      * decoder sees it. This is also used by idempotency fingerprinting.
      */
+    byte[] readStampedUpload(MultipartFile upload) {
+        if (upload == null || !"image/jpeg".equalsIgnoreCase(upload.getContentType())) throw invalidImage();
+        return readBounded(upload, 1024L * 1024L);
+    }
+
     byte[] readBounded(MultipartFile upload) {
+        return readBounded(upload, MAX_ORIGINAL_BYTES);
+    }
+
+    private byte[] readBounded(MultipartFile upload, long maxBytes) {
         if (upload == null || upload.isEmpty()) {
             throw invalidImage();
         }
         long declaredSize = upload.getSize();
-        if (declaredSize > MAX_ORIGINAL_BYTES) {
-            throw tooLarge();
+        if (declaredSize > maxBytes) {
+            throw tooLarge(maxBytes);
         }
         try (InputStream input = upload.getInputStream();
                 ByteArrayOutputStream output = new ByteArrayOutputStream(initialCapacity(declaredSize))) {
@@ -169,8 +194,8 @@ class LocalPrivateMediaStorage {
             int read;
             while ((read = input.read(buffer)) != -1) {
                 total += read;
-                if (total > MAX_ORIGINAL_BYTES) {
-                    throw tooLarge();
+                if (total > maxBytes) {
+                    throw tooLarge(maxBytes);
                 }
                 output.write(buffer, 0, read);
             }
@@ -215,6 +240,10 @@ class LocalPrivateMediaStorage {
     }
 
     private DetectedImage decode(byte[] bytes, Metadata metadata) throws IOException {
+        return decode(bytes, metadata, false);
+    }
+
+    private DetectedImage decode(byte[] bytes, Metadata metadata, boolean derivative) throws IOException {
         try (InputStream input = new ByteArrayInputStream(bytes);
                 ImageInputStream imageInput = ImageIO.createImageInputStream(input)) {
             if (imageInput == null) {
@@ -230,10 +259,12 @@ class LocalPrivateMediaStorage {
                 if (!format.equals("jpeg") && !format.equals("jpg") && !format.equals("png")) {
                     throw invalidImage();
                 }
+                if (derivative && format.equals("png")) throw invalidImage();
                 reader.setInput(imageInput, true, true);
                 int sourceWidth = reader.getWidth(0);
                 int sourceHeight = reader.getHeight(0);
                 validateDimensions(sourceWidth, sourceHeight);
+                if (derivative && (sourceWidth > MAX_WIDTH || sourceHeight > MAX_HEIGHT)) throw invalidImage();
                 BufferedImage image = reader.read(0);
                 if (image == null) {
                     throw invalidImage();
@@ -517,9 +548,9 @@ class LocalPrivateMediaStorage {
                 "INVALID_PHOTO", "Each evidence photo must be a valid JPEG or PNG image.");
     }
 
-    private static ApiProblemException tooLarge() {
+    private static ApiProblemException tooLarge(long maxBytes) {
         return new ApiProblemException(org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY,
-                "PHOTO_TOO_LARGE", "Each evidence photo must be no larger than 10 MiB.");
+                "PHOTO_TOO_LARGE", "Each evidence photo must be no larger than " + maxBytes / (1024L * 1024L) + " MiB.");
     }
 
     private record DetectedImage(BufferedImage image, String contentType) {

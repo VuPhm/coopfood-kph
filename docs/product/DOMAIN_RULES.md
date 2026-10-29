@@ -51,6 +51,14 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
   controlled/server clock theo `Asia/Ho_Chi_Minh`. Audit timestamp là server time
   riêng.
 
+Owner30/10/2026 cho phép đóng dấu tại frontend cả luồng online. Client gửi thêm
+`stampedPhotos` JPEG theo ordinal cùng original `photos`; backend kiểm tra cặp,
+MIME thực, giới hạn1MiB/1280×720/no-upscale/tỷ lệ, lưu bytes hai bản private và
+fingerprint cả hai. Client cũ không gửi derivative vẫn dùng server stamping.
+Authorization, EXIF ưu tiên và audit time ở server giữ nguyên; watermark phía
+client không được coi là bằng chứng mật mã. Xem
+[ví dụ multipart](../../contracts/fixtures/api/kph-create-multipart.md).
+
 ## Catalog và quét
 
 - `barcode`, `sku_code`, `supplier_code` là chuỗi.

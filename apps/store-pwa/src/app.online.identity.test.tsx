@@ -1,8 +1,11 @@
+import {processEvidencePhoto} from "./image-processing";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import sessionFixture from "../../../contracts/fixtures/api/session.json";
 import type { RecordView } from "./record-view";
+
+vi.mock("./image-processing",()=>({processEvidencePhoto:vi.fn()}));
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -106,6 +109,8 @@ function expectSelectedCount(count: number) {
 
 beforeEach(() => {
   vi.resetAllMocks();
+    vi.mocked(processEvidencePhoto).mockResolvedValue({blob:new Blob(["stamped"],{type:"image/jpeg"}),capturedAt:new Date(),width:600,height:400});
+
   mocks.getSession.mockResolvedValue(session);
   mocks.loadHistory.mockImplementation((storeId: string) => Promise.resolve([record(storeId, storeId === storeA.id ? "Phiếu cửa hàng A" : "Phiếu cửa hàng B")]));
   mocks.login.mockResolvedValue(session);

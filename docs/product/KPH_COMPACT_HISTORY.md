@@ -101,3 +101,13 @@ Phần dưới là candidate opt-in, chưa thay acceptance revision5 của comfo
   không nhận CSS Compact screen. DATE/Thông báo/Báo cáo không thuộc slice.
 
 [Preview, số đo, kiểm tra và giới hạn](../delivery/compact02-kph-items.md).
+
+## KPH04 revision2 — yêu cầu owner30/10/2026
+
+Trong chế độ Chọn, toàn bộ item mobile/hàng desktop (tên, metadata, khoảng
+trống, ô đầu và chevron) chọn/bỏ chọn cùng checkbox. Tên là toggle button có
+aria-pressed; không mở chi tiết khi đang chọn. Input/label native không bị
+flip hai lần do bubbling. Khi Xong, tên và hàng dữ liệu trở lại mở chi tiết.
+Nhóm ngày vẫn tách chọn ngày với thu/mở, và strip tag vẫn cuộn native.
+Candidate theo [KPH04](../delivery/kph04-evidence-photos/plan.json); không tự
+suy nghiệm thu giao diện từ checkpoint.

@@ -50,12 +50,16 @@ class KphService {
     }
 
     @Transactional
-    KphRecordResponse create(UUID storeId, KphCreateRequest request, List<MultipartFile> photos,
+    KphRecordResponse create(UUID storeId, KphCreateRequest request, List<MultipartFile> photos, List<MultipartFile> stampedPhotos,
             String idempotencyKey, Authentication authentication) {
         StoreRef store = accessPolicy.requireViewCreate(storeId, authentication);
         UUID actorId = ((vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal()).userId();
         validateIdempotencyKey(idempotencyKey);
-        String requestHash = fingerprint(request, photos);
+        if (stampedPhotos != null && (photos == null || stampedPhotos.size() != photos.size())) {
+            throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "STAMPED_PHOTO_COUNT_INVALID",
+                    "stampedPhotos must pair with photos in the same order.");
+        }
+        String requestHash = fingerprint(request, photos, stampedPhotos);
 
         repository.lockIdempotency(actorId, idempotencyKey);
         var existing = repository.findIdempotency(actorId, idempotencyKey);
@@ -100,7 +104,7 @@ class KphService {
                                 ? request.photoLastModified().get(index)
                                 : createdAt;
                 LocalPrivateMediaStorage.StoredMedia storedPhoto = media.store(
-                        recordId, index + 1, photos.get(index), store.code(), store.name(),
+                        recordId, index + 1, photos.get(index), stampedPhotos == null ? null : stampedPhotos.get(index), store.code(), store.name(),
                         fallbackCapturedAt, createdAt);
                 stored.add(new StoredMedia(storedPhoto.photo(), storedPhoto.capturedAt()));
                 cleanup.track(storedPhoto.photo());
@@ -241,13 +245,23 @@ class KphService {
         validateLength(request.note(), 255, "note");
     }
 
-    private String fingerprint(KphCreateRequest request, List<MultipartFile> photos) {
+    private String fingerprint(KphCreateRequest request, List<MultipartFile> photos, List<MultipartFile> stampedPhotos) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(objectMapper.writeValueAsBytes(request));
             if (photos != null) {
                 for (MultipartFile photo : photos) {
                     byte[] bytes = media.readBounded(photo);
+                    digest.update((byte) 0);
+                    digest.update(Long.toString(bytes.length).getBytes(StandardCharsets.UTF_8));
+                    digest.update((byte) 0);
+                    digest.update(bytes);
+                }
+            }
+            if (stampedPhotos != null) {
+                digest.update("frontend-stamped-v1".getBytes(StandardCharsets.UTF_8));
+                for (MultipartFile photo : stampedPhotos) {
+                    byte[] bytes = media.readStampedUpload(photo);
                     digest.update((byte) 0);
                     digest.update(Long.toString(bytes.length).getBytes(StandardCharsets.UTF_8));
                     digest.update((byte) 0);

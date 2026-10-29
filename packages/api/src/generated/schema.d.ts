@@ -1124,6 +1124,8 @@ export interface operations {
                 "multipart/form-data": {
                     payload: components["schemas"]["KphCreateRequest"];
                     photos: string[];
+                    /** @description Optional frontend-stamped JPEG derivatives paired with photos in ordinal order. When present, count must equal photos. Each part is at most 1 MiB, within 1280x720, preserves source aspect ratio and never upscales. Originals remain required and private. Omit to use server stamping. */
+                    stampedPhotos?: string[];
                 };
             };
         };

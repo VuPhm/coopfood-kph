@@ -1,10 +1,14 @@
+import {processEvidencePhoto} from "./image-processing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CreateRecordDialog } from "./create-record-dialog";
 import { mockBarcodeLookup, mockProfile } from "./store-app-mock";
 
+vi.mock("./image-processing",()=>({processEvidencePhoto:vi.fn()}));
+
 describe("Store App review before submit", () => {
   beforeEach(() => {
+    vi.mocked(processEvidencePhoto).mockResolvedValue({blob:new Blob(["stamped"],{type:"image/jpeg"}),capturedAt:new Date(),width:600,height:400});
     Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn(() => "blob:evidence") });
     Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
   });

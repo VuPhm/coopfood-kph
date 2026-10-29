@@ -24,3 +24,6 @@
 .store-kph-export .store-sheet-actions button { flex: 1 1 120px; height: auto; min-height: 44px; padding: 10px 12px; white-space: normal; font-size: 14px; line-height: 20px; }
 .store-kph-export .store-sheet-actions svg { flex-shrink: 0; }
 @media (max-width: 359px) { .store-kph .store-batch .store-export { flex: 1 1 100%; } .store-kph-export-content, .store-kph-export.store-sheet .store-sheet-actions { padding-inline: 16px; } }
+
+.store-kph [data-selection-mode="true"] { cursor: pointer; }
+.store-kph [data-selection-mode="true"]:has(input:checked) { background-color: var(--store-module-mint); }

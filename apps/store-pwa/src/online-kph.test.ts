@@ -105,6 +105,7 @@ describe("online KPH gateway", () => {
     const gateway = createOnlineGateway({ baseUrl: "http://localhost", fetch: fetcher });
     const file = new File(["original bytes"], "evidence.jpg", { type: "image/jpeg" });
     const payload = draft(file);
+    payload.photos[0]!.blob = new Blob(["frontend-stamped"], {type:"image/jpeg"}) as File;
 
     await expect(gateway.createRecord(sessionFixture.user.stores[0]!.id, payload)).rejects.toThrow("request timed out");
     await gateway.createRecord(sessionFixture.user.stores[0]!.id, payload);
@@ -117,6 +118,7 @@ describe("online KPH gateway", () => {
     const uploaded = form.get("photos");
     expect(uploaded).toBeInstanceOf(File);
     expect(await (uploaded as File).text()).toBe("original bytes");
+    expect(await (form.get("stampedPhotos") as File).text()).toBe("frontend-stamped");
   });
 
   it("allocates a new key when photo bytes or store scope changes", async () => {
@@ -136,6 +138,17 @@ describe("online KPH gateway", () => {
     expect(keys[0]).toBe(first.idempotencyKey);
     expect(keys[1]).not.toBe(keys[0]);
     expect(keys[2]).not.toBe(keys[1]);
+  });
+
+  it("allocates a fresh key when only frontend-stamped bytes change", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockRejectedValueOnce(new Error("timeout")).mockImplementation(() => Promise.resolve(createdResponse()));
+    const gateway = createOnlineGateway({baseUrl:"http://localhost",fetch:fetcher});
+    const payload = draft(new File(["original"],"image.jpg",{type:"image/jpeg"}));
+    await expect(gateway.createRecord("store-a",payload)).rejects.toThrow("timeout");
+    payload.photos[0]!.blob = new Blob(["new-stamp"],{type:"image/jpeg"}) as File;
+    await gateway.createRecord("store-a",payload);
+    const keys=fetcher.mock.calls.map(([request])=>(request as Request).headers.get("Idempotency-Key"));
+    expect(keys[1]).not.toBe(keys[0]);
   });
 
   it("exposes a typed authentication error for an expired session", async () => {

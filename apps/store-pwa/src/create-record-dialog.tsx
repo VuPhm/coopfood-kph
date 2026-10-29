@@ -405,31 +405,19 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     const additions: PhotoDraft[] = [];
     try {
       for (const [index, file] of files.entries()) {
-        if (onlineMode) {
-          const capturedAt = file.lastModified > 0 ? new Date(file.lastModified) : new Date();
-          additions.push({
-            id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
-            fileName: file.name,
-            originalFile: file,
-            stampedBlob: file,
-            capturedAt,
-            url: createObjectUrl(file),
-          });
-        } else {
-          const processed = await processEvidencePhoto(file, { storeCode: profile.storeCode, storeName: profile.storeName });
-          if (session !== photoSession.current) {
-            additions.forEach(photo => URL.revokeObjectURL(photo.url));
-            return;
-          }
-          additions.push({
-            id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
-            fileName: file.name,
-            originalFile: file,
-            stampedBlob: processed.blob,
-            capturedAt: processed.capturedAt,
-            url: createObjectUrl(processed.blob),
-          });
+        const processed = await processEvidencePhoto(file, { storeCode: profile.storeCode, storeName: profile.storeName });
+        if (session !== photoSession.current) {
+          additions.forEach(photo => URL.revokeObjectURL(photo.url));
+          return;
         }
+        additions.push({
+          id: globalThis.crypto?.randomUUID?.() ?? `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
+          fileName: file.name,
+          originalFile: file,
+          stampedBlob: processed.blob,
+          capturedAt: processed.capturedAt,
+          url: createObjectUrl(processed.blob),
+        });
       }
       const next = [...photoRef.current, ...additions];
       photoRef.current = next;
@@ -542,7 +530,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
               </Field>
               <div className="mt-3">
                 <p className="text-sm font-bold">Ảnh minh chứng <span className="text-danger" aria-hidden="true">*</span></p>
-                <p id="kph-photo-help" className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn.{!onlineMode ? " Tự đóng dấu giờ, ngày và cửa hàng lên ảnh." : ""}</p>
+                <p id="kph-photo-help" className="mt-1 text-xs text-ink-muted">Cần ít nhất một ảnh, tối đa ba ảnh. Ảnh được giữ đúng thứ tự đã chọn. Tự đóng dấu giờ, ngày và cửa hàng lên ảnh.</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <PhotoPicker invalid={Boolean(photoError)} accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, "imgFeatherCamera")} alt="" /> : <Camera aria-hidden="true" />} label="Chụp ảnh" capture="environment" onChange={selectPhotos} />
                   <PhotoPicker invalid={Boolean(photoError)} accept={onlineMode ? ONLINE_PHOTO_ACCEPT : PILOT_PHOTO_ACCEPT} disabled={processingPhotos || savingRecord || photos.length >= 3} icon={screenPresentation ? <img data-figma-render-width-desktop="15" data-figma-render-height-desktop="15" src={figmaAsset(assetScreen, "imgFeatherImage")} alt="" /> : <Images aria-hidden="true" />} label="Chọn ảnh" multiple onChange={selectPhotos} />
@@ -567,7 +555,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     {embedded ? content : <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onOpenAutoFocus={onOpenAutoFocus} onCloseAutoFocus={onCloseAutoFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>{content}</DialogContent>
     </Dialog>}
-      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName}${onlineMode ? "" : " đã đóng tem"}` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} presentation={presentation} index={Math.max(0, photos.findIndex(p => p.id === activePhoto?.id))} total={photos.length} onPrevious={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i > 0) setActivePhoto(photos[i - 1]!); }} onNext={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i < photos.length - 1) setActivePhoto(photos[i + 1]!); }} onRemove={screenPresentation && !reviewing && activePhoto ? () => removePhoto(activePhoto.id) : undefined} />
+      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName} đã đóng tem` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} presentation={presentation} index={Math.max(0, photos.findIndex(p => p.id === activePhoto?.id))} total={photos.length} onPrevious={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i > 0) setActivePhoto(photos[i - 1]!); }} onNext={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i < photos.length - 1) setActivePhoto(photos[i + 1]!); }} onRemove={screenPresentation && !reviewing && activePhoto ? () => removePhoto(activePhoto.id) : undefined} />
 
       <BarcodeScannerDialog
         presentation={presentation}
