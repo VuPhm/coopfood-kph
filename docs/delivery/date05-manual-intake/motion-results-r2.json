@@ -1,0 +1,50 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "reducedMotion": "no-preference",
+    "threeOpenCloseCycles": true,
+    "backgroundStable": true,
+    "panelGeometryStable": true,
+    "previewHeightStable": true,
+    "focusRestored": true
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "reducedMotion": "reduce",
+    "threeOpenCloseCycles": true,
+    "backgroundStable": true,
+    "panelGeometryStable": true,
+    "previewHeightStable": true,
+    "focusRestored": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "reducedMotion": "no-preference",
+    "threeOpenCloseCycles": true,
+    "backgroundStable": true,
+    "panelGeometryStable": true,
+    "previewHeightStable": true,
+    "focusRestored": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "reducedMotion": "reduce",
+    "threeOpenCloseCycles": true,
+    "backgroundStable": true,
+    "panelGeometryStable": true,
+    "previewHeightStable": true,
+    "focusRestored": true
+  }
+]

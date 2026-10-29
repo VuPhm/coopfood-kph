@@ -1,7 +1,7 @@
 .store-date-intake-sheet[data-slot="dialog-content"] { inset: auto auto 0 50%; transform: translateX(-50%); translate: none; width: min(100%, 760px); height: min(84dvh, 820px); max-height: calc(100dvh - 32px); border-radius: 24px 24px 0 0; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
-.store-date-intake-sheet[data-state="open"] { animation: date-intake-up 220ms cubic-bezier(.2,.8,.2,1) both; }
-.store-date-intake-sheet[data-state="closed"] { animation: date-intake-up 140ms ease-in reverse both; }
-@keyframes date-intake-up { from { opacity: .96; translate: 0 24px; } to { opacity: 1; translate: 0 0; } }
+.store-date-intake-sheet[data-state="open"] { animation: date-intake-up 260ms cubic-bezier(.22,1,.36,1) both; }
+.store-date-intake-sheet[data-state="closed"] { animation: date-intake-up 180ms ease-in reverse both; }
+@keyframes date-intake-up { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
 .date-intake-method { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: var(--store-canvas); }
 .date-intake-method button { min-height: 44px; padding: 8px 12px; border-radius: 10px; color: var(--store-ink-muted); font-size: 14px; line-height: 20px; font-weight: 600; }
 .date-intake-method button[aria-pressed="true"] { color: var(--store-brand-action); background: white; box-shadow: 0 1px 4px rgb(0 60 40 / 10%); }
@@ -23,7 +23,7 @@
 .date-intake-form label { font-size: 13px; line-height: 20px; font-weight: 600; }
 .date-intake-error { color: var(--store-error-ink); font-size: 13px; line-height: 20px; }
 .date-intake-recovery { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: var(--store-canvas); color: var(--store-ink); font-size: 13px; line-height: 20px; }
-.date-intake-preview { border-radius: 12px; padding: 12px; background: var(--store-canvas); }
+.date-intake-preview { min-height: 82px; align-content: center; border-radius: 12px; padding: 12px; background: var(--store-canvas); }
 .date-intake-preview dl { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; font-size: 13px; line-height: 20px; }
 .date-intake-preview dt { color: var(--store-ink-muted); }
 .date-intake-preview dd { margin: 0; font-weight: 600; }

@@ -1,5 +1,12 @@
 # Trạng thái hiện tại
 
+**DATE05 revision2 — 30/10/2026:** sửa mở Thêm theo dõi: bỏ fallback inline,
+chuẩn bị form cùng DATE, panel trượt từ đáy bằng transform; giữ vùng mốc82px
+và trả focus không cuộn nền. Gate motion390/1440 ở normal/reduced motion,
+3lần mở/đóng và nền0/80px đạt; nhập/quét4viewport và14unit tests đạt.
+Preview vẫn <http://127.0.0.1:4398/#date>; [kiểm tra r2](delivery/date05-manual-intake/motion-r2.md).
+Owner pending; dữ liệu DATE vẫn trong phiên.
+
 **DATE05 — candidate30/10/2026:** ưu tiên nhập DATE thủ công, vẫn có quét
 mã giữ draft; shared choice đúng hai loại, bắt buộc chọn khi tạo mới. NSX/HSD
 hợp lệ hiện ngay mốc và % còn lại, không đợi SKU/tên/loại; dùng rule chung.

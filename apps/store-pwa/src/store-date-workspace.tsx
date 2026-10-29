@@ -2,7 +2,7 @@ import { appendTrackedDateLot, dateLotBatchLabel } from "./store-date-lot";
 import { StoreSearchField } from "./store-search-field";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { revealBelowStickyTabs } from "./store-sticky-tabs";
-import { lazy, Suspense, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button, ListItemMarker } from "@coopfood-kph/ui";
 import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, Plus, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import { acknowledgeDateLot, dateLotKphSeed, dateLotKind } from "./store-date-actions";
@@ -21,7 +21,7 @@ import { DateConditionLabel, DateProcessingLabel, getDatePhaseTone } from "./sto
 import { ShelfLifeTimeline } from "./store-shelf-timeline";
 import { mockBarcodeLookup, mockCatalogProducts, mockProductMetadata, mockProfile, type MockDateLot, type MockDateLotStatus } from "./store-app-mock";
 
-const DateIntake = lazy(() => import("./store-date-intake").then(module => ({ default: module.DateIntake })));
+import { DateIntake } from "./store-date-intake";
 
 type ActiveDateStatus = Exclude<MockDateLotStatus, "resolved">;
 const statuses: Record<ActiveDateStatus, string> = { open: "Mở", acknowledged: "Đã ghi nhận" };
@@ -266,13 +266,13 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
       <p className="store-muted">Thay đổi áp dụng ngay trên các lô phù hợp với mã đang tìm.</p>
       <div className="store-date-filter-footer"><button className="store-date-reset-filter" onClick={() => { setStatus("all"); setAttentionOnly(false); setSort("default"); setPhaseFilter("all"); }}>Đặt lại bộ lọc</button><Button className="store-button" onClick={() => setFilterOpen(false)}>Xong</Button></div>
     </StoreSheet>
-    {intakeOpen ? <Suspense fallback={<p role="status">Đang mở form theo dõi…</p>}><DateIntake today={today} onCancel={() => { setIntakeOpen(false); requestAnimationFrame(() => intakeTrigger.current?.focus()); }} onOpenExisting={lot => {
+    {intakeOpen ? <DateIntake today={today} onCancel={() => { setIntakeOpen(false); requestAnimationFrame(() => intakeTrigger.current?.focus({ preventScroll: true })); }} onOpenExisting={lot => {
       setKind(dateLotKind(lot) ?? "unclassified"); setQuery(""); setAttentionOnly(false); setStatus("all"); setPhaseFilter("all"); setActiveId(lot.id); setIntakeOpen(false);
     }} onSave={lot => {
       const next = appendTrackedDateLot(latestLots.current, lot); latestLots.current = next; onLotsChange(next);
       setKind(dateLotKind(lot) ?? "unclassified"); setQuery(""); setAttentionOnly(false); setStatus("all"); setPhaseFilter("all"); setSort("default"); setActiveId(lot.id); setIntakeOpen(false);
       setActionNotice("Đã thêm lô vào theo dõi trong phiên này.");
-    }} /></Suspense> : null}
+    }} /> : null}
     <StoreSheet className="store-date-sheet store-date-lot-sheet" open={!!active} onOpenChange={open => { if (!open) setActiveId(""); }} title="Chi tiết lô DATE" description="Ngày và trạng thái xử lý của lô">{active ? detail(active) : null}</StoreSheet>
   </StorePageLayout>;
 }
