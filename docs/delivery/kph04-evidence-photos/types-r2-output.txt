@@ -1,0 +1,24 @@
+
+> check
+> npm run check --workspaces --if-present
+
+
+> @coopfood-kph/admin-web@0.0.0 check
+> tsc --noEmit
+
+
+> @coopfood-kph/store-pwa@0.0.0 check
+> tsc --noEmit
+
+
+> @coopfood-kph/api@0.0.0 check
+> tsc --noEmit
+
+
+> @coopfood-kph/kph-rules@0.0.0 check
+> tsc --noEmit
+
+
+> @coopfood-kph/ui@0.0.0 check
+> tsc --noEmit
+

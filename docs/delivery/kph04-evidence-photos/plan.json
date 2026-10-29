@@ -1,30 +1,35 @@
 {
   "schemaVersion": 1,
   "id": "kph04-evidence-photos",
-  "revision": 1,
+  "revision": 2,
   "status": "AWAITING_ACCEPTANCE",
   "objective": "Bring the Pilot evidence-photo workflow into Store Fresh KPH: capture/select, stamped preview, gallery, ordered save and Excel.",
   "inScope": [
     "Reuse existing Pilot processor and stamp/time rules in in-session Store KPH",
     "1–3 ordered photos, decode/error/retry/cancel recovery and resource cleanup",
     "Gallery/lens in create/review/detail, preserved stamped output in Excel",
-    "Playwright synthetic images at390x844 and1440x1024 plus narrow/landscape"
+    "Playwright synthetic images at390x844 and1440x1024 plus narrow/landscape",
+    "Revision2: optional frontend stamped JPEG upload with original retained, validated by backend and idempotency",
+    "Revision2: full mobile card/desktop row selection in selection mode"
   ],
   "outOfScope": [
-    "Changes to backend authorization/API or online original/stamped policy",
+    "Authorization/security boundary/schema migration changes",
     "Universal HEIC converter, crop/rotation editors not present in Pilot",
     "Pilot IndexedDB migration, merge/push/deploy"
   ],
   "baseSha": "c2ac210b88331ca2ab54032766e4f82fc7a7512e",
-  "candidateSha": "9830c69ccf07fc406849795a108375d0e60da1d4",
+  "candidateSha": "889b3ffb0e4d55430160ac4d19b2ec8284abc7c6",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
     "e2e/scripts/**",
-    "docs/**"
+    "docs/**",
+    "backend/src/**",
+    "contracts/**",
+    "packages/api/src/generated/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
@@ -32,8 +37,8 @@
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 1,
-      "sha": "9830c69ccf07fc406849795a108375d0e60da1d4",
+      "revision": 2,
+      "sha": "889b3ffb0e4d55430160ac4d19b2ec8284abc7c6",
       "evidence": "docs/delivery/kph04-evidence-photos/technical.md"
     },
     {
@@ -43,7 +48,15 @@
       "status": "pending"
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "Allow frontend stamping even when previously server-only; fix selection hit area to cover list items; checkpoint after completion.",
+      "source": "Owner chat30/10/2026 at4394/#kph",
+      "impact": "Online upload/API/client/media and KPH selection gates invalidated; r1 evidence archived.",
+      "decision": "Same task/worktree/root writer. Paired optional stampedPhotos with original, backend validates/private storage; old clients retain server fallback."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Owner tries capture/select, stamped gallery, draft removal and ordered Excel at4394; record actual acceptance or bounded feedback."
+  "nextAction": "Checkpoint complete; stop. Owner may review frontend stamping/full-item selection at4396. No merge/push/deploy authorized."
 }

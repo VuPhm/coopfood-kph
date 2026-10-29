@@ -1,0 +1,14 @@
+
+> check:api
+> npm run generate:api && git diff --exit-code -- packages/api/src/generated/schema.d.ts
+
+
+> generate:api
+> npm --workspace @coopfood-kph/api run generate
+
+
+> @coopfood-kph/api@0.0.0 generate
+> openapi-typescript ../../contracts/openapi/kph.openapi.yaml -o src/generated/schema.d.ts
+
+✨ openapi-typescript 7.13.0
+🚀 ../../contracts/openapi/kph.openapi.yaml → src/generated/schema.d.ts [147.5ms]

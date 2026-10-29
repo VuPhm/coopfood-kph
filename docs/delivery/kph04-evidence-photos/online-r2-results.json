@@ -1,0 +1,26 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "created": true,
+    "frontendJpegHash": "521583595ffee34432430dafa1780811175ca6825662f7997be9752bb7d792df",
+    "originalUnchanged": true,
+    "servedBytesMatchPreview": true,
+    "private": true,
+    "reloaded": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "created": true,
+    "frontendJpegHash": "521583595ffee34432430dafa1780811175ca6825662f7997be9752bb7d792df",
+    "originalUnchanged": true,
+    "servedBytesMatchPreview": true,
+    "private": true,
+    "reloaded": true
+  }
+]

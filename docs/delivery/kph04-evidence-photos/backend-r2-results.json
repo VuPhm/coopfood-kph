@@ -1,0 +1,100 @@
+[
+  {
+    "name": "vn.coopfood.kph.identity.IdentityAdminHttpIntegrationTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.lifecycle.LifecycleHttpIntegrationTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.store.KphStoreAccessPolicyTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.kph.KphHttpIntegrationTest",
+    "tests": "9",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.architecture.ArchitectureTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.catalog.CatalogImportHttpIntegrationTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.foundation.DatabaseSmokeTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.catalog.CatalogCsvParserTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.catalog.CatalogLookupHttpIntegrationTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.identity.IdentitySecurityHttpTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.identity.IdentityHttpIntegrationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.identity.PasswordPolicyTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.identity.IdentityServiceTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "name": "vn.coopfood.kph.kph.LocalPrivateMediaStorageTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  }
+]

@@ -1,0 +1,134 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        405,
+        720
+      ],
+      [
+        600,
+        400
+      ]
+    ],
+    "stampedJpeg": true,
+    "storeDateTimeStamp": true,
+    "threePhotoLimit": true,
+    "errorRetry": true,
+    "lens": "touch",
+    "orderedWorkbookHashes": [
+      "78a4600b133601bbd1ed72de322422ab57c2e10aef4d399471849b652600d936",
+      "d6504a9346f14a7f9bf4291fd0ff5fffa153e5bbde864c8a7fd8fe5922c405d7",
+      "101af15cbd877676098be9972e4fc61c67e7a71bc161e2b602dd5bcbe08bb16d"
+    ],
+    "readonlySavedGallery": true,
+    "text200": true,
+    "staleDecodeDiscarded": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        405,
+        720
+      ],
+      [
+        600,
+        400
+      ]
+    ],
+    "stampedJpeg": true,
+    "storeDateTimeStamp": true,
+    "threePhotoLimit": true,
+    "errorRetry": true,
+    "lens": "mouse",
+    "orderedWorkbookHashes": [
+      "bd088d8949332a6fb9846ae84c1134f6dfaced16827b435dad4dc77115a766e8",
+      "98fd02f261464b4bd8fb38460ba4b4d1af294f2c20326e6893fc9689bc089709",
+      "9a5e2ac28bf108cf5eea3003598c0dec9619bff49b1cf38202ae46792faad669"
+    ],
+    "readonlySavedGallery": true,
+    "text200": true,
+    "staleDecodeDiscarded": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        405,
+        720
+      ],
+      [
+        600,
+        400
+      ]
+    ],
+    "stampedJpeg": true,
+    "storeDateTimeStamp": true,
+    "threePhotoLimit": true,
+    "errorRetry": true,
+    "lens": "touch",
+    "orderedWorkbookHashes": [
+      "bd088d8949332a6fb9846ae84c1134f6dfaced16827b435dad4dc77115a766e8",
+      "98fd02f261464b4bd8fb38460ba4b4d1af294f2c20326e6893fc9689bc089709",
+      "9a5e2ac28bf108cf5eea3003598c0dec9619bff49b1cf38202ae46792faad669"
+    ],
+    "readonlySavedGallery": true,
+    "text200": true,
+    "staleDecodeDiscarded": true
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        405,
+        720
+      ],
+      [
+        600,
+        400
+      ]
+    ],
+    "stampedJpeg": true,
+    "storeDateTimeStamp": true,
+    "threePhotoLimit": true,
+    "errorRetry": true,
+    "lens": "touch",
+    "orderedWorkbookHashes": [
+      "bd088d8949332a6fb9846ae84c1134f6dfaced16827b435dad4dc77115a766e8",
+      "98fd02f261464b4bd8fb38460ba4b4d1af294f2c20326e6893fc9689bc089709",
+      "9a5e2ac28bf108cf5eea3003598c0dec9619bff49b1cf38202ae46792faad669"
+    ],
+    "readonlySavedGallery": true,
+    "text200": true,
+    "staleDecodeDiscarded": true
+  }
+]

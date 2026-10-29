@@ -1,0 +1,32 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "points": 8,
+    "wholeItemToggle": true,
+    "keyboard": true,
+    "normalDetail": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "points": 8,
+    "wholeItemToggle": true,
+    "keyboard": true,
+    "normalDetail": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "points": 8,
+    "wholeItemToggle": true,
+    "keyboard": true,
+    "normalDetail": true
+  }
+]
