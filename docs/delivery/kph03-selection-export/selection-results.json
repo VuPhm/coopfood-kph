@@ -1,0 +1,134 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "geometries": [
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      }
+    ],
+    "mixedSelection": true,
+    "approvedOnlyWorkbook": [
+      {
+        "sku": "0011730",
+        "name": "Cải thìa VietGAP 500 g"
+      }
+    ],
+    "appendPreservesSelection": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "geometries": [
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      }
+    ],
+    "mixedSelection": true,
+    "approvedOnlyWorkbook": [
+      {
+        "sku": "0011730",
+        "name": "Cải thìa VietGAP 500 g"
+      }
+    ],
+    "appendPreservesSelection": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "geometries": [
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      }
+    ],
+    "mixedSelection": true,
+    "approvedOnlyWorkbook": [
+      {
+        "sku": "0011730",
+        "name": "Cải thìa VietGAP 500 g"
+      }
+    ],
+    "appendPreservesSelection": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "geometries": [
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      },
+      {
+        "topDelta": 0,
+        "heightDelta": 0
+      }
+    ],
+    "mixedSelection": true,
+    "approvedOnlyWorkbook": [
+      {
+        "sku": "0011730",
+        "name": "Cải thìa VietGAP 500 g"
+      }
+    ],
+    "appendPreservesSelection": true,
+    "text200": true
+  }
+]

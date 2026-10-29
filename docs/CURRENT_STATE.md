@@ -1,5 +1,15 @@
 # Trạng thái hiện tại
 
+**KPH03 — candidate30/10/2026:** sửa lệch đơn vị8px về cùng44px với số lượng,
+skeleton khớp form thật. Thanh chọn rõ phạm vi/count và checkbox mixed; hộp Excel
+có số xuất/bỏ qua, nội dung cuộn/footer giữ yên, chữ200% không cắt hàng. Nhãn
+“TP khô & khác” / “Tạo Khô & Khác”, bỏ acronym ở CTA/online shell. Source117b6ba,
+nhánh/worktree riêng từa8d187a; root sole writer.302tests/online+mock build,
+Playwright4viewport và cold form6ca PASS. Preview <http://127.0.0.1:4392/#kph>;
+[file/checks/giới hạn](delivery/kph03-selection-export/technical.md).
+Owner visual pending; DATE04r2/NOTIF01 vẫn pending. Chưa merge/push/deploy.
+Bước tiếp thử EA/kg, Chọn và Xuất Excel trên preview4392.
+
 **DATE04 revision2 — candidate28/10/2026:** theo feedback bottom panel/tự nhập/
 nút chắp vá, form neo đáy ở mọi viewport, chừa khoảng trên, footer giữ yên.
 Entry+ vào cùng toolbar Cần chú ý/Lọc, heading trở lại tên/count. Hai cách

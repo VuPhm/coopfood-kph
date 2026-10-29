@@ -1,0 +1,86 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "reducedMotion": "no-preference",
+    "cpu": 6,
+    "stableSurface": true,
+    "lazyOpeningAnimations": 1,
+    "sectionGeometryWithin1px": true,
+    "reviewResizeDraftPhotos": true,
+    "cancelFreshSession": true,
+    "submit": true
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "reducedMotion": "reduce",
+    "cpu": 6,
+    "stableSurface": true,
+    "lazyOpeningAnimations": 0,
+    "sectionGeometryWithin1px": true,
+    "reviewResizeDraftPhotos": true,
+    "cancelFreshSession": true,
+    "submit": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "reducedMotion": "no-preference",
+    "cpu": 6,
+    "stableSurface": true,
+    "lazyOpeningAnimations": 1,
+    "sectionGeometryWithin1px": true,
+    "reviewResizeDraftPhotos": true,
+    "cancelFreshSession": true,
+    "submit": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "reducedMotion": "reduce",
+    "cpu": 6,
+    "stableSurface": true,
+    "lazyOpeningAnimations": 0,
+    "sectionGeometryWithin1px": true,
+    "reviewResizeDraftPhotos": true,
+    "cancelFreshSession": true,
+    "submit": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 844
+    },
+    "reducedMotion": "no-preference",
+    "cpu": 6,
+    "stableSurface": true,
+    "lazyOpeningAnimations": 1,
+    "sectionGeometryWithin1px": true,
+    "reviewResizeDraftPhotos": true,
+    "cancelFreshSession": true,
+    "submit": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 844
+    },
+    "reducedMotion": "reduce",
+    "cpu": 6,
+    "stableSurface": true,
+    "lazyOpeningAnimations": 0,
+    "sectionGeometryWithin1px": true,
+    "reviewResizeDraftPhotos": true,
+    "cancelFreshSession": true,
+    "submit": true
+  }
+]
