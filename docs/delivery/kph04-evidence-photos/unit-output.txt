@@ -1,0 +1,15 @@
+
+> @coopfood-kph/store-pwa@0.0.0 test
+> vitest run --maxWorkers=2
+
+
+ RUN  v4.1.10 /Users/vup/.codex/worktrees/kph04-evidence-photos/coopfood-kph/apps/store-pwa
+
+(node:19226) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  44 passed (44)
+      Tests  304 passed (304)
+   Start at  01:27:34
+   Duration  47.04s (transform 1.99s, setup 6.91s, import 9.50s, tests 44.30s, environment 20.97s)
+

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kph04-evidence-photos",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Bring the Pilot evidence-photo workflow into Store Fresh KPH: capture/select, stamped preview, gallery, ordered save and Excel.",
   "inScope": [
     "Reuse existing Pilot processor and stamp/time rules in in-session Store KPH",
@@ -16,7 +16,7 @@
     "Pilot IndexedDB migration, merge/push/deploy"
   ],
   "baseSha": "c2ac210b88331ca2ab54032766e4f82fc7a7512e",
-  "candidateSha": "",
+  "candidateSha": "9830c69ccf07fc406849795a108375d0e60da1d4",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -24,14 +24,17 @@
     "docs/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "9830c69ccf07fc406849795a108375d0e60da1d4",
+      "evidence": "docs/delivery/kph04-evidence-photos/technical.md"
     },
     {
       "id": "owner-photos",
@@ -42,5 +45,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Implement Pilot photo parity in the mock host; verify processing/gallery/export and online-original regression."
+  "nextAction": "Owner tries capture/select, stamped gallery, draft removal and ordered Excel at4394; record actual acceptance or bounded feedback."
 }

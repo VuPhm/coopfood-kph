@@ -1,0 +1,6 @@
+PASS create 390 no-preference: stable portal/overlay, one animation, skeleton/scroll, review/resize/photos/submit, fresh reopen/focus, CPU 6x
+PASS create 390 reduce: stable portal/overlay, one animation, skeleton/scroll, review/resize/photos/submit, fresh reopen/focus, CPU 6x
+PASS create 1440 no-preference: stable portal/overlay, one animation, skeleton/scroll, review/resize/photos/submit, fresh reopen/focus, CPU 6x
+PASS create 1440 reduce: stable portal/overlay, one animation, skeleton/scroll, review/resize/photos/submit, fresh reopen/focus, CPU 6x
+PASS create 320 no-preference: stable portal/overlay, one animation, skeleton/scroll, review/resize/photos/submit, fresh reopen/focus, CPU 6x
+PASS create 320 reduce: stable portal/overlay, one animation, skeleton/scroll, review/resize/photos/submit, fresh reopen/focus, CPU 6x

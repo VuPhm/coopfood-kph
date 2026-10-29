@@ -1,0 +1,13 @@
+
+> @coopfood-kph/store-pwa@0.0.0 test
+> vitest run src/image-processing.test.ts --maxWorkers=2
+
+
+ RUN  v4.1.10 /Users/vup/.codex/worktrees/kph04-evidence-photos/coopfood-kph/apps/store-pwa
+
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  01:29:30
+   Duration  1.43s (transform 90ms, setup 221ms, import 81ms, tests 69ms, environment 675ms)
+
