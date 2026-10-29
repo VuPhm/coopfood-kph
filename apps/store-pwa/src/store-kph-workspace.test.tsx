@@ -54,6 +54,26 @@ describe("Mock KPH history contract", () => {
     expect(screen.getByRole("dialog", { name: "Xuất Excel" })).toHaveTextContent("1 phiếu đã duyệt");
   });
 
+  it("marks a partial selection and explains skipped records without enabling an empty export", () => {
+    const approved = { ...mockRecords[0]!, id: "ok", approvalStatus: "APPROVED" as const };
+    const pending = { ...approved, id: "pending", productName: "Phiếu chưa duyệt", approvalStatus: "PENDING" as const };
+    render(<KphWorkspace records={[approved, pending]} onRecordsChange={vi.fn()} onNotice={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "Chọn" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn Phiếu chưa duyệt" }));
+    const selectAll = within(screen.getByRole("region", { name: "Chọn phiếu để xuất Excel" })).getByRole("checkbox", { name: "Chọn tất cả" });
+    expect(selectAll).toBePartiallyChecked();
+    fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
+    const dialog = within(screen.getByRole("dialog", { name: "Xuất Excel" }));
+    expect(dialog.getByText("1 phiếu chưa được duyệt")).toBeInTheDocument();
+    expect(dialog.getByRole("button", { name: "Tải xuống" })).toBeDisabled();
+    fireEvent.click(dialog.getByRole("button", { name: "Quay lại" }));
+    fireEvent.click(selectAll);
+    expect(selectAll).toBeChecked();
+    expect(selectAll).not.toBePartiallyChecked();
+    fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
+    expect(within(screen.getByRole("dialog", { name: "Xuất Excel" })).getByRole("button", { name: "Tải xuống" })).toBeEnabled();
+  });
+
   it("searches leading-zero SKU and barcode separately on a found record", () => {
     const record = { ...mockRecords[0]!, barcode: "29123415005" };
     render(<KphWorkspace records={[record]} onRecordsChange={vi.fn()} onNotice={vi.fn()} />);

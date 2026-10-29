@@ -26,13 +26,13 @@ export function StoreAppShell({ canCreate, context, onCreate }: StoreAppShellPro
     </div>
 
     <nav className="store-app-shell-tasks" aria-label="Công việc KPH">
-      <button type="button" className="store-app-shell-task" disabled={!canCreate} aria-label="Tạo phiếu TP khô & khác (TPCN)" onClick={() => onCreate("TPCN")}>
+      <button type="button" className="store-app-shell-task" disabled={!canCreate} aria-label="Tạo phiếu TP khô & khác" onClick={() => onCreate("TPCN")}>
         <PackagePlus aria-hidden="true" />
-        <span><strong>Tạo TPCN</strong><small>TP khô & khác</small></span>
+        <span><strong>Tạo Khô & Khác</strong><small>TP khô & khác</small></span>
       </button>
-      <button type="button" className="store-app-shell-task" disabled={!canCreate} aria-label="Tạo phiếu TP tươi sống (TPTS)" onClick={() => onCreate("TPTS")}>
+      <button type="button" className="store-app-shell-task" disabled={!canCreate} aria-label="Tạo phiếu TP tươi sống" onClick={() => onCreate("TPTS")}>
         <Salad aria-hidden="true" />
-        <span><strong>Tạo TPTS</strong><small>TP tươi sống</small></span>
+        <span><strong>Tạo Tươi sống</strong><small>TP tươi sống</small></span>
       </button>
       <a className="store-app-shell-task store-app-shell-history" href="#history-title">
         <History aria-hidden="true" />

@@ -23,7 +23,7 @@
 .store-create-screen[data-kind] .kph-create-quantity > .grid { max-width: none; align-items: start; }
 .store-create-screen[data-kind] .unit-fieldset { height: auto; min-width: 0; padding: 0; margin: 0; }
 .store-create-screen[data-kind] .unit-fieldset legend { margin-bottom: 4px; }
-.store-create-screen[data-kind] .unit-options { background: var(--store-canvas); }
+.store-create-screen[data-kind] .unit-options { height: 44px; padding: 0; background: var(--store-canvas); }
 .store-create-screen[data-kind] .form-section .choice-card {
   min-height: 52px; border-color: transparent; border-radius: 14px;
   background-color: var(--cf-label-surface); background-image: var(--store-material-sheen);
@@ -68,8 +68,6 @@
   .store-create-screen[data-kind] .kph-create-quantity { max-width: 400px; }
   .store-create-screen[data-kind] .form-section:first-of-type > .grid > :last-child { grid-column: 1 / -1; }
   .store-create-screen[data-kind] .kph-create-discovery { grid-template-columns: auto 160px; justify-content: start; }
-  .store-create-screen[data-kind] .kph-create-quantity input:not([type="radio"]),
-  .store-create-screen[data-kind] .kph-create-quantity .store-form-skeleton-input { height: 52px; }
 }
 @media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
   .store-create-screen[data-kind] .create-dialog-footer { box-shadow: none; }
@@ -85,3 +83,6 @@
 /* Keep hidden native controls anchored to their visible hit area. */
 .store-create-screen[data-kind] :is(.choice-card, .photo-picker, .unit-options label) { position: relative; }
 .store-create-screen[data-kind] :is(.choice-card, .photo-picker, .unit-options label) > input.sr-only { top: 50%; left: 50%; }
+
+/* Match the 44px live controls before the lazy form arrives. */
+.store-create-screen[data-kind] .store-form-skeleton-input:not(.is-note) { height: 44px; }

@@ -39,7 +39,7 @@ describe("Store single screen layout", () => {
     const dry = vi.fn(), fresh = vi.fn();
     render(<><KphCreateButton kind="TPCN" onClick={dry} /><KphCreateButton kind="TPTS" onClick={fresh} /></>);
     const button = screen.getByRole("button", { name: "Tạo phiếu TP khô & khác" });
-    expect(button).toHaveTextContent("Tạo TPCN");
+    expect(button).toHaveTextContent("Tạo Khô & Khác");
     expect(button.querySelector(".store-create-kind-label,.store-create-heading")).toBeNull();
     fireEvent.click(button); fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu TP tươi sống" }));
     expect(dry).toHaveBeenCalledOnce(); expect(fresh).toHaveBeenCalledOnce();

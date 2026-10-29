@@ -1,0 +1,26 @@
+/* Selection and export belong to KPH; reuse the shared sheet and button roles. */
+.store-kph .store-batch { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 8px 12px; border: 1px solid var(--store-holder-edge); border-radius: 14px; background: var(--store-surface); }
+.store-batch-heading, .store-batch-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.store-batch-heading > label { flex: 1 1 150px; cursor: pointer; font-size: 13px; line-height: 20px; }
+.store-batch-heading input { flex-shrink: 0; margin: 0; }
+.store-batch-count { color: var(--store-brand-action); font-size: 13px; line-height: 20px; font-variant-numeric: tabular-nums; }
+.store-batch-footer { border-top: 1px solid var(--store-holder-edge); padding-top: 8px; }
+.store-batch-footer p { flex: 1 1 150px; margin: 0; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-kph .store-batch .store-export { flex: 0 0 auto; height: auto; min-height: 44px; gap: 8px; font-size: 13px; line-height: 20px; white-space: normal; }
+.store-kph-export.store-sheet[data-slot="dialog-content"] { grid-template-rows: auto minmax(0, 1fr); overflow: hidden; gap: 0; }
+.store-kph-export.store-sheet > .store-modal-body { display: flex; flex-direction: column; gap: 0; overflow: hidden; padding: 0; min-height: 0; }
+.store-kph-export-content { overflow-y: auto; min-height: 0; padding: 20px 24px; display: grid; grid-auto-rows: max-content; align-content: start; gap: 16px; }
+.store-kph-export-total { display: flex; align-items: center; gap: 12px; color: var(--store-brand-action); }
+.store-kph-export-total > svg { flex-shrink: 0; }
+.store-kph-export-total > div { display: grid; gap: 4px; min-width: 0; }
+.store-kph-export-total strong { color: var(--store-ink); font-size: 18px; line-height: 26px; font-weight: 650; }
+.store-kph-export-total span { color: var(--store-ink-muted); font-size: 13px; line-height: 20px; }
+.store-kph-export.store-sheet .store-summary { border: 0; border-radius: 0; background: transparent; }
+.store-kph-export.store-sheet .store-summary > div { padding: 10px 0; align-items: baseline; flex-wrap: wrap; gap: 4px 16px; }
+.store-kph-export.store-sheet .store-summary dd { overflow-wrap: anywhere; }
+.store-kph-export-note { margin: 0; color: var(--store-ink); font-size: 14px; line-height: 22px; }
+.store-kph-export-content > .store-muted { margin: 0; }
+.store-kph-export.store-sheet .store-sheet-actions { display: flex; flex-wrap: wrap; flex-shrink: 0; gap: 8px; margin: 0; padding: 12px 24px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--store-holder-edge); background: var(--store-surface); }
+.store-kph-export .store-sheet-actions button { flex: 1 1 120px; height: auto; min-height: 44px; padding: 10px 12px; white-space: normal; font-size: 14px; line-height: 20px; }
+.store-kph-export .store-sheet-actions svg { flex-shrink: 0; }
+@media (max-width: 359px) { .store-kph .store-batch .store-export { flex: 1 1 100%; } .store-kph-export-content, .store-kph-export.store-sheet .store-sheet-actions { padding-inline: 16px; } }

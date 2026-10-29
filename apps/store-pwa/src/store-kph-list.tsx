@@ -104,7 +104,7 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     ? selectionMode ? [8, 23, 12, 8, 18, 15, 12, 4] : [27, 13, 8, 19, 16, 13, 4]
     : selectionMode ? [8, 19, 12, 10, 7, 15, 12, 13, 4] : [25, 12, 10, 7, 16, 13, 13, 4];
   return <div className={loading ? "store-kph-list store-kph-list-loading" : "store-kph-list"} aria-hidden={loading || undefined}>{desktop ? <div className="store-kph-table-wrap"><table className="store-kph-table"><colgroup>{widths.map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup><thead><tr>
-    {selectionMode ? <th><label className="store-kph-table-selector"><input type="checkbox" aria-label="Chọn tất cả" checked={visible.length > 0 && visible.every(record => selection.includes(record.id))} onChange={event => selectRecords(visible, event.target.checked)} /></label></th> : null}
+    {selectionMode ? <th><label className="store-kph-table-selector"><input type="checkbox" aria-label="Chọn tất cả" ref={node => { if (node) node.indeterminate = visible.some(record => selection.includes(record.id)) && !visible.every(record => selection.includes(record.id)); }} checked={visible.length > 0 && visible.every(record => selection.includes(record.id))} onChange={event => selectRecords(visible, event.target.checked)} /></label></th> : null}
     <th>Hàng hóa</th><th>SKU / UPC</th>{!groupByDate ? <th>Ngày phát hiện</th> : null}<th>SL</th><th>Tình trạng</th><th>Xử lý</th><th>Trạng thái</th><th><span className="sr-only">Mở chi tiết</span></th>
   </tr></thead>{groups.map(group => {
     const expanded = !groupByDate || !collapsedDates.includes(group.date);

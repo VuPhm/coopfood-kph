@@ -7,6 +7,6 @@ export function KphCreateButton({ kind, className = "", ...props }: ComponentPro
   const label = kind === "TPCN" ? "TP khô & khác" : "TP tươi sống";
   const Icon = kind === "TPCN" ? PackagePlus : Leaf;
   return <button type="button" className={`store-create-cta store-create-inline create-${kind.toLowerCase()} ${className}`} aria-label={`Tạo phiếu ${label}`} title={`Tạo phiếu ${label}`} aria-haspopup="dialog" {...props}>
-    <Icon size={20} aria-hidden="true" /><span>Tạo {kind}</span><ChevronRight className="store-create-chevron" size={16} aria-hidden="true" />
+    <Icon size={20} aria-hidden="true" /><span>{kind === "TPCN" ? "Tạo Khô & Khác" : "Tạo Tươi sống"}</span><ChevronRight className="store-create-chevron" size={16} aria-hidden="true" />
   </button>;
 }

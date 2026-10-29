@@ -7,7 +7,6 @@ import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
 import type { CreatedRecordDraft } from "./create-record-dialog";
 import { approvalLabels, type ApprovalStatus, type RecordView } from "./record-view";
 import { mockProfile } from "./store-app-mock";
-import { figmaAsset } from "./figma-assets";
 import { StoreSheet, Summary } from "./store-sheet";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
@@ -15,10 +14,11 @@ import { EvidenceImageViewer } from "./image-viewer";
 import { KPH_BATCH_SIZE, KPH_DATE_SHORTCUTS, kphDateRange } from "./store-kph-history";
 import { StoreKphMore, StoreKphList } from "./store-kph-list";
 import { KPH_SORT_OPTIONS } from "./store-kph-sort";
-import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, ListChecks, SlidersHorizontal } from "lucide-react";
+import { ArrowDownWideNarrow, CalendarDays, Check, CircleCheck, FileDown, ListChecks, SlidersHorizontal } from "lucide-react";
 import { KphCreateControl, preloadKphCreateForm as preloadCreateForm, type KphCreateHandle } from "./store-kph-create-control";
 import { kphRecordFromDraft } from "./store-kph-draft-record";
 import "./store-kph-create-forms.css";
+import "./store-kph-selection.css";
 import { KphCreateButton } from "./store-kph-create-button";
 import { FOOD_KIND_LABELS, StoreFoodKindTabs } from "./store-food-kind-tabs";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
@@ -84,7 +84,10 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
     for (const record of filtered) totals.set(record.detectedDate, (totals.get(record.detectedDate) ?? 0) + 1);
     return totals;
   }, [filtered]);
-  const eligible = visible.filter(r => selection.includes(r.id) && r.approvalStatus === "APPROVED");
+  const selectedRecords = visible.filter(r => selection.includes(r.id));
+  const eligible = selectedRecords.filter(r => r.approvalStatus === "APPROVED");
+  const skippedCount = selectedRecords.length - eligible.length;
+  const allVisibleSelected = visible.length > 0 && selectedRecords.length === visible.length;
   // Keep modal props stable when only history/filter or account state changes.
   const save = useCallback(async (draft: CreatedRecordDraft) => {
     const record = kphRecordFromDraft(draft);
@@ -105,7 +108,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
       const workbook = await buildKphWorkbook(kind, eligible, mockProfile);
       const bytes = await workbook.xlsx.writeBuffer();
       const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
-      const link = document.createElement("a"); link.href = url; link.download = `KPH-MAU-${kind}.xlsx`; link.click();
+      const link = document.createElement("a"); link.href = url; link.download = `KPH-MAU-${kind === "TPCN" ? "Kho-Khac" : "Tuoi-Song"}.xlsx`; link.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setExportOpen(false); onNotice("Đã tải file Excel từ dữ liệu mẫu.");
     } catch (e) { setError(e instanceof Error ? e.message : "Không thể xuất Excel. Thử lại."); }
@@ -123,10 +126,13 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
         <div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{filtered.length} phiếu</span></div>
         <div className="store-kph-list-toolbar"><button className="store-compact" aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button><KphFilterControl from={from} onFromChange={setFrom} to={to} onToChange={setTo} approval={approval} onApprovalChange={setApproval} sort={sort} onSortChange={setSort} filterError={filterError} groupByDate={groupByDate} onGroupByDateChange={value => { setGroupByDate(value); setCollapsedDates([]); }} /></div>
       </div>
-      {selectionMode ? <div className="store-batch"><label><input type="checkbox" aria-label="Chọn tất cả" checked={visible.length > 0 && visible.every(r => selection.includes(r.id))} onChange={e => {
-        const visibleIds = new Set(visible.map(r => r.id));
-        setSelection(e.target.checked ? [...new Set([...selection, ...visibleIds])] : selection.filter(id => !visibleIds.has(id)));
-      }} />Chọn tất cả đã hiện</label><span>{selection.length} đã chọn</span><small>Chỉ chọn phiếu đã hiển thị</small><Button className="store-export" disabled={!selection.length} onClick={() => { setError(""); setExportOpen(true); }}><img src={figmaAsset("124-445", "imgFileDown")} alt="" />Xuất Excel</Button></div> : null}
+      {selectionMode ? <section className="store-batch" aria-label="Chọn phiếu để xuất Excel">
+        <div className="store-batch-heading"><label><input type="checkbox" aria-label="Chọn tất cả" ref={node => { if (node) node.indeterminate = selectedRecords.length > 0 && !allVisibleSelected; }} checked={allVisibleSelected} disabled={!visible.length} onChange={e => {
+          const visibleIds = new Set(visible.map(r => r.id));
+          setSelection(e.target.checked ? [...new Set([...selection, ...visibleIds])] : selection.filter(id => !visibleIds.has(id)));
+        }} />Chọn tất cả đã hiện</label><span className="store-batch-count" role="status">{selection.length} đã chọn</span></div>
+        <div className="store-batch-footer"><p>Chỉ chọn trong {visible.length} phiếu đã hiển thị.</p><Button className="store-export" disabled={!selection.length} onClick={() => { setError(""); setExportOpen(true); }}><FileDown size={18} aria-hidden="true" />Xuất Excel</Button></div>
+      </section> : null}
       {filterError ? <p className="store-error" role="alert">{filterError}</p> : null}
       <div ref={listRef}><StoreKphList desktop={desktop} visible={visible} totalByDate={totalByDate} groupByDate={groupByDate} collapsedDates={collapsedDates} onToggleDate={date => setCollapsedDates(dates => dates.includes(date) ? dates.filter(value => value !== date) : [...dates, date])} selectionMode={selectionMode} selection={selection} setSelection={setSelection} setActive={setActive} /></div>
       {!visible.length ? <p className="store-muted store-empty">Không có phiếu phù hợp bộ lọc.</p> : null}
@@ -138,9 +144,14 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
     <KphCreateControl ref={createDialogRef} onSaved={save} />
 
     <StoreSheet open={exportOpen} onOpenChange={open => { if (!exporting) setExportOpen(open); }} className="store-kph-sheet store-kph-export" title="Xuất Excel" description="Xác nhận xuất các phiếu đủ điều kiện">
-      <Summary rows={[["Cửa hàng", mockProfile.storeName], ["Loại phiếu", labels[kind]], ["Đủ điều kiện", `${eligible.length} phiếu đã duyệt`], ["Không đưa vào file", `${selection.length - eligible.length} phiếu`]]} />
-      <p className="store-muted">Chỉ phiếu đã gửi và đã duyệt được đưa vào file. File này dùng dữ liệu mẫu.</p>{error ? <p className="store-error" role="alert">{error}</p> : null}
-      <div className="store-sheet-actions"><Button variant="ghost" disabled={exporting} onClick={() => setExportOpen(false)}>Hủy</Button><Button className="store-button" disabled={!eligible.length || exporting} onClick={() => void download()}>{exporting ? "Đang xuất…" : "Tải xuống"}</Button></div>
+      <div className="store-kph-export-content">
+        <div className="store-kph-export-total"><FileDown size={24} aria-hidden="true" /><div><strong>{eligible.length} phiếu đã duyệt</strong><span>{labels[kind]}</span></div></div>
+        <Summary rows={[["Cửa hàng", mockProfile.storeName], ["Đã chọn", `${selectedRecords.length} phiếu`], ["Đưa vào Excel", `${eligible.length} phiếu`], ["Bỏ qua", `${skippedCount} phiếu chưa được duyệt`]]} />
+        <p className="store-kph-export-note">{eligible.length ? "Chỉ phiếu đã gửi và đã duyệt được đưa vào file." : "Chưa có phiếu đủ điều kiện. Quay lại chọn phiếu đã duyệt để xuất Excel."}</p>
+        <p className="store-muted">File Excel hiện dùng dữ liệu mẫu trong phiên.</p>
+        {error ? <p className="store-error" role="alert">{error}</p> : null}
+      </div>
+      <div className="store-sheet-actions"><Button variant="secondary" disabled={exporting} onClick={() => setExportOpen(false)}>Quay lại</Button><Button className="store-button" disabled={!eligible.length || exporting} onClick={() => void download()}><FileDown size={18} aria-hidden="true" />{exporting ? "Đang xuất…" : "Tải xuống"}</Button></div>
     </StoreSheet>
     <StoreSheet className="store-kph-sheet store-kph-detail" open={active !== null} onOpenChange={open => { if (!open) setActive(null); }} title="Chi tiết phiếu KPH" description="Nội dung và trạng thái phiếu trong dữ liệu mẫu">
       {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "Thực phẩm khô & khác" : "Thực phẩm tươi sống"} · {active.id}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["SKU", active.sku || "—"], ["UPC", active.barcode || "—"], ["Nhà cung cấp", active.supplier || "—"], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Biện pháp", active.resolution], ["Trạng thái duyệt", approvalLabels[active.approvalStatus]]]} /></section><section><h3>Ghi nhận</h3><Summary rows={[["Ghi chú", active.note || "Không có"]]} /><p className="store-evidence-count">Ảnh minh chứng · {active.photos.length}/3</p><div className="store-review-photos">{active.photos.map((p, index) => <button key={p.id} aria-label={`Xem ảnh minh chứng ${index + 1}`} onClick={() => setImage(p)}><img src={p.src} alt={p.alt} /><span>{index + 1}</span></button>)}</div>{!active.photos.length ? <p className="store-muted">Phiếu mẫu chưa có ảnh minh chứng.</p> : null}</section><div className="store-sheet-actions"><Button variant="ghost" onClick={() => review("REJECTED")}>Không duyệt</Button><Button className="store-button" onClick={() => review("APPROVED")}>Duyệt phiếu</Button></div></> : null}

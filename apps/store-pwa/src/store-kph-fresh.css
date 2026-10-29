@@ -36,9 +36,6 @@
 .store-scan-trigger { display: grid; width: 44px; height: 48px; place-items: center; border: 0; border-radius: 14px; background: var(--store-module-mint); }
 .store-scan-trigger > svg { display: block; width: 20px; height: 20px; color: var(--store-brand-action); stroke-width: 1.8; }
 .store-kph .store-result-count { margin: 0; border-radius: 0; padding: 0; background: transparent; color: var(--store-ink-muted); font-size: 13px; line-height: 20px; font-weight: 400; }
-.store-kph .store-batch { border: 1px solid var(--store-line); border-radius: 14px; gap: 8px; padding: 8px 12px; margin: 0; background: var(--store-module-mint); }
-.store-kph .store-export { border: 0; background: var(--store-brand-action); color: white; }
-.store-kph .store-export img { filter: brightness(0) invert(1); }
 .store-tickets { display: grid; gap: 12px; }
 .store-ticket { position: relative; display: grid; grid-template-columns: 3px minmax(0, 1fr); align-items: start; column-gap: 10px; border: 1px solid var(--store-line); border-radius: 14px; padding-left: 12px; background: var(--store-surface); }
 .store-ticket:has(.store-ticket-selector) { grid-template-columns: 3px 44px minmax(0, 1fr); }
@@ -87,8 +84,6 @@
 .store-kph-more button { min-height: 44px; min-width: 180px; border: 1px solid var(--store-control-line); border-radius: 12px; padding: 8px 16px; background: var(--store-surface); color: var(--store-brand-action); font-size: 13px; font-weight: 650; cursor: pointer; }
 .store-kph-more button:hover, .store-kph-more button:active { background: var(--store-module-mint); border-color: var(--store-brand-action); }
 .store-kph-more button span { font-weight: 400; }
-.store-kph .store-batch { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
-.store-kph .store-batch > small { line-height: 18px; font-size: 12px; color: var(--store-ink-muted); }
 
 /* KPH sheets reuse account modal chrome; their body roles are local. */
 .store-kph-sheet .store-modal-body { color: var(--store-ink); }
@@ -220,7 +215,6 @@
 
 @media (max-width: 359px) {
   .store-create-screen .form-section { padding: 12px; }
-  .store-kph .store-batch { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
 }
 @media (min-width: 900px) {
   .store-create-screen.create-dialog-content { inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: min(880px, calc(100vw - 48px)); height: min(840px, calc(100dvh - 48px)); max-height: calc(100dvh - 48px); border-radius: var(--cf-modal-radius); }
