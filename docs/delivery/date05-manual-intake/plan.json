@@ -46,15 +46,14 @@
       "status": "pending"
     }
   ],
-  "changes": [
-    {
-      "revision": 1,
-      "request": "Tap tag và vùng đệm dưới cũng mở phiếu ở chế độ xem KPH; DATE ưu tiên tự nhập, vẫn quét, chọn1trong2loại và hiện ngay mốc/% sau nhập ngày.",
-      "source": "Owner feedback trong chat tại4396/#date và4396/#kph,30/10/2026",
-      "impact": "DATE input/choice/preview/scanner layout và KPH tap/focus browser gates; backend/API không đổi.",
-      "decision": "Tiếp tục DATE05/root sole writer, technical đạt, owner pending."
-    }
-  ],
+  "changes": [],
   "blockers": [],
-  "nextAction": "Owner thử tap tag/Duyệt/đệm dưới KPH ở cả hai chế độ và DATE nhập ngày trước sản phẩm tại4398; chờ nghiệm thu. Không merge/push/deploy."
+  "nextAction": "Owner thử tap tag/Duyệt/đệm dưới KPH ở cả hai chế độ và DATE nhập ngày trước sản phẩm tại4398; chờ nghiệm thu. Không merge/push/deploy.",
+  "ownerRequest": {
+    "revision": 1,
+    "request": "Tap tag và vùng đệm dưới cũng mở phiếu ở chế độ xem KPH; DATE ưu tiên tự nhập, vẫn quét, chọn1trong2loại và hiện ngay mốc/% sau nhập ngày.",
+    "source": "Owner feedback trong chat tại4396/#date và4396/#kph,30/10/2026",
+    "impact": "DATE input/choice/preview/scanner layout và KPH tap/focus browser gates; backend/API không đổi.",
+    "decision": "Tiếp tục DATE05/root sole writer, technical đạt, owner pending."
+  }
 }
