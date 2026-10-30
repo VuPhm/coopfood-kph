@@ -152,6 +152,43 @@ class CatalogLookupHttpIntegrationTest {
         assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(503);
     }
 
+    @Test
+    void regionLookupUsesCurrentScopeAndRevocationWithoutSyntheticMembership() throws Exception {
+        insertCatalog("001234", true, true, true, true);
+        database.execute("DELETE FROM store_memberships WHERE user_id = ?", USER_ID);
+        database.execute("""
+                INSERT INTO user_region_assignments (user_id, region_id, active, created_at, updated_at)
+                VALUES (?, ?, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """, USER_ID, REGION_ID);
+        HttpClient client = login();
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(200);
+        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(403);
+        database.execute("UPDATE stores SET region_id = ? WHERE id = ?", OTHER_REGION_ID, STORE_ID);
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(403);
+        database.execute("UPDATE stores SET region_id = ? WHERE id = ?", REGION_ID, STORE_ID);
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(200);
+        database.execute("UPDATE user_region_assignments SET active = FALSE WHERE user_id = ?", USER_ID);
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(403);
+        database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
+        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(200);
+        database.execute("DELETE FROM user_roles WHERE user_id = ?", USER_ID);
+        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(403);
+        assertThat(database.fetchOne("SELECT COUNT(*) FROM store_memberships WHERE user_id = ?", USER_ID)
+                .get(0, Integer.class)).isZero();
+    }
+
+    @Test
+    void chainLookupStillDeniesInactiveStoreAndInactiveRegion() throws Exception {
+        insertCatalog("001234", true, true, true, true);
+        database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
+        HttpClient client = login();
+        database.execute("UPDATE stores SET active = FALSE WHERE id = ?", OTHER_STORE_ID);
+        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(403);
+        database.execute("UPDATE regions SET active = FALSE WHERE id = ?", OTHER_REGION_ID);
+        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(403);
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(200);
+    }
+
     private HttpClient login() throws Exception {
         CookieManager cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
         HttpClient client = HttpClient.newBuilder().cookieHandler(cookies).build();

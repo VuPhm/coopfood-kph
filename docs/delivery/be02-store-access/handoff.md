@@ -54,3 +54,10 @@ vào StoreApp sẽ phải giữ boundary này, không tự mở quyền tra cứ
 
 Bước nhỏ tiếp: dùng discovery này làm nguồn cửa hàng/quyền cho StoreApp, bắt đầu
 session và chọn store, kèm hết phiên/đổi scope; chưa gộp DATE/report persistence.
+
+## Quyết định BE04,31/10/2026
+
+Mô tả guard lookup membership-only ở giới hạn trên đã được thay thế bởi quyết
+định explicit của owner: lookup theo scope KPH vùng/chuỗi như backend hiện có.
+Xem [ADR-0007](../../adr/0007-barcode-lookup-scope.md); BE02 vẫn không mở quyền
+staging/publish/DATE/report. Không sửa lại kết quả test/acceptance lịch sử BE02.

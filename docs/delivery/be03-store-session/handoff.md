@@ -47,3 +47,10 @@ chạy lại theo E2E README. Không nhập dữ liệu vận hành thật.
 
 Candidate `cb9f853d438bfd11a1111e399593b0ad4b0ab2e6`; source checkpoint `b2ac955`.
 [Commands/results/limits](evidence.md).
+
+## Owner follow-up31/10/2026
+
+Owner nói “tạm, giao diện chưa xong, tiếp”. Đây là cho phép tiếp BE04; không
+ghi nhận nghiệm thu UI hoặc đóng BE03. Lookup scope sau đó được owner chọn
+quyền KPH vùng/chuỗi; xem [ADR-0007](../../adr/0007-barcode-lookup-scope.md).
+Câu “không mở quyền catalog” ở handoff ban đầu giữ làm lịch sử trước quyết định mới.

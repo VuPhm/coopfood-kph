@@ -21,3 +21,6 @@ ADR accepted hiện hành:
   credential version để thu hồi session sau self-change; accepted cùng P05.
 - `0006-store-app-evolution.md`: tiến hóa Store App theo slice, giữ contract và
   Pages baseline riêng; branch/worktree theo task thay vì executor.
+
+- `0007-barcode-lookup-scope.md`: lookup barcode dùng effective KPH view/create
+  scope; staging/publish vẫn tách riêng, owner accepted31/10/2026.

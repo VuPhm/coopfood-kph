@@ -23,8 +23,9 @@ Danh sách chỉ chứa active store trong active region thuộc hợp scope hi�
 
 Một store xuất hiện đúng một lần dù nhiều scope trùng nhau. Sắp theo store code
 với PostgreSQL C collation rồi UUID; không đổi code sang số. Danh sách không
-suy quyền catalog, DATE, báo cáo hay admin. Endpoint lookup catalog hiện vẫn có
-guard membership riêng; discovery KPH không hứa lookup cho scope kế thừa.
+suy quyền staging/publish catalog, DATE, báo cáo hay admin. Từ quyết định BE04
+ngày31/10/2026, lookup barcode dùng cùng effective KPH view/create scope theo
+[ADR-0007](../adr/0007-barcode-lookup-scope.md), backend kiểm lại mỗi request.
 
 Mỗi request tính lại từ DB; revoke/downgrade/role/assignment/store chuyển vùng
 và inactive có hiệu lực ở request kế tiếp. Session refresh hiện hành chặn user

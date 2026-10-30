@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "be04-barcode-lookup",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Wire live barcode lookup to Store shell and align effective lookup scope with explicit owner decision.",
+  "inScope": [
+    "Current published barcode API, scan/manual lookup and NOT_FOUND draft UI",
+    "Authorization contract alignment with existing KPH view/create scope",
+    "Cancellation, store/session isolation and PostgreSQL/browser validation"
+  ],
+  "outOfScope": [
+    "KPH persistence/history/review/export wiring",
+    "DATE/report persistence and catalog publish",
+    "UI acceptance/redesign, merge/push/deployment/Pages"
+  ],
+  "baseSha": "4a653345210425230a65eae9265b495d3afca065",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [
+    "contracts/openapi/**",
+    "packages/api/src/generated/**",
+    "apps/store-pwa/vite.config.ts"
+  ],
+  "reviewLimit": 1,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "lookup-technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-lookup-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "Theo backend: quy\u1ec1n KPH v\u00f9ng/chu\u1ed7i \u0111\u01b0\u1ee3c tra",
+      "source": "Owner answer31/10/2026 in this chat",
+      "impact": "Resolve membership-only OpenAPI versus effective-scope backend/test mismatch.",
+      "decision": "Preserve backend guard; align contract/ADR/examples/generated types and add region/revoke tests."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Complete scoped browser/backend verification; UI remains provisional."
+}

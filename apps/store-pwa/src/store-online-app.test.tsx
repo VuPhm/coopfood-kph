@@ -8,7 +8,7 @@ const employee = { id: "store-a", code: "0001", name: "Cửa hàng A", kph: { vi
 const manager = { ...employee, id: "store-b", code: "0002", name: "Cửa hàng B", kph: { view: true, create: true, review: true, export: true } };
 const session = { user: { id: "user", username: "test", displayName: "Người kiểm thử", globalRoles: [], stores: [] }, csrfToken: "synthetic" };
 function gateway(): StoreSessionGateway {
-  return { getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
+  return { getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined), lookupBarcode: vi.fn() };
 }
 async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Quyền hàng không phù hợp" }); }
 describe("Store online session", () => {

@@ -29,7 +29,7 @@ export default defineConfig(({ command, mode }) => ({
   ],
   server: {
     port: 5173,
-    proxy: { "/api": "http://127.0.0.1:8080" },
+    proxy: { "/api": loadEnv(mode, ".", "KPH_").KPH_API_PROXY_TARGET ?? "http://127.0.0.1:8080" },
   },
-  preview: { proxy: { "/api": "http://127.0.0.1:8080" } },
+  preview: { proxy: { "/api": loadEnv(mode, ".", "KPH_").KPH_API_PROXY_TARGET ?? "http://127.0.0.1:8080" } },
 }));

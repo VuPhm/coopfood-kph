@@ -149,8 +149,10 @@ export interface paths {
          * Resolve a barcode to zero or one current active product
          * @description Reads only the published current catalog. `NOT_FOUND` never includes a
          *     guessed product and the response is never a collection.
-         *     Requires active membership in the requested store; global roles do not
-         *     bypass membership. Returns 503 when no current catalog exists or a
+         *     Requires effective view/create KPH access in the requested active store and
+         *     active region: active store membership, active region assignment or
+         *     CHAIN_ADMIN. Scope is revalidated on every request (ADR-0007). Catalog
+         *     staging/publish privileges are separate. Returns 503 when no current catalog exists or a
          *     matching product has no explicitly designated primary supplier.
          */
         get: operations["lookupBarcode"];
@@ -1100,7 +1102,7 @@ export interface operations {
         parameters: {
             query: {
                 /**
-                 * @description Requested store scope, revalidated against active membership.
+                 * @description Requested store scope, revalidated against effective KPH view/create access.
                  * @example 10000000-0000-4000-8000-000000000001
                  */
                 storeId: string;

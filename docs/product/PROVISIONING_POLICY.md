@@ -39,7 +39,9 @@ xuống các store của active region assignment nhưng không được cấp g
 region assignment, tạo/khóa global user hay reset credential. `CHAIN_ADMIN` là
 admin tổng và được đi xuống mọi store; quyền này là contract explicit, không tạo
 synthetic membership. `CATALOG_ADMIN` không được provision identity và
-`CHAIN_ADMIN` không tự có quyền catalog.
+`CHAIN_ADMIN` không tự có quyền staging/publish catalog. Lookup barcode trong
+scope KPH view/create được owner chốt riêng ngày31/10/2026 theo
+[ADR-0007](../adr/0007-barcode-lookup-scope.md).
 
 ## User lifecycle
 

@@ -10,6 +10,7 @@ export function createStoreSessionGateway(options: { baseUrl?: string; fetch?: t
     login: identity.login,
     logout: identity.logout,
     changePassword: identity.changePassword,
+    lookupBarcode: identity.lookupBarcode,
     async listStoreAccess(signal?: AbortSignal): Promise<StoreAccess[]> {
       const result = await client.GET("/api/v1/me/store-access", { ...(signal ? { signal } : {}), cache: "no-store" });
       if (!result.data || result.error) throw new OnlineApiError("Không thể tải quyền cửa hàng.", result.response.status);

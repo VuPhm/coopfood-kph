@@ -2,6 +2,7 @@ import { UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Button, Dialog, DialogContent, DialogTitle, DialogDescription } from "@coopfood-kph/ui";
+import { StoreBarcodeLookup } from "./store-barcode-lookup";
 import { ChangePasswordDialog } from "./change-password-dialog";
 import { StoreLogin } from "./store-login";
 import { StoreAppFrame } from "./store-app-frame";
@@ -87,7 +88,7 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
       <h1>{store.name}</h1><p>Mã cửa hàng · {store.code}</p><p>{session.user.displayName}</p>
       {message ? <p role="alert">{message}</p> : null}
       <h2>Quyền hàng không phù hợp</h2><ul>{([['view', 'Xem phiếu'], ['create', 'Tạo phiếu'], ['review', 'Duyệt phiếu'], ['export', 'Xuất phiếu']] as const).filter(([key]) => store.kph[key]).map(([key, label]) => <li key={key}>{label}</li>)}</ul>
-      <p role="status">Đã kết nối tài khoản và cửa hàng. Các màn nghiệp vụ đang được kết nối dữ liệu.</p>
+      {screen === "date" ? <StoreBarcodeLookup key={store.id} storeId={store.id} lookupBarcode={gateway.lookupBarcode} onSessionExpired={() => { setSelectedId(undefined); void scope.refetch(); }} /> : <><p role="status">Đã kết nối tài khoản và cửa hàng. Các màn nghiệp vụ đang được kết nối dữ liệu.</p>{screen === "home" || screen === "kph" ? <Button onClick={() => { window.location.hash = "date"; }}>Tra mã hàng</Button> : null}</>}
     </StorePageSurface></StorePageLayout>
   </StoreAppFrame>;
 }

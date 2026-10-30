@@ -149,3 +149,17 @@ runs only against the dedicated disposable `coopfood-kph-be03-postgres` containe
 Run the BE02 backend against that DB on8080 and preview the opt-in build on4380.
 The suite resets only that named synthetic DB, tests both configured viewports,
 revokes membership/region scope and credential versions, and checks CSRF/logout.
+
+## BE04 barcode slice
+
+Build with `VITE_STORE_APP_MOCK=false VITE_STORE_APP_ONLINE=true` into a separate
+output. Dedicated fixture container `coopfood-kph-be04-postgres` uses PostgreSQL17,
+`coopfood_kph_e2e`/`kph_e2e`, loopback55434. Run backend with `SERVER_PORT=8081`
+and `SERVER_ADDRESS=127.0.0.1` against that DB, then preview on4382 with
+`KPH_API_PROXY_TARGET=http://127.0.0.1:8081`. Vite proxy default remains8080.
+
+`E2E_BE04=true E2E_APP_URL=http://127.0.0.1:4382 npm --prefix e2e test -- be04-barcode-lookup.spec.ts`
+resets only that named disposable DB and checks found/miss/manual, store isolation,
+camera-to-manual entry, region/chain lookup and revoke,503/offline/401 at both
+viewports. It uses real APIs; hardware scanning itself is a separate real-device
+acceptance. Manual input remains ephemeral until BE05 connects KPH persistence.

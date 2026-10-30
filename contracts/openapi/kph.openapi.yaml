@@ -191,15 +191,17 @@ paths:
       description: |
         Reads only the published current catalog. `NOT_FOUND` never includes a
         guessed product and the response is never a collection.
-        Requires active membership in the requested store; global roles do not
-        bypass membership. Returns 503 when no current catalog exists or a
+        Requires effective view/create KPH access in the requested active store and
+        active region: active store membership, active region assignment or
+        CHAIN_ADMIN. Scope is revalidated on every request (ADR-0007). Catalog
+        staging/publish privileges are separate. Returns 503 when no current catalog exists or a
         matching product has no explicitly designated primary supplier.
       parameters:
         - $ref: '#/components/parameters/BarcodePath'
         - name: storeId
           in: query
           required: true
-          description: Requested store scope, revalidated against active membership.
+          description: Requested store scope, revalidated against effective KPH view/create access.
           schema:
             type: string
             format: uuid
@@ -211,6 +213,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BarcodeLookupResponse'
+              examples:
+                found:
+                  value:
+                    status: FOUND
+                    barcode: '0890123456789'
+                    product:
+                      id: 30000000-0000-4000-8000-000000000001
+                      barcode: '0890123456789'
+                      skuCode: SKU-000042
+                      name: Sản phẩm thử nghiệm 01
+                      primarySupplier: {code: NCC-0007, name: NCC Demo}
+                notFound:
+                  value: {status: NOT_FOUND, barcode: '0000000000000'}
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

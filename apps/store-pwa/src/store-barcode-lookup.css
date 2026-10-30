@@ -1,0 +1,9 @@
+.store-barcode-lookup { display: grid; gap: 16px; max-width: 42rem; }
+.store-barcode-lookup form, .store-barcode-manual { display: grid; gap: 12px; }
+.store-barcode-lookup label, .store-barcode-lookup dt { font-weight: 600; }
+.store-barcode-lookup input { width: 100%; min-height: 48px; border: 1px solid var(--color-border); border-radius: 12px; padding: 10px 12px; background: white; color: var(--color-ink); font-size: 16px; }
+.store-barcode-lookup input:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+.store-barcode-lookup dl { display: grid; gap: 8px; overflow-wrap: anywhere; }
+.store-barcode-lookup dd { margin: 0 0 8px; }
+.store-barcode-manual label { display: grid; gap: 8px; }
+.store-barcode-manual legend { font-weight: 700; margin-block: 16px; }
