@@ -163,3 +163,14 @@ resets only that named disposable DB and checks found/miss/manual, store isolati
 camera-to-manual entry, region/chain lookup and revoke,503/offline/401 at both
 viewports. It uses real APIs; hardware scanning itself is a separate real-device
 acceptance. Manual input remains ephemeral until BE05 connects KPH persistence.
+
+## BE05a
+
+Preview4383 proxies8082 via `KPH_API_PROXY_TARGET`; PostgreSQL17 disposable
+`coopfood-kph-be05-postgres` binds55435. Media fixture root is
+`/tmp/coopfood-kph-be05-media`. Use online build flags from BE04.
+
+`E2E_BE05=true E2E_APP_URL=http://127.0.0.1:4383 npm --prefix e2e test -- be05-kph-history.spec.ts`
+checks concise login, stable DOM/draft during delayed session refresh, scope revoke,
+D01 pages/filter/sort, detail/private images and store switching at both viewports.
+It resets only the named BE05 fixture database. Backend/API remain unchanged.

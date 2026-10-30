@@ -212,3 +212,9 @@ trong touchmove. Khi scale inventory, tách tập dữ liệu/selection/export k
 số row screen; kiểm print đủ dữ liệu trước khi chấp nhận giới hạn render.
 [Thiết kế](STORE_REPORTS_DESIGN.md), [bàn giao](../delivery/rpt01-report-design/handoff.md).
 Technical gate không thay nghiệm thu hình ảnh/gesture trên thiết bị thật.
+
+## Nội dung
+
+Owner31/10/2026: tiêu đề ngắn, chỉ giữ hướng dẫn cần cho thao tác hoặc hiểu kết
+quả. Không thêm slogan, lời chào lặp, copy quảng bá hay ghi chú kỹ thuật vào màn
+vận hành. Đăng nhập giữ một tiêu đề và form; trạng thái lỗi/loading chỉ hiện khi cần.

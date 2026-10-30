@@ -20,8 +20,8 @@ test("employee: real login, CSRF logout, revoke and session invalidation", async
   await login(page, "employee.e2e", "employee-e2e-password");
   await expect(page.getByRole("button", { name: /0002 ·/ })).toHaveCount(0);
   await page.getByRole("button", { name: /0001 ·/ }).click();
-  await expect(page.getByText("Xem phiếu", { exact: true })).toBeVisible();
-  await expect(page.getByText("Duyệt phiếu", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "KPH", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Duyệt phiếu", exact: true })).toHaveCount(0);
   await page.screenshot({ path: info.outputPath("employee.png"), fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   sql("UPDATE store_memberships SET active=false WHERE user_id='10000000-0000-4000-8000-000000000002';");
@@ -42,11 +42,11 @@ test("region/chain discovery, explicit store switch and no mock fallback", async
   await expect(page.getByRole("button", { name: /000[12] ·/ })).toHaveCount(2);
   await expect(page.getByRole("button", { name: /0003 ·/ })).toHaveCount(0);
   await page.getByRole("button", { name: /0001 ·/ }).click();
-  await expect(page.getByText("Duyệt phiếu", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "KPH", exact: true })).toBeVisible();
   await account(page); await page.getByRole("button", { name: "Đổi cửa hàng" }).click();
   await page.getByRole("button", { name: /0002 ·/ }).click();
-  await expect(page.getByText("Mã cửa hàng · 0002", { exact: true })).toBeVisible();
-  await expect(page.getByText("Mã cửa hàng · 0001", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".store-header-store")).toHaveText("Store Hai E2E");
+  await expect(page.locator(".store-header-store")).not.toHaveText("Nguyễn Kiệm E2E");
   await page.screenshot({ path: info.outputPath("region-store.png"), fullPage: true });
   sql("UPDATE user_region_assignments SET active=false WHERE user_id='10000000-0000-4000-8000-000000000004';");
   await account(page); await page.getByRole("button", { name: "Đổi cửa hàng" }).click();

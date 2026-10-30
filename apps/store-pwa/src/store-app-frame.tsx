@@ -26,16 +26,16 @@ import "./store-utility-layout.css";
 import "./store-fresh-foundations.css";
 import "./store-date-notification-surfaces.css";
 
-export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false }: {
+export function StoreAppFrame({ screen, profile, navigate, onKphIntent, account, children, footer, quickOpen = false, busy = false }: {
   screen: StoreAppScreen; profile: StoreProfile; navigate: (screen: Screen) => void;
-  onKphIntent?: () => void; account: ReactNode; children: ReactNode; footer?: ReactNode; quickOpen?: boolean;
+  onKphIntent?: () => void; account: ReactNode; children: ReactNode; footer?: ReactNode; quickOpen?: boolean; busy?: boolean;
 }) {
   const definition = storeScreens[screen];
   const renderHeader = (options: StorePageHeaderOptions = {}) => <StoreAppHeader
     leading={definition.leading} title={definition.title} subtitle={definition.subtitle} storeName={profile.storeName}
     account={account} hideCopy={screen === "home"} onHome={() => navigate("home")}
     {...(options.onBack ? { parent: { label: definition.title, onNavigate: options.onBack } } : {})} {...options} />;
-  return <div className={`store-app store-screen-${screen}`}>
+  return <div className={`store-app store-screen-${screen}`} aria-busy={busy || undefined}>
     <a className="sr-only focus:not-sr-only" href="#store-page-content" onClick={event => { event.preventDefault(); document.getElementById("store-page-content")?.focus(); }}>Đến nội dung</a>
     <StoreNavigation screen={screen} profile={profile} navigate={navigate} onKphIntent={onKphIntent} hidden={quickOpen} />
     <section className="store-main-column"><div className="store-frame-canvas">

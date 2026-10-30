@@ -36,7 +36,8 @@ test("found/miss/manual, camera fallback, identifiers and store isolation", asyn
   await expect(page.getByText("Không tìm thấy barcode 0000000000000.", { exact: true })).toBeVisible();
   await expect(page.getByText("SKU-E2E-0001", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Nhập tay", exact: true }).click();
-  await expect(page.getByText("Trạng thái tra cứu: NOT_FOUND · Barcode: 0000000000000")).toBeVisible();
+  await expect(page.getByRole("group", { name: "Thông tin nhập tay" })).toHaveAttribute("data-lookup-status", "NOT_FOUND");
+  await expect(page.getByRole("group", { name: "Thông tin nhập tay" })).toHaveAttribute("data-barcode", "0000000000000");
   await expect(page.getByLabel("Tên sản phẩm", { exact: true })).toHaveValue("");
   await page.getByLabel("Tên sản phẩm", { exact: true }).fill("Hàng nhập tay tổng hợp");
   await expect.poll(async () => page.getByLabel("Tên sản phẩm", { exact: true }).evaluate(control => {

@@ -35,3 +35,12 @@ describe("Store login form boundary", () => {
     expect(screen.getByRole("button", { name: "Đăng nhập" })).toBeEnabled();
   });
 });
+
+it("keeps one sign-in title and the necessary controls", () => {
+  render(<StoreLogin busy={false} error="" onSubmit={vi.fn()} />);
+  expect(screen.getAllByRole("heading")).toHaveLength(1);
+  expect(screen.getByRole("heading", { name: "Đăng nhập" })).toBeVisible();
+  expect(screen.getByLabelText("Tên đăng nhập")).toHaveAttribute("autocomplete", "username");
+  expect(screen.getByLabelText("Mật khẩu")).toHaveAttribute("autocomplete", "current-password");
+  expect(screen.queryByText(/CO.OP FOOD STORE APP|Vận hành cửa hàng|An toàn ·|CHÀO MỪNG|Vì cửa hàng/)).not.toBeInTheDocument();
+});

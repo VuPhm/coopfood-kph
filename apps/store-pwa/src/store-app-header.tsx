@@ -15,7 +15,7 @@ export function StoreAppHeader({ leading = "back", title, subtitle, storeName, a
 }) {
   const logo = <img src={assetUrl("brand/coopfood-home-logo-144.webp")} alt="Co.op Food" width={1024} height={550} loading="eager" fetchPriority="high" decoding="async" />;
   return <header className={`store-header${hideCopy ? " is-home" : ""}`} onFocusCapture={event => {
-    if (!event.currentTarget.contains(event.target) || event.target.closest(".store-account")) return;
+    if (!event.currentTarget.contains(event.target) || event.target.closest(".store-account, .store-online-account")) return;
     window.scrollTo({ top: 0, behavior: "instant" });
   }}>
     <div className="store-appbar-row">
@@ -27,7 +27,7 @@ export function StoreAppHeader({ leading = "back", title, subtitle, storeName, a
           {!hideCopy && parent ? <li className="store-header-ancestor"><button type="button" onClick={parent.onNavigate} aria-label={backLabel}>{parent.label}</button><ChevronRight size={14} aria-hidden="true" /></li> : null}
           <li aria-current="page"><h1 title={title} id={titleId} ref={titleRef} tabIndex={titleRef ? -1 : undefined}>{title}</h1></li>
         </ol></nav>
-        {!hideCopy ? <p title={subtitle}>{subtitle}</p> : null}
+        {!hideCopy && subtitle ? <p title={subtitle}>{subtitle}</p> : null}
       </div>{storeName ? <span className="store-header-store" title={storeName}>{storeName}</span> : null}</div>
       <div className="store-header-account">{account}</div>
     </div>

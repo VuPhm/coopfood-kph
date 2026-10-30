@@ -79,9 +79,8 @@ export function StoreBarcodeLookup({ storeId, lookupBarcode, onSessionExpired }:
     {result?.status === "NOT_FOUND" ? <div><p role="status">Không tìm thấy barcode {result.barcode}.</p>
       <div className="store-online-actions"><Button variant="secondary" onClick={() => setScannerOpen(true)}>Quét lại</Button>
         <Button variant="secondary" onClick={() => setManual(true)}>Nhập tay</Button></div>
-      {manual ? <fieldset className="store-barcode-manual"><legend>Thông tin nhập tay</legend>
-        <p>Trạng thái tra cứu: NOT_FOUND · Barcode: {result.barcode}</p>
-        <p>Thông tin chỉ giữ trong phiên này, chưa tạo phiếu hoặc lưu lên hệ thống.</p>
+      {manual ? <fieldset className="store-barcode-manual" data-lookup-status="NOT_FOUND" data-barcode={result.barcode}><legend>Thông tin nhập tay</legend>
+        <p>Chưa lưu</p>
         {[["sku", "Mã SKU"], ["name", "Tên sản phẩm"], ["supplier-code", "Mã NCC"], ["supplier-name", "Tên NCC"]].map(([key, label]) =>
           <label key={key} htmlFor={`${id}-${key}`}>{label}<input id={`${id}-${key}`} type="text" maxLength={200} autoComplete="off" /></label>)}
       </fieldset> : null}</div> : null}

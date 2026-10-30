@@ -2,6 +2,7 @@ import { UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Button, Dialog, DialogContent, DialogTitle, DialogDescription } from "@coopfood-kph/ui";
+import { StoreOnlineKph } from "./store-online-kph";
 import { StoreBarcodeLookup } from "./store-barcode-lookup";
 import { ChangePasswordDialog } from "./change-password-dialog";
 import { StoreLogin } from "./store-login";
@@ -35,7 +36,7 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     retry: false,
     networkMode: "always",
     staleTime: 0,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     refetchOnReconnect: true,
   });
   useEffect(() => {
@@ -43,13 +44,17 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     if (scope.isError || (scope.data && !scope.data.stores.some(store => store.id === selectedId))) setSelectedId(undefined);
   }, [scope.data, scope.isError, selectedId]);
   useEffect(() => {
-    const sync = () => { setScreen(readStoreScreen()); void scope.refetch(); };
+    const sync = () => { setScreen(readStoreScreen()); void scope.refetch({ cancelRefetch: false }); };
+    let frame = 0;
     window.addEventListener("hashchange", sync);
     window.addEventListener("focus", refreshScope);
-    function refreshScope() { void scope.refetch(); }
-    const refresh = () => { if (document.visibilityState === "visible") void scope.refetch(); };
+    function refreshScope() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => { void scope.refetch({ cancelRefetch: false }); });
+    }
+    const refresh = () => { if (document.visibilityState === "visible") refreshScope(); };
     document.addEventListener("visibilitychange", refresh);
-    return () => { window.removeEventListener("hashchange", sync); window.removeEventListener("focus", refreshScope); document.removeEventListener("visibilitychange", refresh); };
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("hashchange", sync); window.removeEventListener("focus", refreshScope); document.removeEventListener("visibilitychange", refresh); };
   }, [scope.refetch]);
   const anonymous = scope.isError && scope.error instanceof OnlineApiError && scope.error.status === 401;
   async function login(username: string, password: string) {
@@ -65,7 +70,7 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     finally { await scope.refetch(); setBusy(false); }
   }
   if (anonymous) return <StoreLogin busy={busy} error={message} onSubmit={(username, password) => { void login(username, password); }} />;
-  if (scope.isPending || scope.isFetching) return <main className="store-online-state" role="status">Đang xác minh phiên và quyền cửa hàng…</main>;
+  if (scope.isPending) return <main className="store-online-state" role="status">Đang xác minh phiên và quyền cửa hàng…</main>;
   if (scope.isError || !scope.data) return <main className="store-online-state"><p role="alert">Không thể xác minh phiên và quyền cửa hàng.</p><Button onClick={() => { void scope.refetch(); }}>Thử lại</Button></main>;
   const { session, stores } = scope.data;
   const store = stores.find(item => item.id === selectedId);
@@ -82,13 +87,14 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     <Button onClick={() => { void scope.refetch(); }}>Tải lại quyền cửa hàng</Button>{actions}
   </main>;
   const profile = { storeName: store.name, storeCode: store.code, fullName: session.user.displayName, employeeCode: "", role: "" as const };
-  return <StoreAppFrame key={store.id} screen={screen === "login" ? "home" : screen} profile={profile}
+  return <StoreAppFrame key={`${session.user.id}:${store.id}`} busy={scope.isFetching} screen={screen === "login" ? "home" : screen} profile={profile}
     navigate={next => { window.location.hash = next; }} account={<><button type="button" className="store-online-account" aria-label="Tài khoản" onClick={() => setAccountOpen(true)}><UserRound size={22} aria-hidden="true" /></button><Dialog open={accountOpen} onOpenChange={setAccountOpen}><DialogContent><DialogTitle>Tài khoản</DialogTitle><DialogDescription>{session.user.displayName} · {store.code} · {store.name}</DialogDescription>{actions}</DialogContent></Dialog>{passwordDialog}</>}>
     <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content">
-      <h1>{store.name}</h1><p>Mã cửa hàng · {store.code}</p><p>{session.user.displayName}</p>
       {message ? <p role="alert">{message}</p> : null}
-      <h2>Quyền hàng không phù hợp</h2><ul>{([['view', 'Xem phiếu'], ['create', 'Tạo phiếu'], ['review', 'Duyệt phiếu'], ['export', 'Xuất phiếu']] as const).filter(([key]) => store.kph[key]).map(([key, label]) => <li key={key}>{label}</li>)}</ul>
-      {screen === "date" ? <StoreBarcodeLookup key={store.id} storeId={store.id} lookupBarcode={gateway.lookupBarcode} onSessionExpired={() => { setSelectedId(undefined); void scope.refetch(); }} /> : <><p role="status">Đã kết nối tài khoản và cửa hàng. Các màn nghiệp vụ đang được kết nối dữ liệu.</p>{screen === "home" || screen === "kph" ? <Button onClick={() => { window.location.hash = "date"; }}>Tra mã hàng</Button> : null}</>}
+      {screen === "home" ? <><h2>{store.name}</h2><p>{session.user.displayName}</p><div className="store-online-actions"><Button onClick={() => { window.location.hash = "kph"; }}>KPH</Button><Button variant="secondary" onClick={() => { window.location.hash = "date"; }}>Tra mã hàng</Button></div></> : null}
+      {screen === "date" ? <StoreBarcodeLookup storeId={store.id} lookupBarcode={gateway.lookupBarcode} onSessionExpired={() => { setSelectedId(undefined); void scope.refetch(); }} /> : null}
+      {screen === "kph" ? <StoreOnlineKph userId={session.user.id} storeId={store.id} loadHistory={gateway.loadHistory} onSessionExpired={() => { setSelectedId(undefined); void scope.refetch(); }} /> : null}
+      {!["home", "date", "kph"].includes(screen) ? <p>Chưa khả dụng</p> : null}
     </StorePageSurface></StorePageLayout>
   </StoreAppFrame>;
 }

@@ -205,6 +205,7 @@ describe("online KPH gateway", () => {
     expect(await requests[3]!.json()).toEqual({ type: "TPCN", recordIds: [recordFixture.id] });
     expect(reviewed.approvalStatus).toBe("APPROVED");
     expect(history).toMatchObject({ page: 2, totalItems: 27, totalPages: 2, typeTotals: { TPCN: 20, TPTS: 7 } });
+    expect(history.records[0]?.barcode).toBe(recordFixture.barcode);
     expect(exported.store).toEqual(recordFixture.store);
     expect(exported.records[0]?.reviewedBy).toBe(sessionFixture.user.displayName);
   });

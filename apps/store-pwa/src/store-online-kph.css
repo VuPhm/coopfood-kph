@@ -1,0 +1,10 @@
+.store-online-kph { display: grid; gap: 16px; min-width: 0; }
+.store-online-kph-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: end; }
+.store-online-kph-filters label { display: grid; gap: 8px; font-size: 14px; font-weight: 600; min-width: 0; }
+.store-online-kph-filters select { min-width: 0; width: 100%; min-height: 48px; padding: 8px; border: 1px solid var(--color-border); border-radius: 12px; background: white; font-size: 16px; }
+.store-online-kph-count, .store-online-pagination { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.store-online-pagination { flex-wrap: wrap; }
+.store-online-pagination button { min-height: 44px; }
+.store-online-kph-count { font-size: 14px; }
+.store-online-kph .store-kph-list { min-height: 160px; }
+@media (min-width: 1100px) { .store-online-kph-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

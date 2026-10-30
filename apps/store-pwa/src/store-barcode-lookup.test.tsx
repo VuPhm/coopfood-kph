@@ -32,7 +32,8 @@ describe("Store barcode API flow", () => {
     setup(vi.fn().mockResolvedValue(missing)); search("000000"); await screen.findByText("Không tìm thấy barcode 000000.");
     expect(screen.getByRole("button", { name: "Quét lại" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Nhập tay" }));
-    expect(screen.getByText("Trạng thái tra cứu: NOT_FOUND · Barcode: 000000")).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Thông tin nhập tay" })).toHaveAttribute("data-lookup-status", "NOT_FOUND");
+    expect(screen.getByRole("group", { name: "Thông tin nhập tay" })).toHaveAttribute("data-barcode", "000000");
     expect(screen.getByLabelText("Tên sản phẩm")).toHaveValue("");
     fireEvent.change(screen.getByLabelText("Tên sản phẩm"), { target: { value: "Nhập tay" } });
     fireEvent.change(screen.getByLabelText("Barcode", { exact: true }), { target: { value: "new" } });

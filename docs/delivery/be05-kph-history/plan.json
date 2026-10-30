@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "be05-kph-history",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Reduce UI noise, stop background session remounts and wire KPH paged list/detail.",
+  "inScope": [
+    "Concise login/online copy",
+    "Background scope refresh without losing workspace DOM; invalid scope still removed",
+    "Read-only KPH list/detail using existing D01 API"
+  ],
+  "outOfScope": [
+    "Create/review/export/delete KPH",
+    "API/migration/dependency changes",
+    "Merge/push/deploy and final UI acceptance"
+  ],
+  "baseSha": "eebe0103dc2b85d188eddcfea8ba64fae1777cc4",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [],
+  "reviewLimit": 1,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Verify focus/revalidation regression and live D01 list/detail."
+}
