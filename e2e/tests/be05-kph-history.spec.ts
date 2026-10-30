@@ -72,14 +72,14 @@ test("live KPH pages, server filters/sort, detail and private evidence", async (
   await page.getByRole("button", { name: "Trang trước", exact: true }).click();
   await expect(rows(page)).toHaveCount(25); expect(await ids(page)).toEqual(first);
   const sorted = page.waitForRequest(request => request.url().includes("/kph?") && new URL(request.url()).searchParams.get("sort") === "product");
-  await page.getByLabel("Sắp xếp", { exact: true }).selectOption("product");
+  await page.getByRole("combobox", { name: "Sắp xếp", exact: true }).selectOption("product");
   expect(new URL((await sorted).url()).searchParams.get("page")).toBe("1");
-  await page.getByLabel("Thứ tự", { exact: true }).selectOption("ascending");
+  await page.getByRole("combobox", { name: "Thứ tự", exact: true }).selectOption("ascending");
   await page.getByLabel("Từ ngày", { exact: true }).fill("02/09/2026");
   await page.getByLabel("Đến ngày", { exact: true }).fill("03/09/2026");
   await expect(page.getByText("12 phiếu", { exact: true })).toBeVisible();
   await expect(rows(page)).toHaveCount(12);
-  await page.getByLabel("Trạng thái", { exact: true }).selectOption("APPROVED");
+  await page.getByRole("combobox", { name: "Trạng thái", exact: true }).selectOption("APPROVED");
   await expect(page.getByText("Không có phiếu", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Đặt lại", exact: true }).click();
   await expect(rows(page)).toHaveCount(25);
