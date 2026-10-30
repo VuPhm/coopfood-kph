@@ -46,15 +46,7 @@
       "evidence": "docs/delivery/be02-store-access/handoff.md"
     }
   ],
-  "changes": [
-    {
-      "revision": 1,
-      "request": "Owner “bắt đầu” 31/10/2026 after BE01 handoff",
-      "decision": "Implement BE02 in existing isolated BE01 worktree with root as sole writer; no team dispatch.",
-      "source": "User chat 31/10/2026: “bắt đầu”",
-      "impact": "Implement additive BE02 API; retain BE01 branch/worktree, no UI wiring or deployment."
-    }
-  ],
+  "changes": [],
   "blockers": [],
   "nextAction": "Owner review API scenarios; next bounded slice BE03 session/store wiring, no automatic merge or deployment."
 }
