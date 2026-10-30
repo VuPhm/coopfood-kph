@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "be03-store-session",
   "revision": 1,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Connect accepted Store shell to real session and effective store discovery.",
   "inScope": [
     "Login/session/CSRF/logout/password change",
@@ -15,7 +15,7 @@
     "Merge/push backend/deployment/Pages"
   ],
   "baseSha": "2b42c94f685c5603a1ce000e4a30fe2fd21b2216",
-  "candidateSha": "",
+  "candidateSha": "cb9f853d438bfd11a1111e399593b0ad4b0ab2e6",
   "integrationOwner": "root",
   "sharedPaths": [],
   "reviewLimit": 1,
@@ -26,16 +26,22 @@
       "id": "session-browser-regression",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "cb9f853d438bfd11a1111e399593b0ad4b0ab2e6",
+      "evidence": "docs/delivery/be03-store-session/evidence.md"
     },
     {
       "id": "owner-session-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pending",
+      "revision": 1,
+      "sha": "cb9f853d438bfd11a1111e399593b0ad4b0ab2e6",
+      "evidence": "docs/delivery/be03-store-session/handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Verify scoped implementation, then owner acceptance."
+  "nextAction": "Owner try login/effective store selection at http://127.0.0.1:4381/; BE04 lookup remains next slice."
 }

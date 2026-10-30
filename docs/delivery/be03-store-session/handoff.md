@@ -31,5 +31,19 @@ còn identity cũ. Revoke membership/assignment rồi điều hướng/refresh p
 store; credential reset/session expiry trở về login. Offline che scope và retry.
 Đăng xuất CSRF; đổi mật khẩu thành công yêu cầu login lại. Kiểm 390×844/1440×1024.
 
-Technical đang kiểm; owner acceptance pending. Không coi UI mock là dữ liệu online,
+Technical:354frontend/package tests và6browser API thật PASS;
+contract/generated client/TypeScript/build/PWA đạt.
+Owner acceptance pending. Không coi UI mock là dữ liệu online,
 không claim deploy/remote CI/thiết bị thật. Evidence cập nhật sau verification.
+
+## Preview nghiệm thu
+
+<http://127.0.0.1:4381/> — build online riêng, backend8080 và PostgreSQL55433
+disposable tổng hợp. Ví dụ `employee.e2e` / `employee-e2e-password`,
+`region-manager.e2e` / `manager-e2e-password`,
+`chain-admin.e2e` / `admin-e2e-password`. Fixture đã reset sau tests.
+Backend và preview đang chạy trong process local của lượt này; nếu process dừng,
+chạy lại theo E2E README. Không nhập dữ liệu vận hành thật.
+
+Candidate `cb9f853d438bfd11a1111e399593b0ad4b0ab2e6`; source checkpoint `b2ac955`.
+[Commands/results/limits](evidence.md).
