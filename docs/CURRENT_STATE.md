@@ -1,12 +1,15 @@
 # BE03 — Session/chọn cửa hàng thật, 31/10/2026
 
-Đang triển khai trên `store-app/be03-store-session`, base BE02 `2b42c94`.
+BE03 technical PASS, owner acceptance pending. Nhánh `store-app/be03-store-session`,
+base BE02 `2b42c94`.
 Root sole writer, không merge/push backend/deploy. Chỉ push candidate Fresh
 `157a22f` theo owner; remote đã xác minh. Session/CSRF, effective discovery,
 chọn/đổi store và hết phiên là scope; không nối mock KPH/DATE/report.
 [Handoff và cách chạy](delivery/be03-store-session/handoff.md).
-Bước hiện tại: verification component và browser backend/PostgreSQL thật.
-Owner acceptance pending.
+354frontend/package tests và6E2E backend/PostgreSQL thật đạt; preview online
+<http://127.0.0.1:4381/>. Session/login/logout/đổi mật khẩu, effective scope và
+chọn/đổi store đã nối; KPH/catalog/DATE/report data chưa nối.
+Bước nhỏ tiếp: owner thử login/chọn/đổi store và nghiệm thu BE03; sau đó BE04 lookup.
 
 # Trạng thái hiện tại
 
