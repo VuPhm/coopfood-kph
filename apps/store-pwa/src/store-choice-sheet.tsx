@@ -49,7 +49,7 @@ function ChoiceContent({ value, options, onApply, searchLabel, searchPlaceholder
   const chosen = matches.find(option => option.value === pending);
   return <>
     <div className="store-choice-search" ref={startRef} tabIndex={-1} role="group" aria-label="Tìm và chọn">
-      <StoreSearchField value={query} onValueChange={setQuery} label={searchLabel} placeholder={searchPlaceholder} />
+      <StoreSearchField value={query} onValueChange={setQuery} label={searchLabel} placeholder={searchPlaceholder} groups={[{label:"Lựa chọn hiện có",items:options.map(option=>({value:option.label,label:option.label,...(option.description?{detail:option.description}:{})}))}]} />
       <p aria-live="polite">{matches.length} {itemLabel}</p>
     </div>
     <div className="store-choice-results" ref={listRef} role="region" aria-label="Danh sách lựa chọn">

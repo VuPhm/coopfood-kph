@@ -12,7 +12,6 @@ import type { CreatedRecordDraft } from "./create-record-dialog";
 import { StoreSheet } from "./store-sheet";
 import { StoreFoodKindTabs } from "./store-food-kind-tabs";
 import { useStoreDesktopLayout } from "./use-store-desktop-layout";
-import { figmaAsset } from "./figma-assets";
 import { addDays, formatDisplayDate, type KphKind, type LocalDate } from "@coopfood-kph/kph-rules";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -173,9 +172,8 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
   return <StorePageLayout className="store-date">
     <StorePageHero className="store-date-search-panel" contentLabel="Tra mã hàng">
       <form className="store-date-search-form" onSubmit={event => { event.preventDefault(); void search(); }}>
-        <StoreSearchField className="store-date-search-wrap" label="Tìm SKU, barcode, tên hàng hoặc lô" placeholder="Tìm mã hàng, lô" value={query} onValueChange={changeQuery} clearLabel="Xóa tìm kiếm DATE" />
+        <StoreSearchField className="store-date-search-wrap" label="Tìm SKU, barcode, tên hàng hoặc lô" placeholder="Tìm mã hàng, lô" value={query} onValueChange={changeQuery} clearLabel="Xóa tìm kiếm DATE" onScan={() => setScannerOpen(true)} scanLabel="Quét mã để tìm lô DATE" onSearch={term => void search(term)} groups={[{ label: "Lô đang theo dõi", items: trackedLots.filter(lot => lot.status === "open").map(lot => ({ value: lot.sku, label: lot.name, keywords: `${lot.id} ${lot.batchCode ?? ""} ${lot.productSnapshot?.barcode ?? mockCatalogProducts.find(product => product.skuCode === lot.sku)?.barcode ?? ""}`, detail: `SKU ${lot.sku} · HSD ${displayDate(lot.date)}` })) }, { label: "Lô đã ghi nhận", items: trackedLots.filter(lot => lot.status === "acknowledged").map(lot => ({ value: lot.sku, label: lot.name, keywords: `${lot.id} ${lot.batchCode ?? ""} ${lot.productSnapshot?.barcode ?? mockCatalogProducts.find(product => product.skuCode === lot.sku)?.barcode ?? ""}`, detail: `SKU ${lot.sku} · HSD ${displayDate(lot.date)}` })) }]} />
         <div className="store-date-search-actions">
-        <button type="button" className="store-date-scan" aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></button>
         <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}><span className="store-date-submit-copy"><span aria-hidden={busy}>Tìm</span><span aria-hidden={!busy}>Tìm…</span></span></Button></div>
       </form>
     </StorePageHero>

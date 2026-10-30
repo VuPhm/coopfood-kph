@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "search02-grouped-discovery",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Consistent grouped search suggestions, in-view recent queries, contextual results and integrated scan.",
+  "inScope": [
+    "Shared search UI, grouped context items and in-memory field history",
+    "DATE/KPH/report/picker/intake integration; scan inside DATE lookup inputs",
+    "Keyboard/empty/clear/mobile/desktop verification"
+  ],
+  "outOfScope": [
+    "Catalog API/authorization changes, persistent history, merge/push/deploy"
+  ],
+  "baseSha": "2cb92b73b0e9c509c42f3dbfd763b28321d6b179",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [
+    "apps/store-pwa/src/**",
+    "e2e/scripts/**",
+    "docs/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "technical",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Define scope, acceptance gates and ownership before dispatch."
+}

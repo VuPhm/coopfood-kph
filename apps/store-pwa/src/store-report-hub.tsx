@@ -1,3 +1,4 @@
+import { formatDisplayDate } from "@coopfood-kph/kph-rules";
 import { StoreReportPage } from "./store-page-hero";
 import { useLayoutEffect, useRef, useState } from "react";
 import { Button, Input, Select } from "@coopfood-kph/ui";
@@ -68,7 +69,7 @@ export function ReportHub({ lots }: { lots: MockDateLot[] }) {
       {library.error ? <p className="report-library-error" role="status">{library.error}</p> : null}
 
       {library.history.length ? <section className="report-history-tools" aria-label="Tìm và lọc lịch sử">
-        <StoreSearchField label="Tìm báo cáo" placeholder="Tên báo cáo, kỳ" value={historySearch} onValueChange={value => { setHistorySearch(value); setLimit(10); }} clearLabel="Xóa tìm kiếm lịch sử" />
+        <StoreSearchField label="Tìm báo cáo" placeholder="Tên báo cáo, kỳ" value={historySearch} onValueChange={value => { setHistorySearch(value); setLimit(10); }} clearLabel="Xóa tìm kiếm lịch sử" groups={[{label:"Báo cáo đã tạo",items:library.history.map(report=>({value:report.title,label:report.title,detail:`Ngày chốt ${formatDisplayDate(report.asOf)}`}))}]} />
         <Select className="store-dropdown" contentClassName="store-dropdown" aria-label="Tháng chốt báo cáo" value={month} onValueChange={value => { setMonth(value); setLimit(10); }} options={[{ value: "", label: "Tất cả tháng chốt" }, ...months.map(value => ({ value, label: value.split("-").reverse().join("/") }))]} />
         <p aria-live="polite">{matches.length} / {library.history.length} báo cáo</p>
       </section> : null}

@@ -1,0 +1,10 @@
+import {fireEvent,render,screen} from "@testing-library/react";
+import {useState} from "react";
+import {describe,it,expect,vi} from "vitest";
+import {StoreSearchField} from "./store-search-field";
+const groups=[{label:"Hàng đang theo dõi",items:[{value:"00012",label:"Cải thìa",detail:"SKU 00012"},{value:"00013",label:"Sữa tươi",detail:"SKU 00013"}]}];
+function Field({scan=()=>{}}:{scan?:()=>void}){const[value,setValue]=useState("");return <StoreSearchField label="Tìm thử" placeholder="Tìm" value={value} onValueChange={setValue} groups={groups} onScan={scan}/>}
+describe("grouped contextual search",()=>{
+ it("selects a real result, retains leading zero and can clear field without scan",()=>{const scan=vi.fn();render(<Field scan={scan}/>);const field=screen.getByRole("textbox");fireEvent.focus(field);fireEvent.click(screen.getByRole("button",{name:/Cải thìa/}));expect(field).toHaveValue("00012");expect(screen.queryByRole("region",{name:"Gợi ý Tìm thử"})).not.toBeInTheDocument();fireEvent.click(field);expect(screen.getByRole("region",{name:"Gợi ý Tìm thử"})).toBeVisible();fireEvent.keyDown(field,{key:"Escape"});expect(screen.queryByRole("region",{name:"Gợi ý Tìm thử"})).not.toBeInTheDocument();fireEvent.click(screen.getByRole("button",{name:"Xóa tìm kiếm"}));expect(field).toHaveValue("");expect(scan).not.toHaveBeenCalled();fireEvent.click(screen.getByRole("button",{name:"Quét mã"}));expect(scan).toHaveBeenCalledOnce();});
+ it("shows grouped history, clears history separately and exposes an empty state",()=>{render(<Field/>);const field=screen.getByRole("textbox");fireEvent.focus(field);fireEvent.click(screen.getByRole("button",{name:/Cải thìa/}));fireEvent.change(field,{target:{value:""}});fireEvent.focus(field);expect(screen.getByText("Tìm gần đây")).toBeVisible();fireEvent.click(screen.getByRole("button",{name:"Xóa lịch sử"}));expect(screen.queryByText("Tìm gần đây")).not.toBeInTheDocument();fireEvent.change(field,{target:{value:"missing"}});expect(screen.getByText(/Chưa có mục khớp/)).toBeVisible();fireEvent.keyDown(field,{key:"Escape"});expect(screen.queryByRole("region",{name:"Gợi ý Tìm thử"})).not.toBeInTheDocument();});
+});

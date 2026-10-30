@@ -1,5 +1,14 @@
 # Công việc kế tiếp
 
+**SEARCH02 — candidate30/10/2026:** shared search có nhóm đề xuất/tìm gần đây/
+kết quả, count/empty/clear/keyboard; dữ liệu đúng phạm vi từng màn. Scan vào ô
+DATE và Tra mã hàng trong intake. Native top-layer giữ gợi ý khỏi bị surface
+che; không làm nhảy layout, chữ200% tự wrap/cuộn. History chỉ memory field đang
+mở, không persist.313Store +16targeted, online/mock build và browser390/1440/320
+đạt. Preview <http://127.0.0.1:4400/#date>; [files/checks/giới hạn](delivery/search02-grouped-discovery/technical.md).
+Nhánh/worktree SEARCH02 riêng từ2cb92b7, root sole writer, owner pending.
+DATE05r2 chưa được suy nghiệm thu. Bước tiếp owner thử nhóm/history/scan mới.
+
 **DATE05 revision2 — 30/10/2026:** sửa mở Thêm theo dõi: bỏ fallback inline,
 chuẩn bị form cùng DATE, panel trượt từ đáy bằng transform; giữ vùng mốc82px
 và trả focus không cuộn nền. Gate motion390/1440 ở normal/reduced motion,

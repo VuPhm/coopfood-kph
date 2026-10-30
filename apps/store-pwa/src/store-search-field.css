@@ -19,3 +19,21 @@
 .store-search-field > button > svg { position: relative; }
 .store-search-field > button:hover::before, .store-search-field > button:active::before { background: var(--store-canvas); }
 body:has(.store-app) :is(.store-app, .store-choice-sheet) .store-search-field :is(input,button):focus-visible { outline: 3px solid var(--store-focus); outline-offset: -3px; }
+.store-search-field.has-scan > label > .store-search-input { padding-right: 88px; }
+.store-search-field.has-scan > .store-search-clear { right: 44px; }
+.store-search-field > .store-search-scan { border-radius: 0 12px 12px 0; }
+.store-search-menu { position: absolute; inset: calc(100% + 8px) 0 auto; z-index: 15; max-height: min(360px, 45dvh); overflow: auto; overscroll-behavior: contain; border: 1px solid var(--store-control-line); border-radius: 16px; padding: 8px; background: var(--store-surface,white); color: var(--store-ink); box-shadow: var(--store-layer-panel-shadow,0 8px 24px rgb(0 40 25 / 14%)); }
+.store-search-menu section + section { border-top: 1px solid var(--store-soft-edge); margin-top: 8px; padding-top: 8px; }
+.store-search-group-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 8px; }
+.store-search-group-heading h3 { margin: 0; font-size: 12px; line-height: 18px; font-weight: 650; color: var(--store-ink-muted); }
+.store-search-group-heading > span { font-size: 12px; color: var(--store-ink-muted); }
+.store-search-group-heading button { min-height: 44px; padding: 0 8px; color: var(--store-brand-action); font-size: 13px; border-radius: 8px; }
+.store-search-menu .store-search-option { width: 100%; min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; text-align: left; color: var(--store-ink); background: transparent; }
+.store-search-option > svg { flex: 0 0 auto; color: var(--store-ink-muted); }
+.store-search-option > span { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 14px; line-height: 20px; }
+.store-search-option strong { display: block; font-weight: 600; }
+.store-search-option small { display: block; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-search-menu .store-search-option:hover, .store-search-menu button:focus-visible { background: var(--store-canvas); }
+.store-search-menu-title, .store-search-hint { margin: 0; padding: 8px; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
+.store-search-run { border-top: 1px solid var(--store-soft-edge); }
+@media (forced-colors: active) { .store-search-menu { border: 1px solid CanvasText; } }
