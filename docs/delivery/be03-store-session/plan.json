@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "be03-store-session",
+  "revision": 1,
+  "status": "VERIFYING",
+  "objective": "Connect accepted Store shell to real session and effective store discovery.",
+  "inScope": [
+    "Login/session/CSRF/logout/password change",
+    "Effective store selection/capabilities and scope reset",
+    "Component regression and real API browser checks"
+  ],
+  "outOfScope": [
+    "Catalog/KPH/DATE/report data wiring",
+    "API/migration/dependency changes",
+    "Merge/push backend/deployment/Pages"
+  ],
+  "baseSha": "2b42c94f685c5603a1ce000e4a30fe2fd21b2216",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [],
+  "reviewLimit": 1,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "session-browser-regression",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-session-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Verify scoped implementation, then owner acceptance."
+}

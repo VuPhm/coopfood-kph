@@ -7,7 +7,9 @@ import { FeatureLoadBoundary, FeatureLoadError, KphLoadingSkeleton } from "./fea
 // Load only the configured entry point; the other app and its dependencies stay off startup.
 const entryModule = import.meta.env.VITE_STORE_APP_MOCK === "true"
   ? import("./store-app").then(module => ({ default: module.StoreApp }))
-  : import("./app").then(module => ({ default: module.App }));
+  : import.meta.env.VITE_STORE_APP_ONLINE === "true"
+    ? import("./store-online-app").then(module => ({ default: module.StoreOnlineApp }))
+    : import("./app").then(module => ({ default: module.App }));
 const frameModule = import.meta.env.VITE_STORE_APP_MOCK === "true"
   ? import("./store-loading-frame") : null;
 

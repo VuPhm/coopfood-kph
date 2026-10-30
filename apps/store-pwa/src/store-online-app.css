@@ -1,0 +1,12 @@
+.store-online-state { max-width: 42rem; margin: 0 auto; padding: max(24px, env(safe-area-inset-top)) 20px; display: grid; gap: 16px; min-height: 100dvh; align-content: center; }
+.store-online-state h1 { font-size: 1.5rem; font-weight: 700; }
+.store-online-stores { display: grid; gap: 12px; list-style: none; padding: 0; }
+.store-online-stores button { width: 100%; min-height: 48px; height: auto; white-space: normal; text-align: left; overflow-wrap: anywhere; }
+.store-online-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.store-online-actions button { min-height: 44px; }
+.store-online-content { padding: 24px; display: grid; gap: 16px; align-content: start; }
+.store-online-content h1, .store-online-content h2 { font-weight: 700; }
+
+.store-online-account { display: grid; place-items: center; min-width: 44px; min-height: 44px; }
+.store-online-content h1 { font-size: 1.5rem; }
+.store-online-content ul { list-style: disc; padding-inline-start: 24px; }

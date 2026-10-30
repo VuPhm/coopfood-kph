@@ -1,3 +1,13 @@
+# BE03 — Session/chọn cửa hàng thật, 31/10/2026
+
+Đang triển khai trên `store-app/be03-store-session`, base BE02 `2b42c94`.
+Root sole writer, không merge/push backend/deploy. Chỉ push candidate Fresh
+`157a22f` theo owner; remote đã xác minh. Session/CSRF, effective discovery,
+chọn/đổi store và hết phiên là scope; không nối mock KPH/DATE/report.
+[Handoff và cách chạy](delivery/be03-store-session/handoff.md).
+Bước hiện tại: verification component và browser backend/PostgreSQL thật.
+Owner acceptance pending.
+
 # Công việc kế tiếp
 
 **BE02 — technical PASS, owner pending 31/10/2026:** triển khai

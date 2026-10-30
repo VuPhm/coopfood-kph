@@ -135,3 +135,17 @@ examples; it does not replace the real-backend suite or owner acceptance.
 It checks login isolation, keyboard entry, browser errors, page/dialog overflow
 and form dismissal, and saves six viewport screenshots plus form views under
 `.local/verification/ui-after-*.png` for visual inspection.
+
+## BE03 Store session slice
+
+Opt in with `VITE_STORE_APP_MOCK=false VITE_STORE_APP_ONLINE=true` (build or dev).
+This reuses the Store shell with real session/effective store discovery; business
+screens show connection status until BE04/BE05. It never loads mock operations.
+Existing online/Pilot entry selection remains available without this flag.
+
+`E2E_BE03=true E2E_APP_URL=http://127.0.0.1:4380 npm --prefix e2e test -- be03-store-session.spec.ts`
+runs only against the dedicated disposable `coopfood-kph-be03-postgres` container
+(database/user `coopfood_kph_e2e`/`kph_e2e`, PostgreSQL17, loopback port55433).
+Run the BE02 backend against that DB on8080 and preview the opt-in build on4380.
+The suite resets only that named synthetic DB, tests both configured viewports,
+revokes membership/region scope and credential versions, and checks CSRF/logout.
