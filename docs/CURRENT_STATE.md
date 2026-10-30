@@ -1,6 +1,6 @@
 # BE04 — Tra barcode online,31/10/2026
 
-Đang kiểm trên `store-app/be04-barcode-lookup`, base BE03 `4a65334`; root sole
+BE04 technical PASS trên `store-app/be04-barcode-lookup`, base BE03 `4a65334`; root sole
 writer. Owner “tạm, giao diện chưa xong, tiếp”: UI vẫn provisional, chưa nghiệm
 thu BE03/BE04. Owner đã chọn lookup theo quyền KPH vùng/chuỗi như backend,
 [ADR-0007](adr/0007-barcode-lookup-scope.md); đồng bộ OpenAPI/examples/generated
@@ -8,7 +8,11 @@ client, không thay guard runtime hoặc cấp quyền staging/publish.
 Home/KPH → Tra mã hàng/DATE: FOUND một product, NOT_FOUND cho quét lại/nhập tay,
 không đổi lỗi quyền/network/503 thành miss. Chưa lưu KPH/DATE/report.
 [Handoff/phạm vi](delivery/be04-barcode-lookup/handoff.md). Không merge/push/deploy.
-Bước hiện tại: kiểm backend PostgreSQL và browser thật ở390/1440.
+76backend tests,363frontend/package tests, contracts/generated/types/build/PWA
+và6E2E API thật ở390×844/1440×1024 PASS. Preview mới
+<http://127.0.0.1:4382/#home>;4381 BE03 giữ nguyên.
+Bước nhỏ tiếp BE05a: nối danh sách/chi tiết KPH, giữ D01 paging và scope reset;
+chưa tự nối25/select-all theo UI mock hoặc mở lưu DATE/report.
 
 # BE03 — Session/chọn cửa hàng thật, 31/10/2026
 
