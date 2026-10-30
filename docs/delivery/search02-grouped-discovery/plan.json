@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "search02-grouped-discovery",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Consistent grouped search suggestions, in-view recent queries, contextual results and integrated scan.",
   "inScope": [
     "Shared search UI, grouped context items and in-memory field history",
@@ -13,7 +13,7 @@
     "Catalog API/authorization changes, persistent history, merge/push/deploy"
   ],
   "baseSha": "2cb92b73b0e9c509c42f3dbfd763b28321d6b179",
-  "candidateSha": "",
+  "candidateSha": "5c59cdf7aa0d5b3d406f57701262cb924bee078d",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -21,14 +21,17 @@
     "docs/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 1,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "5c59cdf7aa0d5b3d406f57701262cb924bee078d",
+      "evidence": "docs/delivery/search02-grouped-discovery/technical.md"
     },
     {
       "id": "owner",
@@ -39,5 +42,5 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Define scope, acceptance gates and ownership before dispatch."
+  "nextAction": "Owner thử nhóm đề xuất/history/results và scan trong ô tại4400; chờ nghiệm thu, không merge/push/deploy."
 }
