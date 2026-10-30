@@ -45,15 +45,7 @@
       "evidence": "docs/delivery/be04-barcode-lookup/handoff.md"
     }
   ],
-  "changes": [
-    {
-      "revision": 1,
-      "request": "Theo backend: quy\u1ec1n KPH v\u00f9ng/chu\u1ed7i \u0111\u01b0\u1ee3c tra",
-      "source": "Owner answer31/10/2026 in this chat",
-      "impact": "Resolve membership-only OpenAPI versus effective-scope backend/test mismatch.",
-      "decision": "Preserve backend guard; align contract/ADR/examples/generated types and add region/revoke tests."
-    }
-  ],
+  "changes": [],
   "blockers": [],
   "nextAction": "Owner may try http://127.0.0.1:4382/#home; UI remains provisional. Next bounded backend slice BE05a KPH list/detail preserving D01."
 }

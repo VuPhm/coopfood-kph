@@ -72,3 +72,7 @@ Candidate `607bcc0c625d38a9e57f3431f52974e75d7803a0` only advances CURRENT_STATE
 `git diff --exit-code fc87084 HEAD -- apps backend contracts packages e2e package.json package-lock.json`
 PASS; all runtime and tests match the final scoped build/browser evidence.
 Subsequent record commits are limited to this cycle folder.
+
+Record validation: initial decision belongs to revision1 scope (ADR0007/handoff),
+not a revision-change entry; checker requires change entries only from revision2.
+Corrected that metadata without changing scope, code, evidence or gate decisions.
