@@ -45,7 +45,18 @@ export function StoreBarcodeLookup({ storeId, lookupBarcode, onSessionExpired }:
     : status === 503 ? "Danh mục sản phẩm chưa sẵn sàng. Vui lòng thử lại sau."
     : status === 401 ? "Phiên đăng nhập đã hết hạn."
     : "Không thể tra cứu lúc này. Kiểm tra kết nối rồi thử lại.";
-  return <section className="store-barcode-lookup" aria-labelledby={`${id}-title`}>
+  function keepFocusedControlVisible(target: EventTarget) {
+    if (!(target instanceof HTMLElement) || !target.matches("input, button")) return;
+    requestAnimationFrame(() => {
+      if (!target.isConnected) return;
+      const toolbar = document.querySelector(".store-mobile-toolbar")?.getBoundingClientRect();
+      const control = target.getBoundingClientRect();
+      if (toolbar?.height && control.bottom > toolbar.top - 12 && control.top < toolbar.bottom) {
+        window.scrollBy({ top: control.bottom - toolbar.top + 16, behavior: "instant" });
+      }
+    });
+  }
+  return <section className="store-barcode-lookup" aria-labelledby={`${id}-title`} onFocusCapture={event => keepFocusedControlVisible(event.target)}>
     <h2 id={`${id}-title`}>Tra mã hàng</h2>
     <form onSubmit={event => { event.preventDefault(); search(barcode); }}>
       <label htmlFor={`${id}-barcode`}>Barcode</label>

@@ -39,6 +39,10 @@ test("found/miss/manual, camera fallback, identifiers and store isolation", asyn
   await expect(page.getByText("Trạng thái tra cứu: NOT_FOUND · Barcode: 0000000000000")).toBeVisible();
   await expect(page.getByLabel("Tên sản phẩm", { exact: true })).toHaveValue("");
   await page.getByLabel("Tên sản phẩm", { exact: true }).fill("Hàng nhập tay tổng hợp");
+  await expect.poll(async () => page.getByLabel("Tên sản phẩm", { exact: true }).evaluate(control => {
+    const toolbar = document.querySelector(".store-mobile-toolbar")?.getBoundingClientRect();
+    return !toolbar?.height || control.getBoundingClientRect().bottom <= toolbar.top - 12;
+  })).toBe(true);
   await page.screenshot({ path: info.outputPath("lookup-manual.png"), fullPage: true });
   await page.getByRole("button", { name: "Tài khoản", exact: true }).click();
   await page.getByRole("button", { name: "Đổi cửa hàng", exact: true }).click();
