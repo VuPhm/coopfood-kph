@@ -15,7 +15,7 @@
     "Migration, provisioning, deployment and Pages"
   ],
   "baseSha": "04f7c4a4d9001901c3973e7e6bbf5a2118932ee7",
-  "candidateSha": "",
+  "candidateSha": "9290c479d63665abb2ae800a14ca6deaa0361db1",
   "integrationOwner": "root",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -31,13 +31,19 @@
       "id": "backend-contract-regression",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "9290c479d63665abb2ae800a14ca6deaa0361db1",
+      "evidence": "docs/delivery/be02-store-access/evidence.md"
     },
     {
       "id": "owner-api-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pending",
+      "revision": 1,
+      "sha": "9290c479d63665abb2ae800a14ca6deaa0361db1",
+      "evidence": "docs/delivery/be02-store-access/handoff.md"
     }
   ],
   "changes": [

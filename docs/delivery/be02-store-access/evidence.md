@@ -63,6 +63,7 @@ cài lại rồi chạy check/test/build từ đầu thành công.
 
 - Contract Lock:24manifest resources,16API fixtures.
 - Regeneration SHA256 trước/sau giống nhau; generated client không drift.
+  `npm run check:api` sau checkpoint9290c47 PASS (exit0,git diff generated rỗng).
 - TypeScript: toàn workspace PASS.
 - Tests: Admin16 + Store294 + API2 + rules19 + UI16 =347 PASS.
 - Build: Admin/Store PASS, PWA generateSW92precache entries.
