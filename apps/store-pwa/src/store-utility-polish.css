@@ -1,1 +1,36 @@
 .store-scan-icon { display: block; flex-shrink: 0; }
+/* Fresh camera recovery: the video stays dark; errors and controls use Store surfaces. */
+.store-barcode-scanner[data-slot="dialog-content"] .barcode-scanner-error { padding: 16px; background: var(--store-canvas); color: var(--store-ink); }
+.store-barcode-scanner .barcode-scanner-error-icon { padding: 10px; margin-bottom: 12px; background: var(--store-surface,white); color: var(--store-error-ink); }
+.store-barcode-scanner .barcode-scanner-error-icon svg { width: 24px; height: 24px; }
+.store-barcode-scanner .barcode-scanner-error-title { color: var(--store-ink); font-size: 16px; line-height: 24px; }
+.store-barcode-scanner .barcode-scanner-error-message { color: var(--store-ink-muted); font-size: 14px; line-height: 20px; }
+.store-barcode-scanner[data-slot="dialog-content"] .barcode-scanner-footer { gap: 8px; flex-wrap: wrap; padding: 12px 16px max(12px,env(safe-area-inset-bottom)); background: var(--store-surface,white); border-color: var(--store-soft-edge); }
+.store-barcode-scanner .barcode-scanner-footer > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.store-barcode-scanner[data-slot="dialog-content"] :is(.barcode-scanner-footer,.barcode-scanner-error) button { min-height: 44px; height: auto; border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 20px; white-space: normal; }
+.store-barcode-scanner .barcode-scanner-footer button { color: var(--store-brand-action); background: var(--store-canvas); border: 1px solid var(--store-control-line); }
+.store-barcode-scanner .barcode-scanner-footer button[aria-pressed="true"] { background: var(--store-brand-action); color: white; }
+.store-barcode-scanner[data-slot="dialog-content"] .barcode-scanner-footer > button { margin-left: auto; color: var(--store-brand-action); background: var(--store-module-mint); }
+/* Compact identity leaves the account body usable on short screens. */
+.store-account-sheet .store-account-hero { display: grid; justify-items: stretch; gap: 16px; padding: 20px 24px 24px; }
+.store-account-sheet .store-account-hero h2 { margin: 0 44px 0 0; line-height: 24px; }
+.store-account-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.store-account-identity > div { display: grid; min-width: 0; gap: 8px; justify-items: start; }
+.store-account-sheet .store-account-avatar { flex: 0 0 56px; width: 56px; height: 56px; border-width: 2px; font-size: 20px; }
+.store-account-sheet .store-account-identity h3 { margin: 0; text-align: left; font-size: 20px; line-height: 28px; }
+.store-account-sheet .store-account-role { max-width: 100%; font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.store-account-sheet[data-slot="dialog-content"] .store-account-body { gap: 16px; padding: 20px 24px; }
+.store-account-sheet .store-account-store { gap: 12px; padding: 16px; border-radius: 14px; background: var(--store-canvas); }
+.store-account-sheet .store-account-store-icon { border-radius: 12px; }
+.store-account-sheet .store-account-store h3 { color: var(--store-ink-muted); font-size: 13px; line-height: 20px; }
+.store-account-sheet .store-account-store p { margin: 4px 0; color: var(--store-ink); font-size: 16px; line-height: 24px; }
+.store-account-sheet .store-account-actions { padding-top: 16px; border-top: 1px solid var(--store-soft-edge); }
+.store-account-sheet .store-account-actions button { justify-content: flex-start; text-align: left; }
+.store-account-sheet .store-account-login svg { margin-left: auto; flex-shrink: 0; }
+@media (max-height: 500px) { .store-account-sheet .store-account-hero { padding-block: 16px; gap: 12px; } }
+@media (max-height: 500px) {
+  .store-barcode-scanner[data-slot="dialog-content"] .barcode-scanner-error { padding: 12px; }
+  .store-barcode-scanner .barcode-scanner-error-icon { display: none; }
+  .store-barcode-scanner .barcode-scanner-error-title { font-size: 14px; line-height: 20px; }
+  .store-barcode-scanner .barcode-scanner-error-message { font-size: 13px; line-height: 18px; margin-bottom: 8px; }
+}

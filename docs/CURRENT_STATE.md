@@ -1,5 +1,15 @@
 # Trạng thái hiện tại
 
+**POLISH03 — candidate30/10/2026:** hoàn tất2vòng theo owner: chung glyph
+barcode20px cho nút quét DATE/intake/KPH Fresh, giữ Pilot legacy; tối ưu camera
+recovery/footer≥44px và retry hiện trọn landscape. Account gom identity gọn,
+role theo metadata thay ghi cứng, focus không cuộn.315Store tests, online/mock
+build, browser390/1440/320/844 và chữ200% đạt. Preview
+<http://127.0.0.1:4402/#home>; [files/rounds/checks](delivery/polish03-scan-and-utilities/technical.md).
+Nhánh/worktree riêng từ6565972, root sole writer; owner pending. SEARCH02 và
+DATE05r2 chưa suy nghiệm thu. Đã rà login/settings, không đổi auth/legacy policy.
+Bước tiếp owner xem icon quét và panel tài khoản tại4402; dừng ở2vòng đã chốt.
+
 **SEARCH02 — candidate30/10/2026:** shared search có nhóm đề xuất/tìm gần đây/
 kết quả, count/empty/clear/keyboard; dữ liệu đúng phạm vi từng màn. Scan vào ô
 DATE và Tra mã hàng trong intake. Native top-layer giữ gợi ý khỏi bị surface

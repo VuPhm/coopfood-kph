@@ -1,0 +1,58 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "sameScanGlyph": true,
+    "touchTargets44": true,
+    "deniedRetryRecovery": true,
+    "intakeDraftPreserved": true,
+    "kphScan": true,
+    "accountBounds": true,
+    "accountText200": true,
+    "focusRestored": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "sameScanGlyph": true,
+    "touchTargets44": true,
+    "deniedRetryRecovery": true,
+    "intakeDraftPreserved": true,
+    "kphScan": true,
+    "accountBounds": true,
+    "accountText200": true,
+    "focusRestored": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "sameScanGlyph": true,
+    "touchTargets44": true,
+    "deniedRetryRecovery": true,
+    "intakeDraftPreserved": true,
+    "kphScan": true,
+    "accountBounds": true,
+    "accountText200": true,
+    "focusRestored": true
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "sameScanGlyph": true,
+    "touchTargets44": true,
+    "deniedRetryRecovery": true,
+    "intakeDraftPreserved": true,
+    "kphScan": true,
+    "accountBounds": true,
+    "accountText200": true,
+    "focusRestored": true
+  }
+]

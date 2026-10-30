@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@coopfood-kph/ui";
 import { ArrowRight, Home, Store } from "lucide-react";
 import { useRef, useState, type RefObject } from "react";
-import { StoreAccountTrigger, storeAccountIdentity } from "./store-account-trigger";
+import { StoreAccountTrigger, storeAccountIdentity, storeAccountRole } from "./store-account-trigger";
+import "./store-utility-polish.css";
 import type { StoreProfile } from "./store-profile";
 
 // Opening the account sheet should not render the entire active workspace.
@@ -31,12 +32,10 @@ export function StoreAccountSheet({ open, onOpenChange, profile, initials, trigg
   onLoginPreview: () => void;
 }) {
   return <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="store-account-sheet" closeTone="inverse" onCloseAutoFocus={event => { event.preventDefault(); triggerRef.current?.focus(); }}>
+    <DialogContent className="store-account-sheet" closeTone="inverse" onCloseAutoFocus={event => { event.preventDefault(); triggerRef.current?.focus({ preventScroll: true }); }}>
       <div className="store-account-hero">
         <DialogTitle>Tài khoản</DialogTitle>
-        <span className="store-account-avatar" aria-hidden="true">{initials}</span>
-        <h3>{profile.fullName}</h3>
-        <span className="store-account-role">Quản lý cửa hàng</span>
+        <div className="store-account-identity"><span className="store-account-avatar" aria-hidden="true">{initials}</span><div><h3>{profile.fullName}</h3><span className="store-account-role">{storeAccountRole(profile)}</span></div></div>
       </div>
       <DialogDescription className="sr-only">Thông tin tài khoản và cửa hàng đang sử dụng</DialogDescription>
       <div className="store-account-body">

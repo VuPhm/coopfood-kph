@@ -403,11 +403,11 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation 
           {/* Error state */}
           {status === "error" && (
             <div className="barcode-scanner-error absolute inset-0 bg-neutral-950 p-6 flex flex-col items-center justify-center text-center text-white z-10" role="alert">
-              <div className="rounded-full bg-red-500/20 p-3 mb-3 text-red-400">
+              <div className="barcode-scanner-error-icon rounded-full bg-red-500/20 p-3 mb-3 text-red-400">
                 <TriangleAlert size={32} />
               </div>
-              <p className="font-bold text-sm text-red-200 mb-1">Không thể dùng máy ảnh</p>
-              <p className="text-xs text-white/70 max-w-xs leading-relaxed mb-4">
+              <p className="barcode-scanner-error-title font-bold text-sm text-red-200 mb-1">Không thể dùng máy ảnh</p>
+              <p className="barcode-scanner-error-message text-xs text-white/70 max-w-xs leading-relaxed mb-4">
                 {errorMessage}
               </p>
               <div className="flex gap-2">
@@ -437,6 +437,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation 
                 onClick={() => {
                   void toggleTorch();
                 }}
+                aria-pressed={torchOn}
                 title={torchOn ? "Tắt đèn pin" : "Bật đèn pin"}
               >
                 {torchOn ? <FlashlightOff size={16} className="mr-1.5" /> : <Flashlight size={16} className="mr-1.5" />}

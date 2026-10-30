@@ -1,5 +1,5 @@
 /* Shared Store chrome only: page/portal headers, never chart or business-status colors. */
-.store-app, .store-login, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-scanner-screen {
+.store-app, .store-login, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-scanner-screen, .store-barcode-scanner {
   --store-chrome-base: #007a52;
   --store-chrome-background: linear-gradient(90deg, #005f43, #007a52 58%, #00805a);
   --cf-modal-header: var(--store-chrome-background);
