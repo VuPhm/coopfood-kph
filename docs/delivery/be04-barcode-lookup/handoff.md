@@ -37,5 +37,19 @@ mã thủ công. Region/chain không membership vẫn tra đúng scope; revoke r
 kế tiếp phải403 hoặc trở về chọn store khi refresh. Offline/503 không báo miss;
 phiên401 quay về login. Kiểm headless390×844/1440×1024, DOM/interaction/screenshot.
 
-Technical đang kiểm; owner chưa nghiệm thu. Không UI redesign, không thêm tính
+Technical PASS:76backend,363frontend/package và6E2E API thật.
+Owner chưa nghiệm thu UI. Không UI redesign, không thêm tính
 năng catalog publish hoặc lưu DATE/report/KPH. Không merge/push/deploy.
+
+## Preview
+
+<http://127.0.0.1:4382/#home>, backend8081/DB55434 riêng; previewBE03 tại4381
+không đổi. Fixture đã reset sau tests; dùng `employee.e2e` /
+`employee-e2e-password`, `region-manager.e2e` / `manager-e2e-password` hoặc
+`chain-admin.e2e` / `admin-e2e-password`. Login → chọn store → Tra mã hàng.
+
+Bước nhỏ tiếp BE05a: list/detail KPH theo D01; chốt interaction nếu đổi
+paging/selection trước wiring, không tự áp nối25 của mock vào online contract.
+[Commands/evidence/giới hạn](evidence.md).
+
+Candidate `607bcc0c625d38a9e57f3431f52974e75d7803a0`; final runtime checkpoint `fc87084`.

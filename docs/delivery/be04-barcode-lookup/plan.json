@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "be04-barcode-lookup",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Wire live barcode lookup to Store shell and align effective lookup scope with explicit owner decision.",
   "inScope": [
     "Current published barcode API, scan/manual lookup and NOT_FOUND draft UI",
@@ -15,7 +15,7 @@
     "UI acceptance/redesign, merge/push/deployment/Pages"
   ],
   "baseSha": "4a653345210425230a65eae9265b495d3afca065",
-  "candidateSha": "",
+  "candidateSha": "607bcc0c625d38a9e57f3431f52974e75d7803a0",
   "integrationOwner": "root",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -30,13 +30,19 @@
       "id": "lookup-technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "607bcc0c625d38a9e57f3431f52974e75d7803a0",
+      "evidence": "docs/delivery/be04-barcode-lookup/evidence.md"
     },
     {
       "id": "owner-lookup-acceptance",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pending",
+      "revision": 1,
+      "sha": "607bcc0c625d38a9e57f3431f52974e75d7803a0",
+      "evidence": "docs/delivery/be04-barcode-lookup/handoff.md"
     }
   ],
   "changes": [
@@ -49,5 +55,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Complete scoped browser/backend verification; UI remains provisional."
+  "nextAction": "Owner may try http://127.0.0.1:4382/#home; UI remains provisional. Next bounded backend slice BE05a KPH list/detail preserving D01."
 }
