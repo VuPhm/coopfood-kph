@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "polish03-scan-and-utilities",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Two bounded UI polish rounds: unify Store scan actions, then refresh aged scanner recovery and account utility.",
   "inScope": [
     "One scan glyph across DATE/search/intake/KPH Fresh; keep Pilot baseline",
@@ -15,7 +15,7 @@
     "Login redesign, new features, merge/push/deploy"
   ],
   "baseSha": "6565972d92644ed931bee9fa8c72792767e4c6e9",
-  "candidateSha": "",
+  "candidateSha": "52a54f5fba37a42c9931a6d819d65c9a4f743946",
   "integrationOwner": "root",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -23,14 +23,17 @@
     "docs/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "technical",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "52a54f5fba37a42c9931a6d819d65c9a4f743946",
+      "evidence": "docs/delivery/polish03-scan-and-utilities/technical.md"
     },
     {
       "id": "owner",
@@ -41,5 +44,17 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Define scope, acceptance gates and ownership before dispatch."
+  "nextAction": "Owner xem icon quét DATE/intake/KPH và account/camera recovery tại4402; hai vòng đã đạt kỹ thuật, dừng rà rộng, không merge/push/deploy.",
+  "completedRounds": [
+    {
+      "id": "scan-icons",
+      "sha": "59dc42c",
+      "result": "45targeted tests + Store types pass"
+    },
+    {
+      "id": "aged-utilities",
+      "sha": "52a54f5fba37a42c9931a6d819d65c9a4f743946",
+      "result": "48targeted +315Store +builds +4viewport browser pass"
+    }
+  ]
 }
