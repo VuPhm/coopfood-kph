@@ -1,7 +1,8 @@
 import { useId, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { Input } from "@coopfood-kph/ui";
-import { Search, X, ScanLine, Clock3, ArrowUpLeft } from "lucide-react";
+import { Search, X, Clock3, ArrowUpLeft } from "lucide-react";
 import "./store-search-field.css";
+import { StoreScanIcon } from "./store-scan-icon";
 
 export type SearchItem = { value: string; label: string; detail?: string; keywords?: string };
 export type SearchGroup = { label: string; items: readonly SearchItem[] };
@@ -62,7 +63,7 @@ export function StoreSearchField({ value, onValueChange, label, placeholder, cle
   }}>
     <label><Search size={18} aria-hidden="true" /><span className="sr-only">{label}</span><Input className="store-search-input" ref={field} disabled={disabled} autoComplete="off" inputMode="search" enterKeyHint="search" placeholder={placeholder} value={value} title={title} aria-controls={supported && open ? id : undefined} onClick={() => setOpen(true)} onFocus={() => { if (!suppressFocus.current) setOpen(true); }} onChange={event => { onValueChange(event.target.value); setOpen(true); }} onKeyDown={event => { if (event.key === "Enter" && !event.nativeEvent.isComposing) { remember(value); setOpen(false); if (onSearch) { event.preventDefault(); event.stopPropagation(); onSearch(value); } } }} /></label>
     {value && !disabled ? <button className="store-search-clear" type="button" aria-label={clearLabel} onClick={() => { onValueChange(""); setOpen(true); field.current?.focus({ preventScroll: true }); }}><X size={18} aria-hidden="true" /></button> : null}
-    {onScan ? <button className="store-search-scan" type="button" disabled={disabled} aria-label={scanLabel} onClick={() => { setOpen(false); onScan(); }}><ScanLine size={20} aria-hidden="true" /></button> : null}
+    {onScan ? <button className="store-search-scan" type="button" disabled={disabled} aria-label={scanLabel} onClick={() => { setOpen(false); onScan(); }}><StoreScanIcon /></button> : null}
     {supported && open && !disabled ? <div ref={menu} popover={nativePopover ? "manual" : undefined} className="store-search-menu" id={id} role="region" aria-label={`Gợi ý ${label}`}>
       {!needle && recent.length ? <section><div className="store-search-group-heading"><h3>Tìm gần đây</h3><button type="button" onClick={() => { setRecent([]); field.current?.focus({ preventScroll: true }); }}>Xóa lịch sử</button></div>{recent.map(term => <button className="store-search-option" key={term} type="button" onClick={() => choose(term)}><Clock3 size={17} aria-hidden="true" /><span><strong>{term}</strong></span><ArrowUpLeft size={16} aria-hidden="true" /></button>)}</section> : null}
       <div className="store-search-menu-title" aria-live="polite">{needle ? `${count} kết quả trong danh sách` : "Đề xuất theo nội dung hiện có"}</div>

@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coopfood-kph/ui";
+import { StoreScanIcon } from "./store-scan-icon";
 import type { BrowserMultiFormatReader, Exception, Result } from "@zxing/library";
 import {
   Camera,
@@ -21,6 +22,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { figmaAsset } from "./figma-assets";
 
 export type BarcodeScannerDialogProps = {
+  appearance?: "store";
   presentation?: "dialog" | "screen";
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -47,7 +49,8 @@ const NATIVE_BARCODE_FORMATS = ["ean_8", "ean_13", "upc_a", "code_128", "code_39
 const SCAN_INTERVAL_MS = 100;
 const SUCCESS_FEEDBACK_MS = 450;
 
-export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation = "dialog" }: BarcodeScannerDialogProps) {
+export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation = "dialog", appearance }: BarcodeScannerDialogProps) {
+  const storeTone = appearance === "store" || presentation === "screen";
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const zxingReaderRef = useRef<BrowserMultiFormatReader | null>(null);
@@ -333,14 +336,14 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         closeTone="inverse"
-        className={`barcode-scanner-dialog-content max-w-lg p-0 overflow-hidden ${presentation === "screen" ? "store-scanner-screen" : ""}`}
+        className={`barcode-scanner-dialog-content max-w-lg p-0 overflow-hidden ${storeTone ? "store-barcode-scanner" : ""} ${presentation === "screen" ? "store-scanner-screen" : ""}`}
         aria-describedby={descId}
         aria-labelledby={titleId}
       >
         <DialogHeader className="barcode-scanner-header">
           {presentation === "screen" ? <CloseButton className="store-scanner-close" tone="inverse" aria-label="Đóng quét mã" onClick={() => onOpenChange(false)} /> : null}
           <DialogTitle id={titleId} className="flex items-center gap-2 text-base font-bold text-white">
-            {presentation !== "screen" ? <ScanLine size={20} aria-hidden="true" className="text-emerald-400" /> : null}
+            {presentation !== "screen" ? storeTone ? <StoreScanIcon className="text-emerald-400" /> : <ScanLine size={20} aria-hidden="true" className="text-emerald-400" /> : null}
             <span>Quét mã SKU / UPC</span>
           </DialogTitle>
           <DialogDescription id={descId} className="text-xs text-white/70">
@@ -380,7 +383,7 @@ export function BarcodeScannerDialog({ onOpenChange, onScan, open, presentation 
           {status === "success" && (
             <div className="absolute inset-0 bg-emerald-600/40 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20 animate-in fade-in zoom-in-95 duration-200" role="status" aria-live="polite">
               <div className="rounded-full bg-emerald-500 p-3 shadow-lg mb-2">
-                <ScanLine size={32} className="text-white" />
+                {storeTone ? <StoreScanIcon size={32} className="text-white" /> : <ScanLine size={32} className="text-white" />}
               </div>
               <p className="text-sm font-bold tracking-wide">Đã nhận diện mã</p>
               <p className="text-lg font-black tracking-widest text-emerald-200 mt-1 font-mono bg-black/50 px-3 py-1 rounded-lg">
