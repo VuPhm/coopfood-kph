@@ -1,5 +1,24 @@
 # Trạng thái hiện tại
 
+**BE02 — technical PASS, owner pending 31/10/2026:** triển khai
+`GET /api/v1/me/store-access` trả active stores/capabilities KPH theo hợp scope
+membership/vùng/chain; refresh mỗi request, deduplicate, no-store, không tạo
+membership giả. Giữ session và `/api/v1/stores` cũ; không migration/UI/wiring.
+Full backend74tests (9HTTP mới) trên PostgreSQL17, contracts/generated client,
+TypeScript,347frontend/package tests và build/PWA PASS. Root sole writer trên
+`store-app/be01-backend-transition` từ main04f7c4a; Docker đã hoạt động.
+[Handoff và giới hạn](delivery/be02-store-access/handoff.md),
+[evidence](delivery/be02-store-access/evidence.md). Chưa merge/push/deploy;
+owner chưa nghiệm thu. Bước nhỏ tiếp BE03: nối session/chọn store của StoreApp
+với API discovery; chưa mở DATE/report persistence hoặc catalog inherited scope.
+
+**BE01 — chuyển dần sang backend, 30/10/2026:** đã rà implementation và tạo
+[lộ trình backend](delivery/be01-backend-transition/assessment.md) trên worktree
+riêng từ main `04f7c4a`. Ưu tiên effective store/capability discovery →
+identity/store context của StoreApp → lookup → KPH. DATE/report cần contract
+riêng; giữ UI đã chốt. Docker/OrbStack chưa chạy nên full backend integration
+và E2E chưa xác minh. Không merge/push/deploy.
+
 **FRESH01 revision5 — CLOSED, tích hợp27/10/2026:** owner yêu cầu merge các
 nhánh lân cận và cho phép1lần push. Main local đã merge candidate4368 cùng
 lịch sử12nhánh UI; sourcead85c66, runtime khớp bản đã xem. Compact01–03,

@@ -20,6 +20,7 @@ const acceptedKphLookupStatuses = ["FOUND", "NOT_FOUND", "MANUAL"];
 
 const apiFixtureSchemas = new Map([
   ["api/session.json", "SessionResponse"],
+  ["api/store-access.json", "EffectiveStoreAccess"],
   ["api/admin-users.json", "AdminUser"],
   ["api/credential-change.json", "ChangePasswordRequest"],
   ["api/barcode-found.json", "BarcodeLookupResponse"],

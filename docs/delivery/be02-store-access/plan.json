@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "be02-store-access",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Expose effective KPH store discovery without changing session memberships or business authorization.",
+  "inScope": [
+    "OpenAPI/examples/generated client",
+    "Read-only effective store and KPH capability API",
+    "HTTP PostgreSQL authorization and next-request refresh tests"
+  ],
+  "outOfScope": [
+    "StoreApp wiring/visual changes",
+    "DATE/report/catalog capability expansion",
+    "Migration, provisioning, deployment and Pages"
+  ],
+  "baseSha": "04f7c4a4d9001901c3973e7e6bbf5a2118932ee7",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [
+    "contracts/openapi/**",
+    "contracts/fixtures/**",
+    "packages/api/src/generated/**",
+    "scripts/check-contracts.mjs"
+  ],
+  "reviewLimit": 1,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "backend-contract-regression",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-api-acceptance",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "Owner “bắt đầu” 31/10/2026 after BE01 handoff",
+      "decision": "Implement BE02 in existing isolated BE01 worktree with root as sole writer; no team dispatch.",
+      "source": "User chat 31/10/2026: “bắt đầu”",
+      "impact": "Implement additive BE02 API; retain BE01 branch/worktree, no UI wiring or deployment."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Owner review API scenarios; next bounded slice BE03 session/store wiring, no automatic merge or deployment."
+}

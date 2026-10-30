@@ -136,6 +136,53 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /api/v1/me/store-access:
+    get:
+      tags: [Stores]
+      operationId: listMyStoreAccess
+      summary: List effective KPH store access of the current actor
+      description: |
+        Returns the complete unpaginated list of active stores in active regions
+        accessible through active membership, active region assignment or CHAIN_ADMIN.
+        Scope unions are deduplicated by store id. Ordered by store code using
+        PostgreSQL C collation, then id. Codes remain strings, including leading zeroes.
+        Capabilities are recomputed from database scope on every request. They are
+        navigation hints; business endpoints independently enforce authorization.
+        No DATE, reporting, catalog or administrative capability is implied.
+        Session memberships and GET /api/v1/stores retain their existing semantics.
+      responses:
+        '200':
+          description: Effective store access; an actor without KPH scope receives [].
+          headers:
+            Cache-Control:
+              description: Prevent storage of account-specific capability discovery.
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EffectiveStoreAccess'
+              examples:
+                employee:
+                  value:
+                    - id: 20000000-0000-4000-8000-000000000001
+                      code: '0001'
+                      name: Cửa hàng tổng hợp 01
+                      kph: {view: true, create: true, review: false, export: false}
+                inheritedManager:
+                  value:
+                    - id: 20000000-0000-4000-8000-000000000001
+                      code: '0001'
+                      name: Cửa hàng tổng hợp 01
+                      kph: {view: true, create: true, review: true, export: true}
+                noScope:
+                  value: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /api/v1/catalog/barcodes/{barcode}:
     get:
       tags: [Catalog]
@@ -988,6 +1035,36 @@ components:
           type: string
         role:
           $ref: '#/components/schemas/StoreRole'
+
+    EffectiveStoreAccess:
+      type: object
+      additionalProperties: false
+      required: [id, code, name, kph]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: Store identifier; leading zeroes are significant.
+        name:
+          type: string
+        kph:
+          $ref: '#/components/schemas/KphCapabilities'
+
+    KphCapabilities:
+      type: object
+      additionalProperties: false
+      required: [view, create, review, export]
+      properties:
+        view:
+          type: boolean
+        create:
+          type: boolean
+        review:
+          type: boolean
+        export:
+          type: boolean
 
     AdminUser:
       type: object

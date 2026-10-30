@@ -7,7 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import vn.coopfood.kph.foundation.web.ApiProblemException;
-import vn.coopfood.kph.identity.StoreRole;
 
 @Service
 public class KphStoreAccessPolicy {
@@ -20,7 +19,7 @@ public class KphStoreAccessPolicy {
 
     public StoreRef requireViewCreate(UUID storeId, Authentication authentication) {
         StoreAccessRepository.AccessSnapshot access = resolver.requireActiveStore(storeId, authentication);
-        if (access.membershipRole() == null && !access.regionManager() && !access.chainAdmin()) {
+        if (!access.canViewCreate()) {
             throw forbidden(
                     "STORE_ACCESS_DENIED",
                     "Active store membership, region scope or chain scope is required for KPH access.");
@@ -30,9 +29,7 @@ public class KphStoreAccessPolicy {
 
     public StoreRef requireReviewExport(UUID storeId, Authentication authentication) {
         StoreAccessRepository.AccessSnapshot access = resolver.requireActiveStore(storeId, authentication);
-        if (access.membershipRole() != StoreRole.STORE_MANAGER
-                && !access.regionManager()
-                && !access.chainAdmin()) {
+        if (!access.canReviewExport()) {
             throw forbidden(
                     "STORE_MANAGER_REQUIRED",
                     "Active KPH manager scope for this store, its region or the chain is required.");

@@ -83,7 +83,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/session", "/api/v1/stores").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/session", "/api/v1/stores", "/api/v1/me/store-access").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/password/change").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/catalog/barcodes/*").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/*/photos/*").authenticated()

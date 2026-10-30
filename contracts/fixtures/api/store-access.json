@@ -1,0 +1,24 @@
+[
+  {
+    "id": "20000000-0000-4000-8000-000000000001",
+    "code": "0001",
+    "name": "Cửa hàng tổng hợp 01",
+    "kph": {
+      "view": true,
+      "create": true,
+      "review": false,
+      "export": false
+    }
+  },
+  {
+    "id": "20000000-0000-4000-8000-000000000002",
+    "code": "0002",
+    "name": "Cửa hàng tổng hợp 02",
+    "kph": {
+      "view": true,
+      "create": true,
+      "review": true,
+      "export": true
+    }
+  }
+]

@@ -111,6 +111,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/store-access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List effective KPH store access of the current actor
+         * @description Returns the complete unpaginated list of active stores in active regions
+         *     accessible through active membership, active region assignment or CHAIN_ADMIN.
+         *     Scope unions are deduplicated by store id. Ordered by store code using
+         *     PostgreSQL C collation, then id. Codes remain strings, including leading zeroes.
+         *     Capabilities are recomputed from database scope on every request. They are
+         *     navigation hints; business endpoints independently enforce authorization.
+         *     No DATE, reporting, catalog or administrative capability is implied.
+         *     Session memberships and GET /api/v1/stores retain their existing semantics.
+         */
+        get: operations["listMyStoreAccess"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/catalog/barcodes/{barcode}": {
         parameters: {
             query?: never;
@@ -456,6 +483,20 @@ export interface components {
             code: string;
             name: string;
             role: components["schemas"]["StoreRole"];
+        };
+        EffectiveStoreAccess: {
+            /** Format: uuid */
+            id: string;
+            /** @description Store identifier; leading zeroes are significant. */
+            code: string;
+            name: string;
+            kph: components["schemas"]["KphCapabilities"];
+        };
+        KphCapabilities: {
+            view: boolean;
+            create: boolean;
+            review: boolean;
+            export: boolean;
         };
         AdminUser: {
             /** Format: uuid */
@@ -1027,6 +1068,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StoreContext"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listMyStoreAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Effective store access; an actor without KPH scope receives []. */
+            200: {
+                headers: {
+                    /** @description Prevent storage of account-specific capability discovery. */
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EffectiveStoreAccess"][];
                 };
             };
             401: components["responses"]["Unauthorized"];

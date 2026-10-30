@@ -14,7 +14,8 @@ Set `KPH_DATABASE_URL`, `KPH_DATABASE_USERNAME` and `KPH_DATABASE_PASSWORD`, the
 
 Public operational endpoints are limited to `/actuator/health`, its probe paths,
 `/actuator/info` and `POST /api/v1/auth/login`. Authenticated routes include
-session, store-scoped catalog/KPH, credential self-change and the scoped Admin
+session, effective KPH store discovery (`GET /api/v1/me/store-access`),
+store-scoped catalog/KPH, credential self-change and the scoped Admin
 APIs in the [OpenAPI contract](../contracts/openapi/kph.openapi.yaml); unmatched
 routes remain denied by default. KPH create requires CSRF,
 `Idempotency-Key` and one to three JPEG/PNG multipart photos. Local private
