@@ -1,0 +1,130 @@
+[
+  {
+    "branch": "store-app/list01-kph-layout",
+    "sha": "df77179ec8a81d1dd55d53aea421a208209c02ce",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "df77179ec8a81d1dd55d53aea421a208209c02ce",
+    "verified": true
+  },
+  {
+    "branch": "store-app/search01-consistent-fields",
+    "sha": "82d7a5e9d82c77f55285ea2f684fbf5ac8916342",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "82d7a5e9d82c77f55285ea2f684fbf5ac8916342",
+    "verified": true
+  },
+  {
+    "branch": "store-app/hero01-seamless-underlay",
+    "sha": "ffb4e37e259c456ee1b90719bbec7e89b7cf2ac1",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "ffb4e37e259c456ee1b90719bbec7e89b7cf2ac1",
+    "verified": true
+  },
+  {
+    "branch": "store-app/color01-feature-headers",
+    "sha": "2692c28b9ea7a25dc314ce9a0265f8d626a62ef1",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "2692c28b9ea7a25dc314ce9a0265f8d626a62ef1",
+    "verified": true
+  },
+  {
+    "branch": "store-app/motion01-page-transitions",
+    "sha": "c9dbbbad0d30d583617c96d30cccac01475e3899",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "c9dbbbad0d30d583617c96d30cccac01475e3899",
+    "verified": true
+  },
+  {
+    "branch": "store-app/notif01-compact-items",
+    "sha": "c4c7da23bf622a95cfeb82c0416d7d332ac451cf",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "c4c7da23bf622a95cfeb82c0416d7d332ac451cf",
+    "verified": true
+  },
+  {
+    "branch": "store-app/date04-intake-prep",
+    "sha": "a8d187a5f2d8c8600581f7ef9fd6650cd327d5f2",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "a8d187a5f2d8c8600581f7ef9fd6650cd327d5f2",
+    "verified": true
+  },
+  {
+    "branch": "store-app/kph03-selection-export",
+    "sha": "c2ac210b88331ca2ab54032766e4f82fc7a7512e",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "c2ac210b88331ca2ab54032766e4f82fc7a7512e",
+    "verified": true
+  },
+  {
+    "branch": "store-app/kph04-evidence-photos",
+    "sha": "f9e60d33e5b4d0323ee4b99325628f7a758de506",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "f9e60d33e5b4d0323ee4b99325628f7a758de506",
+    "verified": true
+  },
+  {
+    "branch": "store-app/date05-manual-intake",
+    "sha": "2cb92b73b0e9c509c42f3dbfd763b28321d6b179",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "2cb92b73b0e9c509c42f3dbfd763b28321d6b179",
+    "verified": true
+  },
+  {
+    "branch": "store-app/search02-grouped-discovery",
+    "sha": "6565972d92644ed931bee9fa8c72792767e4c6e9",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "6565972d92644ed931bee9fa8c72792767e4c6e9",
+    "verified": true
+  },
+  {
+    "branch": "store-app/polish03-scan-and-utilities",
+    "sha": "c7cc93910664dad66e2652a55cad76b8d53b4e4a",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "c7cc93910664dad66e2652a55cad76b8d53b4e4a",
+    "verified": true
+  },
+  {
+    "branch": "store-app/be01-backend-transition",
+    "sha": "2b42c94f685c5603a1ce000e4a30fe2fd21b2216",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "2b42c94f685c5603a1ce000e4a30fe2fd21b2216",
+    "verified": true
+  },
+  {
+    "branch": "store-app/be03-store-session",
+    "sha": "4a653345210425230a65eae9265b495d3afca065",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "4a653345210425230a65eae9265b495d3afca065",
+    "verified": true
+  },
+  {
+    "branch": "store-app/be04-barcode-lookup",
+    "sha": "eebe0103dc2b85d188eddcfea8ba64fae1777cc4",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "eebe0103dc2b85d188eddcfea8ba64fae1777cc4",
+    "verified": true
+  },
+  {
+    "branch": "store-app/be05-kph-history",
+    "sha": "3894d514e404ec4f4b8f974850242c908c0ace11",
+    "remoteBefore": null,
+    "status": "new",
+    "remoteAfter": "3894d514e404ec4f4b8f974850242c908c0ace11",
+    "verified": true
+  }
+]

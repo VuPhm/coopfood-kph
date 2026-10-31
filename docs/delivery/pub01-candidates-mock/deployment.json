@@ -1,0 +1,9 @@
+{
+  "Id": "964a4c68-2f8e-4949-afb7-9fb3049eec8a",
+  "Environment": "Production",
+  "Branch": "demo",
+  "Source": "c7cc939",
+  "Deployment": "https://964a4c68.coopfood-demo-20261021.pages.dev",
+  "Status": "24 seconds ago",
+  "Build": "https://dash.cloudflare.com/ffd2229a08803cd2da8f4aa4c0b0c437/pages/view/coopfood-demo-20261021/964a4c68-2f8e-4949-afb7-9fb3049eec8a"
+}

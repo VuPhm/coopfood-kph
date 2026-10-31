@@ -1,5 +1,16 @@
 # Trạng thái hiện tại
 
+**PUB01 — mock Cloudflare đã cập nhật31/10/2026:** owner yêu cầu push candidate
+trước khi nối backend và đưa UI đầy đủ cho khách xem. Đã atomic push16nhánh
+UI/backend, remote SHA khớp; publish đúng POLISH03c7cc939 lên
+<https://coopfood-demo-20261021.pages.dev/#home>, deployment964a4c68 (demo).
+369tests/verify/build PASS; Playwright local/public390×844/1440×1024 bảy màn,
+DATE/polish bốn viewport và nâng cấp PWA cache cũ PASS. Dữ liệu mock, không API.
+[Handoff/receipt/giới hạn](delivery/pub01-candidates-mock/handoff.md).
+Không merge main/backend/UI, không GitHub Pages; owner/khách chưa nghiệm thu
+candidate. Bước tiếp khách xem đúng link mới, rồi tích hợp UI POLISH03 với
+backend trong slice riêng; những mục no-push/no-deploy cũ bên dưới là lịch sử.
+
 **POLISH03 — candidate30/10/2026:** hoàn tất2vòng theo owner: chung glyph
 barcode20px cho nút quét DATE/intake/KPH Fresh, giữ Pilot legacy; tối ưu camera
 recovery/footer≥44px và retry hiện trọn landscape. Account gom identity gọn,

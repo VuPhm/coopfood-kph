@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "pub01-candidates-mock",
+  "revision": 1,
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Push prior UI/backend candidate branches, then publish the complete POLISH03 mock to the existing Cloudflare demo link.",
+  "inScope": [
+    "Push 16 exact candidate refs; verify remote SHAs",
+    "Build and verify POLISH03 mock c7cc939",
+    "Publish same Cloudflare Pages demo project and verify public assets/workflows"
+  ],
+  "outOfScope": [
+    "Merge into main or combine backend/UI",
+    "Protected GitHub Pages, tags, force or deletion",
+    "New design iteration, real operational data or online backend deployment"
+  ],
+  "baseSha": "c7cc93910664dad66e2652a55cad76b8d53b4e4a",
+  "candidateSha": "",
+  "integrationOwner": "root",
+  "sharedPaths": [],
+  "reviewLimit": 1,
+  "reviewRound": 1,
+  "teams": [],
+  "gates": [
+    {
+      "id": "push-and-mock-publication",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-publication-result",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Publication complete. Owner/customer review the public POLISH03 mock before any separate UI/backend integration; no automatic wiring."
+}

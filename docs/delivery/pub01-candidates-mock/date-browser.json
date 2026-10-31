@@ -1,0 +1,62 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "keyboardFocusReveal": true,
+    "immediateBeforeIdentity": true,
+    "twoKinds": true,
+    "scanPreservesManual": true,
+    "lookupScan": true,
+    "deniedRecovery": true,
+    "percent13And0And100": true,
+    "shortAndInvalidDates": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "keyboardFocusReveal": true,
+    "immediateBeforeIdentity": true,
+    "twoKinds": true,
+    "scanPreservesManual": true,
+    "lookupScan": true,
+    "deniedRecovery": true,
+    "percent13And0And100": true,
+    "shortAndInvalidDates": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "keyboardFocusReveal": true,
+    "immediateBeforeIdentity": true,
+    "twoKinds": true,
+    "scanPreservesManual": true,
+    "lookupScan": true,
+    "deniedRecovery": true,
+    "percent13And0And100": true,
+    "shortAndInvalidDates": true,
+    "text200": true
+  },
+  {
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "keyboardFocusReveal": true,
+    "immediateBeforeIdentity": true,
+    "twoKinds": true,
+    "scanPreservesManual": true,
+    "lookupScan": true,
+    "deniedRecovery": true,
+    "percent13And0And100": true,
+    "shortAndInvalidDates": true,
+    "text200": true
+  }
+]

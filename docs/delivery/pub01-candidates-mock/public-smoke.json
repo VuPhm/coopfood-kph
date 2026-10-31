@@ -1,0 +1,32 @@
+[
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "routes": 7,
+    "kphSearchAndForms": true,
+    "shelfCalculation": true,
+    "reportSaveAndExcel": true,
+    "serviceWorkerReady": true,
+    "errors": [],
+    "badResponses": [],
+    "apiRequests": [],
+    "external": []
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1024
+    },
+    "routes": 7,
+    "kphSearchAndForms": true,
+    "shelfCalculation": true,
+    "reportSaveAndExcel": true,
+    "serviceWorkerReady": true,
+    "errors": [],
+    "badResponses": [],
+    "apiRequests": [],
+    "external": []
+  }
+]
