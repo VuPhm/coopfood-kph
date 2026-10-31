@@ -15,7 +15,7 @@
     "New design iteration, real operational data or online backend deployment"
   ],
   "baseSha": "c7cc93910664dad66e2652a55cad76b8d53b4e4a",
-  "candidateSha": "",
+  "candidateSha": "5d7caad7734629fe1ef27eaf32badabcb4a54223",
   "integrationOwner": "root",
   "sharedPaths": [],
   "reviewLimit": 1,
@@ -26,13 +26,19 @@
       "id": "push-and-mock-publication",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "5d7caad7734629fe1ef27eaf32badabcb4a54223",
+      "evidence": "docs/delivery/pub01-candidates-mock/handoff.md"
     },
     {
       "id": "owner-publication-result",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pending",
+      "revision": 1,
+      "sha": "5d7caad7734629fe1ef27eaf32badabcb4a54223",
+      "evidence": "docs/delivery/pub01-candidates-mock/handoff.md"
     }
   ],
   "changes": [],
