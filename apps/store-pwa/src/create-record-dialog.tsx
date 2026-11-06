@@ -33,6 +33,7 @@ import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState, type Chang
 import { useForm, type UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
+import type { DemoRecord } from "./demo-records";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -42,7 +43,7 @@ import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 import { primeScanSuccessSound } from "./scanner-sound";
 import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
-import { EMPTY_SKU_MEMORY, REMEMBERED_SKU_FIELDS, skuMemoryKey, type RememberedSkuField, type SkuMemory } from "./sku-memory";
+import { EMPTY_SKU_MEMORY, REMEMBERED_SKU_FIELDS, findSkuSuggestions, skuMemoryKey, type RememberedSkuField, type SkuMemory } from "./sku-memory";
 
 function isDisplayDate(value: string) {
   try {
@@ -109,6 +110,7 @@ type CreateRecordDialogProps = {
   open: boolean;
   profile?: StoreProfile;
   skuMemory?: SkuMemory;
+  template?: DemoRecord | null;
   onOpenChange: (open: boolean) => void;
   onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
 };
@@ -118,26 +120,32 @@ const kindLabels: Record<KphKind, string> = {
   TPTS: "Thực phẩm tươi sống",
 };
 
-function defaultValues(kind: KphKind, profile: StoreProfile): FormData {
+function defaultValues(kind: KphKind, profile: StoreProfile, template?: DemoRecord | null): FormData {
   const options = KPH_OPTIONS[kind];
+  const choice = (choices: readonly { value: string; label: string }[], label: string) => {
+    const known = choices.find((item) => item.label === label);
+    return { value: known?.value ?? "OTHER", detail: known ? "" : label };
+  };
+  const condition = template ? choice(options.conditions, template.condition) : null;
+  const resolution = template ? choice(options.resolutions, template.resolution) : null;
   return {
     detectedDate: formatBusinessDate(new Date()).display,
-    barcode: "",
-    supplier: "",
-    productName: "",
-    quantity: "1",
-    unit: "EA",
-    condition: options.defaultCondition,
-    conditionDetail: "",
-    resolution: options.defaultResolution,
-    resolutionDetail: "",
-    treatmentDate: "",
+    barcode: template?.sku === "NHẬP TAY" ? "" : template?.sku ?? "",
+    supplier: template?.supplier === "Chưa nhập nhà cung cấp" ? "" : template?.supplier ?? "",
+    productName: template?.productName ?? "",
+    quantity: template ? String(template.quantityValue) : "1",
+    unit: template?.unit ?? "EA",
+    condition: condition?.value ?? options.defaultCondition,
+    conditionDetail: condition?.detail ?? "",
+    resolution: resolution?.value ?? options.defaultResolution,
+    resolutionDetail: resolution?.detail ?? "",
+    treatmentDate: template?.treatmentDate ?? "",
     detectedBy: profile.fullName,
-    note: "",
+    note: template?.note ?? "",
   };
 }
 
-export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile = DEFAULT_STORE_PROFILE, skuMemory = EMPTY_SKU_MEMORY }: CreateRecordDialogProps) {
+export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile = DEFAULT_STORE_PROFILE, skuMemory = EMPTY_SKU_MEMORY, template = null }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -148,11 +156,13 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const [activePhoto, setActivePhoto] = useState<PhotoDraft | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [weightExtracted, setWeightExtracted] = useState(false);
-  const [rememberedFields, setRememberedFields] = useState<RememberedSkuField[]>([]);
   const rememberedValuesRef = useRef<Partial<Record<RememberedSkuField, string>>>({});
-  const manuallyEditedFieldsRef = useRef(new Set<RememberedSkuField>());
   const observedBarcodeRef = useRef("");
   const barcodeTimeoutRef = useRef<number | null>(null);
+  const skuInputContainerRef = useRef<HTMLDivElement>(null);
+  const suggestionListRef = useRef<HTMLDivElement>(null);
+  const createDialogRef = useRef<HTMLDivElement>(null);
+  const [suggestionPosition, setSuggestionPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
   const skipPendingWeightRef = useRef(false);
   const focusTimeoutRef = useRef<number | null>(null);
   const sessionRef = useRef(0);
@@ -174,11 +184,73 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     defaultValues: formDefaults,
   });
 
+  const barcodeValue = watch("barcode");
+  const [suggestionQuery, setSuggestionQuery] = useState("");
+  const [suggestionsEnabled, setSuggestionsEnabled] = useState(true);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const suggestions = useMemo(() => suggestionsEnabled && suggestionQuery === barcodeValue.trim() ? findSkuSuggestions(skuMemory, activeKind, suggestionQuery) : [], [skuMemory, activeKind, suggestionQuery, barcodeValue, suggestionsEnabled]);
   const selectedCondition = watch("condition");
   const selectedResolution = watch("resolution");
   const detectedDate = watch("detectedDate");
   const treatmentDate = watch("treatmentDate");
   const initialMonth = useMemo(() => parseDisplayDate(detectedDate), [detectedDate]);
+
+  // Lookup follows the actual form value, independently of barcode weight/blur timers.
+  useEffect(() => {
+    setActiveSuggestion(-1);
+    if (!open || !suggestionsEnabled || !barcodeValue.trim()) { setSuggestionQuery(""); return; }
+    if (suggestionQuery === barcodeValue.trim()) return;
+    setSuggestionQuery("");
+    const timer = window.setTimeout(() => setSuggestionQuery(barcodeValue.trim()), 500);
+    return () => window.clearTimeout(timer);
+  }, [barcodeValue, activeKind, open, suggestionsEnabled]);
+
+  useEffect(() => {
+    if (!open) return;
+    const dismiss = (event: PointerEvent) => {
+      if (event.target instanceof Node && !skuInputContainerRef.current?.contains(event.target) && !suggestionListRef.current?.contains(event.target)) setSuggestionsEnabled(false);
+    };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, [open]);
+
+  // Render beside the scrollport, in the dialog layer: no ancestor scroll clipping.
+  useLayoutEffect(() => {
+    if (!open || !suggestions.length) { setSuggestionPosition(null); return; }
+    const trackAnchor = () => {
+      const anchor = skuInputContainerRef.current;
+      const dialog = createDialogRef.current;
+      if (!anchor || !dialog) return;
+      const rect = anchor.getBoundingClientRect();
+      const bounds = dialog.getBoundingClientRect();
+      if (!bounds.height) { setSuggestionPosition({ left: 0, top: 0, width: rect.width, maxHeight: 224 }); return; }
+      const viewport = window.visualViewport;
+      const upper = Math.max(bounds.top + 8, (viewport?.offsetTop ?? 0) + 8);
+      const lower = Math.min(bounds.bottom - 8, (viewport?.offsetTop ?? 0) + (viewport?.height ?? window.innerHeight) - 8);
+      if (rect.bottom < upper || rect.top > lower) { setSuggestionPosition(null); return; }
+      const below = Math.max(0, lower - rect.bottom - 4);
+      const above = Math.max(0, rect.top - upper - 4);
+      const upwards = below < 160 && above > below;
+      const maxHeight = Math.min(224, upwards ? above : below);
+      const height = Math.min(suggestionListRef.current?.scrollHeight ?? 224, maxHeight);
+      setSuggestionPosition({
+        left: Math.max(8, rect.left - bounds.left),
+        top: upwards ? rect.top - bounds.top - height - 4 : rect.bottom - bounds.top + 4,
+        width: Math.min(rect.width, bounds.width - 16), maxHeight,
+      });
+    };
+    trackAnchor();
+    document.addEventListener("scroll", trackAnchor, true);
+    window.addEventListener("resize", trackAnchor);
+    window.visualViewport?.addEventListener("resize", trackAnchor);
+    window.visualViewport?.addEventListener("scroll", trackAnchor);
+    return () => {
+      document.removeEventListener("scroll", trackAnchor, true);
+      window.removeEventListener("resize", trackAnchor);
+      window.visualViewport?.removeEventListener("resize", trackAnchor);
+      window.visualViewport?.removeEventListener("scroll", trackAnchor);
+    };
+  }, [open, suggestions.length, suggestionQuery]);
 
   function isCurrentSession(session: number) {
     return mountedRef.current && session === sessionRef.current;
@@ -200,7 +272,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
       focusTimeoutRef.current = null;
       releasePendingPhotoUrls();
     };
-  }, [kind, open, profile]);
+  }, [kind, open, profile, template]);
 
   function cancelPendingBarcodeCompletion() {
     if (barcodeTimeoutRef.current !== null) window.clearTimeout(barcodeTimeoutRef.current);
@@ -224,6 +296,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   }
 
   function scheduleBarcodeCompletion(barcode: string) {
+    setSuggestionsEnabled(true);
+    setSuggestionQuery("");
     cancelPendingBarcodeCompletion();
     setWeightExtracted(false);
     prepareRememberedBarcode(barcode);
@@ -231,15 +305,8 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     barcodeTimeoutRef.current = window.setTimeout(() => completeBarcode(barcode, !skipPendingWeightRef.current), 500);
   }
 
-  function updateRememberedFields() {
-    const next = REMEMBERED_SKU_FIELDS.filter((field) => rememberedValuesRef.current[field] !== undefined);
-    setRememberedFields((current) => current.join() === next.join() ? current : next);
-  }
-
   function markRememberedFieldEdited(field: RememberedSkuField) {
-    manuallyEditedFieldsRef.current.add(field);
     delete rememberedValuesRef.current[field];
-    updateRememberedFields();
   }
 
   function prepareRememberedBarcode(barcode: string) {
@@ -251,33 +318,42 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     }
     observedBarcodeRef.current = code;
     rememberedValuesRef.current = {};
-    manuallyEditedFieldsRef.current.clear();
-    updateRememberedFields();
   }
 
   function completeBarcode(barcode: string, applyWeight = true) {
     cancelPendingBarcodeCompletion();
     prepareRememberedBarcode(barcode);
     if (applyWeight) applyFreshFoodWeight(barcode);
+    if (suggestionsEnabled) setSuggestionQuery(barcode.trim());
+  }
+
+  function applySkuSuggestion(barcode: string) {
+    const changed = getValues("barcode").trim() !== barcode;
+    cancelPendingBarcodeCompletion();
+    prepareRememberedBarcode(barcode);
+    setValue("barcode", barcode, { shouldDirty: true, shouldValidate: true });
+    if (changed) applyFreshFoodWeight(barcode);
     if (!kind) return;
     const key = skuMemoryKey(kind, barcode);
     const remembered = key ? skuMemory.get(key) : undefined;
     if (!remembered) return;
     for (const field of REMEMBERED_SKU_FIELDS) {
-      if (remembered[field] && !getValues(field).trim() && !manuallyEditedFieldsRef.current.has(field)) {
+      if (remembered[field]) {
         setValue(field, remembered[field], { shouldDirty: true, shouldValidate: true });
         rememberedValuesRef.current[field] = remembered[field];
       }
     }
-    updateRememberedFields();
+    setFocus("barcode");
+    setSuggestionsEnabled(false);
+    setSuggestionQuery("");
   }
 
   function resetRememberedFields() {
+    setSuggestionsEnabled(true);
+    setSuggestionQuery("");
     cancelPendingBarcodeCompletion();
     observedBarcodeRef.current = "";
     rememberedValuesRef.current = {};
-    manuallyEditedFieldsRef.current.clear();
-    setRememberedFields([]);
   }
 
   function clearPhotos() {
@@ -292,11 +368,11 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   useEffect(() => {
     clearWeightExtraction();
     if (!kind) return;
-    reset(defaultValues(kind, profile));
+    reset(defaultValues(kind, profile, template));
     resetRememberedFields();
     clearPhotos();
     setPhotoError("");
-  }, [kind, profile, reset]);
+  }, [kind, profile, reset, template]);
 
   useEffect(() => {
     if (!open) clearWeightExtraction();
@@ -420,7 +496,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0" aria-describedby="create-description">
+        <DialogContent ref={createDialogRef} className="create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0" aria-describedby="create-description" onEscapeKeyDown={(event) => { if (suggestions.length) { event.preventDefault(); setSuggestionsEnabled(false); } }}>
           <DialogHeader className="create-dialog-header">
             <DialogTitle className="create-dialog-title">Tạo phiếu KPH · {kindLabels[kind]}</DialogTitle>
             <DialogDescription id="create-description" className="sr-only">
@@ -435,10 +511,20 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                   <CalendarInput id="detected-date" initialMonth={initialMonth} label="Ngày phát hiện" value={detectedDate} readOnly onValueChange={(value) => setValue("detectedDate", value, { shouldDirty: true })} />
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
-                  <div className="relative">
-                    <Input id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", {
+                  <div className="relative" ref={skuInputContainerRef}>
+                    <Input id="barcode" className="pr-12" role="combobox" aria-autocomplete="list" aria-expanded={suggestions.length > 0} aria-controls={suggestions.length ? "sku-suggestions" : undefined} aria-activedescendant={activeSuggestion >= 0 && suggestions[activeSuggestion] ? `sku-suggestion-${activeSuggestion}` : undefined} autoComplete="off" placeholder="Nhập mã hoặc tên hàng" onFocus={() => setSuggestionsEnabled(true)} onKeyDown={(event) => {
+                      if (event.key === "Escape" && suggestions.length) {
+                        event.preventDefault(); event.stopPropagation(); setSuggestionsEnabled(false);
+                      } else if ((event.key === "ArrowDown" || event.key === "ArrowUp") && suggestions.length) {
+                        event.preventDefault();
+                        setActiveSuggestion((index) => event.key === "ArrowDown" ? (index + 1) % suggestions.length : (index <= 0 ? suggestions.length - 1 : index - 1));
+                      } else if (event.key === "Enter" && suggestions.length) {
+                        event.preventDefault();
+                        applySkuSuggestion(suggestions[activeSuggestion < 0 ? 0 : activeSuggestion]!.code);
+                      }
+                    }} {...register("barcode", {
                       onChange: (event) => scheduleBarcodeCompletion(event.target.value),
-                      onBlur: (event) => completeBarcode(event.target.value, !skipPendingWeightRef.current),
+                      onBlur: (event) => { completeBarcode(event.target.value, !skipPendingWeightRef.current); if (event.relatedTarget) setSuggestionsEnabled(false); },
                     })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => {
                       primeScanSuccessSound();
@@ -446,16 +532,17 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                     }}>
                       <ScanLine aria-hidden="true" size={18} />
                     </button>
+
                   </div>
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
-                  <Input id="supplier" placeholder="Điền tên NCC" aria-describedby={rememberedFields.includes("supplier") ? "sku-memory-note" : undefined} {...register("supplier", { onChange: () => markRememberedFieldEdited("supplier") })} />
+                  <Input id="supplier" placeholder="Điền tên NCC" {...register("supplier", { onChange: () => markRememberedFieldEdited("supplier") })} />
                 </Field>
                 <Field label="Tên hàng hóa" htmlFor="product-name" error={errors.productName?.message}>
-                  <Input id="product-name" placeholder="Điền tên hàng hóa" aria-describedby={rememberedFields.includes("productName") ? "sku-memory-note" : undefined} {...register("productName", { onChange: () => markRememberedFieldEdited("productName") })} />
+                  <Input id="product-name" placeholder="Điền tên hàng hóa" {...register("productName", { onChange: () => markRememberedFieldEdited("productName") })} />
                 </Field>
               </div>
-              {rememberedFields.length ? <p id="sku-memory-note" className="mt-2 text-xs text-ink-muted" role="status">Đã điền {rememberedFields.map((field) => field === "productName" ? "tên hàng" : "nhà cung cấp").join(" và ")} từ phiếu đã lưu có mã này trên thiết bị. Bạn có thể sửa.</p> : null}
+
             </FormSection>
 
             <FormSection number="2" title="Số lượng & đơn vị">
@@ -512,6 +599,13 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
               <Button type="submit" disabled={processingPhotos || savingRecord}>{processingPhotos || savingRecord ? <><LoaderCircle className="animate-spin" size={17} aria-hidden="true" />{processingPhotos ? "Đang xử lý ảnh" : "Đang lưu phiếu"}</> : "Lưu phiếu"}</Button>
             </footer>
           </form>
+          {suggestions.length ? <div ref={suggestionListRef} id="sku-suggestions" style={{ ...suggestionPosition, visibility: suggestionPosition ? "visible" : "hidden" }} className="sku-memory-list" role="listbox" aria-label="Đề xuất SKU">
+            {suggestions.map((suggestion, index) => <button id={`sku-suggestion-${index}`} key={suggestion.code} type="button" role="option" tabIndex={-1} aria-selected={index === activeSuggestion} className="sku-memory-suggestion" onPointerDown={(event) => event.preventDefault()} onMouseDown={(event) => event.preventDefault()} onClick={() => applySkuSuggestion(suggestion.code)}>
+              <strong>{suggestion.code}</strong>
+              {suggestion.productName ? <span>{suggestion.productName}</span> : null}
+              {suggestion.supplier ? <small>{suggestion.supplier}</small> : null}
+            </button>)}
+          </div> : null}
         </DialogContent>
       </Dialog>
 

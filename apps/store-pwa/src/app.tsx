@@ -1,6 +1,6 @@
 import { getConditionTone, getResolutionTone, type KphKind } from "@coopfood-kph/kph-rules";
 import { Button, cn, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, Tag } from "@coopfood-kph/ui";
-import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, ChevronDown, ChevronRight, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, Store, Trash2, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Building2, CalendarDays, CopyPlus, ChevronDown, ChevronRight, ChevronUp, ChevronsDown, ChevronsUp, FileDown, FileSpreadsheet, History, ListFilter, LoaderCircle, PackagePlus, RotateCcw, Salad, Scale, Store, Trash2, UserRound } from "lucide-react";
 import { type KeyboardEvent, type MouseEvent, memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { assetUrl } from "./asset-url";
@@ -145,6 +145,8 @@ function KphCreateActions({ disabled, profile, onSaved, skuMemory }: {
 }
 
 export function App() {
+  const [template, setTemplate] = useState<DemoRecord | null>(null);
+  const duplicateRecord = useCallback((record: DemoRecord) => setTemplate(record), []);
   const [records, setRecords] = useState<readonly DemoRecord[]>(initialRecords);
   const [activeKind, setActiveKind] = useState<KphKind>("TPCN");
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
@@ -633,7 +635,7 @@ export function App() {
                 </tr>
               </thead>
               <tbody>{visibleRecords.length > 0
-                ? renderedRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)
+                ? renderedRecords.map((record) => <RecordRow key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDuplicate={duplicateRecord} onDelete={requestDelete} onRestore={restoreRecord} onToggle={toggleSelection} />)
                 : <tr><td className="empty-history-cell" colSpan={10}>{emptyHistoryMessage}</td></tr>}
               </tbody>
             </table>
@@ -641,7 +643,7 @@ export function App() {
 
           <div className="grid gap-3 mobile-history">
             {visibleRecords.length > 0
-              ? renderedRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
+              ? renderedRecords.map((record) => <RecordCard key={record.id} approvalStatus={approvalByRecord[record.id] ?? record.approvalStatus} expanded={expandedMobileRecords.has(record.id)} record={record} selected={selected.has(record.id)} trashMode={trashMode} onApprovalChange={updateApproval} onDuplicate={duplicateRecord} onDelete={requestDelete} onRestore={restoreRecord} onExpansionChange={setMobileRecordExpanded} onToggle={toggleSelection} />)
               : <p className="empty-history-card">{emptyHistoryMessage}</p>}
           </div>
           {visibleRecords.length > HISTORY_BATCH_SIZE ? <div className="history-load-more">
@@ -657,6 +659,7 @@ export function App() {
         </div>
       </main>
 
+      <CreateRecordDialog kind={template?.kind ?? null} open={template !== null} template={template} profile={storeProfile} skuMemory={skuMemory} onSaved={saveCreatedRecord} onOpenChange={(open) => { if (!open) setTemplate(null); }} />
       <StoreSettingsDialog open={storeSettingsOpen} profile={storeProfile} onOpenChange={setStoreSettingsOpen} onSaved={saveStoreSettings} />
 
       <Dialog open={deleteIds.length > 0} onOpenChange={(open) => { if (!open) setDeleteIds([]); }}>
@@ -819,13 +822,14 @@ type RecordProps = {
   selected: boolean;
   trashMode: boolean;
   onApprovalChange: (id: string, status: DemoApprovalStatus) => void;
+  onDuplicate: (record: DemoRecord) => void;
   onDelete: (id: string) => void;
   onExpansionChange?: (id: string, expanded: boolean) => void;
   onRestore: (id: string) => void;
   onToggle: (id: string) => void;
 };
 
-const RecordRow = memo(function RecordRow({ approvalStatus, onApprovalChange, onDelete, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
+const RecordRow = memo(function RecordRow({ approvalStatus, onApprovalChange, onDuplicate, onDelete, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
   return <tr className={cn("record-row", selected && "is-selected")}>
     <td className="p-3 text-center"><input type="checkbox" checked={selected} onChange={() => onToggle(record.id)} aria-label={`Chọn phiếu ${record.id}`} /></td>
     <td className="p-3"><strong>{record.detectedDate}</strong><br /><span className="text-ink-muted">{record.detectedBy}</span></td>
@@ -835,12 +839,12 @@ const RecordRow = memo(function RecordRow({ approvalStatus, onApprovalChange, on
     <td className="p-3"><Tag className="status-badge" tone={getConditionTone(record.condition)}>{record.condition}</Tag></td>
     <td className="p-3"><Tag className="resolution-badge" tone={getResolutionTone(record.resolution)}>{record.resolution}</Tag></td>
     <td className="p-3"><RecordPhotoGallery photos={record.photos} recordId={record.id} variant="table" /></td>
-    <td className="p-3"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></td>
+    <td className="p-3"><span className="record-approval-actions"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} />{!trashMode ? <DuplicateRecordButton record={record} onDuplicate={onDuplicate} /> : null}</span></td>
     <td className="p-3 text-center"><RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} /></td>
   </tr>;
 });
 
-const RecordCard = memo(function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDelete, onExpansionChange, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
+const RecordCard = memo(function RecordCard({ approvalStatus, expanded = false, onApprovalChange, onDuplicate, onDelete, onExpansionChange, onRestore, onToggle, record, selected, trashMode }: RecordProps) {
   function isInteractiveTarget(event: MouseEvent<HTMLElement>) {
     return event.target instanceof HTMLElement && event.target.closest("button, input, select, label") !== null;
   }
@@ -885,21 +889,25 @@ const RecordCard = memo(function RecordCard({ approvalStatus, expanded = false, 
     </> : null}
     <footer className="record-card-footer">
       {!expanded ? (
-        <RecordCardStatuses approvalStatus={approvalStatus} compact onApprovalChange={onApprovalChange} record={record} />
+        <RecordCardStatuses approvalStatus={approvalStatus} compact onDuplicate={onDuplicate} trashMode={trashMode} onApprovalChange={onApprovalChange} record={record} />
       ) : (
-        <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
+        <div className="record-card-approval"><span className="record-approval-actions"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} />{!trashMode ? <DuplicateRecordButton record={record} onDuplicate={onDuplicate} /> : null}</span></div>
       )}
       <RecordHistoryActionButton recordId={record.id} trashMode={trashMode} onDelete={onDelete} onRestore={onRestore} />
     </footer>
   </article>;
 });
 
-function RecordCardStatuses({ approvalStatus, compact = false, onApprovalChange, record }: { approvalStatus: DemoApprovalStatus; compact?: boolean; onApprovalChange: RecordProps["onApprovalChange"]; record: DemoRecord }) {
+function RecordCardStatuses({ approvalStatus, compact = false, onApprovalChange, onDuplicate, record, trashMode }: Pick<RecordProps, "approvalStatus" | "onApprovalChange" | "onDuplicate" | "record" | "trashMode"> & { compact?: boolean }) {
   return <div className={cn("record-card-statuses", compact && "record-card-compact-outcomes")} aria-label="Tình trạng, biện pháp và duyệt">
     <Tag className="status-badge" tone={getConditionTone(record.condition)} title={`Tình trạng: ${record.condition}`}>{record.condition}</Tag>
     <Tag className="resolution-badge" tone={getResolutionTone(record.resolution)} title={`Biện pháp: ${record.resolution}`}>{record.resolution}</Tag>
-    <div className="record-card-approval"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} /></div>
+    <div className="record-card-approval"><span className="record-approval-actions"><ApprovalControl recordId={record.id} status={approvalStatus} onChange={onApprovalChange} />{!trashMode ? <DuplicateRecordButton record={record} onDuplicate={onDuplicate} /> : null}</span></div>
   </div>;
+}
+
+function DuplicateRecordButton({ record, onDuplicate }: Pick<RecordProps, "record" | "onDuplicate">) {
+  return <button type="button" className="record-duplicate" aria-label={`Tạo phiếu tương tự ${record.id}`} title="Tạo phiếu tương tự" onClick={() => onDuplicate(record)}><CopyPlus size={17} aria-hidden="true" /></button>;
 }
 
 function ApprovalControl({ onChange, recordId, status }: { onChange: (id: string, status: DemoApprovalStatus) => void; recordId: string; status: DemoApprovalStatus }) {

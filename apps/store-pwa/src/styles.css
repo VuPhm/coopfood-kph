@@ -1036,3 +1036,14 @@ html[data-focus-modality="keyboard"] .photo-picker:has(input:focus) { outline: 3
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+.sku-memory-suggestion { display: flex; flex-direction: column; gap: 2px; width: 100%; min-height: 44px; padding: 10px 12px; border: 0; border-bottom: 1px solid #e7ece9; background: white; color: var(--color-ink); text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+.sku-memory-suggestion strong { color: #006b4b; font: 700 13px ui-monospace, monospace; }
+.sku-memory-suggestion span { font-size: 14px; }
+.sku-memory-suggestion small { font-size: 12px; color: var(--color-ink-muted); }
+.sku-memory-suggestion:hover, .sku-memory-suggestion[aria-selected="true"] { background: #edf8f1; }
+.sku-memory-suggestion:focus-visible, .record-duplicate:focus-visible { outline: 3px solid #007a52; outline-offset: -3px; }
+.record-approval-actions { display: inline-flex; align-items: center; gap: 4px; }
+.record-duplicate { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; min-height: 44px; border-radius: 8px; color: #006b4b; cursor: pointer; }
+.record-duplicate:hover { background: #edf8f1; }
+.sku-memory-list { position: absolute; z-index: 80; max-height: 224px; pointer-events: auto; overflow-y: auto; overscroll-behavior: contain; border: 1px solid #c9d8cf; border-radius: 12px; background: white; box-shadow: 0 8px 24px #173d2926; }

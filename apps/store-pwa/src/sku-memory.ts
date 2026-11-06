@@ -42,3 +42,17 @@ export function buildSkuMemory(
   }
   return memory;
 }
+
+export function findSkuSuggestions(memory: SkuMemory, kind: KphKind, input: string) {
+  const normalize = (value: string) => value.trim().toLocaleLowerCase("vi").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
+  const query = normalize(input);
+  if (!query || query.length > 50) return [];
+  const prefix = `${kind}:`;
+  return [...memory.entries()]
+    .filter(([key, info]) => key.startsWith(prefix) && (normalize(key.slice(prefix.length)).includes(query) || normalize(info.productName).includes(query)))
+    .map(([key, info]) => ({ code: key.slice(prefix.length), ...info }))
+    .sort((a, b) => {
+      const rank = (code: string) => code.toLocaleLowerCase("vi") === query ? 0 : code.toLocaleLowerCase("vi").startsWith(query) ? 1 : 2;
+      return rank(a.code) - rank(b.code) || a.code.localeCompare(b.code, "vi");
+    }).slice(0, 8);
+}

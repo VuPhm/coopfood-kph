@@ -75,3 +75,23 @@ describe("local SKU memory", () => {
     expect(Object.keys(memory.get("TPCN:code-999")!)).toEqual(["productName", "supplier"]);
   });
 });
+
+it("lists partial SKU matches with exact/prefix matches first and keeps food kinds separate", async () => {
+  const { findSkuSuggestions } = await import("./sku-memory");
+  const memory = new Map([
+    ["TPCN:00123", { productName: "A", supplier: "NCC A" }],
+    ["TPCN:00124", { productName: "B", supplier: "NCC B" }],
+    ["TPCN:990012", { productName: "C", supplier: "NCC C" }],
+    ["TPTS:00125", { productName: "D", supplier: "NCC D" }],
+  ]);
+  expect(findSkuSuggestions(memory, "TPCN", "0012").map(item => item.code)).toEqual(["00123", "00124", "990012"]);
+  expect(findSkuSuggestions(memory, "TPCN", "00124").map(item => item.code)).toEqual(["00124"]);
+  expect(findSkuSuggestions(memory, "TPCN", "")).toEqual([]);
+  expect(findSkuSuggestions(memory, "TPCN", "missing")).toEqual([]);
+});
+
+it("suggests saved SKU codes even when name and supplier are empty display placeholders", async () => {
+  const { findSkuSuggestions } = await import("./sku-memory");
+  const memory = buildSkuMemory([source({ sku: "890001", productName: "Sản phẩm 890001", supplier: "Chưa nhập nhà cung cấp" })], new Set(), {});
+  expect(findSkuSuggestions(memory, "TPCN", "89")).toEqual([{ code: "890001", productName: "", supplier: "" }]);
+});

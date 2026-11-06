@@ -71,14 +71,14 @@ describe("Create KPH record", () => {
       throw new Error("Error preparing Blob/File data to be stored in object store");
     });
     renderDialog("TPCN", onSaved);
-    fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Nhân viên thử nghiệm" } });
     const picker = screen.getByText("Chọn ảnh").closest("label")!.querySelector("input")!;
     fireEvent.change(picker, { target: { files: [new File(["original"], "test.jpg", { type: "image/jpeg" })] } });
     await screen.findByText(/Đã xử lý 1\/3 ảnh/);
     fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Error preparing Blob/File data");
-    expect(screen.getByRole("textbox", { name: "Mã SKU / UPC" })).toHaveValue("000123");
+    expect(screen.getByRole("combobox", { name: "Mã SKU / UPC" })).toHaveValue("000123");
     expect(screen.getByRole("button", { name: "Xem ảnh minh chứng 1" })).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Lưu phiếu" }));
     await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(2));
@@ -92,7 +92,7 @@ describe("Create KPH record", () => {
     ["2912345699995", "9.999"],
   ])("fills TPTS quantity and kg on blur for %s, without parsing during typing", (barcode, quantity) => {
     renderDialog("TPTS");
-    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    const barcodeInput = screen.getByRole("combobox", { name: "Mã SKU / UPC" });
     fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
     fireEvent.change(barcodeInput, { target: { value: barcode } });
     expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7");
@@ -110,7 +110,7 @@ describe("Create KPH record", () => {
     vi.useFakeTimers();
     try {
       renderDialog("TPTS");
-      const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+      const barcodeInput = screen.getByRole("combobox", { name: "Mã SKU / UPC" });
       fireEvent.focus(barcodeInput);
       fireEvent.change(barcodeInput, { target: { value: "291234561234" } });
       await act(async () => { vi.advanceTimersByTime(300); });
@@ -147,7 +147,7 @@ describe("Create KPH record", () => {
     try {
       renderDialog(kind);
       fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
-      fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: barcode } });
+      fireEvent.change(screen.getByRole("combobox", { name: "Mã SKU / UPC" }), { target: { value: barcode } });
       await act(async () => { vi.advanceTimersByTime(500); });
       expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7");
       expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
@@ -162,7 +162,7 @@ describe("Create KPH record", () => {
     try {
       const props = { kind: "TPTS" as const, onOpenChange: vi.fn(), onSaved: vi.fn() };
       const { rerender } = render(<CreateRecordDialog {...props} open />);
-      const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+      const barcodeInput = screen.getByRole("combobox", { name: "Mã SKU / UPC" });
       fireEvent.change(barcodeInput, { target: { value: "2912345612345" } });
       await act(async () => { vi.advanceTimersByTime(500); });
       expect(screen.getByText("Trọng lượng đã được trích xuất từ mã barcode.")).toBeVisible();
@@ -189,7 +189,7 @@ describe("Create KPH record", () => {
   ] as const)("preserves entered quantity and unit for %s barcode %s", (kind, barcode) => {
     renderDialog(kind);
     fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
-    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    const barcodeInput = screen.getByRole("combobox", { name: "Mã SKU / UPC" });
     fireEvent.change(barcodeInput, { target: { value: barcode } });
     fireEvent.blur(barcodeInput);
 
@@ -200,7 +200,7 @@ describe("Create KPH record", () => {
 
   it("fills zero weight but still rejects it through the existing quantity validation", async () => {
     const onSaved = renderDialog("TPTS");
-    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" });
+    const barcodeInput = screen.getByRole("combobox", { name: "Mã SKU / UPC" });
     fireEvent.change(barcodeInput, { target: { value: "2912345600005" } });
     fireEvent.blur(barcodeInput);
     expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("0");
@@ -235,7 +235,7 @@ describe("Create KPH record", () => {
       fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7" } });
       fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
 
-      await waitFor(() => expect(screen.getByRole("textbox", { name: "Mã SKU / UPC" })).toHaveValue(barcode), { timeout: 1_500 });
+      await waitFor(() => expect(screen.getByRole("combobox", { name: "Mã SKU / UPC" })).toHaveValue(barcode), { timeout: 1_500 });
 
       expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue(quantity);
       expect(screen.getByRole("radio", { name: unit })).toBeChecked();
@@ -294,7 +294,7 @@ describe("Create KPH record", () => {
 
   it("fills the barcode input when barcode is scanned", async () => {
     renderDialog();
-    const barcodeInput = screen.getByRole("textbox", { name: "Mã SKU / UPC" }) as HTMLInputElement;
+    const barcodeInput = screen.getByRole("combobox", { name: "Mã SKU / UPC" }) as HTMLInputElement;
     expect(barcodeInput.value).toBe("");
 
     fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
@@ -334,7 +334,7 @@ describe("Create KPH record", () => {
       height: 720,
     });
     const onSaved = renderDialog();
-    fireEvent.change(screen.getByRole("textbox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Mã SKU / UPC" }), { target: { value: "000123" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Tên hàng hóa" }), { target: { value: "Sản phẩm kiểm thử" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Tên người nhập" }), { target: { value: "Trần An" } });
     const picker = screen.getByText("Chọn ảnh").closest("label")?.querySelector("input");
