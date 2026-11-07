@@ -11,12 +11,40 @@ liệu do backend xác nhận: đăng nhập → chọn cửa hàng hợp lệ �
 nhập tay → tạo TPCN/TPTS với 1–3 ảnh → history → duyệt → xuất đúng quyền.
 Tái sử dụng backend/API/client, auth, media và rule đã có; không rewrite nền.
 
-## Quyết định cần chốt trước implementation phụ thuộc
+## Đề xuất contract cho danh sách cửa hàng KPH
 
-- **Effective context:** hình dạng API/context, danh sách store/capability cho
-  các actor theo membership, region assignment và chain scope; trạng thái
-  zero-access/inactive/revoked, chuyển store và refresh quyền. Không coi danh
-  sách membership hiện tại là toàn bộ quyền kế thừa.
+Giữ `GET /api/v1/stores` và `session.user.stores` cho consumer đọc membership.
+Đề xuất một endpoint đọc riêng `GET /api/v1/kph/stores` cho bộ chọn cửa hàng
+của KPH. Tên endpoint và response dưới đây cần được chốt trước khi đưa vào OpenAPI.
+
+Ví dụ cho một quản lý có quyền tại một cửa hàng (định danh tổng hợp):
+
+```json
+[{"id":"00000000-0000-4000-8000-000000000001","code":"0001","name":"Cửa hàng mẫu","capabilities":["VIEW","CREATE","REVIEW","EXPORT"]}]
+```
+
+| Quyền hiệu lực tại store và region đang active | Store trả về và thao tác |
+| --- | --- |
+| EMPLOYEE có membership | Đúng store, VIEW và CREATE |
+| STORE_MANAGER có membership | Đúng store, đủ bốn thao tác |
+| REGION_MANAGER có active assignment | Store thuộc vùng được giao, đủ bốn thao tác |
+| CHAIN_ADMIN | Mọi store hợp lệ toàn chuỗi, đủ bốn thao tác |
+
+Đề xuất lấy hợp các scope và trả mỗi store một lần, kể cả khi user vừa có
+membership vừa quản lý vùng. Session hợp lệ hết quyền nhận `200 []`. Phiên hết
+hiệu lực nhận `401`. Server kiểm lại mỗi request nghiệp vụ. Nếu quyền bị thu
+hồi khi màn đang mở, khi nhận `403` UI tải lại danh sách, bỏ selection và dữ
+liệu cũ của store bị mất quyền. Kiểm cả trường hợp chỉ mất quyền duyệt/xuất
+nhưng còn quyền xem qua membership.
+
+Dùng cùng policy KPH cho discovery và mutation. Mô tả lookup barcode trong
+[OpenAPI](../../contracts/openapi/kph.openapi.yaml) hiện ghi cần membership,
+trong khi [CatalogService](../../backend/src/main/java/vn/coopfood/kph/catalog/CatalogService.java)
+gọi `requireViewCreate` có xét quyền vùng/chuỗi. Khi chốt contract cần đồng bộ
+mô tả với policy đã duyệt và kiểm lookup đúng vùng, sai vùng trên backend thật.
+
+## Quyết định giao diện
+
 - **History:** phương án mặc định bảo toàn D01: page-local selection, reset khi
   đổi scope/filter/sort/page, count từ server và busy state rõ. Nếu muốn nối
   trang và giữ chọn như mock, phải sửa contract/examples/tests bằng quyết định

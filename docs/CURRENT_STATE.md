@@ -1,10 +1,6 @@
 # Trạng thái hiện tại
 
-Chuẩn hóa ngày 07/11/2026. Baseline kiểm tra: `main` tại
-`04f7c4a4d9001901c3973e7e6bbf5a2118932ee7`; working tree sạch trước task tài liệu.
-Ref local `origin/main` cùng SHA; đây không phải xác minh remote mới hoặc deploy.
-Task tài liệu: `store-app/docs01-roadmap-normalization`, base SHA như trên,
-worktree `/private/tmp/coopfood-kph-docs01`, một writer. Không đổi runtime/contract.
+Ngày rà soát: 07/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
 ## Baseline đã chấp nhận
 
@@ -49,12 +45,8 @@ Không có cycle triển khai mới được mở trong lần chuẩn hóa này.
 vòng visual diện rộng. Push/deploy/Cloudflare/Pages là thao tác riêng; không
 kế thừa quyền push một lần từ bản ghi lịch sử. Pages và tag bảo tồn giữ nguyên.
 
-## Điểm quyết định tiếp theo
-
-Ưu tiên chuẩn bị slice **UI mới + KPH online**, bắt đầu bằng contract effective
-store/capability và ánh xạ history UI sang D01. Xem [NEXT](NEXT.md) và
-[scope đề xuất](product/STORE_KPH_ONLINE_NEXT_SCOPE.md).
-
 Toàn bộ checkpoint cũ được giữ tại
-[lịch sử trạng thái đến 27/10](CURRENT_STATE_HISTORY_2026-10-27.md).
+[lịch sử trạng thái đến 27/10](https://github.com/VuPhm/coopfood-kph/blob/04f7c4a4d9001901c3973e7e6bbf5a2118932ee7/docs/CURRENT_STATE.md).
 Các pending cũ không mở lại acceptance đã được thay bằng quyết định mới hơn.
+
+Xem [lộ trình và bước tiếp theo](NEXT.md).

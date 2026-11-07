@@ -7,19 +7,7 @@ không phải nghiệm thu contract mới hoặc lệnh bắt đầu toàn bộ 
 
 ## Bước nhỏ kế tiếp: chuẩn bị UI mới + KPH online
 
-Chốt [scope và gate](product/STORE_KPH_ONLINE_NEXT_SCOPE.md) trước khi mở cycle:
-
-1. Effective-store/capability discovery cho employee, store manager, region
-   manager và chain admin; backend quyết định quyền, không suy từ membership-only.
-2. Giữ D01 page-local selection/reset/count/busy semantics cho online. Mock
-   “Hiển thị thêm 25, giữ lựa chọn” không tự trở thành contract online.
-3. Chọn luồng kiểm chứng đầy đủ: đăng nhập → chọn store → lookup → tạo KPH
-   với ảnh → history → duyệt/xuất. Dùng backend thật và fixture tổng hợp.
-
-Khi bắt đầu milestone, dùng delivery-cycle và DELIVERY_WORKFLOW; tạo task
-worktree từ main, ghi base SHA/allowed paths/owner/gates. Một owner cho OpenAPI,
-examples/generated client, migration và shared config. Chưa tạo plan triển khai
-hoặc dispatch team trong task chuẩn hóa tài liệu này.
+Chốt [scope và gate](product/STORE_KPH_ONLINE_NEXT_SCOPE.md) trước khi mở cycle.
 
 ## Thứ tự phụ thuộc đề xuất
 
@@ -42,5 +30,5 @@ online; không triển khai module tương lai, redesign rộng hoặc cutover P
 trong slice KPH. Pages cutover phải có quyết định explicit và đường quay lại.
 Technical PASS và owner acceptance là hai gate riêng.
 
-[Lịch sử NEXT đến 27/10](NEXT_HISTORY_2026-10-27.md) giữ nguyên provenance;
+[Lịch sử NEXT đến 27/10](https://github.com/VuPhm/coopfood-kph/blob/04f7c4a4d9001901c3973e7e6bbf5a2118932ee7/docs/NEXT.md) giữ nguyên provenance;
 những mục “kế tiếp”, “pending”, quyền push và preview ở đó không phải kế hoạch active.
