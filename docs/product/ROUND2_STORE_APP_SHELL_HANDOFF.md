@@ -1,6 +1,12 @@
 # Round 2 handoff — shared Store App shell and KPH validation slice
 
-Status: R1-D04 handoff accepted by the owner. Round 2 has not started.
+Status: historical R1-D04 handoff, accepted by the owner. R2-01 subsequently
+closed on 2026-09-24 at candidate `3799a30` and is an ancestor of current main.
+See [R2-01 acceptance](../delivery/r2-01-shell-spine/acceptance-handoff.md) and
+[current state](../CURRENT_STATE.md). The remaining text records the original
+validation scope; its future-tense wording does not reset completed delivery.
+The next online integration scope is [proposed separately](STORE_KPH_ONLINE_NEXT_SCOPE.md);
+this document does not start R2-02.
 The [Store App UI DNA](STORE_APP_UI_DNA.md) gives the design direction;
 [Store App contracts](STORE_APP_CONTRACTS.md) and accepted ADRs govern behavior,
 scope, and data. This document defines the minimum slice to validate, not the

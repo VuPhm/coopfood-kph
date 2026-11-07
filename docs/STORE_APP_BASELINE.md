@@ -1,6 +1,6 @@
 # Store App baseline
 
-Trạng thái: Round 0 — baseline để vào Round 1 UI/UX/Brand DNA.
+Trạng thái: baseline lịch sử Round 0 để vào Round 1 UI/UX/Brand DNA.
 Baseline implementation đã kiểm: `main` tại
 `35db9b359016b95e10eaa2dcebd335468223a5d8` (2026-09-24).
 Tình trạng delivery mới nhất nằm ở [CURRENT_STATE](CURRENT_STATE.md), không ở
@@ -53,7 +53,9 @@ KPH, history/review/export và evidence ảnh phải tiếp tục đúng theo
 [contract index](product/STORE_APP_CONTRACTS.md). Hướng UI đã hội tụ nằm ở
 [Store App UI DNA](product/STORE_APP_UI_DNA.md); [UI DNA Tool KPH](product/UI_DNA.md)
 chỉ là evidence kế thừa. [Round 2 handoff](product/ROUND2_STORE_APP_SHELL_HANDOFF.md)
-xác định slice kiểm chứng tối thiểu, chưa khởi động implementation.
+ghi scope kiểm chứng tại thời điểm R1-D04; R2-01 sau đó đã được chấp nhận
+và có trong main hiện tại. UI Fresh đã tích hợp, nhưng nối UI mới với backend
+là scope kế tiếp; xem CURRENT_STATE/NEXT thay cho trạng thái lịch sử ở handoff.
 
 ## Pages được bảo tồn riêng
 

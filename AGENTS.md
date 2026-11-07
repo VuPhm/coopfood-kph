@@ -1,7 +1,9 @@
 # Hướng dẫn cho coding agent
 
 Áp dụng cho toàn bộ repository Co.op Food Store Operations App. Round 0 khóa
-baseline; Round 1 hội tụ UI/UX/Brand DNA, chưa triển khai shell Round 2.
+baseline; R2-01 shell spine đã được chấp nhận, UI Fresh đã tích hợp qua FRESH01.
+UI mới vẫn dùng mock; nối KPH online là scope kế tiếp cần chốt. Trạng thái hiện
+hành nằm ở `docs/CURRENT_STATE.md`, thứ tự công việc ở `docs/NEXT.md`.
 
 ## Thứ tự đọc bắt buộc
 
