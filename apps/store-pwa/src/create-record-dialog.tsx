@@ -43,7 +43,7 @@ import { processEvidencePhoto } from "./image-processing";
 import { EvidenceImageViewer } from "./image-viewer";
 import { primeScanSuccessSound } from "./scanner-sound";
 import { DEFAULT_STORE_PROFILE, type StoreProfile } from "./store-profile";
-import { EMPTY_SKU_MEMORY, REMEMBERED_SKU_FIELDS, findSkuSuggestions, skuMemoryKey, type RememberedSkuField, type SkuMemory } from "./sku-memory";
+import { EMPTY_SKU_MEMORY, REMEMBERED_SKU_FIELDS, findSkuSuggestions, skuMemoryKey, type RememberedSkuField, type RememberedSkuInfo, type SkuMemory } from "./sku-memory";
 
 function isDisplayDate(value: string) {
   try {
@@ -164,6 +164,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   const createDialogRef = useRef<HTMLDivElement>(null);
   const [suggestionPosition, setSuggestionPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
   const skipPendingWeightRef = useRef(false);
+  const scannedFocusRef = useRef(false);
   const focusTimeoutRef = useRef<number | null>(null);
   const sessionRef = useRef(0);
   const mountedRef = useRef(false);
@@ -296,6 +297,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   }
 
   function scheduleBarcodeCompletion(barcode: string) {
+    scannedFocusRef.current = false;
     setSuggestionsEnabled(true);
     setSuggestionQuery("");
     cancelPendingBarcodeCompletion();
@@ -327,7 +329,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     if (suggestionsEnabled) setSuggestionQuery(barcode.trim());
   }
 
-  function applySkuSuggestion(barcode: string) {
+  function applySkuSuggestion(barcode: string, chosen?: RememberedSkuInfo) {
     const changed = getValues("barcode").trim() !== barcode;
     cancelPendingBarcodeCompletion();
     prepareRememberedBarcode(barcode);
@@ -335,13 +337,11 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
     if (changed) applyFreshFoodWeight(barcode);
     if (!kind) return;
     const key = skuMemoryKey(kind, barcode);
-    const remembered = key ? skuMemory.get(key) : undefined;
+    const remembered = chosen ?? (key ? skuMemory.get(key) : undefined);
     if (!remembered) return;
     for (const field of REMEMBERED_SKU_FIELDS) {
-      if (remembered[field]) {
-        setValue(field, remembered[field], { shouldDirty: true, shouldValidate: true });
-        rememberedValuesRef.current[field] = remembered[field];
-      }
+      setValue(field, remembered[field], { shouldDirty: true, shouldValidate: true });
+      rememberedValuesRef.current[field] = remembered[field];
     }
     setFocus("barcode");
     setSuggestionsEnabled(false);
@@ -349,6 +349,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
   }
 
   function resetRememberedFields() {
+    scannedFocusRef.current = false;
     setSuggestionsEnabled(true);
     setSuggestionQuery("");
     cancelPendingBarcodeCompletion();
@@ -512,15 +513,17 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode">
                   <div className="relative" ref={skuInputContainerRef}>
-                    <Input id="barcode" className="pr-12" role="combobox" aria-autocomplete="list" aria-expanded={suggestions.length > 0} aria-controls={suggestions.length ? "sku-suggestions" : undefined} aria-activedescendant={activeSuggestion >= 0 && suggestions[activeSuggestion] ? `sku-suggestion-${activeSuggestion}` : undefined} autoComplete="off" placeholder="Nhập mã hoặc tên hàng" onFocus={() => setSuggestionsEnabled(true)} onKeyDown={(event) => {
-                      if (event.key === "Escape" && suggestions.length) {
+                    <Input id="barcode" className="pr-12" role="combobox" aria-autocomplete="list" aria-expanded={suggestions.length > 0} aria-controls={suggestions.length ? "sku-suggestions" : undefined} aria-activedescendant={activeSuggestion >= 0 && suggestions[activeSuggestion] ? `sku-suggestion-${activeSuggestion}` : undefined} autoComplete="off" placeholder="Nhập mã hoặc tên hàng" onFocus={() => { if (!scannedFocusRef.current) setSuggestionsEnabled(true); }} onClick={() => { scannedFocusRef.current = false; setSuggestionsEnabled(true); }} onKeyDown={(event) => {
+                      if (event.key === "ArrowDown" && !suggestionsEnabled) {
+                        event.preventDefault(); scannedFocusRef.current = false; setSuggestionsEnabled(true);
+                      } else if (event.key === "Escape" && suggestions.length) {
                         event.preventDefault(); event.stopPropagation(); setSuggestionsEnabled(false);
                       } else if ((event.key === "ArrowDown" || event.key === "ArrowUp") && suggestions.length) {
                         event.preventDefault();
                         setActiveSuggestion((index) => event.key === "ArrowDown" ? (index + 1) % suggestions.length : (index <= 0 ? suggestions.length - 1 : index - 1));
                       } else if (event.key === "Enter" && suggestions.length) {
                         event.preventDefault();
-                        applySkuSuggestion(suggestions[activeSuggestion < 0 ? 0 : activeSuggestion]!.code);
+                        applySkuSuggestion(suggestions[activeSuggestion < 0 ? 0 : activeSuggestion]!.code, suggestions[activeSuggestion < 0 ? 0 : activeSuggestion]);
                       }
                     }} {...register("barcode", {
                       onChange: (event) => scheduleBarcodeCompletion(event.target.value),
@@ -600,7 +603,7 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
             </footer>
           </form>
           {suggestions.length ? <div ref={suggestionListRef} id="sku-suggestions" style={{ ...suggestionPosition, visibility: suggestionPosition ? "visible" : "hidden" }} className="sku-memory-list" role="listbox" aria-label="Đề xuất SKU">
-            {suggestions.map((suggestion, index) => <button id={`sku-suggestion-${index}`} key={suggestion.code} type="button" role="option" tabIndex={-1} aria-selected={index === activeSuggestion} className="sku-memory-suggestion" onPointerDown={(event) => event.preventDefault()} onMouseDown={(event) => event.preventDefault()} onClick={() => applySkuSuggestion(suggestion.code)}>
+            {suggestions.map((suggestion, index) => <button id={`sku-suggestion-${index}`} key={`${suggestion.code}:${index}`} type="button" role="option" tabIndex={-1} aria-selected={index === activeSuggestion} className="sku-memory-suggestion" onPointerDown={(event) => event.preventDefault()} onMouseDown={(event) => event.preventDefault()} onClick={() => applySkuSuggestion(suggestion.code, suggestion)}>
               <strong>{suggestion.code}</strong>
               {suggestion.productName ? <span>{suggestion.productName}</span> : null}
               {suggestion.supplier ? <small>{suggestion.supplier}</small> : null}
@@ -616,12 +619,18 @@ export function CreateRecordDialog({ kind, onOpenChange, onSaved, open, profile 
         onOpenChange={setScannerOpen}
         onScan={(scannedBarcode) => {
           if (!open) return;
+          scannedFocusRef.current = true;
           setValue("barcode", scannedBarcode, { shouldDirty: true, shouldValidate: true });
           completeBarcode(scannedBarcode);
+          const key = skuMemoryKey(kind, scannedBarcode);
+          const latest = key ? skuMemory.get(key) : undefined;
+          if (latest) applySkuSuggestion(scannedBarcode, latest);
+          setSuggestionsEnabled(false);
+          setSuggestionQuery("");
           const session = sessionRef.current;
           focusTimeoutRef.current = window.setTimeout(() => {
             focusTimeoutRef.current = null;
-            if (isCurrentSession(session)) setFocus("barcode");
+            if (isCurrentSession(session)) { setFocus("barcode"); setSuggestionsEnabled(false); }
           }, 0);
         }}
       />

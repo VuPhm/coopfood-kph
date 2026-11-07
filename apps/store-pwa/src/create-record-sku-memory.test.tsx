@@ -1,7 +1,8 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { DEMO_RECORDS } from "./demo-records";
 import { CreateRecordDialog } from "./create-record-dialog";
-import { type SkuMemory } from "./sku-memory";
+import { buildSkuMemory, type SkuMemory } from "./sku-memory";
 
 vi.mock("./barcode-scanner-dialog", () => ({ BarcodeScannerDialog: ({ open, onScan, onOpenChange }: { open: boolean; onScan: (code: string) => void; onOpenChange: (open: boolean) => void }) => open ? <button onClick={() => { onScan("2912345612345"); onOpenChange(false); }}>Trả mã scanner tổng hợp</button> : null }));
 
@@ -19,7 +20,7 @@ function complete(code: string) {
   chooseSuggestion();
 }
 function chooseSuggestion() {
-  const button = screen.queryByRole("option");
+  const button = screen.queryAllByRole("option")[0];
   if (button) fireEvent.click(button);
 }
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
@@ -57,9 +58,7 @@ describe("SKU memory completion", () => {
     fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
     fireEvent.click(screen.getByText("Trả mã scanner tổng hợp"));
     expect(barcode()).toHaveValue("2912345612345");
-    expect(product()).toHaveValue("");
-    chooseSuggestion();
-    chooseSuggestion();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(product()).toHaveValue("Tươi sống tổng hợp");
     expect(supplier()).toHaveValue("NCC tươi sống");
     expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("1.234");
@@ -314,4 +313,34 @@ it("shows and selects a code-only saved SKU after typing 89", async () => {
   expect(barcode()).toHaveValue("890001");
   expect(product()).toHaveValue("");
   expect(supplier()).toHaveValue("");
+});
+
+it("scans the exact latest name immediately, then offers older names without changing entered lot fields", async () => {
+  vi.useFakeTimers();
+  const code = "2912345612345";
+  const source = { ...DEMO_RECORDS[0]!, kind: "TPTS" as const, sku: code };
+  const memory = buildSkuMemory([
+    { ...source, id: "old", productName: "Tên cũ", supplier: "NCC cũ", createdAt: "2026-01-01T00:00:00Z" },
+    { ...source, id: "new", productName: "Tên mới", supplier: "NCC mới", createdAt: "2026-02-01T00:00:00Z" },
+  ], new Set(), {});
+  render(<CreateRecordDialog kind="TPTS" open skuMemory={memory} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+  fireEvent.click(screen.getByRole("button", { name: "Quét mã barcode" }));
+  fireEvent.click(screen.getByText("Trả mã scanner tổng hợp"));
+  await act(async () => { vi.advanceTimersByTime(500); });
+  expect(product()).toHaveValue("Tên mới");
+  expect(supplier()).toHaveValue("NCC mới");
+  expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  fireEvent.change(screen.getByRole("textbox", { name: "Số lượng" }), { target: { value: "7,5" } });
+  fireEvent.click(screen.getByRole("radio", { name: "EA" }));
+  fireEvent.click(screen.getByRole("radio", { name: "Thối mốc" }));
+  fireEvent.click(barcode());
+  await act(async () => { vi.advanceTimersByTime(500); });
+  expect(screen.getAllByRole("option")).toHaveLength(2);
+  fireEvent.click(screen.getByRole("option", { name: /Tên cũ/ }));
+  fireEvent.blur(barcode());
+  expect(product()).toHaveValue("Tên cũ");
+  expect(supplier()).toHaveValue("NCC cũ");
+  expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("7,5");
+  expect(screen.getByRole("radio", { name: "EA" })).toBeChecked();
+  expect(screen.getByRole("radio", { name: "Thối mốc" })).toBeChecked();
 });

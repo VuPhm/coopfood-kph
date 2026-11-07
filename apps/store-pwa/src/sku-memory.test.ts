@@ -95,3 +95,18 @@ it("suggests saved SKU codes even when name and supplier are empty display place
   const memory = buildSkuMemory([source({ sku: "890001", productName: "Sản phẩm 890001", supplier: "Chưa nhập nhà cung cấp" })], new Set(), {});
   expect(findSkuSuggestions(memory, "TPCN", "89")).toEqual([{ code: "890001", productName: "", supplier: "" }]);
 });
+
+it("keeps the newest supplier for each distinct name as exact-SKU fallbacks", async () => {
+  const { findSkuSuggestions } = await import("./sku-memory");
+  const memory = buildSkuMemory([
+    source({ productName: "A", supplier: "old", createdAt: "2026-01-01T00:00:00Z" }),
+    source({ id: "b", productName: "B", supplier: "B supplier", createdAt: "2026-03-01T00:00:00Z" }),
+    source({ id: "a-new", productName: "A", supplier: "latest A", createdAt: "2026-02-01T00:00:00Z" }),
+  ], new Set(), {});
+  expect(memory.get("TPCN:000123")).toEqual({ productName: "B", supplier: "B supplier" });
+  expect(findSkuSuggestions(memory, "TPCN", "000123")).toEqual([
+    { code: "000123", productName: "B", supplier: "B supplier" },
+    { code: "000123", productName: "A", supplier: "latest A" },
+  ]);
+  expect(findSkuSuggestions(memory, "TPCN", "000")).toHaveLength(1);
+});

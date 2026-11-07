@@ -40,7 +40,7 @@ function complete(code: string) {
   const barcode = screen.getByRole("combobox", { name: "Mã SKU / UPC" });
   fireEvent.change(barcode, { target: { value: code } });
   fireEvent.blur(barcode);
-  const suggestion = screen.queryByRole("option");
+  const suggestion = screen.queryAllByRole("option")[0];
   if (suggestion) fireEvent.click(suggestion);
 }
 async function prepareEvidence() {
