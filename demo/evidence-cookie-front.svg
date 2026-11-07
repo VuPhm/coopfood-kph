@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Ảnh minh chứng hộp bánh quy</title>
+  <desc id="desc">Minh họa tổng hợp một hộp bánh quy trên kệ, không phải dữ liệu vận hành thật.</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e4ece6"/><stop offset="1" stop-color="#a8c8b3"/></linearGradient><linearGradient id="box" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5b546"/><stop offset="1" stop-color="#d97706"/></linearGradient></defs>
+  <rect width="1200" height="800" fill="url(#bg)"/><rect y="590" width="1200" height="210" fill="#d2aa7d"/>
+  <rect x="380" y="150" width="440" height="500" rx="34" fill="url(#box)" stroke="#7c4512" stroke-width="12"/>
+  <circle cx="600" cy="390" r="142" fill="#f8e0ad"/><circle cx="600" cy="390" r="112" fill="#c7812f"/>
+  <g fill="#5a341d"><circle cx="550" cy="350" r="12"/><circle cx="650" cy="340" r="11"/><circle cx="620" cy="430" r="13"/><circle cx="535" cy="445" r="10"/></g>
+  <text x="600" y="230" fill="#fff" font-family="system-ui,sans-serif" font-size="58" font-weight="800" text-anchor="middle">BÁNH QUY BƠ</text>
+  <g transform="translate(36 628)"><rect width="500" height="132" rx="22" fill="#002d20" fill-opacity=".84" stroke="#d5f0de" stroke-opacity=".5" stroke-width="3"/><text x="24" y="62" fill="#fff" font-family="monospace" font-size="48" font-weight="700">09:18</text><text x="190" y="43" fill="#fff" font-family="system-ui,sans-serif" font-size="25" font-weight="650">Thứ Bảy</text><text x="190" y="78" fill="#fff" font-family="system-ui,sans-serif" font-size="23">15/08/2026</text><rect x="24" y="94" width="5" height="24" fill="#93c11f"/><text x="42" y="115" fill="#fff" font-family="system-ui,sans-serif" font-size="20">CF-DEMO-001 - Nguyễn Kiệm</text></g>
+</svg>
