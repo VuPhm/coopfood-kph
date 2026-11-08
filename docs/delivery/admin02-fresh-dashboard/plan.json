@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
   "revision": 4,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -19,30 +19,39 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "",
+  "candidateSha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [],
   "reviewLimit": 5,
-  "reviewRound": 4,
+  "reviewRound": 5,
   "teams": [],
   "gates": [
     {
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/reference-r4.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/reference-r4.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 4,
+      "sha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/reference-r4.md"
     },
     {
       "id": "owner-ui-review",
@@ -75,5 +84,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Reroll material/palette from two owner-provided image refs; keep shell workflows and verify light surfaces/account portal/responsive."
+  "nextAction": "Preview revision4 tại4175 theo hai ref owner; nhận phản hồi trên candidate, không tự push/merge/deploy."
 }

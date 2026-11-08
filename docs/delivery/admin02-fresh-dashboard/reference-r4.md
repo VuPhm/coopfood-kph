@@ -23,4 +23,4 @@ Tham chiếu là ảnh owner cung cấp, không xác nhận ảnh thể hiện p
 - Contrast token sRGB: data15.65:1, muted5.41, sidebar8.50, selectednav5.38, attention5.05. Không suy thành audit accessibility đầy đủ.
 - `npm run check:docs` PASS; `git diff --check` PASS.
 
-Candidate ghi sau checkpoint; commit không đổi implementation đã test. Evidence revision1–3 giữ provenance và không thay cho visual/build gate revision4. Không test thiết bị thật, không mở analytics/realtime thật. Owner acceptance revision4 pending. Preview http://127.0.0.1:4175/#overview, tải lại bundle để xem. Không push/merge/deploy.
+Candidate `7419f548a9cebb666c4f55cace34b416cb04f84e`; commit không đổi implementation đã test. Evidence revision1–3 giữ provenance và không thay cho visual/build gate revision4. Không test thiết bị thật, không mở analytics/realtime thật. Owner acceptance revision4 pending. Preview http://127.0.0.1:4175/#overview, tải lại bundle để xem. Không push/merge/deploy.
