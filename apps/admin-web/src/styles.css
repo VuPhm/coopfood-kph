@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./admin-fresh.css";
+@import "./admin-fresh-material.css";
 @source "../../../packages/ui/src";
 
 @theme {

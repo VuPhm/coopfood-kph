@@ -1,0 +1,95 @@
+/* Admin adaptation of current Store Fresh material/weight roles.
+   Keep desktop geometry and opaque data surfaces; do not load Store selectors. */
+body:has(.admin-shell) {
+  --admin-accent: #007a52;
+  --admin-accent-deep: #00583d;
+  --admin-text: #183b2d;
+  --admin-muted: #52655d;
+  --admin-soft-edge: rgb(0 70 45 / 16%);
+  --admin-weight-body: 400;
+  --admin-weight-label: 500;
+  --admin-weight-control: 600;
+  --admin-weight-heading: 650;
+  --admin-item-light: radial-gradient(ellipse at 8% 0%, rgb(255 255 255 / 85%), transparent 65%);
+  --admin-item-image: var(--admin-item-light), linear-gradient(155deg, #fbfefd, #eaf5ef);
+  --admin-item-hover: var(--admin-item-light), linear-gradient(155deg, #f7fcfa, #dcefe4);
+  --admin-jewel-image: linear-gradient(145deg, #00724e, #00583d);
+  --admin-card-shadow: inset 0 1px 0 rgb(255 255 255 / 85%), 0 3px 8px rgb(0 60 40 / 5%), 0 8px 18px rgb(0 60 40 / 4%);
+  --admin-control-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 3px 8px rgb(0 60 40 / 7%);
+  --admin-primary-shadow: inset 0 1px 0 rgb(255 255 255 / 48%), inset 0 -1px 1px rgb(0 30 20 / 12%), 0 3px 8px rgb(0 60 40 / 16%);
+  --admin-pressed-shadow: inset 0 1px 2px rgb(0 40 25 / 14%);
+  --admin-panel-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 12px 32px rgb(0 40 25 / 18%);
+}
+.admin-shell { font-weight: var(--admin-weight-body); }
+.admin-page-heading h1, .kpi-value { font-weight: var(--admin-weight-heading); }
+.panel-heading h2, .admin-nav-item, .attention-summary strong, .identity-user-name h2 { font-weight: var(--admin-weight-control); }
+.kpi-heading, .admin-data-table thead th { font-weight: var(--admin-weight-label); }
+.admin-data-table tbody th, .activity-list strong, .attention-list strong, .monitor-state strong { font-weight: var(--admin-weight-control); }
+.admin-brand .admin-logo { background-image: var(--admin-jewel-image); box-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), 0 3px 6px rgb(0 40 25 / 16%); }
+.admin-sidebar { background-color: white; border-right-color: var(--admin-soft-edge); box-shadow: inset -1px 0 0 white, 2px 0 12px rgb(0 60 40 / 4%); }
+.admin-topbar { border-bottom-color: var(--admin-soft-edge); box-shadow: inset 0 1px 0 white, 0 2px 8px rgb(0 60 40 / 3%); }
+.admin-organization { border-color: var(--admin-soft-edge); box-shadow: inset 0 1px 0 white; }
+.admin-nav-item { color: var(--admin-accent-deep); }
+.admin-nav-item:hover { background-color: #edf5f0; }
+.admin-nav-item.is-active { background-color: var(--admin-accent); background-image: linear-gradient(155deg, #087e58, #005c40); color: white; box-shadow: var(--admin-primary-shadow); }
+.admin-nav-item.is-active:hover { background: var(--admin-accent-deep); }
+.admin-nav-item:active, .admin-filter-button:active, .admin-account:active { box-shadow: var(--admin-pressed-shadow); }
+.admin-kpi { border-color: var(--admin-soft-edge); background-image: var(--admin-item-light); box-shadow: var(--admin-card-shadow); }
+/* Data remains on a solid white holder. No sheen/blur across rows or chart ink. */
+.admin-panel { border-color: var(--admin-soft-edge); background-color: white; box-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 2px 6px rgb(0 60 40 / 3%); }
+.admin-date-control, .admin-filter-button { border-color: var(--admin-soft-edge) !important; background-image: var(--admin-item-image); box-shadow: var(--admin-control-shadow); font-weight: var(--admin-weight-control); }
+.admin-filter-button:hover, .admin-date-control:hover { background-image: var(--admin-item-hover); }
+.admin-filter-button.is-active { background: var(--admin-accent); color: white; border-color: var(--admin-accent) !important; box-shadow: var(--admin-primary-shadow); }
+.admin-account { padding: 4px 8px 4px 4px; border: 1px solid transparent; }
+.admin-account:hover, .admin-account[data-state="open"] { background: #f0f7f3; border-color: var(--admin-soft-edge); box-shadow: inset 0 1px 0 white; }
+.admin-avatar { color: var(--admin-accent-deep); background: #eaf5ef; box-shadow: inset 0 1px 0 white, 0 1px 4px rgb(0 60 40 / 8%); text-transform: uppercase; }
+/* Portal owns its complete token context; it does not inherit .admin-shell. */
+.admin-account-menu {
+  --dropdown-ink: var(--admin-text);
+  --dropdown-muted: var(--admin-muted);
+  --dropdown-line: rgb(0 70 45 / 16%);
+  --dropdown-surface: #fff;
+  --dropdown-soft: #edf6f0;
+  --dropdown-brand: #00583d;
+  --dropdown-focus: #00583d;
+  width: 248px;
+  background: #fff;
+  color: var(--admin-text);
+  border: 1px solid var(--admin-soft-edge);
+  box-shadow: var(--admin-panel-shadow);
+  font-family: var(--font-sans);
+  border-radius: 12px;
+  padding: 6px;
+}
+.admin-account-menu .ui-dropdown-label { font-weight: var(--admin-weight-control); overflow-wrap: anywhere; }
+.admin-account-menu .ui-dropdown-option { justify-content: flex-start; gap: 10px; font-size: 13px; font-weight: var(--admin-weight-control); min-height: 42px; border-radius: 8px; }
+.admin-account-menu .ui-dropdown-option svg { flex-shrink: 0; stroke-width: 1.8; }
+.admin-account-menu .ui-dropdown-option[data-highlighted] { background-image: var(--admin-item-image); outline: 2px solid var(--dropdown-focus); outline-offset: -2px; }
+.admin-account-menu .admin-signout { color: #b42318; }
+body:has(.admin-shell) [data-slot="dialog-content"] { border-color: var(--admin-soft-edge); box-shadow: var(--admin-panel-shadow); border-radius: 16px; }
+body:has(.admin-shell) [data-slot="dialog-title"] { font-weight: var(--admin-weight-heading); }
+body:has(.admin-shell) [data-slot="button"] { font-weight: var(--admin-weight-control); transform: none; translate: 0 0; transition: background-color 120ms ease-out; }
+body:has(.admin-shell) [data-slot="button"][data-variant="primary"] { background-color: var(--admin-accent); background-image: linear-gradient(155deg, #00724e, #00724e 48%, #005c40); border: 1px solid var(--admin-soft-edge); color: white; box-shadow: var(--admin-primary-shadow); }
+body:has(.admin-shell) [data-slot="button"][data-variant="secondary"] { background: white; background-image: var(--admin-item-image); border: 1px solid var(--admin-soft-edge); color: var(--admin-accent-deep); box-shadow: var(--admin-control-shadow); }
+body:has(.admin-shell) [data-slot="button"][data-variant="danger"] { background: #b42318; color: white; box-shadow: var(--admin-primary-shadow); }
+body:has(.admin-shell) [data-slot="button"][data-variant="primary"]:hover:not(:disabled) { background: var(--admin-accent-deep); }
+body:has(.admin-shell) [data-slot="button"][data-variant="secondary"]:hover:not(:disabled) { background-image: var(--admin-item-hover); }
+body:has(.admin-shell) [data-slot="button"][data-variant="danger"]:hover:not(:disabled) { background: #9c2118; }
+body:has(.admin-shell) [data-slot="button"]:active:not(:disabled) { box-shadow: var(--admin-pressed-shadow); }
+body:has(.admin-shell) [data-slot="button"]:disabled { background: #e4ece7; color: #506358; box-shadow: none; opacity: 1; }
+body:has(.admin-shell) .identity-user-action .identity-deactivate:not(:disabled) { color: #b42318; background: white; border-color: #ecd9d8; box-shadow: none; }
+body:has(.admin-shell) .identity-user-action .identity-deactivate:hover:not(:disabled) { background: #fff3f1; }
+@media (max-width:767px) {
+  body:has(.admin-shell) .admin-mobile-nav { border-radius: 0 14px 14px 0; }
+  .admin-account-menu .ui-dropdown-option { min-height: 44px; }
+}
+@media (prefers-reduced-motion:reduce), (prefers-reduced-transparency:reduce) {
+  body:has(.admin-shell) { --admin-card-shadow: none; --admin-control-shadow: none; --admin-panel-shadow: none; --admin-primary-shadow: inset 0 1px 0 rgb(255 255 255 / 32%); }
+  .admin-account-menu { animation: none; }
+}
+@media (prefers-contrast:more), (forced-colors:active) {
+  body:has(.admin-shell) { --admin-soft-edge: CanvasText; --admin-card-shadow: none; --admin-control-shadow: none; --admin-panel-shadow: none; --admin-primary-shadow: none; --admin-item-image: none; --admin-item-hover: none; --admin-item-light: none; }
+  .admin-nav-item.is-active { outline: 2px solid Highlight; outline-offset: -3px; }
+  .admin-account-menu { background: Canvas; color: CanvasText; --dropdown-soft: Canvas; --dropdown-focus: Highlight; --dropdown-muted: CanvasText; }
+  .admin-account-menu .admin-signout { color: CanvasText; }
+}

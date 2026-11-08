@@ -70,7 +70,26 @@ async function login(page, username) {
       await page.keyboard.press('Enter');
       await expect(page.locator('#admin-main')).toBeFocused();
       await expect(page.getByRole('heading', { name: 'Đặt lịch ngừng hoạt động', exact: true })).toBeVisible();
-      await page.getByRole('button', { name: 'Menu tài khoản', exact: true }).focus();
+      const account = page.getByRole('button', { name: 'Menu tài khoản', exact: true });
+      await account.click();
+      const menu = page.getByRole('menu');
+      await expect(menu).toBeVisible();
+      const paint = await menu.evaluate(e => {
+        const style = getComputedStyle(e), rect = e.getBoundingClientRect();
+        const items = [...e.querySelectorAll('[role=menuitem]')];
+        return { background:style.backgroundColor, color:style.color, border:style.borderTopWidth, left:rect.left, right:rect.right,
+          alignment:items.map(item => getComputedStyle(item).justifyContent),
+          topIsMenu:e.contains(document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2)) };
+      });
+      assert.equal(paint.background, 'rgb(255, 255, 255)', 'Account portal must have an opaque surface');
+      assert.equal(paint.border, '1px');
+      assert.ok(paint.left >= 0 && paint.right <= width, 'Account menu inside viewport');
+      assert.ok(paint.topIsMenu, 'Account menu must cover underlying controls');
+      assert.ok(paint.alignment.every(value=>value==='flex-start'), 'Menu icons stay next to their labels');
+      await page.screenshot({path:`${output}/${name}-account-menu.png`});
+      await page.keyboard.press('Escape');
+      await expect(menu).toHaveCount(0);
+      await expect(account).toBeFocused();
       await page.keyboard.press('ArrowDown');
       await page.getByRole('menuitem', { name: 'Đổi mật khẩu', exact: true }).click();
       await expect(page.getByRole('dialog', { name: 'Đổi mật khẩu', exact: true })).toBeVisible();
@@ -117,6 +136,9 @@ async function login(page, username) {
       await conflict.click();
       await expect(conflict).toHaveAttribute('aria-pressed', 'true');
       await expect(cp.getByRole('heading', {name:'catalog-conflict.csv',exact:true})).toBeVisible();
+      const upload = cp.getByRole('button', { name: 'Tải lên và kiểm tra', exact: true });
+      await expect(upload).toBeDisabled();
+      assert.equal(await upload.evaluate(e => getComputedStyle(e).opacity), '1');
       await noOverflow(cp,'catalog '+name);
       await cp.screenshot({path:`${output}/${name}-catalog-fixture.png`,fullPage:true});
       await context.close(); console.log(`PASS Catalog fixture ${width}x${height}`);
