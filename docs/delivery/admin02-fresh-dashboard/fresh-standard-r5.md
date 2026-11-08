@@ -38,3 +38,5 @@ Xem desktop/mobile overview, Store Home mobile và account menu; không có xung
 Thiết lập local: root node_modules trước đó symlink sang main nên package export Fresh mới không resolve; đã tạo symlink dependency riêng và trỏ workspace packages về worktree này. Không sửa dependency/main node_modules/lockfile để xử lý lỗi setup.
 
 Payload cuối Admin: CSS72.90kB/gzip14.44kB; JS423.90kB/gzip131.32kB. Không claim giảm payload so với revision4 vì dùng foundation chung và thang chữ đầy đủ. Không có runtime dependency mới.
+
+Candidate content `6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2`; implementation không đổi khi bổ sung metadata/evidence. Technical ready, owner gate pending.

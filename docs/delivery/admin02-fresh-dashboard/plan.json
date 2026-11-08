@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
   "revision": 5,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -20,33 +20,42 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "",
+  "candidateSha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [
     "packages/ui/src/fresh-tokens.css",
     "packages/ui/package.json"
   ],
   "reviewLimit": 8,
-  "reviewRound": 5,
+  "reviewRound": 8,
   "teams": [],
   "gates": [
     {
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/fresh-standard-r5.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/fresh-standard-r5.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 5,
+      "sha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/fresh-standard-r5.md"
     },
     {
       "id": "owner-ui-review",
@@ -86,5 +95,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Finish Fresh token consolidation, then two owner-requested optimization rounds: CSS/token cleanup; responsive/accessibility/state/performance verification."
+  "nextAction": "Chuẩn hóa Fresh và2vòng tốiưu hoàn tất; preview4175 sẵn để owner xem. Không tự push/merge/deploy."
 }
