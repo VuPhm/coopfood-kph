@@ -18,7 +18,7 @@ Fresh adaptation local tại `apps/admin-web/src/admin-fresh-material.css`, nh�
 
 ## Verification revision 2
 
-Candidate sẽ được ghi trong plan sau checkpoint. Evidence gắn với content đã build/test trước commit; không đổi implementation khi thêm hồ sơ.
+Candidate `6b818ba2ca6126a4c0cd051d823b5d59e36977c7`. Evidence gắn với content đã build/test trước commit; không đổi implementation khi thêm hồ sơ.
 
 - `npm --workspace @coopfood-kph/admin-web run build`: PASS TypeScript + Vite 1714 modules; JS423.88kB/gzip131.32kB, CSS61.06kB/gzip12.83kB.
 - `npm --workspace @coopfood-kph/admin-web test`: PASS 2 files / 19 tests; workflow/session/account tests giữ nguyên.
