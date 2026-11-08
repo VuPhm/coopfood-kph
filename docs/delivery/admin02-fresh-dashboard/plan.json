@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
   "revision": 3,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -19,30 +19,39 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "",
+  "candidateSha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [],
   "reviewLimit": 4,
-  "reviewRound": 3,
+  "reviewRound": 4,
   "teams": [],
   "gates": [
     {
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/color-r3.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/color-r3.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 3,
+      "sha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/color-r3.md"
     },
     {
       "id": "owner-ui-review",
@@ -68,5 +77,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Apply 6:3:1 Admin color roles, verify contrast and desktop/mobile screenshots; preserve workflow/API."
+  "nextAction": "Preview revision3 tại4175 với token6:3:1; chờ phản hồi thực tế trên candidate, không tự push/merge/deploy."
 }

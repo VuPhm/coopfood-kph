@@ -25,4 +25,4 @@ Tra ui-ux-pro-max: query color đầu trả palette design-system indigo không 
 - Xem ảnh desktop/mobile overview và menu: điểm neo đậm, dữ liệu nền đặc dịu, amber chỉ tập trung attention. Ảnh synthetic tại `.local/verification/admin02-fresh/`; không commit ảnh và không pixel snapshot diện rộng.
 - `npm run check:docs` và `git diff --check` kiểm ở cuối checkpoint. Không đổi code nghiệp vụ, Store, shared UI, dependencies, backend, membership hoặc deployment.
 
-Candidate ghi trong plan sau commit; tests chạy trên đúng content trước commit, không thay CSS khi thêm evidence. Revision2 evidence giữ provenance; revision3 build/visual đã kiểm mới. Không chứng minh thiết bị thật hoặc realtime backend. Preview vẫn http://127.0.0.1:4175/#overview; tải lại để lấy màu mới. Không push/merge/deploy.
+Candidate `9a8a5ea4d92732dbd92bf77b4d465c34f7537288`; tests chạy trên đúng content trước commit, không thay CSS khi thêm evidence. Revision2 evidence giữ provenance; revision3 build/visual đã kiểm mới. Không chứng minh thiết bị thật hoặc realtime backend. Preview vẫn http://127.0.0.1:4175/#overview; tải lại để lấy màu mới. Không push/merge/deploy.
