@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "id": "admin01-membership",
+  "revision": 1,
+  "status": "PLANNING",
+  "objective": "Admin Web theo vai trò và luồng gán/thu hồi store membership, giữ scope backend và hiệu lực request kế tiếp.",
+  "inScope": [
+    "Owner walkthrough Admin hiện có trước khi chốt màn/API membership",
+    "Chọn user hiện có → store → EMPLOYEE/STORE_MANAGER → revoke có lý do",
+    "Backend scope chain/region, last-manager concurrency guard, append-only audit",
+    "OpenAPI/examples/generated client cùng slice; đồng bộ mô tả KPH với P01/ADR-0004",
+    "Hai phiên Admin/Store với backend thật và fixture tổng hợp"
+  ],
+  "outOfScope": [
+    "Fresh online wiring",
+    "DATE/backend/push/report",
+    "User creation/reset/bootstrap và region/global grants",
+    "Catalog publish C02",
+    "Redesign diện rộng, Pages cutover, push/deploy"
+  ],
+  "baseSha": "59c7caa240119bdc3bca33084caffad9bc09d8ed",
+  "candidateSha": "",
+  "integrationOwner": "Codex /root, sole writer",
+  "sharedPaths": [
+    "contracts/openapi/**",
+    "contracts/fixtures/api/**",
+    "packages/api/**",
+    "backend/src/main/resources/db/migration/**",
+    "packages/ui/**",
+    "package.json",
+    "package-lock.json"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "existing-admin-walkthrough",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "contract-and-generated-client",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "backend-scope-guards-audit",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "real-backend-two-session",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "playwright-mobile-desktop",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "membership-workflow-owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Owner xem preview Admin theo vai trò và phản hồi vị trí quản lý quyền; sau đó chốt màn/API và triển khai membership. Không coi im lặng là acceptance."
+}

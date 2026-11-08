@@ -58,7 +58,11 @@ Integration ngày 27/10 ghi nhận `VITEST_MAX_WORKERS=1 npm run verify` PASS
 workflow/Excel/PDF đạt. Đây là kết quả lịch sử trên source đã tích hợp, không
 phải test mới ngày 07/11; không chứng minh backend thật hoặc thiết bị thật.
 
-Không có cycle triển khai mới được mở trong lần chuẩn hóa này. Không mở thêm
+Sau lần chuẩn hóa, owner yêu cầu “bắt đầu lộ trình”: ADMIN01 đã mở ngày
+09/11/2026 trên worktree `/private/tmp/coopfood-kph-admin01`, nhánh
+`store-app/admin01-membership`, base `59c7caa`. Giai đoạn đầu: duyệt Admin hiện
+có theo vai trò, sau đó chốt màn/API cấp và thu hồi membership.
+[Kế hoạch và gate](delivery/admin01-membership/plan.json). Không mở thêm
 vòng visual diện rộng. Push/deploy/Cloudflare/Pages là thao tác riêng; không
 kế thừa quyền push một lần từ bản ghi lịch sử. Pages và tag bảo tồn giữ nguyên.
 

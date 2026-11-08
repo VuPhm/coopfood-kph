@@ -1,7 +1,9 @@
 # Công việc kế tiếp
 
 Cập nhật 09/11/2026. Baseline: [CURRENT_STATE](CURRENT_STATE.md).
-FRESH01 đã CLOSED; không có milestone implementation mới đang active.
+FRESH01 đã CLOSED. ADMIN01 đã khởi động ngày 09/11/2026 trên nhánh
+`store-app/admin01-membership`; đang chuẩn bị/duyệt Admin hiện có trước khi
+chốt màn/API membership. Xem [kế hoạch](delivery/admin01-membership/plan.json).
 Thứ tự dưới đây là đề xuất ưu tiên đã được ghi nhận trong lần chuẩn hóa tài liệu,
 không phải nghiệm thu contract mới hoặc lệnh bắt đầu toàn bộ roadmap.
 
