@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 3,
+  "status": "EXECUTING",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -19,10 +19,10 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "6b818ba2ca6126a4c0cd051d823b5d59e36977c7",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [],
-  "reviewLimit": 3,
+  "reviewLimit": 4,
   "reviewRound": 3,
   "teams": [],
   "gates": [
@@ -30,28 +30,19 @@
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "6b818ba2ca6126a4c0cd051d823b5d59e36977c7",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/refinement-r2.md"
+      "status": "pending"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "6b818ba2ca6126a4c0cd051d823b5d59e36977c7",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/refinement-r2.md"
+      "status": "pending"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "6b818ba2ca6126a4c0cd051d823b5d59e36977c7",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/refinement-r2.md"
+      "status": "pending"
     },
     {
       "id": "owner-ui-review",
@@ -67,8 +58,15 @@
       "source": "User feedback in current chat 09/11/2026",
       "impact": "Account portal styling and Admin-only typography/material/control states; previous visual/build evidence must be refreshed. No business/API changes.",
       "decision": "One bounded repair/refinement round added to review limit (3); preserve layout, use local Admin tokens and verify portal paint, keyboard and account actions. Overall positive feedback is not full acceptance of revised candidate."
+    },
+    {
+      "revision": 3,
+      "request": "Owner: ổn hơn rồi; áp dụng token hướng màu 6:3:1 để có neo và nhấn, tránh trắng loá.",
+      "source": "Current chat owner feedback 09/11/2026",
+      "impact": "Admin color roles/surfaces/chrome/attention only; visual/build evidence refreshed.",
+      "decision": "One bounded color refinement round (review limit4). 60% calm neutral data/canvas,30% deep Fresh anchor and supporting surfaces,10% active/action/attention accents. Roles guide composition, not exact pixel coverage at every breakpoint."
     }
   ],
   "blockers": [],
-  "nextAction": "Preview revision2 tại4175; owner xem bản sửa menu và Fresh weights. Không tự push/merge/deploy."
+  "nextAction": "Apply 6:3:1 Admin color roles, verify contrast and desktop/mobile screenshots; preserve workflow/API."
 }
