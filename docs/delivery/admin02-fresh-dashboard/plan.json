@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
-  "revision": 3,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 4,
+  "status": "EXECUTING",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -19,10 +19,10 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [],
-  "reviewLimit": 4,
+  "reviewLimit": 5,
   "reviewRound": 4,
   "teams": [],
   "gates": [
@@ -30,28 +30,19 @@
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/color-r3.md"
+      "status": "pending"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/color-r3.md"
+      "status": "pending"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 3,
-      "sha": "9a8a5ea4d92732dbd92bf77b4d465c34f7537288",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/color-r3.md"
+      "status": "pending"
     },
     {
       "id": "owner-ui-review",
@@ -74,8 +65,15 @@
       "source": "Current chat owner feedback 09/11/2026",
       "impact": "Admin color roles/surfaces/chrome/attention only; visual/build evidence refreshed.",
       "decision": "One bounded color refinement round (review limit4). 60% calm neutral data/canvas,30% deep Fresh anchor and supporting surfaces,10% active/action/attention accents. Roles guide composition, not exact pixel coverage at every breakpoint."
+    },
+    {
+      "revision": 4,
+      "request": "Reroll from newly attached references: light translucent Apple-style settings sidebar and neutral enterprise dashboard with restrained green accents.",
+      "source": "Owner image attachments in current chat 09/11/2026",
+      "impact": "Supersede revision3 dark green chrome and tinted data palette. Admin-only color/material/limited frame styling; no API/workflow changes.",
+      "decision": "One bounded reference-guided visual round (review limit5). Neutral light canvas and white data, inset frosted sidebar, clear dark typography, green only selected/action/chart. No OS settings, theme switch or fake controls from image contents."
     }
   ],
   "blockers": [],
-  "nextAction": "Preview revision3 tại4175 với token6:3:1; chờ phản hồi thực tế trên candidate, không tự push/merge/deploy."
+  "nextAction": "Reroll material/palette from two owner-provided image refs; keep shell workflows and verify light surfaces/account portal/responsive."
 }
