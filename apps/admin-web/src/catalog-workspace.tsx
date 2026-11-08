@@ -81,7 +81,7 @@ export function CatalogWorkspace({ gateway, session, onError }: {
   return <div className="admin-workspace admin-business-workspace">
     <div className="admin-workspace-grid">
       <section className="self-start rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="upload-heading">
-        <div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><Upload aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">C01 · Chỉ staging</p><h1 id="upload-heading" className="mt-1 text-2xl font-black tracking-tight">Kiểm tra catalog CSV</h1></div></div>
+        <div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><Upload aria-hidden="true" /></span><div><h1 id="upload-heading" className="mt-1 text-2xl font-black tracking-tight">Kiểm tra catalog CSV</h1></div></div>
         <p className="mt-4 text-sm leading-6 text-ink-muted">File hợp lệ vẫn chưa được publish và không xuất hiện trong lookup cửa hàng.</p>
         <form className="mt-6 grid gap-4" onSubmit={submit}>
           <Field htmlFor="catalog-file" label="File UTF-8 CSV" hint="Tối đa 5 MiB / 50.000 dòng. Header: NCC, Tên NCC, UPC, SKU, Tên sản phẩm." required>
@@ -91,7 +91,7 @@ export function CatalogWorkspace({ gateway, session, onError }: {
           {upload.error instanceof Error ? <div ref={errorSummary} tabIndex={-1} className="rounded-xl bg-danger-soft px-3 py-3 text-sm font-semibold text-danger" role="alert"><p>Chưa thể kiểm tra file.</p><p className="mt-1 font-medium">{upload.error.message}</p></div> : null}
           <Button disabled={upload.isPending || !file} type="submit"><FileSearch aria-hidden="true" size={18} />{upload.isPending ? "Đang kiểm tra…" : "Tải lên và kiểm tra"}</Button>
         </form>
-        <div className="mt-6 rounded-2xl border border-surface-strong bg-surface-muted p-4 text-sm leading-6 text-ink-muted"><strong className="text-ink">Upload lại rõ ràng</strong><p>Cùng bytes trả lại batch cũ; file khác tạo batch mới. Không batch nào ghi đè batch trước.</p></div>
+        <div className="mt-6 rounded-2xl border border-surface-strong bg-surface-muted p-4 text-sm leading-6 text-ink-muted"><strong className="text-ink">Tải lại tệp đã kiểm tra</strong><p>Tải lại cùng tệp sẽ mở kết quả cũ. Tệp khác tạo kết quả mới.</p></div>
       </section>
 
       <section className="min-w-0 rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="imports-heading">

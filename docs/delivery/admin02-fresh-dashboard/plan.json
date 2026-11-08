@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
-  "revision": 5,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 6,
+  "status": "EXECUTING",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -20,13 +20,13 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [
     "packages/ui/src/fresh-tokens.css",
     "packages/ui/package.json"
   ],
-  "reviewLimit": 8,
+  "reviewLimit": 9,
   "reviewRound": 8,
   "teams": [],
   "gates": [
@@ -34,28 +34,19 @@
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/fresh-standard-r5.md"
+      "status": "pending"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/fresh-standard-r5.md"
+      "status": "pending"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "6aeb9d823a50566ea6e9a2ee32dac9fd910f19d2",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/fresh-standard-r5.md"
+      "status": "pending"
     },
     {
       "id": "owner-ui-review",
@@ -92,8 +83,15 @@
       "source": "Owner message09/11/2026",
       "impact": "Shared pure CSS token extraction and Store alias-only refactor; Admin consolidation. Refresh Admin and shared/Store evidence.",
       "decision": "Bounded token cleanup round6; source is latest integrated Fresh mobile in current baseline, not old R1R tokens or unmerged historical branches. Preserve all Store computed token values, add no runtime dependency. Two additional bounded optimization rounds authorized in current chat; review limit8, with separate evidence for each."
+    },
+    {
+      "revision": 6,
+      "request": "Owner points out incomplete cleanup: ĐIỀU HÀNH & GIÁM SÁT and Nhìn toàn cảnh... are unnecessary copy.",
+      "source": "Current chat owner feedback09/11/2026",
+      "impact": "Admin UI copy and unused associated CSS; no token source, backend, API or business changes.",
+      "decision": "Bounded editorial repair round9. Remove decorative eyebrow/tagline/sidebar slogan/footer and redundant section prose; retain operational constraints, source/date, counts, errors, confirmation consequences and actionable guidance."
     }
   ],
   "blockers": [],
-  "nextAction": "Chuẩn hóa Fresh và2vòng tốiưu hoàn tất; preview4175 sẵn để owner xem. Không tự push/merge/deploy."
+  "nextAction": "Remove decorative/duplicated product copy across Admin, verify useful mock/rule/status copy remains and rerun Admin/browser gates."
 }

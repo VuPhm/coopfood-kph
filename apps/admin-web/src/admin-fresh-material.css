@@ -18,7 +18,6 @@
 .admin-account:hover, .admin-account[data-state="open"] { background: var(--fresh-canvas); border-color: var(--fresh-soft-edge); }
 .admin-avatar { color: var(--fresh-brand-action); background: var(--fresh-surface); border-color: var(--fresh-canvas); text-transform: uppercase; box-shadow: inset 0 1px 0 var(--fresh-layer-highlight); }
 .admin-page-heading h1 { color: var(--admin-text); font-weight: 650; }
-.admin-eyebrow { color: var(--fresh-brand-action); }
 .admin-demo-notice { background: var(--fresh-canvas); border-color: var(--fresh-soft-edge); color: var(--admin-muted); }
 .admin-demo-notice strong { color: var(--admin-text); }
 .admin-kpi, .admin-panel { background: var(--fresh-surface); border-color: var(--fresh-soft-edge); border-radius: var(--fresh-radius-group); box-shadow: var(--admin-card-shadow); }
@@ -67,8 +66,8 @@ body:has(.admin-shell) [data-slot="button"][data-variant="danger"]:hover:not(:di
 body:has(.admin-shell) [data-slot="button"]:disabled { background: var(--fresh-form-disabled-surface); color: var(--fresh-button-disabled-ink); box-shadow: none; opacity: 1; }
 body:has(.admin-shell) .identity-user-action .identity-deactivate:not(:disabled) { color: var(--fresh-error-ink); background: var(--fresh-surface); border-color: var(--fresh-soft-edge); box-shadow: none; }
 body:has(.admin-shell) .identity-user-action .identity-deactivate:hover:not(:disabled) { background: var(--fresh-error-soft); }
-body:has(.admin-shell) :is(input,textarea,select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { background-color: var(--fresh-form-field-surface); border-color: var(--fresh-form-field-edge); border-radius: var(--fresh-radius-control); box-shadow: var(--fresh-form-field-shadow); }
-body:has(.admin-shell) :is(input,textarea,select):disabled { background-color: var(--fresh-form-disabled-surface); color: var(--fresh-ink-muted); }
+body:has(.admin-shell) :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { background-color: var(--fresh-form-field-surface); border-color: var(--fresh-form-field-edge); border-radius: var(--fresh-radius-control); box-shadow: var(--fresh-form-field-shadow); }
+body:has(.admin-shell) :is(input, textarea, select):disabled { background-color: var(--fresh-form-disabled-surface); color: var(--fresh-ink-muted); }
 .admin-shell.is-collapsed { --sidebar-width: 88px; }
 .is-collapsed .admin-sidebar { padding-inline: 8px; }
 .is-collapsed .admin-brand { padding: 0; justify-content: center; }
@@ -97,7 +96,7 @@ body:has(.admin-shell) :is(input,textarea,select):disabled { background-color: v
 .admin-page-heading h1 { font-size: var(--cf-font-size-display); }
 .kpi-value { font-size: var(--cf-font-size-display); }
 .admin-kpi p, .panel-heading p, .admin-data-table, .admin-status, .store-name-button small { font-size: var(--fresh-type-caption); }
-body:has(.admin-shell) :is(input,textarea,select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { font-size: var(--fresh-type-input); line-height: var(--fresh-leading-input); }
+body:has(.admin-shell) :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { font-size: var(--fresh-type-input); line-height: var(--fresh-leading-input); }
 @media (max-width:767px) {
   .admin-page-heading h1 { font-size: var(--fresh-type-page); }
   .admin-icon-button, .chart-point-controls button, .admin-filter-button { min-height: var(--fresh-size-control-md); }
