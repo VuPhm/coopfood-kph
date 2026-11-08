@@ -39,3 +39,5 @@ Trong quá trình viết test đã sửa locator text gồm mã cửa hàng và 
 Technical ready cho candidate UI. Owner acceptance: PENDING, không có sign-off. Không chạy lại full backend/Store suites vì không đổi phần đó; không chứng minh production, thiết bị thật, push notification hoặc realtime/analytics backend. Tổng quan hoàn toàn mock, snapshot cố định và không là scope authority. API workspace vẫn có auth/CSRF/authorization/error handling hiện có.
 
 Preview http://127.0.0.1:4175/#overview, account/runbook tại [handoff](design-and-handoff.md). Không push/merge/deploy. Khi tiếp tục refinement dùng nhánh/worktree này và plan revision hiện hành; chỉ đổi revision nếu scope/observable gate thay đổi theo feedback.
+
+Hồ sơ cycle: lần check đầu báo `Invalid change record` vì ghi initial brief vào `changes` revision1 (schema chỉ cho scope changes từ revision2). Đã giữ brief trong handoff và xóa entry initial khỏi changes; không đổi UI/candidate hoặc evidence.

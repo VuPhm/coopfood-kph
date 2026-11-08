@@ -60,15 +60,7 @@
       "status": "pending"
     }
   ],
-  "changes": [
-    {
-      "revision": 1,
-      "request": "User explicitly authorizes separate Admin redesign, shell and overview first; preserve membership and all business/API/security behavior.",
-      "source": "User message 09/11/2026 in current chat",
-      "impact": "Separate UI cycle/worktree, no changes to ADMIN01 cycle or membership implementation.",
-      "decision": "Start ADMIN02 from ADMIN01 029b0e7 with isolated writer and local preview 4175."
-    }
-  ],
+  "changes": [],
   "blockers": [],
   "nextAction": "Preview UI sẵn tại 4175; owner xem candidate và phản hồi. Tiếp tục refinement UI theo brief khi có phản hồi, không mở membership/analytics API và không tự push/merge/deploy."
 }
