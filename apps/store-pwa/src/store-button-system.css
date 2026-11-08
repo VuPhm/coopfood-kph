@@ -5,8 +5,8 @@
     --store-button-radius: 12px;
     --store-button-radius-compact: 10px;
     --store-button-primary-bg: var(--store-brand-action);
-    --store-button-primary-top: #00724e;
-    --store-button-primary-bottom: #005c40;
+    --store-button-primary-top: var(--fresh-button-primary-top);
+    --store-button-primary-bottom: var(--fresh-button-primary-bottom);
     --store-button-primary-hover: var(--store-brand-deep);
     --store-button-primary-active: var(--store-brand-deep);
     --store-button-on-primary: #fff;
@@ -17,19 +17,19 @@
     --store-button-edge: var(--store-soft-edge);
     --store-button-ghost-ink: var(--store-ink-muted);
     --store-button-danger-bg: #b42318;
-    --store-button-danger-hover: #9c2118;
+    --store-button-danger-hover: var(--fresh-button-danger-hover);
     --store-button-disabled-bg: #e4ece7;
-    --store-button-disabled-ink: #506358;
+    --store-button-disabled-ink: var(--fresh-button-disabled-ink);
     --store-button-focus: var(--store-ink);
-    --store-button-duration: 120ms;
+    --store-button-duration: var(--fresh-button-duration);
     --store-button-translate-x: 0px;
     --store-button-translate-y: 0px;
     --store-button-icon-hover: var(--store-canvas);
     --store-button-inverse-edge: rgb(255 255 255 / 18%);
     --store-button-inverse-hover: rgb(255 255 255 / 16%);
-    --store-button-primary-shadow: inset 0 1px 0 rgb(255 255 255 / 48%), inset 0 -1px 1px rgb(0 30 20 / 12%), 0 3px 8px rgb(0 60 40 / 16%);
+    --store-button-primary-shadow: var(--fresh-button-primary-shadow);
     --store-button-secondary-shadow: inset 0 0 0 1px var(--store-button-edge), inset 0 1px 0 rgb(255 255 255 / 90%), 0 3px 8px rgb(0 60 40 / 10%);
-    --store-button-pressed-shadow: inset 0 1px 2px rgb(0 40 25 / 14%);
+    --store-button-pressed-shadow: var(--fresh-button-pressed-shadow);
   }
   body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-login) :is([data-slot="button"][data-variant="primary"], .store-login-submit, .store-choice-confirm, .store-account-home, .store-notifications-body > button, .store-create-loading-body > button, [data-slot="button"][data-variant="secondary"], .store-choice-cancel, .store-login-preview, .store-account-login, .store-reset-filter, .store-date-reset-filter, .store-kph-more button, .store-create-cta, [data-slot="button"][data-variant="ghost"], [data-slot="button"][data-variant="danger"], .store-tabs button.is-active, .store-date-statuses button.is-selected, .store-choices button.is-selected, .store-compact[aria-pressed="true"], .store-filter.is-filtered, .store-quick-sort-options button[aria-pressed="true"], .store-kph-date-shortcuts button[aria-pressed="true"], .unit-options input:checked + span, .store-compact:not([aria-pressed="true"]), .store-filter:not(.is-filtered), .store-quick-sort-trigger, .store-selection-menu, .store-choices button:not(.is-selected), .store-kph-date-shortcuts button:not([aria-pressed="true"])) {
     border-radius: var(--store-button-radius);

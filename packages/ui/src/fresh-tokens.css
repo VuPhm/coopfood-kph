@@ -1,0 +1,43 @@
+/* Fresh mobile foundations: palette, material, controls and sizing. */
+:root {
+  --fresh-brand-action: #007a52;
+  --fresh-brand-deep: #00583d;
+  --fresh-surface: #fff;
+  --fresh-canvas: #f2f5f3;
+  --fresh-ink: #183b2d;
+  --fresh-ink-muted: #52655d;
+  --fresh-line: #cedbd4;
+  --fresh-warning-ink: #884312;
+  --fresh-error-ink: #b42318;
+  --fresh-error-soft: #fef3f2;
+  --fresh-control-line: #718578;
+  --fresh-soft-edge: rgb(0 70 45 / 16%);
+  --fresh-item-light: radial-gradient(ellipse at 8% 0%, rgb(255 255 255 / 85%), transparent 65%);
+  --fresh-control-light: radial-gradient(ellipse at 12% 0%, rgb(255 255 255 / 8%), transparent 70%);
+  --fresh-jewel-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), inset 0 -2px 3px rgb(0 30 20 / 12%), 0 3px 6px rgb(0 40 25 / 16%);
+  --fresh-soft-card-shadow: inset 0 1px 0 rgb(255 255 255 / 85%), 0 3px 8px rgb(0 60 40 / 8%), 0 8px 18px rgb(0 60 40 / 8%);
+  --fresh-button-primary-top: #00724e;
+  --fresh-button-primary-bottom: #005c40;
+  --fresh-button-danger-hover: #9c2118;
+  --fresh-button-disabled-ink: #506358;
+  --fresh-button-duration: 120ms;
+  --fresh-button-primary-shadow: inset 0 1px 0 rgb(255 255 255 / 48%), inset 0 -1px 1px rgb(0 30 20 / 12%), 0 3px 8px rgb(0 60 40 / 16%);
+  --fresh-button-pressed-shadow: inset 0 1px 2px rgb(0 40 25 / 14%);
+  --fresh-layer-highlight: rgb(255 255 255 / 90%);
+  --fresh-size-control-md: 44px;
+  --fresh-radius-sm: 8px;
+  --fresh-radius-control: 12px;
+  --fresh-radius-group: 16px;
+  --fresh-radius-sheet: 24px;
+  --fresh-type-caption: 12px;
+  --fresh-type-control: 14px;
+  --fresh-type-input: 16px;
+  --fresh-leading-input: 24px;
+  --fresh-type-section: 17px;
+  --fresh-type-page: 20px;
+  --fresh-form-field-surface: #fff;
+  --fresh-form-field-edge: rgb(27 61 45 / 24%);
+  --fresh-form-readonly-surface: #f9fbfa;
+  --fresh-form-disabled-surface: #e4ece7;
+  --fresh-form-field-shadow: none;
+}

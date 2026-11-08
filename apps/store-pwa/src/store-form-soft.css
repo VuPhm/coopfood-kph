@@ -1,12 +1,12 @@
 /* Co.op Fresh Soft / coop-fresh-soft-v1: a form recipe, not a new app theme.
    Body scope reaches Store portals while keeping online/Pilot/Admin untouched. */
 body:has(.store-app, .store-login) {
-  --store-form-field-surface: #fff;
-  --store-form-field-edge: rgb(27 61 45 / 24%);
-  --store-form-readonly-surface: #f9fbfa;
-  --store-form-disabled-surface: #e4ece7;
+  --store-form-field-surface: var(--fresh-form-field-surface);
+  --store-form-field-edge: var(--fresh-form-field-edge);
+  --store-form-readonly-surface: var(--fresh-form-readonly-surface);
+  --store-form-disabled-surface: var(--fresh-form-disabled-surface);
   --store-form-control-radius: 12px;
-  --store-form-field-shadow: none;
+  --store-form-field-shadow: var(--fresh-form-field-shadow);
 }
 body:has(.store-app, .store-login) :is(.store-app, .store-sheet, .store-create-screen, .store-quick-panel)
   :is(input, textarea, select, .ui-select-trigger):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not(.sr-only):not(.store-page-hero input) {

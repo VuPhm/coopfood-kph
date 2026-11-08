@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@coopfood-kph/ui/tokens.css";
+@import "@coopfood-kph/ui/fresh-tokens.css";
 @source "../../../packages/ui/src";
 
 @theme inline {

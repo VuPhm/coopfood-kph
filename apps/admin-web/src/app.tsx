@@ -191,7 +191,7 @@ function LifecycleWorkspace({ gateway, targets, schedules, loading, loadError, o
   const pendingCount = schedules.filter((schedule) => schedule.status === "SCHEDULED").length;
   const canManage = targets.length > 0;
 
-  return <div className="admin-workspace legacy-workspace">
+  return <div className="admin-workspace admin-business-workspace">
     <div className="admin-workspace-grid">
       <section className="rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="schedule-heading">
         <div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><CalendarClock aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">Tối thiểu 30 ngày</p><h1 id="schedule-heading" className="mt-1 text-2xl font-black tracking-tight">Đặt lịch ngừng hoạt động</h1></div></div>

@@ -1,15 +1,16 @@
 {
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
-  "revision": 4,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 5,
+  "status": "EXECUTING",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
     "Overview mock: KPI/trend/attention/store table/activity/source monitoring/time range",
     "Embed existing Identity/Catalog/Lifecycle without business/API changes",
     "Admin-only Fresh tokens, reuse Dialog/Dropdown and existing form controls",
-    "Build/component regressions/Playwright 1440/1280/834/390 and visual review; local preview"
+    "Build/component regressions/Playwright 1440/1280/834/390 and visual review; local preview",
+    "Extract consumed Fresh mobile CSS foundations to a shared token file; mechanically alias Store declarations without changing computed values; Admin consumes same source."
   ],
   "outOfScope": [
     "Membership implementation or its branch/worktree",
@@ -19,10 +20,13 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — sole UI writer",
-  "sharedPaths": [],
-  "reviewLimit": 5,
+  "sharedPaths": [
+    "packages/ui/src/fresh-tokens.css",
+    "packages/ui/package.json"
+  ],
+  "reviewLimit": 8,
   "reviewRound": 5,
   "teams": [],
   "gates": [
@@ -30,28 +34,19 @@
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/reference-r4.md"
+      "status": "pending"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/reference-r4.md"
+      "status": "pending"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "7419f548a9cebb666c4f55cace34b416cb04f84e",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/reference-r4.md"
+      "status": "pending"
     },
     {
       "id": "owner-ui-review",
@@ -81,8 +76,15 @@
       "source": "Owner image attachments in current chat 09/11/2026",
       "impact": "Supersede revision3 dark green chrome and tinted data palette. Admin-only color/material/limited frame styling; no API/workflow changes.",
       "decision": "One bounded reference-guided visual round (review limit5). Neutral light canvas and white data, inset frosted sidebar, clear dark typography, green only selected/action/chart. No OS settings, theme switch or fake controls from image contents."
+    },
+    {
+      "revision": 5,
+      "request": "Remove redundant old tokens/comments; latest Fresh mobile UI is the token standard. Owner further requests two optimization rounds after completion.",
+      "source": "Owner message09/11/2026",
+      "impact": "Shared pure CSS token extraction and Store alias-only refactor; Admin consolidation. Refresh Admin and shared/Store evidence.",
+      "decision": "Bounded token cleanup round6; source is latest integrated Fresh mobile in current baseline, not old R1R tokens or unmerged historical branches. Preserve all Store computed token values, add no runtime dependency. Two additional bounded optimization rounds authorized in current chat; review limit8, with separate evidence for each."
     }
   ],
   "blockers": [],
-  "nextAction": "Preview revision4 tại4175 theo hai ref owner; nhận phản hồi trên candidate, không tự push/merge/deploy."
+  "nextAction": "Finish Fresh token consolidation, then two owner-requested optimization rounds: CSS/token cleanup; responsive/accessibility/state/performance verification."
 }

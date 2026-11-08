@@ -1,0 +1,42 @@
+/* Admin aliases of the shared Fresh mobile foundations. */
+:root, body:has(.admin-shell) [data-slot="dialog-content"] {
+  --cf-color-brand: var(--fresh-brand-action);
+  --cf-color-brand-hover: var(--fresh-brand-deep);
+  --cf-color-brand-active: var(--fresh-brand-deep);
+  --cf-color-brand-soft: var(--fresh-canvas);
+  --cf-color-canvas: var(--fresh-canvas);
+  --cf-color-surface: var(--fresh-surface);
+  --cf-color-surface-muted: var(--fresh-canvas);
+  --cf-color-surface-strong: var(--fresh-line);
+  --cf-color-border: var(--fresh-soft-edge);
+  --cf-color-line: var(--fresh-line);
+  --cf-color-ink: var(--fresh-ink);
+  --cf-color-ink-muted: var(--fresh-ink-muted);
+  --cf-color-focus: var(--fresh-brand-deep);
+  --cf-color-danger: var(--fresh-error-ink);
+  --cf-color-danger-soft: var(--fresh-error-soft);
+  --cf-radius-control: var(--fresh-radius-control);
+  --cf-radius-card: var(--fresh-radius-group);
+  --cf-radius-sheet: var(--fresh-radius-sheet);
+  --cf-shadow-card: var(--fresh-soft-card-shadow);
+  --cf-shadow-panel: var(--fresh-soft-card-shadow);
+}
+:root {
+  --admin-accent: var(--fresh-brand-action);
+  --admin-accent-soft: var(--fresh-canvas);
+  --admin-text: var(--fresh-ink);
+  --admin-muted: var(--fresh-ink-muted);
+  --admin-line: var(--fresh-line);
+  --admin-canvas: var(--fresh-canvas);
+  --admin-radius: var(--fresh-radius-group);
+  --admin-chart-secondary: var(--fresh-control-line);
+  --admin-warning: var(--fresh-warning-ink);
+  --admin-warning-soft: var(--cf-color-amber-soft);
+  --admin-primary-image: var(--fresh-control-light), linear-gradient(155deg, var(--fresh-button-primary-top), var(--fresh-button-primary-top) 48%, var(--fresh-button-primary-bottom));
+  --admin-item-image: var(--fresh-item-light), linear-gradient(155deg, #fbfefd, #eaf5ef);
+  --admin-item-hover: var(--fresh-item-light), linear-gradient(155deg, #f7fcfa, #dcefe4);
+  --admin-primary-shadow: var(--fresh-button-primary-shadow);
+  --admin-card-shadow: var(--fresh-soft-card-shadow);
+  --admin-pressed-shadow: var(--fresh-button-pressed-shadow);
+  --admin-panel-shadow: inset 0 0 0 1px var(--fresh-soft-edge), inset 0 1px 0 var(--fresh-layer-highlight), 0 12px 32px rgb(0 40 25 / 18%);
+}

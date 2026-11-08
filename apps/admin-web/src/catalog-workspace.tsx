@@ -78,7 +78,7 @@ export function CatalogWorkspace({ gateway, session, onError }: {
   }
 
   const loadError = imports.error instanceof Error ? imports.error.message : detail.error instanceof Error ? detail.error.message : null;
-  return <div className="admin-workspace legacy-workspace">
+  return <div className="admin-workspace admin-business-workspace">
     <div className="admin-workspace-grid">
       <section className="self-start rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="upload-heading">
         <div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><Upload aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">C01 · Chỉ staging</p><h1 id="upload-heading" className="mt-1 text-2xl font-black tracking-tight">Kiểm tra catalog CSV</h1></div></div>
