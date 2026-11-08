@@ -23,3 +23,7 @@ URL: http://127.0.0.1:4174 — Admin online, backend 8081, DB container `coopfoo
 - Owner decision: PENDING. NEXT yêu cầu walkthrough trước khi chốt màn/API; skill delivery-cycle yêu cầu “silence is not acceptance”.
 
 Runtime qua launchctl, logs `/tmp/coopfood-kph-p03-acceptance`. Dừng bằng `bash e2e/scripts/stop-p03-acceptance.sh` trong worktree. Không push/deploy/Pages.
+
+## Phản hồi owner sau checkpoint fb5e526
+
+Owner: “giao diện sau đó cần làm lại; trước tiên push đã”. Ghi nhận UI hiện tại cần làm lại ở bước sau; đây không phải acceptance UI hoặc luồng membership. Ưu tiên hiện hành là push checkpoint nhánh ADMIN01. Chưa mở scope redesign hoặc triển khai membership trong lần push này.
