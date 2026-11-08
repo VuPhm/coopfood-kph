@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
   "revision": 6,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -20,33 +20,42 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "",
+  "candidateSha": "a76215656038867d928b30b62df6629c0d5d7b30",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [
     "packages/ui/src/fresh-tokens.css",
     "packages/ui/package.json"
   ],
   "reviewLimit": 9,
-  "reviewRound": 8,
+  "reviewRound": 9,
   "teams": [],
   "gates": [
     {
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 6,
+      "sha": "a76215656038867d928b30b62df6629c0d5d7b30",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/copy-r6.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 6,
+      "sha": "a76215656038867d928b30b62df6629c0d5d7b30",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/copy-r6.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 6,
+      "sha": "a76215656038867d928b30b62df6629c0d5d7b30",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/copy-r6.md"
     },
     {
       "id": "owner-ui-review",
@@ -93,5 +102,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Remove decorative/duplicated product copy across Admin, verify useful mock/rule/status copy remains and rerun Admin/browser gates."
+  "nextAction": "Preview4175 đã dọn copy trang trí; owner xem candidate mới. Không push/merge/deploy."
 }

@@ -13,3 +13,5 @@ Kiểm tra:
 - `npm run check:docs`, `git diff --check`:PASS. Search source xác nhận hai câu owner nêu và các class trang trí đã gỡ không còn.
 
 Candidate ghi sau checkpoint. Evidence350tests/Store token parity ởrevision5 giữ provenance, không chạy lại phần Store/backend vì copy/CSS Admin không chạm các phần đó. Technical readiness không thay owner acceptance. Preview4175; không push/merge/deploy.
+
+Candidate `a76215656038867d928b30b62df6629c0d5d7b30`, không đổi implementation khi ghi evidence. Owner review pending.
