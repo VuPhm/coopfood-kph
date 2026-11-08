@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
   "revision": 1,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -19,7 +19,7 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "",
+  "candidateSha": "3617ef79e660a7cf28368a7340a3f823c0a8bd3e",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [],
   "reviewLimit": 2,
@@ -30,19 +30,28 @@
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "3617ef79e660a7cf28368a7340a3f823c0a8bd3e",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/technical.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "3617ef79e660a7cf28368a7340a3f823c0a8bd3e",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/technical.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "3617ef79e660a7cf28368a7340a3f823c0a8bd3e",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/technical.md"
     },
     {
       "id": "owner-ui-review",
@@ -61,5 +70,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Lưu evidence kỹ thuật theo candidate; preview 4175 sẵn cho owner xem và phản hồi trong phạm vi UI đã giao."
+  "nextAction": "Preview UI sẵn tại 4175; owner xem candidate và phản hồi. Tiếp tục refinement UI theo brief khi có phản hồi, không mở membership/analytics API và không tự push/merge/deploy."
 }
