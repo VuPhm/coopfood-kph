@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "admin02-fresh-dashboard",
+  "revision": 1,
+  "status": "VERIFYING",
+  "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
+  "inScope": [
+    "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
+    "Overview mock: KPI/trend/attention/store table/activity/source monitoring/time range",
+    "Embed existing Identity/Catalog/Lifecycle without business/API changes",
+    "Admin-only Fresh tokens, reuse Dialog/Dropdown and existing form controls",
+    "Build/component regressions/Playwright 1440/1280/834/390 and visual review; local preview"
+  ],
+  "outOfScope": [
+    "Membership implementation or its branch/worktree",
+    "Backend, OpenAPI/client, database/migrations and business semantics",
+    "Real analytics/realtime infrastructure or synthetic operational authority",
+    "Deployment/Pages config, push/merge/deploy",
+    "Large shared design system or Store/Pilot styling"
+  ],
+  "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
+  "candidateSha": "",
+  "integrationOwner": "Codex /root — sole UI writer",
+  "sharedPaths": [],
+  "reviewLimit": 2,
+  "reviewRound": 2,
+  "teams": [],
+  "gates": [
+    {
+      "id": "admin-check-test-build",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "browser-responsive-and-workflow",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "scope-and-mock-separation",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-ui-review",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "User explicitly authorizes separate Admin redesign, shell and overview first; preserve membership and all business/API/security behavior.",
+      "source": "User message 09/11/2026 in current chat",
+      "impact": "Separate UI cycle/worktree, no changes to ADMIN01 cycle or membership implementation.",
+      "decision": "Start ADMIN02 from ADMIN01 029b0e7 with isolated writer and local preview 4175."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Lưu evidence kỹ thuật theo candidate; preview 4175 sẵn cho owner xem và phản hồi trong phạm vi UI đã giao."
+}

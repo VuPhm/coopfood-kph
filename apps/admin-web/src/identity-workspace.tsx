@@ -1,39 +1,26 @@
-import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, ListItemMarker } from "@coopfood-kph/ui";
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field } from "@coopfood-kph/ui";
 import { useMutation } from "@tanstack/react-query";
-import { CheckCircle2, KeyRound, Leaf, LogOut, RefreshCw, ShieldCheck, UserRound, UserRoundX } from "lucide-react";
+import { CheckCircle2, RefreshCw, ShieldCheck, UserRound, UserRoundX } from "lucide-react";
 import { useState } from "react";
 
 import { AdminListLabel, userPresentation, rolePresentation } from "./list-labels";
 import type { AdminSession, AdminUser, LifecycleAdminGateway } from "./lifecycle-admin";
 
-export function IdentityWorkspace({ gateway, session, users, loading, loadError, onRefresh, onLogout, logoutBusy, onChangePassword, onError, onOpenLifecycle, onOpenCatalog }: {
+export function IdentityWorkspace({ gateway, session, users, loading, loadError, onRefresh, onError }: {
   gateway: LifecycleAdminGateway;
   session: AdminSession;
   users: AdminUser[];
   loading: boolean;
   loadError: string | null;
   onRefresh(): void;
-  onLogout(): void;
-  logoutBusy: boolean;
-  onChangePassword(): void;
   onError(error: unknown): void;
-  onOpenLifecycle(): void;
-  onOpenCatalog?: () => void;
 }) {
   const [selected, setSelected] = useState<AdminUser | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const activeCount = users.filter((user) => user.active).length;
 
-  return <div className="min-h-dvh bg-canvas text-ink">
-    <a href="#admin-main" className="sr-only fixed left-4 top-4 z-50 rounded-xl bg-white px-4 py-3 font-bold text-brand shadow-panel focus:not-sr-only">Bỏ qua đến nội dung chính</a>
-    <header className="sticky top-0 z-20 bg-brand text-white shadow-panel">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-brand"><Leaf aria-hidden="true" /></span><div className="min-w-0"><strong className="block truncate text-base font-black sm:text-lg">Co.op Food KPH</strong><span className="block truncate text-xs text-white/80">Quản trị tài khoản</span></div></div>
-        <div className="flex flex-wrap items-center justify-end gap-2"><Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenLifecycle} variant="secondary">Lifecycle</Button>{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đổi mật khẩu" className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onChangePassword} size="icon" variant="secondary"><KeyRound aria-hidden="true" size={18} /></Button><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
-      </div>
-    </header>
-
-    <main id="admin-main" className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
+  return <div className="admin-workspace legacy-workspace">
+    <div className="admin-identity-content">
       <section className="rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="users-heading">
         <div className="flex flex-wrap items-start justify-between gap-4"><div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><ShieldCheck aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">Quản trị toàn chuỗi</p><h1 id="users-heading" className="mt-1 text-2xl font-black tracking-tight">Tài khoản người dùng</h1><p className="mt-2 text-sm leading-6 text-ink-muted">{activeCount} đang hoạt động · {users.length} tài khoản. Sau khi vô hiệu hóa, người dùng sẽ mất quyền ở lần thao tác tiếp theo.</p></div></div><Button aria-label="Tải lại danh sách tài khoản" onClick={onRefresh} size="icon" variant="secondary"><RefreshCw aria-hidden="true" size={18} /></Button></div>
 
@@ -42,20 +29,19 @@ export function IdentityWorkspace({ gateway, session, users, loading, loadError,
         {loading ? <p className="mt-6 text-sm text-ink-muted" role="status">Đang tải danh sách tài khoản…</p> : null}
         {!loading && users.length === 0 ? <div className="mt-6 rounded-2xl border border-dashed border-border bg-surface-muted p-8 text-center"><UserRound className="mx-auto text-brand" aria-hidden="true" /><p className="mt-3 font-black">Chưa có tài khoản</p></div> : null}
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="admin-identity-list"><div className="identity-list-heading" aria-hidden="true"><span>Tài khoản</span><span>Quyền toàn chuỗi</span><span>Trạng thái</span><span>Thao tác</span></div>
           {users.map((user) => {
             const current = user.id === session.user.id;
-            return <article key={user.id} className="ui-list-marker-card flex min-h-56 flex-col rounded-2xl border border-surface-strong bg-surface-muted/55 p-4 sm:p-5">
-              <ListItemMarker variant="bar" tone={userPresentation(user.active).tone} />
-              <div className="flex items-start justify-between gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-brand"><UserRound aria-hidden="true" size={20} /></span><AdminListLabel category="Tài khoản" presentation={userPresentation(user.active)} /></div>
-              <h2 className="mt-4 break-words text-lg font-black">{user.displayName}</h2><p className="break-all text-sm text-ink-muted">{user.username}</p>
-              <div className="mt-3 flex min-h-7 flex-wrap gap-2">{user.globalRoles.length ? user.globalRoles.map((role) => <AdminListLabel key={role} category="Quyền global" presentation={rolePresentation(role)} />) : <span className="text-xs text-ink-muted">Không có quyền global</span>}</div>
-              <div className="mt-auto pt-5">{current ? <p className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-ink-muted">Tài khoản đang đăng nhập</p> : <Button className="w-full" disabled={!user.active} onClick={() => { setNotice(null); setSelected(user); }} variant="danger"><UserRoundX aria-hidden="true" size={17} />{user.active ? "Vô hiệu hóa" : "Đã vô hiệu hóa"}</Button>}</div>
+            return <article key={user.id} className="identity-user-row">
+              <div className="identity-user-name"><span className="identity-avatar"><UserRound aria-hidden="true" size={18} /></span><div><h2>{user.displayName}</h2><p>{user.username}</p></div></div>
+              <div className="identity-user-roles">{user.globalRoles.length ? user.globalRoles.map((role) => <AdminListLabel key={role} category="Quyền global" presentation={rolePresentation(role)} />) : <span className="text-ink-muted">Không có quyền global</span>}</div>
+              <div className="identity-user-status"><AdminListLabel category="Tài khoản" presentation={userPresentation(user.active)} /></div>
+              <div className="identity-user-action">{current ? <span className="text-ink-muted">Tài khoản đang đăng nhập</span> : <Button className="identity-deactivate" disabled={!user.active} onClick={() => { setNotice(null); setSelected(user); }} variant="secondary"><UserRoundX aria-hidden="true" size={15} />{user.active ? "Vô hiệu hóa" : "Đã vô hiệu hóa"}</Button>}</div>
             </article>;
           })}
         </div>
       </section>
-    </main>
+    </div>
 
     {selected ? <DeactivateUserDialog
       gateway={gateway}

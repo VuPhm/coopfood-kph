@@ -46,7 +46,8 @@ function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdmin
   };
 }
 
-function renderApp(api: LifecycleAdminGateway) {
+function renderApp(api: LifecycleAdminGateway, workspace = "lifecycle") {
+  window.history.replaceState(null, "", `#${workspace}`);
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
   return render(<QueryClientProvider client={client}><App gateway={api} /></QueryClientProvider>);
 }
@@ -56,7 +57,8 @@ describe("Admin lifecycle workspace", () => {
     const api = gateway();
     renderApp(api);
     await screen.findByText("CF-0012 · Nguyễn Kiệm");
-    fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
+    fireEvent.keyDown(screen.getByRole("button", { name: "Menu tài khoản" }), { key: "ArrowDown" });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Đăng xuất" }));
     await screen.findByRole("heading", { name: "Đăng nhập quản trị" });
     expect(screen.queryByText("CF-0012 · Nguyễn Kiệm")).not.toBeInTheDocument();
     vi.mocked(api.listTargets).mockResolvedValue([]);
@@ -64,6 +66,8 @@ describe("Admin lifecycle workspace", () => {
     fireEvent.change(screen.getByLabelText(/Tên đăng nhập/), { target: { value: "another.admin" } });
     fireEvent.change(screen.getByLabelText(/Mật khẩu/), { target: { value: "synthetic-password" } });
     fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
+    await screen.findByRole("heading", { name: "Tổng quan vận hành" });
+    fireEvent.click(await screen.findByRole("button", { name: "Lifecycle" }));
     await screen.findByText("Chưa có lịch ngừng hoạt động");
     expect(screen.queryByText("CF-0012 · Nguyễn Kiệm")).not.toBeInTheDocument();
   });
@@ -80,17 +84,13 @@ describe("Admin lifecycle workspace", () => {
 
   it.each(["lifecycle", "identity", "catalog"] as const)("changes password from %s and requires a fresh login", async (workspace) => {
     const api = gateway(workspace === "catalog" ? { getSession: vi.fn().mockResolvedValue(catalogSession) } : {});
-    renderApp(api);
+    renderApp(api, workspace);
     if (workspace === "catalog") await screen.findByRole("heading", { name: "Kiểm tra catalog CSV" });
-    else {
-      await screen.findByText("CF-0012 · Nguyễn Kiệm");
-      if (workspace === "identity") {
-        fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
-        await screen.findByRole("heading", { name: "Tài khoản người dùng" });
-      }
-    }
+    else if (workspace === "identity") await screen.findByRole("heading", { name: "Tài khoản người dùng" });
+    else await screen.findByText("CF-0012 · Nguyễn Kiệm");
 
-    fireEvent.click(screen.getByRole("button", { name: "Đổi mật khẩu" }));
+    fireEvent.keyDown(screen.getByRole("button", { name: "Menu tài khoản" }), { key: "ArrowDown" });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Đổi mật khẩu" }));
     const dialog = screen.getByRole("dialog", { name: "Đổi mật khẩu" });
     fireEvent.change(within(dialog).getByLabelText(/Mật khẩu hiện tại/), { target: { value: "correct-password" } });
     fireEvent.change(within(dialog).getByLabelText(/Mật khẩu mới/), { target: { value: "Một mật khẩu rất riêng 2026!" } });
@@ -135,7 +135,7 @@ describe("Admin lifecycle workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
 
     await waitFor(() => expect(api.login).toHaveBeenCalledWith("chain.admin", "correct-password"));
-    expect(await screen.findByRole("heading", { name: "Đặt lịch ngừng hoạt động" })).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Tổng quan vận hành" })).toBeVisible();
   });
 
   it("creates a schedule with display date converted to the ISO contract", async () => {
@@ -179,18 +179,18 @@ describe("Admin lifecycle workspace", () => {
 });
 
 describe("Admin catalog staging workspace", () => {
-  it("opens catalog for CATALOG_ADMIN without requesting lifecycle scope", async () => {
+  it("opens catalog for CATALOG_ADMIN without requesting lifecycle schedules", async () => {
     const api = gateway({
       getSession: vi.fn().mockResolvedValue(catalogSession),
       listCatalogImports: vi.fn().mockResolvedValue(catalogImportsFixture as Awaited<ReturnType<LifecycleAdminGateway["listCatalogImports"]>>),
       getCatalogImport: vi.fn().mockResolvedValue(catalogDetailFixture as Awaited<ReturnType<LifecycleAdminGateway["getCatalogImport"]>>),
     });
-    renderApp(api);
+    renderApp(api, "catalog");
 
     expect(await screen.findByRole("heading", { name: "Kiểm tra catalog CSV" })).toBeVisible();
     expect(await screen.findByText("catalog-conflict.csv")).toBeVisible();
     expect((await screen.findAllByText("UPC bị lặp trong cùng file."))[0]).toBeVisible();
-    expect(api.listTargets).not.toHaveBeenCalled();
+    // Scoped targets are probed for navigation because session lacks region assignments.
     expect(api.listSchedules).not.toHaveBeenCalled();
   });
 
@@ -204,7 +204,7 @@ describe("Admin catalog staging workspace", () => {
       }),
       uploadCatalogImport: vi.fn().mockResolvedValue(catalogUploadFixture as Awaited<ReturnType<LifecycleAdminGateway["uploadCatalogImport"]>>),
     });
-    renderApp(api);
+    renderApp(api, "catalog");
     const input = await screen.findByLabelText(/File UTF-8 CSV/);
     const file = new File(["NCC,Tên NCC,UPC,SKU,Tên sản phẩm\n0007,NCC Demo,00123,SKU-1,Sản phẩm\n"], "catalog.csv", { type: "text/csv" });
     fireEvent.change(input, { target: { files: [file] } });
@@ -225,7 +225,7 @@ describe("Admin catalog staging workspace", () => {
       listCatalogImports: vi.fn().mockResolvedValue([]),
       uploadCatalogImport: vi.fn().mockRejectedValue(new Error("Header catalog không hợp lệ.")),
     });
-    renderApp(api);
+    renderApp(api, "catalog");
     const input = await screen.findByLabelText(/File UTF-8 CSV/);
     fireEvent.change(input, { target: { files: [new File(["bad"], "bad.csv", { type: "text/csv" })] } });
     fireEvent.click(screen.getByRole("button", { name: "Tải lên và kiểm tra" }));
@@ -272,5 +272,45 @@ describe("Admin identity workspace", () => {
     fireEvent.change(within(dialog).getByLabelText(/Lý do/), { target: { value: "Kiểm tra guard" } });
     fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận vô hiệu hóa" }));
     expect(await within(dialog).findByRole("alert")).toHaveTextContent("quản trị chuỗi cuối cùng");
+  });
+});
+
+
+describe("Admin Fresh shell and overview", () => {
+  it("keeps mock overview separate from API data and filters its sample table", async () => {
+    const api = gateway();
+    renderApp(api, "overview");
+    expect(await screen.findByRole("heading", { name: "Tổng quan vận hành" })).toBeVisible();
+    expect(screen.getByText("Chưa kết nối realtime")).toBeVisible();
+    expect(api.listUsers).not.toHaveBeenCalled();
+    expect(api.listSchedules).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText("Khoảng thời gian"), { target: { value: "30" } });
+    expect(screen.getByText("Trong 30 ngày được chọn")).toBeVisible();
+    fireEvent.change(screen.getByLabelText("Tìm cửa hàng mẫu"), { target: { value: "DEMO-003" } });
+    const table = screen.getByRole("region", { name: "Bảng cửa hàng minh họa" });
+    expect(within(table).getByText("Cửa hàng Tân Phong")).toBeVisible();
+    expect(within(table).queryByText("Cửa hàng An Phú")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Chờ duyệt" }));
+    expect(within(table).getByText(/Không có cửa hàng mẫu phù hợp/)).toBeVisible();
+  });
+
+  it("does not expose chain or catalog navigation to a region actor", async () => {
+    const api = gateway({ getSession: vi.fn().mockResolvedValue(sessionFixture) });
+    renderApp(api, "identity");
+    expect(await screen.findByRole("heading", { name: "Tổng quan vận hành" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Lifecycle" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Tài khoản" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Catalog" })).not.toBeInTheDocument();
+    expect(api.listUsers).not.toHaveBeenCalled();
+  });
+
+  it("hides lifecycle on server scope denial and allows catalog via navigation", async () => {
+    const api = gateway({ getSession: vi.fn().mockResolvedValue(catalogSession), listTargets: vi.fn().mockRejectedValue(Object.assign(new Error("No scope"), { status: 403 })) });
+    renderApp(api, "overview");
+    await screen.findByRole("heading", { name: "Tổng quan vận hành" });
+    await waitFor(() => expect(api.listTargets).toHaveBeenCalled());
+    expect(screen.queryByRole("button", { name: "Lifecycle" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Catalog" }));
+    expect(await screen.findByRole("heading", { name: "Kiểm tra catalog CSV" })).toBeVisible();
   });
 });

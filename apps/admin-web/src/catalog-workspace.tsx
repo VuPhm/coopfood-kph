@@ -1,7 +1,7 @@
 import { AdminListLabel, batchPresentation, rowPresentation } from "./list-labels";
 import { Button, Field, ListItemMarker } from "@coopfood-kph/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, CheckCircle2, FileSearch, KeyRound, Leaf, ListChecks, LogOut, RefreshCw, Upload } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FileSearch, ListChecks, RefreshCw, Upload } from "lucide-react";
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from "react";
 
 import type { AdminSession, CatalogImportBatch, LifecycleAdminGateway } from "./lifecycle-admin";
@@ -11,15 +11,10 @@ const catalogKeys = {
   detail: ["catalog-import"] as const,
 };
 
-export function CatalogWorkspace({ gateway, session, onLogout, logoutBusy, onChangePassword, onError, onOpenLifecycle, onOpenIdentity }: {
+export function CatalogWorkspace({ gateway, session, onError }: {
   gateway: LifecycleAdminGateway;
   session: AdminSession;
-  onLogout(): void;
-  logoutBusy: boolean;
-  onChangePassword(): void;
   onError(error: unknown): void;
-  onOpenLifecycle?: () => void;
-  onOpenIdentity?: () => void;
 }) {
   const queryClient = useQueryClient();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -83,16 +78,8 @@ export function CatalogWorkspace({ gateway, session, onLogout, logoutBusy, onCha
   }
 
   const loadError = imports.error instanceof Error ? imports.error.message : detail.error instanceof Error ? detail.error.message : null;
-  return <div className="min-h-dvh bg-canvas text-ink">
-    <a href="#admin-main" className="sr-only fixed left-4 top-4 z-50 rounded-xl bg-white px-4 py-3 font-bold text-brand shadow-panel focus:not-sr-only">Bỏ qua đến nội dung chính</a>
-    <header className="sticky top-0 z-20 bg-brand text-white shadow-panel">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-brand"><Leaf aria-hidden="true" /></span><div className="min-w-0"><strong className="block truncate text-base font-black sm:text-lg">Co.op Food KPH</strong><span className="block truncate text-xs text-white/80">Catalog staging & validation</span></div></div>
-        <div className="flex flex-wrap items-center justify-end gap-2">{onOpenIdentity ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenIdentity} variant="secondary">Tài khoản</Button> : null}{onOpenLifecycle ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenLifecycle} variant="secondary">Lifecycle</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đổi mật khẩu" className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onChangePassword} size="icon" variant="secondary"><KeyRound aria-hidden="true" size={18} /></Button><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
-      </div>
-    </header>
-
-    <main id="admin-main" className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)] lg:py-8">
+  return <div className="admin-workspace legacy-workspace">
+    <div className="admin-workspace-grid">
       <section className="self-start rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="upload-heading">
         <div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><Upload aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">C01 · Chỉ staging</p><h1 id="upload-heading" className="mt-1 text-2xl font-black tracking-tight">Kiểm tra catalog CSV</h1></div></div>
         <p className="mt-4 text-sm leading-6 text-ink-muted">File hợp lệ vẫn chưa được publish và không xuất hiện trong lookup cửa hàng.</p>
@@ -121,7 +108,7 @@ export function CatalogWorkspace({ gateway, session, onLogout, logoutBusy, onCha
           {detail.data.rowTotal > detail.data.rowLimit ? <nav className="mt-4 flex items-center justify-between gap-3" aria-label="Phân trang dòng catalog"><Button variant="secondary" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - detail.data!.rowLimit))}>Trang trước</Button><span className="text-sm font-semibold text-ink-muted">{offset + 1}–{Math.min(offset + detail.data.rowLimit, detail.data.rowTotal)} / {detail.data.rowTotal}</span><Button variant="secondary" disabled={offset + detail.data.rowLimit >= detail.data.rowTotal} onClick={() => setOffset(offset + detail.data!.rowLimit)}>Trang sau</Button></nav> : null}
         </div> : selected && detail.isPending ? <p className="mt-8 text-sm text-ink-muted" role="status">Đang tải chi tiết batch…</p> : null}
       </section>
-    </main>
+    </div>
   </div>;
 }
 

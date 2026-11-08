@@ -1,15 +1,22 @@
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Input, ListItemMarker } from "@coopfood-kph/ui";
 import { AdminListLabel, schedulePresentation } from "./list-labels";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarClock, CheckCircle2, Clock3, KeyRound, Leaf, LogOut, MapPinned, RefreshCw, ShieldCheck, Store, XCircle } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock3, Leaf, MapPinned, RefreshCw, ShieldCheck, Store, XCircle } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
+import { AdminShell, type AdminWorkspace } from "./admin-shell";
+import { AdminOverview } from "./admin-overview";
 import { CatalogWorkspace } from "./catalog-workspace";
 import { IdentityWorkspace } from "./identity-workspace";
 import { ChangePasswordDialog } from "./change-password-dialog";
-import { createLifecycleAdminGateway, type AdminSession, type LifecycleAdminGateway, type LifecycleSchedule, type LifecycleTarget } from "./lifecycle-admin";
+import { createLifecycleAdminGateway, type LifecycleAdminGateway, type LifecycleSchedule, type LifecycleTarget } from "./lifecycle-admin";
 
 type AppProps = { gateway?: LifecycleAdminGateway };
+function workspaceFromHash(): AdminWorkspace {
+  const hash = window.location.hash.slice(1);
+  return hash === "identity" || hash === "catalog" || hash === "lifecycle" ? hash : "overview";
+}
+
 type ScheduleAction = "reschedule" | "cancel" | "execute";
 
 function isUnauthorized(error: unknown) {
@@ -26,7 +33,13 @@ const queryKeys = {
 export function App({ gateway: providedGateway }: AppProps) {
   const gateway = useMemo(() => providedGateway ?? createLifecycleAdminGateway(), [providedGateway]);
   const queryClient = useQueryClient();
-  const [workspace, setWorkspace] = useState<"catalog" | "identity" | "lifecycle">("catalog");
+  const [workspace, setWorkspace] = useState<AdminWorkspace>(() => workspaceFromHash());
+  useEffect(() => {
+    const update = () => { if (window.location.hash !== "#admin-main") setWorkspace(workspaceFromHash()); };
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
+  function navigate(next: AdminWorkspace) { window.location.hash = next; setWorkspace(next); }
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [loginNotice, setLoginNotice] = useState<string | null>(null);
   const sessionQuery = useQuery({ queryKey: queryKeys.session, queryFn: async ({ signal }) => {
@@ -35,12 +48,11 @@ export function App({ gateway: providedGateway }: AppProps) {
   }, retry: false });
   const hasCatalog = Boolean(sessionQuery.data?.user.globalRoles.includes("CATALOG_ADMIN"));
   const hasChainAdmin = Boolean(sessionQuery.data?.user.globalRoles.includes("CHAIN_ADMIN"));
-  const activeWorkspace = workspace === "catalog" && !hasCatalog
-    ? "lifecycle"
-    : workspace === "identity" && !hasChainAdmin
-      ? hasCatalog ? "catalog" : "lifecycle"
-      : workspace;
-  const targetsQuery = useQuery({ queryKey: [...queryKeys.targets, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listTargets(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "lifecycle", retry: false });
+  // The session does not expose region assignments. Probe the existing scoped API;
+  // never infer inherited scope from membership or global role names alone.
+  const targetsQuery = useQuery({ queryKey: [...queryKeys.targets, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listTargets(signal), enabled: Boolean(sessionQuery.data), retry: false });
+  const canLifecycle = hasChainAdmin || targetsQuery.isSuccess;
+  const activeWorkspace = workspace === "catalog" && !hasCatalog || workspace === "identity" && !hasChainAdmin || workspace === "lifecycle" && !canLifecycle ? "overview" : workspace;
   const schedulesQuery = useQuery({ queryKey: [...queryKeys.schedules, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listSchedules(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "lifecycle", retry: false });
   const usersQuery = useQuery({ queryKey: [...queryKeys.users, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listUsers(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "identity", retry: false });
   const clearSession = useCallback(() => {
@@ -72,7 +84,7 @@ export function App({ gateway: providedGateway }: AppProps) {
       setLoginNotice(null);
       queryClient.setQueryData(queryKeys.session, session);
       const catalog = session.user.globalRoles.includes("CATALOG_ADMIN");
-      setWorkspace(catalog ? "catalog" : "lifecycle");
+      navigate("overview");
       if (catalog) void queryClient.invalidateQueries({ queryKey: ["catalog-imports"] });
       else {
         void queryClient.invalidateQueries({ queryKey: queryKeys.targets });
@@ -106,67 +118,39 @@ export function App({ gateway: providedGateway }: AppProps) {
     }}
   />;
 
-  if (activeWorkspace === "catalog") {
-    return <><CatalogWorkspace
-      gateway={gateway}
-      session={sessionQuery.data}
-      onChangePassword={() => setChangePasswordOpen(true)}
-      onLogout={() => logout.mutate()}
-      logoutBusy={logout.isPending}
-      onError={handleError}
-      onOpenLifecycle={() => setWorkspace("lifecycle")}
-      {...(hasChainAdmin ? { onOpenIdentity: () => setWorkspace("identity") } : {})}
-    />{passwordDialog}</>;
-  }
-
-  if (activeWorkspace === "identity") {
-    return <><IdentityWorkspace
-      gateway={gateway}
-      session={sessionQuery.data}
-      onChangePassword={() => setChangePasswordOpen(true)}
-      users={usersQuery.data ?? []}
-      loading={usersQuery.isPending}
-      loadError={logout.error instanceof Error ? logout.error.message : usersQuery.error instanceof Error ? usersQuery.error.message : null}
-      onRefresh={() => void usersQuery.refetch()}
-      onLogout={() => logout.mutate()}
-      logoutBusy={logout.isPending}
-      onError={handleError}
-      onOpenLifecycle={() => setWorkspace("lifecycle")}
-      {...(hasCatalog ? { onOpenCatalog: () => setWorkspace("catalog") } : {})}
-    />{passwordDialog}</>;
-  }
-
-  return <><LifecycleWorkspace
-    gateway={gateway}
-    session={sessionQuery.data}
-    targets={targetsQuery.data ?? []}
-    schedules={schedulesQuery.data ?? []}
-    loading={targetsQuery.isPending || schedulesQuery.isPending}
-    loadError={logout.error instanceof Error ? logout.error.message : targetsQuery.error instanceof Error ? targetsQuery.error.message : schedulesQuery.error instanceof Error ? schedulesQuery.error.message : null}
-    onRefresh={() => { void targetsQuery.refetch(); void schedulesQuery.refetch(); }}
-    onLogout={() => logout.mutate()}
-    logoutBusy={logout.isPending}
-    onChangePassword={() => setChangePasswordOpen(true)}
-    onError={handleError}
-    {...(hasCatalog ? { onOpenCatalog: () => setWorkspace("catalog") } : {})}
-    {...(hasChainAdmin ? { onOpenIdentity: () => setWorkspace("identity") } : {})}
-  />{passwordDialog}</>;
+  return <AdminShell
+    session={sessionQuery.data} workspace={activeWorkspace}
+    canIdentity={hasChainAdmin} canCatalog={hasCatalog} canLifecycle={canLifecycle}
+    onNavigate={navigate} onChangePassword={() => setChangePasswordOpen(true)}
+    onLogout={() => logout.mutate()} logoutBusy={logout.isPending}
+  >
+    {logout.error instanceof Error && <p role="alert" className="admin-error">{logout.error.message}</p>}
+    {targetsQuery.isError && !isUnauthorized(targetsQuery.error) && !(typeof targetsQuery.error === "object" && targetsQuery.error !== null && "status" in targetsQuery.error && targetsQuery.error.status === 403) && <p role="alert" className="admin-error">Không thể tải phạm vi quản trị. <button type="button" onClick={() => void targetsQuery.refetch()}>Thử lại</button></p>}
+    {activeWorkspace === "overview" && <AdminOverview />}
+    {activeWorkspace === "catalog" && <CatalogWorkspace gateway={gateway} session={sessionQuery.data} onError={handleError} />}
+    {activeWorkspace === "identity" && <IdentityWorkspace
+      gateway={gateway} session={sessionQuery.data} users={usersQuery.data ?? []}
+      loading={usersQuery.isPending} loadError={usersQuery.error instanceof Error ? usersQuery.error.message : null}
+      onRefresh={() => void usersQuery.refetch()} onError={handleError}
+    />}
+    {activeWorkspace === "lifecycle" && <LifecycleWorkspace
+      gateway={gateway} targets={targetsQuery.data ?? []} schedules={schedulesQuery.data ?? []}
+      loading={targetsQuery.isPending || schedulesQuery.isPending}
+      loadError={targetsQuery.error instanceof Error ? targetsQuery.error.message : schedulesQuery.error instanceof Error ? schedulesQuery.error.message : null}
+      onRefresh={() => { void targetsQuery.refetch(); void schedulesQuery.refetch(); }} onError={handleError}
+    />}
+    {passwordDialog}
+  </AdminShell>;
 }
 
-function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loadError, onRefresh, onLogout, logoutBusy, onChangePassword, onError, onOpenCatalog, onOpenIdentity }: {
+function LifecycleWorkspace({ gateway, targets, schedules, loading, loadError, onRefresh, onError }: {
   gateway: LifecycleAdminGateway;
-  session: AdminSession;
   targets: LifecycleTarget[];
   schedules: LifecycleSchedule[];
   loading: boolean;
   loadError: string | null;
   onRefresh(): void;
-  onLogout(): void;
-  logoutBusy: boolean;
-  onChangePassword(): void;
   onError(error: unknown): void;
-  onOpenCatalog?: () => void;
-  onOpenIdentity?: () => void;
 }) {
   const queryClient = useQueryClient();
   const [targetKey, setTargetKey] = useState("");
@@ -207,16 +191,8 @@ function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loa
   const pendingCount = schedules.filter((schedule) => schedule.status === "SCHEDULED").length;
   const canManage = targets.length > 0;
 
-  return <div className="min-h-dvh bg-canvas text-ink">
-    <a href="#admin-main" className="sr-only fixed left-4 top-4 z-50 rounded-xl bg-white px-4 py-3 font-bold text-brand shadow-panel focus:not-sr-only">Bỏ qua đến nội dung chính</a>
-    <header className="sticky top-0 z-20 bg-brand text-white shadow-panel">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-brand"><Leaf aria-hidden="true" /></span><div className="min-w-0"><strong className="block truncate text-base font-black sm:text-lg">Co.op Food KPH</strong><span className="block truncate text-xs text-white/80">Quản trị vùng và cửa hàng</span></div></div>
-        <div className="flex flex-wrap items-center justify-end gap-2">{onOpenIdentity ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenIdentity} variant="secondary">Tài khoản</Button> : null}{onOpenCatalog ? <Button className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onOpenCatalog} variant="secondary">Catalog</Button> : null}<span className="hidden text-right text-xs leading-5 text-white/80 sm:block"><strong className="block text-sm text-white">{session.user.displayName}</strong>{session.user.username}</span><Button aria-label="Đổi mật khẩu" className="border-white/25 bg-white/10 text-white hover:bg-white/20" onClick={onChangePassword} size="icon" variant="secondary"><KeyRound aria-hidden="true" size={18} /></Button><Button aria-label="Đăng xuất" className="border-white/25 bg-white/10 text-white hover:bg-white/20" disabled={logoutBusy} onClick={onLogout} size="icon" variant="secondary"><LogOut aria-hidden="true" size={18} /></Button></div>
-      </div>
-    </header>
-
-    <main id="admin-main" className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)] lg:py-8">
+  return <div className="admin-workspace legacy-workspace">
+    <div className="admin-workspace-grid">
       <section className="rounded-3xl border border-surface-strong bg-white p-5 shadow-panel sm:p-6" aria-labelledby="schedule-heading">
         <div className="flex items-start gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand"><CalendarClock aria-hidden="true" /></span><div><p className="text-xs font-black uppercase tracking-[.14em] text-brand">Tối thiểu 30 ngày</p><h1 id="schedule-heading" className="mt-1 text-2xl font-black tracking-tight">Đặt lịch ngừng hoạt động</h1></div></div>
         <p className="mt-4 text-sm leading-6 text-ink-muted">Vùng hoặc cửa hàng vẫn hoạt động cho đến khi bạn thực thi lịch đã đến hạn. Lịch không tự động chạy.</p>
@@ -238,7 +214,7 @@ function LifecycleWorkspace({ gateway, session, targets, schedules, loading, loa
         {!loading && schedules.length === 0 ? <div className="mt-6 rounded-2xl border border-dashed border-border bg-surface-muted p-8 text-center"><Clock3 className="mx-auto text-brand" aria-hidden="true" /><p className="mt-3 font-black">Chưa có lịch ngừng hoạt động</p><p className="mt-1 text-sm text-ink-muted">Lịch đầu tiên sẽ xuất hiện ở đây sau khi tạo.</p></div> : null}
         <div className="mt-6 grid gap-4">{schedules.map((schedule) => <ScheduleCard key={schedule.id} schedule={schedule} onAction={(type) => setAction({ type, schedule })} />)}</div>
       </section>
-    </main>
+    </div>
     {action ? <ScheduleActionDialog action={action} gateway={gateway} onError={onError} onClose={() => setAction(null)} onSuccess={async (message) => { setNotice(message); setAction(null); await refreshLifecycle(); }} /> : null}
   </div>;
 }
