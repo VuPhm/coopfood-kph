@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Ngày rà soát: 07/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+Ngày rà soát: 09/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
 ## Baseline đã chấp nhận
 
@@ -16,6 +16,23 @@ Ngày rà soát: 07/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài
   commit này là ancestor của main hiện tại. Visual refinement của mốc đó đã
   được deferred, không phải final design system.
   [Quyết định lịch sử](delivery/r2-01-shell-spine/acceptance-handoff.md).
+
+## Admin Web: phần quản lý đã có
+
+Admin Web là [ứng dụng riêng](../apps/admin-web/src/app.tsx), dùng chung backend với Store PWA.
+Chạy `npm --workspace @coopfood-kph/admin-web run dev` rồi mở `http://localhost:5174`.
+Cần backend ở cổng 8081 để đăng nhập. Các workspace hiển thị theo quyền của tài khoản.
+
+| Màn | Người dùng thực hiện được gì | Bằng chứng nghiệm thu |
+| --- | --- | --- |
+| Ngừng hoạt động vùng/cửa hàng | Quản lý chuỗi đặt, đổi, hủy hoặc thực thi lịch đến hạn. Quản lý vùng thao tác trong phạm vi cửa hàng được giao. | [P03](delivery/p03-scheduled-lifecycle/acceptance-handoff.md) |
+| Tài khoản người dùng | Quản trị chuỗi xem danh sách và vô hiệu hóa tài khoản có lý do. | [P04](delivery/p04-user-deactivation/acceptance-handoff.md) |
+| Đổi mật khẩu | Người dùng đổi mật khẩu của mình và đăng nhập lại. | [P05](delivery/p05-credential-self-service/acceptance-handoff.md) |
+| Kiểm tra catalog CSV | Người có quyền CATALOG_ADMIN nhập CSV, xem lỗi từng dòng và lịch sử kiểm tra. Dữ liệu ở staging. | [C01](delivery/c01-catalog-staging/acceptance-handoff.md) |
+
+Các mốc trên nghiệm thu từng chức năng. FRESH01 nghiệm thu giao diện Store.
+Màn gán/thu hồi quyền tại cửa hàng chưa có trong Admin Web. Tạo người dùng, tạo
+cửa hàng và cấp quyền vùng là các nhu cầu riêng trong [policy P01](product/PROVISIONING_POLICY.md).
 
 ## Ranh giới implementation
 
