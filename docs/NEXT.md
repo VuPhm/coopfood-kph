@@ -8,8 +8,9 @@ owner chấp nhận ADMIN03 qua chat, giữ kiểm tổ hợp rộng ở vòng c
 
 Nhánh `store-app/kphon01-effective-context`, từ checkpoint ADMIN03 accepted
 `b6bd19a`, không merge các nhánh BE cũ hoặc main. [Plan](delivery/kphon01-effective-context/plan.json).
-Bước hiện tại: GET /api/v1/kph/stores + Fresh login/chọn store, kiểm scope thật,
-không mock fallback. [Contract](product/STORE_KPH_CONTEXT_CONTRACT.md).
+KPHON01 đã tạm đạt theo owner ngày09/11/2026 và đóng slice context.
+[Quyết định](delivery/kphon01-effective-context/acceptance-2026-11-09.md).
+Đã có GET /api/v1/kph/stores + Fresh login/chọn store, kiểm scope thật, không mock fallback. [Contract](product/STORE_KPH_CONTEXT_CONTRACT.md).
 
 Slice kế tiếp: nối lookup barcode và history KPH trên context này, giữ D01
 filter/sort/count trước pagination và page-local selection/reset. Sau đó nối
@@ -20,6 +21,16 @@ DATE/report/notification chưa có backend trong entry này phải hiện rõ ch
 kết nối, không render mock operational data. C02 supplier/lookup publish và
 rollout vẫn outcome riêng. Kiểm authorization/integrity có mục tiêu ở mỗi slice;
 không thay kiểm tổ hợp cuối bằng việc ký nhận các tổ hợp con.
+
+## Hai vòng để sau trước nghiệm thu cuối
+
+1. Một vòng test kỹ và tổ hợp các luồng đã nối.
+2. Một vòng UI/UX sau vòng test kỹ.
+
+Đây là yêu cầu owner ngày09/11/2026; cả hai còn pending, chưa chạy hoặc được
+coi là PASS. Không tự mở hai vòng trong lượt ghi nhận tạm đạt; giữ kiểm scope/
+integrity có mục tiêu khi triển khai tiếp. Tạm đạt context không phải nghiệm thu
+cuối toàn app hoặc quyền rollout.
 
 ## Thứ tự phụ thuộc đề xuất
 

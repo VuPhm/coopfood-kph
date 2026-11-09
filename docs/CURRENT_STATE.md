@@ -64,7 +64,8 @@ ngày09/11/2026. Candidate `0bd2c47`: frontend358 tests/build/PWA, backend80 tes
 và real-backend Playwright hai phiên đạt. Owner yêu cầu tiếp roadmap và giữ kiểm
 tổ hợp toàn cục ở vòng cuối; không coi tổ hợp cuối đã chạy hoặc rollout đã duyệt.
 
-**KPHON01 — effective context** đang là candidate trên nhánh
+**KPHON01 — effective context** được owner ghi nhận tạm đạt ngày09/11/2026,
+đóng slice trong phạm vi context trên nhánh
 `store-app/kphon01-effective-context`, base accepted ADMIN03 `b6bd19a`.
 Thêm GET `/api/v1/kph/stores`, fixture/client và Fresh online entry
 `VITE_STORE_APP_MOCK=false VITE_STORE_APP_ONLINE=true`. Session và GET /stores
@@ -74,7 +75,9 @@ Các màn nghiệp vụ chưa nối hiện trạng thái rõ, không fallback mo
 Targeted checks đạt20 backend tests (discovery/policy/catalog/architecture),22
 frontend tests (9 context/client mới,9 online cũ,4 API), builds Fresh online/mock
 và real-backend Playwright390×844/1440×1024. Không phải full regression mới hoặc
-kiểm tổ hợp cuối; owner context candidate còn pending.
+kiểm tổ hợp cuối. [Owner acceptance có giới hạn](delivery/kphon01-effective-context/acceptance-2026-11-09.md):
+giữ một vòng test kỹ/tổ hợp, rồi một vòng UI/UX cho sau; hai vòng này chưa chạy.
+Đây chưa phải nghiệm thu cuối toàn KPH/app; ADR0007 vẫn Proposed.
 [Contract context](product/STORE_KPH_CONTEXT_CONTRACT.md),
 [kế hoạch](delivery/kphon01-effective-context/plan.json).
 
