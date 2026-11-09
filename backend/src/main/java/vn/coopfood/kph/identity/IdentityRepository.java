@@ -167,7 +167,7 @@ class IdentityRepository {
                 JOIN user_roles ur ON ur.user_id = u.id AND ur.role = 'CHAIN_ADMIN'
                 WHERE u.active
                 ORDER BY u.id
-                FOR UPDATE OF u
+                FOR NO KEY UPDATE OF u
                 """).getValues("id", UUID.class);
     }
 
@@ -176,7 +176,7 @@ class IdentityRepository {
                 SELECT id, username, display_name, active
                 FROM app_users
                 WHERE id = ?
-                FOR UPDATE
+                FOR NO KEY UPDATE
                 """, userId).map(row -> new TargetUser(
                         row.get("id", UUID.class),
                         row.get("username", String.class),
@@ -200,7 +200,9 @@ class IdentityRepository {
                 """, userId).getValues("id", UUID.class);
     }
 
-    List<UUID> lockActiveStoreManagerIds(UUID storeId) {
+    // Caller owns the store row lock. Do not lock other manager users here:
+    // concurrent mutations lock their own target user before waiting on the store.
+    List<UUID> activeStoreManagerIds(UUID storeId) {
         return database.fetch("""
                 SELECT sm.user_id
                 FROM store_memberships sm
@@ -209,7 +211,6 @@ class IdentityRepository {
                   AND sm.active
                   AND sm.role = 'STORE_MANAGER'
                 ORDER BY sm.user_id
-                FOR UPDATE OF sm, u
                 """, storeId).getValues("user_id", UUID.class);
     }
 

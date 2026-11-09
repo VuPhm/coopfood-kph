@@ -56,7 +56,7 @@ class IdentityAdminService {
                     "The last active chain administrator cannot be deactivated.");
         }
         for (UUID storeId : repository.lockActiveStoresManagedBy(userId)) {
-            if (repository.lockActiveStoreManagerIds(storeId).size() == 1) {
+            if (repository.activeStoreManagerIds(storeId).size() == 1) {
                 throw problem(HttpStatus.CONFLICT, "LAST_STORE_MANAGER_REQUIRED",
                         "A user cannot be deactivated while they are the last active manager of an active store.");
             }

@@ -211,6 +211,8 @@ class LifecycleRepository {
         return count == null ? 0 : count;
     }
 
+    // execute already owns the store row lock; manager state changes use that
+    // same lock. Locking user rows here would invert target-user -> store order.
     int countActiveStoreManagers(UUID storeId) {
         return database.fetch("""
                 SELECT sm.user_id
@@ -219,7 +221,6 @@ class LifecycleRepository {
                 WHERE sm.store_id = ?
                   AND sm.active
                   AND sm.role = 'STORE_MANAGER'
-                FOR SHARE OF sm, u
                 """, storeId).size();
     }
 

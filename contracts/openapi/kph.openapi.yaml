@@ -18,7 +18,7 @@ tags:
   - name: KPH
   - name: Admin identity
   - name: Admin membership
-    description: ADMIN03 contract-first slice; runtime implementation and acceptance are pending.
+    description: ADMIN03 backend implemented; Admin Web membership UI and owner acceptance are pending.
   - name: Admin lifecycle
   - name: Admin catalog
 security:
@@ -485,7 +485,7 @@ paths:
   /api/v1/admin/membership-stores:
     get:
       tags: [Admin membership]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       operationId: listMembershipStores
       summary: List active stores the actor can manage
       description: |
@@ -516,7 +516,7 @@ paths:
   /api/v1/admin/stores/{storeId}/memberships:
     get:
       tags: [Admin membership]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       operationId: listStoreMemberships
       summary: List memberships of one authorized store
       description: |
@@ -551,7 +551,7 @@ paths:
   /api/v1/admin/stores/{storeId}/membership-user-lookup:
     post:
       tags: [Admin membership]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       operationId: lookupMembershipUser
       summary: Find one active user by exact username
       description: |
@@ -600,7 +600,7 @@ paths:
   /api/v1/admin/stores/{storeId}/memberships/{userId}:
     put:
       tags: [Admin membership]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       operationId: upsertStoreMembership
       summary: Create, reactivate or change a store membership
       description: |
@@ -654,7 +654,7 @@ paths:
   /api/v1/admin/stores/{storeId}/memberships/{userId}/revoke:
     post:
       tags: [Admin membership]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       operationId: revokeStoreMembership
       summary: Immediately revoke a store membership with a reason
       description: |

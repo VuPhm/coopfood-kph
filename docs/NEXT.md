@@ -2,8 +2,8 @@
 
 Cập nhật 09/11/2026. Baseline: [CURRENT_STATE](CURRENT_STATE.md).
 FRESH01 đã CLOSED. ADMIN03 đang thực hiện trên nhánh
-`store-app/admin03-store-membership`: contract/examples/generated client đã có,
-backend/UI và nghiệm thu hai phiên còn pending. Tiếp tục cùng
+`store-app/admin03-store-membership`: contract/examples/generated client và backend đã có;
+workspace Admin và kiểm hai phiên bằng browser còn pending. Tiếp tục cùng
 [kế hoạch](delivery/admin03-store-membership/plan.json), không mở lại ADMIN01
 hoặc xem preview ADMIN02 như implementation membership.
 Thứ tự dưới đây là đề xuất ưu tiên đã được ghi nhận trong lần chuẩn hóa tài liệu,
@@ -11,8 +11,8 @@ không phải nghiệm thu contract mới hoặc lệnh bắt đầu toàn bộ 
 
 ## Mốc Admin Web: cấp và thu hồi quyền cửa hàng
 
-Bước tiếp theo của ADMIN03 là triển khai backend theo OpenAPI, giải quyết thứ tự
-khóa với user deactivation, rồi nối workspace Quyền cửa hàng vào Admin Fresh.
+Bước tiếp theo của ADMIN03 là nối workspace Quyền cửa hàng vào Admin Fresh,
+dùng backend membership hiện có rồi kiểm hai phiên bằng Playwright.
 Bản draft và quyết định lookup đã ở [checkpoint](delivery/admin03-store-membership/contract-draft.md).
 
 Gate duyệt giao diện quản trị riêng vẫn cần owner. Owner mở

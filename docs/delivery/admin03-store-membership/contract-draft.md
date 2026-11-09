@@ -33,7 +33,7 @@ Tests bắt buộc trước demo:
 
 ## Trạng thái thực tế
 
-OpenAPI, 6 fixture API và generated client đã được bổ sung trong bước contract-first ngày 09/11/2026. Các operation mang `x-implementation-status: planned`; backend/UI chưa có implementation. Bảng trên tiếp tục mô tả scope triển khai, không phải API đang chạy hoặc nghiệm thu toàn luồng. ADMIN01 vẫn029b0e7, không bị sửa. ADMIN02 source preview4175 đang chạy riêng và UI acceptance vẫn thuộc owner. Khi chuyển demo sang ADMIN03 cần ghi source rõ, giữ cùng canonical port4175 và dừng đúng process sở hữu; không mở thêm port ngầm.
+OpenAPI, 6 fixture API và generated client đã được bổ sung trong bước contract-first ngày 09/11/2026. Backend đã có implementation cho 5 operation, đánh dấu `x-implementation-status: implemented`; UI membership chưa triển khai. Bảng trên là wire contract dùng triển khai; backend test không phải nghiệm thu toàn luồng UI. ADMIN01 vẫn029b0e7, không bị sửa. ADMIN02 source preview4175 được ghi nhận ở checkpoint trước, lượt này không kiểm lại process và UI acceptance vẫn thuộc owner. Khi chuyển demo sang ADMIN03 cần ghi source rõ, giữ cùng canonical port4175 và dừng đúng process sở hữu; không mở thêm port ngầm.
 
 
 ## Wire contract đã cụ thể hóa
@@ -53,4 +53,20 @@ actor có capability nhưng không còn store active nhận mảng rỗng.
 
 Fixture tổng hợp được link từ operation và kiểm qua `npm run check:contracts`.
 Guard schema/client không thay cho HTTP scope tests, audit/concurrency hoặc
-Playwright; các gate runtime vẫn pending trong plan.
+Playwright; gate backend được ghi riêng, browser và owner vẫn pending trong plan.
+
+
+## Khóa transaction trong backend
+
+Membership mutation kiểm scope trước target, khóa target user bằng
+`FOR NO KEY UPDATE`, rồi khóa store; recheck actor/store scope sau khi chờ khóa.
+User deactivation giữ thứ tự khóa chain admins (UUID order), target user, rồi
+các store đang quản lý (UUID order). Tập store của target ổn định do grant/revoke
+cùng giữ target-user lock. Manager count được đọc bằng statement mới sau khi
+đã giữ store lock, không khóa thêm user quản lý khác. Lifecycle execution cũng
+đã giữ store lock trước manager count và không khóa ngược user rows.
+
+`NO KEY UPDATE` vẫn tuần tự hóa thay đổi user nhưng tương thích với khóa
+`KEY SHARE` của FK khi audit tham chiếu actor/target. Mọi mutation tương lai làm
+đổi active-manager count phải giữ cùng store lock trước khi commit; thêm luồng
+activate/reactivate/move cần kiểm lại protocol này. Không cần schema migration.

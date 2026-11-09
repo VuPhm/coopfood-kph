@@ -89,6 +89,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/*/photos/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/kph", "/api/v1/stores/*/kph/exports").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/stores/*/kph/*/approval").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/membership-stores",
+                                "/api/v1/admin/stores/*/memberships").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/stores/*/membership-user-lookup",
+                                "/api/v1/admin/stores/*/memberships/*/revoke").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/admin/stores/*/memberships/*").authenticated()
                         .requestMatchers("/api/v1/admin/users/**").authenticated()
                         .requestMatchers("/api/v1/admin/lifecycle/**").authenticated()
                         .requestMatchers("/api/v1/admin/catalog/imports/**").authenticated()

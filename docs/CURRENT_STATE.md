@@ -60,9 +60,11 @@ phải test mới ngày 07/11; không chứng minh backend thật hoặc thiết
 
 Sau lần chuẩn hóa, ADMIN01 mở từ `59c7caa`; ADMIN02 có candidate Admin Fresh
 và preview source 4175 riêng, vẫn chờ owner nghiệm thu UI. Tiến độ mới nhất
-trong worktree này là **ADMIN03 contract-first**, nhánh
-`store-app/admin03-store-membership`, base `0adad4d`. Đã thêm 5 API dự kiến,
-fixture và client; backend/UI membership chưa triển khai. Quyết định exact
+trong worktree này là **ADMIN03 backend membership**, nhánh
+`store-app/admin03-store-membership`, base `0adad4d`. Đã có 5 API, fixture/client và backend membership;
+UI membership chưa triển khai. Backend `verify` PASS 80 tests (15 membership),
+gồm kiểm hai phiên HTTP và concurrency; chưa phải browser/owner acceptance.
+Quyết định exact
 username lookup ngoài vùng được giữ theo checkpoint owner ngày 09/11/2026.
 [Kế hoạch hiện hành](delivery/admin03-store-membership/plan.json) và
 [bàn giao](delivery/admin03-store-membership/handoff.md). Những tiến độ trên
