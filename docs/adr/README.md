@@ -21,3 +21,7 @@ ADR accepted hiện hành:
   credential version để thu hồi session sau self-change; accepted cùng P05.
 - `0006-store-app-evolution.md`: tiến hóa Store App theo slice, giữ contract và
   Pages baseline riêng; branch/worktree theo task thay vì executor.
+
+ADR proposed đang có implementation candidate:
+
+- [0007-kph-effective-store-context.md](0007-kph-effective-store-context.md): discovery KPH riêng, giữ membership/session compatibility và backend authority; owner context acceptance pending.

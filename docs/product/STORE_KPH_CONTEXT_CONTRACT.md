@@ -37,3 +37,5 @@ thay đổi, không lấy selector làm authority.
 Provenance chọn lọc: BE02/BE03 cũ2b42c94/4a65334 cung cấp SQL/tests và session
 skeleton, chưa được coi accepted. Path/response hiện tại theo đề xuất mới, không
 nhập `/me/store-access` hay tài liệu catalog sai từ nhánh cũ. Không migration.
+
+Rationale public contract: [ADR0007 proposed](../adr/0007-kph-effective-store-context.md).
