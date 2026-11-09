@@ -61,15 +61,13 @@
       "status": "pending"
     }
   ],
-  "changes": [
-    {
-      "revision": 1,
-      "request": "Tiếp tục lộ trình từ checkpoint ADMIN03; exact username lookup ngoài vùng đã được owner quyết định.",
-      "source": "User 09/11/2026; checkpoint handoff.md tại base ADMIN03",
-      "impact": "Resume cùng branch/worktree; hoàn tất contract-first trước runtime.",
-      "decision": "Giữ contract P01/ADR0004 và draft; không tự nghiệm thu UI hoặc gán API mới cho preview ADMIN02."
-    }
-  ],
+  "changes": [],
   "blockers": [],
-  "nextAction": "Owner dùng thử Admin4175/Store online4173 với tài khoản tổng hợp và quyết định nghiệm thu. Không tự đóng cycle, merge/push/deploy hoặc mở slice KPH tiếp theo."
+  "nextAction": "Owner dùng thử Admin4175/Store online4173 với tài khoản tổng hợp và quyết định nghiệm thu. Không tự đóng cycle, merge/push/deploy hoặc mở slice KPH tiếp theo.",
+  "initialRequest": {
+    "request": "Tiếp tục lộ trình từ checkpoint ADMIN03; exact username lookup ngoài vùng đã được owner quyết định.",
+    "source": "User 09/11/2026; checkpoint handoff.md tại base ADMIN03",
+    "impact": "Resume cùng branch/worktree; hoàn tất contract-first trước runtime.",
+    "decision": "Giữ contract P01/ADR0004 và draft; không tự nghiệm thu UI hoặc gán API mới cho preview ADMIN02."
+  }
 }
