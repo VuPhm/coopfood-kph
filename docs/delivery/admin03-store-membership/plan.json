@@ -15,7 +15,7 @@
     "Thay đổi ADMIN01/ADMIN02, push/merge/deploy/Pages"
   ],
   "baseSha": "0adad4d1076466406c30559a9d5cbb4dfa8ba52c",
-  "candidateSha": "",
+  "candidateSha": "664e2f0fb0a02d382247be892ba104de46fe1340",
   "integrationOwner": "Codex /root — sole writer ADMIN03",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -31,7 +31,10 @@
       "id": "contract-fixtures-client",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "664e2f0fb0a02d382247be892ba104de46fe1340",
+      "evidence": "docs/delivery/admin03-store-membership/contract-evidence.md"
     },
     {
       "id": "backend-scope-audit-concurrency",
@@ -62,5 +65,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Hoàn tất contract/examples/client; sau đó backend + UI và real-backend/browser gates. Owner acceptance vẫn pending."
+  "nextAction": "Triển khai backend theo OpenAPI; giải quyết lock order với user deactivation/lifecycle, test scope/audit/concurrency rồi nối Admin Fresh và kiểm hai phiên/Playwright. Owner acceptance pending."
 }
