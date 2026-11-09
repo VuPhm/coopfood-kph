@@ -4,6 +4,6 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: { port: 5174, proxy: { "/api": "http://127.0.0.1:8081" } },
-  preview: { proxy: { "/api": "http://127.0.0.1:8081" } },
+  server: { port: 5174, strictPort: true, headers: { "Cache-Control": "no-store" }, proxy: { "/api": "http://127.0.0.1:8081" } },
+  preview: { strictPort: true, headers: { "Cache-Control": "no-store" }, proxy: { "/api": "http://127.0.0.1:8081" } },
 });
