@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon01-effective-context",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Effective KPH store discovery và session/chọn cửa hàng trên shell Fresh, không fallback mock; nền để nối KPH từng slice.",
   "inScope": [
     "GET /api/v1/kph/stores theo scope P01; OpenAPI/fixture/generated client cùng backend",
@@ -16,7 +16,7 @@
     "Merge main/push/deploy/Pages, redesign diện rộng"
   ],
   "baseSha": "b6bd19a6e229c852e1d28a43027b9266bc44c9b4",
-  "candidateSha": "",
+  "candidateSha": "751df44f207a8d6ff76068cbe2bcbdbce00d1cd4",
   "integrationOwner": "Codex /root — sole writer",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -25,26 +25,35 @@
     "scripts/check-contracts.mjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "contract-backend-scope",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "751df44f207a8d6ff76068cbe2bcbdbce00d1cd4",
+      "evidence": "docs/delivery/kphon01-effective-context/evidence.md"
     },
     {
       "id": "fresh-session-client",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "751df44f207a8d6ff76068cbe2bcbdbce00d1cd4",
+      "evidence": "docs/delivery/kphon01-effective-context/evidence.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "751df44f207a8d6ff76068cbe2bcbdbce00d1cd4",
+      "evidence": "docs/delivery/kphon01-effective-context/evidence.md"
     },
     {
       "id": "owner-context",
@@ -55,7 +64,7 @@
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Triển khai và kiểm KPHON01; tổ hợp toàn roadmap giữ cho vòng cuối theo owner.",
+  "nextAction": "KPHON01 technical PASS; tiếp nối lookup/history trên effective context, giữ D01. Owner context/ADR acceptance chưa được suy từ ADMIN03; tổ hợp trọn KPH và toàn roadmap giữ ở vòng cuối.",
   "initialRequest": {
     "request": "coi như pass ... test tổ hợp sau cuối ... tiếp",
     "source": "Owner chat09/11/2026 sau bàn giao ADMIN03",
