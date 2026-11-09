@@ -63,3 +63,11 @@ JDK21, DB/private media trên. Không tự mở thêm Admin port hoặc dừng p
 Nếu cần trả preview về ADMIN02: dừng đúng `.admin03.app` rồi dùng launcher
 `e2e/scripts/start-admin02-ui.sh` trong worktree ADMIN02 đã lưu; không reset data.
 Không merge/push/deploy hoặc thay protected Pages. Owner acceptance còn pending.
+
+
+## Quyết định mới nhất
+
+Owner chấp nhận qua chat ngày09/11/2026: “coi như pass, vì test tổ hợp sau cuối
+sẽ cover được tổ hợp con này”, đồng thời yêu cầu tiếp lộ trình. [Acceptance](acceptance-2026-11-09.md).
+ADMIN03 CLOSED; các ghi chú chờ nghiệm thu phía trên là trạng thái tại lúc bàn giao.
+Không coi kiểm tổ hợp cuối đã chạy hoặc rollout đã được chấp nhận.

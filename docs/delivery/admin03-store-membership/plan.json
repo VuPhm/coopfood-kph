@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "admin03-store-membership",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Admin Fresh đã có luồng cấp/thu hồi quyền cửa hàng với API thật; technical gates đạt, chờ owner nghiệm thu.",
+  "status": "CLOSED",
+  "objective": "Admin Fresh cấp/thu hồi quyền cửa hàng: technical PASS và owner chấp nhận ngày09/11/2026; tổ hợp rộng giữ ở gate cuối.",
   "inScope": [
     "5 API membership theo contract-draft; fixture tổng hợp và generated client",
     "Backend chain/region scope, audit, last-manager và concurrency với user deactivation",
@@ -58,12 +58,17 @@
       "id": "owner-membership-workflow",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "0bd2c474e4cc28c9665860f1294c953c05b148c5",
+      "evidence": "docs/delivery/admin03-store-membership/acceptance-2026-11-09.md",
+      "acceptedBy": "Project owner",
+      "decisionRef": "docs/delivery/admin03-store-membership/acceptance-2026-11-09.md#quyet-dinh-owner"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Owner dùng thử Admin4175/Store online4173 với tài khoản tổng hợp và quyết định nghiệm thu. Không tự đóng cycle, merge/push/deploy hoặc mở slice KPH tiếp theo.",
+  "nextAction": "ADMIN03 CLOSED. Owner yêu cầu tiếp roadmap KPH online; mở outcome kế tiếp riêng từ checkpoint đã nghiệm thu, giữ kiểm tổ hợp cuối và giới hạn rollout.",
   "initialRequest": {
     "request": "Tiếp tục lộ trình từ checkpoint ADMIN03; exact username lookup ngoài vùng đã được owner quyết định.",
     "source": "User 09/11/2026; checkpoint handoff.md tại base ADMIN03",
