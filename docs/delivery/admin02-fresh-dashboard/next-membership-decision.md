@@ -17,6 +17,6 @@ API hiện tại GET admin/users chỉ dành cho CHAIN_ADMIN; không mở nguyê
 1. Chỉ tìm người đã có membership/assignment trong vùng actor được giao. Phạm vi kín hơn; người chưa thuộc vùng cần chain admin cấp lần đầu. Cần định nghĩa rõ quan hệ active nào làm người đó xuất hiện.
 2. Tra cứu username chính xác của active user toàn hệ thống, trả identity tối thiểu cho việc cấp membership vào store đúng scope. Cho phép người chưa thuộc vùng; cần owner chấp nhận việc xác nhận sự tồn tại của username từ ngoài vùng. Không trả global/region roles hay memberships ngoài scope.
 
-Câu hỏi đã gửi trong chat. Chưa có quyết định tại lúc ghi đề xuất. Không tự chọn eligibility hoặc đổi contract vì đã được yêu cầu tiếp roadmap.
+Owner đã quyết định trong chat09/11/2026: chọn phương án2 — tra cứu chính xác username, kể cả người chưa thuộc vùng. Chỉ trả id/username/displayName của active user; scope store vẫn do server kiểm. Không mở global directory cho region.
 
 Sau quyết định: kiểm tra ownership ADMIN01 thực tế, giữ worktree/branch task riêng, chốt OpenAPI+examples+client trong một slice; backend scope/audit/transaction tests; UI Fresh và Playwright hai phiên Admin/Store. Store user chỉ có membership này phải được phép sau grant và bị deny ở request kế tiếp sau revoke. Cross-region ID hợp lệ phải bị từ chối. Owner acceptance riêng với technical PASS.
