@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "admin03-store-membership",
   "revision": 1,
-  "status": "EXECUTING",
-  "objective": "Cấp/thu hồi quyền cửa hàng trên Admin Fresh; backend và contract đã kiểm, còn workspace Admin và nghiệm thu browser/owner.",
+  "status": "AWAITING_ACCEPTANCE",
+  "objective": "Admin Fresh đã có luồng cấp/thu hồi quyền cửa hàng với API thật; technical gates đạt, chờ owner nghiệm thu.",
   "inScope": [
     "5 API membership theo contract-draft; fixture tổng hợp và generated client",
     "Backend chain/region scope, audit, last-manager và concurrency với user deactivation",
@@ -15,7 +15,7 @@
     "Thay đổi ADMIN01/ADMIN02, push/merge/deploy/Pages"
   ],
   "baseSha": "0adad4d1076466406c30559a9d5cbb4dfa8ba52c",
-  "candidateSha": "a768bd75f0821fb14e8383a3565c2cbfd1269dc7",
+  "candidateSha": "0bd2c474e4cc28c9665860f1294c953c05b148c5",
   "integrationOwner": "Codex /root — sole writer ADMIN03",
   "sharedPaths": [
     "contracts/openapi/**",
@@ -24,7 +24,7 @@
     "scripts/check-contracts.mjs"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
@@ -33,8 +33,8 @@
       "required": true,
       "status": "pass",
       "revision": 1,
-      "sha": "a768bd75f0821fb14e8383a3565c2cbfd1269dc7",
-      "evidence": "docs/delivery/admin03-store-membership/backend-evidence.md"
+      "sha": "0bd2c474e4cc28c9665860f1294c953c05b148c5",
+      "evidence": "docs/delivery/admin03-store-membership/ui-evidence.md"
     },
     {
       "id": "backend-scope-audit-concurrency",
@@ -42,14 +42,17 @@
       "required": true,
       "status": "pass",
       "revision": 1,
-      "sha": "a768bd75f0821fb14e8383a3565c2cbfd1269dc7",
-      "evidence": "docs/delivery/admin03-store-membership/backend-evidence.md"
+      "sha": "0bd2c474e4cc28c9665860f1294c953c05b148c5",
+      "evidence": "docs/delivery/admin03-store-membership/ui-evidence.md"
     },
     {
       "id": "two-session-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "0bd2c474e4cc28c9665860f1294c953c05b148c5",
+      "evidence": "docs/delivery/admin03-store-membership/ui-evidence.md"
     },
     {
       "id": "owner-membership-workflow",
@@ -68,5 +71,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Nối workspace Quyền cửa hàng vào Admin Fresh bằng 5 API đã có; kiểm Playwright 390×844/1440×1024 và hai phiên Admin/Store backend thật, rồi owner acceptance. Không đổi preview4175 trước khi xác minh đúng source/process."
+  "nextAction": "Owner dùng thử Admin4175/Store online4173 với tài khoản tổng hợp và quyết định nghiệm thu. Không tự đóng cycle, merge/push/deploy hoặc mở slice KPH tiếp theo."
 }
