@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "id": "kphon01-effective-context",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Effective KPH store discovery và session/chọn cửa hàng trên shell Fresh, không fallback mock; nền để nối KPH từng slice.",
+  "inScope": [
+    "GET /api/v1/kph/stores theo scope P01; OpenAPI/fixture/generated client cùng backend",
+    "Fresh online login/session/CSRF/logout/password và explicit effective-store selection",
+    "Scope union/dedup/revoke/downgrade, offline/401, request race và ngăn dữ liệu mock",
+    "Targeted backend/frontend checks và real-backend Playwright390×844/1440×1024"
+  ],
+  "outOfScope": [
+    "KPH lookup/history/create/review/export UI wiring (slice sau), giữ D01",
+    "DATE/report/notification persistence, catalog C02 và provisioning mới",
+    "Merge main/push/deploy/Pages, redesign diện rộng"
+  ],
+  "baseSha": "b6bd19a6e229c852e1d28a43027b9266bc44c9b4",
+  "candidateSha": "",
+  "integrationOwner": "Codex /root — sole writer",
+  "sharedPaths": [
+    "contracts/openapi/**",
+    "contracts/fixtures/**",
+    "packages/api/**",
+    "scripts/check-contracts.mjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "contract-backend-scope",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "fresh-session-client",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "real-backend-browser",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-context",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Triển khai và kiểm KPHON01; tổ hợp toàn roadmap giữ cho vòng cuối theo owner.",
+  "initialRequest": {
+    "request": "coi như pass ... test tổ hợp sau cuối ... tiếp",
+    "source": "Owner chat09/11/2026 sau bàn giao ADMIN03",
+    "decision": "Đóng ADMIN03 bằng acceptance explicit; tiếp roadmap KPH, bắt đầu discovery/session; không waiver scope/security tests."
+  }
+}
