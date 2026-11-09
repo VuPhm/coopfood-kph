@@ -31,7 +31,8 @@ Cần backend ở cổng 8081 để đăng nhập. Các workspace hiển thị t
 | Kiểm tra catalog CSV | Người có quyền CATALOG_ADMIN nhập CSV, xem lỗi từng dòng và lịch sử kiểm tra. Dữ liệu ở staging. | [C01](delivery/c01-catalog-staging/acceptance-handoff.md) |
 
 Các mốc trên nghiệm thu từng chức năng. FRESH01 nghiệm thu giao diện Store.
-Màn gán/thu hồi quyền tại cửa hàng chưa có trong Admin Web. Tạo người dùng, tạo
+ADMIN03 candidate đã có màn gán/thu hồi quyền cửa hàng dùng backend thật,
+đang chờ owner nghiệm thu; chưa tích hợp main. Tạo người dùng, tạo
 cửa hàng và cấp quyền vùng là các nhu cầu riêng trong [policy P01](product/PROVISIONING_POLICY.md).
 
 ## Ranh giới implementation
@@ -60,15 +61,19 @@ phải test mới ngày 07/11; không chứng minh backend thật hoặc thiết
 
 Sau lần chuẩn hóa, ADMIN01 mở từ `59c7caa`; ADMIN02 có candidate Admin Fresh
 và preview source 4175 riêng, vẫn chờ owner nghiệm thu UI. Tiến độ mới nhất
-trong worktree này là **ADMIN03 backend membership**, nhánh
+trong worktree này là **ADMIN03 tích hợp, chờ nghiệm thu**, nhánh
 `store-app/admin03-store-membership`, base `0adad4d`. Đã có 5 API, fixture/client và backend membership;
-UI membership chưa triển khai. Backend `verify` PASS 80 tests (15 membership),
-gồm kiểm hai phiên HTTP và concurrency; chưa phải browser/owner acceptance.
+UI Quyền cửa hàng đã nối API. Frontend `verify` PASS 358 tests và build/PWA;
+Playwright backend thật PASS ở 390×844/1440×1024, gồm hai phiên cấp/thu hồi,
+quyền kế thừa, last-manager, keyboard/focus và cache khi đổi tài khoản.
+Backend `verify` PASS 80 tests (15 membership) tại candidate backend trước,
+source backend giữ nguyên. Technical PASS chưa phải owner acceptance.
 Quyết định exact
 username lookup ngoài vùng được giữ theo checkpoint owner ngày 09/11/2026.
 [Kế hoạch hiện hành](delivery/admin03-store-membership/plan.json) và
 [bàn giao](delivery/admin03-store-membership/handoff.md). Những tiến độ trên
-chưa tích hợp main; preview ADMIN02 không chứng minh API ADMIN03 đang chạy.
+chưa tích hợp main. Preview4175 đã chuyển sang source ADMIN03, proxy backend8082
+và database thử riêng55434. Runtime P03 ở8081 và database cũ giữ nguyên.
 Push/deploy/Pages là thao tác riêng; tag và nhánh bảo tồn giữ nguyên.
 
 Toàn bộ checkpoint cũ được giữ tại

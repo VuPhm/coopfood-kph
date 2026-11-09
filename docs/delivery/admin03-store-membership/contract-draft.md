@@ -33,7 +33,7 @@ Tests bắt buộc trước demo:
 
 ## Trạng thái thực tế
 
-OpenAPI, 6 fixture API và generated client đã được bổ sung trong bước contract-first ngày 09/11/2026. Backend đã có implementation cho 5 operation, đánh dấu `x-implementation-status: implemented`; UI membership chưa triển khai. Bảng trên là wire contract dùng triển khai; backend test không phải nghiệm thu toàn luồng UI. ADMIN01 vẫn029b0e7, không bị sửa. ADMIN02 source preview4175 được ghi nhận ở checkpoint trước, lượt này không kiểm lại process và UI acceptance vẫn thuộc owner. Khi chuyển demo sang ADMIN03 cần ghi source rõ, giữ cùng canonical port4175 và dừng đúng process sở hữu; không mở thêm port ngầm.
+OpenAPI, 6 fixture API và generated client đã được bổ sung trong bước contract-first ngày 09/11/2026. Backend đã có implementation cho 5 operation, đánh dấu `x-implementation-status: implemented`; UI membership đã nối backend, Playwright hai phiên đạt; owner acceptance còn pending. Bảng trên là wire contract dùng triển khai; technical PASS không phải nghiệm thu owner. ADMIN01 vẫn029b0e7, không bị sửa. Preview4175 đã chuyển từ đúng process ADMIN02 sang source ADMIN03; backend8082/database55434 thử riêng. Store online4173 dùng entry hiện có để kiểm hai phiên, không phải Fresh online wiring. Owner acceptance vẫn pending.
 
 
 ## Wire contract đã cụ thể hóa
@@ -53,7 +53,7 @@ actor có capability nhưng không còn store active nhận mảng rỗng.
 
 Fixture tổng hợp được link từ operation và kiểm qua `npm run check:contracts`.
 Guard schema/client không thay cho HTTP scope tests, audit/concurrency hoặc
-Playwright; gate backend được ghi riêng, browser và owner vẫn pending trong plan.
+Playwright; gate backend được ghi riêng, browser gate đã có evidence, owner vẫn pending trong plan.
 
 
 ## Khóa transaction trong backend

@@ -9,6 +9,11 @@ export type CatalogImportDetail = components["schemas"]["CatalogImportDetail"];
 export type CatalogImportUploadResponse = components["schemas"]["CatalogImportUploadResponse"];
 export type AdminUser = components["schemas"]["AdminUser"];
 
+export type MembershipStore = components["schemas"]["AdminMembershipStore"];
+export type StoreMembership = components["schemas"]["AdminStoreMembership"];
+export type MembershipUser = components["schemas"]["MembershipLookupUser"];
+export type MembershipRole = components["schemas"]["StoreRole"];
+
 export class AdminApiError extends Error {
   readonly status: number | undefined;
   readonly code: string | undefined;
@@ -40,6 +45,11 @@ export type LifecycleAdminGateway = {
   listCatalogImports(signal?: AbortSignal): Promise<CatalogImportBatch[]>;
   getCatalogImport(id: string, offset?: number, signal?: AbortSignal): Promise<CatalogImportDetail>;
   uploadCatalogImport(file: File): Promise<CatalogImportUploadResponse>;
+  listMembershipStores(signal?: AbortSignal): Promise<MembershipStore[]>;
+  listStoreMemberships(storeId: string, signal?: AbortSignal): Promise<StoreMembership[]>;
+  lookupMembershipUser(storeId: string, username: string): Promise<MembershipUser>;
+  upsertMembership(storeId: string, userId: string, role: MembershipRole, reason: string): Promise<StoreMembership>;
+  revokeMembership(storeId: string, userId: string, reason: string): Promise<StoreMembership>;
   listUsers(signal?: AbortSignal): Promise<AdminUser[]>;
   deactivateUser(id: string, reason: string): Promise<AdminUser>;
 };
@@ -162,6 +172,44 @@ export function createLifecycleAdminGateway(
     return response.data;
   }
 
+  async function listMembershipStores(signal?: AbortSignal) {
+    const response = await client.GET("/api/v1/admin/membership-stores", signal ? { signal } : {});
+    if (response.error || !response.data) throw apiError(response, "Không thể tải cửa hàng được quản lý.");
+    return response.data;
+  }
+
+  async function listStoreMemberships(storeId: string, signal?: AbortSignal) {
+    const response = await client.GET("/api/v1/admin/stores/{storeId}/memberships", {
+      params: { path: { storeId } }, ...(signal ? { signal } : {}),
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể tải quyền cửa hàng.");
+    return response.data;
+  }
+
+  async function lookupMembershipUser(storeId: string, username: string) {
+    const response = await client.POST("/api/v1/admin/stores/{storeId}/membership-user-lookup", {
+      params: { path: { storeId }, header: { "X-CSRF-TOKEN": csrfToken } }, body: { username },
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể tìm tài khoản.");
+    return response.data;
+  }
+
+  async function upsertMembership(storeId: string, userId: string, role: MembershipRole, reason: string) {
+    const response = await client.PUT("/api/v1/admin/stores/{storeId}/memberships/{userId}", {
+      params: { path: { storeId, userId }, header: { "X-CSRF-TOKEN": csrfToken } }, body: { role, reason },
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể lưu quyền cửa hàng.");
+    return response.data;
+  }
+
+  async function revokeMembership(storeId: string, userId: string, reason: string) {
+    const response = await client.POST("/api/v1/admin/stores/{storeId}/memberships/{userId}/revoke", {
+      params: { path: { storeId, userId }, header: { "X-CSRF-TOKEN": csrfToken } }, body: { reason },
+    });
+    if (response.error || !response.data) throw apiError(response, "Không thể thu hồi quyền cửa hàng.");
+    return response.data;
+  }
+
   async function listUsers(signal?: AbortSignal) {
     const response = await client.GET("/api/v1/admin/users", signal ? { signal } : {});
     if (response.error || !response.data) throw apiError(response, "Không thể tải danh sách tài khoản.");
@@ -182,6 +230,7 @@ export function createLifecycleAdminGateway(
     listTargets, listSchedules, createSchedule, reschedule, cancel, execute,
     listCatalogImports, getCatalogImport, uploadCatalogImport,
     listUsers, deactivateUser,
+    listMembershipStores, listStoreMemberships, lookupMembershipUser, upsertMembership, revokeMembership,
   };
 }
 
@@ -224,7 +273,15 @@ function apiError(
     ADMIN_USER_ALREADY_INACTIVE: "Tài khoản này đã bị vô hiệu hóa.",
     USER_SELF_DEACTIVATION_FORBIDDEN: "Bạn không thể tự vô hiệu hóa tài khoản đang đăng nhập.",
     LAST_CHAIN_ADMIN_REQUIRED: "Không thể vô hiệu hóa quản trị chuỗi cuối cùng đang hoạt động.",
-    LAST_STORE_MANAGER_REQUIRED: "Không thể vô hiệu hóa quản lý cuối cùng của một cửa hàng đang hoạt động.",
+    LAST_STORE_MANAGER_REQUIRED: "Cửa hàng phải còn ít nhất một quản lý đang hoạt động. Hãy bổ sung quản lý thay thế trước.",
+    MEMBERSHIP_ADMIN_REQUIRED: "Bạn chưa có quyền quản lý cửa hàng trong chuỗi hoặc vùng đang hoạt động.",
+    MEMBERSHIP_STORE_SCOPE_DENIED: "Cửa hàng không còn hoạt động hoặc nằm ngoài phạm vi quản lý của bạn. Hãy tải lại cửa hàng.",
+    MEMBERSHIP_USER_NOT_FOUND: "Không tìm thấy tài khoản đang hoạt động với tên đăng nhập này.",
+    MEMBERSHIP_NOT_FOUND: "Không còn quyền cửa hàng này. Hãy tải lại danh sách.",
+    MEMBERSHIP_ALREADY_REVOKED: "Quyền này đã được thu hồi. Hãy tải lại danh sách.",
+    MEMBERSHIP_ROLE_INVALID: "Hãy chọn Nhân viên hoặc Quản lý cửa hàng.",
+    MEMBERSHIP_USERNAME_INVALID: "Hãy nhập tên đăng nhập chính xác, từ 3 đến 64 ký tự chữ Latin, số, dấu chấm, gạch nối hoặc gạch dưới.",
+    MEMBERSHIP_REASON_INVALID: "Hãy nhập lý do từ 1 đến 500 ký tự.",
     ADMIN_USER_STATE_CHANGED: "Trạng thái tài khoản vừa thay đổi. Hãy tải lại danh sách.",
     USER_DEACTIVATION_REASON_INVALID: "Hãy nhập lý do từ 1 đến 500 ký tự.",
   };

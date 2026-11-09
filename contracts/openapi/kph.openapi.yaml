@@ -18,7 +18,7 @@ tags:
   - name: KPH
   - name: Admin identity
   - name: Admin membership
-    description: ADMIN03 backend implemented; Admin Web membership UI and owner acceptance are pending.
+    description: ADMIN03 backend and Admin Web implemented; owner acceptance is pending.
   - name: Admin lifecycle
   - name: Admin catalog
 security:

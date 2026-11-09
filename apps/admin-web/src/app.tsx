@@ -7,6 +7,7 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react
 import { AdminShell, type AdminWorkspace } from "./admin-shell";
 import { AdminOverview } from "./admin-overview";
 import { CatalogWorkspace } from "./catalog-workspace";
+import { MembershipWorkspace, membershipRootKey } from "./membership-workspace";
 import { IdentityWorkspace } from "./identity-workspace";
 import { ChangePasswordDialog } from "./change-password-dialog";
 import { createLifecycleAdminGateway, type LifecycleAdminGateway, type LifecycleSchedule, type LifecycleTarget } from "./lifecycle-admin";
@@ -14,7 +15,7 @@ import { createLifecycleAdminGateway, type LifecycleAdminGateway, type Lifecycle
 type AppProps = { gateway?: LifecycleAdminGateway };
 function workspaceFromHash(): AdminWorkspace {
   const hash = window.location.hash.slice(1);
-  return hash === "identity" || hash === "catalog" || hash === "lifecycle" ? hash : "overview";
+  return hash === "identity" || hash === "catalog" || hash === "lifecycle" || hash === "memberships" ? hash : "overview";
 }
 
 type ScheduleAction = "reschedule" | "cancel" | "execute";
@@ -52,11 +53,15 @@ export function App({ gateway: providedGateway }: AppProps) {
   // never infer inherited scope from membership or global role names alone.
   const targetsQuery = useQuery({ queryKey: [...queryKeys.targets, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listTargets(signal), enabled: Boolean(sessionQuery.data), retry: false });
   const canLifecycle = hasChainAdmin || targetsQuery.isSuccess;
-  const activeWorkspace = workspace === "catalog" && !hasCatalog || workspace === "identity" && !hasChainAdmin || workspace === "lifecycle" && !canLifecycle ? "overview" : workspace;
+  const membershipStoresQuery = useQuery({ queryKey: [...membershipRootKey, "stores", sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listMembershipStores(signal), enabled: Boolean(sessionQuery.data), retry: false });
+  const canMemberships = hasChainAdmin || membershipStoresQuery.isSuccess;
+  const activeWorkspace = workspace === "catalog" && !hasCatalog || workspace === "identity" && !hasChainAdmin || workspace === "lifecycle" && !canLifecycle || workspace === "memberships" && !canMemberships ? "overview" : workspace;
   const schedulesQuery = useQuery({ queryKey: [...queryKeys.schedules, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listSchedules(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "lifecycle", retry: false });
   const usersQuery = useQuery({ queryKey: [...queryKeys.users, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listUsers(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "identity", retry: false });
   const clearSession = useCallback(() => {
     queryClient.setQueryData(queryKeys.session, null);
+    void queryClient.cancelQueries({ queryKey: membershipRootKey });
+    queryClient.removeQueries({ queryKey: membershipRootKey });
     void queryClient.cancelQueries({ queryKey: queryKeys.targets });
     void queryClient.cancelQueries({ queryKey: queryKeys.schedules });
     void queryClient.cancelQueries({ queryKey: queryKeys.users });
@@ -69,10 +74,12 @@ export function App({ gateway: providedGateway }: AppProps) {
     queryClient.removeQueries({ queryKey: ["catalog-import"] });
   }, [queryClient]);
   const handleError = useCallback((error: unknown) => { if (isUnauthorized(error)) clearSession(); }, [clearSession]);
-  const expired = isUnauthorized(targetsQuery.error) || isUnauthorized(schedulesQuery.error) || isUnauthorized(usersQuery.error);
+  const expired = isUnauthorized(targetsQuery.error) || isUnauthorized(schedulesQuery.error) || isUnauthorized(usersQuery.error) || isUnauthorized(membershipStoresQuery.error);
   useEffect(() => {
     if (expired) {
       queryClient.setQueryData(queryKeys.session, null);
+      void queryClient.cancelQueries({ queryKey: membershipRootKey });
+      queryClient.removeQueries({ queryKey: membershipRootKey });
       queryClient.removeQueries({ queryKey: queryKeys.targets });
       queryClient.removeQueries({ queryKey: queryKeys.schedules });
       queryClient.removeQueries({ queryKey: queryKeys.users });
@@ -85,6 +92,7 @@ export function App({ gateway: providedGateway }: AppProps) {
       queryClient.setQueryData(queryKeys.session, session);
       const catalog = session.user.globalRoles.includes("CATALOG_ADMIN");
       navigate("overview");
+      void queryClient.invalidateQueries({ queryKey: membershipRootKey });
       if (catalog) void queryClient.invalidateQueries({ queryKey: ["catalog-imports"] });
       else {
         void queryClient.invalidateQueries({ queryKey: queryKeys.targets });
@@ -120,12 +128,18 @@ export function App({ gateway: providedGateway }: AppProps) {
 
   return <AdminShell
     session={sessionQuery.data} workspace={activeWorkspace}
-    canIdentity={hasChainAdmin} canCatalog={hasCatalog} canLifecycle={canLifecycle}
+    canIdentity={hasChainAdmin} canCatalog={hasCatalog} canLifecycle={canLifecycle} canMemberships={canMemberships}
     onNavigate={navigate} onChangePassword={() => setChangePasswordOpen(true)}
     onLogout={() => logout.mutate()} logoutBusy={logout.isPending}
   >
     {logout.error instanceof Error && <p role="alert" className="admin-error">{logout.error.message}</p>}
     {targetsQuery.isError && !isUnauthorized(targetsQuery.error) && !(typeof targetsQuery.error === "object" && targetsQuery.error !== null && "status" in targetsQuery.error && targetsQuery.error.status === 403) && <p role="alert" className="admin-error">Không thể tải phạm vi quản trị. <button type="button" onClick={() => void targetsQuery.refetch()}>Thử lại</button></p>}
+    {membershipStoresQuery.isError && !isUnauthorized(membershipStoresQuery.error) && !(typeof membershipStoresQuery.error === "object" && membershipStoresQuery.error !== null && "status" in membershipStoresQuery.error && membershipStoresQuery.error.status === 403) && activeWorkspace !== "memberships" && <p role="alert" className="admin-error">Không thể tải cửa hàng được quản lý. <button type="button" onClick={() => void membershipStoresQuery.refetch()}>Thử lại</button></p>}
+    {activeWorkspace === "memberships" && <MembershipWorkspace
+      key={sessionQuery.data.user.id} gateway={gateway} actorId={sessionQuery.data.user.id}
+      stores={membershipStoresQuery.data ?? []} loading={membershipStoresQuery.isPending}
+      loadError={membershipStoresQuery.error} onRefreshStores={() => void membershipStoresQuery.refetch()} onError={handleError}
+    />}
     {activeWorkspace === "overview" && <AdminOverview />}
     {activeWorkspace === "catalog" && <CatalogWorkspace gateway={gateway} session={sessionQuery.data} onError={handleError} />}
     {activeWorkspace === "identity" && <IdentityWorkspace

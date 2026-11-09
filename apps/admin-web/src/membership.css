@@ -1,0 +1,38 @@
+.membership-workspace { display:grid; gap:20px; }
+.membership-store-panel, .membership-members { padding:24px; min-width:0; }
+.membership-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; }
+.membership-heading h1, .membership-heading h2 { margin:0; }
+.membership-heading p, .membership-store-picker > p { color:var(--admin-muted); margin:6px 0 0; font-size:14px; }
+.membership-heading-icon, .membership-avatar { display:grid; place-items:center; flex-shrink:0; width:44px; height:44px; border-radius:var(--fresh-radius-control); background:var(--fresh-canvas); color:var(--fresh-brand-action); }
+.membership-store-picker { max-width:640px; margin-top:24px; }
+.membership-store-picker select, .membership-dialog select, .membership-dialog textarea { width:100%; min-width:0; min-height:44px; border:1px solid var(--admin-line); border-radius:var(--fresh-radius-control); padding:10px 12px; background:var(--fresh-surface); color:var(--admin-text); font:inherit; }
+.membership-dialog textarea { resize:vertical; }
+.membership-actions, .membership-row-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.membership-workspace button, .membership-dialog button { min-height:44px; }
+.membership-list { list-style:none; margin:20px 0 0; padding:0; }
+.membership-row { display:grid; grid-template-columns:minmax(180px,1.35fr) minmax(140px,.8fr) minmax(100px,.6fr) auto; gap:16px; align-items:center; padding:18px 0; border-top:1px solid var(--admin-line); font-size:14px; }
+.membership-person { display:flex; gap:12px; align-items:center; min-width:0; }
+.membership-person h3 { margin:0; overflow-wrap:anywhere; }
+.membership-person p { margin:3px 0 0; color:var(--admin-muted); overflow-wrap:anywhere; }
+.membership-role { font-weight:600; }
+.membership-mobile-label { display:none; }
+.membership-state { display:inline-block; padding:5px 9px; border-radius:var(--fresh-radius-sm); background:var(--fresh-canvas); color:var(--admin-muted); font-size:var(--fresh-type-caption); font-weight:600; }
+.membership-state.is-assigned { background:var(--admin-accent-soft); color:var(--fresh-brand-action); }
+.membership-row-actions { justify-content:flex-end; }
+.membership-revoke { color:var(--fresh-error-ink); }
+.membership-account-inactive { display:block; margin-top:4px; font-size:var(--fresh-type-caption); color:var(--fresh-error-ink); }
+.membership-footnote, .membership-empty { font-size:14px; color:var(--admin-muted); line-height:1.6; }
+.membership-footnote { border-top:1px solid var(--admin-line); padding-top:16px; margin-bottom:0; }
+.membership-notice { display:flex; align-items:flex-start; gap:8px; padding:12px; border-radius:var(--fresh-radius-control); background:var(--admin-accent-soft); color:var(--fresh-brand-action); font-size:14px; }
+.membership-notice svg { flex-shrink:0; margin-top:2px; }
+.membership-load-error { padding:16px 0; color:var(--fresh-error-ink); }
+.membership-dialog { max-width:560px; background:var(--fresh-surface); color:var(--admin-text); border-radius:var(--fresh-radius-sheet); }
+.membership-lookup { display:flex; gap:8px; }
+.membership-lookup input { min-width:0; flex:1; }
+.membership-lookup button { flex-shrink:0; }
+.membership-found { display:grid; gap:4px; padding:12px; background:var(--fresh-canvas); border-radius:var(--fresh-radius-control); overflow-wrap:anywhere; }
+.membership-found span, .membership-consequence { color:var(--admin-muted); font-size:14px; line-height:1.6; }
+.membership-error { margin:0; padding:10px 12px; background:var(--fresh-error-soft); color:var(--fresh-error-ink); border-radius:var(--fresh-radius-control); font-size:14px; }
+.membership-dialog-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+@media (max-width:1199px) { .membership-row { grid-template-columns:minmax(0,1.5fr) minmax(140px,1fr); } .membership-row-actions { justify-content:flex-start; } }
+@media (max-width:599px) { .membership-store-panel, .membership-members { padding:18px 16px; } .membership-row { grid-template-columns:minmax(0,1fr); gap:12px; } .membership-mobile-label { display:inline; color:var(--admin-muted); font-weight:400; margin-right:8px; } .membership-dialog[data-slot="dialog-content"] { --cf-modal-inset:20px; padding:20px; } .membership-dialog [data-slot="dialog-header"] { padding:20px 64px 20px 20px; } .membership-lookup { flex-wrap:wrap; } .membership-lookup input { flex-basis:100%; } .membership-dialog-actions { flex-direction:column-reverse; } .membership-dialog-actions button { width:100%; } }

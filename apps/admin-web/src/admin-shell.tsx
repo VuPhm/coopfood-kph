@@ -1,23 +1,24 @@
 import { useState, type ReactNode } from "react";
-import { Boxes, CalendarClock, ChevronDown, ChevronRight, KeyRound, LayoutDashboard, Leaf, LogOut, Menu, PanelLeftClose, PanelLeftOpen, ShieldCheck, Users } from "lucide-react";
+import { Boxes, CalendarClock, ChevronDown, ChevronRight, KeyRound, LayoutDashboard, Leaf, LogOut, Menu, PanelLeftClose, PanelLeftOpen, ShieldCheck, UserRoundCog, Users } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@coopfood-kph/ui";
 import type { AdminSession } from "./lifecycle-admin";
 
-export type AdminWorkspace = "overview" | "identity" | "catalog" | "lifecycle";
+export type AdminWorkspace = "overview" | "identity" | "catalog" | "lifecycle" | "memberships";
 const destinations = [
   { id: "overview", label: "Tổng quan", icon: LayoutDashboard, group: "Không gian làm việc" },
   { id: "identity", label: "Tài khoản", icon: Users, group: "Quản lý vận hành" },
+  { id: "memberships", label: "Quyền cửa hàng", icon: UserRoundCog, group: "Quản lý vận hành" },
   { id: "catalog", label: "Catalog", icon: Boxes, group: "Quản lý vận hành" },
   { id: "lifecycle", label: "Lifecycle", icon: CalendarClock, group: "Quản lý vận hành" },
 ] as const;
 
-export function AdminShell({ session, workspace, canIdentity, canCatalog, canLifecycle, onNavigate, onChangePassword, onLogout, logoutBusy, children }: {
-  session: AdminSession; workspace: AdminWorkspace; canIdentity: boolean; canCatalog: boolean; canLifecycle: boolean;
+export function AdminShell({ session, workspace, canIdentity, canCatalog, canLifecycle, canMemberships, onNavigate, onChangePassword, onLogout, logoutBusy, children }: {
+  session: AdminSession; workspace: AdminWorkspace; canIdentity: boolean; canCatalog: boolean; canLifecycle: boolean; canMemberships: boolean;
   onNavigate(workspace: AdminWorkspace): void; onChangePassword(): void; onLogout(): void; logoutBusy: boolean; children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const items = destinations.filter(item => item.id === "overview" || item.id === "identity" && canIdentity || item.id === "catalog" && canCatalog || item.id === "lifecycle" && canLifecycle);
+  const items = destinations.filter(item => item.id === "overview" || item.id === "identity" && canIdentity || item.id === "catalog" && canCatalog || item.id === "lifecycle" && canLifecycle || item.id === "memberships" && canMemberships);
   const current = destinations.find(item => item.id === workspace)!;
   const role = canIdentity ? "Quản trị chuỗi" : canCatalog && !canLifecycle ? "Quản trị catalog" : canLifecycle ? "Quản lý vận hành" : "Tài khoản";
   function navigate(id: AdminWorkspace) { onNavigate(id); setMobileOpen(false); }
