@@ -19,6 +19,7 @@ const contractSchemaId = "urn:coopfood-kph:openapi";
 const acceptedKphLookupStatuses = ["FOUND", "NOT_FOUND", "MANUAL"];
 
 const apiFixtureSchemas = new Map([
+  ["api/kph-store-access.json", "KphStoreAccess"],
   ["api/session.json", "SessionResponse"],
   ["api/admin-users.json", "AdminUser"],
   ["api/admin-membership-stores.json", "AdminMembershipStore"],
@@ -215,6 +216,12 @@ async function validateApiFixtures(openApi) {
     }
     fixtures.set(resource, fixture);
   }
+
+  const [effectiveStore] = fixtures.get("api/kph-store-access.json");
+  expectInvalid(ajv, "KphStoreAccess", { ...effectiveStore, role: "STORE_MANAGER" }, "additionalProperties", "Discovery cannot synthesize a role");
+  expectInvalid(ajv, "KphStoreAccess", { ...effectiveStore, code: 1 }, "type", "Discovery identifiers stay strings");
+  expectInvalid(ajv, "KphStoreAccess", { ...effectiveStore, capabilities: ["VIEW", "CREATE", "ADMIN"] }, "enum", "Discovery grants KPH capabilities only");
+  expectInvalid(ajv, "KphStoreAccess", { ...effectiveStore, capabilities: ["VIEW", "VIEW"] }, "uniqueItems", "Discovery deduplicates capabilities");
 
   // Membership wire boundaries: no identity/scope authority in bodies, and no
   // global directory data in exact-username results. HTTP authorization and

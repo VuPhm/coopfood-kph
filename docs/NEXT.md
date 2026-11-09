@@ -1,40 +1,25 @@
 # Công việc kế tiếp
 
-Cập nhật 09/11/2026. Baseline: [CURRENT_STATE](CURRENT_STATE.md).
-FRESH01 đã CLOSED. ADMIN03 đang thực hiện trên nhánh
-`store-app/admin03-store-membership`: contract/backend/UI và kiểm hai phiên bằng browser đã đạt gate kỹ thuật;
-đang AWAITING_ACCEPTANCE từ owner. Tiếp tục cùng
-[kế hoạch](delivery/admin03-store-membership/plan.json), không mở lại ADMIN01
-hoặc tự đóng milestone khi chưa có nghiệm thu owner.
-Thứ tự dưới đây là đề xuất ưu tiên đã được ghi nhận trong lần chuẩn hóa tài liệu,
-không phải nghiệm thu contract mới hoặc lệnh bắt đầu toàn bộ roadmap.
+Cập nhật09/11/2026. [CURRENT_STATE](CURRENT_STATE.md). FRESH01 và ADMIN03 CLOSED;
+owner chấp nhận ADMIN03 qua chat, giữ kiểm tổ hợp rộng ở vòng cuối.
+[Quyết định](delivery/admin03-store-membership/acceptance-2026-11-09.md).
 
-## Mốc Admin Web: cấp và thu hồi quyền cửa hàng
+## KPHON01 — nền session và effective store context
 
-Bước tiếp theo của ADMIN03 là owner dùng thử [preview4175](http://127.0.0.1:4175/#memberships)
-với dữ liệu mẫu và nghiệm thu luồng. [Bàn giao và tài khoản thử](delivery/admin03-store-membership/handoff.md).
-Chỉ chuyển sang slice KPH online sau khi đóng gate owner hoặc chốt thay đổi explicit.
-Bản draft và quyết định lookup đã ở [checkpoint](delivery/admin03-store-membership/contract-draft.md).
+Nhánh `store-app/kphon01-effective-context`, từ checkpoint ADMIN03 accepted
+`b6bd19a`, không merge các nhánh BE cũ hoặc main. [Plan](delivery/kphon01-effective-context/plan.json).
+Bước hiện tại: GET /api/v1/kph/stores + Fresh login/chọn store, kiểm scope thật,
+không mock fallback. [Contract](product/STORE_KPH_CONTEXT_CONTRACT.md).
 
-Gate duyệt giao diện quản trị riêng vẫn cần owner. Owner mở
-[Admin Web hiện có](CURRENT_STATE.md#admin-web-phần-quản-lý-đã-có) với tài khoản
-mẫu theo vai trò, xác nhận tìm được các màn phù hợp và vị trí để quản lý quyền
-cửa hàng. Luồng cần nghiệm thu: chọn người dùng hiện có → chọn
-cửa hàng → gán vai trò EMPLOYEE hoặc STORE_MANAGER → thu hồi có lý do.
+Slice kế tiếp: nối lookup barcode và history KPH trên context này, giữ D01
+filter/sort/count trước pagination và page-local selection/reset. Sau đó nối
+create/private media/idempotency, review/export rồi kiểm tổ hợp trọn KPH. Giữ
+quyết định accepted, không đổi load-more semantics hoặc ngày/rule ngầm.
 
-**Điều kiện kỹ thuật.** Theo [P01](product/PROVISIONING_POLICY.md) và
-[ADR-0004](adr/0004-scoped-management-hierarchy.md), quản trị chuỗi thao tác
-toàn chuỗi, quản lý vùng chỉ trong vùng đang được giao. Kiểm từ backend việc
-từ chối ID đúng nhưng sai vùng/cửa hàng, bảo vệ quản lý cửa hàng cuối cùng và
-ghi audit khi thay đổi quyền. API, examples và client sinh từ OpenAPI đi cùng
-một lần thay đổi.
-
-**Điều kiện nghiệm thu.** Dùng hai phiên và dữ liệu mẫu: một phiên Admin gán
-rồi thu hồi membership, phiên Store của người dùng thử truy cập KPH sau mỗi
-thay đổi. Với người dùng chỉ có membership đó, request kế tiếp phải được phép
-sau khi gán và bị từ chối sau khi thu hồi. Nếu người dùng còn quyền vùng/chuỗi
-hợp lệ thì quyền kế thừa vẫn có hiệu lực. Ghi riêng kết quả backend/Playwright
-với quyết định của owner về giao diện và luồng quản lý.
+DATE/report/notification chưa có backend trong entry này phải hiện rõ chưa
+kết nối, không render mock operational data. C02 supplier/lookup publish và
+rollout vẫn outcome riêng. Kiểm authorization/integrity có mục tiêu ở mỗi slice;
+không thay kiểm tổ hợp cuối bằng việc ký nhận các tổ hợp con.
 
 ## Thứ tự phụ thuộc đề xuất
 

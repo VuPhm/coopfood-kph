@@ -14,6 +14,7 @@
     {"resource":"golden/identity/provisioning-policy-cases.json","tracePrefix":"ID-P01-"},
     {"resource":"golden/images/expected-manifest.json","tracePrefix":"IMG-"},
     {"resource":"golden/excel/expected-structure.json","tracePrefix":"XLSX-"},
+    {"resource":"api/kph-store-access.json","tracePrefix":"KPHON01-"},
     {"resource":"api/session.json","tracePrefix":"ID-"},
     {"resource":"api/admin-users.json","tracePrefix":"ID-P04-"},
     {"resource":"api/admin-membership-stores.json","tracePrefix":"ADMIN03-"},

@@ -111,6 +111,35 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/kph/stores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List effective KPH store access for the authenticated actor
+         * @description Complete unpaginated list of active stores in active regions, using the
+         *     union of active membership, active regional assignment and CHAIN_ADMIN.
+         *     Each store occurs once; ordered by code (PostgreSQL C collation), then id.
+         *     EMPLOYEE has VIEW/CREATE; STORE_MANAGER, regional and chain scopes add
+         *     REVIEW/EXPORT. Codes remain strings. No synthetic roles or memberships.
+         *     Recomputed every request, including permission downgrades and revocation.
+         *     Capabilities describe navigation; every business request rechecks scope.
+         *     No DATE/report/notification, catalog administration or Admin rights are
+         *     implied. Session and GET /stores remain membership-only. Valid sessions
+         *     without effective KPH scope, including catalog-only users, receive [].
+         */
+        get: operations["listKphStores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/catalog/barcodes/{barcode}": {
         parameters: {
             query?: never;
@@ -122,8 +151,8 @@ export interface paths {
          * Resolve a barcode to zero or one current active product
          * @description Reads only the published current catalog. `NOT_FOUND` never includes a
          *     guessed product and the response is never a collection.
-         *     Requires active membership in the requested store; global roles do not
-         *     bypass membership. Returns 503 when no current catalog exists or a
+         *     Requires effective KPH VIEW/CREATE scope in the requested active store and
+         *     active region: membership, assigned region or CHAIN_ADMIN, per P01/ADR-0004. Returns 503 when no current catalog exists or a
          *     matching product has no explicitly designated primary supplier.
          */
         get: operations["lookupBarcode"];
@@ -144,7 +173,7 @@ export interface paths {
         };
         /**
          * List KPH records for one authorized store
-         * @description Store membership is revalidated by the backend.
+         * @description Effective KPH scope is revalidated by the backend.
          */
         get: operations["listKphRecords"];
         put?: never;
@@ -609,6 +638,17 @@ export interface components {
         };
         UserDeactivateRequest: {
             reason: string;
+        };
+        /** @enum {string} */
+        KphCapability: "VIEW" | "CREATE" | "REVIEW" | "EXPORT";
+        KphStoreAccess: {
+            /** Format: uuid */
+            id: string;
+            /** @description Identifier string; leading zeroes are significant. */
+            code: string;
+            name: string;
+            /** @description Stable order VIEW, CREATE, REVIEW, EXPORT; only effective capabilities are included. */
+            capabilities: components["schemas"]["KphCapability"][] & (unknown & unknown);
         };
         AdminMembershipStore: {
             /** Format: uuid */
@@ -1079,7 +1119,7 @@ export interface components {
         };
     };
     parameters: {
-        /** @description Requested scope; membership remains authoritative on the server. */
+        /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
         StoreIdPath: string;
         /** @description Server rechecks active store and region against chain or assigned regional scope. */
         MembershipStoreIdPath: string;
@@ -1236,11 +1276,33 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
         };
     };
+    listKphStores: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Effective KPH stores, or an empty array when no scope remains. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KphStoreAccess"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     lookupBarcode: {
         parameters: {
             query: {
                 /**
-                 * @description Requested store scope, revalidated against active membership.
+                 * @description Requested store scope, revalidated against effective KPH authority.
                  * @example 10000000-0000-4000-8000-000000000001
                  */
                 storeId: string;
@@ -1287,7 +1349,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description Requested scope; membership remains authoritative on the server. */
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
                 storeId: components["parameters"]["StoreIdPath"];
             };
             cookie?: never;
@@ -1318,7 +1380,7 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
-                /** @description Requested scope; membership remains authoritative on the server. */
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
                 storeId: components["parameters"]["StoreIdPath"];
             };
             cookie?: never;
@@ -1355,7 +1417,7 @@ export interface operations {
                 "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Requested scope; membership remains authoritative on the server. */
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
                 storeId: components["parameters"]["StoreIdPath"];
                 recordId: string;
             };
@@ -1390,7 +1452,7 @@ export interface operations {
                 "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Requested scope; membership remains authoritative on the server. */
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
                 storeId: components["parameters"]["StoreIdPath"];
             };
             cookie?: never;
@@ -1422,7 +1484,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Requested scope; membership remains authoritative on the server. */
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
                 storeId: components["parameters"]["StoreIdPath"];
                 recordId: string;
                 ordinal: number;

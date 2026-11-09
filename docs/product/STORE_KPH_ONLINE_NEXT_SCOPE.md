@@ -1,7 +1,7 @@
 # Scope đề xuất — UI mới + KPH online
 
-Ngày 07/11/2026. Trạng thái: đề xuất để chốt trước cycle implementation;
-không phải contract accepted, chưa bắt đầu R2-02. Baseline và quyết định hiện
+Cập nhật09/11/2026. KPHON01 implementation candidate cho discovery/session;
+full KPH wiring và nghiệm thu tổ hợp còn lại. Không mở lại R2-02 lịch sử. Baseline và quyết định hiện
 hành ở [CURRENT_STATE](../CURRENT_STATE.md), thứ tự ở [NEXT](../NEXT.md).
 
 ## Outcome và phạm vi
@@ -15,7 +15,7 @@ Tái sử dụng backend/API/client, auth, media và rule đã có; không rewri
 
 Giữ `GET /api/v1/stores` và `session.user.stores` cho consumer đọc membership.
 Đề xuất một endpoint đọc riêng `GET /api/v1/kph/stores` cho bộ chọn cửa hàng
-của KPH. Tên endpoint và response dưới đây cần được chốt trước khi đưa vào OpenAPI.
+của KPH. Path và shape dưới đây đã được đưa vào OpenAPI ở KPHON01; [context contract](STORE_KPH_CONTEXT_CONTRACT.md).
 
 Ví dụ cho một quản lý có quyền tại một cửa hàng (định danh tổng hợp):
 

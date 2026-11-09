@@ -138,6 +138,42 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /api/v1/kph/stores:
+    get:
+      tags: [KPH]
+      operationId: listKphStores
+      summary: List effective KPH store access for the authenticated actor
+      description: |
+        Complete unpaginated list of active stores in active regions, using the
+        union of active membership, active regional assignment and CHAIN_ADMIN.
+        Each store occurs once; ordered by code (PostgreSQL C collation), then id.
+        EMPLOYEE has VIEW/CREATE; STORE_MANAGER, regional and chain scopes add
+        REVIEW/EXPORT. Codes remain strings. No synthetic roles or memberships.
+        Recomputed every request, including permission downgrades and revocation.
+        Capabilities describe navigation; every business request rechecks scope.
+        No DATE/report/notification, catalog administration or Admin rights are
+        implied. Session and GET /stores remain membership-only. Valid sessions
+        without effective KPH scope, including catalog-only users, receive [].
+      responses:
+        '200':
+          description: Effective KPH stores, or an empty array when no scope remains.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KphStoreAccess'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/kph-store-access.json
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /api/v1/catalog/barcodes/{barcode}:
     get:
       tags: [Catalog]
@@ -146,15 +182,15 @@ paths:
       description: |
         Reads only the published current catalog. `NOT_FOUND` never includes a
         guessed product and the response is never a collection.
-        Requires active membership in the requested store; global roles do not
-        bypass membership. Returns 503 when no current catalog exists or a
+        Requires effective KPH VIEW/CREATE scope in the requested active store and
+        active region: membership, assigned region or CHAIN_ADMIN, per P01/ADR-0004. Returns 503 when no current catalog exists or a
         matching product has no explicitly designated primary supplier.
       parameters:
         - $ref: '#/components/parameters/BarcodePath'
         - name: storeId
           in: query
           required: true
-          description: Requested store scope, revalidated against active membership.
+          description: Requested store scope, revalidated against effective KPH authority.
           schema:
             type: string
             format: uuid
@@ -180,7 +216,7 @@ paths:
       tags: [KPH]
       operationId: listKphRecords
       summary: List KPH records for one authorized store
-      description: Store membership is revalidated by the backend.
+      description: Effective KPH scope is revalidated by the backend.
       parameters:
         - $ref: '#/components/parameters/StoreIdPath'
         - name: type
@@ -996,7 +1032,7 @@ components:
       name: storeId
       in: path
       required: true
-      description: Requested scope; membership remains authoritative on the server.
+      description: Requested scope; backend rechecks active store/region and effective KPH authority.
       schema:
         type: string
         format: uuid
@@ -1265,6 +1301,37 @@ components:
           type: string
           minLength: 1
           maxLength: 500
+
+    KphCapability:
+      type: string
+      enum: [VIEW, CREATE, REVIEW, EXPORT]
+
+    KphStoreAccess:
+      type: object
+      additionalProperties: false
+      required: [id, code, name, capabilities]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: Identifier string; leading zeroes are significant.
+        name:
+          type: string
+        capabilities:
+          type: array
+          uniqueItems: true
+          minItems: 2
+          maxItems: 4
+          description: Stable order VIEW, CREATE, REVIEW, EXPORT; only effective capabilities are included.
+          items:
+            $ref: '#/components/schemas/KphCapability'
+          allOf:
+            - contains:
+                const: VIEW
+            - contains:
+                const: CREATE
 
     AdminMembershipStore:
       type: object

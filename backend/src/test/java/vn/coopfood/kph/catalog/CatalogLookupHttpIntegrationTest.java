@@ -144,6 +144,23 @@ class CatalogLookupHttpIntegrationTest {
     }
 
     @Test
+    void regionalLookupUsesActiveAssignmentWithoutSyntheticMembershipAndRevokesNextRequest() throws Exception {
+        insertCatalog("001234", true, true, true, true);
+        HttpClient client = login();
+        database.execute("UPDATE store_memberships SET active = FALSE WHERE user_id = ?", USER_ID);
+        database.execute("""
+                INSERT INTO user_region_assignments (user_id, region_id, active, created_at, updated_at)
+                VALUES (?, ?, TRUE, now(), now())
+                """, USER_ID, REGION_ID);
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(200);
+        assertThat(get(client, "001234", OTHER_STORE_ID).statusCode()).isEqualTo(403);
+        database.execute("UPDATE user_region_assignments SET active = FALSE WHERE user_id = ?", USER_ID);
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(403);
+        database.execute("UPDATE store_memberships SET active = TRUE WHERE user_id = ?", USER_ID);
+        assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(200);
+    }
+
+    @Test
     void reportsUnavailableForNoCurrentCatalogOrMissingExplicitPrimarySupplier() throws Exception {
         HttpClient client = login();
         assertThat(get(client, "001234", STORE_ID).statusCode()).isEqualTo(503);
