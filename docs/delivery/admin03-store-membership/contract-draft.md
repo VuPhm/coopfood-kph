@@ -33,4 +33,24 @@ Tests bắt buộc trước demo:
 
 ## Trạng thái thực tế
 
-Chưa đổi OpenAPI/client/backend/UI ở ADMIN03. Đây là draft để làm slice contract/examples trước implementation, không phải API đã tồn tại hoặc technical acceptance. ADMIN01 vẫn029b0e7, không bị sửa. ADMIN02 source preview4175 đang chạy riêng và UI acceptance vẫn thuộc owner. Khi chuyển demo sang ADMIN03 cần ghi source rõ, giữ cùng canonical port4175 và dừng đúng process sở hữu; không mở thêm port ngầm.
+OpenAPI, 6 fixture API và generated client đã được bổ sung trong bước contract-first ngày 09/11/2026. Các operation mang `x-implementation-status: planned`; backend/UI chưa có implementation. Bảng trên tiếp tục mô tả scope triển khai, không phải API đang chạy hoặc nghiệm thu toàn luồng. ADMIN01 vẫn029b0e7, không bị sửa. ADMIN02 source preview4175 đang chạy riêng và UI acceptance vẫn thuộc owner. Khi chuyển demo sang ADMIN03 cần ghi source rõ, giữ cùng canonical port4175 và dừng đúng process sở hữu; không mở thêm port ngầm.
+
+
+## Wire contract đã cụ thể hóa
+
+Nguồn wire hiện tại là `contracts/openapi/kph.openapi.yaml`, nhóm Admin membership.
+Schema lookup cho phép input uppercase/whitespace rồi canonicalize; response
+username luôn canonical. Reason wire dài 1–500 ký tự, có ít nhất một ký tự không
+phải whitespace; trim trước lưu. Unknown property bị từ chối ở mọi request và
+response. Store/region code giữ string và leading zero.
+
+List memberships trả cả active/revoked, tách `userActive` khỏi `active`, xếp theo
+username/userId. Scope kiểm trước target: store không tồn tại, inactive hoặc
+ngoài scope đều 403. Lookup/grant user inactive hoặc không tồn tại cùng 404.
+Revoke membership được giữ lại của user inactive vẫn được phép, nhưng không
+revoke lại membership đã inactive (409). GET stores xếp regionCode/code/id;
+actor có capability nhưng không còn store active nhận mảng rỗng.
+
+Fixture tổng hợp được link từ operation và kiểm qua `npm run check:contracts`.
+Guard schema/client không thay cho HTTP scope tests, audit/concurrency hoặc
+Playwright; các gate runtime vẫn pending trong plan.

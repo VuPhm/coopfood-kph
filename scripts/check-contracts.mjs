@@ -21,6 +21,13 @@ const acceptedKphLookupStatuses = ["FOUND", "NOT_FOUND", "MANUAL"];
 const apiFixtureSchemas = new Map([
   ["api/session.json", "SessionResponse"],
   ["api/admin-users.json", "AdminUser"],
+  ["api/admin-membership-stores.json", "AdminMembershipStore"],
+  ["api/admin-store-memberships.json", "AdminStoreMembership"],
+  ["api/admin-membership-user-lookup.json", "MembershipUserLookupRequest"],
+  ["api/admin-membership-user.json", "MembershipLookupUser"],
+  ["api/admin-membership-upsert.json", "MembershipUpsertRequest"],
+  ["api/admin-membership-revoke.json", "MembershipReasonRequest"],
+
   ["api/credential-change.json", "ChangePasswordRequest"],
   ["api/barcode-found.json", "BarcodeLookupResponse"],
   ["api/barcode-not-found.json", "BarcodeLookupResponse"],
@@ -208,6 +215,46 @@ async function validateApiFixtures(openApi) {
     }
     fixtures.set(resource, fixture);
   }
+
+  // Membership wire boundaries: no identity/scope authority in bodies, and no
+  // global directory data in exact-username results. HTTP authorization and
+  // concurrency need independent real-backend tests after implementation.
+  const membershipUpsert = fixtures.get("api/admin-membership-upsert.json");
+  for (const role of ["CHAIN_ADMIN", "REGION_MANAGER", "CATALOG_ADMIN", "UNKNOWN"]) {
+    expectInvalid(ajv, "MembershipUpsertRequest", { ...membershipUpsert, role },
+      "enum", `Membership cannot grant ${role}`);
+  }
+  for (const authority of ["actorId", "storeId", "regionId", "active"]) {
+    expectInvalid(ajv, "MembershipUpsertRequest", { ...membershipUpsert, [authority]: "untrusted" },
+      "additionalProperties", `Membership rejects body authority ${authority}`);
+  }
+  for (const schema of ["MembershipUpsertRequest", "MembershipReasonRequest"]) {
+    const base = schema === "MembershipUpsertRequest" ? membershipUpsert : {};
+    expectInvalid(ajv, schema, { ...base, reason: "" }, "minLength", `${schema} empty reason`);
+    expectInvalid(ajv, schema, { ...base, reason: " \t\n " }, "pattern", `${schema} blank reason`);
+    expectInvalid(ajv, schema, { ...base, reason: "x".repeat(501) }, "maxLength", `${schema} long reason`);
+    validateFixture(ajv, schema, { ...base, reason: "x".repeat(500) }, `${schema} maximum reason`);
+  }
+  const lookupUser = fixtures.get("api/admin-membership-user.json");
+  for (const field of ["globalRoles", "regionAssignments", "memberships", "active", "passwordHash"]) {
+    expectInvalid(ajv, "MembershipLookupUser", { ...lookupUser, [field]: [] },
+      "additionalProperties", `Membership lookup excludes ${field}`);
+  }
+  expectInvalid(ajv, "MembershipLookupUser", { ...lookupUser, id: "invalid" },
+    "format", "Membership lookup UUID");
+  for (const username of ["ab", "a".repeat(65), "demo*", "demo user", "tên.demo"]) {
+    expectInvalid(ajv, "MembershipUserLookupRequest", { username },
+      "pattern", `Invalid membership username ${username}`);
+  }
+  for (const username of ["abc", "a".repeat(64), "  MEMBER.DEMO  "]) {
+    validateFixture(ajv, "MembershipUserLookupRequest", { username }, "Normalized exact username input");
+  }
+  const [membershipStore] = fixtures.get("api/admin-membership-stores.json");
+  expectInvalid(ajv, "AdminMembershipStore", { ...membershipStore, code: 1 },
+    "type", "Store code preserves leading zeroes");
+  const [membership] = fixtures.get("api/admin-store-memberships.json");
+  expectInvalid(ajv, "AdminStoreMembership", { ...membership, userActive: "false" },
+    "type", "Account state remains a boolean");
 
   const extraProperty = structuredClone(fixtures.get("api/session.json"));
   extraProperty.user.unexpected = true;

@@ -17,6 +17,8 @@ tags:
   - name: Catalog
   - name: KPH
   - name: Admin identity
+  - name: Admin membership
+    description: ADMIN03 contract-first slice; runtime implementation and acceptance are pending.
   - name: Admin lifecycle
   - name: Admin catalog
 security:
@@ -480,6 +482,227 @@ paths:
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
 
+  /api/v1/admin/membership-stores:
+    get:
+      tags: [Admin membership]
+      x-implementation-status: planned
+      operationId: listMembershipStores
+      summary: List active stores the actor can manage
+      description: |
+        Requires an active CHAIN_ADMIN or active regional assignment. Returns only
+        active stores in active regions within that explicit scope, ordered by
+        regionCode, code, id. An authorized actor with no active stores gets [].
+        EMPLOYEE, STORE_MANAGER and catalog-only actors cannot manage memberships.
+        This endpoint is not Store PWA effective-capability discovery.
+      responses:
+        '200':
+          description: Authorized result.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminMembershipStore'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/admin-membership-stores.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/stores/{storeId}/memberships:
+    get:
+      tags: [Admin membership]
+      x-implementation-status: planned
+      operationId: listStoreMemberships
+      summary: List memberships of one authorized store
+      description: |
+        Authorizes an active store in an active region before returning membership
+        data. CHAIN_ADMIN manages all such stores; REGION_MANAGER requires an
+        active assignment to the store's region. A valid out-of-scope, inactive
+        or unknown store returns 403 without membership data. Rows include active
+        and revoked memberships, ordered by username, userId. userActive and
+        membership active are independent; inherited regional/global rights are
+        not synthetic memberships and are not included.
+      parameters:
+        - $ref: '#/components/parameters/MembershipStoreIdPath'
+      responses:
+        '200':
+          description: Authorized result.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminStoreMembership'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/admin-store-memberships.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/stores/{storeId}/membership-user-lookup:
+    post:
+      tags: [Admin membership]
+      x-implementation-status: planned
+      operationId: lookupMembershipUser
+      summary: Find one active user by exact username
+      description: |
+        Authorizes store scope before looking up the username. CHAIN_ADMIN or an
+        active REGION_MANAGER of the store may find an active user even when
+        that user has no membership in the region. Trim and lowercase the input,
+        then validate the P01 canonical username (3–64 ASCII characters).
+        Exact match only: no prefix, substring, suggestions or directory search.
+        Unknown and inactive users both return 404. Returns only id, username and
+        displayName, never global roles, region assignments or other memberships.
+        POST keeps the username out of the URL; CSRF is required. This read does
+        not create a membership or an audit mutation. /admin/users stays chain-only.
+      parameters:
+        - $ref: '#/components/parameters/MembershipStoreIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipUserLookupRequest'
+            examples:
+              synthetic:
+                externalValue: ../fixtures/api/admin-membership-user-lookup.json
+      responses:
+        '200':
+          description: Authorized result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipLookupUser'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/admin-membership-user.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/MembershipValidation'
+
+  /api/v1/admin/stores/{storeId}/memberships/{userId}:
+    put:
+      tags: [Admin membership]
+      x-implementation-status: planned
+      operationId: upsertStoreMembership
+      summary: Create, reactivate or change a store membership
+      description: |
+        Requires CHAIN_ADMIN or an active REGION_MANAGER assigned to the active
+        region containing the active store. Authorize store before disclosing
+        user state; out-of-scope, inactive or unknown stores return 403.
+        Unknown or inactive target users return 404. At most one membership per
+        user/store exists; an upsert creates, reactivates or changes its role.
+        Same active role returns 200 without a new audit event. A role downgrade
+        cannot remove the last active STORE_MANAGER of an active store (409).
+        Lock and recheck scope, target and manager guard in the same transaction,
+        including concurrent membership mutations and user deactivation.
+        Write MEMBERSHIP_UPSERTED only for a real change, with actor, target user,
+        store/region and reason plus previous/new role and active state. Do not
+        audit usernames, display names, credentials, sessions or request bodies.
+        Membership changes affect access on the next request; valid inherited
+        chain/region permissions remain effective. Never create synthetic roles.
+      parameters:
+        - $ref: '#/components/parameters/MembershipStoreIdPath'
+        - $ref: '#/components/parameters/UserIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipUpsertRequest'
+            examples:
+              synthetic:
+                externalValue: ../fixtures/api/admin-membership-upsert.json
+      responses:
+        '200':
+          description: Authorized result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStoreMembership'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/MembershipConflict'
+        '422':
+          $ref: '#/components/responses/MembershipValidation'
+
+  /api/v1/admin/stores/{storeId}/memberships/{userId}/revoke:
+    post:
+      tags: [Admin membership]
+      x-implementation-status: planned
+      operationId: revokeStoreMembership
+      summary: Immediately revoke a store membership with a reason
+      description: |
+        Uses the same chain/regional store scope as upsert, checked before target
+        lookup; out-of-scope, inactive or unknown stores return 403. An unknown
+        membership returns 404. An already revoked membership returns 409 without
+        another audit event. Revocation of a retained membership is permitted
+        even if its user is inactive. Never hard-delete the membership.
+        Cannot revoke the last active STORE_MANAGER of an active store (409).
+        Lock and recheck scope, target and manager guard atomically, including
+        races with role changes, other revocations and user deactivation.
+        Write MEMBERSHIP_REVOKED with actor, target user, store/region and reason
+        plus previous/new role and active state, without username/displayName,
+        credentials, session or request body. The next request loses this
+        membership's authority; valid inherited chain/region rights still apply.
+      parameters:
+        - $ref: '#/components/parameters/MembershipStoreIdPath'
+        - $ref: '#/components/parameters/UserIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipReasonRequest'
+            examples:
+              synthetic:
+                externalValue: ../fixtures/api/admin-membership-revoke.json
+      responses:
+        '200':
+          description: Authorized result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStoreMembership'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/MembershipConflict'
+        '422':
+          $ref: '#/components/responses/MembershipValidation'
+
   /api/v1/admin/lifecycle/targets:
     get:
       tags: [Admin lifecycle]
@@ -777,6 +1000,14 @@ components:
       schema:
         type: string
         format: uuid
+    MembershipStoreIdPath:
+      name: storeId
+      in: path
+      required: true
+      description: Server rechecks active store and region against chain or assigned regional scope.
+      schema:
+        type: string
+        format: uuid
     BarcodePath:
       name: barcode
       in: path
@@ -861,6 +1092,18 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
+    MembershipConflict:
+      description: Last active store manager would be removed, or membership is already revoked; no mutation or audit is committed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    MembershipValidation:
+      description: Invalid role, username or reason; code identifies the failed rule.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     LifecycleValidation:
       description: Invalid lifecycle date or reason; code identifies the failed rule.
       content:
@@ -1022,6 +1265,108 @@ components:
           type: string
           minLength: 1
           maxLength: 500
+
+    AdminMembershipStore:
+      type: object
+      additionalProperties: false
+      required: [id, code, name, regionId, regionCode, regionName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: String identifier; leading zeroes are significant.
+        name:
+          type: string
+        regionId:
+          type: string
+          format: uuid
+        regionCode:
+          type: string
+          description: String identifier; leading zeroes are significant.
+        regionName:
+          type: string
+
+    AdminStoreMembership:
+      type: object
+      additionalProperties: false
+      required: [userId, username, displayName, userActive, role, active]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+          pattern: '^[a-z0-9][a-z0-9._-]{2,63}$'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        userActive:
+          type: boolean
+          description: Account state; independent of membership state.
+        role:
+          $ref: '#/components/schemas/StoreRole'
+        active:
+          type: boolean
+          description: Membership state; does not describe inherited chain or regional access.
+
+    MembershipLookupUser:
+      type: object
+      additionalProperties: false
+      required: [id, username, displayName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+          pattern: '^[a-z0-9][a-z0-9._-]{2,63}$'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 120
+
+    MembershipUserLookupRequest:
+      type: object
+      additionalProperties: false
+      required: [username]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          pattern: '^\s*[A-Za-z0-9][A-Za-z0-9._-]{2,63}\s*$'
+          description: Trim and lowercase before exact lookup; normalized P01 username has 3–64 ASCII characters.
+
+    MembershipUpsertRequest:
+      type: object
+      additionalProperties: false
+      required: [role, reason]
+      properties:
+        role:
+          $ref: '#/components/schemas/StoreRole'
+        reason:
+          $ref: '#/components/schemas/MembershipReason'
+
+    MembershipReasonRequest:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason:
+          $ref: '#/components/schemas/MembershipReason'
+
+    MembershipReason:
+      type: string
+      minLength: 1
+      maxLength: 500
+      pattern: '\S'
+      description: Required nonblank reason, trimmed before storage. Must not contain credentials or unnecessary personal information.
 
     LifecycleTargetType:
       type: string

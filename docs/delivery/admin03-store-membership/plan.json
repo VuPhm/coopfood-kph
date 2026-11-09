@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "admin03-store-membership",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Cấp/thu hồi quyền cửa hàng trên Admin Fresh theo checkpoint ADMIN03; bước hiện tại hoàn tất contract/examples/generated client trước implementation.",
+  "inScope": [
+    "5 API membership theo contract-draft; fixture tổng hợp và generated client",
+    "Backend chain/region scope, audit, last-manager và concurrency với user deactivation",
+    "Admin Fresh membership workspace; hai phiên backend thật; Playwright 390×844 và 1440×1024"
+  ],
+  "outOfScope": [
+    "Tạo user/reset credential/cấp quyền vùng hoặc global",
+    "KPH Fresh online wiring, DATE, catalog publish",
+    "Thay đổi ADMIN01/ADMIN02, push/merge/deploy/Pages"
+  ],
+  "baseSha": "0adad4d1076466406c30559a9d5cbb4dfa8ba52c",
+  "candidateSha": "",
+  "integrationOwner": "Codex /root — sole writer ADMIN03",
+  "sharedPaths": [
+    "contracts/openapi/**",
+    "contracts/fixtures/**",
+    "packages/api/**",
+    "scripts/check-contracts.mjs"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "contract-fixtures-client",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "backend-scope-audit-concurrency",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "two-session-browser",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-membership-workflow",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [
+    {
+      "revision": 1,
+      "request": "Tiếp tục lộ trình từ checkpoint ADMIN03; exact username lookup ngoài vùng đã được owner quyết định.",
+      "source": "User 09/11/2026; checkpoint handoff.md tại base ADMIN03",
+      "impact": "Resume cùng branch/worktree; hoàn tất contract-first trước runtime.",
+      "decision": "Giữ contract P01/ADR0004 và draft; không tự nghiệm thu UI hoặc gán API mới cho preview ADMIN02."
+    }
+  ],
+  "blockers": [],
+  "nextAction": "Hoàn tất contract/examples/client; sau đó backend + UI và real-backend/browser gates. Owner acceptance vẫn pending."
+}

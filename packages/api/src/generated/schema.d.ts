@@ -273,6 +273,148 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/membership-stores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List active stores the actor can manage
+         * @description Requires an active CHAIN_ADMIN or active regional assignment. Returns only
+         *     active stores in active regions within that explicit scope, ordered by
+         *     regionCode, code, id. An authorized actor with no active stores gets [].
+         *     EMPLOYEE, STORE_MANAGER and catalog-only actors cannot manage memberships.
+         *     This endpoint is not Store PWA effective-capability discovery.
+         */
+        get: operations["listMembershipStores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/stores/{storeId}/memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List memberships of one authorized store
+         * @description Authorizes an active store in an active region before returning membership
+         *     data. CHAIN_ADMIN manages all such stores; REGION_MANAGER requires an
+         *     active assignment to the store's region. A valid out-of-scope, inactive
+         *     or unknown store returns 403 without membership data. Rows include active
+         *     and revoked memberships, ordered by username, userId. userActive and
+         *     membership active are independent; inherited regional/global rights are
+         *     not synthetic memberships and are not included.
+         */
+        get: operations["listStoreMemberships"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/stores/{storeId}/membership-user-lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Find one active user by exact username
+         * @description Authorizes store scope before looking up the username. CHAIN_ADMIN or an
+         *     active REGION_MANAGER of the store may find an active user even when
+         *     that user has no membership in the region. Trim and lowercase the input,
+         *     then validate the P01 canonical username (3–64 ASCII characters).
+         *     Exact match only: no prefix, substring, suggestions or directory search.
+         *     Unknown and inactive users both return 404. Returns only id, username and
+         *     displayName, never global roles, region assignments or other memberships.
+         *     POST keeps the username out of the URL; CSRF is required. This read does
+         *     not create a membership or an audit mutation. /admin/users stays chain-only.
+         */
+        post: operations["lookupMembershipUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/stores/{storeId}/memberships/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Create, reactivate or change a store membership
+         * @description Requires CHAIN_ADMIN or an active REGION_MANAGER assigned to the active
+         *     region containing the active store. Authorize store before disclosing
+         *     user state; out-of-scope, inactive or unknown stores return 403.
+         *     Unknown or inactive target users return 404. At most one membership per
+         *     user/store exists; an upsert creates, reactivates or changes its role.
+         *     Same active role returns 200 without a new audit event. A role downgrade
+         *     cannot remove the last active STORE_MANAGER of an active store (409).
+         *     Lock and recheck scope, target and manager guard in the same transaction,
+         *     including concurrent membership mutations and user deactivation.
+         *     Write MEMBERSHIP_UPSERTED only for a real change, with actor, target user,
+         *     store/region and reason plus previous/new role and active state. Do not
+         *     audit usernames, display names, credentials, sessions or request bodies.
+         *     Membership changes affect access on the next request; valid inherited
+         *     chain/region permissions remain effective. Never create synthetic roles.
+         */
+        put: operations["upsertStoreMembership"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/stores/{storeId}/memberships/{userId}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Immediately revoke a store membership with a reason
+         * @description Uses the same chain/regional store scope as upsert, checked before target
+         *     lookup; out-of-scope, inactive or unknown stores return 403. An unknown
+         *     membership returns 404. An already revoked membership returns 409 without
+         *     another audit event. Revocation of a retained membership is permitted
+         *     even if its user is inactive. Never hard-delete the membership.
+         *     Cannot revoke the last active STORE_MANAGER of an active store (409).
+         *     Lock and recheck scope, target and manager guard atomically, including
+         *     races with role changes, other revocations and user deactivation.
+         *     Write MEMBERSHIP_REVOKED with actor, target user, store/region and reason
+         *     plus previous/new role and active state, without username/displayName,
+         *     credentials, session or request body. The next request loses this
+         *     membership's authority; valid inherited chain/region rights still apply.
+         */
+        post: operations["revokeStoreMembership"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/lifecycle/targets": {
         parameters: {
             query?: never;
@@ -468,6 +610,48 @@ export interface components {
         UserDeactivateRequest: {
             reason: string;
         };
+        AdminMembershipStore: {
+            /** Format: uuid */
+            id: string;
+            /** @description String identifier; leading zeroes are significant. */
+            code: string;
+            name: string;
+            /** Format: uuid */
+            regionId: string;
+            /** @description String identifier; leading zeroes are significant. */
+            regionCode: string;
+            regionName: string;
+        };
+        AdminStoreMembership: {
+            /** Format: uuid */
+            userId: string;
+            username: string;
+            displayName: string;
+            /** @description Account state; independent of membership state. */
+            userActive: boolean;
+            role: components["schemas"]["StoreRole"];
+            /** @description Membership state; does not describe inherited chain or regional access. */
+            active: boolean;
+        };
+        MembershipLookupUser: {
+            /** Format: uuid */
+            id: string;
+            username: string;
+            displayName: string;
+        };
+        MembershipUserLookupRequest: {
+            /** @description Trim and lowercase before exact lookup; normalized P01 username has 3–64 ASCII characters. */
+            username: string;
+        };
+        MembershipUpsertRequest: {
+            role: components["schemas"]["StoreRole"];
+            reason: components["schemas"]["MembershipReason"];
+        };
+        MembershipReasonRequest: {
+            reason: components["schemas"]["MembershipReason"];
+        };
+        /** @description Required nonblank reason, trimmed before storage. Must not contain credentials or unnecessary personal information. */
+        MembershipReason: string;
         /** @enum {string} */
         LifecycleTargetType: "REGION" | "STORE";
         /** @enum {string} */
@@ -830,6 +1014,24 @@ export interface components {
                 "application/problem+json": components["schemas"]["ValidationProblem"];
             };
         };
+        /** @description Last active store manager would be removed, or membership is already revoked; no mutation or audit is committed. */
+        MembershipConflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description Invalid role, username or reason; code identifies the failed rule. */
+        MembershipValidation: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description Invalid lifecycle date or reason; code identifies the failed rule. */
         LifecycleValidation: {
             headers: {
@@ -879,6 +1081,8 @@ export interface components {
     parameters: {
         /** @description Requested scope; membership remains authoritative on the server. */
         StoreIdPath: string;
+        /** @description Server rechecks active store and region against chain or assigned regional scope. */
+        MembershipStoreIdPath: string;
         /** @description Exact string identifier; leading zeroes are significant. */
         BarcodePath: string;
         CsrfHeader: string;
@@ -1296,6 +1500,161 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["UnprocessableEntity"];
+        };
+    };
+    listMembershipStores: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMembershipStore"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listStoreMemberships: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Server rechecks active store and region against chain or assigned regional scope. */
+                storeId: components["parameters"]["MembershipStoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStoreMembership"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    lookupMembershipUser: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Server rechecks active store and region against chain or assigned regional scope. */
+                storeId: components["parameters"]["MembershipStoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipUserLookupRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipLookupUser"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["MembershipValidation"];
+        };
+    };
+    upsertStoreMembership: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Server rechecks active store and region against chain or assigned regional scope. */
+                storeId: components["parameters"]["MembershipStoreIdPath"];
+                userId: components["parameters"]["UserIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipUpsertRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStoreMembership"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["MembershipConflict"];
+            422: components["responses"]["MembershipValidation"];
+        };
+    };
+    revokeStoreMembership: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Server rechecks active store and region against chain or assigned regional scope. */
+                storeId: components["parameters"]["MembershipStoreIdPath"];
+                userId: components["parameters"]["UserIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipReasonRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStoreMembership"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["MembershipConflict"];
+            422: components["responses"]["MembershipValidation"];
         };
     };
     listLifecycleTargets: {

@@ -1,18 +1,24 @@
 # Công việc kế tiếp
 
 Cập nhật 09/11/2026. Baseline: [CURRENT_STATE](CURRENT_STATE.md).
-FRESH01 đã CLOSED. ADMIN01 đã khởi động ngày 09/11/2026 trên nhánh
-`store-app/admin01-membership`; đang chuẩn bị/duyệt Admin hiện có trước khi
-chốt màn/API membership. Xem [kế hoạch](delivery/admin01-membership/plan.json).
+FRESH01 đã CLOSED. ADMIN03 đang thực hiện trên nhánh
+`store-app/admin03-store-membership`: contract/examples/generated client đã có,
+backend/UI và nghiệm thu hai phiên còn pending. Tiếp tục cùng
+[kế hoạch](delivery/admin03-store-membership/plan.json), không mở lại ADMIN01
+hoặc xem preview ADMIN02 như implementation membership.
 Thứ tự dưới đây là đề xuất ưu tiên đã được ghi nhận trong lần chuẩn hóa tài liệu,
 không phải nghiệm thu contract mới hoặc lệnh bắt đầu toàn bộ roadmap.
 
 ## Mốc Admin Web: cấp và thu hồi quyền cửa hàng
 
-Đề xuất ưu tiên duyệt giao diện quản trị riêng. Bước nhỏ đầu tiên là owner mở
+Bước tiếp theo của ADMIN03 là triển khai backend theo OpenAPI, giải quyết thứ tự
+khóa với user deactivation, rồi nối workspace Quyền cửa hàng vào Admin Fresh.
+Bản draft và quyết định lookup đã ở [checkpoint](delivery/admin03-store-membership/contract-draft.md).
+
+Gate duyệt giao diện quản trị riêng vẫn cần owner. Owner mở
 [Admin Web hiện có](CURRENT_STATE.md#admin-web-phần-quản-lý-đã-có) với tài khoản
 mẫu theo vai trò, xác nhận tìm được các màn phù hợp và vị trí để quản lý quyền
-cửa hàng. Sau đó chốt màn và API cho một luồng: chọn người dùng hiện có → chọn
+cửa hàng. Luồng cần nghiệm thu: chọn người dùng hiện có → chọn
 cửa hàng → gán vai trò EMPLOYEE hoặc STORE_MANAGER → thu hồi có lý do.
 
 **Điều kiện kỹ thuật.** Theo [P01](product/PROVISIONING_POLICY.md) và

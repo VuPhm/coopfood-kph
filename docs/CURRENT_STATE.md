@@ -58,13 +58,16 @@ Integration ngày 27/10 ghi nhận `VITEST_MAX_WORKERS=1 npm run verify` PASS
 workflow/Excel/PDF đạt. Đây là kết quả lịch sử trên source đã tích hợp, không
 phải test mới ngày 07/11; không chứng minh backend thật hoặc thiết bị thật.
 
-Sau lần chuẩn hóa, owner yêu cầu “bắt đầu lộ trình”: ADMIN01 đã mở ngày
-09/11/2026 trên worktree `/private/tmp/coopfood-kph-admin01`, nhánh
-`store-app/admin01-membership`, base `59c7caa`. Giai đoạn đầu: duyệt Admin hiện
-có theo vai trò, sau đó chốt màn/API cấp và thu hồi membership.
-[Kế hoạch và gate](delivery/admin01-membership/plan.json). Không mở thêm
-vòng visual diện rộng. Push/deploy/Cloudflare/Pages là thao tác riêng; không
-kế thừa quyền push một lần từ bản ghi lịch sử. Pages và tag bảo tồn giữ nguyên.
+Sau lần chuẩn hóa, ADMIN01 mở từ `59c7caa`; ADMIN02 có candidate Admin Fresh
+và preview source 4175 riêng, vẫn chờ owner nghiệm thu UI. Tiến độ mới nhất
+trong worktree này là **ADMIN03 contract-first**, nhánh
+`store-app/admin03-store-membership`, base `0adad4d`. Đã thêm 5 API dự kiến,
+fixture và client; backend/UI membership chưa triển khai. Quyết định exact
+username lookup ngoài vùng được giữ theo checkpoint owner ngày 09/11/2026.
+[Kế hoạch hiện hành](delivery/admin03-store-membership/plan.json) và
+[bàn giao](delivery/admin03-store-membership/handoff.md). Những tiến độ trên
+chưa tích hợp main; preview ADMIN02 không chứng minh API ADMIN03 đang chạy.
+Push/deploy/Pages là thao tác riêng; tag và nhánh bảo tồn giữ nguyên.
 
 Toàn bộ checkpoint cũ được giữ tại
 [lịch sử trạng thái đến 27/10](https://github.com/VuPhm/coopfood-kph/blob/04f7c4a4d9001901c3973e7e6bbf5a2118932ee7/docs/CURRENT_STATE.md).
