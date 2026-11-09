@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
-  "revision": 7,
+  "revision": 8,
   "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
   "inScope": [
@@ -21,14 +21,14 @@
     "Large shared design system or Store/Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "b46741a266cd80ed1c39609b40898d993dd9aed5",
+  "candidateSha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [
     "packages/ui/src/fresh-tokens.css",
     "packages/ui/package.json"
   ],
-  "reviewLimit": 10,
-  "reviewRound": 10,
+  "reviewLimit": 11,
+  "reviewRound": 11,
   "teams": [],
   "gates": [
     {
@@ -36,27 +36,27 @@
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 7,
-      "sha": "b46741a266cd80ed1c39609b40898d993dd9aed5",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/reload-r7.md"
+      "revision": 8,
+      "sha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/worker-r8.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 7,
-      "sha": "b46741a266cd80ed1c39609b40898d993dd9aed5",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/reload-r7.md"
+      "revision": 8,
+      "sha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/worker-r8.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 7,
-      "sha": "b46741a266cd80ed1c39609b40898d993dd9aed5",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/reload-r7.md"
+      "revision": 8,
+      "sha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/worker-r8.md"
     },
     {
       "id": "owner-ui-review",
@@ -107,8 +107,15 @@
       "source": "Current chat09/11/2026",
       "impact": "Admin local Vite dev/preview settings, UI preview command, macOS local launcher and normal-reload regression. No deploy/Pages/business changes.",
       "decision": "Bounded runtime repair round10. Restore same branch into durable worktree, source preview4175 instead of static dist; stop only owned old P03 frontend4174. Prepare membership flow decision without modifying ADMIN01/backend/API."
+    },
+    {
+      "revision": 8,
+      "request": "Owner still sees old page until hard refresh.",
+      "source": "Current chat09/11/2026",
+      "impact": "Existing-origin offline worker migration, not only clean-browser CSS cache. Local Admin serving only; no deployment or Store/Pages changes.",
+      "decision": "Bounded repair round11. Observed actual IAB4175 identity showing old Pilot. Serve /sw.js retirement worker for local dev/preview, claim/unregister/navigate; preserve all origin data. Reproduce previously installed offline worker with normal reload and verify persistent data preservation."
     }
   ],
   "blockers": [],
-  "nextAction": "Source preview4175 ready; owner UI review pending. Membership next-step proposal prepared; await target-directory eligibility decision before API work. No push/merge/deploy."
+  "nextAction": "Owner tab4175 identity recovered to Admin and normal reload rechecked. Owner UI acceptance still pending; membership username eligibility approved in chat, draft on separate ADMIN03. No push/merge/deploy."
 }
