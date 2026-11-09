@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon01-effective-context",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Effective KPH store discovery và session/chọn cửa hàng trên shell Fresh, không fallback mock; nền để nối KPH từng slice.",
   "inScope": [
     "GET /api/v1/kph/stores theo scope P01; OpenAPI/fixture/generated client cùng backend",
@@ -59,15 +59,35 @@
       "id": "owner-context",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "751df44f207a8d6ff76068cbe2bcbdbce00d1cd4",
+      "evidence": "docs/delivery/kphon01-effective-context/acceptance-2026-11-09.md",
+      "acceptedBy": "Project owner — provisional context acceptance",
+      "decisionRef": "docs/delivery/kphon01-effective-context/acceptance-2026-11-09.md#quyet-dinh-owner"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "KPHON01 technical PASS; tiếp nối lookup/history trên effective context, giữ D01. Owner context/ADR acceptance chưa được suy từ ADMIN03; tổ hợp trọn KPH và toàn roadmap giữ ở vòng cuối.",
+  "nextAction": "KPHON01 tạm đạt theo owner; đóng slice context trong phạm vi hiện tại. Giữ đúng một vòng test kỹ/tổ hợp và một vòng UI/UX cho sau; chưa chạy hoặc tính là nghiệm thu cuối. Chưa tự mở slice mới.",
   "initialRequest": {
     "request": "coi như pass ... test tổ hợp sau cuối ... tiếp",
     "source": "Owner chat09/11/2026 sau bàn giao ADMIN03",
     "decision": "Đóng ADMIN03 bằng acceptance explicit; tiếp roadmap KPH, bắt đầu discovery/session; không waiver scope/security tests."
-  }
+  },
+  "acceptanceLevel": "provisional-scoped",
+  "deferredReviews": [
+    {
+      "id": "final-technical-review",
+      "sequence": 1,
+      "status": "pending",
+      "outcome": "Một vòng test kỹ và tổ hợp các luồng đã nối trước nghiệm thu cuối."
+    },
+    {
+      "id": "final-uiux-review",
+      "sequence": 2,
+      "status": "pending",
+      "outcome": "Một vòng UI/UX sau vòng test kỹ, trước nghiệm thu cuối."
+    }
+  ]
 }

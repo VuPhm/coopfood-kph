@@ -17,7 +17,8 @@ session/GET /stores và entry mock/online cũ giữ riêng.
 TypeScript/builds online+mock và Playwright real-backend2viewport PASS.
 [Evidence](evidence.md), [contract](../../product/STORE_KPH_CONTEXT_CONTRACT.md),
 [ADR0007 proposed](../../adr/0007-kph-effective-store-context.md).
-Plan AWAITING_ACCEPTANCE; không suy acceptance KPHON01 từ acceptance ADMIN03.
+Owner đã ghi nhận KPHON01 **tạm đạt** ngày09/11/2026; plan CLOSED trong phạm vi
+context. [Quyết định và hai vòng để sau](acceptance-2026-11-09.md).
 Kiểm tổ hợp cuối còn để vòng cuối theo owner, không gọi slice này là full KPH PASS.
 
 ## Preview thật
@@ -43,4 +44,5 @@ Nối lookup barcode và history KPH trên context này; giữ D01 server filter
 paging/count, page-local selection/reset. Sau đó create/private media/idempotency,
 review/export và tổ hợp trọn KPH. Khi gắn draft/form phải giữ state phù hợp trong
 revalidation và clear đúng khi scope mất/đổi, không mang authority từ mock.
-Không hỏi lại quyết định ADMIN03; không tự chốt tổ hợp cuối hoặc rollout.
+Không hỏi lại quyết định ADMIN03/KPHON01 tạm đạt. Giữ một vòng test kỹ/tổ hợp,
+rồi một vòng UI/UX cho sau; chưa chạy và chưa coi là nghiệm thu cuối hoặc rollout.
