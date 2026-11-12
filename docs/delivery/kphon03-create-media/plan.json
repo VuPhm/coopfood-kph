@@ -1,63 +1,76 @@
 {
   "schemaVersion": 1,
   "id": "kphon03-create-media",
-  "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 2,
+  "status": "EXECUTING",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
     "Actor/store/capability thật, lookup FOUND/NOT_FOUND,1–3 original photos theo thứ tự",
     "Giữ draft/ảnh khi xác minh scope hợp lệ; chặn close/double-send trong lúc gửi",
     "Tạo thành công refresh history D01; lỗi không báo thành công giả",
-    "Targeted tests và real-backend Playwright390×844/1440×1024"
+    "Targeted tests và real-backend Playwright390×844/1440×1024",
+    "Owner bổ sung: merge UI green-header source e8a2df7 vào KPHON03, giữ create/session/idempotency/media; kiểm có mục tiêu chrome và create trên bản kết hợp."
   ],
   "outOfScope": [
-    "Redesign/optimization UI diện rộng; giữ UI debt cho vòng sau",
+    "Redesign/optimization ngoài UI source e8a2df7; UI debt khác và final UI acceptance giữ cho vòng sau",
     "Review/export và DATE persistence",
     "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
-  "candidateSha": "837720e60924a1eb24429d391077d91999e952c6",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — sole writer",
   "sharedPaths": [
-    "apps/store-pwa/src/**"
+    "apps/store-pwa/src/**",
+    "apps/admin-web/**",
+    "apps/store-pwa/public/**",
+    "docs/**",
+    "e2e/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "837720e60924a1eb24429d391077d91999e952c6",
-      "evidence": "docs/delivery/kphon03-create-media/evidence.md"
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 1,
-      "sha": "837720e60924a1eb24429d391077d91999e952c6",
-      "evidence": "docs/delivery/kphon03-create-media/evidence.md"
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 1,
-      "sha": "837720e60924a1eb24429d391077d91999e952c6",
-      "evidence": "docs/delivery/kphon03-create-media/handoff.md"
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
     }
   ],
-  "changes": [],
+  "changes": [
+    {
+      "revision": 2,
+      "request": "tích hợp luôn KPHON03, tôi đổi ý r",
+      "source": "Owner chat UI qua handoff e8a2df7 và coordination message12/11/2026",
+      "impact": "Ghép green chrome/official logos/Admin shell vào KPHON03; invalidates frontend/browser gates của candidate cũ. Backend tree không đổi, có thể reuse9 targeted tests với rationale.",
+      "decision": "Merge local --no-ff source e8a2df7 sau checkpoint55f398e; hai review có giới hạn cho revision2; không main/push/deploy/milestone mới."
+    }
+  ],
   "blockers": [],
-  "nextAction": "Owner thử create KPHON03 theo handoff. Bước nhỏ sau là review theo scope, rồi export; giữ UI debt và hai vòng cuối pending.",
+  "nextAction": "Merge UI branch and resolve docs by latest KPHON03 progress; verify create + chrome combined before handoff.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
