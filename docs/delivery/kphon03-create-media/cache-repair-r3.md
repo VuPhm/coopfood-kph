@@ -4,7 +4,7 @@
 sau đó chỉ đạo “fix lỗi bị neo sw hoặc trang cũ trước”. Reopen feedback UI,
 chưa kết luận layout đúng và không triển khai layout repair trong lượt ưu tiên này.
 
-Source79f54b3 sạch lúc bắt đầu. Preview4173/4175/backend8082 đã dừng;
+Candidate `7908acaef234cf629c5fff212be613bd959e272d`. Source79f54b3 sạch lúc bắt đầu. Preview4173/4175/backend8082 đã dừng;
 Docker cũng tắt. Khởi động lại OrbStack và đúng container synthetic KPHON02,
 backend jar KPHON01/media cũ và preview từ KPHON03. Không seed/reset.
 

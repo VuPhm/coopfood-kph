@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon03-create-media",
   "revision": 3,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -20,7 +20,7 @@
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
-  "candidateSha": "",
+  "candidateSha": "7908acaef234cf629c5fff212be613bd959e272d",
   "integrationOwner": "Codex /root — sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -32,26 +32,26 @@
     "tooling/vite/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 3,
-      "sha": "",
-      "evidence": ""
+      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
+      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 3,
-      "sha": "",
-      "evidence": ""
+      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
+      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
     },
     {
       "id": "owner-create",
@@ -59,17 +59,17 @@
       "required": true,
       "status": "pending",
       "revision": 3,
-      "sha": "",
-      "evidence": ""
+      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
+      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
     },
     {
       "id": "owner-green-ui",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "fail",
       "revision": 3,
-      "sha": "",
-      "evidence": ""
+      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
+      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
     }
   ],
   "changes": [
@@ -89,7 +89,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Reproduce stale root/custom-script workers, fix Store/Admin dev+preview freshness and preserve browser storage; layout repair waits until cache is ruled out.",
+  "nextAction": "Cache/SW repair đã kiểm kỹ thuật; owner reload thường Store4173/Admin4175 để lấy trang hiện hành, sau đó đối chiếu UI sai/hao hụt. UI feedback chưa khép; không tự mở review/export hoặc đánh dấu final UI acceptance.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
@@ -108,5 +108,13 @@
       "sequence": 2,
       "outcome": "Một vòng UI/UX sau vòng kỹ thuật; integration chrome không tự là final visual acceptance."
     }
-  ]
+  ],
+  "cacheRepair": {
+    "status": "technically-verified",
+    "candidateSha": "7908acaef234cf629c5fff212be613bd959e272d",
+    "browserCases": 8,
+    "dataCleared": false,
+    "uiLayoutChanged": false,
+    "ownerUiReport": "open — owner asked to fix stale SW/page first"
+  }
 }
