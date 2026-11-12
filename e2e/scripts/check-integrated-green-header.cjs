@@ -43,6 +43,7 @@ const gradient='linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb
     await page.getByRole('button',{name:'Quyền cửa hàng',exact:true}).click();
     await expect(page.locator('.membership-workspace')).toBeVisible();
     await expect(page.locator('.admin-topbar')).toHaveCSS('background-image',gradient);
+    await expect(page.locator('.admin-sidebar [aria-current="page"]')).toHaveCSS('color','rgb(255, 255, 255)');
     await page.screenshot({path:`${output}/admin-membership-1440.png`});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     await page.close();console.log('PASS real backend Admin: region membership navigation retained and green header');
