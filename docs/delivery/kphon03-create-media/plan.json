@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon03-create-media",
   "revision": 1,
-  "status": "PLANNING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -18,40 +18,46 @@
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
-  "candidateSha": "",
+  "candidateSha": "837720e60924a1eb24429d391077d91999e952c6",
   "integrationOwner": "Codex /root — sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 1
+      "status": "pass",
+      "revision": 1,
+      "sha": "837720e60924a1eb24429d391077d91999e952c6",
+      "evidence": "docs/delivery/kphon03-create-media/evidence.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 1
+      "status": "pass",
+      "revision": 1,
+      "sha": "837720e60924a1eb24429d391077d91999e952c6",
+      "evidence": "docs/delivery/kphon03-create-media/evidence.md"
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 1
+      "revision": 1,
+      "sha": "837720e60924a1eb24429d391077d91999e952c6",
+      "evidence": "docs/delivery/kphon03-create-media/handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Connect existing Fresh form to current create gateway and verify scoped retry/media.",
+  "nextAction": "Owner thử create KPHON03 theo handoff. Bước nhỏ sau là review theo scope, rồi export; giữ UI debt và hai vòng cuối pending.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
