@@ -1,5 +1,5 @@
 import { UserRound } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Dialog, DialogContent, DialogTitle, DialogDescription } from "@coopfood-kph/ui";
 import { ChangePasswordDialog } from "./change-password-dialog";
@@ -59,6 +59,8 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     document.addEventListener("visibilitychange", refresh);
     return () => { if (frame !== undefined) cancelAnimationFrame(frame); window.removeEventListener("hashchange", sync); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
   }, [refreshScope]);
+  const selectedStore = scope.data?.stores.find(item => item.id === selectedId);
+  const profile = useMemo(() => ({ storeName: selectedStore?.name ?? "", storeCode: selectedStore?.code ?? "", fullName: scope.data?.session.user.displayName ?? "", employeeCode: "", role: "" as const }), [selectedStore?.name, selectedStore?.code, scope.data?.session.user.displayName]);
   const anonymous = scope.isError && scope.error instanceof OnlineApiError && scope.error.status === 401;
   async function login(username: string, password: string) {
     ++selectionTicket.current;
@@ -93,12 +95,11 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     <Button onClick={() => { void scope.refetch(); }}>Tải lại quyền cửa hàng</Button>{actions}{passwordDialog}
   </main>;
   const currentScreen = screen === "login" ? "home" : screen;
-  const profile = { storeName: store.name, storeCode: store.code, fullName: session.user.displayName, employeeCode: "", role: "" as const };
   return <><div style={scope.isFetching ? { visibility: "hidden" } : undefined} inert={scope.isFetching || undefined} aria-hidden={scope.isFetching || undefined}><StoreAppFrame key={`${session.user.id}:${store.id}`} screen={currentScreen} profile={profile}
     navigate={next => { window.location.hash = next; }} account={<><button type="button" className="store-online-account" aria-label="Tài khoản" onClick={() => setAccountOpen(true)}><UserRound size={22} aria-hidden="true" /></button><Dialog open={accountOpen && !scope.isFetching} onOpenChange={setAccountOpen}><DialogContent><DialogTitle>Tài khoản</DialogTitle><DialogDescription>{session.user.displayName} · {store.code} · {store.name}</DialogDescription>{actions}</DialogContent></Dialog>{passwordDialog}</>}>
     <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content">
       {currentScreen === "date" ? <StoreBarcodeLookup suspended={scope.isFetching} userId={session.user.id} storeId={store.id} lookupBarcode={gateway.lookupBarcode} onSessionExpired={refreshScope} />
-        : currentScreen === "kph" ? <StoreOnlineKph suspended={scope.isFetching} userId={session.user.id} storeId={store.id} loadHistory={gateway.loadHistory} onSessionExpired={refreshScope} /> : <>
+        : currentScreen === "kph" ? <StoreOnlineKph suspended={scope.isFetching} userId={session.user.id} storeId={store.id} loadHistory={gateway.loadHistory} createRecord={gateway.createRecord} lookupBarcode={gateway.lookupBarcode} profile={profile} canCreate={store.capabilities.includes("CREATE")} onSessionExpired={refreshScope} /> : <>
       <h1>{currentScreen === "home" ? store.name : `${storeScreens[currentScreen].title} chưa kết nối`}</h1><p>{store.code} · {session.user.displayName}</p>
       {message ? <p role="alert">{message}</p> : null}
       {currentScreen === "home" ? <><div className="store-online-actions"><Button onClick={() => { window.location.hash = "date"; }}>Tra mã hàng</Button><Button onClick={() => { window.location.hash = "kph"; }}>Phiếu KPH</Button></div><h2>Quyền hàng không phù hợp</h2><ul>{([['VIEW', 'Xem phiếu'], ['CREATE', 'Tạo phiếu'], ['REVIEW', 'Duyệt phiếu'], ['EXPORT', 'Xuất phiếu']] as const).filter(([key]) => store.capabilities.includes(key)).map(([key, label]) => <li key={key}>{label}</li>)}</ul></> : <p role="status">{storeScreens[currentScreen].title} chưa được kết nối trong phiên online. Không có dữ liệu minh họa trong màn này.</p>}</>}

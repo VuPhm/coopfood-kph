@@ -31,10 +31,16 @@ tháo scope cũ. Đổi actor luôn yêu cầu chọn store lại. Scope mất k
 chọn store khác tự động; giảm quyền nhưng còn VIEW cập nhật capabilities.
 
 KPHON02 nối lookup và history/chi tiết chỉ đọc; giữ D01 filter/sort/count
-trước pagination, reset detail/grouping khi đổi page/filter/sort. Create,
-review/export nối ở slice sau. DATE/report/notification và mọi route chưa nối hiện rõ chưa
+trước pagination, reset detail/grouping khi đổi page/filter/sort. Review/export
+nối ở slice sau. KPHON03 nối create qua form Fresh và gateway
+hiện hành: ngày/actor read-only,1–3 original photos theo thứ tự, xem lại trước
+gửi, retry cùng payload/key khi mất response. Backend resolve catalog snapshot
+và sinh stamped JPEG, original/stamped đều private; không upload stamped pair
+từ frontend. Thành công mới refresh history/hiện xác nhận. Profile theo scalar
+authoritative được memoize để revalidate không reset draft/ảnh. Submit không
+chuyển sang actor mới trong lúc chuẩn bị file hoặc khi response cũ về. Persistence DATE/report/notification và route chưa nối hiện rõ chưa
 kết nối, không render mock operational data trong phiên thật. NOT_FOUND cho
-scan lại hoặc nhập tay trống, giữ barcode/status, chưa lưu; error không biến
+scan lại hoặc nhập tay trống, giữ barcode/status; draft lookup riêng chưa lưu; error không biến
 thành NOT_FOUND. Draft được clear khi đổi/mất scope; selector không là authority.
 
 Provenance chọn lọc: BE02/BE03 cũ2b42c94/4a65334 cung cấp SQL/tests và session

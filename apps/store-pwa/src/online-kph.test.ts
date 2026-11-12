@@ -209,4 +209,32 @@ describe("online KPH gateway", () => {
     expect(exported.store).toEqual(recordFixture.store);
     expect(exported.records[0]?.reviewedBy).toBe(sessionFixture.user.displayName);
   });
+  it("cancels a create prepared under a previous actor before any mutation", async () => {
+    const response = (value: unknown) => new Response(JSON.stringify(value), { status: 200, headers: { "Content-Type": "application/json" } });
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(sessionFixture)).mockResolvedValueOnce(response({ ...sessionFixture, user: { ...sessionFixture.user, id: "another-actor" } }));
+    const gateway = createOnlineGateway({ baseUrl: "http://localhost", fetch: fetcher });
+    await gateway.getSession();
+    let release!: (bytes: ArrayBuffer) => void;
+    const file = new File(["original"], "synthetic.jpg", { type: "image/jpeg" });
+    Object.defineProperty(file, "arrayBuffer", { value: vi.fn().mockImplementationOnce(() => new Promise<ArrayBuffer>(resolve => { release = resolve; })).mockResolvedValue(new ArrayBuffer(0)) });
+    const pending = gateway.createRecord("store", draft(file));
+    await gateway.getSession(); release(new ArrayBuffer(0));
+    await expect(pending).rejects.toMatchObject({ status: 401 });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not deliver an old actor's committed response into a new session", async () => {
+    const response = (value: unknown) => new Response(JSON.stringify(value), { status: 200, headers: { "Content-Type": "application/json" } });
+    let release!: (value: Response) => void;
+    let started!: () => void;
+    const postStarted = new Promise<void>(resolve => { started = resolve; });
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response(sessionFixture)).mockImplementationOnce(() => { started(); return new Promise<Response>(resolve => { release = resolve; }); }).mockResolvedValueOnce(response({ ...sessionFixture, user: { ...sessionFixture.user, id: "another-actor" } }));
+    const gateway = createOnlineGateway({ baseUrl: "http://localhost", fetch: fetcher });
+    await gateway.getSession();
+    const pending = gateway.createRecord("store", draft(new File(["original"], "synthetic.jpg", { type: "image/jpeg" })));
+    await postStarted; await gateway.getSession(); release(createdResponse());
+    await expect(pending).rejects.toMatchObject({ status: 401 });
+    expect(fetcher).toHaveBeenCalledTimes(3);
+  });
+
 });

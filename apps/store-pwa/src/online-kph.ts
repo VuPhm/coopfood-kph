@@ -83,14 +83,25 @@ export function onlineModeEnabled() {
 
 export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof globalThis.fetch } = {}): OnlineGateway {
   let csrfToken = "";
+  let sessionEpoch = 0;
+  let actorId: string | undefined;
   const pendingCreates = new Map<string, string>();
   const keySignatures = new Map<string, string>();
   const client = createKphApiClient({ ...options, getCsrfToken: () => csrfToken });
 
+  function rememberSession(session: Session) {
+    if (actorId !== session.user.id) {
+      ++sessionEpoch;
+      pendingCreates.clear(); keySignatures.clear();
+    }
+    actorId = session.user.id;
+    csrfToken = session.csrfToken;
+  }
+
   async function getSession(signal?: AbortSignal): Promise<Session> {
     const response = await client.GET("/api/v1/auth/session", signal ? { signal } : {});
     if (response.error || !response.data) throw apiError(response, "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tiếp tục.");
-    csrfToken = response.data.csrfToken;
+    rememberSession(response.data);
     return response.data;
   }
 
@@ -130,7 +141,7 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
       ...(signal ? { signal } : {}),
     });
     if (response.error || !response.data) throw apiError(response, "Tên đăng nhập hoặc mật khẩu không đúng.");
-    csrfToken = response.data.csrfToken;
+    rememberSession(response.data);
     return response.data;
   }
 
@@ -140,6 +151,7 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     });
     if (response.error) throw apiError(response, "Không thể đăng xuất khỏi phiên hiện tại.");
     csrfToken = "";
+    actorId = undefined; ++sessionEpoch;
     pendingCreates.clear();
     keySignatures.clear();
   }
@@ -151,11 +163,15 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
     });
     if (response.error) throw apiError(response, "Không thể đổi mật khẩu lúc này.");
     csrfToken = "";
+    actorId = undefined; ++sessionEpoch;
     pendingCreates.clear();
     keySignatures.clear();
   }
 
   async function createRecord(storeId: string, draft: CreatedRecordDraft) {
+    const requestEpoch = sessionEpoch;
+    const requestCsrfToken = csrfToken;
+    const mutationClient = createKphApiClient({ ...options, getCsrfToken: () => requestCsrfToken });
     const payload: components["schemas"]["KphCreateRequest"] = {
       type: draft.kind,
       detectedDate: displayDateToIso(draft.detectedDate),
@@ -182,6 +198,7 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
       form.append("photos", new Blob([originalBytes], { type: originalFile.type }), originalFile.name);
     }
     const signature = await createRequestSignature(storeId, payload, draft.photos.map(({ originalFile }) => originalFile));
+    if (requestEpoch !== sessionEpoch) throw new OnlineApiError("Phiên đăng nhập đã thay đổi. Hãy chọn lại cửa hàng.", 401);
     const suppliedKey = draft.idempotencyKey?.trim();
     const pendingKey = pendingCreates.get(signature);
     const suppliedKeySignature = suppliedKey ? keySignatures.get(suppliedKey) : undefined;
@@ -195,16 +212,17 @@ export function createOnlineGateway(options: { baseUrl?: string; fetch?: typeof 
       ?? (reusableSuppliedKey ?? newIdempotencyKey());
     pendingCreates.set(signature, idempotencyKey);
     keySignatures.set(idempotencyKey, signature);
-    const response = await client.POST("/api/v1/stores/{storeId}/kph", {
+    const response = await mutationClient.POST("/api/v1/stores/{storeId}/kph", {
       params: {
         path: { storeId },
         header: {
-          "X-CSRF-TOKEN": csrfToken,
+          "X-CSRF-TOKEN": requestCsrfToken,
           "Idempotency-Key": idempotencyKey,
         },
       },
       body: form as never,
     });
+    if (requestEpoch !== sessionEpoch) throw new OnlineApiError("Phiên đăng nhập đã thay đổi. Hãy chọn lại cửa hàng.", 401);
     if (response.error || !response.data) throw apiError(response, "Không thể lưu phiếu KPH.");
     pendingCreates.delete(signature);
     if (!reusableSuppliedKey) keySignatures.delete(idempotencyKey);

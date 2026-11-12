@@ -9,6 +9,7 @@ export function createStoreSessionGateway(options: { baseUrl?: string; fetch?: t
     getSession: identity.getSession,
     lookupBarcode: identity.lookupBarcode,
     loadHistory: identity.loadHistory,
+    createRecord: identity.createRecord,
     login: identity.login,
     logout: identity.logout,
     changePassword: identity.changePassword,

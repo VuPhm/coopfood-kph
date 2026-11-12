@@ -39,7 +39,7 @@ cửa hàng và cấp quyền vùng là các nhu cầu riêng trong [policy P01]
 
 | Vùng | Đã có | Còn thiếu trước vận hành online bằng UI mới |
 | --- | --- | --- |
-| Store Fresh | UI mock đã tích hợp; KPHON01 session/chọn store tạm đạt; KPHON02 lookup/history candidate | Nối create/review/export; nghiệm thu lookup/history và tổ hợp cuối |
+| Store Fresh | UI mock đã tích hợp; KPHON01 session/chọn store tạm đạt; KPHON02 lookup/history tạm đạt; KPHON03 create candidate | Nối review/export; nghiệm thu create và tổ hợp cuối |
 | KPH online | Backend, authorization, private media, duyệt/xuất và history D01 qua entry hiện có | Đưa luồng này vào UI mới; giữ hoặc chốt thay đổi contract explicit |
 | Store/capability | Backend kiểm quyền store/region/chain; KPHON01 thêm GET /api/v1/kph/stores dùng cùng policy | Consumer KPH và owner acceptance/tổ hợp cuối |
 | DATE/Thông báo | Lô, xử lý, nhắc 1/7 ngày trong phiên mock | Contract lô, persistence, audit, nhắc bền vững; chưa có backend/push |
@@ -89,14 +89,27 @@ stamped photos. Context revalidate che/khóa DOM và portal, giữ draft/scroll;
 401/403 về boundary, đổi actor/mất scope đóng dữ liệu cũ.
 [Evidence và giới hạn](delivery/kphon02-lookup-history/evidence.md),
 [handoff](delivery/kphon02-lookup-history/handoff.md). Technical và owner acceptance
-là hai gate riêng; owner chưa nghiệm thu KPHON02. Hai vòng cuối vẫn pending.
+là hai gate riêng. Owner cho tiếp ngày12/11 với các điểm tối ưu giao diện
+để sau: [quyết định có giới hạn](delivery/kphon02-lookup-history/acceptance-2026-11-12.md).
+KPHON02 CLOSED provisional-scoped; hai vòng cuối vẫn pending.
 
-Runtime thử12/11: Store4173 source KPHON02, backend8082 dùng jar KPHON01
-(backend source không đổi). Runtime cũ đã tắt; container ADMIN03 không còn,
-nên tạo container `coopfood-kph-kphon02-acceptance` riêng ở55434, nạp fixture
-synthetic có guard, không truncate hoặc reseed database khác. Media private
-ở worktree KPHON02. Admin4175 chưa khôi phục trong lượt này. Không merge main,
-push, deploy hoặc chạm Pages/tag. Bước sau là create/private media/idempotency.
+**KPHON03 — create/private media/idempotency** trên nhánh
+`store-app/kphon03-create-media`, base KPHON02 close `4bcbb48`.
+Tái sử dụng form/control Fresh: actor/ngày read-only, lookup thật,1–3 ảnh,
+xem lại trước khi gửi. Gửi originals qua API hiện hành; backend giữ original
+private và sinh stamped JPEG theo contract, không nhập paired-upload từ BE06 cũ.
+Context hợp lệ revalidate vẫn giữ draft/ảnh; submit gắn với phiên đang soạn,
+chặn đóng/gửi lặp lúc đang gửi; mất response retry cùng key chỉ có một phiếu.
+Thành công refresh history D01;401/403 xác minh scope, không success giả.
+[Evidence](delivery/kphon03-create-media/evidence.md),
+[hướng dẫn thử và UI debt](delivery/kphon03-create-media/handoff.md).
+KPHON03 chờ owner; chưa phải nghiệm thu cuối KPH/app.
+
+Runtime thử12/11: Store4173 source KPHON03; backend8082 vẫn jar KPHON01
+(backend/API source không đổi), container synthetic KPHON02 ở55434 và media
+private trong worktree KPHON02 được tái sử dụng, không seed/reset.
+Admin4175 chưa khôi phục. Không merge main/push/deploy hoặc chạm Pages/tag.
+Bước sau là review/export đúng scope, sau đó hai vòng cuối đã hẹn.
 
 Toàn bộ checkpoint cũ được giữ tại
 [lịch sử trạng thái đến 27/10](https://github.com/VuPhm/coopfood-kph/blob/04f7c4a4d9001901c3973e7e6bbf5a2118932ee7/docs/CURRENT_STATE.md).

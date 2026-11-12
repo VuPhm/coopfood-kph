@@ -1,7 +1,8 @@
 # Scope đề xuất — UI mới + KPH online
 
 Cập nhật12/11/2026. KPHON01 tạm đạt cho discovery/session; KPHON02 nối
-lookup/history chỉ đọc, chờ owner. Create/review/export và nghiệm thu tổ hợp còn lại. Không mở lại R2-02 lịch sử. Baseline và quyết định hiện
+lookup/history tạm đạt với UI debt. KPHON03 nối create với original/private
+server-stamped media và idempotency, chờ owner; review/export và tổ hợp còn lại. Không mở lại R2-02 lịch sử. Baseline và quyết định hiện
 hành ở [CURRENT_STATE](../CURRENT_STATE.md), thứ tự ở [NEXT](../NEXT.md).
 
 ## Outcome và phạm vi

@@ -109,6 +109,8 @@ type CreateRecordDialogProps = {
   initialValues?: CreateRecordSeed | undefined;
   /** The Store host owns the portal, chrome and focus lifecycle in this mode. */
   embedded?: boolean;
+  /** Keep draft mounted while the online host verifies scope. */
+  suspended?: boolean;
   onReviewingChange?: (reviewing: boolean) => void;
   initialScrollTop?: number;
   onOpenAutoFocus?: ComponentProps<typeof DialogContent>["onOpenAutoFocus"];
@@ -148,7 +150,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile, initial?: CreateRec
   };
 }
 
-export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, initialValues, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog", embedded = false, onReviewingChange }: CreateRecordDialogProps) {
+export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, initialValues, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog", embedded = false, suspended = false, onReviewingChange }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -315,7 +317,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
   }
 
   const submit = handleSubmit(async (values) => {
-    if (savingRecordRef.current) return;
+    if (savingRecordRef.current || suspended) return;
     if (processingPhotos) {
       setPhotoError("Vui lòng chờ ảnh được tối ưu và đóng tem xong");
       return;
@@ -480,7 +482,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
             </DialogDescription>
           </DialogHeader> : null}
 
-          {screenPresentation && reviewing ? <div className="store-form-review" onFocusCapture={revealCreateFocus}>
+          {screenPresentation && reviewing ? <div className="store-form-review" inert={suspended || undefined} aria-hidden={suspended || undefined} onFocusCapture={revealCreateFocus}>
             <p className={cn("store-review-notice", photoError && "is-error")} role={photoError ? "alert" : "status"}><img src={figmaAsset(photoError ? "280-1915" : "279-1299", photoError ? "imgFeatherWifiOff" : "imgFeatherAlertCircle")} alt="" /><span><strong>{photoError ? "Chưa gửi được phiếu" : "Chưa gửi"}</strong><small>{photoError || "Phiếu chỉ được tạo sau khi bạn bấm “Gửi phiếu”."}</small></span></p>
             <ReviewSection title="Hàng hóa" rows={[["Cửa hàng", profile.storeName], ["Ngày phát hiện", getValues("detectedDate")], ["Mã SKU / UPC", getValues("barcode") || "—"], ["Tên hàng hóa", getValues("productName") || "—"], ["Nhà cung cấp", getValues("supplier") || "—"], ["Số lượng", `${getValues("quantity")} ${getValues("unit")}`]]} />
             <ReviewSection title="Xử lý" rows={[["Tình trạng", resolveChoiceLabel(options.conditions.find(c => c.value === getValues("condition"))!, getValues("conditionDetail"))], ["Biện pháp", resolveChoiceLabel(options.resolutions.find(c => c.value === getValues("resolution"))!, getValues("resolutionDetail"))], ["Ngày xử lý", getValues("treatmentDate") || "Chưa có"]]} />
@@ -567,11 +569,11 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     {embedded ? content : <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onOpenAutoFocus={onOpenAutoFocus} onCloseAutoFocus={onCloseAutoFocus} data-kind={kind.toLowerCase()} data-reviewing={screenPresentation && reviewing ? "true" : "false"} className={cn("create-dialog-content w-[min(46rem,calc(100%-2rem))] max-w-[46rem] p-0 sm:p-0", screenPresentation && "store-create-screen")} aria-describedby="create-description" {...(screenPresentation ? { onInteractOutside: (event: Event) => event.preventDefault() } : {})}>{content}</DialogContent>
     </Dialog>}
-      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName}${onlineMode ? "" : " đã đóng tem"}` } : null} open={activePhoto !== null} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} presentation={presentation} index={Math.max(0, photos.findIndex(p => p.id === activePhoto?.id))} total={photos.length} onPrevious={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i > 0) setActivePhoto(photos[i - 1]!); }} onNext={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i < photos.length - 1) setActivePhoto(photos[i + 1]!); }} onRemove={screenPresentation && !reviewing && activePhoto ? () => removePhoto(activePhoto.id) : undefined} />
+      <EvidenceImageViewer image={activePhoto ? { src: activePhoto.url, alt: `Ảnh minh chứng ${activePhoto.fileName}${onlineMode ? "" : " đã đóng tem"}` } : null} open={activePhoto !== null && !suspended} onOpenChange={(next) => { if (!next) setActivePhoto(null); }} presentation={presentation} index={Math.max(0, photos.findIndex(p => p.id === activePhoto?.id))} total={photos.length} onPrevious={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i > 0) setActivePhoto(photos[i - 1]!); }} onNext={() => { const i = photos.findIndex(p => p.id === activePhoto?.id); if (i < photos.length - 1) setActivePhoto(photos[i + 1]!); }} onRemove={screenPresentation && !reviewing && activePhoto ? () => removePhoto(activePhoto.id) : undefined} />
 
       <BarcodeScannerDialog
         presentation={presentation}
-        open={scannerOpen}
+        open={scannerOpen && !suspended}
         onOpenChange={setScannerOpen}
           onScan={(scannedBarcode) => {
             lookupRequestId.current += 1;

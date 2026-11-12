@@ -1,5 +1,5 @@
-import { useEffect, useId, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@coopfood-kph/ui";
 import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
 import { CalendarInput } from "./calendar-input";
@@ -12,16 +12,32 @@ import { EvidenceImageViewer } from "./image-viewer";
 import { approvalLabels, type ApprovalStatus, type EvidencePhotoView } from "./record-view";
 import { OnlineApiError, type OnlineHistoryFilter } from "./online-kph";
 import type { StoreSessionGateway } from "./store-session-api";
+import { KphCreateButton } from "./store-kph-create-button";
+import { KphCreateControl, preloadKphCreateForm, type KphCreateHandle } from "./store-kph-create-control";
+import type { CreatedRecordDraft } from "./create-record-dialog";
+import type { StoreProfile } from "./store-profile";
 import "./store-online-kph.css";
 
 type Filters = { kind: KphKind; approval: "ALL" | ApprovalStatus; from: string; to: string; sort: "newest" | NonNullable<OnlineHistoryFilter["sort"]>; direction: NonNullable<OnlineHistoryFilter["direction"]>; page: number };
 const defaults: Filters = { kind: "TPTS", approval: "ALL", from: "", to: "", sort: "newest", direction: "descending", page: 1 };
 function iso(value: string) { try { return value ? parseDisplayDate(value) : undefined; } catch { return null; } }
 
-export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory, onSessionExpired }: {
+export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory, createRecord, lookupBarcode, profile, canCreate = false, onSessionExpired }: {
   suspended?: boolean; userId: string; storeId: string; loadHistory: StoreSessionGateway["loadHistory"]; onSessionExpired: () => void;
+  createRecord?: StoreSessionGateway["createRecord"]; lookupBarcode?: StoreSessionGateway["lookupBarcode"];
+  profile?: StoreProfile; canCreate?: boolean;
 }) {
   const id = useId();
+  const client = useQueryClient();
+  const create = useRef<KphCreateHandle>(null);
+  const [notice, setNotice] = useState("");
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const lookup = useCallback(async (barcode: string) => {
+    if (!lookupBarcode) throw new Error("Không thể tra cứu barcode.");
+    try { return await lookupBarcode(storeId, barcode); }
+    catch (error) { if (error instanceof OnlineApiError && (error.status === 401 || error.status === 403)) onSessionExpired(); throw error; }
+  }, [lookupBarcode, storeId, onSessionExpired]);
   const desktop = useStoreDesktopLayout();
   const [filters, setFilters] = useState(defaults);
   const [collapsed, setCollapsed] = useState<string[]>([]);
@@ -55,12 +71,27 @@ export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory
     setActiveId(null); setImage(null); setCollapsed([]);
     setFilters(current => ({ ...current, ...patch, page: patch.page ?? 1 }));
   }
+  async function save(draft: CreatedRecordDraft) {
+    if (suspended || !canCreate || !createRecord) throw new Error("Chưa thể gửi phiếu trong phiên này.");
+    try {
+      await createRecord(storeId, draft);
+      if (!mounted.current) return;
+      change({ ...defaults, kind: draft.kind });
+      setNotice("Đã gửi phiếu");
+      await client.invalidateQueries({ queryKey: ["store-kph", userId, storeId] });
+    } catch (error) {
+      if (error instanceof OnlineApiError && (error.status === 401 || error.status === 403)) onSessionExpired();
+      throw error;
+    }
+  }
   const records = !dateError && !query.isError ? query.data?.records ?? [] : [];
   const active = records.find(record => record.id === activeId) ?? null;
   useEffect(() => { if (query.isError || dateError) { setActiveId(null); setImage(null); } }, [query.isError, dateError]);
   const pending = query.isFetching || !!dateError;
   const denied = query.error instanceof OnlineApiError && query.error.status === 403;
   return <section className="store-online-kph" aria-label="Phiếu KPH" aria-busy={query.isFetching}>
+    {canCreate && createRecord && lookupBarcode && profile ? <><KphCreateButton kind={filters.kind} disabled={suspended || expired} onPointerEnter={preloadKphCreateForm} onFocus={preloadKphCreateForm} onClick={() => { setNotice(""); create.current?.open(filters.kind); }} /><KphCreateControl ref={create} profile={profile} suspended={suspended} onBarcodeLookup={lookup} onSaved={save} /></> : null}
+    {notice ? <p role="status">{notice}</p> : null}
     <StoreFoodKindTabs value={filters.kind} counts={(!dateError && !query.isError ? query.data?.typeTotals : undefined) ?? { TPCN: 0, TPTS: 0 }} onChange={kind => change({ kind })} />
     <div className="store-online-kph-filters">
       <div><label htmlFor={`${id}-from`}>Từ ngày</label><CalendarInput id={`${id}-from`} label="Từ ngày" value={filters.from} initialMonth={formatBusinessDate(new Date()).iso} onValueChange={value => change({ from: value })} invalid={!!dateError} /></div>

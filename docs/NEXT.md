@@ -18,11 +18,21 @@ Nhánh `store-app/kphon02-lookup-history`, base `0c37581`.
 Đã nối lookup FOUND/NOT_FOUND/nhập tay chưa lưu và history/chi tiết theo D01.
 [Evidence](delivery/kphon02-lookup-history/evidence.md),
 [scenarios để owner thử](delivery/kphon02-lookup-history/handoff.md).
-KPHON02 chờ owner; chưa tự coi “tiếp” từ trước là nghiệm thu code mới.
+Owner cho tiếp ngày12/11, giữ các điểm tối ưu giao diện cho sau. KPHON02
+CLOSED provisional-scoped theo [quyết định](delivery/kphon02-lookup-history/acceptance-2026-11-12.md).
 
-Bước nhỏ tiếp theo sau slice này: create TPCN/TPTS với private media và
-idempotency; tiếp đó review/export, rồi hai vòng cuối theo thứ tự bên dưới.
-Giữ quyết định accepted, không đổi load-more semantics hoặc ngày/rule ngầm.
+## KPHON03 — tạo phiếu với ảnh private
+
+Nhánh `store-app/kphon03-create-media`, base `4bcbb48`.
+Đã nối form Fresh vào create hiện hành: context thật, original/server-stamped
+private media, review-before-send, retry idempotent và history D01 sau thành công.
+[Evidence](delivery/kphon03-create-media/evidence.md),
+[scenarios và UI debt](delivery/kphon03-create-media/handoff.md). Chờ owner;
+không suy acceptance của KPHON02 thành acceptance code mới.
+
+Bước nhỏ tiếp theo: review theo scope; kế đó export phiếu hợp lệ, rồi hai vòng
+cuối theo thứ tự bên dưới. Giữ quyết định accepted, không đổi API/media, ngày,
+rule hoặc D01 load/paging ngầm. Các điểm tối ưu giao diện được giữ cho vòng UI/UX.
 
 DATE/report/notification chưa có backend trong entry này phải hiện rõ chưa
 kết nối, không render mock operational data. C02 supplier/lookup publish và
