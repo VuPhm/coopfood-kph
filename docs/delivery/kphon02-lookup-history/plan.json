@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon02-lookup-history",
   "revision": 1,
-  "status": "PLANNING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối lookup barcode và lịch sử/chi tiết KPH chỉ đọc trên Fresh online, giữ D01 và context KPHON01.",
   "inScope": [
     "Lookup FOUND/NOT_FOUND và nhập tay chưa lưu, scanner hiện có",
@@ -16,40 +16,46 @@
     "Vòng test tổ hợp và UI/UX cuối; merge/push/deploy/Pages"
   ],
   "baseSha": "0c37581027ea942528168d96cd8f9f46d9c6993f",
-  "candidateSha": "",
+  "candidateSha": "1a21ab5f61af6a410fc64b7bd0b1a1d974f11785",
   "integrationOwner": "Codex /root — sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "focused-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 1
+      "status": "pass",
+      "revision": 1,
+      "sha": "1a21ab5f61af6a410fc64b7bd0b1a1d974f11785",
+      "evidence": "docs/delivery/kphon02-lookup-history/evidence.md"
     },
     {
       "id": "browser",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 1
+      "status": "pass",
+      "revision": 1,
+      "sha": "1a21ab5f61af6a410fc64b7bd0b1a1d974f11785",
+      "evidence": "docs/delivery/kphon02-lookup-history/evidence.md"
     },
     {
       "id": "owner",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 1
+      "revision": 1,
+      "sha": "1a21ab5f61af6a410fc64b7bd0b1a1d974f11785",
+      "evidence": "docs/delivery/kphon02-lookup-history/handoff.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Implement lookup/history and focused scope verification.",
+  "nextAction": "Owner thử KPHON02 theo handoff; chưa tự đóng slice. Bước nhỏ sau là create/private media/idempotency. Giữ một vòng test kỹ/tổ hợp rồi một vòng UI/UX cuối pending.",
   "initialRequest": {
     "request": "tiếp",
     "source": "Owner chat 12/11/2026 sau KPHON01 tạm đạt",
