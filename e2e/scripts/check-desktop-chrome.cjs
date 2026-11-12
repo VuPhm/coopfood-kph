@@ -59,6 +59,10 @@ async function navigate(page, label) {
         await expect(page.locator('.admin-sidebar')).toHaveCSS('border-top-left-radius','0px');
         await expect(page.locator('.admin-logo')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
         await expect(page.locator('.admin-logo img')).toHaveAttribute('src','/brand/coopfood-logo-light.png');
+        await expect(page.locator('.admin-topbar')).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
+        await expect(page.locator('.admin-topbar')).toHaveCSS('border-bottom-width','0px');
+        await expect(page.locator('.admin-sidebar')).toHaveCSS('border-right-width','0px');
+        await expect(page.locator('.admin-brand')).toHaveCSS('border-bottom-width','0px');
         if(width===1440) desktopNavPaint=await page.locator('.admin-sidebar [aria-current="page"]').evaluate(navPaint);
       }
       await page.screenshot({path:`${output}/admin-after-${width}.png`});
@@ -101,8 +105,11 @@ async function navigate(page, label) {
           const brand=await page.locator('.store-sidebar-brand').boundingBox();
           assert.equal(rail.width,248);assert.equal(rail.x+rail.width,header.x);
           assert.equal(brand.y+brand.height,header.y+header.height);
-          await expect(page.locator('.store-header')).toHaveCSS('background-color','rgb(255, 255, 255)');
-          await expect(page.locator('.store-header h1')).toHaveCSS('color','rgb(24, 59, 45)');
+          await expect(page.locator('.store-header')).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
+          await expect(page.locator('.store-header h1')).toHaveCSS('color','rgb(255, 255, 255)');
+          await expect(page.locator('.store-header')).toHaveCSS('border-bottom-width','0px');
+          await expect(page.locator('.store-desktop-rail')).toHaveCSS('border-right-width','0px');
+          await expect(page.locator('.store-sidebar-brand')).toHaveCSS('border-bottom-width','0px');
           await expect(page.locator('.store-header-brand')).toBeHidden();
           await expect(page.locator('.store-sidebar-logo img')).toHaveAttribute('src','/brand/coopfood-logo-light.png');
           await expect(page.locator('.store-sidebar-logo img')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');

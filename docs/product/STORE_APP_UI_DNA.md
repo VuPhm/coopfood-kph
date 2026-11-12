@@ -2,7 +2,8 @@
 
 **Owner direction — 12/11/2026:** ưu tiên token Store mobile → Admin desktop →
 các bề mặt còn lại. Candidate desktop dùng chung rail/header/navigation roles
-từ Fresh; header trắng và sidebar cùng đường căn, không bọc logo trong hộp xanh.
+từ Fresh; revision11 dùng header xanh như mobile, bỏ line trang trí ở header/
+sidebar và giữ cùng đường căn; logo light trên sidebar trắng không có hộp xanh.
 Logo chính thức do owner cung cấp là `light-vector.png` (chữ xanh, nền sáng) và
 `dark-vector.png` (chữ trắng, nền xanh/tối), không có slogan; slogan bổ sung sau.
 Các bản PNG gốc được giữ nguyên tại `public/brand/coopfood-logo-light.png` và

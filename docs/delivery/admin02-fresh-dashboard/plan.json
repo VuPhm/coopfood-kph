@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
-  "revision": 10,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 11,
+  "status": "EXECUTING",
   "objective": "Admin header/sidebar rõ điểm giao và Store desktop dùng chung Fresh tokens; logo chính thức theo nền, Store mobile giữ phong cách.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -19,7 +19,7 @@
     "Membership implementation or its branch/worktree",
     "Backend, OpenAPI/client, database/migrations and business semantics",
     "Real analytics/realtime infrastructure or synthetic operational authority",
-    "Deployment/Pages config, push/merge/deploy",
+    "Deployment/Pages config, push/deploy; local integration is authorized in revision11",
     "Large shared design system, Store mobile redesign or Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
@@ -29,36 +29,30 @@
     "packages/ui/src/fresh-tokens.css",
     "packages/ui/package.json"
   ],
-  "reviewLimit": 13,
-  "reviewRound": 13,
+  "reviewLimit": 14,
+  "reviewRound": 14,
   "teams": [],
   "gates": [
     {
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 10,
-      "sha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/chrome-r10.md"
+      "status": "pending",
+      "revision": 11
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 10,
-      "sha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/chrome-r10.md"
+      "status": "pending",
+      "revision": 11
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 10,
-      "sha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/chrome-r10.md"
+      "status": "pending",
+      "revision": 11
     },
     {
       "id": "owner-ui-review",
@@ -136,6 +130,13 @@
       "source": "User message and image attachments12/11/2026",
       "impact": "Supersede fetched temporary logo with exact user-provided PNGs. Light on white Admin/Store desktop and Admin login; dark on green Store mobile/login header. Mobile baseline comparison excludes the authorized logo artwork/ratio change and hidden desktop DOM.",
       "decision": "Same worktree and sole writer. Original asset bytes preserved; no recoloring, slogan, backend/API/export/Pilot changes. Refresh builds, Admin component tests and focused browser checks."
+    },
+    {
+      "revision": 11,
+      "request": "Owner: green desktop headers for Store/Admin following mobile; remove unnecessary header/sidebar lines; integrate into parallel BE branch flow after this round.",
+      "source": "Owner chat12/11/2026",
+      "impact": "Desktop header paint/contrast/focus and decorative rail separators; isolated integration with accepted BE checkpoint, preserving active KPHON03 writer.",
+      "decision": "Rev11 on same ADMIN02 worktree; green header shared token; light logo remains on white rail. Local integration authorized by owner; no push/deploy/Pages."
     }
   ],
   "blockers": [],

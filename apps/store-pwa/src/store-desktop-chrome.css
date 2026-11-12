@@ -3,13 +3,14 @@
   .store-app { background: var(--fresh-canvas); }
   .store-app .store-desktop-rail {
     flex-basis: var(--fresh-desktop-rail-width); width: var(--fresh-desktop-rail-width);
-    padding: 0; border-right: 1px solid var(--fresh-chrome-edge);
+    padding: 0; border-right: 0;
     background: var(--fresh-chrome-surface); color: var(--fresh-ink); box-shadow: none;
   }
+  body:has(.store-app) .store-desktop-rail { box-shadow: none; }
   .store-sidebar-brand {
     flex-direction: row; align-items: center; gap: 12px; flex-shrink: 0;
     min-height: var(--fresh-desktop-header-height); margin: 0 0 20px; padding: 11px 20px;
-    border-bottom: 1px solid var(--fresh-chrome-edge); color: var(--fresh-ink);
+    border-bottom: 0; color: var(--fresh-ink);
   }
   .store-sidebar-logo { display: grid; place-items: center; flex-shrink: 0; width: 112px; height: 48px; }
   .store-sidebar-brand img { width: 112px; height: auto; border-radius: 0; padding: 0; background: transparent; }
@@ -27,23 +28,22 @@
   }
   .store-app .store-desktop-rail nav a[aria-current="page"]:hover { background: var(--fresh-brand-deep); }
   .store-app .store-desktop-rail .store-rail-label { margin: 20px 24px 12px; color: var(--fresh-ink-muted); }
-  .store-app .store-desktop-rail .store-rail-store { margin: auto 12px 0; padding: 20px 12px; border-color: var(--fresh-chrome-edge); }
+  .store-app .store-desktop-rail .store-rail-store { margin: auto 12px 0; padding: 20px 12px; border: 0; }
   .store-app .store-desktop-rail .store-rail-store :is(small, span) { color: var(--fresh-ink-muted); }
   .store-app .store-desktop-rail .store-rail-store strong { color: var(--fresh-ink); }
   .store-app .store-page-layout { --store-header-gutter: var(--fresh-desktop-gutter); }
   .store-app .store-header {
-    min-height: var(--fresh-desktop-header-height); background: var(--fresh-chrome-surface);
-    border-bottom: 1px solid var(--fresh-chrome-edge); color: var(--fresh-ink);
-    padding-block: 14px 13px;
+    min-height: var(--fresh-desktop-header-height); background: var(--fresh-header-background);
+    border-bottom: 0; color: var(--fresh-header-ink); padding-block: 14px;
   }
   .store-app .store-header .store-appbar-row { grid-template-columns: minmax(0, 1fr) 44px; }
   .store-app .store-header .store-header-brand { display: none; }
-  .store-app .store-header :is(h1, .store-header-ancestor > button) { color: var(--fresh-ink); }
-  .store-app .store-header :is(p, .store-header-ancestor > svg) { color: var(--fresh-ink-muted); }
+  .store-app .store-header :is(h1, .store-header-ancestor > button) { color: var(--fresh-header-ink); }
+  .store-app .store-header :is(p, .store-header-ancestor > svg) { color: var(--fresh-header-muted); }
   .store-app .store-header h1 { font-size: var(--fresh-type-control); line-height: 20px; font-weight: 600; }
-  .store-app .store-header-store { background: var(--fresh-canvas); border-color: var(--fresh-chrome-edge); color: var(--fresh-ink-muted); }
-  .store-app .store-header .store-profile-avatar { background: var(--fresh-canvas); color: var(--fresh-brand-action); }
-  .store-app .store-header :where(button):focus-visible { outline-color: var(--fresh-brand-deep); }
+  .store-app .store-header-store { background: rgb(255 255 255 / 10%); border: 0; color: var(--fresh-header-ink); }
+  .store-app .store-header .store-profile-avatar { background: var(--fresh-surface); color: var(--fresh-brand-action); }
+  .store-app .store-header :where(button):focus-visible { outline-color: var(--fresh-header-ink); }
   .store-app .store-header.is-home .store-header-copy > .sr-only {
     position: static; width: auto; height: auto; margin: 0; padding: 0; overflow: visible; clip: auto; clip-path: none; white-space: normal;
   }

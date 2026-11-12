@@ -24,7 +24,7 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    expect(h.y).toBe(0);expect(h.y+h.height-s.y).toBe(12);expect(bar.y).toBe(14);expect(bar.height).toBe(44);
    const header=page.locator('.store-header');expect((await bounds(header)).height).toBe(72);
    await expect(header.locator('h1')).toHaveCSS('font-size',desktopChrome?'14px':'20px');await expect(header.locator('h1')).toHaveCSS('line-height',desktopChrome?'20px':'26px');
-   if(desktopChrome)await expect(header).toHaveCSS('background-color','rgb(255, 255, 255)');
+   if(desktopChrome)await expect(header).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
    await expect(hero).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
    await expect(surface).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(surface).toHaveCSS('border-top-left-radius','24px');
    if(route!=='login'){
