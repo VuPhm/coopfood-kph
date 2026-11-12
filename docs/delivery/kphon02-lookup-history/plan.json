@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "kphon02-lookup-history",
+  "revision": 1,
+  "status": "PLANNING",
+  "objective": "Nối lookup barcode và lịch sử/chi tiết KPH chỉ đọc trên Fresh online, giữ D01 và context KPHON01.",
+  "inScope": [
+    "Lookup FOUND/NOT_FOUND và nhập tay chưa lưu, scanner hiện có",
+    "History/filter/sort/counts/paging server D01 và private stamped photos",
+    "Giữ draft khi xác minh lại context; đóng scope khi mất quyền",
+    "Targeted frontend và Playwright mobile/desktop"
+  ],
+  "outOfScope": [
+    "Create/upload/review/export UI",
+    "Đổi API/schema/ADR, nối DATE nghiệp vụ",
+    "Vòng test tổ hợp và UI/UX cuối; merge/push/deploy/Pages"
+  ],
+  "baseSha": "0c37581027ea942528168d96cd8f9f46d9c6993f",
+  "candidateSha": "",
+  "integrationOwner": "Codex /root — sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "focused-checks",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1
+    },
+    {
+      "id": "browser",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1
+    },
+    {
+      "id": "owner",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Implement lookup/history and focused scope verification.",
+  "initialRequest": {
+    "request": "tiếp",
+    "source": "Owner chat 12/11/2026 sau KPHON01 tạm đạt",
+    "decision": "Tiếp roadmap lookup/history; giữ hai vòng kiểm tra cuối đã hoãn."
+  }
+}
