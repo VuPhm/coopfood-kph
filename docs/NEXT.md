@@ -1,12 +1,17 @@
 # Công việc kế tiếp
 
+Ưu tiên theo owner13/11: sửa SW/trang cũ cho Store/Admin trước khi thay UI layout.
+[Cache repair revision3](delivery/kphon03-create-media/cache-repair-r3.md).
+Owner vẫn báo UI sai/hao hụt; reload preview hiện hành rồi đối chiếu tiếp,
+không lấy cache-fix PASS thành UI acceptance hoặc tự mở review/export.
+
 UI green header đã ghép vào KPHON03 theo owner đổi ý, merge `59fbcb8`.
 Giữ toàn bộ create/session/idempotency/private media. Kiểm có mục tiêu trên
 bản kết hợp và owner UI acceptance vẫn riêng với hai vòng cuối đã hẹn.
 [Integration KPHON03 revision2](delivery/kphon03-create-media/integration-r2.md).
 Không tự mở milestone tiếp trong lượt tích hợp.
 
-Cập nhật12/11/2026. [CURRENT_STATE](CURRENT_STATE.md). FRESH01 và ADMIN03 CLOSED;
+Cập nhật13/11/2026. [CURRENT_STATE](CURRENT_STATE.md). FRESH01 và ADMIN03 CLOSED;
 owner chấp nhận ADMIN03 qua chat, giữ kiểm tổ hợp rộng ở vòng cuối.
 [Quyết định](delivery/admin03-store-membership/acceptance-2026-11-09.md).
 

@@ -1,5 +1,10 @@
 # KPHON03 — hướng dẫn thử
 
+Cập nhật13/11/2026: owner báo UI sai/hao hụt ở cả Store/Admin và ưu tiên
+SW/trang cũ trước. [Cache repair](cache-repair-r3.md). Reload thường Store4173
+và Admin4175 để worker cũ được thay. Không cần Clear site data/xóa IndexedDB.
+Bố cục chưa sửa trong lượt cache; owner UI rejection vẫn mở.
+
 Ngày12/11/2026, cập nhật revision2 sau owner yêu cầu ghép UI green chrome.
 [Evidence bản kết hợp](integration-r2.md). Admin từ cùng worktree ở4175; Store4173.
 Technical evidence riêng với owner acceptance; chưa có owner

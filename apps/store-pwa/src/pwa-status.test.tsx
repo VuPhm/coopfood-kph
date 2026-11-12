@@ -63,4 +63,11 @@ describe("PWA status", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cập nhật" }));
     expect(postMessage).toHaveBeenCalledWith({ type: "SKIP_WAITING" });
   });
+
+  it("does not install a worker on a marked local preview, even for a production build", async () => {
+    const marker = document.createElement("meta"); marker.name = "coopfood-local-preview"; marker.content = "fresh"; document.head.append(marker);
+    const register = vi.fn(); Object.defineProperty(Navigator.prototype, "serviceWorker", { configurable: true, get: () => ({ register }) });
+    try { render(<PwaStatus enableServiceWorker />); expect(register).not.toHaveBeenCalled(); }
+    finally { marker.remove(); }
+  });
 });

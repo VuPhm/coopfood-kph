@@ -1,6 +1,18 @@
 # Trạng thái hiện tại
 
-Ngày rà soát: 12/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+Ngày rà soát: 13/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+
+## Ưu tiên hiện tại: SW/trang cũ — 13/11/2026
+
+Owner báo UI cả Store/Admin bị sai và hao hụt; sau clarification yêu cầu
+“fix lỗi bị neo sw hoặc trang cũ trước”. Chưa coi UI được nghiệm thu hoặc
+quy kết toàn bộ lỗi layout cho cache. Tạm chưa sửa bố cục, chưa mở review/export.
+Đã phục hồi đúng preview4173/4175 và backend8082/DB synthetic cũ, không seed/reset.
+Cache repair áp dụng riêng Vite dev/preview: retirement worker cho root/custom
+script URL, no-store HTML, cleanup registration trên HTML mới và tránh Store
+preview đăng ký lại worker. Không xóa browser storage/cache/cookie hoặc đổi SW
+production/Pilot. [Evidence cache repair](delivery/kphon03-create-media/cache-repair-r3.md).
+Sau reload để lấy đúng trang hiện hành mới tiếp đối chiếu UI thiếu/sai.
 
 ## UI green chrome đã ghép vào KPHON03 — 12/11/2026
 

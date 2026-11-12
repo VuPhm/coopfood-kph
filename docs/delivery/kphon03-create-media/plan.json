@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "kphon03-create-media",
-  "revision": 2,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 3,
+  "status": "EXECUTING",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -10,16 +10,17 @@
     "Giữ draft/ảnh khi xác minh scope hợp lệ; chặn close/double-send trong lúc gửi",
     "Tạo thành công refresh history D01; lỗi không báo thành công giả",
     "Targeted tests và real-backend Playwright390×844/1440×1024",
-    "Owner bổ sung: merge UI green-header source e8a2df7 vào KPHON03, giữ create/session/idempotency/media; kiểm có mục tiêu chrome và create trên bản kết hợp."
+    "Owner bổ sung: merge UI green-header source e8a2df7 vào KPHON03, giữ create/session/idempotency/media; kiểm có mục tiêu chrome và create trên bản kết hợp.",
+    "Owner13/11 yêu cầu ưu tiên sửa SW/trang cũ trên cả Store/Admin; chưa đổi UI layout. Phục hồi preview đúng nguồn và kiểm stale workers/cache không mất dữ liệu."
   ],
   "outOfScope": [
-    "Redesign/optimization ngoài UI source e8a2df7; UI debt khác và final UI acceptance giữ cho vòng sau",
+    "Sửa/redesign UI layout trong lượt ưu tiên SW/trang cũ; giữ phản hồi UI sai/hao hụt để đối chiếu sau cache fix",
     "Review/export và DATE persistence",
     "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
-  "candidateSha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -27,47 +28,48 @@
     "apps/store-pwa/public/**",
     "docs/**",
     "e2e/**",
-    "packages/ui/**"
+    "packages/ui/**",
+    "tooling/vite/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 0,
   "teams": [],
   "gates": [
     {
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
-      "evidence": "docs/delivery/kphon03-create-media/integration-r2.md"
+      "status": "pending",
+      "revision": 3,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 2,
-      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
-      "evidence": "docs/delivery/kphon03-create-media/integration-r2.md"
+      "status": "pending",
+      "revision": 3,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 2,
-      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
-      "evidence": "docs/delivery/kphon03-create-media/handoff.md"
+      "revision": 3,
+      "sha": "",
+      "evidence": ""
     },
     {
       "id": "owner-green-ui",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 2,
-      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
-      "evidence": "docs/delivery/kphon03-create-media/handoff.md"
+      "revision": 3,
+      "sha": "",
+      "evidence": ""
     }
   ],
   "changes": [
@@ -77,10 +79,17 @@
       "source": "Owner chat UI qua handoff e8a2df7 và coordination message12/11/2026",
       "impact": "Ghép green chrome/official logos/Admin shell vào KPHON03; invalidates frontend/browser gates của candidate cũ. Backend tree không đổi, có thể reuse9 targeted tests với rationale.",
       "decision": "Merge local --no-ff source e8a2df7 sau checkpoint55f398e; hai review có giới hạn cho revision2; không main/push/deploy/milestone mới."
+    },
+    {
+      "revision": 3,
+      "request": "giao diện bị sai và hao hụt; Cả Store và Admin; fix lỗi bị neo sw hoặc trang cũ trước",
+      "source": "Owner chat13/11/2026, trả lời clarification",
+      "impact": "Reopen owner UI rejection; ưu tiên local preview SW/HTML freshness. Invalidate preview/browser gate và kiểm lại registration/PWA behavior; không triển khai layout repair lúc này.",
+      "decision": "Bounded repair revision3 với hai lượt review; không xóa browser data/cache/cookie, không đổi backend/business/Pages/production offline policy."
     }
   ],
   "blockers": [],
-  "nextAction": "UI integration vào KPHON03 đã hoàn tất. Owner thử create và green UI trên Store4173/Admin4175; final combined technical/UIUX vẫn deferred riêng. Không tự mở milestone tiếp.",
+  "nextAction": "Reproduce stale root/custom-script workers, fix Store/Admin dev+preview freshness and preserve browser storage; layout repair waits until cache is ruled out.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",

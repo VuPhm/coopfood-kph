@@ -20,7 +20,7 @@ export function PwaStatus({ enableServiceWorker = import.meta.env.PROD, offlineM
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    if (!("serviceWorker" in navigator) || !enableServiceWorker) {
+    if (!("serviceWorker" in navigator) || !enableServiceWorker || document.querySelector('meta[name="coopfood-local-preview"][content="fresh"]')) {
       return () => {
         window.removeEventListener("online", handleOnline);
         window.removeEventListener("offline", handleOffline);

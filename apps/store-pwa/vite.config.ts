@@ -2,6 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
+import { previewFreshness } from "../../tooling/vite/preview-freshness.mjs";
 
 export default defineConfig(({ command, mode }) => ({
   // Mobile implementation uses memory-only fixtures in dev until API wiring.
@@ -10,6 +11,7 @@ export default defineConfig(({ command, mode }) => ({
     "import.meta.env.VITE_STORE_APP_MOCK": JSON.stringify(loadEnv(mode, ".", "VITE_").VITE_STORE_APP_MOCK ?? (command === "serve" ? "true" : "false")),
   },
   plugins: [
+    previewFreshness(),
     react(),
     tailwindcss(),
     VitePWA({
