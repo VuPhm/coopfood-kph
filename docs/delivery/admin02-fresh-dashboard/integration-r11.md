@@ -68,3 +68,8 @@ git merge --no-ff store-app/ui08-green-header-integration
 Đọc diff và kiểm lại các paths Store create/session/focus của KPHON03 sau gộp.
 Main và active BE giữ nguyên. UI pending owner review không được hiểu thành
 backend/combined-flow acceptance.
+
+Metadata candidate `e8a2df7729fb376b7bb8b7972cbd967b87d84552` cập nhật CURRENT_STATE/NEXT và quyết định owner;
+runtime bằng2e41b71, browser script bằnga045c4c đã PASS. Không đổi app/backend/API
+sau các kiểm chứng trên. Đã gửi bàn giao sang chat “Tiếp tục lộ trình” theo
+quyết định đổi ý của owner; chờ writer gộp vào KPHON03 và kiểm kết hợp.

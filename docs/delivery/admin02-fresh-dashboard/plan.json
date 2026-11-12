@@ -23,7 +23,7 @@
     "Large shared design system, Store mobile redesign or Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+  "candidateSha": "e8a2df7729fb376b7bb8b7972cbd967b87d84552",
   "integrationOwner": "Codex /root — sole UI/integration writer",
   "sharedPaths": [
     "packages/ui/src/fresh-tokens.css",
@@ -39,7 +39,7 @@
       "required": true,
       "status": "pass",
       "revision": 11,
-      "sha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+      "sha": "e8a2df7729fb376b7bb8b7972cbd967b87d84552",
       "evidence": "docs/delivery/admin02-fresh-dashboard/integration-r11.md"
     },
     {
@@ -48,7 +48,7 @@
       "required": true,
       "status": "pass",
       "revision": 11,
-      "sha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+      "sha": "e8a2df7729fb376b7bb8b7972cbd967b87d84552",
       "evidence": "docs/delivery/admin02-fresh-dashboard/integration-r11.md"
     },
     {
@@ -57,7 +57,7 @@
       "required": true,
       "status": "pass",
       "revision": 11,
-      "sha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+      "sha": "e8a2df7729fb376b7bb8b7972cbd967b87d84552",
       "evidence": "docs/delivery/admin02-fresh-dashboard/integration-r11.md"
     },
     {
