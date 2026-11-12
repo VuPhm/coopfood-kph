@@ -1,0 +1,82 @@
+.fresh-login {
+  min-height: 100svh;
+  background: var(--fresh-surface);
+  color: var(--fresh-ink);
+  font-family: var(--cf-font-family);
+}
+.fresh-login-panel {
+  --login-gutter: clamp(20px, 6vw, 36px);
+  background: var(--fresh-header-background);
+}
+.fresh-login-brand {
+  padding: calc(32px + env(safe-area-inset-top)) var(--login-gutter) 48px;
+}
+.fresh-login-brand img { width: 112px; height: auto; display: block; }
+.fresh-login-sheet {
+  margin-top: calc(-1 * var(--fresh-radius-sheet));
+  padding: 32px var(--login-gutter) calc(32px + env(safe-area-inset-bottom));
+  background: var(--fresh-surface);
+  border-radius: var(--fresh-radius-sheet) var(--fresh-radius-sheet) 0 0;
+}
+.fresh-login h1 {
+  margin: 0 0 28px;
+  font-size: clamp(1.5rem, 5vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  font-weight: 650;
+}
+.fresh-login form { display: grid; gap: 8px; }
+.fresh-login label { font-size: var(--fresh-type-control); font-weight: 600; }
+.fresh-login input + label { margin-top: 12px; }
+.fresh-login input {
+  width: 100%;
+  min-height: var(--fresh-size-field);
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid var(--fresh-control-line);
+  border-radius: var(--fresh-radius-control);
+  background: var(--fresh-form-field-surface);
+  color: var(--fresh-ink);
+  font: inherit;
+  font-size: var(--fresh-type-input);
+  line-height: var(--fresh-leading-input);
+}
+.fresh-login-password { position: relative; }
+.fresh-login-password input { padding-inline-end: 52px; }
+.fresh-login :where(button) { min-height: var(--fresh-size-control-md); cursor: pointer; }
+.fresh-login-reveal {
+  position: absolute; inset-inline-end: 2px; top: 50%; transform: translateY(-50%);
+  width: var(--fresh-size-control-md); display: grid; place-items: center;
+  color: var(--fresh-ink-muted); border-radius: var(--fresh-radius-control);
+}
+.fresh-login-submit {
+  margin-top: 16px; padding: 12px; min-height: var(--fresh-size-field);
+  background: linear-gradient(var(--fresh-button-primary-top), var(--fresh-button-primary-bottom));
+  color: var(--fresh-header-ink); box-shadow: var(--fresh-button-primary-shadow);
+  border-radius: var(--fresh-radius-group); font-size: var(--fresh-type-input); font-weight: 600;
+}
+.fresh-login-submit:active:enabled { box-shadow: var(--fresh-button-pressed-shadow); }
+.fresh-login button:disabled { cursor: default; }
+.fresh-login-submit:disabled { background: var(--fresh-form-disabled-surface); color: var(--fresh-button-disabled-ink); box-shadow: none; }
+.fresh-login :is(button, input):focus-visible { outline: 3px solid var(--fresh-brand-action); outline-offset: 2px; }
+.fresh-login-preview { width: 100%; margin-top: 8px; color: var(--fresh-brand-deep); font-weight: 600; }
+.fresh-login-error, .fresh-login-notice {
+  padding: 10px 14px; border-radius: var(--fresh-radius-control); font-size: var(--fresh-type-control);
+}
+.fresh-login-error { background: var(--fresh-error-soft); color: var(--fresh-error-ink); }
+.fresh-login-notice { margin-bottom: 16px; background: var(--fresh-canvas); }
+@media (min-width: 600px) {
+  .fresh-login { display: grid; align-items: safe center; justify-items: center; padding: 32px; background: var(--fresh-canvas); }
+  .fresh-login-panel { width: min(100%, 440px); overflow: hidden; border-radius: var(--fresh-radius-sheet); box-shadow: var(--fresh-soft-card-shadow); }
+}
+
+@media (max-width: 599px) {
+  .fresh-login-brand, .fresh-login-sheet {
+    padding-left: max(var(--login-gutter), env(safe-area-inset-left));
+    padding-right: max(var(--login-gutter), env(safe-area-inset-right));
+  }
+}
+@media (forced-colors: active) {
+  .fresh-login-submit { border: 1px solid ButtonText; }
+  .fresh-login-submit:disabled { border-color: GrayText; color: GrayText; }
+}

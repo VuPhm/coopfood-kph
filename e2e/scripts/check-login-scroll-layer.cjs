@@ -4,14 +4,6 @@ const baseUrl = process.env.STORE_PREVIEW_URL || 'http://127.0.0.1:5176';
 const output = '.local/login-scroll-layer';
 fs.mkdirSync(output, { recursive: true });
 
-async function geometry(page) {
-  return page.evaluate(() => {
-    const brand = document.querySelector('.store-login-brand').getBoundingClientRect();
-    const card = document.querySelector('.store-login-card').getBoundingClientRect();
-    return { brandTop: brand.top, cardTop: card.top, scroll: scrollY };
-  });
-}
-
 (async () => {
   const browser = await chromium.launch({ headless: true });
   try {
@@ -20,22 +12,9 @@ async function geometry(page) {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(`${baseUrl}/#login`);
-      await expect(page.getByRole('heading', { name: 'Đăng nhập', exact: true })).toBeVisible();
-      const initial = await geometry(page);
+      await expect(page.getByRole('heading', { name: 'Đăng nhập cửa hàng', exact: true })).toBeVisible();
+      await expect(page.locator('.fresh-login-sheet')).toBeVisible();
       await page.screenshot({ path: `${output}/initial-${viewport.width}.png` });
-      await page.mouse.move(viewport.width - 50, viewport.height / 2);
-      await page.mouse.wheel(0, 48);
-      await expect.poll(async () => (await geometry(page)).scroll).toBeGreaterThan(30);
-      const scrolled = await geometry(page);
-      expect(Math.abs(scrolled.brandTop - initial.brandTop)).toBeLessThanOrEqual(2);
-      expect(scrolled.cardTop).toBeCloseTo(initial.cardTop - scrolled.scroll, 0);
-      expect(await page.evaluate(() => {
-        const card = document.querySelector('.store-login-card');
-        const rect = card.getBoundingClientRect();
-        return card.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.top + 12));
-      })).toBe(true);
-      await page.evaluate(() => window.scrollTo(0, 100000));
-      await page.screenshot({ path: `${output}/raised-${viewport.width}.png` });
       const username = page.getByLabel('Tên đăng nhập', { exact: true });
       const password = page.getByLabel('Mật khẩu', { exact: true });
       await username.fill('  sample  ');
@@ -61,7 +40,7 @@ async function geometry(page) {
       await page.getByRole('button', { name: 'Vào bản dùng thử', exact: true }).click();
       await expect(page).toHaveURL(/#home$/);
       expect(errors).toEqual([]);
-      console.log(`PASS ${viewport.width}x${viewport.height}: native layered scroll, stationary brand, hit-test, keyboard/form/reveal/error, no overflow/errors`);
+      console.log(`PASS ${viewport.width}x${viewport.height}: Fresh sign-in, keyboard/form/reveal/error, no overflow/errors`);
       await page.close();
     }
   } finally {

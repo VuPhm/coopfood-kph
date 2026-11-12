@@ -2,7 +2,14 @@
 
 Ngày rà soát: 13/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
-## Ưu tiên hiện tại: SW/trang cũ — 13/11/2026
+## Store và Admin đăng nhập — 13/11/2026
+
+Hai entry dùng chung `SignIn` trong packages/ui, logo chính thức và token Fresh mobile.
+Màn hình chỉ hiện tiêu đề theo ứng dụng, thông tin đăng nhập, nút gửi và phản hồi theo trạng thái.
+Store mẫu có thêm lối vào dùng thử. Kiểm bằng `node e2e/scripts/check-fresh-sign-in.cjs`
+trên Store4173 và Admin4175 ở 390×844 và 1440×1024.
+
+## Sửa SW/trang cũ — 13/11/2026
 
 Owner báo UI cả Store/Admin bị sai và hao hụt; sau clarification yêu cầu
 “fix lỗi bị neo sw hoặc trang cũ trước”. Chưa coi UI được nghiệm thu hoặc

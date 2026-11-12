@@ -1,9 +1,9 @@
 # Công việc kế tiếp
 
-Ưu tiên theo owner13/11: sửa SW/trang cũ cho Store/Admin trước khi thay UI layout.
-[Cache repair revision3](delivery/kphon03-create-media/cache-repair-r3.md).
-Owner vẫn báo UI sai/hao hụt; reload preview hiện hành rồi đối chiếu tiếp,
-không lấy cache-fix PASS thành UI acceptance hoặc tự mở review/export.
+Vòng đồng bộ style token bắt đầu từ hai trang đăng nhập theo yêu cầu ngày 13/11.
+Store4173 và Admin4175 đã dùng form chung theo Fresh mobile. Bước tiếp theo là
+đối chiếu hai preview với owner rồi chọn màn tiếp theo trong vòng tối ưu UI.
+Bản sửa [SW/trang cũ](delivery/kphon03-create-media/cache-repair-r3.md) đã có trong hai preview.
 
 UI green header đã ghép vào KPHON03 theo owner đổi ý, merge `59fbcb8`.
 Giữ toàn bộ create/session/idempotency/private media. Kiểm có mục tiêu trên

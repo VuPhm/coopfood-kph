@@ -26,14 +26,21 @@ async function bounds(page) {
       const errors=[];page.on('pageerror',e=>errors.push(e.message));
       await page.clock.setFixedTime(new Date('2026-10-07T08:00:00+07:00'));
       for (const route of ['home','kph','date','reports','shelf','notifications','login']) {
-        await page.goto(`${base}/#${route}`);await expect(page.locator('.store-header')).toBeVisible();
+        await page.goto(`${base}/#${route}`);
+   if (route === 'login') {
+      await expect(page.getByRole('heading', {name:'Đăng nhập cửa hàng',exact:true})).toBeVisible();
+      await expect(page.locator('.fresh-login-sheet')).toHaveCSS('border-top-left-radius','24px');
+      await audit(page, '.fresh-login', `login-${viewport.width}`);
+      continue;
+    }
+    await expect(page.locator('.store-header')).toBeVisible();
         if(route==='kph')await expect(page.locator('.store-kph:not(.kph-loading-frame) [data-record-id]').first()).toBeVisible();
         if(route==='reports')await expect(page.locator('.report-type-card').first()).toBeVisible();
         await settle(page);await bounds(page);
         await expect(page.locator('html')).not.toHaveAttribute('data-store-density', /.+/);
         const palette=await page.locator('body').evaluate(n=>{const s=getComputedStyle(n);return {brand:s.getPropertyValue('--store-brand-action').trim(),well:s.getPropertyValue('--store-canvas').trim(),edge:s.getPropertyValue('--store-soft-edge').trim()}});
         expect(palette.brand).toBe('#007a52');expect(palette.well).toBe('#f2f5f3');
-        await audit(page,route==='login'?'.store-login':'.store-app',`${route}-${viewport.width}`);
+        await audit(page,'.store-app',`${route}-${viewport.width}`);
         if(route==='home') {
           const cards=await page.locator('.store-module').evaluateAll(ns=>ns.map(n=>{const s=getComputedStyle(n),i=getComputedStyle(n.querySelector('.store-module-icon'));return{bg:s.backgroundColor,image:s.backgroundImage,shadow:s.boxShadow,icon:i.backgroundColor,iconImage:i.backgroundImage}}));
           expect(new Set(cards.map(c=>c.bg)).size).toBe(4);expect(cards.every(c=>c.image.includes('gradient')&&c.iconImage.includes('gradient'))).toBe(true);expect(cards.every(c=>c.shadow!=='none')).toBe(true);

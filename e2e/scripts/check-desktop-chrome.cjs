@@ -95,7 +95,7 @@ async function navigate(page, label) {
       const errors=[];page.on('pageerror',e=>errors.push(e.message));
       for(const route of ['home','kph','date','reports','notifications','shelf','login']) {
         await page.goto(`${storeBase}/#${route}`);
-        await page.locator('.store-page-surface').waitFor();
+        await page.locator(route === 'login' ? '.fresh-login-sheet' : '.store-page-surface').waitFor();
         if(route==='reports') await expect(page.getByRole('heading',{name:'Chọn báo cáo',exact:true})).toBeVisible();
         await page.evaluate(()=>document.fonts.ready);
         await noOverflow(page);

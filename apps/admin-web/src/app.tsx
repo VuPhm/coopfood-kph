@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Input, ListItemMarker } from "@coopfood-kph/ui";
+import { SignIn, Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Input, ListItemMarker } from "@coopfood-kph/ui";
 import { AdminListLabel, schedulePresentation } from "./list-labels";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, CheckCircle2, Clock3, MapPinned, RefreshCw, ShieldCheck, Store, XCircle } from "lucide-react";
@@ -110,7 +110,7 @@ export function App({ gateway: providedGateway }: AppProps) {
   if (sessionQuery.isPending) return <LoadingScreen />;
   if (!sessionQuery.data || expired) {
     if (!sessionQuery.error || isUnauthorized(sessionQuery.error) || expired) {
-      return <LoginScreen busy={login.isPending} error={login.error instanceof Error ? login.error.message : null} notice={loginNotice} onLogin={(username, password) => login.mutate({ username, password })} />;
+      return <SignIn title="Đăng nhập quản trị" logo={`${import.meta.env.BASE_URL}brand/coopfood-logo-dark.png`} busy={login.isPending} error={login.error instanceof Error ? login.error.message : null} notice={loginNotice} onSubmit={(username, password) => login.mutate({ username, password })} />;
     }
     return <LoadFailure message="Không thể kiểm tra phiên Admin Web." onRetry={() => void sessionQuery.refetch()} />;
   }
@@ -272,12 +272,6 @@ function ScheduleActionDialog({ action, gateway, onClose, onSuccess, onError }: 
   });
   const copy = actionCopy(action?.type);
   return <Dialog open={Boolean(action)} onOpenChange={(open) => { if (!open && !mutation.isPending) onClose(); }}><DialogContent><DialogHeader><DialogTitle>{copy.title}</DialogTitle><DialogDescription>{action ? `${action.schedule.target.code} · ${action.schedule.target.name}. ${copy.description}` : copy.description}</DialogDescription></DialogHeader><form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); mutation.mutate(); }}>{action?.type === "reschedule" ? <Field htmlFor="reschedule-date" label="Ngày hiệu lực mới" required><Input id="reschedule-date" inputMode="numeric" placeholder="dd/mm/yyyy" value={date} onChange={(event) => setDate(event.target.value)} /></Field> : null}<Field htmlFor="action-reason" label="Lý do" required><textarea id="action-reason" className="min-h-24 w-full resize-y rounded-xl border-2 border-surface-strong px-3 py-2 text-base" maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} /></Field>{mutation.error instanceof Error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm font-semibold text-danger" role="alert">{mutation.error.message}</p> : null}<div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><Button type="button" variant="ghost" onClick={onClose} disabled={mutation.isPending}>Quay lại</Button><Button type="submit" variant={action?.type === "execute" ? "danger" : "primary"} disabled={mutation.isPending}>{mutation.isPending ? "Đang xử lý…" : copy.submit}</Button></div></form></DialogContent></Dialog>;
-}
-
-function LoginScreen({ busy, error, notice, onLogin }: { busy: boolean; error: string | null; notice: string | null; onLogin(username: string, password: string): void }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  return <main className="grid min-h-dvh place-items-center bg-canvas px-4 py-8 text-ink"><section className="w-full max-w-md rounded-3xl border border-surface-strong bg-white p-6 shadow-panel sm:p-8"><img src={`${import.meta.env.BASE_URL}brand/coopfood-logo-light.png`} alt="Co.op Food" width={598} height={246} className="h-auto w-32" /><p className="mt-6 text-xs font-black uppercase tracking-[.14em] text-brand">Admin Web</p><h1 className="mt-2 text-3xl font-black">Đăng nhập quản trị</h1><p className="mt-3 text-sm leading-6 text-ink-muted">Dành cho quản trị catalog, quản trị chuỗi hoặc quản lý vùng đã được cấp quyền.</p>{notice ? <p className="mt-4 rounded-xl bg-brand-soft px-3 py-3 text-sm font-semibold text-brand" role="status">{notice}</p> : null}<form className="mt-6 grid gap-4" onSubmit={(event) => { event.preventDefault(); onLogin(username.trim(), password); }}><Field htmlFor="username" label="Tên đăng nhập" required><Input id="username" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} /></Field><Field htmlFor="password" label="Mật khẩu" required><Input id="password" autoComplete="current-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></Field>{error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm font-semibold text-danger" role="alert">{error}</p> : null}<Button disabled={busy || !username.trim() || !password} type="submit">{busy ? "Đang đăng nhập…" : "Đăng nhập"}</Button></form></section></main>;
 }
 
 function LoadingScreen() { return <main className="grid min-h-dvh place-items-center bg-canvas text-ink"><p className="flex items-center gap-3 font-bold" role="status"><RefreshCw className="animate-spin motion-reduce:animate-none text-brand" aria-hidden="true" />Đang mở Admin Web…</p></main>; }

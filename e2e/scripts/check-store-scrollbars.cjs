@@ -7,7 +7,7 @@ const output = process.env.STORE_SCROLLBARS_OUTPUT || '.local/ui02-scrollbars/br
 fs.mkdirSync(output, { recursive: true });
 async function ready(page, screen) {
   await page.goto(`${base}/#${screen}`);
-  if (screen === 'login') await expect(page.locator('.store-login-form')).toBeVisible();
+  if (screen === 'login') await expect(page.locator('.fresh-login form')).toBeVisible();
   else await expect(page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true })).toBeEnabled();
   if (screen === 'kph') await expect(page.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
   if (screen === 'reports') await expect(page.locator('.report-type-card').first()).toBeVisible();
@@ -58,14 +58,14 @@ async function scrollBody(page, dialog, selector, desktop) {
         await ready(page, screen); await fits(page);
         if (desktop && screen === 'kph') expect(await page.locator('.store-kph-table-wrap').evaluate(el => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
         const root = await page.evaluate(() => ({ bar: innerWidth - document.documentElement.clientWidth, height: document.documentElement.scrollHeight }));
-        if (desktop) {
+        if (desktop && screen !== 'login') {
           expect(root.bar).toBeGreaterThanOrEqual(0); expect(root.bar).toBeLessThanOrEqual(12);
           expect(await page.locator('html').evaluate(el => getComputedStyle(el).scrollbarWidth)).toBe('thin');
         }
-        const box = await page.locator(desktop && screen !== 'login' ? '.store-main-column' : '.store-page-layout').boundingBox();
+        const box = await page.locator(screen === 'login' ? '.fresh-login' : desktop ? '.store-main-column' : '.store-page-layout').boundingBox();
         expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
         await page.mouse.move(viewport.width - 30, viewport.height / 2); await page.mouse.wheel(0, 500);
-        await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+        if (root.height > viewport.height) await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
         results.push({ viewport, screen, root });
       }
       await ready(page, 'kph');

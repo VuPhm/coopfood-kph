@@ -1,5 +1,5 @@
 /* Store roles: compact elements, distinct spacing, full primary/field targets. */
-body:has(.store-app, .store-login) {
+body:has(.store-app) {
   --store-space-1: 4px;
   --store-space-2: 8px;
   --store-space-3: 12px;

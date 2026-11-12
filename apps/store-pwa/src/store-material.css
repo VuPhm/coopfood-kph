@@ -1,6 +1,6 @@
 /* Store Fresh Solid: one palette, one set of material roles, no theme switch.
    Body scope reaches Radix portals; online/Pilot/Admin do not load these roles. */
-body:has(.store-app, .store-login) {
+body:has(.store-app) {
   --store-brand-start: #007a52;
   --store-brand-end: #007a52;
   --store-brand-action: var(--fresh-brand-action);
@@ -87,7 +87,7 @@ body:has(.store-app, .store-login) {
   .store-app .store-desktop-rail nav a[aria-current="page"] { background: var(--fresh-nav-selected-image); color: white; }
 }
 @media (prefers-contrast: more), (forced-colors: active) {
-  body:has(.store-app, .store-login) { --store-soft-edge: CanvasText; --store-holder-edge: CanvasText; --store-soft-card-shadow: none; --store-material-shadow: none; --store-item-image: none; --store-item-hover-image: none; --store-item-hover-shadow: none; --store-item-pressed-shadow: none; --store-jewel-image: none; }
+  body:has(.store-app) { --store-soft-edge: CanvasText; --store-holder-edge: CanvasText; --store-soft-card-shadow: none; --store-material-shadow: none; --store-item-image: none; --store-item-hover-image: none; --store-item-hover-shadow: none; --store-item-pressed-shadow: none; --store-jewel-image: none; }
   .store-app :is(.store-mobile-toolbar, .store-action-dock[data-floating="true"]) { background: Canvas; background-image: none; }
   .store-app :is(.store-ticket, .store-date-lot, .date-report-card, .store-notification-item, .store-kph-record-row) { background-image: none; }
   .store-app :is(.store-mobile-toolbar, .store-desktop-rail) a[aria-current="page"] { outline: 2px solid Highlight; outline-offset: -3px; }

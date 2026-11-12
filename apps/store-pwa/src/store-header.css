@@ -1,5 +1,5 @@
 /* Shared Store chrome only: page/portal headers, never chart or business-status colors. */
-.store-app, .store-login, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-scanner-screen {
+.store-app, .store-sheet, .store-create-screen, .store-quick-panel, .store-account-sheet, .store-scanner-screen {
   --store-chrome-base: #007a52;
   --store-chrome-background: linear-gradient(120deg, #005f43, #007a52 58%, #00805a);
   --cf-modal-header: var(--store-chrome-background);
@@ -47,7 +47,7 @@
 .store-home-welcome p { margin: 5px 0 0; color: white; font-size: 12px; line-height: 18px; }
 @media (max-width: 359px) { .store-page-layout { --store-header-gutter: 16px; } }
 @media (min-width: 900px) { .store-page-layout { --store-header-gutter: 36px; } .store-header-store { display: inline-flex; flex-shrink: 0; max-width: 40%; } }
-@media print { body .store-app, body .store-login { background: white; } .store-page-layout { background: white; } .store-page-hero { position: static; padding: 0; background: white; } .store-page-layout > .store-page-surface { margin: 0; border-radius: 0; box-shadow: none; min-height: 0; } }
+@media print { body .store-app { background: white; } .store-page-layout { background: white; } .store-page-hero { position: static; padding: 0; background: white; } .store-page-layout > .store-page-surface { margin: 0; border-radius: 0; box-shadow: none; min-height: 0; } }
 
 /* Desktop uses the persistent sidebar and explicit ancestors, rather than a Back control. */
 @media (min-width: 900px) {

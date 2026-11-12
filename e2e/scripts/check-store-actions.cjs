@@ -15,7 +15,7 @@ const selectors = {
   reports: ['.store-header','.report-composer-controls',reportSettings,'.report-selection-bar'],
   shelf: ['.store-header','.store-shelf-form','.store-shelf-result'],
   notifications: ['.store-header','.store-notification-section > summary','.store-notification-item'],
-  login: ['.store-header','.store-login-form'],
+  login: ['.fresh-login-brand','.fresh-login form'],
 };
 async function settle(p) {
   await p.evaluate(async () => { await document.fonts.ready; await Promise.all(document.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{}))); });

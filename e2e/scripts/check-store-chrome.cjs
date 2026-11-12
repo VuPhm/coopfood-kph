@@ -4,17 +4,24 @@ const output=process.env.STORE_CHROME_OUTPUT||'.local/header02/chrome';fs.mkdirS
 const {audit}=require('./check-kph-colors.cjs');const green='linear-gradient(115deg, rgb(0, 107, 75), rgb(0, 122, 82))';
 async function ready(p,url){
  await p.goto(url);const route=new URL(url).hash.slice(1);
- await expect(p.locator(route==='login'?'.store-login':`.store-app.store-screen-${route}`)).toBeVisible();
+ await expect(p.locator(route==='login'?'.fresh-login':`.store-app.store-screen-${route}`)).toBeVisible();
  if(route==='kph')await expect(p.locator('.store-kph:not(.kph-loading-frame)')).toBeVisible();
  if(route==='reports')await expect(p.getByRole('heading',{name:'Chọn báo cáo',exact:true})).toBeVisible();
- await expect(p.locator('.store-header')).toBeVisible();await p.evaluate(()=>document.fonts.ready);
+ await expect(p.locator(route==='login'?'.fresh-login-brand':'.store-header')).toBeVisible();await p.evaluate(()=>document.fonts.ready);
 }
 async function chart(p){return p.locator('.store-date-milestones .store-timeline').evaluate(root=>[root,...root.querySelectorAll('*')].flatMap(el=>[null,'::before','::after'].map(pseudo=>{const s=getComputedStyle(el,pseudo);return{cls:el.className,pseudo,color:s.color,bg:s.backgroundColor,image:s.backgroundImage,border:s.borderColor}})))}
 (async()=>{const b=await chromium.launch();const results=[];try{
  for(const viewport of[{width:390,height:844},{width:1440,height:1024},{width:320,height:740}]){
   const p=await b.newPage({viewport,serviceWorkers:'block',reducedMotion:'reduce'});const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.clock.setFixedTime(new Date('2026-10-07T08:00:00+07:00'));
   for(const route of['home','date','kph','reports','shelf','notifications','login']){
-   await ready(p,`${base}/#${route}`);if(route==='reports')await p.getByRole('heading',{name:'Chọn báo cáo',exact:true}).waitFor();
+   await ready(p,`${base}/#${route}`);
+   if (route === 'login') {
+      await expect(p.getByRole('heading', {name:'Đăng nhập cửa hàng',exact:true})).toBeVisible();
+      await expect(p.locator('.fresh-login-sheet')).toHaveCSS('border-top-left-radius','24px');
+      await audit(p, '.fresh-login', `login-${viewport.width}`);
+      continue;
+    }
+    if(route==='reports')await p.getByRole('heading',{name:'Chọn báo cáo',exact:true}).waitFor();
    await expect(p.locator('.store-page-hero')).toHaveCSS('background-image',green);
    expect(await p.locator('.store-page-hero').evaluate(root=>[root,...root.querySelectorAll('*')].filter(el=>getComputedStyle(el).backdropFilter!=='none').length)).toBe(0);
    const end=p.locator('.store-page-hero-content').or(p.locator('.store-header')).last();const last=await end.boundingBox();const cover=await p.locator('.store-page-surface').boundingBox();expect(cover.y-last.y-last.height).toBe(8);

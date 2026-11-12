@@ -94,9 +94,9 @@ async function create(page) {
       await page.goto(`${base}/#login`);
       const user = page.getByLabel('Tên đăng nhập', { exact: true }); const password = page.getByLabel('Mật khẩu', { exact: true });
       await expect(user).toBeVisible();
-      await material(user, user.locator('..')); await material(password, password.locator('..'));
+      await material(user, user, true); await material(password, password, true);
       await user.fill('form-preview'); await page.keyboard.press('Tab'); await expect(password).toBeFocused();
-      await material(password, password.locator('..'), true);
+      await material(password, password, true);
       expect(await password.evaluate(el => parseFloat(getComputedStyle(el).outlineWidth))).toBeGreaterThanOrEqual(2);
       await password.fill('sample-form-password');
       await page.getByRole('button', { name: 'Hiện mật khẩu', exact: true }).click();
@@ -105,7 +105,7 @@ async function create(page) {
       await expect(page.getByRole('status')).toContainText('chưa khả dụng');
       await expect(password).toHaveValue('sample-form-password');
       await page.screenshot({ path: `${output}/login-${viewport.width}.png` });
-      await page.locator('.store-login').evaluate(root => {
+      await page.locator('.fresh-login').evaluate(root => {
         const nodes = [...root.querySelectorAll('*')].map(el => { const s = getComputedStyle(el); return { el, size: parseFloat(s.fontSize), line: parseFloat(s.lineHeight) }; });
         for (const { el, size, line } of nodes) { el.style.fontSize = `${size * 1.5}px`; if (Number.isFinite(line)) el.style.lineHeight = `${line * 1.5}px`; }
       });
@@ -120,7 +120,7 @@ async function create(page) {
       await material(page.locator('#detected-date'), page.locator('#detected-date'), true);
       await page.keyboard.press('Escape'); await page.goto(`${base}/#login`);
       const contrastUser = page.getByLabel('Tên đăng nhập', { exact: true });
-      await material(contrastUser, contrastUser.locator('..'), true);
+      await material(contrastUser, contrastUser, true);
       await fits(page); expect(errors).toEqual([]);
       results.push({ viewport, dimensions, paint, nativeReadonly: true, linkedInvalidFocus: true, loginRecovery: true });
       await page.close(); console.log(`PASS Fresh Soft ${viewport.width}x${viewport.height}: field geometry parity, quiet resting edges/visible cues, strong focus/errors and text, readonly/errors, login/reveal/recovery, 150% text, forced colors/increased contrast`);

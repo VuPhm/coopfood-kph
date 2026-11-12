@@ -12,6 +12,12 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
   for(const route of routes){
    const desktopChrome=viewport.width>=900&&route!=='login';
    await page.goto(`${base}/#${route}`);
+   if (route === 'login') {
+      await expect(page.getByRole('heading', {name:'Đăng nhập cửa hàng',exact:true})).toBeVisible();
+      await expect(page.locator('.fresh-login-sheet')).toHaveCSS('border-top-left-radius','24px');
+      await audit(page, '.fresh-login', `login-${viewport.width}`);
+      continue;
+    }
    // Measure the loaded report frame, not the transient feature placeholder.
    // Slow/failed chunk behavior has its own deferred-loading gate.
    if(route==='reports')await expect(page.getByRole('heading',{name:'Chọn báo cáo',exact:true})).toBeVisible();
