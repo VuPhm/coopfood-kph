@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon02-lookup-history",
   "revision": 1,
-  "status": "AWAITING_ACCEPTANCE",
+  "status": "CLOSED",
   "objective": "Nối lookup barcode và lịch sử/chi tiết KPH chỉ đọc trên Fresh online, giữ D01 và context KPHON01.",
   "inScope": [
     "Lookup FOUND/NOT_FOUND và nhập tay chưa lưu, scanner hiện có",
@@ -47,18 +47,26 @@
       "id": "owner",
       "kind": "user",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 1,
       "sha": "1a21ab5f61af6a410fc64b7bd0b1a1d974f11785",
-      "evidence": "docs/delivery/kphon02-lookup-history/handoff.md"
+      "evidence": "docs/delivery/kphon02-lookup-history/acceptance-2026-11-12.md",
+      "acceptedBy": "Project owner — scoped continuation with UI debt",
+      "decisionRef": "docs/delivery/kphon02-lookup-history/acceptance-2026-11-12.md"
     }
   ],
   "changes": [],
   "blockers": [],
-  "nextAction": "Owner thử KPHON02 theo handoff; chưa tự đóng slice. Bước nhỏ sau là create/private media/idempotency. Giữ một vòng test kỹ/tổ hợp rồi một vòng UI/UX cuối pending.",
+  "nextAction": "Owner cho tiếp; KPHON03 create/private media/idempotency. Giữ UI debt và hai vòng cuối pending.",
   "initialRequest": {
     "request": "tiếp",
     "source": "Owner chat 12/11/2026 sau KPHON01 tạm đạt",
     "decision": "Tiếp roadmap lookup/history; giữ hai vòng kiểm tra cuối đã hoãn."
+  },
+  "acceptanceLevel": "provisional-scoped",
+  "ownerFeedback": {
+    "source": "Owner chat12/11/2026 sau bàn giao KPHON02",
+    "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
+    "decision": "Tiếp create/private media/idempotency; UI optimization deferred, không final acceptance."
   }
 }
