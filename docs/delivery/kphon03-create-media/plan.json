@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "id": "kphon03-create-media",
+  "revision": 1,
+  "status": "PLANNING",
+  "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
+  "inScope": [
+    "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
+    "Actor/store/capability thật, lookup FOUND/NOT_FOUND,1–3 original photos theo thứ tự",
+    "Giữ draft/ảnh khi xác minh scope hợp lệ; chặn close/double-send trong lúc gửi",
+    "Tạo thành công refresh history D01; lỗi không báo thành công giả",
+    "Targeted tests và real-backend Playwright390×844/1440×1024"
+  ],
+  "outOfScope": [
+    "Redesign/optimization UI diện rộng; giữ UI debt cho vòng sau",
+    "Review/export và DATE persistence",
+    "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
+    "Merge/push/deploy/Pages và hai vòng cuối"
+  ],
+  "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
+  "candidateSha": "",
+  "integrationOwner": "Codex /root — sole writer",
+  "sharedPaths": [
+    "apps/store-pwa/src/**"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [],
+  "gates": [
+    {
+      "id": "create-checks",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1
+    },
+    {
+      "id": "real-backend-browser",
+      "kind": "technical",
+      "required": true,
+      "status": "pending",
+      "revision": 1
+    },
+    {
+      "id": "owner-create",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 1
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Connect existing Fresh form to current create gateway and verify scoped retry/media.",
+  "initialRequest": {
+    "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
+    "source": "Owner chat12/11/2026 sau KPHON02",
+    "decision": "Tiếp create; tối ưu UI deferred, không suy final acceptance."
+  }
+}
