@@ -40,4 +40,19 @@
   --fresh-form-readonly-surface: #f9fbfa;
   --fresh-form-disabled-surface: #e4ece7;
   --fresh-form-field-shadow: none;
+
+  /* Desktop composition follows the mobile palette and selected navigation. */
+  --fresh-desktop-rail-width: 248px;
+  --fresh-desktop-rail-collapsed: 80px;
+  --fresh-desktop-header-height: 72px;
+  --fresh-desktop-gutter: 32px;
+  --fresh-chrome-surface: var(--fresh-surface);
+  --fresh-chrome-edge: var(--fresh-soft-edge);
+  --fresh-header-background: linear-gradient(120deg, #005f43, #007a52 58%, #00805a);
+  --fresh-header-ink: #fff;
+  --fresh-header-muted: rgb(255 255 255 / 88%);
+  --fresh-nav-ink: var(--fresh-ink-muted);
+  --fresh-nav-hover: var(--fresh-canvas);
+  --fresh-nav-selected-image: linear-gradient(155deg, #087e58, #005c40);
+  --fresh-nav-selected-shadow: inset 0 1px 0 rgb(255 255 255 / 32%), 0 2px 5px rgb(0 60 40 / 16%);
 }
