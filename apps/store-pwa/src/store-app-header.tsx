@@ -13,7 +13,7 @@ export function StoreAppHeader({ leading = "back", title, subtitle, storeName, a
   leading?: "brand" | "back"; title: string; subtitle: string; storeName?: string;
   account?: ReactNode; onHome?: () => void; onBack?: () => void; backLabel?: string; titleRef?: Ref<HTMLHeadingElement>; titleId?: string;
 }) {
-  const logo = <img src={assetUrl("brand/coopfood-home-logo-144.webp")} alt="Co.op Food" width={1024} height={550} loading="eager" fetchPriority="high" decoding="async" />;
+  const logo = <img src={assetUrl("brand/coopfood-logo-dark.png")} alt="Co.op Food" width={598} height={246} loading="eager" fetchPriority="high" decoding="async" />;
   return <header className={`store-header${hideCopy ? " is-home" : ""}`} onFocusCapture={event => {
     if (!event.currentTarget.contains(event.target) || event.target.closest(".store-account")) return;
     window.scrollTo({ top: 0, behavior: "instant" });

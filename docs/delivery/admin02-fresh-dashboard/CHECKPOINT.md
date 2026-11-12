@@ -1,4 +1,12 @@
-# Checkpoint Admin — 09/11/2026
+# Checkpoint Admin — 12/11/2026
+
+Owner đã resume ADMIN02 ngày12/11 và xác nhận worktree này. Candidate mới tối ưu
+header/sidebar Admin, đồng bộ Store desktop theo ưu tiên token mobile và dùng
+hai logo chính thức owner cung cấp (không slogan). Xem [revision10](chrome-r10.md)
+và plan hiện tại; nội dung09/11 bên dưới là checkpoint lịch sử. UI mới đang chờ
+owner xem; chưa có quyền push/merge/deploy. Backend8081 chưa chạy ở lần UI này.
+
+## Checkpoint trước — 09/11/2026
 
 Owner yêu cầu tạm checkpoint Admin để trở ra tiếp lộ trình. Dừng mở thêm việc Admin tại đây; đây không phải nghiệm thu UI hoặc quyền push/merge/deploy.
 

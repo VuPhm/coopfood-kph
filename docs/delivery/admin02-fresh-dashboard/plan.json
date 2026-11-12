@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
-  "revision": 8,
-  "status": "AWAITING_ACCEPTANCE",
-  "objective": "Admin Shell và Tổng quan desktop-first theo Admin Fresh; giữ API/workflows và tách mock khỏi dữ liệu vận hành.",
+  "revision": 10,
+  "status": "VERIFYING",
+  "objective": "Admin header/sidebar rõ điểm giao và Store desktop dùng chung Fresh tokens; logo chính thức theo nền, Store mobile giữ phong cách.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
     "Overview mock: KPI/trend/attention/store table/activity/source monitoring/time range",
@@ -11,14 +11,16 @@
     "Admin-only Fresh tokens, reuse Dialog/Dropdown and existing form controls",
     "Build/component regressions/Playwright 1440/1280/834/390 and visual review; local preview",
     "Extract consumed Fresh mobile CSS foundations to a shared token file; mechanically alias Store declarations without changing computed values; Admin consumes same source.",
-    "Local source preview on fixed port4175, strict port ownership, no-store responses and normal reload verification; durable worktree runtime handoff."
+    "Local source preview on fixed port4175, strict port ownership, no-store responses and normal reload verification; durable worktree runtime handoff.",
+    "Owner12/11: simplify Admin header/sidebar junction and share desktop chrome tokens with Store Fresh; preserve mobile computed styles and business workflows.",
+    "Official owner-provided logo variants without slogan: light for white desktop/Admin login, dark for green Fresh Store header."
   ],
   "outOfScope": [
     "Membership implementation or its branch/worktree",
     "Backend, OpenAPI/client, database/migrations and business semantics",
     "Real analytics/realtime infrastructure or synthetic operational authority",
     "Deployment/Pages config, push/merge/deploy",
-    "Large shared design system or Store/Pilot styling"
+    "Large shared design system, Store mobile redesign or Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
   "candidateSha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
@@ -27,39 +29,39 @@
     "packages/ui/src/fresh-tokens.css",
     "packages/ui/package.json"
   ],
-  "reviewLimit": 11,
-  "reviewRound": 11,
+  "reviewLimit": 13,
+  "reviewRound": 13,
   "teams": [],
   "gates": [
     {
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 8,
-      "sha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/worker-r8.md"
+      "status": "pending",
+      "revision": 10
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 8,
-      "sha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/worker-r8.md"
+      "status": "pending",
+      "revision": 10
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 8,
-      "sha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
-      "evidence": "docs/delivery/admin02-fresh-dashboard/worker-r8.md"
+      "status": "pending",
+      "revision": 10
     },
     {
       "id": "owner-ui-review",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-store-desktop-review",
       "kind": "user",
       "required": true,
       "status": "pending"
@@ -114,8 +116,22 @@
       "source": "Current chat09/11/2026",
       "impact": "Existing-origin offline worker migration, not only clean-browser CSS cache. Local Admin serving only; no deployment or Store/Pages changes.",
       "decision": "Bounded repair round11. Observed actual IAB4175 identity showing old Pilot. Serve /sw.js retirement worker for local dev/preview, claim/unregister/navigate; preserve all origin data. Reproduce previously installed offline worker with normal reload and verify persistent data preservation."
+    },
+    {
+      "revision": 9,
+      "request": "Owner12/11: optimize Admin header/sidebar junction then align Store desktop tokens; priority Store mobile → Admin desktop → remaining surfaces. Owner confirmed admin02 worktree. Follow-up: desktop must remove boxed green logo; use light-background logo directly on white.",
+      "source": "User messages12/11/2026 in current chat",
+      "impact": "Admin shell composition and shared desktop chrome roles; Store desktop only. Refresh affected technical/browser gates; mobile regression compared to pre-change baseline. Original official light-background asset on both desktop sidebars; Store mobile branding unchanged.",
+      "decision": "Resume same branch/worktree b6c4eb3, sole writer /root. One bounded refinement round12; no backend/API/Pages changes. Mobile foundations retain values; no delegation."
+    },
+    {
+      "revision": 10,
+      "request": "Owner supplies light-vector.png and dark-vector.png as official primary logos without slogan; slogan will be added later.",
+      "source": "User message and image attachments12/11/2026",
+      "impact": "Supersede fetched temporary logo with exact user-provided PNGs. Light on white Admin/Store desktop and Admin login; dark on green Store mobile/login header. Mobile baseline comparison excludes the authorized logo artwork/ratio change and hidden desktop DOM.",
+      "decision": "Same worktree and sole writer. Original asset bytes preserved; no recoloring, slogan, backend/API/export/Pilot changes. Refresh builds, Admin component tests and focused browser checks."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner09/11/2026 requests temporary Admin checkpoint to continue roadmap elsewhere. Stop further Admin work; resume from CHECKPOINT.md when requested. Technical readiness recorded, owner UI acceptance pending; no push/merge/deploy."
+  "nextAction": "Implement revision9 chrome refinement; targeted checks and Playwright; owner UI acceptance remains pending."
 }

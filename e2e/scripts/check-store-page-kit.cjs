@@ -10,6 +10,7 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
   const page=await browser.newPage({viewport,reducedMotion:'reduce',serviceWorkers:'block'});page.setDefaultTimeout(10000);
   const errors=[];page.on('pageerror',e=>errors.push(e.message));let accountAnchor,backAnchor;
   for(const route of routes){
+   const desktopChrome=viewport.width>=900&&route!=='login';
    await page.goto(`${base}/#${route}`);
    // Measure the loaded report frame, not the transient feature placeholder.
    // Slow/failed chunk behavior has its own deferred-loading gate.
@@ -22,8 +23,9 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    expect(h.x).toBe(l.x);expect(h.width).toBe(l.width);expect(s.x).toBe(l.x);expect(s.width).toBe(l.width);
    expect(h.y).toBe(0);expect(h.y+h.height-s.y).toBe(12);expect(bar.y).toBe(14);expect(bar.height).toBe(44);
    const header=page.locator('.store-header');expect((await bounds(header)).height).toBe(72);
-   await expect(header.locator('h1')).toHaveCSS('font-size','20px');await expect(header.locator('h1')).toHaveCSS('line-height','26px');
-   await expect(hero).toHaveCSS('background-image','linear-gradient(115deg, rgb(0, 107, 75), rgb(0, 122, 82))');
+   await expect(header.locator('h1')).toHaveCSS('font-size',desktopChrome?'14px':'20px');await expect(header.locator('h1')).toHaveCSS('line-height',desktopChrome?'20px':'26px');
+   if(desktopChrome)await expect(header).toHaveCSS('background-color','rgb(255, 255, 255)');
+   await expect(hero).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
    await expect(surface).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(surface).toHaveCSS('border-top-left-radius','24px');
    if(route!=='login'){
     const a=await bounds(page.locator('.store-account'));expect(a.x+a.width).toBe(bar.x+bar.width);expect(a.y).toBe(bar.y);
@@ -37,16 +39,23 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
    if([390,1440].includes(viewport.width)){
     await page.locator('.store-header h1').evaluate(el=>{el.style.fontSize='30px';el.style.lineHeight='39px'});
     if(await page.locator('.store-header p').count())await page.locator('.store-header p').evaluate(el=>{el.style.fontSize='18px';el.style.lineHeight='24px'});
-    const large=await bounds(page.locator('.store-header-account')),leading=await bounds(page.locator(viewport.width>=900&&route!=='home'&&route!=='login'?'.store-header-location':'.store-header-brand,.store-back'));
+    const large=await bounds(page.locator('.store-header-account')),leading=await bounds(page.locator(desktopChrome?'.store-header-location':'.store-header-brand,.store-back'));
     // Login has no account control; its empty grid slot is not an alignment anchor.
     // With enlarged copy the baseline logo remains 44px, centered in the taller row.
-    if(route!=='login'&&(viewport.width<900||route==='home'))expect(large.y).toBe(leading.y);
+    if(route!=='login'&&viewport.width<900)expect(large.y).toBe(leading.y);
     if(route==='login'){expect(leading.width).toBe(44);expect(leading.height).toBe(44);}
     expect(large.x).toBeGreaterThan(leading.x+leading.width);
     expect(await page.locator('.store-header h1').getAttribute('title')).toBe(await page.locator('.store-header h1').textContent());
    }
-   await page.locator('.store-header').evaluate(el=>[...el.querySelectorAll('button')].find(b=>b.getBoundingClientRect().width>0)?.focus());
-   if(route!=='login')await expect.poll(()=>page.evaluate(()=>scrollY)).toBe(0);
+   const scrollBeforeFocus=await page.evaluate(()=>scrollY);
+   const focusedNavigation=await page.locator('.store-header').evaluate(el=>{
+    const button=[...el.querySelectorAll('button')].find(b=>b.getBoundingClientRect().width>0&&!b.closest('.store-account'));
+    if(button){button.focus();return true;}
+    el.querySelector('.store-account')?.focus();return false;
+   });
+   // Home desktop has its brand in the sidebar. Account focus preserves the
+   // current task scroll; a navigation command returns to the page header.
+   if(route!=='login')await expect.poll(()=>page.evaluate(()=>scrollY)).toBe(focusedNavigation?0:scrollBeforeFocus);
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }
   await page.goto(`${base}/#reports`);await page.getByRole('button',{name:/^Báo cáo tổng hợp/}).click();

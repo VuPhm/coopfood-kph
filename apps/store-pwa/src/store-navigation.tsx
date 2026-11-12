@@ -26,7 +26,7 @@ export function StoreNavigation({ screen, profile, navigate, onKphIntent, hidden
   const primaryLinks = () => storePrimaryNavigation.map(item => link(item.screen, item.label, item.icon));
   return <>
     <aside className="store-desktop-rail" aria-label="Điều hướng cửa hàng">
-      <a className="store-sidebar-brand" href="#home" aria-label="Co.op Food — Trang chủ"><img src={assetUrl("brand/coopfood-home-logo-144.webp")} alt="Co.op Food" width={72} height={39} /><span>Vận hành cửa hàng</span></a>
+      <a className="store-sidebar-brand" href="#home" aria-label="Co.op Food — Trang chủ"><span className="store-sidebar-logo"><img src={assetUrl("brand/coopfood-logo-light.png")} alt="Co.op Food" width={598} height={246} /></span><span>Vận hành cửa hàng</span></a>
       <nav aria-label="Điều hướng chung">{primaryLinks()}</nav>
       <p className="store-rail-label">TÍNH NĂNG</p>
       <nav aria-label="Tính năng cửa hàng">{storeFeatures.map(feature => link(feature.screen, feature.sidebarLabel, feature.icon))}</nav>
