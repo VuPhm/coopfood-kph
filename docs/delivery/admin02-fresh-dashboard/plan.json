@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
   "revision": 10,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin header/sidebar rõ điểm giao và Store desktop dùng chung Fresh tokens; logo chính thức theo nền, Store mobile giữ phong cách.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -23,7 +23,7 @@
     "Large shared design system, Store mobile redesign or Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "1ef9b46ddd4f35f17ef76c01692e461aac250c94",
+  "candidateSha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
   "integrationOwner": "Codex /root — sole UI writer",
   "sharedPaths": [
     "packages/ui/src/fresh-tokens.css",
@@ -37,22 +37,28 @@
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 10
+      "status": "pass",
+      "revision": 10,
+      "sha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/chrome-r10.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 10
+      "status": "pass",
+      "revision": 10,
+      "sha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/chrome-r10.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 10
+      "status": "pass",
+      "revision": 10,
+      "sha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/chrome-r10.md"
     },
     {
       "id": "owner-ui-review",
@@ -133,5 +139,5 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Implement revision9 chrome refinement; targeted checks and Playwright; owner UI acceptance remains pending."
+  "nextAction": "Owner review Admin junction/collapsed sidebar and Store desktop Home/KPH with official logo variants. Technical UI gates pass; backend8081 is not running. No push/merge/deploy."
 }

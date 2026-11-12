@@ -6,6 +6,8 @@ hai logo chính thức owner cung cấp (không slogan). Xem [revision10](chrome
 và plan hiện tại; nội dung09/11 bên dưới là checkpoint lịch sử. UI mới đang chờ
 owner xem; chưa có quyền push/merge/deploy. Backend8081 chưa chạy ở lần UI này.
 
+Implementation candidate `0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71`; technical ready, owner UI pending.
+
 ## Checkpoint trước — 09/11/2026
 
 Owner yêu cầu tạm checkpoint Admin để trở ra tiếp lộ trình. Dừng mở thêm việc Admin tại đây; đây không phải nghiệm thu UI hoặc quyền push/merge/deploy.

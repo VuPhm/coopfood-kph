@@ -82,3 +82,5 @@ cross-region authorization. Store Fresh vẫn mock; chưa kiểm thiết bị th
 
 Bước nhỏ tiếp: owner xem điểm giao Admin mở/thu sidebar, Store desktop Home/KPH
 và logo trên trắng/xanh. Hai gate UI Admin/Store mới chờ quyết định owner.
+
+Candidate implementation `0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71`; metadata checkpoint theo sau chỉ cập nhật hồ sơ. Gate UI owner vẫn pending.
