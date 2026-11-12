@@ -25,14 +25,17 @@ Fresh entry dùng `VITE_STORE_APP_MOCK=false VITE_STORE_APP_ONLINE=true`;
 entry mock và online/Pilot cũ giữ riêng. Login/session/CSRF/logout/password tái
 sử dụng client chuẩn. Chọn store explicit, không persist session/token/store
 selection vào browser storage. Refresh navigation/focus/reconnect/visibility và
-trước chọn store; đang xác minh/error không render scope cũ. Scope mất không
+trước chọn store. KPHON02 giữ DOM/draft khi revalidate nhưng che nội dung,
+khóa tương tác và ẩn cả portal dialog; không hiển thị scope cũ. Lỗi xác minh
+tháo scope cũ. Đổi actor luôn yêu cầu chọn store lại. Scope mất không
 chọn store khác tự động; giảm quyền nhưng còn VIEW cập nhật capabilities.
 
-KPH/history/lookup/create/review/export UI nối ở slice sau, giữ D01 page-local
-selection/reset. DATE/report/notification và mọi route chưa nối hiện rõ chưa
-kết nối, không render mock operational data trong phiên thật. Khi gắn form/draft
-ở slice sau cần giữ dữ liệu form an toàn khi revalidate và clear đúng khi scope
-thay đổi, không lấy selector làm authority.
+KPHON02 nối lookup và history/chi tiết chỉ đọc; giữ D01 filter/sort/count
+trước pagination, reset detail/grouping khi đổi page/filter/sort. Create,
+review/export nối ở slice sau. DATE/report/notification và mọi route chưa nối hiện rõ chưa
+kết nối, không render mock operational data trong phiên thật. NOT_FOUND cho
+scan lại hoặc nhập tay trống, giữ barcode/status, chưa lưu; error không biến
+thành NOT_FOUND. Draft được clear khi đổi/mất scope; selector không là authority.
 
 Provenance chọn lọc: BE02/BE03 cũ2b42c94/4a65334 cung cấp SQL/tests và session
 skeleton, chưa được coi accepted. Path/response hiện tại theo đề xuất mới, không

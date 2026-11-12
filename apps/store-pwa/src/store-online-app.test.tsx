@@ -8,7 +8,7 @@ const employee = { id: "store-a", code: "0001", name: "Cửa hàng A", capabilit
 const manager = { ...employee, id: "store-b", code: "0002", name: "Cửa hàng B", capabilities: ["VIEW", "CREATE", "REVIEW", "EXPORT"] as ("VIEW" | "CREATE" | "REVIEW" | "EXPORT")[] };
 const session = { user: { id: "user", username: "test", displayName: "Người kiểm thử", globalRoles: [], stores: [] }, csrfToken: "synthetic" };
 function gateway(): StoreSessionGateway {
-  return { getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
+  return { lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
 }
 async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Quyền hàng không phù hợp" }); }
 describe("Store online session", () => {
@@ -55,15 +55,14 @@ describe("Store online session", () => {
     vi.mocked(api.listStoreAccess).mockReturnValueOnce(pending);
     fireEvent(window, new Event("focus"));
     await screen.findByText("Đang xác minh phiên và quyền cửa hàng…");
-    expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
+    expect(screen.getByText("Duyệt phiếu")).not.toBeVisible();
     resolve([employee]);
-    await screen.findByText("Xem phiếu");
-    expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
-    expect(screen.getByText("Mã cửa hàng · 0001")).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument());
+    expect(screen.getByText("0001 · Người kiểm thử")).toBeInTheDocument();
   });
   it("shows explicit unavailable states on unwired routes instead of mock operational data", async () => {
     render(<StoreOnlineApp gateway={gateway()} />); await selectA();
-    window.history.replaceState(null, "", "#date"); fireEvent(window, new Event("hashchange"));
+    window.history.replaceState(null, "", "#reports"); fireEvent(window, new Event("hashchange"));
     await screen.findByText(/chưa được kết nối trong phiên online/);
     expect(screen.queryByText("Vào bản dùng thử")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Tạo lô" })).not.toBeInTheDocument();
@@ -76,4 +75,40 @@ describe("Store online session", () => {
     fireEvent.click(screen.getByRole("button", { name: "Đăng xuất" }));
     await screen.findByLabelText("Tên đăng nhập"); await waitFor(() => expect(api.logout).toHaveBeenCalledOnce());
   });
+  it("retains manual input through a masked scope refresh and closes it on revoke", async () => {
+    const api = gateway();
+    vi.mocked(api.lookupBarcode).mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" });
+    render(<StoreOnlineApp gateway={api} />); await selectA();
+    fireEvent.click(screen.getByRole("button", { name: "Tra mã hàng" }));
+    fireEvent.change(await screen.findByLabelText("Barcode"), { target: { value: "000123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Nhập tay" }));
+    const input = screen.getByLabelText("Tên sản phẩm");
+    fireEvent.change(input, { target: { value: "Bản nháp chưa lưu" } });
+    let release!: (value: typeof employee[]) => void;
+    vi.mocked(api.listStoreAccess).mockReturnValueOnce(new Promise(resolve => { release = resolve; }));
+    fireEvent(window, new Event("focus"));
+    await screen.findByText("Đang xác minh phiên và quyền cửa hàng…");
+    expect(input).not.toBeVisible();
+    release([employee]);
+    await waitFor(() => expect(input).toBeVisible());
+    expect(input).toHaveValue("Bản nháp chưa lưu");
+    vi.mocked(api.listStoreAccess).mockResolvedValue([]);
+    fireEvent(window, new Event("hashchange"));
+    await screen.findByRole("heading", { name: "Chọn cửa hàng" });
+    expect(input).not.toBeInTheDocument();
+    window.history.replaceState(null, "", "#home");
+  });
+
+  it("requires explicit selection when the session actor changes in the same store", async () => {
+    const api = gateway(); render(<StoreOnlineApp gateway={api} />); await selectA();
+    vi.mocked(api.getSession).mockResolvedValue({ ...session, user: { ...session.user, id: "other-user", displayName: "Người khác" } });
+    fireEvent(window, new Event("hashchange"));
+    await screen.findByRole("heading", { name: "Chọn cửa hàng" });
+    expect(screen.queryByRole("heading", { name: "Quyền hàng không phù hợp" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "0001 · Cửa hàng A" }));
+    await screen.findByRole("heading", { name: "Quyền hàng không phù hợp" });
+    expect(screen.getByText("0001 · Người khác")).toBeInTheDocument();
+  });
+
 });

@@ -15,7 +15,7 @@ export function StoreAppHeader({ leading = "back", title, subtitle, storeName, a
 }) {
   const logo = <img src={assetUrl("brand/coopfood-home-logo-144.webp")} alt="Co.op Food" width={1024} height={550} loading="eager" fetchPriority="high" decoding="async" />;
   return <header className={`store-header${hideCopy ? " is-home" : ""}`} onFocusCapture={event => {
-    if (!event.currentTarget.contains(event.target) || event.target.closest(".store-account")) return;
+    if (!event.currentTarget.contains(event.target) || event.target.closest(".store-account, .store-online-account")) return;
     window.scrollTo({ top: 0, behavior: "instant" });
   }}>
     <div className="store-appbar-row">

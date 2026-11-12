@@ -10,3 +10,9 @@
 .store-online-account { display: grid; place-items: center; min-width: 44px; min-height: 44px; }
 .store-online-content h1 { font-size: 1.5rem; }
 .store-online-content ul { list-style: disc; padding-inline-start: 24px; }
+
+/* Keep the mounted scope out of interaction while retaining draft and scroll. */
+.store-online-verifying { position: fixed; inset: 0; z-index: 100; max-width: none; background: var(--cf-color-canvas, #edf4ef); }
+@media (max-width: 1099px) {
+  .store-online-content { padding-bottom: calc(24px + var(--store-mobile-toolbar-height, 84px)); }
+}

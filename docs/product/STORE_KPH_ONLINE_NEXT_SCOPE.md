@@ -1,7 +1,7 @@
 # Scope đề xuất — UI mới + KPH online
 
-Cập nhật09/11/2026. KPHON01 implementation candidate cho discovery/session;
-full KPH wiring và nghiệm thu tổ hợp còn lại. Không mở lại R2-02 lịch sử. Baseline và quyết định hiện
+Cập nhật12/11/2026. KPHON01 tạm đạt cho discovery/session; KPHON02 nối
+lookup/history chỉ đọc, chờ owner. Create/review/export và nghiệm thu tổ hợp còn lại. Không mở lại R2-02 lịch sử. Baseline và quyết định hiện
 hành ở [CURRENT_STATE](../CURRENT_STATE.md), thứ tự ở [NEXT](../NEXT.md).
 
 ## Outcome và phạm vi

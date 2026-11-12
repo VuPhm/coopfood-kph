@@ -19,7 +19,7 @@ export function StorePageHero({ children, className = "", contentLabel, header, 
     // React portal focus bubbles through this component although its DOM is outside.
     if (!event.currentTarget.contains(event.target)) return;
     // Account/settings opens above the current work; preserve its scroll anchor.
-    if (!(event.target instanceof Element && event.target.closest(".store-account"))) window.scrollTo({ top: 0, behavior: "instant" });
+    if (!(event.target instanceof Element && event.target.closest(".store-account, .store-online-account"))) window.scrollTo({ top: 0, behavior: "instant" });
   }}>
     {appHeader ?? renderHeader?.(header)}
     {children ? <div className="store-page-hero-content" role={contentLabel ? "region" : undefined} aria-label={contentLabel}>{children}</div> : null}

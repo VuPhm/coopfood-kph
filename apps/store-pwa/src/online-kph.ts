@@ -343,6 +343,7 @@ function toRecordView(record: KphRecord): RecordView {
     kind: record.type,
     detectedDate: isoToDisplayDate(record.detectedDate),
     detectedBy: record.detectedBy.displayName,
+    ...(record.barcode ? { barcode: record.barcode } : {}),
     sku: record.catalogSnapshot.skuCode ?? record.barcode ?? "NHẬP TAY",
     productName: record.catalogSnapshot.productName ?? "Sản phẩm nhập tay",
     supplier: record.catalogSnapshot.supplierName ?? "Chưa nhập nhà cung cấp",

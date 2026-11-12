@@ -1,6 +1,6 @@
 # Trạng thái hiện tại
 
-Ngày rà soát: 09/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+Ngày rà soát: 12/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
 ## Baseline đã chấp nhận
 
@@ -39,7 +39,7 @@ cửa hàng và cấp quyền vùng là các nhu cầu riêng trong [policy P01]
 
 | Vùng | Đã có | Còn thiếu trước vận hành online bằng UI mới |
 | --- | --- | --- |
-| Store Fresh | UI mock đã tích hợp; KPHON01 candidate thêm Fresh online session/chọn store | Nối lookup/history/create/review/export trên context thật |
+| Store Fresh | UI mock đã tích hợp; KPHON01 session/chọn store tạm đạt; KPHON02 lookup/history candidate | Nối create/review/export; nghiệm thu lookup/history và tổ hợp cuối |
 | KPH online | Backend, authorization, private media, duyệt/xuất và history D01 qua entry hiện có | Đưa luồng này vào UI mới; giữ hoặc chốt thay đổi contract explicit |
 | Store/capability | Backend kiểm quyền store/region/chain; KPHON01 thêm GET /api/v1/kph/stores dùng cùng policy | Consumer KPH và owner acceptance/tổ hợp cuối |
 | DATE/Thông báo | Lô, xử lý, nhắc 1/7 ngày trong phiên mock | Contract lô, persistence, audit, nhắc bền vững; chưa có backend/push |
@@ -81,10 +81,22 @@ giữ một vòng test kỹ/tổ hợp, rồi một vòng UI/UX cho sau; hai vò
 [Contract context](product/STORE_KPH_CONTEXT_CONTRACT.md),
 [kế hoạch](delivery/kphon01-effective-context/plan.json).
 
-Runtime thử: Admin4175 giữ source ADMIN03; Store4173 chuyển sang Fresh context
-KPHON01; backend8082 nâng lên KPHON01, cùng DB thử55434/media đã có, không reseed.
-P03 cũ8081/55433 giữ nguyên. Không merge main, push, deploy hoặc chạm Pages/tag.
-UI KPH lookup/history/create/review/export vẫn là slice kế; D01 giữ nguyên.
+**KPHON02 — lookup/history** trên nhánh `store-app/kphon02-lookup-history`,
+base KPHON01 close `0c37581`. Nối lookup barcode FOUND/NOT_FOUND, nhập tay trống
+chưa lưu, và history/chi tiết read-only theo D01 (page25, filter/sort/count
+server, reset detail/group khi đổi tham số). Giữ barcode snapshot và private
+stamped photos. Context revalidate che/khóa DOM và portal, giữ draft/scroll;
+401/403 về boundary, đổi actor/mất scope đóng dữ liệu cũ.
+[Evidence và giới hạn](delivery/kphon02-lookup-history/evidence.md),
+[handoff](delivery/kphon02-lookup-history/handoff.md). Technical và owner acceptance
+là hai gate riêng; owner chưa nghiệm thu KPHON02. Hai vòng cuối vẫn pending.
+
+Runtime thử12/11: Store4173 source KPHON02, backend8082 dùng jar KPHON01
+(backend source không đổi). Runtime cũ đã tắt; container ADMIN03 không còn,
+nên tạo container `coopfood-kph-kphon02-acceptance` riêng ở55434, nạp fixture
+synthetic có guard, không truncate hoặc reseed database khác. Media private
+ở worktree KPHON02. Admin4175 chưa khôi phục trong lượt này. Không merge main,
+push, deploy hoặc chạm Pages/tag. Bước sau là create/private media/idempotency.
 
 Toàn bộ checkpoint cũ được giữ tại
 [lịch sử trạng thái đến 27/10](https://github.com/VuPhm/coopfood-kph/blob/04f7c4a4d9001901c3973e7e6bbf5a2118932ee7/docs/CURRENT_STATE.md).

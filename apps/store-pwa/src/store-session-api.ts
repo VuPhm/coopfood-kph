@@ -7,6 +7,8 @@ export function createStoreSessionGateway(options: { baseUrl?: string; fetch?: t
   const client = createKphApiClient(options);
   return {
     getSession: identity.getSession,
+    lookupBarcode: identity.lookupBarcode,
+    loadHistory: identity.loadHistory,
     login: identity.login,
     logout: identity.logout,
     changePassword: identity.changePassword,
