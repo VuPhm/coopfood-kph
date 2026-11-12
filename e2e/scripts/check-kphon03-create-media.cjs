@@ -13,6 +13,12 @@ async function login(page, user='region.admin03') {
  await page.goto(base+'/#kph'); await page.getByLabel('Tên đăng nhập',{exact:true}).fill(user); await page.getByLabel('Mật khẩu',{exact:true}).fill(password);
  await page.getByRole('button',{name:'Đăng nhập',exact:true}).click(); await page.getByRole('button',{name:/^001 ·/}).click();
  await expect(page.getByRole('heading',{name:'Quyền hàng không phù hợp',exact:true})).toBeVisible();
+ if((page.viewportSize()?.width??0)>=900) {
+  await expect(page.locator('.store-header')).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
+  await expect(page.locator('.store-header')).toHaveCSS('border-bottom-width','0px');
+  await expect(page.locator('.store-desktop-rail')).toHaveCSS('border-right-width','0px');
+  await expect(page.locator('.store-sidebar-brand img')).toHaveAttribute('src',/coopfood-logo-light\.png$/);
+ }
  await page.evaluate(()=>location.hash='kph'); await expect(page.getByRole('button',{name:'Tạo phiếu TP tươi sống',exact:true})).toBeVisible();
 }
 async function history(c,type='TPTS') { const r=await c.request.get(`${base}/api/v1/stores/${store}/kph?type=${type}`); assert.equal(r.status(),200); return r.json(); }
@@ -98,7 +104,7 @@ async function originals(record, files) {
   await page.getByRole('button',{name:'Gửi phiếu',exact:true}).click();const found=await(await foundResponse).json();
   await expect(page.getByText('Đã gửi phiếu',{exact:true})).toBeVisible();assert.equal(found.type,'TPCN');assert.equal(found.lookupStatus,'FOUND');assert.equal(found.catalogSnapshot.skuCode,'000042');assert.equal(found.catalogSnapshot.supplierCode,'000007');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);
-  results.push({viewport:name,result:'PASS',recordId:saved.id,foundRecordId:found.id,checks:['real inherited context','NOT_FOUND barcode preserved','review then send','3 originals ordered byte-identical','private stamped photos','focus preserves form/photos','close/double-submit blocked while sending','lost committed response retried once without duplicate','TPCN published lookup snapshot']});await c.close();
+  results.push({viewport:name,result:'PASS',recordId:saved.id,foundRecordId:found.id,checks:['green chrome and official logo','real inherited context','NOT_FOUND barcode preserved','review then send','3 originals ordered byte-identical','private stamped photos','focus preserves form/photos','close/double-submit blocked while sending','lost committed response retried once without duplicate','TPCN published lookup snapshot']});await c.close();
  }
  // Revoke membership between review and submission; no guessed success or persisted record.
  const admin=await browser.newContext(options);const logged=await admin.request.post(base+'/api/v1/auth/login',{data:{username:'chain.admin03',password}});assert.equal(logged.status(),200);const token=(await logged.json()).csrfToken;

@@ -2,14 +2,17 @@
 
 Ngày rà soát: 12/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
-## Candidate UI tích hợp riêng — 12/11/2026
+## UI green chrome đã ghép vào KPHON03 — 12/11/2026
 
-Admin/Store desktop header xanh Fresh, bỏ line header/sidebar và logo chính
-thức đã gộp với checkpoint KPHON02 `4bcbb48` trên
-`store-app/ui08-green-header-integration`. Fullverify384tests và read-only
-backend UI smoke đạt; owner đổi ý yêu cầu tích hợp luôn vào KPHON03 sau checkpoint của writer.
-[Evidence và cách ghép vào KPHON03](delivery/admin02-fresh-dashboard/integration-r11.md).
-Chưa merge main, không thay active KPHON03 hoặc final acceptance.
+Theo owner đổi ý “tích hợp luôn KPHON03”, đã merge --no-ff nhánh
+`store-app/ui08-green-header-integration` vào KPHON03 tại `59fbcb8`.
+Source thực tế `f005586` (sau `e8a2df7` chỉ thêm tài liệu pin checkpoint).
+Header desktop xanh Fresh, sidebar trắng/official light logo, dark logo trên
+xanh, bỏ decorative lines; giữ Admin memberships và focus ngoại lệ online.
+Create/session/idempotency/media và backend/API không đổi so với `55f398e`.
+[Kiểm bản kết hợp](delivery/kphon03-create-media/integration-r2.md).
+Technical integration, owner UI và nghiệm thu tổ hợp cuối là các gate riêng.
+Không merge main, push/deploy hoặc tự mở milestone tiếp.
 
 ## Baseline đã chấp nhận
 
@@ -117,7 +120,7 @@ KPHON03 chờ owner; chưa phải nghiệm thu cuối KPH/app.
 Runtime thử12/11: Store4173 source KPHON03; backend8082 vẫn jar KPHON01
 (backend/API source không đổi), container synthetic KPHON02 ở55434 và media
 private trong worktree KPHON02 được tái sử dụng, không seed/reset.
-Admin4175 chưa khôi phục. Không merge main/push/deploy hoặc chạm Pages/tag.
+Admin4175 đã chuyển sang cùng worktree KPHON03 sau khi task UI tự dừng process cũ. Không merge main/push/deploy hoặc chạm Pages/tag.
 Bước sau là review/export đúng scope, sau đó hai vòng cuối đã hẹn.
 
 Toàn bộ checkpoint cũ được giữ tại

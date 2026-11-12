@@ -26,7 +26,8 @@
     "apps/admin-web/**",
     "apps/store-pwa/public/**",
     "docs/**",
-    "e2e/**"
+    "e2e/**",
+    "packages/ui/**"
   ],
   "reviewLimit": 2,
   "reviewRound": 0,
@@ -58,6 +59,15 @@
       "revision": 2,
       "sha": "",
       "evidence": ""
+    },
+    {
+      "id": "owner-green-ui",
+      "kind": "user",
+      "required": true,
+      "status": "pending",
+      "revision": 2,
+      "sha": "",
+      "evidence": ""
     }
   ],
   "changes": [
@@ -75,5 +85,19 @@
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
     "decision": "Tiếp create; tối ưu UI deferred, không suy final acceptance."
-  }
+  },
+  "deferredReviews": [
+    {
+      "id": "final-combined-technical",
+      "status": "pending",
+      "sequence": 1,
+      "outcome": "Một vòng test kỹ/tổ hợp toàn luồng sau nối đủ KPH; không thay bằng targeted integration."
+    },
+    {
+      "id": "final-uiux",
+      "status": "pending",
+      "sequence": 2,
+      "outcome": "Một vòng UI/UX sau vòng kỹ thuật; integration chrome không tự là final visual acceptance."
+    }
+  ]
 }

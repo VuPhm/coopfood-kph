@@ -1,6 +1,8 @@
 # KPHON03 — hướng dẫn thử
 
-Ngày12/11/2026. Technical evidence riêng với owner acceptance; chưa có owner
+Ngày12/11/2026, cập nhật revision2 sau owner yêu cầu ghép UI green chrome.
+[Evidence bản kết hợp](integration-r2.md). Admin từ cùng worktree ở4175; Store4173.
+Technical evidence riêng với owner acceptance; chưa có owner
 sign-off cho create mới. [Evidence](evidence.md). Không tự mở slice review.
 
 Preview http://127.0.0.1:4173, source worktree KPHON03. Nếu preview dừng:
@@ -19,6 +21,10 @@ KPHON02 giữ nguyên. Tài khoản `region.admin03` / `admin-e2e-password` (syn
 5. Chuyển TPCN → tạo với barcode `0890123456789`: lookup SKU000042/NCC000007.
    Backend quyết catalog/store/actor snapshot; frontend không là authority.
 
+Revision2 thêm official logos/green header/sidebar tokens và Admin shell từ
+source UI, giữ memberships/Admin API proxy/cache và focus ngoại lệ online.
+Các file create/session/idempotency/media ở dưới không đổi qua merge.
+
 Files chính: `store-session-api.ts`, `store-online-app.tsx`, `store-online-kph.tsx`,
 `store-kph-create-control.tsx`, `create-record-dialog.tsx`, `online-kph.ts`, CSS
 masking tương ứng; unit tests, launcher/Playwright checker; CURRENT/NEXT/context docs.
@@ -27,7 +33,7 @@ Không đổi backend/API/migration/dependency/lockfile.
 ## UI debt và giới hạn
 
 Owner đã nói còn vài điểm tối ưu, đặc biệt giao diện, nhưng cho tiếp. Không có
-frame Figma mới được giao; giữ form Fresh và chưa mở redesign. Mang feedback
+frame Figma mới được giao; giữ form Fresh; revision2 chỉ ghép phần green chrome/official logos đã bàn giao. Mang feedback
 này vào đúng vòng UI/UX sau. Quan sát screenshot retry: thông báo lỗi/điểm neo
 cuộn dưới sticky header và copy mạng “Failed to fetch” cần refinement trong
 vòng đó. Không coi đây là final visual acceptance.
