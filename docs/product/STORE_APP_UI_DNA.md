@@ -1,5 +1,15 @@
 # Store App UI DNA
 
+**Owner direction — 12/11/2026:** ưu tiên token Store mobile → Admin desktop →
+các bề mặt còn lại. Candidate desktop dùng chung rail/header/navigation roles
+từ Fresh; revision11 dùng header xanh như mobile, bỏ line trang trí ở header/
+sidebar và giữ cùng đường căn; logo light trên sidebar trắng không có hộp xanh.
+Logo chính thức do owner cung cấp là `light-vector.png` (chữ xanh, nền sáng) và
+`dark-vector.png` (chữ trắng, nền xanh/tối), không có slogan; slogan bổ sung sau.
+Các bản PNG gốc được giữ nguyên tại `public/brand/coopfood-logo-light.png` và
+`coopfood-logo-dark.png` của consumer. Đây là authority cho logo; nghiệm thu UI
+desktop mới vẫn pending. [Phạm vi và kiểm chứng](../delivery/admin02-fresh-dashboard/chrome-r10.md).
+
 **FORM01 revision4 — candidate24/10:** hệ token nút bao gồm primary xanh,
 secondary/ghost/danger, selected/disabled/focus và native command. Vật liệu mép
 khối trượt/sidebar/menu dùng token layer riêng, không đổi geometry/navigation.

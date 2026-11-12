@@ -21,7 +21,7 @@
 .store-header-brand { background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; }
 .store-back { border: 0; border-radius: 14px; background: transparent; }
 .store-back:hover { background: transparent; color: #fff; }
-.store-header-brand img { display: block; width: 42px; height: auto; aspect-ratio: 1024 / 550; }
+.store-header-brand img { display: block; width: 42px; height: auto; aspect-ratio: 598 / 246; }
 .store-header-copy { display: flex; align-items: center; justify-content: space-between; align-self: center; gap: 12px; min-width: 0; }
 .store-header-copy > div { min-width: 0; }
 .store-header-location { min-width: 0; }

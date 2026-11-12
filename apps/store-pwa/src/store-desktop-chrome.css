@@ -1,0 +1,58 @@
+/* Desktop inherits Fresh mobile foundations and the Admin chrome composition. */
+@media screen and (min-width: 900px) {
+  .store-app { background: var(--fresh-canvas); }
+  .store-app .store-desktop-rail {
+    flex-basis: var(--fresh-desktop-rail-width); width: var(--fresh-desktop-rail-width);
+    padding: 0; border-right: 0;
+    background: var(--fresh-chrome-surface); color: var(--fresh-ink); box-shadow: none;
+  }
+  body:has(.store-app) .store-desktop-rail { box-shadow: none; }
+  .store-sidebar-brand {
+    flex-direction: row; align-items: center; gap: 12px; flex-shrink: 0;
+    min-height: var(--fresh-desktop-header-height); margin: 0 0 20px; padding: 11px 20px;
+    border-bottom: 0; color: var(--fresh-ink);
+  }
+  .store-sidebar-logo { display: grid; place-items: center; flex-shrink: 0; width: 112px; height: 48px; }
+  .store-sidebar-brand img { width: 112px; height: auto; border-radius: 0; padding: 0; background: transparent; }
+  .store-sidebar-brand > span:last-child { font-size: var(--fresh-type-caption); line-height: 18px; }
+  .store-app .store-desktop-rail nav { gap: 4px; padding-inline: 12px; }
+  .store-app .store-desktop-rail nav a {
+    min-height: var(--fresh-size-control-md); padding: 10px 12px; gap: 10px;
+    border-radius: var(--fresh-radius-control); color: var(--fresh-nav-ink);
+    font-size: var(--fresh-type-control); font-weight: 600;
+  }
+  .store-app .store-desktop-rail nav a:hover { background: var(--fresh-nav-hover); color: var(--fresh-brand-deep); }
+  body:has(.store-app) .store-desktop-rail nav a[aria-current="page"] {
+    background: var(--fresh-brand-action); background-image: var(--fresh-nav-selected-image);
+    color: var(--fresh-surface); box-shadow: var(--fresh-nav-selected-shadow);
+  }
+  .store-app .store-desktop-rail nav a[aria-current="page"]:hover { background: var(--fresh-brand-deep); }
+  .store-app .store-desktop-rail .store-rail-label { margin: 20px 24px 12px; color: var(--fresh-ink-muted); }
+  .store-app .store-desktop-rail .store-rail-store { margin: auto 12px 0; padding: 20px 12px; border: 0; }
+  .store-app .store-desktop-rail .store-rail-store :is(small, span) { color: var(--fresh-ink-muted); }
+  .store-app .store-desktop-rail .store-rail-store strong { color: var(--fresh-ink); }
+  .store-app .store-page-layout { --store-header-gutter: var(--fresh-desktop-gutter); }
+  .store-app .store-header {
+    min-height: var(--fresh-desktop-header-height); background: var(--fresh-header-background);
+    border-bottom: 0; color: var(--fresh-header-ink); padding-block: 14px;
+  }
+  .store-app .store-header .store-appbar-row { grid-template-columns: minmax(0, 1fr) 44px; }
+  .store-app .store-header .store-header-brand { display: none; }
+  .store-app .store-header :is(h1, .store-header-ancestor > button) { color: var(--fresh-header-ink); }
+  .store-app .store-header :is(p, .store-header-ancestor > svg) { color: var(--fresh-header-muted); }
+  .store-app .store-header h1 { font-size: var(--fresh-type-control); line-height: 20px; font-weight: 600; }
+  .store-app .store-header-store { background: rgb(255 255 255 / 10%); border: 0; color: var(--fresh-header-ink); }
+  .store-app .store-header .store-profile-avatar { background: var(--fresh-surface); color: var(--fresh-brand-action); }
+  .store-app .store-header :where(button):focus-visible { outline-color: var(--fresh-header-ink); }
+  .store-app .store-header.is-home .store-header-copy > .sr-only {
+    position: static; width: auto; height: auto; margin: 0; padding: 0; overflow: visible; clip: auto; clip-path: none; white-space: normal;
+  }
+  .store-app .store-page-hero-content { padding-top: 16px; }
+}
+@media screen and (min-width: 900px) and (forced-colors: active) {
+  .store-app .store-header, .store-app .store-desktop-rail { background: Canvas; color: CanvasText; border-color: CanvasText; }
+  body:has(.store-app) .store-desktop-rail nav a[aria-current="page"] { background: Highlight; color: HighlightText; box-shadow: none; }
+}
+@media screen and (min-width: 900px) and (prefers-reduced-transparency: reduce) {
+  body:has(.store-app) .store-desktop-rail nav a[aria-current="page"] { box-shadow: none; }
+}

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Boxes, CalendarClock, ChevronDown, ChevronRight, KeyRound, LayoutDashboard, Leaf, LogOut, Menu, PanelLeftClose, PanelLeftOpen, ShieldCheck, UserRoundCog, Users } from "lucide-react";
+import { Boxes, CalendarClock, ChevronDown, ChevronRight, KeyRound, LayoutDashboard, LogOut, Menu, PanelLeftClose, PanelLeftOpen, UserRoundCog, Users } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@coopfood-kph/ui";
 import type { AdminSession } from "./lifecycle-admin";
 
@@ -28,11 +28,10 @@ export function AdminShell({ session, workspace, canIdentity, canCatalog, canLif
   </div>)}</nav>;
   return <div className={`admin-shell ${collapsed ? "is-collapsed" : ""}`}>
     <a href="#admin-main" className="admin-skip" onClick={event => { event.preventDefault(); document.getElementById("admin-main")?.focus(); }}>Bỏ qua đến nội dung chính</a>
-    <aside className="admin-sidebar">
-      <a className="admin-brand" href="#overview" onClick={() => navigate("overview")} aria-label="Co.op Food Admin · Tổng quan"><span className="admin-logo"><Leaf size={21} aria-hidden="true" /></span><span><strong>Co.op Food<span className="brand-dot">.</span></strong><small>Admin</small></span></a>
-      <div className="admin-organization"><span className="organization-icon"><ShieldCheck size={18} aria-hidden="true" /></span><div><strong>Quản trị vận hành</strong><small>{role}</small></div></div>
+    <aside className="admin-sidebar" aria-label="Thanh bên Admin">
+      <a className="admin-brand" href="#overview" onClick={() => navigate("overview")} aria-label="Co.op Food Admin · Tổng quan"><span className="admin-logo"><img src={`${import.meta.env.BASE_URL}brand/coopfood-logo-light.png`} alt="Co.op Food" width={598} height={246} /></span><span><small>Admin</small></span></a>
       {nav}
-      <div className="admin-sidebar-footer"><button className="admin-nav-item collapse-button" type="button" aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"} onClick={() => setCollapsed(!collapsed)}>{collapsed ? <PanelLeftOpen size={18} aria-hidden="true" /> : <PanelLeftClose size={18} aria-hidden="true" />}<span>Thu gọn thanh bên</span></button></div>
+      <div className="admin-sidebar-footer"><button className="admin-nav-item collapse-button" type="button" aria-expanded={!collapsed} aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"} onClick={() => setCollapsed(!collapsed)}>{collapsed ? <PanelLeftOpen size={18} aria-hidden="true" /> : <PanelLeftClose size={18} aria-hidden="true" />}<span>Thu gọn thanh bên</span></button></div>
     </aside>
     <div className="admin-inset">
       <header className="admin-topbar">
