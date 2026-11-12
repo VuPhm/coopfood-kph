@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon03-create-media",
   "revision": 2,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -19,7 +19,7 @@
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
-  "candidateSha": "",
+  "candidateSha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
   "integrationOwner": "Codex /root — sole writer",
   "sharedPaths": [
     "apps/store-pwa/src/**",
@@ -30,26 +30,26 @@
     "packages/ui/**"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [],
   "gates": [
     {
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
+      "evidence": "docs/delivery/kphon03-create-media/integration-r2.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
+      "evidence": "docs/delivery/kphon03-create-media/integration-r2.md"
     },
     {
       "id": "owner-create",
@@ -57,8 +57,8 @@
       "required": true,
       "status": "pending",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
+      "evidence": "docs/delivery/kphon03-create-media/handoff.md"
     },
     {
       "id": "owner-green-ui",
@@ -66,8 +66,8 @@
       "required": true,
       "status": "pending",
       "revision": 2,
-      "sha": "",
-      "evidence": ""
+      "sha": "f842e0c8973e5c311df4c5302be1a62873a313d1",
+      "evidence": "docs/delivery/kphon03-create-media/handoff.md"
     }
   ],
   "changes": [
@@ -80,7 +80,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Merge UI branch and resolve docs by latest KPHON03 progress; verify create + chrome combined before handoff.",
+  "nextAction": "UI integration vào KPHON03 đã hoàn tất. Owner thử create và green UI trên Store4173/Admin4175; final combined technical/UIUX vẫn deferred riêng. Không tự mở milestone tiếp.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",

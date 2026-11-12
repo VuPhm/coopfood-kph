@@ -21,7 +21,7 @@ green header/official logo/nav tokens/no decorative lines; shared fresh tokens
 
 ## Kiểm bản kết hợp
 
-Final candidate ghi trong plan.json. Runtime ở candidate bằng merge59fbcb8;
+Final candidate `f842e0c8973e5c311df4c5302be1a62873a313d1`. Runtime ở candidate bằng merge59fbcb8;
 các thay đổi tiếp theo chỉ cập nhật docs và checker URLs/lifecycle assertions.
 
 ```sh
