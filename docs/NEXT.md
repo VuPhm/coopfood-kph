@@ -1,5 +1,12 @@
 # Công việc kế tiếp
 
+UI integration riêng đã sẵn sàng tại `store-app/ui08-green-header-integration`;
+owner12/11 đổi ý yêu cầu tích hợp luôn KPHON03. KPHON03 writer checkpoint rồi
+merge nhánh này theo bàn giao trực tiếp. Giữ workflow đang làm, kiểm conflict create/
+session/focus; không lấy kết quả UI smoke làm kiểm tổ hợp cuối.
+[Handoff](delivery/admin02-fresh-dashboard/integration-r11.md).
+
+
 Cập nhật12/11/2026. [CURRENT_STATE](CURRENT_STATE.md). FRESH01 và ADMIN03 CLOSED;
 owner chấp nhận ADMIN03 qua chat, giữ kiểm tổ hợp rộng ở vòng cuối.
 [Quyết định](delivery/admin03-store-membership/acceptance-2026-11-09.md).

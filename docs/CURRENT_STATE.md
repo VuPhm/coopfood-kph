@@ -2,6 +2,15 @@
 
 Ngày rà soát: 12/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
+## Candidate UI tích hợp riêng — 12/11/2026
+
+Admin/Store desktop header xanh Fresh, bỏ line header/sidebar và logo chính
+thức đã gộp với checkpoint KPHON02 `4bcbb48` trên
+`store-app/ui08-green-header-integration`. Fullverify384tests và read-only
+backend UI smoke đạt; owner đổi ý yêu cầu tích hợp luôn vào KPHON03 sau checkpoint của writer.
+[Evidence và cách ghép vào KPHON03](delivery/admin02-fresh-dashboard/integration-r11.md).
+Chưa merge main, không thay active KPHON03 hoặc final acceptance.
+
 ## Baseline đã chấp nhận
 
 - FRESH01 revision5 CLOSED ngày 27/10/2026: UI Fresh hiện hành đã tích hợp vào

@@ -35,9 +35,11 @@ với stable BE base.
   backend8082, Store390×844/1440×1024 login/scope/barcode/history/account;
   Admin1440×1024 region membership navigation. Không route API mocks, không
   đổi dữ liệu nghiệp vụ hoặc chạy lại seed/reset trong lúc BE active.
-- Full `VITEST_MAX_WORKERS=1 npm run verify`: kết quả cuối ghi trong metadata
-  checkpoint sau khi process hoàn tất, không dùng kết quả lịch sử ADMIN02 để
-  thay kiểm trên bản gộp.
+- Full `VITEST_MAX_WORKERS=1 npm run verify`: PASS384tests (Admin25,Store320,
+  API4,rules19,UI16), docs/contracts/generatedAPI/typechecks/build/PWA.
+  Log `.local/verification/ui08/verify.log`, exit0. Warning ExcelJS chunk>500kB
+  giữ nguyên. Candidate sau chỉ thêm chờ selected-state ổn định trong browser
+  script; runtime code bằng merge2e41b71, browser smoke đã chạy lại PASS.
 
 Preview tích hợp riêng: Store online4179, Admin4178, Store mock4177. Không thay
 preview canonical4173 hoặc nhánh KPHON03 active. Log/ảnh tại
@@ -50,3 +52,19 @@ Merge integration branch này vào KPHON03 sau khi writer checkpoint phần đan
 làm. Chỉ khác stable BE base ở UI/assets/preview/tests/docs; không yêu cầu copy
 hoặc thay business code đang sửa. Giữ quyền scoped continuation của các slice
 BE; final combined workflow tests và owner UI/UX acceptance vẫn là gate riêng.
+
+## Checkpoint cuối
+
+Candidate `a045c4c68eec2bbb197e79fa979264c5d6a2fb77`, merge implementation `2e41b71`.
+Owner ban đầu chọn giữ riêng, sau đó đổi ý: “tích hợp luôn KPHON03, tôi đổi ý r”.
+Quyết định mới: phối hợp trực tiếp với writer KPHON03, checkpoint rồi merge
+nhánh integration và kiểm lại code kết hợp; không merge main hoặc deploy.
+Sau checkpoint sạch của KPHON03, writer có thể dùng:
+
+```sh
+git merge --no-ff store-app/ui08-green-header-integration
+```
+
+Đọc diff và kiểm lại các paths Store create/session/focus của KPHON03 sau gộp.
+Main và active BE giữ nguyên. UI pending owner review không được hiểu thành
+backend/combined-flow acceptance.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "admin02-fresh-dashboard",
   "revision": 11,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Admin header/sidebar rõ điểm giao và Store desktop dùng chung Fresh tokens; logo chính thức theo nền, Store mobile giữ phong cách.",
   "inScope": [
     "Admin shell: role-aware sidebar/topbar/account menu, hash navigation, responsive",
@@ -23,8 +23,8 @@
     "Large shared design system, Store mobile redesign or Pilot styling"
   ],
   "baseSha": "029b0e72132bc105648a999089a8fd38f1632b92",
-  "candidateSha": "0cc2e963dc3804b9b93a80bd54b73b4ed63a7b71",
-  "integrationOwner": "Codex /root — sole UI writer",
+  "candidateSha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+  "integrationOwner": "Codex /root — sole UI/integration writer",
   "sharedPaths": [
     "packages/ui/src/fresh-tokens.css",
     "packages/ui/package.json"
@@ -37,22 +37,28 @@
       "id": "admin-check-test-build",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 11
+      "status": "pass",
+      "revision": 11,
+      "sha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/integration-r11.md"
     },
     {
       "id": "browser-responsive-and-workflow",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 11
+      "status": "pass",
+      "revision": 11,
+      "sha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/integration-r11.md"
     },
     {
       "id": "scope-and-mock-separation",
       "kind": "technical",
       "required": true,
-      "status": "pending",
-      "revision": 11
+      "status": "pass",
+      "revision": 11,
+      "sha": "a045c4c68eec2bbb197e79fa979264c5d6a2fb77",
+      "evidence": "docs/delivery/admin02-fresh-dashboard/integration-r11.md"
     },
     {
       "id": "owner-ui-review",
@@ -140,5 +146,13 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Owner review Admin junction/collapsed sidebar and Store desktop Home/KPH with official logo variants. Technical UI gates pass; backend8081 is not running. No push/merge/deploy."
+  "nextAction": "KPHON03 writer checkpoint and merge verified integration branch; coordinate directly per owner changed decision, then run targeted combined checks.",
+  "integration": {
+    "branch": "store-app/ui08-green-header-integration",
+    "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/ui08-green-header-integration",
+    "stableBeBase": "4bcbb48",
+    "uiSource": "b783455",
+    "mergeCommit": "2e41b7141874c676a9185cc872fe24437382bfc4",
+    "ownerDecision": "Owner12/11 changed mind: tích hợp luôn KPHON03, tôi đổi ý r. Authorizes coordination with active BE writer after checkpoint."
+  }
 }

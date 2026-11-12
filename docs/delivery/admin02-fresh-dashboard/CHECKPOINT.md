@@ -1,5 +1,12 @@
 # Checkpoint Admin — 12/11/2026
 
+Revision11/integration mới nhất: header desktop xanh, bỏ line thừa, original
+light logo trên rail trắng. Nhánh `store-app/ui08-green-header-integration`,
+candidate `a045c4c68eec2bbb197e79fa979264c5d6a2fb77`; [integration evidence](integration-r11.md).
+Fullverify384tests và real-backend read-only UI smoke PASS. Owner đổi ý yêu cầu tích hợp KPHON03; bàn giao trực tiếp cho writer checkpoint
+rồi merge. Main/Pages không thay đổi.
+
+
 Owner đã resume ADMIN02 ngày12/11 và xác nhận worktree này. Candidate mới tối ưu
 header/sidebar Admin, đồng bộ Store desktop theo ưu tiên token mobile và dùng
 hai logo chính thức owner cung cấp (không slogan). Xem [revision10](chrome-r10.md)
