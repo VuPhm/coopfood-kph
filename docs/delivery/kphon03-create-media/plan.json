@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon03-create-media",
   "revision": 5,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -21,7 +21,7 @@
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "96bfd0c",
-  "candidateSha": "",
+  "candidateSha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
   "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
     "docs/**",
@@ -34,10 +34,14 @@
     "apps/store-pwa/src/store-tag-strip.tsx",
     "apps/store-pwa/src/store-tag-strip.css",
     "apps/store-pwa/src/store-workspace-search.tsx",
-    "apps/store-pwa/src/store-workspace-search.css"
+    "apps/store-pwa/src/store-workspace-search.css",
+    "apps/store-pwa/src/store-search-field.tsx",
+    "apps/store-pwa/src/store-app-frame.css",
+    "apps/store-pwa/src/store-online-app.tsx",
+    "apps/store-pwa/src/store-online-app.test.tsx"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [
     {
       "id": "kph",
@@ -93,18 +97,18 @@
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 5,
-      "sha": "",
+      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
       "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 5,
-      "sha": "",
+      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
       "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     },
     {
@@ -113,7 +117,7 @@
       "required": true,
       "status": "pending",
       "revision": 5,
-      "sha": "",
+      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
       "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     },
     {
@@ -122,7 +126,7 @@
       "required": true,
       "status": "pending",
       "revision": 5,
-      "sha": "",
+      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
       "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     }
   ],
@@ -157,7 +161,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Terra phục hồi KPH/DATE và kiểm Admin từ checkpoint96bfd0c; root tích hợp và kiểm2lượt.",
+  "nextAction": "Owner xem candidate3273e94: Admin4175 mở/đăng nhập thật, Storeonline4173 KPH, Storemẫu4180 compact/nhómDATE. Kỹ thuật đạt328Store tests/build/Playwright; owner UI acceptance và hai vòng cuối vẫn pending.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
