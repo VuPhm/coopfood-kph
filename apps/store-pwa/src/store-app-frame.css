@@ -5,3 +5,6 @@
   html:has(.store-app) { scrollbar-gutter: auto; }
   .store-app { max-width: none; margin: 0; }
 }
+
+/* Route/skip-link focus uses the same visible ring as Store controls. */
+.store-page-surface:focus-visible { outline: 2px solid var(--store-focus); outline-offset: -2px; }

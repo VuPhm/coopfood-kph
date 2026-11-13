@@ -2,12 +2,13 @@
 
 ## Lịch đồng bộ token Store và Admin
 
-Đang hoàn tất bản khôi phục Fresh theo owner14/11: Home/tài khoản/tra hạn và
-KPH có đủ composition đã duyệt, sidebar desktop đồng bộ, mobile giữ nền trượt.
-[Target UI/UX và evidence revision4](delivery/kphon03-create-media/fresh-restore-r4.md).
-Tiếp nhóm token Admin sau khi owner xem candidate; giữ hai vòng cuối toàn app.
+Đã tìm đúng chuỗi compact có nhóm DATE và sửa login focus: DATE07/DATE08/UI05
+`53122ae`; POLISH03 `c7cc939` là mốc sớm. Đội Terra ba worktree đã phục hồi và
+rà hai lượt. [Target và evidence revision5](delivery/kphon03-create-media/compact-restore-r5.md).
+Bản mẫu4180 có nhóm DATE; Store online4173 giữ backend KPH hiện hành; Admin4175
+đã sửa proxy8082. Tiếp token Admin theo nhóm màn sau khi owner xem candidate.
 
-Mốc đối chiếu là hai trang đăng nhập tại `1ea1937` và Store Fresh sau compact/polish `c7cc939` (PUB01 `41febf6`). Các số dưới đây là thứ tự thực hiện. Nhóm đầu đã bắt đầu ngay ngày 13/11. Mỗi vòng bàn giao một nhóm màn có thể thử trọn luồng.
+Mốc token đăng nhập vẫn là `1ea1937`, composition theo UI05 nói trên. Các số dưới đây là thứ tự thực hiện. Nhóm đầu đã bắt đầu ngay ngày 13/11. Mỗi vòng bàn giao một nhóm màn có thể thử trọn luồng.
 
 | Thứ tự | Màn ưu tiên | Thay đổi và cách kiểm |
 | --- | --- | --- |

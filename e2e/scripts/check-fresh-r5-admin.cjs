@@ -1,6 +1,8 @@
 // Synthetic local fixture only; no credential values are printed.
 const { chromium, expect } = require('@playwright/test');
-const base = process.env.FRESH_ADMIN_URL || 'http://127.0.0.1:4185';
+const base = process.env.FRESH_ADMIN_URL || 'http://127.0.0.1:4175';
+const out = '.local/verification/compact-r5/admin';
+require('node:fs').mkdirSync(out, { recursive: true });
 
 (async () => {
   const browser = await chromium.launch();
@@ -11,6 +13,7 @@ const base = process.env.FRESH_ADMIN_URL || 'http://127.0.0.1:4185';
       expect(anonymous.status()).toBe(401);
       const page = await context.newPage();
       await page.goto(base);
+      await page.screenshot({ path: `${out}/login-${viewport.width}.png` });
       await page.getByLabel('Tên đăng nhập', { exact: true }).fill('region.admin03');
       await page.getByLabel('Mật khẩu', { exact: true }).fill('admin-e2e-password');
       const login = page.waitForResponse(response => response.url().includes('/api/v1/auth/login') && response.request().method() === 'POST');
@@ -18,6 +21,7 @@ const base = process.env.FRESH_ADMIN_URL || 'http://127.0.0.1:4185';
       expect((await login).status()).toBe(200);
       await expect(page.getByRole('button', { name: 'Menu tài khoản' })).toBeVisible();
       expect((await context.request.get(`${base}/api/v1/auth/session`)).status()).toBe(200);
+      await page.screenshot({ path: `${out}/shell-${viewport.width}.png` });
       await context.close();
 
       const draftContext = await browser.newContext({ viewport });

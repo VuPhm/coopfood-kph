@@ -211,15 +211,15 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
           const percent = remainingShelfPercent(assessment);
           return <div key={lot.id} data-date-lot-id={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={event => { if (event.target instanceof Element && !event.target.closest("button, .store-tag-shell")) setActiveId(lot.id); }}>
             <ListItemMarker variant="bar" tone={getDatePhaseTone(assessment.phase)} />
-            <button className="store-date-lot-open" aria-pressed={activeId === lot.id} aria-label={`Mở lô ${lot.name} · Lô ${lot.id}`} onClick={() => setActiveId(lot.id)}>
+            <button className="store-date-lot-open" aria-pressed={activeId === lot.id} aria-label={`Mở lô ${lot.name} · Lô ${lot.id}`} aria-describedby={`${filterSummaryId}-${encodeURIComponent(lot.id)}-percent ${filterSummaryId}-${encodeURIComponent(lot.id)}-facts ${filterSummaryId}-${encodeURIComponent(lot.id)}-dates`} onClick={() => setActiveId(lot.id)}>
               <span className="store-date-lot-main"><strong><StoreProductName text={lot.name} /></strong></span>
-              <span className="store-date-lot-end"><strong className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}>{percent === null ? "Chưa đủ dữ liệu" : `${percent}%`}</strong><ChevronRight size={16} aria-hidden="true" /></span>
+              <span className="store-date-lot-end"><strong id={`${filterSummaryId}-${encodeURIComponent(lot.id)}-percent`} className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}><span className="sr-only">HSD còn lại: </span>{percent === null ? "Chưa đủ dữ liệu" : `${percent}%`}</strong><ChevronRight size={16} aria-hidden="true" /></span>
             </button>
-            <span className="store-date-lot-footer"><small className="store-date-lot-identifiers store-sku" title={lot.sku}><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {lot.id}</span></small>
+            <span id={`${filterSummaryId}-${encodeURIComponent(lot.id)}-facts`} className="store-date-lot-footer"><small className="store-date-lot-identifiers store-sku" title={lot.sku}><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {lot.id}</span></small>
               <StoreTagStrip className="store-date-lot-labels" label={`Nhãn lô ${lot.name}`}><DateGroupChip group={lot.group} /><DateConditionLabel phase={assessment.phase} />{lot.remindOn ? <span className="store-date-remind-label">Báo lại {formatDisplayDate(lot.remindOn)}</span> : null}</StoreTagStrip>
               <span className="store-date-lot-processing"><DateProcessingLabel status={lot.status} /></span>
             </span>
-            <small className="store-date-lot-dates">{lot.manufactured ? <span>NSX {lot.manufactured}</span> : null}<span>HSD {displayDate(lot.date)}</span></small>
+            <small id={`${filterSummaryId}-${encodeURIComponent(lot.id)}-dates`} className="store-date-lot-dates">{lot.manufactured ? <span>NSX {lot.manufactured}</span> : null}<span>HSD {displayDate(lot.date)}</span></small>
           </div>;
         })}</div>}
         {!visible.length ? <section className="store-date-empty"><Package size={28} aria-hidden="true" /><h3>Không có lô phù hợp</h3><p>{product ? "Mã hàng đã nhận diện. Thử trạng thái khác hoặc bỏ lọc để xem các lô." : "Thử mã hàng, tên hoặc số lô khác; bạn cũng có thể quét lại."}</p><Button variant="ghost" onClick={() => { changeQuery(""); setGroupFilter("all"); setAttentionOnly(false); setStatus("all"); setPhaseFilter("all"); }}>Xem tất cả lô</Button></section> : null}

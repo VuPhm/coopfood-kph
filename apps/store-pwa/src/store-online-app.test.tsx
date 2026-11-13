@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { StoreOnlineApp } from "./store-online-app";
 import { OnlineApiError } from "./online-kph";
@@ -12,6 +12,27 @@ function gateway(): StoreSessionGateway {
 }
 async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Công việc cửa hàng" }); }
 describe("Store online session", () => {
+  it("keeps the same login draft through a pending background check and network failure", async () => {
+    const api = gateway();
+    vi.mocked(api.getSession).mockRejectedValue(new OnlineApiError("expired", 401));
+    render(<StoreOnlineApp gateway={api} />);
+    const username = await screen.findByLabelText("Tên đăng nhập");
+    const password = screen.getByLabelText("Mật khẩu");
+    fireEvent.change(username, { target: { value: "draft-user" } });
+    fireEvent.change(password, { target: { value: " synthetic draft " } });
+    let reject!: (error: Error) => void;
+    vi.mocked(api.getSession).mockImplementationOnce(() => new Promise((_, fail) => { reject = fail; }));
+    const before = vi.mocked(api.getSession).mock.calls.length;
+    fireEvent(window, new Event("focus"));
+    await waitFor(() => expect(api.getSession).toHaveBeenCalledTimes(before + 1));
+    expect(screen.getByLabelText("Mật khẩu")).toBe(password);
+    await act(async () => reject(new Error("offline")));
+    expect(screen.getByLabelText("Tên đăng nhập")).toBe(username);
+    expect(password).toHaveValue(" synthetic draft ");
+    expect(username).toHaveValue("draft-user");
+  });
+
+
   it("uses effective stores with no synthetic membership and switches scope without old content", async () => {
     render(<StoreOnlineApp gateway={gateway()} />); await selectA();
     fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));

@@ -12,7 +12,7 @@ const password='admin-e2e-password';
 async function login(page, user='region.admin03') {
  await page.goto(base+'/#kph'); await page.getByLabel('Tên đăng nhập',{exact:true}).fill(user); await page.getByLabel('Mật khẩu',{exact:true}).fill(password);
  await page.getByRole('button',{name:'Đăng nhập',exact:true}).click(); await page.getByRole('button',{name:/^001 ·/}).click();
- await expect(page.getByRole('heading',{name:'Quyền hàng không phù hợp',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Công việc cửa hàng',exact:true})).toBeVisible();
  if((page.viewportSize()?.width??0)>=900) {
   await expect(page.locator('.store-header')).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
   await expect(page.locator('.store-header')).toHaveCSS('border-bottom-width','0px');

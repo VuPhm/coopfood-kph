@@ -24,13 +24,15 @@ describe("DATE milestones and processing are separate", () => {
     expect(dialog).toHaveTextContent("000001"); expect(dialog).toHaveTextContent("LOT-01");
     expect(within(dialog).getByRole("button", { name: "Xử lý" })).toBeEnabled();
     fireEvent.click(within(dialog).getByRole("button", { name: "Đóng" }));
-    const card = screen.getByRole("button", { name: /Lô hết hạn/ });
+    const opener = screen.getByRole("button", { name: /Lô hết hạn/ });
+    const card = opener.closest("[data-date-lot-id]")!;
+    expect(opener).toHaveAccessibleDescription(/HSD còn lại: 0%.*Hết HSD.*Mở.*HSD 10\/10\/2026/);
     expect(card.querySelector('[data-processing-status="open"]')).toHaveTextContent("Mở");
     expect(card.querySelector('[data-date-phase="EXPIRED"]')).toHaveTextContent("Hết HSD");
     expect(card.querySelector(".store-timeline, .store-date-life")).toBeNull();
-    expect(card.querySelector(".store-date-percent")).toHaveTextContent("Còn 0% HSD");
+    expect(card.querySelector(".store-date-percent")).toHaveTextContent("HSD còn lại: 0%");
     expect(card.querySelector(".store-date-percent")).toHaveAttribute("data-tone", "danger");
-    fireEvent.click(card);
+    fireEvent.click(opener);
     dialog = screen.getByRole("dialog", { name: "Chi tiết lô DATE" });
     expect(dialog.querySelector('[data-processing-status="open"]')).toHaveTextContent("Mở");
     expect(dialog.querySelector('[data-date-phase="EXPIRED"]')).toHaveTextContent("Hết HSD");

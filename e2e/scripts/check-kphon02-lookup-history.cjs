@@ -9,7 +9,7 @@ async function login(page, username='region.admin03') {
  await page.getByLabel('Mật khẩu',{exact:true}).fill('admin-e2e-password');
  await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();
  await page.getByRole('button',{name:/^001 ·/}).click();
- await expect(page.getByRole('heading',{name:'Quyền hàng không phù hợp'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Công việc cửa hàng'})).toBeVisible();
 }
 async function route(page, hash) { await page.evaluate(h=>location.hash=h,hash); }
 async function layout(page,name) {

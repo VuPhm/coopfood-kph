@@ -2,7 +2,18 @@
 
 Ngày rà soát: 14/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
-## Khôi phục Fresh sau compact/polish — 14/11/2026
+## Compact KPH/DATE và nhóm hàng — 14/11/2026
+
+Owner phản hồi revision4 gần đúng nhưng nguồn còn sớm. Đã xác định chuỗi
+DATE07 → DATE08 → UI05 (`53122ae`) khớp nhóm DATE, item gọn và giữ draft khi
+chuyển tab. Phục hồi composition KPH dùng chung online/mock; DATE nhóm và
+intake nằm trong bản mẫu riêng, không nối giả backend DATE vào online.
+Admin4175 lỗi session502 do proxy, đã chạy lại đúng backend8082 và có launcher
+`node tooling/preview/fresh-review.mjs`. Giữ login/token mới và sidebar900.
+[Phạm vi, số đo và evidence revision5](delivery/kphon03-create-media/compact-restore-r5.md).
+Revision4 chưa được owner chấp nhận; revision5 là candidate tiếp theo.
+
+## Khôi phục Fresh sau compact/polish — 14/11/2026 (nguồn sớm, được bổ sung ở revision5)
 
 Theo owner, đối chiếu nguồn POLISH03 `c7cc939`, PUB01 `41febf6` và wiring
 BE06 `a6872f2`; khôi phục composition Home, tài khoản, tra hạn, KPH/history,

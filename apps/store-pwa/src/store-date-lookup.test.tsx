@@ -29,9 +29,9 @@ describe("DATE unified product and lot lookup", () => {
     render(<StoreLookupWorkspace />);
     fireEvent.change(screen.getByRole("textbox", { name: "Tìm SKU, barcode, tên hàng hoặc lô" }), { target: { value: "0008421" } });
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Tìm mã hàng" })); await Promise.resolve(); });
-    expect(screen.getByRole("button", { name: /Còn 38% HSD/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Còn 13% HSD/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Còn 1% HSD/ })).toBeInTheDocument();
+    for (const [id, percent] of [["A24-301", 38], ["A24-255", 13], ["A24-198", 1]] as const) {
+      expect(screen.getByRole("button", { name: new RegExp(`Mở lô.*${id}`) })).toHaveAccessibleDescription(new RegExp(`HSD còn lại: ${percent}%`));
+    }
   });
 
   it("resolves an exact tracked lot ID to its product", async () => {

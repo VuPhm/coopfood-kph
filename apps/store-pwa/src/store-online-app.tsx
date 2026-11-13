@@ -24,6 +24,7 @@ export function StoreOnlineApp({ gateway: provided }: { gateway?: StoreSessionGa
 
 function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
   const client = useQueryClient();
+  const [loginVisible, setLoginVisible] = useState(false);
   const accountTrigger = useRef<HTMLButtonElement>(null);
   const selectionTicket = useRef(0);
   const selectedActor = useRef<string | undefined>(undefined);
@@ -65,7 +66,13 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
   }, [refreshScope]);
   const selectedStore = scope.data?.stores.find(item => item.id === selectedId);
   const profile = useMemo(() => ({ storeName: selectedStore?.name ?? "", storeCode: selectedStore?.code ?? "", fullName: scope.data?.session.user.displayName ?? "", employeeCode: "", role: "" as const }), [selectedStore?.name, selectedStore?.code, scope.data?.session.user.displayName]);
-  const anonymous = scope.isError && scope.error instanceof OnlineApiError && scope.error.status === 401;
+  const sessionUnauthorized = scope.isError && scope.error instanceof OnlineApiError && scope.error.status === 401;
+  // Retrying a no-data session query must not replace an existing login draft.
+  useEffect(() => {
+    if (sessionUnauthorized) setLoginVisible(true);
+    else if (scope.isSuccess) setLoginVisible(false);
+  }, [sessionUnauthorized, scope.isSuccess]);
+  const anonymous = loginVisible || sessionUnauthorized;
   async function login(username: string, password: string) {
     ++selectionTicket.current;
     setBusy(true); setMessage(""); setSelectedId(undefined);
