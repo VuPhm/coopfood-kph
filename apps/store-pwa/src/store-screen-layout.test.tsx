@@ -31,8 +31,7 @@ describe("Store single screen layout", () => {
     const dry = vi.fn(), fresh = vi.fn();
     render(<><KphCreateButton kind="TPCN" onClick={dry} /><KphCreateButton kind="TPTS" onClick={fresh} /></>);
     const button = screen.getByRole("button", { name: "Tạo phiếu TP khô & khác" });
-    expect(button).toHaveTextContent("Tạo TPCN");
-    expect(button.querySelector(".store-create-kind-label,.store-create-heading")).toBeNull();
+    expect(button).toHaveTextContent("Tạo Khô & Khác");
     fireEvent.click(button); fireEvent.click(screen.getByRole("button", { name: "Tạo phiếu TP tươi sống" }));
     expect(dry).toHaveBeenCalledOnce(); expect(fresh).toHaveBeenCalledOnce();
     expect(getItem).not.toHaveBeenCalled();
@@ -78,10 +77,10 @@ describe("Store single screen layout", () => {
     render(<StoreKphList desktop={false} visible={[mockRecords[0]!]} />);
     const row=document.querySelector('[data-record-id]');
     const labels=()=>document.querySelectorAll('.store-ticket-tags [data-label-kind]');
-    expect(document.querySelector('.store-ticket-quick [data-label-kind="approval"]')).not.toBeNull();
+    expect(document.querySelector('.store-ticket-foot > [data-label-kind="approval"]')).not.toBeNull();
     expect(labels()).toHaveLength(2);
     act(()=>{printing=true;listeners.forEach(notify=>notify());});
-    expect(labels()).toHaveLength(3);expect(document.querySelector('.store-ticket-quick [data-label-kind="approval"]')).toBeNull();
+    expect(labels()).toHaveLength(3);expect(document.querySelector('.store-ticket-foot > [data-label-kind="approval"]')).toBeNull();
     act(()=>{printing=false;listeners.forEach(notify=>notify());});
     expect(document.querySelector('[data-record-id]')).toBe(row);expect(labels()).toHaveLength(2);
   });

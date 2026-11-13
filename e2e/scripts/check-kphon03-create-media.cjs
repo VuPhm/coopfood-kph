@@ -7,7 +7,7 @@ const { execFileSync } = require('node:child_process');
 const path = require('node:path');
 const base='http://127.0.0.1:4173', store='73000000-0000-4000-8000-000000000001', outside='73000000-0000-4000-8000-000000000002', employee='71000000-0000-4000-8000-000000000003';
 const mediaRoot=path.resolve('../kphon02-lookup-history/.local/runtime/kphon02/media');
-const output='.local/verification/kphon03';
+const output='.local/verification/fresh-restore/kphon03';
 const password='admin-e2e-password';
 async function login(page, user='region.admin03') {
  await page.goto(base+'/#kph'); await page.getByLabel('Tên đăng nhập',{exact:true}).fill(user); await page.getByLabel('Mật khẩu',{exact:true}).fill(password);
@@ -96,7 +96,7 @@ async function originals(record, files) {
   await expect(page.getByRole('button',{name:`Mở phiếu ${title}`,exact:true})).toBeVisible();
   await page.screenshot({path:`${output}/${name}-saved.png`});
   // Create the other kind through real published lookup, preserving leading-zero catalog IDs.
-  await page.getByRole('button',{name:/TP khô/}).click(); await page.getByRole('button',{name:'Tạo phiếu TP khô & khác',exact:true}).click();
+  await page.getByRole('button',{name:'Tạo phiếu TP khô & khác',exact:true}).click();
   await page.getByRole('textbox',{name:'Mã SKU / UPC',exact:true}).fill('0890123456789');await page.getByRole('textbox',{name:'Tên hàng hóa',exact:true}).focus();
   await expect(page.getByText('Đã tìm thấy 000042.',{exact:true})).toBeVisible();
   await fillDraft(page,'Sản phẩm E2E FOUND',[payloads[0]]); await review(page);

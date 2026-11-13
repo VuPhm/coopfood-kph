@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
+import { StorePageLayout, StorePageHero, StorePageSurface } from "./store-page-hero";
+import { revealBelowStickyTabs } from "./store-sticky-tabs";
+import { KPH_DATE_SHORTCUTS, kphDateRange } from "./store-kph-history";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@coopfood-kph/ui";
 import { parseDisplayDate, type KphKind } from "@coopfood-kph/kph-rules";
@@ -31,6 +35,8 @@ export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory
   const client = useQueryClient();
   const create = useRef<KphCreateHandle>(null);
   const [notice, setNotice] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [groupByDate, setGroupByDate] = useState(true);
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const lookup = useCallback(async (barcode: string) => {
@@ -89,30 +95,41 @@ export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory
   useEffect(() => { if (query.isError || dateError) { setActiveId(null); setImage(null); } }, [query.isError, dateError]);
   const pending = query.isFetching || !!dateError;
   const denied = query.error instanceof OnlineApiError && query.error.status === 403;
-  return <section className="store-online-kph" aria-label="Phiếu KPH" aria-busy={query.isFetching}>
-    {canCreate && createRecord && lookupBarcode && profile ? <><KphCreateButton kind={filters.kind} disabled={suspended || expired} onPointerEnter={preloadKphCreateForm} onFocus={preloadKphCreateForm} onClick={() => { setNotice(""); create.current?.open(filters.kind); }} /><KphCreateControl ref={create} profile={profile} suspended={suspended} onBarcodeLookup={lookup} onSaved={save} /></> : null}
-    {notice ? <p role="status">{notice}</p> : null}
+  return <StorePageLayout className="store-kph store-online-kph" aria-label="Phiếu KPH" aria-busy={query.isFetching}>
+    <StorePageHero className="store-kph-underlay">
+      {canCreate && createRecord && lookupBarcode && profile ? <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled={suspended || expired} onPointerEnter={preloadKphCreateForm} onFocus={preloadKphCreateForm} onClick={() => { setNotice(""); create.current?.open(kind); }} />)}</div></section> : null}
+    </StorePageHero>
+    <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
     <StoreFoodKindTabs value={filters.kind} counts={(!dateError && !query.isError ? query.data?.typeTotals : undefined) ?? { TPCN: 0, TPTS: 0 }} onChange={kind => change({ kind })} />
+    <div className="store-kph-list-controls"><div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{query.data?.totalItems ?? 0} phiếu</span></div><div className="store-kph-list-toolbar"><button className="store-filter" aria-label="Lọc phiếu KPH" onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" /></button></div></div>
+    {notice ? <p role="status">{notice}</p> : null}
+    <StoreSheet open={filterOpen && !suspended} onOpenChange={setFilterOpen} className="store-kph-sheet store-kph-filter" title="Lọc & sắp xếp" description="Bộ lọc phiếu áp dụng ngay khi thay đổi">
     <div className="store-online-kph-filters">
+      <section className="store-kph-filter-section"><h3>Ngày phát hiện hàng KPH</h3><div className="store-kph-date-shortcuts" role="group" aria-label="Lọc nhanh ngày phát hiện">{KPH_DATE_SHORTCUTS.map(shortcut => { const range = kphDateRange(shortcut.value); return <button type="button" key={shortcut.value} aria-pressed={filters.from === range.from && filters.to === range.to} onClick={() => change(range)}>{shortcut.label}</button>; })}</div></section>
       <div><label htmlFor={`${id}-from`}>Từ ngày</label><CalendarInput id={`${id}-from`} label="Từ ngày" value={filters.from} initialMonth={formatBusinessDate(new Date()).iso} onValueChange={value => change({ from: value })} invalid={!!dateError} /></div>
       <div><label htmlFor={`${id}-to`}>Đến ngày</label><CalendarInput id={`${id}-to`} label="Đến ngày" value={filters.to} initialMonth={formatBusinessDate(new Date()).iso} onValueChange={value => change({ to: value })} invalid={!!dateError} /></div>
       <label>Trạng thái<select aria-label="Trạng thái" value={filters.approval} onChange={event => change({ approval: event.target.value as Filters["approval"] })}><option value="ALL">Tất cả</option>{Object.entries(approvalLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <label>Sắp xếp<select aria-label="Sắp xếp" value={filters.sort} onChange={event => change({ sort: event.target.value as Filters["sort"] })}>{[["newest", "Mới tạo"], ["detectedDate", "Ngày phát hiện"], ["product", "Tên hàng"], ["supplier", "NCC"], ["quantity", "Số lượng"], ["condition", "Tình trạng"], ["resolution", "Xử lý"], ["approval", "Trạng thái duyệt"]].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <label>Thứ tự<select aria-label="Thứ tự" value={filters.direction} disabled={filters.sort === "newest"} onChange={event => change({ direction: event.target.value as Filters["direction"] })}><option value="descending">Giảm dần</option><option value="ascending">Tăng dần</option></select></label>
-      <Button variant="ghost" onClick={() => { setFilters(defaults); setActiveId(null); setImage(null); setCollapsed([]); }}>Đặt lại</Button>
-    </div>
-    {dateError ? <p role="alert">{dateError}</p> : null}
+      {dateError ? <p role="alert">{dateError}</p> : null}
+      <label className="store-online-group"><input type="checkbox" checked={groupByDate} onChange={event => { setGroupByDate(event.target.checked); setCollapsed([]); }} />Nhóm theo ngày</label>
+      <Button variant="ghost" onClick={() => { setFilters(defaults); setActiveId(null); setImage(null); setCollapsed([]); setGroupByDate(true); }}>Đặt lại</Button>
+      <Button onClick={() => setFilterOpen(false)}>Xong</Button>
+    </div></StoreSheet>
+    {dateError && !filterOpen ? <p role="alert">{dateError}</p> : null}
     {query.isError ? <div role="alert"><p>{denied ? "Không có quyền xem phiếu tại cửa hàng này." : "Không tải được phiếu."}</p>{!denied && !expired ? <Button variant="secondary" onClick={() => { void query.refetch(); }}>Thử lại</Button> : null}</div> : null}
     {!dateError && !query.isError ? <>
-      <div className="store-online-kph-count"><span>{query.data?.totalItems ?? 0} phiếu</span>{query.isFetching ? <span role="status">Đang tải…</span> : null}</div>
-      <StoreKphList desktop={desktop} visible={records} loading={pending} collapsedDates={collapsed} onToggleDate={date => setCollapsed(current => current.includes(date) ? current.filter(item => item !== date) : [...current, date])} setActive={record => { if (!pending) setActiveId(record.id); }} />
+      {query.isFetching ? <span className="sr-only" role="status">Đang tải…</span> : null}
+      <StoreKphList desktop={desktop} visible={records} groupByDate={groupByDate} loading={pending} collapsedDates={collapsed} onToggleDate={date => setCollapsed(current => current.includes(date) ? current.filter(item => item !== date) : [...current, date])} setActive={record => { if (!pending) setActiveId(record.id); }} />
       {!query.isPending && !query.isFetching && !records.length ? <p>Không có phiếu</p> : null}
       <nav className="store-online-pagination" aria-label="Phân trang"><Button variant="secondary" disabled={pending || filters.page <= 1} onClick={() => change({ page: filters.page - 1 })}>Trang trước</Button><span>Trang {query.data?.totalPages ? filters.page : 0}/{query.data?.totalPages ?? 0}</span><Button variant="secondary" disabled={pending || filters.page >= (query.data?.totalPages ?? 0)} onClick={() => change({ page: filters.page + 1 })}>Trang sau</Button></nav>
     </> : null}
+    </StorePageSurface>
+    {canCreate && createRecord && lookupBarcode && profile ? <KphCreateControl ref={create} profile={profile} suspended={suspended} onBarcodeLookup={lookup} onSaved={save} /> : null}
     <StoreSheet open={!!active && !query.isError && !suspended} onOpenChange={open => { if (!open) { setActiveId(null); setImage(null); } }} title="Phiếu KPH" description="Chi tiết phiếu" className="store-kph-sheet store-kph-detail">
-      {active ? <><h3>{active.productName}</h3><Summary rows={[["SKU", active.sku], ["Barcode", active.barcode || "—"], ["NCC", active.supplier], ["Số lượng", active.quantity], ["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Xử lý", active.resolution], ["Ngày xử lý", active.treatmentDate || "—"], ["Duyệt", approvalLabels[active.approvalStatus]], ["Người duyệt", active.reviewedBy || "—"]]} />
-        {active.note ? <p>{active.note}</p> : null}<div className="store-review-photos">{active.photos.map((photo, index) => <button key={photo.id} aria-label={`Xem ảnh ${index + 1}`} onClick={() => setImage(photo)}><img src={photo.src} alt={photo.alt} loading="lazy" /></button>)}</div></> : null}
+      {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["SKU", active.sku], ["Barcode", active.barcode || "—"], ["NCC", active.supplier], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Xử lý", active.resolution], ["Ngày xử lý", active.treatmentDate || "—"], ["Duyệt", approvalLabels[active.approvalStatus]], ["Người duyệt", active.reviewedBy || "—"]]} />
+        </section><section><h3>Ảnh minh chứng</h3>{active.note ? <p>{active.note}</p> : null}<div className="store-review-photos">{active.photos.map((photo, index) => <button key={photo.id} aria-label={`Xem ảnh ${index + 1}`} onClick={() => setImage(photo)}><img src={photo.src} alt={photo.alt} loading="lazy" /></button>)}</div></section></> : null}
     </StoreSheet>
-    <EvidenceImageViewer image={image} open={!!image && !!active && !query.isError && !suspended} onOpenChange={open => { if (!open) setImage(null); }} />
-  </section>;
+    <EvidenceImageViewer image={image} open={!!image && !!active && !query.isError && !suspended} presentation="screen" index={Math.max(0, active?.photos.findIndex(photo => photo.id === image?.id) ?? 0)} total={active?.photos.length ?? 0} onPrevious={() => { if (active && image) { const index = active.photos.findIndex(photo => photo.id === image.id); if (index > 0) setImage(active.photos[index - 1]!); } }} onNext={() => { if (active && image) { const index = active.photos.findIndex(photo => photo.id === image.id); if (index < active.photos.length - 1) setImage(active.photos[index + 1]!); } }} onOpenChange={open => { if (!open) setImage(null); }} />
+  </StorePageLayout>;
 }

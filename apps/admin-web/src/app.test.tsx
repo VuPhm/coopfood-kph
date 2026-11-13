@@ -1,5 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { QueryClient, QueryClientProvider, focusManager } from "@tanstack/react-query";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import schedulesFixture from "../../../contracts/fixtures/api/lifecycle-schedules.json";
@@ -58,6 +58,31 @@ function renderApp(api: LifecycleAdminGateway, workspace = "lifecycle") {
 }
 
 describe("Admin lifecycle workspace", () => {
+  it("keeps an anonymous login draft during focus rechecks, including network failure", async () => {
+    const unauthorized = Object.assign(new Error("Hết phiên"), { status: 401 });
+    const api = gateway({ getSession: vi.fn().mockRejectedValue(unauthorized) });
+    renderApp(api);
+    const password = await screen.findByLabelText(/Mật khẩu/);
+    const username = screen.getByLabelText(/Tên đăng nhập/);
+    fireEvent.change(username, { target: { value: "typing-user" } });
+    fireEvent.change(password, { target: { value: "typing-password" } });
+    let reject!: (error: Error) => void;
+    vi.mocked(api.getSession).mockImplementationOnce(() => new Promise((_, fail) => { reject = fail; }));
+    const calls = vi.mocked(api.getSession).mock.calls.length;
+    act(() => { focusManager.setFocused(false); focusManager.setFocused(true); });
+    await waitFor(() => expect(api.getSession).toHaveBeenCalledTimes(calls + 1));
+    expect(screen.getByLabelText(/Mật khẩu/)).toBe(password);
+    await act(async () => reject(new Error("Network unavailable")));
+    expect(screen.getByLabelText(/Mật khẩu/)).toBe(password);
+    expect(password).toHaveValue("typing-password");
+    expect(username).toHaveValue("typing-user");
+    focusManager.setFocused(undefined);
+  });
+
+  it("shows a retry screen when the initial session check fails", async () => {
+    renderApp(gateway({ getSession: vi.fn().mockRejectedValue(new Error("Network unavailable")) }));
+    expect(await screen.findByRole("heading", { name: "Chưa thể mở Admin Web" })).toBeVisible();
+  });
   it("logs out and removes the previous account's data before another login", async () => {
     const api = gateway();
     renderApp(api);

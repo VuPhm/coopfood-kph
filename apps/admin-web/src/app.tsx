@@ -109,7 +109,8 @@ export function App({ gateway: providedGateway }: AppProps) {
 
   if (sessionQuery.isPending) return <LoadingScreen />;
   if (!sessionQuery.data || expired) {
-    if (!sessionQuery.error || isUnauthorized(sessionQuery.error) || expired) {
+    // A failed background recheck must not unmount an already visible login draft.
+    if (sessionQuery.data === null || !sessionQuery.error || isUnauthorized(sessionQuery.error) || expired) {
       return <SignIn title="Đăng nhập quản trị" logo={`${import.meta.env.BASE_URL}brand/coopfood-logo-dark.png`} busy={login.isPending} error={login.error instanceof Error ? login.error.message : null} notice={loginNotice} onSubmit={(username, password) => login.mutate({ username, password })} />;
     }
     return <LoadFailure message="Không thể kiểm tra phiên Admin Web." onRetry={() => void sessionQuery.refetch()} />;

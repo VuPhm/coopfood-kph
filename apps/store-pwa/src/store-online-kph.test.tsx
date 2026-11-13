@@ -37,6 +37,7 @@ describe("online KPH history", () => {
   });
   it("sends validated Vietnamese dates, approval, sort and direction to the backend", async () => {
     const { load } = setup(); await screen.findByText("31 phiếu");
+    fireEvent.click(screen.getByRole("button", { name: "Lọc phiếu KPH" }));
     fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "09/09/2026" } });
     await waitFor(() => expect(load).toHaveBeenLastCalledWith("store-a", expect.objectContaining({ detectedFrom: "2026-09-09", page: 1 }), expect.any(AbortSignal)));
     fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "APPROVED" } });

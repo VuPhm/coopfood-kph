@@ -1,8 +1,27 @@
 # Công việc kế tiếp
 
-Vòng đồng bộ style token bắt đầu từ hai trang đăng nhập theo yêu cầu ngày 13/11.
-Store4173 và Admin4175 đã dùng form chung theo Fresh mobile. Bước tiếp theo là
-đối chiếu hai preview với owner rồi chọn màn tiếp theo trong vòng tối ưu UI.
+## Lịch đồng bộ token Store và Admin
+
+Đang hoàn tất bản khôi phục Fresh theo owner14/11: Home/tài khoản/tra hạn và
+KPH có đủ composition đã duyệt, sidebar desktop đồng bộ, mobile giữ nền trượt.
+[Target UI/UX và evidence revision4](delivery/kphon03-create-media/fresh-restore-r4.md).
+Tiếp nhóm token Admin sau khi owner xem candidate; giữ hai vòng cuối toàn app.
+
+Mốc đối chiếu là hai trang đăng nhập tại `1ea1937` và Store Fresh sau compact/polish `c7cc939` (PUB01 `41febf6`). Các số dưới đây là thứ tự thực hiện. Nhóm đầu đã bắt đầu ngay ngày 13/11. Mỗi vòng bàn giao một nhóm màn có thể thử trọn luồng.
+
+| Thứ tự | Màn ưu tiên | Thay đổi và cách kiểm |
+| --- | --- | --- |
+| 1 | Chọn cửa hàng, Home Store và Tổng quan Admin | Đối chiếu các lối vào theo vai trò trước khi bỏ chữ thừa. Đồng bộ tiêu đề, nhóm tác vụ, khoảng cách và trạng thái đang chọn. Thử chọn và đổi cửa hàng, mở từng mục được cấp quyền. |
+| 2 | Menu tài khoản và đổi mật khẩu ở cả hai app | Dùng cùng token cho trường nhập, nút chính/phụ và thông báo. Thử lỗi mật khẩu, trạng thái đang gửi, đóng hộp thoại và trả focus. |
+| 3–4 | Tra barcode, lịch sử và chi tiết KPH | Đồng bộ ô tìm, bộ lọc, tab, dòng phiếu và trạng thái rỗng/lỗi. Kiểm FOUND/NOT_FOUND, phân trang D01 và mở ảnh từ chi tiết. |
+| 5 | Tạo và xem lại phiếu TPCN/TPTS | Gom trường theo tác vụ, làm rõ trường chỉ đọc, giữ lỗi cạnh thao tác cần sửa. Thử chọn ảnh, quay lại chỉnh sửa và gửi lại sau mất kết nối. |
+| 6–7 | Quyền cửa hàng, tài khoản, lifecycle và catalog Admin | Áp cùng token cho bảng, bộ chọn, nhãn trạng thái và hộp xác nhận. Kiểm bằng tài khoản chuỗi và vùng để phân biệt mục thiếu với mục giới hạn theo quyền. |
+| 8–9 | Tra hạn, DATE, thông báo và báo cáo Store | Rà các màn Fresh hiện có theo luồng từ cảnh báo tới chi tiết. Kiểm ngày, trạng thái, lựa chọn và bản in trên dữ liệu thử phù hợp từng màn. |
+
+**Nguyên tắc áp dụng.** Dùng `packages/ui/src/fresh-tokens.css` và form `SignIn` làm mẫu cho vai trò màu, chữ, focus và kích thước điều khiển. Theo hướng Store Fresh mobile và iOS, ưu tiên nhãn rõ, vùng chạm từ 44 px, chữ nhập 16 px và cuộn tự nhiên khi bàn phím mở. Bỏ slogan, nhãn viết hoa trang trí, lời giải thích lặp và CSS cũ khi đã chuyển hết nơi sử dụng. Giữ những chỉ dẫn giúp quyết định hoặc khắc phục lỗi.
+
+**Kiểm từng vòng.** So ảnh trước/sau ở 390×844 và 1440×1024, kiểm thứ tự focus, tràn ngang và thao tác nghiệp vụ trong bảng. Ghi phần UI còn thiếu bên cạnh kết quả kỹ thuật. Sau khi nối đủ luồng KPH, thực hiện vòng test tổ hợp rồi tới vòng UI/UX cuối, gồm kiểm bàn phím và vùng an toàn trên iPhone thật.
+
 Bản sửa [SW/trang cũ](delivery/kphon03-create-media/cache-repair-r3.md) đã có trong hai preview.
 
 UI green header đã ghép vào KPHON03 theo owner đổi ý, merge `59fbcb8`.
@@ -11,7 +30,7 @@ bản kết hợp và owner UI acceptance vẫn riêng với hai vòng cuối đ
 [Integration KPHON03 revision2](delivery/kphon03-create-media/integration-r2.md).
 Không tự mở milestone tiếp trong lượt tích hợp.
 
-Cập nhật13/11/2026. [CURRENT_STATE](CURRENT_STATE.md). FRESH01 và ADMIN03 CLOSED;
+Cập nhật14/11/2026. [CURRENT_STATE](CURRENT_STATE.md). FRESH01 và ADMIN03 CLOSED;
 owner chấp nhận ADMIN03 qua chat, giữ kiểm tổ hợp rộng ở vòng cuối.
 [Quyết định](delivery/admin03-store-membership/acceptance-2026-11-09.md).
 

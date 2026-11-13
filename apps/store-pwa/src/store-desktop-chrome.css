@@ -32,6 +32,8 @@
   .store-app .store-desktop-rail .store-rail-store :is(small, span) { color: var(--fresh-ink-muted); }
   .store-app .store-desktop-rail .store-rail-store strong { color: var(--fresh-ink); }
   .store-app .store-page-layout { --store-header-gutter: var(--fresh-desktop-gutter); }
+  /* The mobile cover slides over a sticky hero; desktop scrolls both together. */
+  .store-app .store-page-hero { position: static; }
   .store-app .store-header {
     min-height: var(--fresh-desktop-header-height); background: var(--fresh-header-background);
     border-bottom: 0; color: var(--fresh-header-ink); padding-block: 14px;

@@ -35,6 +35,7 @@ import { z } from "zod";
 import type { components } from "@coopfood-kph/api";
 
 import { getKphChoicePresentation, KphChoiceContent } from "./store-kph-choice";
+import { StoreScanIcon } from "./store-scan-icon";
 import { CalendarInput } from "./calendar-input";
 import { formatBusinessDate } from "./business-date";
 import { BarcodeScannerDialog } from "./barcode-scanner-dialog";
@@ -506,7 +507,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
                     if (autoFilledLookup.current.barcode && event.target.value.trim() !== autoFilledLookup.current.barcode) clearAutoFilledLookup();
                   }, onBlur: () => void lookupBarcode() })} />
                     <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
-                      {screenPresentation ? <img src={figmaAsset(assetScreen, "imgFeatherMaximize")} alt="" /> : <ScanLine aria-hidden="true" size={18} />}
+                      {screenPresentation ? <StoreScanIcon /> : <ScanLine aria-hidden="true" size={18} />}
                     </button>
                   </div>
                   {barcodeLookupMessage ? <p className={cn("mt-1 text-xs text-ink-muted", screenPresentation && "store-lookup-notice")} role="status">{barcodeLookupMessage}{lookupRetryValue ? <button type="button" className="ml-2 underline" onClick={() => void lookupBarcode(lookupRetryValue)}>Thử tra cứu lại</button> : null}{screenPresentation && !barcodeLookupMessage.startsWith("Đã tìm thấy") && !barcodeLookupMessage.startsWith("Đang") ? <button type="button" onClick={() => setScannerOpen(true)}>Quét lại</button> : null}</p> : null}

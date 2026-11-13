@@ -10,14 +10,15 @@ const session = { user: { id: "user", username: "test", displayName: "Người k
 function gateway(): StoreSessionGateway {
   return { createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
 }
-async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Quyền hàng không phù hợp" }); }
+async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Công việc cửa hàng" }); }
 describe("Store online session", () => {
   it("uses effective stores with no synthetic membership and switches scope without old content", async () => {
     render(<StoreOnlineApp gateway={gateway()} />); await selectA();
-    expect(screen.getByText("Xem phiếu")).toBeInTheDocument(); expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
+    expect(screen.getByText("Xem phiếu")).toBeInTheDocument(); expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Đổi cửa hàng" }));
     fireEvent.click(await screen.findByRole("button", { name: "0002 · Cửa hàng B" }));
+    await screen.findByRole("heading", { name: "Công việc cửa hàng" }); fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
     await screen.findByText("Duyệt phiếu"); expect(screen.queryByText("Mã cửa hàng · 0001")).not.toBeInTheDocument();
   });
   it("removes revoked store at the next refresh and does not select another store automatically", async () => {
@@ -49,16 +50,18 @@ describe("Store online session", () => {
     const api = gateway();
     vi.mocked(api.listStoreAccess).mockResolvedValue([{ ...employee, capabilities: manager.capabilities }]);
     render(<StoreOnlineApp gateway={api} />); await selectA();
+    fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
     expect(screen.getByText("Duyệt phiếu")).toBeInTheDocument();
     let resolve!: (value: Awaited<ReturnType<StoreSessionGateway["listStoreAccess"]>>) => void;
     const pending = new Promise<Awaited<ReturnType<StoreSessionGateway["listStoreAccess"]>>>(done => { resolve = done; });
     vi.mocked(api.listStoreAccess).mockReturnValueOnce(pending);
     fireEvent(window, new Event("focus"));
     await screen.findByText("Đang xác minh phiên và quyền cửa hàng…");
-    expect(screen.getByText("Duyệt phiếu")).not.toBeVisible();
+    expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
     resolve([employee]);
-    await waitFor(() => expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument());
-    expect(screen.getByText("0001 · Người kiểm thử")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Người kiểm thử" })).toBeInTheDocument();
+    expect(screen.getByText("Xem phiếu")).toBeVisible();
+    expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
   });
   it("shows explicit unavailable states on unwired routes instead of mock operational data", async () => {
     render(<StoreOnlineApp gateway={gateway()} />); await selectA();
@@ -107,8 +110,8 @@ describe("Store online session", () => {
     await screen.findByRole("heading", { name: "Chọn cửa hàng" });
     expect(screen.queryByRole("heading", { name: "Quyền hàng không phù hợp" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "0001 · Cửa hàng A" }));
-    await screen.findByRole("heading", { name: "Quyền hàng không phù hợp" });
-    expect(screen.getByText("0001 · Người khác")).toBeInTheDocument();
+    await screen.findByRole("heading", { name: "Công việc cửa hàng" });
+    expect(screen.getByRole("heading", { name: "Người khác" })).toBeInTheDocument();
   });
 
 });

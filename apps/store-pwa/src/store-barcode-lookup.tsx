@@ -84,6 +84,6 @@ export function StoreBarcodeLookup({ suspended = false, userId, storeId, lookupB
         {[["sku", "Mã SKU"], ["name", "Tên sản phẩm"], ["supplier-code", "Mã NCC"], ["supplier-name", "Tên NCC"]].map(([key, label]) =>
           <label key={key} htmlFor={`${id}-${key}`}>{label}<input id={`${id}-${key}`} type="text" maxLength={200} autoComplete="off" /></label>)}
       </fieldset> : null}</div> : null}
-    <BarcodeScannerDialog open={scannerOpen && !suspended} onOpenChange={setScannerOpen} onScan={search} />
+    <BarcodeScannerDialog appearance="store" open={scannerOpen && !suspended} onOpenChange={setScannerOpen} onScan={search} />
   </section>;
 }

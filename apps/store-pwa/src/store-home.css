@@ -24,7 +24,7 @@
 .store-home-attention-kind { min-width: 42px; color: var(--store-brand-action); font-size: 12px; line-height: 16px; font-weight: 700; }
 .store-home-attention strong { flex: 1; color: var(--store-ink); font-size: 14px; line-height: 20px; font-weight: 500; }
 .store-home-attention svg { flex-shrink: 0; color: var(--store-brand-action); }
-.store-home-page :is(button,a):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 3px; }
+.store-home-surface :is(button,a):focus-visible { outline: 3px solid var(--store-focus); outline-offset: 3px; }
 @media (min-width: 1280px) { .store-screen-home .store-launcher-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; } }
 
 @media (forced-colors: active) {

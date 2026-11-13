@@ -1,6 +1,18 @@
 # Trạng thái hiện tại
 
-Ngày rà soát: 13/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+Ngày rà soát: 14/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+
+## Khôi phục Fresh sau compact/polish — 14/11/2026
+
+Theo owner, đối chiếu nguồn POLISH03 `c7cc939`, PUB01 `41febf6` và wiring
+BE06 `a6872f2`; khôi phục composition Home, tài khoản, tra hạn, KPH/history,
+lọc, chi tiết và scanner. Giữ online D01/server counts/paging, create retry
+idempotent và originals/server-stamped private; không nhập backend/media cũ.
+Desktop Store/Admin dùng breakpoint 900px và cùng sidebar token. Hero desktop
+cuộn tự nhiên; mobile giữ sticky. Admin giữ form đăng nhập khi kiểm tra phiên
+nền lỗi mạng, không lưu mật khẩu qua reload. Login mới và SW repair giữ nguyên.
+[Target, evidence và giới hạn](delivery/kphon03-create-media/fresh-restore-r4.md).
+Đây là candidate UI có kiểm kỹ thuật; owner acceptance và hai vòng cuối còn pending.
 
 ## Store và Admin đăng nhập — 13/11/2026
 
