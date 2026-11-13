@@ -28,44 +28,24 @@ describe("DATE food-kind workspace", () => {
     expect(screen.queryByRole("button", {name:/Cải thìa/})).not.toBeInTheDocument();
   });
 
-  it("uses the two food kinds as primary tabs and leaves unsupported creation out of the toolbar", () => {
+  it("shows all existing lots without inferring DATE groups and offers one create action", () => {
     render(<DateWorkspace />);
-    const tabs=screen.getByRole("group", {name:"Loại thực phẩm"});
-    expect(within(tabs).getAllByRole("button")).toHaveLength(2);
-    expect(within(tabs).getByRole("button", {name:/TP tươi sống/})).toHaveAttribute("aria-pressed","true");
-    expect(within(tabs).getByRole("button", {name:/TP khô & khác/})).toHaveTextContent("3");
-    expect(screen.queryByRole("button", {name:/Theo dõi DATE|Thêm theo dõi/})).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", {name:"Nhóm DATE"})).toHaveTextContent("Tất cả nhóm");
+    expect(screen.getByRole("button", {name:"Thêm theo dõi DATE"})).toBeInTheDocument();
+    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(7);
+    expect(screen.getAllByText("Chưa phân loại").length).toBeGreaterThan(0);
   });
-
-  it("does not silently classify unknown lots or discard them from the workspace", () => {
-    render(<DateWorkspace />);
-    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(1);
-    fireEvent.click(screen.getByRole("button", {name:/Chưa phân loại/}));
-    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(3);
-    expect(screen.getByRole("button", {name:/Lô D24-090/})).toBeInTheDocument();
-    expect(within(screen.getByRole("group", {name:"Loại thực phẩm"})).getAllByRole("button").every(button=>button.getAttribute("aria-pressed")==="false")).toBe(true);
-  });
-
-  it("excludes resolved lots and keeps status filtering independent of the selected food kind", () => {
-    render(<DateWorkspace resolved />);
+  it("excludes resolved lots and keeps status filtering", () => {
+    render(<DateWorkspace resolved />); statusFilter("Đã ghi nhận");
     expect(screen.queryByRole("button", {name:/Cải thìa/})).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", {name:/TP khô & khác/})); statusFilter("Đã ghi nhận");
-    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(1);
-    expect(screen.getByRole("button", {name:/Lô A24-301/})).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", {name:/Chưa phân loại/}));
-    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(2);
+    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(3);
     fireEvent.click(screen.getByRole("button", {name:"Lọc DATE"}));
     expect(screen.queryByRole("button", {name:"Đã xử lý"})).not.toBeInTheDocument();
   });
-
-  it("routes exact SKU/barcode/lot lookup to the explicit kind, including unknown", () => {
+  it("finds an exact lot without assigning a catalog group", () => {
     render(<DateWorkspace />);
-    const query=screen.getByRole("textbox", {name:"Tìm SKU, barcode, tên hàng hoặc lô"});
-    fireEvent.change(query,{target:{value:"8936000123456"}});
-    expect(screen.getByRole("button", {name:/TP khô & khác/})).toHaveAttribute("aria-pressed","true");
-    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(3);
-    fireEvent.change(query,{target:{value:"D24-090"}});
-    expect(screen.getByRole("button", {name:/Chưa phân loại/})).toHaveAttribute("aria-pressed","true");
+    fireEvent.change(screen.getByRole("textbox", {name:"Tìm SKU, barcode, tên hàng hoặc lô"}),{target:{value:"D24-090"}});
+    expect(screen.getByRole("combobox", {name:"Nhóm DATE"})).toHaveTextContent("Chưa phân loại");
     expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(1);
   });
 

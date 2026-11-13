@@ -44,7 +44,7 @@ export const mockProductMetadata: Record<string, { group: string; unit: "EA" | "
   "synthetic-product-1": { group: "Thực phẩm tươi sống", unit: "kg", kphKind: "TPTS" },
 };
 export type MockDateLotStatus = "open" | "acknowledged" | "resolved";
-export type MockDateLot = { id: string; name: string; sku: string; date: `${number}-${number}-${number}`; manufactured?: string; status: MockDateLotStatus; remindOn?: LocalDate; kphRecordId?: string };
+export type MockDateLot = { group?: import("./store-date-groups").DateGroup | null; id: string; name: string; sku: string; date: `${number}-${number}-${number}`; manufactured?: string; status: MockDateLotStatus; remindOn?: LocalDate; kphRecordId?: string };
 export const mockDateLots: MockDateLot[] = [
   { id: "C24-118", name: "Cải thìa VietGAP 500 g", sku: "0011730", manufactured: "01/09/2026", date: "2026-10-07", status: "open" },
   { id: "D24-090", name: "Sản phẩm D", sku: "071204", date: "2026-10-12", status: "open" },

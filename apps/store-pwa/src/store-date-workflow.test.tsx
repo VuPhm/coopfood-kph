@@ -37,7 +37,7 @@ describe("DATE actions use real KPH form",()=>{
     expect(document.querySelector('.store-date-lot [data-processing-status]')).toHaveAttribute('data-processing-status','open');
     fireEvent.click(screen.getByRole("button",{name:"Ghi nhận"}));fireEvent.click(screen.getByRole("radio",{name:/1 tuần/}));fireEvent.click(screen.getByRole("button",{name:"Hẹn báo lại"}));
 
-    expect(screen.getByRole("button",{name:/Báo lại 23\/11\/2026/})).toBeInTheDocument();expect(save).not.toHaveBeenCalled();
+    expect(screen.getByText(/Báo lại 23\/11\/2026/)).toBeInTheDocument();expect(save).not.toHaveBeenCalled();
   });
   it("cancelling a seeded form leaves DATE open and saves nothing",async()=>{
     const save=await openKph();expect(screen.getByRole('textbox',{name:'Mã SKU / UPC'})).toHaveValue('8936000123456');

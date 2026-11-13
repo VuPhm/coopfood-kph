@@ -1,0 +1,62 @@
+/* Group color is confined to its chip/swatch. DATE phase still owns row markers. */
+.store-date-group-chip[data-group-color="gray"], .store-date-group-colors [data-group-color="gray"] { --group-bg: #f2f4f7; --group-ink: #475467; --group-edge: #d0d5dd; }
+[data-group-color="amber"] { --group-bg: #fff0e6; --group-ink: #884312; --group-edge: #f4c8a7; }
+[data-group-color="blue"] { --group-bg: #eff8ff; --group-ink: #175cd3; --group-edge: #b2ddff; }
+[data-group-color="green"] { --group-bg: #e6f7f2; --group-ink: #00724e; --group-edge: #99d4bc; }
+[data-group-color="violet"] { --group-bg: #f4f3ff; --group-ink: #6941c6; --group-edge: #d9d6fe; }
+[data-group-color="rose"] { --group-bg: #fdf2fa; --group-ink: #9e165f; --group-edge: #f6c4e4; }
+.store-date-group-chip.ui-list-label[data-group-color] { background: var(--group-bg); color: var(--group-ink); border-color: var(--group-edge); }
+.store-date-group-filter { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.store-date-group-filter > .ui-select-trigger { flex: 1; min-width: 0; max-width: 360px; }
+.store-date-group-filter .ui-select-trigger > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.store-date-group-editor { display: grid; gap: 16px; }
+.store-date-group-editor fieldset { min-width: 0; padding: 0; border: 0; }
+.store-date-group-editor legend { margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+.store-date-group-colors { display: grid; grid-template-columns: repeat(auto-fit,minmax(44px,1fr)); gap: 6px; }
+.store-date-group-colors label { position: relative; display: grid; place-items: center; min-width: 44px; height: 44px; padding: 0; border: 1px solid transparent; border-radius: 12px; cursor: pointer; }
+.store-date-group-colors label:has(:checked) { background: var(--group-bg); border-color: var(--group-ink); }
+.store-date-group-colors label:has(:focus-visible) { outline: 3px solid var(--store-focus); outline-offset: 1px; }
+.store-date-group-colors input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.store-date-group-swatch { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--group-edge); border-radius: 50%; background: var(--group-swatch, var(--group-ink)); color: var(--group-check, white); }
+.store-date-group-swatch svg { opacity: 0; }
+.store-date-group-colors label:has(:checked) .store-date-group-swatch svg { opacity: 1; }
+@media (min-width: 600px) { .store-date-group-colors { grid-template-columns: repeat(8,minmax(44px,1fr)); } }
+.store-date-group-toggle { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; }
+.store-date-group-toggle input { width: 20px; height: 20px; accent-color: var(--store-brand-action); }
+.store-date-group-rows { display: grid; gap: 8px; }
+.store-date-group-rows > button { display: grid; grid-template-columns: minmax(0,1fr) auto 18px; gap: 8px; align-items: center; min-height: 48px; padding: 8px; text-align: left; border-radius: 12px; background: var(--store-canvas); }
+.store-date-group-rows > button > span:nth-child(2) { font-size: 12px; color: var(--store-ink-muted); }
+.store-date-group-rows .ui-list-label-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.store-app .store-date-create-cta { display: inline-flex; justify-content: center; gap: 8px; min-height: 44px; width: 100%; max-width: 360px; justify-self: start; }
+.store-date-table .store-tag-strip { max-width: 100%; }
+.store-app .store-date-group-filter > .store-filter { width: 44px; height: 44px; min-height: 44px; }
+
+.store-date-group-colors input { accent-color: var(--store-brand-action); }
+
+[data-group-color="red"] { --group-bg: #fef3f2; --group-ink: #b42318; --group-edge: #fecdca; }
+[data-group-color="orange"] { --group-bg: #fff4ed; --group-ink: #9c2a10; --group-edge: #f9c5a8; }
+[data-group-color="yellow"] { --group-bg: #fefbe8; --group-ink: #854a0e; --group-edge: #f3dfa0; }
+[data-group-color="lime"] { --group-bg: #f3fbe7; --group-ink: #416218; --group-edge: #cce4ab; }
+[data-group-color="teal"] { --group-bg: #e8faf6; --group-ink: #08675e; --group-edge: #a9ddd2; }
+[data-group-color="cyan"] { --group-bg: #eafaff; --group-ink: #125d76; --group-edge: #afe2f2; }
+[data-group-color="indigo"] { --group-bg: #eef2ff; --group-ink: #3538a3; --group-edge: #c7d1fe; }
+[data-group-color="pink"] { --group-bg: #fff1f6; --group-ink: #a11053; --group-edge: #f5c2d9; }
+[data-group-color="brown"] { --group-bg: #fbf2e9; --group-ink: #795032; --group-edge: #e5c8ae; }
+[data-group-color="slate"] { --group-bg: #f1f5f9; --group-ink: #334a61; --group-edge: #cbd5e1; }
+
+[data-group-color="amber"] { --group-swatch: #d58b18; --group-check: #243329; }
+[data-group-color="blue"] { --group-swatch: #277ac9; }
+[data-group-color="green"] { --group-swatch: #168a62; }
+[data-group-color="violet"] { --group-swatch: #7b50cc; }
+[data-group-color="rose"] { --group-swatch: #bc3b83; }
+[data-group-color="gray"] { --group-swatch: #7c8796; }
+[data-group-color="red"] { --group-swatch: #d2453b; }
+[data-group-color="orange"] { --group-swatch: #ea6d20; --group-check: #243329; }
+[data-group-color="yellow"] { --group-swatch: #f0cc3a; --group-check: #243329; }
+[data-group-color="lime"] { --group-swatch: #8fbe3b; --group-check: #243329; }
+[data-group-color="teal"] { --group-swatch: #1b9c8d; }
+[data-group-color="cyan"] { --group-swatch: #39b8d7; --group-check: #243329; }
+[data-group-color="indigo"] { --group-swatch: #525acb; }
+[data-group-color="pink"] { --group-swatch: #ec72aa; --group-check: #243329; }
+[data-group-color="brown"] { --group-swatch: #9b704e; }
+[data-group-color="slate"] { --group-swatch: #647d95; }

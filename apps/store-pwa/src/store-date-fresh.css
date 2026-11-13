@@ -4,15 +4,13 @@
 .store-date h3, .store-date-sheet h3 { margin: 0; font-size: 15px; line-height: 22px; font-weight: 650; }
 .store-date p { margin: 0; }
 .store-date-search-panel { min-width: 0; }
-.store-date-search-form { display: grid; grid-template-columns: minmax(0, 1fr) 44px auto; gap: 8px; }
-.store-date-search-wrap { position: relative; min-width: 0; }
-.store-date-search-icon { position: absolute; z-index: 1; top: 15px; left: 14px; color: var(--store-ink-muted); pointer-events: none; }
-.store-date-search { width: 100%; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; padding: 0 12px 0 42px; background: var(--store-canvas); font-size: 16px; color: var(--store-ink); }
-.store-date-search::placeholder { color: var(--store-ink-muted); opacity: 1; }
-.store-date-scan { display: grid; place-items: center; width: 44px; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; background: var(--store-module-mint); }
+.store-date-search-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.store-date-search-wrap { flex: 1 1 12rem; }
+.store-date-search-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.store-date-scan { display: grid; place-items: center; width: 44px; min-height: 44px; border: 1px solid var(--store-control-line); border-radius: 12px; background: var(--store-module-mint); }
 .store-date-scan-icon { width: 20px; height: 20px; }
 :is(.store-date, .store-date-sheet) .store-button { min-height: 44px; border: 0; border-radius: 12px; background: var(--store-brand-action); color: white; font-size: 14px; }
-.store-date .store-date-search-form > .store-button { min-width: 56px; height: 48px; padding-inline: 12px; font-size: 13px; line-height: 20px; font-weight: 600; }
+.store-date .store-date-search-actions > .store-button { min-width: 56px; min-height: 44px; height: auto; padding-inline: 12px; font-size: 13px; line-height: 20px; font-weight: 600; }
 :is(.store-date, .store-date-sheet) .store-button:hover { background: #005e40; }
 .store-date-message { padding: 14px 16px; border: 1px solid var(--store-line); border-radius: 14px; background: var(--store-canvas); font-size: 14px; line-height: 21px; }
 .store-date-product { min-width: 0; border: 1px solid var(--store-line); border-radius: 14px; background: var(--store-surface); }
@@ -40,24 +38,23 @@
 .store-date .store-filter.is-filtered { position: relative; border-color: var(--store-brand-action); background: var(--store-brand-action); color: white; }
 .store-date-workspace { display: grid; gap: 24px; min-width: 0; }
 .store-date-lots { display: grid; grid-template-columns: 1fr; align-content: start; gap: 8px; min-width: 0; }
-.store-date-lot { --ui-list-marker-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; min-width: 0; border: 1px solid var(--store-holder-edge); border-radius: 16px; padding: 12px 12px 12px 28px; background: var(--store-surface); color: var(--store-ink); text-align: left; }
+.store-date-lot { --ui-list-marker-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr) fit-content(42%); gap: 4px 8px; min-width: 0; border: 1px solid var(--store-holder-edge); border-radius: 14px; padding: 8px 12px 8px 24px; background: var(--store-surface); color: var(--store-ink); text-align: left; }
 .store-date-lot:hover { border-color: var(--store-control-line); }
 .store-date-lot.is-active { border-color: var(--store-brand-action); box-shadow: inset 0 0 0 1px var(--store-brand-action); background: var(--store-module-mint); }
-.store-date-lot-main, .store-date-lot-end { display: contents; }
-.store-date-lot-main > strong { grid-column: 1; grid-row: 1; font-size: 16px; font-weight: 650; line-height: 23px; overflow-wrap: anywhere; }
-.store-date-lot small { font-size: 12px; line-height: 18px; color: var(--store-ink-muted); overflow-wrap: anywhere; }
-.store-date-lot-main > small:first-of-type { grid-column: 1; grid-row: 2; min-width: 0; align-self: start; }
-.store-date-lot-identifiers > span { white-space: nowrap; }
-.store-date-lot-footer { display: flex; grid-column: 1 / -1; grid-row: 4; align-items: center; gap: 12px; min-width: 0; margin-top: 4px; }
-.store-date-lot-labels { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
-.store-date-lot-main > .store-date-lot-dates { display: flex; flex-wrap: wrap; gap: 2px 12px; grid-column: 1 / -1; grid-row: 3; min-width: 0; }
+.store-date-lot-main { display: contents; }
+.store-date-lot-main > strong { grid-column: 1; grid-row: 1; font-size: 14px; font-weight: 650; line-height: 20px; overflow-wrap: anywhere; }
+.store-date-lot small { font-size: 12px; line-height: 16px; color: var(--store-ink-muted); overflow-wrap: anywhere; }
+.store-date-lot-identifiers { flex: 0 1 auto; min-width: 0; }
+.store-date-lot-footer { display: flex; flex-wrap: wrap; grid-column: 1 / -1; grid-row: 2; align-items: center; gap: 4px 8px; min-width: 0; }
+.store-date-lot-labels { display: flex; flex: 1 1 auto; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.store-date-lot > .store-date-lot-dates { display: flex; flex-wrap: wrap; gap: 2px 12px; grid-column: 1 / -1; grid-row: 3; min-width: 0; }
 .store-date-lot-dates > span { white-space: nowrap; }
-.store-date-lot-end > strong { display: grid; align-content: start; justify-items: end; grid-column: 2; grid-row: 1 / 3; align-self: start; max-width: 6em; color: var(--store-ink-muted); font-size: 13px; font-weight: 600; line-height: 20px; text-align: right; overflow-wrap: anywhere; }
-.store-date-percent-caption { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; font-weight: 400; }
-.store-date-percent-value { font-size: 24px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.store-date-lot-end { display: flex; align-items: start; justify-content: flex-end; gap: 8px; grid-column: 2; grid-row: 1; min-width: 0; }
+.store-date-lot-end > svg { flex: 0 0 16px; margin-top: 2px; color: var(--store-ink-muted); }
+.store-date-lot-end > strong { max-width: 9em; color: var(--store-ink-muted); font-size: 12px; font-weight: 500; line-height: 20px; text-align: right; overflow-wrap: anywhere; }
+.store-date-percent-value { font-size: 14px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .store-date-lot-end .is-danger { color: var(--store-error-ink); }
 .store-date-lot-end .is-warning { color: var(--store-warning-ink); }
-.store-date-lot-action { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; color: var(--store-brand-action); font-size: 12px; line-height: 18px; font-weight: 650; }
 .store-date-lot-heading { display: grid; gap: 4px; min-width: 0; }
 :is(.store-date, .store-date-sheet) .store-date-lot-heading h3 { color: var(--store-ink); font-size: 16px; line-height: 23px; overflow-wrap: anywhere; }
 .store-date-lot-heading p { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
@@ -126,14 +123,12 @@
 /* DATE uses the KPH compact controls and native sliding cover. Lookup output
    lives in the white cover so expanded metadata can scroll without obstruction. */
 .store-date { --store-date-gutter: var(--store-header-gutter); max-width: none; margin: 0; padding: 0; gap: 0; }
-.store-date-search-panel > .store-page-hero-content { display: grid; gap: 8px; }
-.store-date-search-form, .store-date-search-panel .store-date-message { width: 100%; max-width: 640px; }
-.store-date-search-panel .store-date-search { border-color: var(--store-line); }
+.store-date-search-form { width: 100%; max-width: var(--store-hero-measure); }
 .store-date-search-panel .store-date-scan { border-color: var(--store-module-mint); }
-.store-date-search-panel .store-date-search-form > .store-button { background: var(--store-surface); color: var(--store-brand-action); }
-.store-date-search-panel .store-date-search-form > .store-button:hover { background: var(--store-module-mint); }
-.store-date .store-date-search-panel :is(button, input):focus-visible { outline-color: white; }
-.store-date-workspace { position: relative; z-index: 1; align-content: start; gap: 12px 24px; min-height: 100dvh; margin-top: -12px; border-radius: 24px 24px 0 0; padding: 12px var(--store-date-gutter) 24px; background: var(--store-surface); box-shadow: 0 -8px 24px rgb(0 60 40 / 8%); }
+.store-date-search-panel .store-date-search-actions > .store-button { background: var(--store-surface); color: var(--store-brand-action); }
+.store-date-search-panel .store-date-search-actions > .store-button:hover { background: var(--store-module-mint); }
+.store-date .store-date-search-actions :is(button):focus-visible { outline: 3px solid var(--store-focus); outline-offset: -3px; }
+.store-date-workspace { align-content: start; gap: 12px 24px; padding: 12px var(--store-date-gutter) 24px; }
 .store-date-browser { gap: 12px; }
 .store-date .store-tabs { padding: 0; gap: 8px; }
 @media (min-width: 900px) {
@@ -210,13 +205,32 @@
 .store-date .store-date-unclassified { justify-self: start; min-height: 44px; padding: 8px 0; color: var(--store-ink-muted); font-size: 12px; line-height: 18px; text-align: left; }
 .store-date .store-date-unclassified span { margin-left: 8px; }
 .store-date .store-date-unclassified[aria-pressed="true"] { color: var(--store-brand-action); text-decoration: underline; text-underline-offset: 4px; font-weight: 600; }
-.store-date-lot-main > strong { font-size: 14px; line-height: 20px; }
 .store-date-table :is(td > small, td > strong) { display: block; }
 .store-date .store-date-table { table-layout: auto; }
 .store-date-table td > small { color: var(--store-ink-muted); font-size: 12px; line-height: 18px; }
 .store-date-table td > strong:not(.store-date-percent) { font-weight: 500; font-size: 13px; line-height: 20px; }
-.store-date-table .store-date-percent { display: block; font-size: 24px; line-height: 28px; }
+.store-date-table .store-date-percent { display: block; font-size: 14px; line-height: 20px; }
 .store-date-table .is-active { background: var(--store-module-mint); }
 .store-date-table .store-kph-row-open { width: 100%; }
 .store-date-table .store-kph-chevron-cell svg { margin-left: auto; }
 @media (min-width: 900px) { .store-date .store-tabs { width: fit-content; min-width: 380px; } }
+
+/* Reserve the longest submit label; async lookup never resizes the green row. */
+.store-date-submit-copy { display: grid; }
+.store-date-submit-copy > span { grid-area: 1 / 1; }
+.store-date-submit-copy > [aria-hidden="true"] { visibility: hidden; }
+
+/* Entry belongs to the action row; geometry is available before lazy form CSS. */
+.store-date .store-date-add { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 8px; min-width: 44px; height: 44px; padding: 10px; }
+.store-date-add-copy { display: none; }
+@media (min-width: 900px) { .store-date-add-copy { display: inline; } }
+
+.store-app .store-date .store-date-toolbar .store-date-add[data-variant="primary"] > svg { color: currentColor; }
+
+/* Search geometry for the existing mock lookup controls. */
+.store-date-search-panel > .store-page-hero-content { display: grid; gap: 8px; }
+.store-date-search-form { display: grid; grid-template-columns: minmax(0, 1fr) 44px auto; gap: 8px; }
+.store-date-search-wrap { position: relative; min-width: 0; }
+.store-date-search-icon { position: absolute; z-index: 1; top: 15px; left: 14px; color: var(--store-ink-muted); pointer-events: none; }
+.store-date-search { width: 100%; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; padding: 0 12px 0 42px; background: var(--store-canvas); font-size: 16px; color: var(--store-ink); }
+.store-date-search-panel .store-date-search-form > .store-button { min-width: 56px; height: 48px; padding-inline: 12px; background: var(--store-surface); color: var(--store-brand-action); }

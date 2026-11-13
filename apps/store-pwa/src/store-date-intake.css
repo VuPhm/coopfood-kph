@@ -1,0 +1,21 @@
+/* DATE shares the live KPH dialog/fields/CTA roles; only date-specific composition lives here. */
+.store-create-screen.store-date-intake-sheet[data-kind] .create-dialog-form.date-intake-form > .form-section { grid-column: 1 / -1; }
+.date-intake-product-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.date-intake-code { grid-column: 1 / -1; }
+.date-intake-dates { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.date-intake-preview { display: grid; gap: 8px; margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--store-canvas); color: var(--store-ink); font-size: 13px; line-height: 20px; }
+.date-intake-preview-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; font-variant-numeric: tabular-nums; }
+.date-intake-preview dl { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; }
+.date-intake-preview dl > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.date-intake-preview dt { color: var(--store-ink-muted); }
+.date-intake-preview dd { margin: 0; font-weight: 600; }
+.date-intake-preview p { margin: 0; color: var(--store-warning-ink); }
+.date-intake-extra { margin-top: 12px; border-top: 1px solid var(--store-holder-edge); font-size: 13px; line-height: 20px; }
+.date-intake-extra summary { min-height: 44px; align-content: center; cursor: pointer; color: var(--store-ink-muted); }
+.date-intake-extra[open] summary { margin-bottom: 8px; }
+.date-intake-error, .date-intake-recovery { grid-column: 1 / -1; color: var(--store-error-ink); font-size: 13px; line-height: 20px; }
+.date-intake-recovery { display: grid; gap: 8px; }
+@media (min-width: 900px) { .date-intake-product-fields { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 359px) { .date-intake-dates { grid-template-columns: 1fr; } }
+
+.store-date-intake { display: grid; gap: 12px; min-width: 0; }

@@ -1,0 +1,11 @@
+const {chromium,expect}=require('@playwright/test');
+const fs=require('node:fs'); const out='.local/verification/freshr5-date';fs.mkdirSync(out,{recursive:true});
+(async()=>{const b=await chromium.launch();try{for(const width of [390,1440]){const p=await b.newPage({viewport:{width,height:844},serviceWorkers:'block',reducedMotion:'reduce'});await p.goto('http://127.0.0.1:4182/#date');await expect(p.getByRole('combobox',{name:'Nhóm DATE'})).toBeVisible();
+ const row=p.locator('[data-date-lot-id]').first();console.log(width,'height',await row.evaluate(e=>e.getBoundingClientRect().height));await p.screenshot({path:`${out}/date-${width}.png`});
+ await p.getByRole('combobox',{name:'Nhóm DATE'}).click();await p.getByRole('option',{name:'Lương thực'}).click();await expect(p.locator('[data-date-lot-id]')).toHaveCount(0);await p.screenshot({path:`${out}/group-${width}.png`});
+ await p.getByRole('combobox',{name:'Nhóm DATE'}).click();await p.getByRole('option',{name:'Chưa phân loại'}).click();await expect(p.locator('[data-date-lot-id]')).toHaveCount(7);
+ await p.getByRole('button',{name:'Thêm theo dõi DATE'}).click();const d=p.getByRole('dialog',{name:'Thêm theo dõi DATE'});await expect(d).toBeVisible();await p.screenshot({path:`${out}/intake-${width}.png`});
+ for(const [label,value] of [['SKU','000042'],['Tên hàng','Hàng mẫu'],['Số lô','SYNTH-42'],['NSX','01/11/2026'],['HSD','10/11/2026']])await d.getByRole('textbox',{name:new RegExp('^'+label)}).fill(value);
+ await d.getByRole('combobox',{name:'Nhóm hàng'}).click();await p.getByRole('option',{name:'Lương thực'}).click();await d.getByRole('button',{name:'Thêm theo dõi',exact:true}).click();await expect(p.locator('[data-date-lot-id]')).toHaveCount(1);await expect(p.getByText('Lương thực',{exact:true}).last()).toBeVisible();
+ await p.evaluate(()=>document.documentElement.style.zoom='200%');expect(await p.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);await p.keyboard.press('Tab');await p.screenshot({path:`${out}/zoom-${width}.png`});await p.close();}
+}finally{await b.close()}})().catch(e=>{console.error(e);process.exitCode=1});
