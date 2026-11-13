@@ -30,11 +30,10 @@
     align-items: center;
     gap: var(--store-space-2);
     min-width: 0;
-    flex-wrap: wrap;
   }
-  .store-app .store-ticket-identity { display: flex; flex: 1 1 50%; flex-wrap: wrap; gap: 0 var(--store-space-2); min-width: 0; }
+  .store-app .store-ticket-identity { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: 0 var(--store-space-2); min-width: 0; max-width: 40%; }
   .store-app .store-ticket-identity .store-ticket-sku { line-height: 16px; }
-  .store-app .store-ticket-foot .store-ticket-tag-shell { flex: 1 1 100%; order: 1; pointer-events: auto; }
+  .store-app .store-ticket-foot .store-ticket-tag-shell { flex: 1 1 0; pointer-events: auto; }
   .store-app .store-ticket-foot > .store-ticket-approval {
     flex: 0 0 auto;
     min-height: 20px;

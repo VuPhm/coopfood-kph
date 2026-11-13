@@ -1,3 +1,4 @@
+import { StoreWorkspaceSearch } from "./store-workspace-search";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { revealBelowStickyTabs } from "./store-sticky-tabs";
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState, useLayoutEffect } from "react";
@@ -113,7 +114,7 @@ export const KphWorkspace = memo(function KphWorkspace({ records, onRecordsChang
 
   return <StorePageLayout className="store-kph">
     <StorePageHero className="store-kph-underlay">
-      <div className="store-kph-toolbar"><label className="store-kph-search"><Search className="store-kph-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm tên hàng hoặc SKU</span><input aria-label="Tìm tên hàng hoặc SKU" value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm tên hàng hoặc SKU" /></label></div>
+      <StoreWorkspaceSearch label="Tìm tên hàng hoặc SKU" placeholder="Tìm mã hoặc tên hàng" value={query} onValueChange={setQuery} clearLabel="Xóa tìm kiếm KPH" onSearch={term => { const match = records.find(record => record.sku === term); if (match) setKind(match.kind); }} />
     <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(k => <KphCreateButton key={k} kind={k} onPointerEnter={preloadCreateForm} onFocus={preloadCreateForm} onClick={() => createDialogRef.current?.open(k)} />)}</div></section>
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>

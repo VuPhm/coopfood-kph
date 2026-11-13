@@ -76,7 +76,7 @@ describe("Store single screen layout", () => {
     vi.stubGlobal("matchMedia", () => ({get matches(){return printing;},addEventListener:(_type:string,listener:()=>void)=>listeners.add(listener),removeEventListener:(_type:string,listener:()=>void)=>listeners.delete(listener)}));
     render(<StoreKphList desktop={false} visible={[mockRecords[0]!]} />);
     const row=document.querySelector('[data-record-id]');
-    const labels=()=>document.querySelectorAll('.store-ticket-tags [data-label-kind]');
+    const labels=()=>document.querySelectorAll('.store-tag-strip [data-label-kind]');
     expect(document.querySelector('.store-ticket-foot > [data-label-kind="approval"]')).not.toBeNull();
     expect(labels()).toHaveLength(2);
     act(()=>{printing=true;listeners.forEach(notify=>notify());});
