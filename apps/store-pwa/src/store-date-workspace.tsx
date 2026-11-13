@@ -192,7 +192,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
             const assessment = assessments.get(lot.id)!;
             const percent = remainingShelfPercent(assessment);
             return <tr key={lot.id} data-date-lot-id={lot.id} aria-selected={activeId === lot.id} className={`store-kph-record-row${activeId === lot.id ? " is-active" : ""}`} onClick={event => {
-              if (event.target instanceof Element && !event.target.closest("button")) {
+              if (event.target instanceof Element && !event.target.closest("button, .store-tag-shell")) {
                 event.currentTarget.querySelector<HTMLButtonElement>(".store-kph-row-open")?.focus({preventScroll: true});
                 setActiveId(lot.id);
               }
@@ -209,7 +209,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
         </table></div> : <div className="store-date-lots">{visible.map(lot => {
           const assessment = assessments.get(lot.id)!;
           const percent = remainingShelfPercent(assessment);
-          return <div key={lot.id} data-date-lot-id={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={event => { if (event.target instanceof Element && !event.target.closest("button")) setActiveId(lot.id); }}>
+          return <div key={lot.id} data-date-lot-id={lot.id} className={`store-date-lot ui-list-marker-card ${activeId === lot.id ? "is-active" : ""}`} onClick={event => { if (event.target instanceof Element && !event.target.closest("button, .store-tag-shell")) setActiveId(lot.id); }}>
             <ListItemMarker variant="bar" tone={getDatePhaseTone(assessment.phase)} />
             <button className="store-date-lot-open" aria-pressed={activeId === lot.id} aria-label={`Mở lô ${lot.name} · Lô ${lot.id}`} onClick={() => setActiveId(lot.id)}>
               <span className="store-date-lot-main"><strong><StoreProductName text={lot.name} /></strong></span>
@@ -226,7 +226,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
       </section>
 
     </StorePageSurface>
-    {intakeOpen ? <DateIntake groups={DEFAULT_DATE_GROUPS} existingLots={lots} onCancel={() => setIntakeOpen(false)} onSave={lot => { onLotsChange([...lots, lot]); setIntakeOpen(false); setGroupFilter(lot.group?.id ?? "unclassified"); }} /> : null}
+    {intakeOpen ? <DateIntake today={today} groups={DEFAULT_DATE_GROUPS} existingLots={lots} onCancel={() => setIntakeOpen(false)} onSave={lot => { onLotsChange([...lots, lot]); setIntakeOpen(false); setGroupFilter(lot.group?.id ?? "unclassified"); }} /> : null}
     <KphCreateControl ref={createRef} onSaved={finishKph} />
     <StoreSheet className="store-date-sheet store-date-kind-sheet" open={!!kindChoice} onOpenChange={open => { if (!open) { const row = Array.from(document.querySelectorAll<HTMLElement>("[data-date-lot-id]")).find(el => el.dataset.dateLotId === kindChoice?.id); setKindChoice(null); window.requestAnimationFrame(() => (row?.querySelector<HTMLElement>(".store-kph-row-open") ?? row)?.focus()); } }} title="Chọn loại phiếu KPH" description="Chưa có phân loại hàng; chọn biểu mẫu phù hợp.">{kindChoice ? <><p>{kindChoice.name} · SKU {kindChoice.sku}</p><div className="store-two-col">{(["TPCN","TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} onClick={() => startProcessing(kindChoice, kind)} />)}</div></> : null}</StoreSheet>
     <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={value => { void search(value); }} presentation="screen" />
