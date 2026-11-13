@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "kphon03-create-media",
-  "revision": 4,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 5,
+  "status": "EXECUTING",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -12,64 +12,118 @@
     "Targeted tests và real-backend Playwright390×844/1440×1024",
     "Owner bổ sung: merge UI green-header source e8a2df7 vào KPHON03, giữ create/session/idempotency/media; kiểm có mục tiêu chrome và create trên bản kết hợp.",
     "Owner13/11 yêu cầu ưu tiên sửa SW/trang cũ trên cả Store/Admin; chưa đổi UI layout. Phục hồi preview đúng nguồn và kiểm stale workers/cache không mất dữ liệu.",
-    "Owner14/11: khôi phục đúng Fresh sau compact/polish; đồng bộ sidebar Store/Admin, desktop cuộn tự nhiên, mobile giữ hero sticky; giữ draft đăng nhập Admin khi chuyển tab; chỉnh nhẹ token theo UI/UX."
+    "Owner14/11: khôi phục đúng Fresh sau compact/polish; đồng bộ sidebar Store/Admin, desktop cuộn tự nhiên, mobile giữ hero sticky; giữ draft đăng nhập Admin khi chuyển tab; chỉnh nhẹ token theo UI/UX.",
+    "Revision5: compact list primitives UI05, KPH density/search, DATE group dropdown/chips trong mock entry, sửa runtime Admin proxy và smoke session thật."
   ],
   "outOfScope": [
     "Review/export và DATE persistence",
     "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
-  "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
-  "candidateSha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
+  "baseSha": "96bfd0c",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
-    "apps/store-pwa/src/**",
-    "apps/admin-web/**",
-    "apps/store-pwa/public/**",
     "docs/**",
-    "e2e/**",
     "packages/ui/**",
-    "tooling/vite/**"
+    "contracts/**",
+    "backend/**",
+    "apps/store-pwa/src/store-record-items.css",
+    "apps/store-pwa/src/store-product-name.tsx",
+    "apps/store-pwa/src/store-product-name.css",
+    "apps/store-pwa/src/store-tag-strip.tsx",
+    "apps/store-pwa/src/store-tag-strip.css",
+    "apps/store-pwa/src/store-workspace-search.tsx",
+    "apps/store-pwa/src/store-workspace-search.css"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
-  "teams": [],
+  "reviewRound": 1,
+  "teams": [
+    {
+      "id": "kph",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr5-kph",
+      "allowedPaths": [
+        "apps/store-pwa/src/store-kph-list.tsx",
+        "apps/store-pwa/src/store-kph-items.css",
+        "apps/store-pwa/src/store-online-kph.tsx",
+        "apps/store-pwa/src/store-online-kph.css",
+        "apps/store-pwa/src/store-kph-workspace.tsx",
+        "apps/store-pwa/src/store-kph-workspace.test.tsx",
+        "apps/store-pwa/src/store-screen-layout.test.tsx",
+        "apps/store-pwa/src/store-kph-label.test.tsx",
+        "apps/store-pwa/src/store-online-kph.test.tsx",
+        "e2e/scripts/check-fresh-r5-kph.cjs"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "date",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr5-date",
+      "allowedPaths": [
+        "apps/store-pwa/src/store-date-groups.tsx",
+        "apps/store-pwa/src/store-date-groups.css",
+        "apps/store-pwa/src/store-date-groups.test.tsx",
+        "apps/store-pwa/src/store-date-workspace.tsx",
+        "apps/store-pwa/src/store-date-workspace.test.tsx",
+        "apps/store-pwa/src/store-date-fresh.css",
+        "apps/store-pwa/src/store-date-intake.tsx",
+        "apps/store-pwa/src/store-date-intake.css",
+        "apps/store-pwa/src/store-date-intake.test.tsx",
+        "apps/store-pwa/src/store-date-lot-view.tsx",
+        "apps/store-pwa/src/store-app-mock.ts",
+        "apps/store-pwa/src/store-date-assessment.ts",
+        "apps/store-pwa/src/store-date-assessment.test.ts",
+        "apps/store-pwa/src/store-date-workflow.test.tsx",
+        "e2e/scripts/check-fresh-r5-date.cjs"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "admin",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr5-admin",
+      "allowedPaths": [
+        "tooling/preview/fresh-review.mjs",
+        "e2e/scripts/check-fresh-r5-admin.cjs"
+      ],
+      "dependsOn": []
+    }
+  ],
   "gates": [
     {
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
-      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
+      "status": "pending",
+      "revision": 5,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 4,
-      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
-      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
+      "status": "pending",
+      "revision": 5,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 4,
-      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
-      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
+      "revision": 5,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     },
     {
       "id": "owner-green-ui",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 4,
-      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
-      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
+      "revision": 5,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
     }
   ],
   "changes": [
@@ -93,10 +147,17 @@
       "source": "Owner chat14/11/2026, tiếp phiên bị ngắt; cho phép Terra nhỏ",
       "impact": "Đối chiếu POLISH03 c7cc939/PUB01 41febf6 và wiring BE06 a6872f2; invalidates frontend/browser evidence cho UI mới. Backend/API/media không đổi.",
       "decision": "Hai lượt rà giới hạn trong revision4, khôi phục composition và token có mục tiêu; giữ login1ea1937/cache repair; không mở review/export hoặc merge main/push/deploy."
+    },
+    {
+      "revision": 5,
+      "request": "Admin không mở được; gần được nhưng bản đúng compact sau này, item KPH/DATE thấp hơn và có nhóm hàng DATE; tìm được rồi lập đội inloop tối ưu tiếp.",
+      "source": "Owner chat14/11/2026 sau revision4",
+      "impact": "POLISH03 quá sớm. Nguồn DATE07/DATE08/UI05 (53122ae) có groups và login focus fix; port UI theo nguồn, không nhập backend V11–13 hoặc paired media. Admin proxy502 cần sửa runtime/tooling.",
+      "decision": "Hai lượt integration review, Terra ở3 worktree độc lập; KPH online giữ D01 và DATE nhóm trong bản mẫu riêng cho đến scope backend DATE."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner xem candidate Fresh e3a49b2 tại Store4173/Admin4175; kỹ thuật đã đạt, chưa suy owner acceptance hoặc mở review/export. Hai vòng toàn app cuối vẫn pending.",
+  "nextAction": "Terra phục hồi KPH/DATE và kiểm Admin từ checkpoint96bfd0c; root tích hợp và kiểm2lượt.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
