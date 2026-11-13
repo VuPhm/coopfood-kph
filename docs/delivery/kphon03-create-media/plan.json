@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kphon03-create-media",
-  "revision": 3,
+  "revision": 4,
   "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
@@ -11,17 +11,17 @@
     "Tạo thành công refresh history D01; lỗi không báo thành công giả",
     "Targeted tests và real-backend Playwright390×844/1440×1024",
     "Owner bổ sung: merge UI green-header source e8a2df7 vào KPHON03, giữ create/session/idempotency/media; kiểm có mục tiêu chrome và create trên bản kết hợp.",
-    "Owner13/11 yêu cầu ưu tiên sửa SW/trang cũ trên cả Store/Admin; chưa đổi UI layout. Phục hồi preview đúng nguồn và kiểm stale workers/cache không mất dữ liệu."
+    "Owner13/11 yêu cầu ưu tiên sửa SW/trang cũ trên cả Store/Admin; chưa đổi UI layout. Phục hồi preview đúng nguồn và kiểm stale workers/cache không mất dữ liệu.",
+    "Owner14/11: khôi phục đúng Fresh sau compact/polish; đồng bộ sidebar Store/Admin, desktop cuộn tự nhiên, mobile giữ hero sticky; giữ draft đăng nhập Admin khi chuyển tab; chỉnh nhẹ token theo UI/UX."
   ],
   "outOfScope": [
-    "Sửa/redesign UI layout trong lượt ưu tiên SW/trang cũ; giữ phản hồi UI sai/hao hụt để đối chiếu sau cache fix",
     "Review/export và DATE persistence",
     "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "4bcbb48751a7b4968d19fca6a7d502ba84d506cc",
-  "candidateSha": "7908acaef234cf629c5fff212be613bd959e272d",
-  "integrationOwner": "Codex /root — sole writer",
+  "candidateSha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
+  "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
     "apps/store-pwa/src/**",
     "apps/admin-web/**",
@@ -40,36 +40,36 @@
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 3,
-      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
-      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
+      "revision": 4,
+      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
+      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 3,
-      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
-      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
+      "revision": 4,
+      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
+      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 3,
-      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
-      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
+      "revision": 4,
+      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
+      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
     },
     {
       "id": "owner-green-ui",
       "kind": "user",
       "required": true,
-      "status": "fail",
-      "revision": 3,
-      "sha": "7908acaef234cf629c5fff212be613bd959e272d",
-      "evidence": "docs/delivery/kphon03-create-media/cache-repair-r3.md"
+      "status": "pending",
+      "revision": 4,
+      "sha": "e3a49b2f3ef217cd9b02e1ed815de86ca0707beb",
+      "evidence": "docs/delivery/kphon03-create-media/fresh-restore-r4.md"
     }
   ],
   "changes": [
@@ -86,10 +86,17 @@
       "source": "Owner chat13/11/2026, trả lời clarification",
       "impact": "Reopen owner UI rejection; ưu tiên local preview SW/HTML freshness. Invalidate preview/browser gate và kiểm lại registration/PWA behavior; không triển khai layout repair lúc này.",
       "decision": "Bounded repair revision3 với hai lượt review; không xóa browser data/cache/cookie, không đổi backend/business/Pages/production offline policy."
+    },
+    {
+      "revision": 4,
+      "request": "Tìm lại bản Fresh đúng sau compact và tối ưu; sidebar đồng bộ desktop, bỏ nền trượt desktop và giữ mobile; tiếp inloop với target UIUX và chỉnh nhẹ token nếu cần.",
+      "source": "Owner chat14/11/2026, tiếp phiên bị ngắt; cho phép Terra nhỏ",
+      "impact": "Đối chiếu POLISH03 c7cc939/PUB01 41febf6 và wiring BE06 a6872f2; invalidates frontend/browser evidence cho UI mới. Backend/API/media không đổi.",
+      "decision": "Hai lượt rà giới hạn trong revision4, khôi phục composition và token có mục tiêu; giữ login1ea1937/cache repair; không mở review/export hoặc merge main/push/deploy."
     }
   ],
   "blockers": [],
-  "nextAction": "Cache/SW repair đã kiểm kỹ thuật; owner reload thường Store4173/Admin4175 để lấy trang hiện hành, sau đó đối chiếu UI sai/hao hụt. UI feedback chưa khép; không tự mở review/export hoặc đánh dấu final UI acceptance.",
+  "nextAction": "Owner xem candidate Fresh e3a49b2 tại Store4173/Admin4175; kỹ thuật đã đạt, chưa suy owner acceptance hoặc mở review/export. Hai vòng toàn app cuối vẫn pending.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
