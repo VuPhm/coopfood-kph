@@ -1,0 +1,28 @@
+@media screen {
+  .store-app .store-tag-shell { min-width: 0; }
+  .store-app .store-tag-strip { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; min-width: 0; max-width: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x pan-y; scrollbar-width: none; padding-block: 2px; }
+  .store-tag-strip::-webkit-scrollbar { display: none; }
+  .store-app .store-tag-strip > * { flex: 0 0 auto; max-inline-size: min(100%, 10.5rem); white-space: nowrap; }
+  .store-app .store-tag-strip .ui-list-label-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .store-tag-strip:focus-visible { outline: 2px solid var(--store-focus); outline-offset: -2px; border-radius: 5px; }
+  .store-tag-shell[data-more] { mask-image: linear-gradient(to right, #000 calc(100% - 10px), transparent); }
+  .store-tag-shell[data-back] { mask-image: linear-gradient(to right, transparent, #000 10px); }
+  .store-tag-shell[data-back][data-more] { mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 10px), transparent); }
+  .store-app :is(.store-kph-table,.store-date-table) .ui-list-label { max-width: 100%; white-space: nowrap; }
+  .store-app :is(.store-kph-table,.store-date-table) .ui-list-label-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .store-app .store-sku { display: inline-block; max-width: 100%; vertical-align: middle; font-family: "Arial Narrow", "Roboto Condensed", var(--cf-font-family); font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "tnum", "lnum"; font-stretch: condensed; letter-spacing: -.025em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+@media screen {
+  .store-app .store-ticket-identity { flex-wrap: nowrap; max-width: 32%; }
+  .store-app .store-ticket-foot { flex-wrap: nowrap; }
+  .store-app .store-ticket-foot .store-ticket-tag-shell { flex: 1 1 0; }
+  .store-app .store-ticket-identity .store-ticket-sku { overflow-wrap: normal; }
+  .store-app .store-date-lot-footer { flex-wrap: nowrap; }
+  .store-app .store-date-lot-identifiers { max-width: 30%; }
+  .store-app .store-date-lot-labels { display: block; flex: 1 1 0; }
+  .store-app .store-date-lot-processing { flex: 0 0 auto; max-width: 30%; }
+  .store-app .store-date-lot-processing .ui-list-label { max-width: 100%; white-space: nowrap; }
+  .store-app .store-date-lot-processing .ui-list-label-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .store-app .store-date-lot-open { display: grid; grid-template-columns: minmax(0, 1fr) fit-content(42%); grid-column: 1 / -1; gap: 8px; min-height: 44px; min-width: 0; width: 100%; padding: 0 0 24px; margin-bottom: -24px; border: 0; border-radius: 4px; color: inherit; background: transparent; text-align: left; cursor: pointer; }
+  .store-app .store-date-lot-footer { position: relative; margin-top: 0; }
+}

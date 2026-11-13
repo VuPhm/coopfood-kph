@@ -1,0 +1,3 @@
+.store-product-name { --product-name-size: 14px; --product-name-line: 20px; --product-name-compact-size: 13px; --product-name-compact-line: 18px; display: block; min-width: 0; font-size: var(--product-name-size); line-height: var(--product-name-line); overflow-wrap: anywhere; }
+.store-product-name[data-wrapped] { font-size: var(--product-name-compact-size); line-height: var(--product-name-compact-line); }
+.store-kph-table .store-product-name { --product-name-size: 13px; --product-name-line: 18px; --product-name-compact-size: 12px; --product-name-compact-line: 16px; }
