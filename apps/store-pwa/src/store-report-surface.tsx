@@ -1,3 +1,4 @@
+import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
@@ -11,13 +12,19 @@ export function shouldDismissReportPull(distance: number, velocity: number): boo
 export function ReportSurface({ hero, children, onDismiss, dismissLabel = "Về menu báo cáo", pullToDismiss = true, className = "" }: {
   hero: ReactNode; children: ReactNode; onDismiss: () => void; dismissLabel?: string; pullToDismiss?: boolean; className?: string;
 }) {
+  const desktop = useStoreDesktopLayout();
+  const canPull = pullToDismiss && !desktop;
   const capRef = useRef<HTMLElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
   const dismissRef = useRef(onDismiss);
   const closeRef = useRef<() => void>(() => {});
   useLayoutEffect(() => { dismissRef.current = onDismiss; }, [onDismiss]);
   useEffect(() => {
-    if (!pullToDismiss) return;
+    if (!canPull) {
+      capRef.current?.style.removeProperty("transform");
+      closeRef.current = () => dismissRef.current();
+      return;
+    }
     const cap = capRef.current; const handle = handleRef.current;
     if (!cap || !handle) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -95,11 +102,11 @@ export function ReportSurface({ hero, children, onDismiss, dismissLabel = "Về 
       cap.removeEventListener("click", click, true); cap.removeEventListener("transitionend", transitionEnd); cap.removeEventListener("animationend", animationEnd);
       handle.removeEventListener("pointerdown", pointerDown); handle.removeEventListener("pointermove", pointerMove); handle.removeEventListener("pointerup", pointerEnd); handle.removeEventListener("pointercancel", pointerEnd);
     };
-  }, [pullToDismiss]);
+  }, [canPull]);
   return <StorePageLayout className={`report-stage ${className}`}>
     <StorePageHero className="report-stage-hero">{hero}</StorePageHero>
-    <StorePageSurface ref={capRef} className="report-sliding-cap" data-phase={pullToDismiss ? "entering" : "idle"} data-pull-enabled={pullToDismiss} aria-label="Nội dung báo cáo">
-      {pullToDismiss ? <button ref={handleRef} type="button" className="report-cap-handle" aria-label={dismissLabel} title="Kéo xuống để chọn loại báo cáo" onClick={() => closeRef.current()}><span aria-hidden="true" /></button> : <nav className="report-cap-navigation" aria-label="Điều hướng mẫu báo cáo"><button type="button" aria-label={dismissLabel} onClick={onDismiss}><ArrowLeft size={18} aria-hidden="true" /><span>Chọn mẫu khác</span></button></nav>}
+    <StorePageSurface ref={capRef} className="report-sliding-cap" data-phase={canPull ? "entering" : "idle"} data-pull-enabled={canPull} aria-label="Nội dung báo cáo">
+      {canPull ? <button ref={handleRef} type="button" className="report-cap-handle" aria-label={dismissLabel} title="Kéo xuống để chọn loại báo cáo" onClick={() => closeRef.current()}><span aria-hidden="true" /></button> : <nav className="report-cap-navigation" aria-label="Điều hướng báo cáo"><button type="button" aria-label={dismissLabel} onClick={onDismiss}><ArrowLeft size={18} aria-hidden="true" /><span>{pullToDismiss ? dismissLabel : "Chọn mẫu khác"}</span></button></nav>}
       {children}
     </StorePageSurface>
   </StorePageLayout>;

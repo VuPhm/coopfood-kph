@@ -1,5 +1,13 @@
 # Công việc kế tiếp
 
+## Store desktop: workspace theo Admin
+
+Theo phản hồi owner mới nhất, revision8 bỏ cơ chế nền xanh/nắp trượt trên desktop
+và sắp lại cả cụm heading, tìm kiếm/tác vụ, tab và nội dung. Giữ shared chrome
+revision7, compact KPH/DATE và mobile Fresh. [Evidence](delivery/kphon03-create-media/store-desktop-r8.md).
+Bước nhỏ tiếp: owner xem Store4173 và bản mẫu4180 cạnh Admin4175 trên desktop.
+Nghiệm thu UI và hai vòng toàn app cuối vẫn riêng; chưa mở slice backend tiếp.
+
 ## Chrome desktop theo Admin
 
 Owner14/11 yêu cầu hai entry dùng chung sidebar/header. Revision7 chuyển cả

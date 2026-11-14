@@ -2,6 +2,16 @@
 
 Ngày rà soát: 14/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
+## Store desktop theo bố cục Admin — 14/11/2026
+
+Revision8 bỏ green underlay/cover overlap và kéo nắp trên Store desktop từ900px.
+Tiêu đề nằm trong body; tìm kiếm/tác vụ là toolbar riêng, tab/danh sách nằm trong
+panel trắng trên canvas Fresh. Home dùng thẻ phẳng, tra hạn có các panel riêng,
+báo cáo dùng nút quay lại trên desktop; mobile giữ hero sticky/overlap/kéo.
+Sidebar/header shared revision7 và danh sách compact UI05 tiếp tục dùng chung.
+[Phạm vi, kiểm và giới hạn](delivery/kphon03-create-media/store-desktop-r8.md).
+Đây là candidate kỹ thuật, chưa thay owner acceptance hoặc hai vòng cuối.
+
 ## Sidebar/header desktop dùng chung — 14/11/2026
 
 Theo owner ưu tiên hướng Admin, Store/Admin dùng cùng DesktopSidebar/NavItem/

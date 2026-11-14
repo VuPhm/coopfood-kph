@@ -18,6 +18,23 @@ desktop ở phần lịch sử sau đây được supersede bởi shared chrome 
 route, focus, navigation và header form/modal riêng giữ nguyên.
 [Implementation/evidence](../delivery/kphon03-create-media/desktop-unify-r7.md).
 
+## Desktop workspace — revision8, 14/11/2026
+
+Owner yêu cầu Store desktop bỏ nền xanh/nắp trượt và trình bày cụm chức năng sát
+Admin. Từ900px, page kit giữ API/slots nhưng hero dùng `display: contents`, không
+paint nền hoặc overlap. Header shared72px giữ breadcrumb/account; H1 duy nhất
+chuyển vào body dưới header, giữ id/ref/focus của feature. Body dùng canvas Fresh,
+gutter32px, heading, toolbar tìm kiếm/tác vụ và panel nội dung có viền/bo16px.
+Tab vẫn sticky dưới header; focus toolbar không ép cuộn về đầu trang.
+
+Home bỏ welcome banner trên desktop, dùng thẻ chức năng phẳng; tra hạn tách form,
+kết quả và lịch sử thành panel. Report history/document dùng nút quay lại và không
+có handle/pull/slide desktop. Mobile dưới900px giữ nguyên hero xanh sticky,
+overlap12px, welcome, gesture và navigation đã có. Quy tắc xanh/cover/focus-scroll
+trong phần lịch sử bên dưới chỉ còn áp dụng mobile, không áp vào desktop mới.
+Print và modal/form riêng giữ semantics hiện có. Không đổi contract nghiệp vụ.
+[Kiểm hiện hành](../delivery/kphon03-create-media/store-desktop-r8.md).
+
 ## Một cấu trúc, ba vị trí lắp
 
 ```tsx

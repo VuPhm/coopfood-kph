@@ -1,12 +1,87 @@
 /* Desktop chrome comes from packages/ui; page composition stays Store-owned. */
 @media screen and (min-width: 900px) {
-  .store-app .store-page-layout { --store-header-gutter: var(--fresh-desktop-gutter); }
-  .store-app .store-page-hero { position: static; }
   .store-app .store-sticky-tabs { top: var(--fresh-desktop-header-height); }
   .store-app .store-header .store-header-copy { display: block; }
   .store-app .store-header .store-header-copy p, .store-app .store-header .store-header-store { display: none; }
   .store-app .store-header .store-header-copy > .sr-only {
     position: static; width: auto; height: auto; margin: 0; padding: 0; overflow: visible; clip: auto; clip-path: none; white-space: normal;
   }
-  .store-app .store-page-hero-content { padding-top: 16px; }
+}
+
+/* Desktop is a workspace on the Admin canvas; the mobile hero/cover is not used. */
+@media screen and (min-width: 900px) {
+  .store-app.fresh-desktop-frame { background: var(--fresh-canvas); }
+  .store-app .store-main-column > .store-frame-canvas { min-height: calc(100dvh - var(--fresh-desktop-header-height)); background: var(--fresh-canvas); isolation: auto; }
+  .store-app .store-page-layout {
+    --store-cover-overlap: 0px;
+    --store-hero-background: var(--fresh-canvas);
+    --store-header-gutter: var(--fresh-desktop-gutter);
+    min-height: calc(100dvh - var(--fresh-desktop-header-height)); padding: 28px var(--fresh-desktop-gutter);
+    display: flex; flex-direction: column; gap: 20px; background: var(--fresh-canvas); color: var(--fresh-ink); isolation: auto;
+  }
+  .store-app .store-page-hero { display: contents; position: static; padding: 0; background: none; color: var(--fresh-ink); }
+  .store-desktop-page-heading { min-width: 0; }
+  .store-desktop-page-heading h1 { margin: 0; color: var(--fresh-ink); font-size: var(--fresh-type-page); line-height: 28px; font-weight: 650; }
+  .store-desktop-page-heading p { margin: 4px 0 0; color: var(--fresh-ink-muted); font-size: var(--fresh-type-control); line-height: 21px; }
+  .store-header-desktop-title { display: block; color: var(--fresh-header-ink); font-size: var(--fresh-type-control); line-height: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body:has(.store-app) .store-app .store-page-hero > .store-page-hero-content {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+    min-width: 0; margin: 0; padding: 16px 20px; border: 1px solid var(--fresh-soft-edge); border-radius: var(--fresh-radius-group);
+    background: var(--fresh-surface); color: var(--fresh-ink); box-shadow: none;
+  }
+  .store-app .store-page-hero-content > :is(.store-workspace-search, .store-date-search-form) { flex: 1 1 320px; min-width: 0; margin: 0; }
+  body:has(.store-app) .store-app .store-page-hero-content > .store-create-actions { flex: 0 1 auto; width: auto; margin: 0; padding: 0; }
+  .store-app .store-create-actions .store-two-col { display: flex; flex-wrap: wrap; gap: 8px; }
+  body:has(.store-app) .store-app .store-page-hero-content .store-create-cta {
+    --store-create-surface: var(--fresh-brand-action); --store-create-hover: var(--fresh-brand-deep); --store-create-pressed: var(--fresh-brand-deep); --store-create-gradient: none;
+    --store-create-ink: var(--fresh-header-ink); --store-button-image: none; --store-button-border: transparent; --store-button-shadow: none;
+    flex: 1 0 auto; min-height: 44px; height: auto; padding: 10px 14px; gap: 8px; border-radius: var(--fresh-radius-control); font-size: var(--fresh-type-control);
+  }
+  .store-app .store-page-hero-content > .store-create-actions:only-child { margin-inline-start: auto; }
+  .store-app .store-page-hero-content > .store-date-create-cta { flex: 0 0 auto; width: auto; max-width: none; }
+  .store-app .store-page-hero-content .store-date-message { flex-basis: 100%; color: var(--fresh-ink-muted); margin: 0; }
+  .store-app .store-page-hero-content :is(input, .store-date-search, .store-search-input) { color: var(--fresh-ink); }
+  .store-app .store-page-hero-content :is(button, input, a):focus-visible { outline-color: var(--fresh-brand-deep); }
+  body:has(.store-app) .store-app .store-main-column .store-page-layout > .store-page-surface {
+    position: relative; z-index: auto; min-height: 0; margin: 0; padding: 24px; border: 1px solid var(--fresh-soft-edge); border-radius: var(--fresh-radius-group);
+    background: var(--fresh-surface); box-shadow: none; gap: 16px;
+  }
+  .store-app .store-page-surface > .store-sticky-tabs, .store-app .store-date-browser > .store-sticky-tabs {
+    margin: -24px -24px 0; padding: 16px 24px; border-bottom: 1px solid var(--fresh-soft-edge); border-radius: var(--fresh-radius-group) var(--fresh-radius-group) 0 0; background: var(--fresh-surface);
+  }
+  .store-app .store-home-welcome { display: none; }
+  body:has(.store-app) .store-app .store-home-page .store-page-hero-content:has(> .store-home-welcome:only-child) { display: none; }
+  body:has(.store-app) .store-app .store-main-column .store-home-page > .store-home-surface,
+  body:has(.store-app) .store-app .store-main-column .store-page-layout > .store-shelf-surface {
+    border: 0; padding: 0; border-radius: 0; background: transparent; box-shadow: none;
+  }
+  .store-app .store-home-features { padding: 0; }
+  .store-app .store-home-section-heading { margin-bottom: 16px; }
+  .store-app .store-home-section-heading > button { min-width: 44px; min-height: 44px; box-shadow: none; border-radius: var(--fresh-radius-control); }
+  .store-app.store-screen-home .store-launcher-grid { gap: 16px; }
+  .store-app.store-screen-home .store-launcher-grid .store-module {
+    min-height: 136px; padding: 20px; gap: 12px; border: 1px solid var(--fresh-soft-edge); border-radius: var(--fresh-radius-group);
+    background: var(--fresh-surface); background-image: none; box-shadow: none;
+  }
+  .store-app.store-screen-home .store-module-icon { width: 40px; height: 40px; border: 0; border-radius: var(--fresh-radius-control); background: var(--fresh-canvas); color: var(--fresh-brand-action); box-shadow: none; }
+  .store-app.store-screen-home .store-module-icon svg { width: 24px; height: 24px; }
+  .store-app .store-home-attention { margin: 24px 0 0; }
+  body:has(.store-app) .store-app .store-home-attention > button { background: var(--fresh-surface); box-shadow: none; }
+  body:has(.store-app) .store-app .store-main-column .store-shelf-surface .store-shelf-page { padding: 0; }
+  body:has(.store-app) .store-app.store-screen-shelf :is(.store-shelf-form, .store-shelf-result) { border-color: var(--fresh-soft-edge); border-radius: var(--fresh-radius-group); box-shadow: none; }
+  body:has(.store-app) .store-app.store-screen-shelf .store-main-column .store-shelf-history {
+    margin: 20px 0 0; padding: 20px; border: 1px solid var(--fresh-soft-edge); border-radius: var(--fresh-radius-group); background: var(--fresh-surface); box-shadow: none;
+  }
+  body:has(.store-app) .store-app .report-hub :is(.report-type-card, .report-history-card, .report-custom-card) { background: var(--fresh-surface); box-shadow: none; }
+  body:has(.store-app) .store-app .store-quick-fab { border-color: var(--fresh-soft-edge); border-radius: var(--fresh-radius-control); background: var(--fresh-surface); color: var(--fresh-brand-deep); box-shadow: var(--fresh-soft-card-shadow); }
+  body:has(.store-app) .store-app .store-quick-fab:hover { background: var(--fresh-canvas); }
+  .store-app .report-stage-hero .date-report-heading { width: 100%; }
+  .store-app .report-stage-hero .date-report-heading :is(h2, span),
+  .store-app .report-stage-hero .report-history-hero-count { color: var(--fresh-ink); }
+  .store-app .report-stage-hero .date-report-document-meta, .store-app .report-stage-hero .date-report-document-meta p { color: var(--fresh-ink); border-color: var(--fresh-line); }
+  .store-app .report-stage-hero :is(.date-report-info, .date-report-back, .report-type-trigger) { color: var(--fresh-brand-deep); border-color: var(--fresh-line); background: var(--fresh-surface); }
+  .store-app .report-stage-hero .report-type-trigger { max-width: 520px; min-height: 64px; }
+  .store-app .report-sliding-cap { animation: none; transition: none; transform: none; }
+  .store-app .report-cap-navigation { margin: 0 0 16px; padding: 0; }
+  .store-app .report-stage-hero :is(button, a):focus-visible { outline-color: var(--fresh-brand-deep); }
 }

@@ -9,8 +9,8 @@ export type StorePageHeaderOptions = {
 };
 
 /** One row and one geometry for every page, including Home, shelf and sign-in. */
-export function StoreAppHeader({ leading = "back", title, subtitle, storeName, account, onHome, onBack = onHome, backLabel = "Về trang chủ", titleRef, titleId, hideCopy = false, parent }: {
-  hideCopy?: boolean; parent?: { label: string; onNavigate: () => void };
+export function StoreAppHeader({ leading = "back", title, subtitle, storeName, account, onHome, onBack = onHome, backLabel = "Về trang chủ", titleRef, titleId, hideCopy = false, parent, heading = true }: {
+  heading?: boolean; hideCopy?: boolean; parent?: { label: string; onNavigate: () => void };
   leading?: "brand" | "back"; title: string; subtitle: string; storeName?: string;
   account?: ReactNode; onHome?: () => void; onBack?: () => void; backLabel?: string; titleRef?: Ref<HTMLHeadingElement>; titleId?: string;
 }) {
@@ -23,7 +23,7 @@ export function StoreAppHeader({ leading = "back", title, subtitle, storeName, a
         <nav className="store-header-location" aria-label="Vị trí hiện tại"><ol>
           {!hideCopy && onHome ? <li className="store-header-ancestor"><button type="button" onClick={onHome}>Trang chủ</button><ChevronRight size={14} aria-hidden="true" /></li> : null}
           {!hideCopy && parent ? <li className="store-header-ancestor"><button type="button" onClick={parent.onNavigate} aria-label={backLabel}>{parent.label}</button><ChevronRight size={14} aria-hidden="true" /></li> : null}
-          <li aria-current="page"><h1 title={title} id={titleId} ref={titleRef} tabIndex={titleRef ? -1 : undefined}>{title}</h1></li>
+          <li aria-current="page">{heading ? <h1 title={title} id={titleId} ref={titleRef} tabIndex={titleRef ? -1 : undefined}>{title}</h1> : <span className="store-header-desktop-title" title={title}>{title}</span>}</li>
         </ol></nav>
         {!hideCopy ? <p title={subtitle}>{subtitle}</p> : null}
       </div>{storeName ? <span className="store-header-store" title={storeName}>{storeName}</span> : null}</div>} actions={<><span className="fresh-desktop-context" title={storeName}>{storeName}</span>{account}</>} />;

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "kphon03-create-media",
-  "revision": 7,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 8,
+  "status": "VERIFYING",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -15,15 +15,16 @@
     "Owner14/11: khôi phục đúng Fresh sau compact/polish; đồng bộ sidebar Store/Admin, desktop cuộn tự nhiên, mobile giữ hero sticky; giữ draft đăng nhập Admin khi chuyển tab; chỉnh nhẹ token theo UI/UX.",
     "Revision5: compact list primitives UI05, KPH density/search, DATE group dropdown/chips trong mock entry, sửa runtime Admin proxy và smoke session thật.",
     "Revision6: chọn store/account, password form dùng chung và token/control/tables/feedback Admin hiện có; không đổi business/API.",
-    "Revision7: shared desktop sidebar/nav/header/account trigger theo Admin, Store và Admin cùng layout fixed72/rail248–80; giữ mobile entry."
+    "Revision7: shared desktop sidebar/nav/header/account trigger theo Admin, Store và Admin cùng layout fixed72/rail248–80; giữ mobile entry.",
+    "Revision8: Store desktop canvas/panels/heading/functional toolbar theoAdmin, không green underlay/slide; mobile giữ Fresh hiện hành."
   ],
   "outOfScope": [
     "Review/export và DATE persistence",
     "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
-  "baseSha": "638f982",
-  "candidateSha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
+  "baseSha": "38dc839",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
     "packages/ui/**",
@@ -40,37 +41,37 @@
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 7,
-      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
-      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
+      "status": "pending",
+      "revision": 8,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 7,
-      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
-      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
+      "status": "pending",
+      "revision": 8,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 7,
-      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
-      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
+      "revision": 8,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     },
     {
       "id": "owner-green-ui",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 7,
-      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
-      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
+      "revision": 8,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     }
   ],
   "changes": [
@@ -115,10 +116,17 @@
       "source": "Owner chat14/11/2026 sau goalUIrevision6",
       "impact": "Shareddesktopcomponents thật thay hai composition khác nhau; Store thêmthu/mở rail vàheader cố định theoAdmin, giữmobile vàcontracts. Invalidate frame/nav/browserchecks.",
       "decision": "Rootsoleintegrationwriter cho packages/ui và2consumers; hai lượt kiểm390/834/900/1440, không mởbackend/module hoặcrollout."
+    },
+    {
+      "revision": 8,
+      "request": "Store desktop bỏ cơ chế trượt nền xanh, trình bày lại nguyên cụm chức năng, sát Admin",
+      "source": "Owner chat14/11/2026 sau revision7",
+      "impact": "Chrome dùng chung chưa đủ; thay desktop page composition: canvas, heading, toolbar, panel; bỏ cover overlap/hero paint và report pull desktop, mobile giữ nguyên. Invalidate Store layout/browser checks.",
+      "decision": "Root sole writer, hai lượt kiểm có mục tiêu tất cả màn Store hiện có390/900/1440; không đổi contracts/API/business hoặc nhập backend DATE."
     }
   ],
   "blockers": [],
-  "nextAction": "Bàn giao shareddesktopchrome theoAdmin tại 3fc1a61;375unit/TypeScript/build/Playwright390/834/900/1440 vàcreatebackendthậtđạt. Ownerđối chiếuStore4173/Admin4175; hai vòngcuốiriêng.",
+  "nextAction": "Pin candidate revision8, xác nhận kiểm tích hợp và bàn giao owner xem Store desktop cạnh Admin.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",

@@ -1,3 +1,4 @@
+import { useStoreDesktopLayout } from "./use-store-desktop-layout";
 import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
 import type { StorePageHeaderOptions } from "./store-app-header";
 export type { StorePageHeaderOptions } from "./store-app-header";
@@ -15,9 +16,10 @@ export function StorePageHero({ children, className = "", contentLabel, header, 
   children?: ReactNode; className?: string; contentLabel?: string; header?: StorePageHeaderOptions; appHeader?: ReactNode;
 }) {
   const renderHeader = useContext(StorePageHeaderContext);
+  const desktop = useStoreDesktopLayout();
   return <div className={`store-page-hero ${className}`} onFocusCapture={event => {
     // React portal focus bubbles through this component although its DOM is outside.
-    if (!event.currentTarget.contains(event.target)) return;
+    if (!event.currentTarget.contains(event.target) || desktop) return;
     // Account/settings opens above the current work; preserve its scroll anchor.
     if (!(event.target instanceof Element && event.target.closest(".store-account, .store-online-account"))) window.scrollTo({ top: 0, behavior: "instant" });
   }}>

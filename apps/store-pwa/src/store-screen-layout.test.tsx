@@ -13,7 +13,8 @@ import { mockProfile, mockRecords } from "./store-app-mock";
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("Store single screen layout", () => {
-  it("keeps account and portal focus from resetting the reading position, while revealing other hero controls", () => {
+  it.each([false, true])("keeps account/portal focus stable and follows the hero mode desktop=%s", desktop => {
+    vi.stubGlobal("matchMedia", () => ({ matches: desktop, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
     const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
     const account = <><button className="store-account">Tài khoản</button>{createPortal(<button>Cài đặt popup</button>, document.body)}</>;
     render(<StorePageHero appHeader={<StoreAppHeader title="KPH" subtitle="KPH" account={account} onHome={() => {}} />}><input aria-label="Tìm hàng" /></StorePageHero>);
@@ -21,7 +22,8 @@ describe("Store single screen layout", () => {
     fireEvent.focus(screen.getByRole("button", { name: "Cài đặt popup" }));
     expect(scroll).not.toHaveBeenCalled();
     fireEvent.focus(screen.getByRole("textbox", { name: "Tìm hàng" }));
-    expect(scroll).toHaveBeenCalledWith({ top: 0, behavior: "instant" });
+    if (desktop) expect(scroll).not.toHaveBeenCalled();
+    else expect(scroll).toHaveBeenCalledWith({ top: 0, behavior: "instant" });
   });
 
 
