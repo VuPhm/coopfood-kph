@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon03-create-media",
   "revision": 8,
-  "status": "VERIFYING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -24,7 +24,7 @@
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "38dc839",
-  "candidateSha": "",
+  "candidateSha": "de740775569b70f60b819b9ff0832813271860dd",
   "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
     "packages/ui/**",
@@ -41,18 +41,18 @@
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 8,
-      "sha": "",
+      "sha": "de740775569b70f60b819b9ff0832813271860dd",
       "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 8,
-      "sha": "",
+      "sha": "de740775569b70f60b819b9ff0832813271860dd",
       "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     },
     {
@@ -61,7 +61,7 @@
       "required": true,
       "status": "pending",
       "revision": 8,
-      "sha": "",
+      "sha": "de740775569b70f60b819b9ff0832813271860dd",
       "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     },
     {
@@ -70,7 +70,7 @@
       "required": true,
       "status": "pending",
       "revision": 8,
-      "sha": "",
+      "sha": "de740775569b70f60b819b9ff0832813271860dd",
       "evidence": "docs/delivery/kphon03-create-media/store-desktop-r8.md"
     }
   ],
@@ -126,7 +126,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Pin candidate revision8, xác nhận kiểm tích hợp và bàn giao owner xem Store desktop cạnh Admin.",
+  "nextAction": "Owner xem Store desktop4173/bản mẫu4180 cạnh Admin4175; UI/create acceptance và hai vòng cuối vẫn pending.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",

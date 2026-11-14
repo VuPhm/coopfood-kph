@@ -3,7 +3,9 @@
 Owner: “Store desktop: bỏ cơ chế trượt nền xanh, trình bày lại nguyên cụm chức
 năng, đưa về giống sát Admin”. Tiếp trên branch `store-app/kphon03-create-media`,
 worktree `.local/worktrees/kphon03-create-media`, base `38dc839` của revision7.
-Candidate SHA được pin trong plan sau checkpoint và kiểm tích hợp cuối.
+Candidate đã kiểm: `de740775569b70f60b819b9ff0832813271860dd`. Ba script browser
+workspace/chrome/create chạy lại trên checkpoint này đều PASS; các commit sau
+chỉ cập nhật hồ sơ cycle.
 
 ## Kết quả
 
@@ -72,6 +74,8 @@ QA độc lập report/shelf ở390/1440: menu/history/composer/picker/back và 
 panel/hàng giữ layout, chữ tối rõ. Kiểm desktop dùng native scrollbar headless.
 Script kiểm mới đã sửa tên màn/selector theo DOM thật và dùng contrast thay so
 literal màu token; các lỗi đó thuộc script kiểm, không phải bỏ qua product failure.
+
+`npm run check:docs` và `git diff --check` PASS.
 
 Admin/shared-ui source không đổi trong revision8; unit/build các phần đó dùng
 lại evidence revision7 `3fc1a61` với rationale phạm vi không bị tác động. Browser
