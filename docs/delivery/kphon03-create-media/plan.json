@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "kphon03-create-media",
-  "revision": 5,
-  "status": "AWAITING_ACCEPTANCE",
+  "revision": 6,
+  "status": "EXECUTING",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -13,81 +13,52 @@
     "Owner bổ sung: merge UI green-header source e8a2df7 vào KPHON03, giữ create/session/idempotency/media; kiểm có mục tiêu chrome và create trên bản kết hợp.",
     "Owner13/11 yêu cầu ưu tiên sửa SW/trang cũ trên cả Store/Admin; chưa đổi UI layout. Phục hồi preview đúng nguồn và kiểm stale workers/cache không mất dữ liệu.",
     "Owner14/11: khôi phục đúng Fresh sau compact/polish; đồng bộ sidebar Store/Admin, desktop cuộn tự nhiên, mobile giữ hero sticky; giữ draft đăng nhập Admin khi chuyển tab; chỉnh nhẹ token theo UI/UX.",
-    "Revision5: compact list primitives UI05, KPH density/search, DATE group dropdown/chips trong mock entry, sửa runtime Admin proxy và smoke session thật."
+    "Revision5: compact list primitives UI05, KPH density/search, DATE group dropdown/chips trong mock entry, sửa runtime Admin proxy và smoke session thật.",
+    "Revision6: chọn store/account, password form dùng chung và token/control/tables/feedback Admin hiện có; không đổi business/API."
   ],
   "outOfScope": [
     "Review/export và DATE persistence",
     "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
-  "baseSha": "96bfd0c",
-  "candidateSha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
+  "baseSha": "b39f3c7",
+  "candidateSha": "",
   "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
-    "docs/**",
     "packages/ui/**",
-    "contracts/**",
-    "backend/**",
-    "apps/store-pwa/src/store-record-items.css",
-    "apps/store-pwa/src/store-product-name.tsx",
-    "apps/store-pwa/src/store-product-name.css",
-    "apps/store-pwa/src/store-tag-strip.tsx",
-    "apps/store-pwa/src/store-tag-strip.css",
-    "apps/store-pwa/src/store-workspace-search.tsx",
-    "apps/store-pwa/src/store-workspace-search.css",
-    "apps/store-pwa/src/store-search-field.tsx",
-    "apps/store-pwa/src/store-app-frame.css",
-    "apps/store-pwa/src/store-online-app.tsx",
-    "apps/store-pwa/src/store-online-app.test.tsx"
+    "docs/**",
+    "apps/store-pwa/src/change-password-dialog.tsx",
+    "apps/admin-web/src/change-password-dialog.tsx",
+    "apps/admin-web/src/app.tsx"
   ],
   "reviewLimit": 2,
-  "reviewRound": 2,
+  "reviewRound": 1,
   "teams": [
     {
-      "id": "kph",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr5-kph",
+      "id": "store",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr6-store",
       "allowedPaths": [
-        "apps/store-pwa/src/store-kph-list.tsx",
-        "apps/store-pwa/src/store-kph-items.css",
-        "apps/store-pwa/src/store-online-kph.tsx",
-        "apps/store-pwa/src/store-online-kph.css",
-        "apps/store-pwa/src/store-kph-workspace.tsx",
-        "apps/store-pwa/src/store-kph-workspace.test.tsx",
-        "apps/store-pwa/src/store-screen-layout.test.tsx",
-        "apps/store-pwa/src/store-kph-label.test.tsx",
-        "apps/store-pwa/src/store-online-kph.test.tsx",
-        "e2e/scripts/check-fresh-r5-kph.cjs"
-      ],
-      "dependsOn": []
-    },
-    {
-      "id": "date",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr5-date",
-      "allowedPaths": [
-        "apps/store-pwa/src/store-date-groups.tsx",
-        "apps/store-pwa/src/store-date-groups.css",
-        "apps/store-pwa/src/store-date-groups.test.tsx",
-        "apps/store-pwa/src/store-date-workspace.tsx",
-        "apps/store-pwa/src/store-date-workspace.test.tsx",
-        "apps/store-pwa/src/store-date-fresh.css",
-        "apps/store-pwa/src/store-date-intake.tsx",
-        "apps/store-pwa/src/store-date-intake.css",
-        "apps/store-pwa/src/store-date-intake.test.tsx",
-        "apps/store-pwa/src/store-date-lot-view.tsx",
-        "apps/store-pwa/src/store-app-mock.ts",
-        "apps/store-pwa/src/store-date-assessment.ts",
-        "apps/store-pwa/src/store-date-assessment.test.ts",
-        "apps/store-pwa/src/store-date-workflow.test.tsx",
-        "e2e/scripts/check-fresh-r5-date.cjs"
+        "apps/store-pwa/src/store-online-app.tsx",
+        "apps/store-pwa/src/store-online-app.css",
+        "apps/store-pwa/src/store-online-app.test.tsx",
+        "apps/store-pwa/src/store-account-sheet.tsx",
+        "apps/store-pwa/src/store-account-trigger.tsx",
+        "apps/store-pwa/src/store-utility-polish.css",
+        "e2e/scripts/check-fresh-r6-store.cjs"
       ],
       "dependsOn": []
     },
     {
       "id": "admin",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr5-admin",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr6-admin",
       "allowedPaths": [
-        "tooling/preview/fresh-review.mjs",
-        "e2e/scripts/check-fresh-r5-admin.cjs"
+        "apps/admin-web/src/admin-fresh.css",
+        "apps/admin-web/src/admin-fresh-material.css",
+        "apps/admin-web/src/membership.css",
+        "apps/admin-web/src/identity-workspace.tsx",
+        "apps/admin-web/src/catalog-workspace.tsx",
+        "apps/admin-web/src/admin-overview.tsx",
+        "e2e/scripts/check-fresh-r6-admin.cjs"
       ],
       "dependsOn": []
     }
@@ -97,37 +68,37 @@
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
-      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
+      "status": "pending",
+      "revision": 6,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pass",
-      "revision": 5,
-      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
-      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
+      "status": "pending",
+      "revision": 6,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 5,
-      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
-      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
+      "revision": 6,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     },
     {
       "id": "owner-green-ui",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 5,
-      "sha": "3273e94d23ec0a8aeaac28810295a8531fec6152",
-      "evidence": "docs/delivery/kphon03-create-media/compact-restore-r5.md"
+      "revision": 6,
+      "sha": "",
+      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     }
   ],
   "changes": [
@@ -158,10 +129,17 @@
       "source": "Owner chat14/11/2026 sau revision4",
       "impact": "POLISH03 quá sớm. Nguồn DATE07/DATE08/UI05 (53122ae) có groups và login focus fix; port UI theo nguồn, không nhập backend V11–13 hoặc paired media. Admin proxy502 cần sửa runtime/tooling.",
       "decision": "Hai lượt integration review, Terra ở3 worktree độc lập; KPH online giữ D01 và DATE nhóm trong bản mẫu riêng cho đến scope backend DATE."
+    },
+    {
+      "revision": 6,
+      "request": "tiếp, đặt goal để out task",
+      "source": "Owner chat14/11/2026",
+      "impact": "Tiếp đồng bộ token/UI của các luồng đã có để bàn giao kỹ thuật; không tự suy owner acceptance cho revision5 hoặc mở backend mới.",
+      "decision": "Goal active cho vòng hoàn tất; hai lượt rà giới hạn, Terra Store/Admin ở worktree riêng; root packages/ui và đổi mật khẩu dùng chung; kiểm390/1440, checkpoint sạch và hồ sơ out-task."
     }
   ],
   "blockers": [],
-  "nextAction": "Owner xem candidate3273e94: Admin4175 mở/đăng nhập thật, Storeonline4173 KPH, Storemẫu4180 compact/nhómDATE. Kỹ thuật đạt328Store tests/build/Playwright; owner UI acceptance và hai vòng cuối vẫn pending.",
+  "nextAction": "Thực thi goal hoàn tất token Store/Admin hiện có, hai lượt kiểm và bàn giao technical-ready; không tự đóng owner acceptance.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
