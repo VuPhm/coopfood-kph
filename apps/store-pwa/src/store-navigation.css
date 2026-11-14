@@ -1,6 +1,5 @@
 /* Rounded floating navigation with an opaque surface, without glass effects. */
 .store-quick-fab { bottom: max(calc(var(--store-mobile-toolbar-height, 0px) + 12px), var(--store-floating-action-clearance, 0px)); }
-.store-app .store-desktop-rail { display: none; }
 .store-app .store-mobile-toolbar { display: none; }
 .store-notifications-body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 12px; padding: 64px 24px 160px; text-align: center; color: #20344a; }
 .store-notifications-icon { display: grid; place-items: center; width: 72px; height: 72px; margin-bottom: 8px; border-radius: 24px; background: #e6f7f2; color: #00724e; }
@@ -26,24 +25,7 @@
   .store-app .store-mobile-toolbar a:focus-visible { outline: 3px solid #00724e; outline-offset: -3px; }
   .store-app .store-quick-fab { right: 16px; bottom: max(calc(var(--store-mobile-toolbar-height) + 12px), var(--store-floating-action-clearance, 0px)); }
 }
-@media (min-width: 900px) {
-  .store-app .store-desktop-rail { position: sticky; top: 0; display: flex; flex-direction: column; flex: 0 0 248px; width: 248px; height: 100dvh; overflow-y: auto; padding: 24px 16px 20px; border-right: 1px solid #dce9e3; background: #f5f9f7; color: #20344a; }
-  .store-sidebar-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin: 0 8px 28px; color: #00724e; text-decoration: none; }
-  .store-sidebar-brand img { display: block; width: 106px; height: auto; border-radius: 14px; padding: 12px; background: #00724e; }
-  .store-sidebar-brand span { font-size: 12px; line-height: 18px; font-weight: 600; }
-  .store-app .store-desktop-rail nav { display: grid; gap: 4px; }
-  .store-app .store-desktop-rail nav a { display: flex; align-items: center; gap: 12px; min-height: 48px; border-radius: 12px; padding: 10px 14px; color: #475e62; font-size: 14px; line-height: 20px; text-decoration: none; }
-  .store-app .store-desktop-rail nav a svg { flex: 0 0 21px; }
-  .store-app .store-desktop-rail nav a:hover { background: #e8f2ec; }
-  .store-app .store-desktop-rail nav a[aria-current="page"] { background: #dcefe6; color: #006846; font-weight: 650; }
-  .store-app .store-desktop-rail .store-rail-label { margin: 24px 14px 8px; color: #596b7d; font-size: 10px; line-height: 16px; font-weight: 650; letter-spacing: .06em; }
-  .store-app .store-desktop-rail .store-rail-store { display: grid; gap: 5px; margin-top: auto; border-top: 1px solid #dce9e3; padding: 20px 12px 0; }
-  .store-app .store-desktop-rail .store-rail-store small { color: #596b7d; font-size: 10px; line-height: 16px; }
-  .store-app .store-desktop-rail .store-rail-store strong { font-size: 14px; line-height: 20px; color: #20344a; }
-  .store-app .store-desktop-rail .store-rail-store > span { color: #596b7d; font-size: 12px; line-height: 18px; }
-  .store-sidebar-brand:focus-visible, .store-desktop-rail nav a:focus-visible { outline: 3px solid #00724e; outline-offset: 2px; }
-  .store-app .store-quick-fab { bottom: max(24px, var(--store-floating-action-clearance, 0px)); }
-}
+@media (min-width: 900px) { .store-app .store-quick-fab { bottom: max(24px, var(--store-floating-action-clearance, 0px)); } }
 @media (prefers-reduced-motion: reduce) { .store-app .store-mobile-toolbar a { transition: none; } }
 @media (forced-colors: active) { .store-app .store-mobile-toolbar { border-color: ButtonText; background: Canvas; } .store-app .store-mobile-toolbar a[aria-current] { outline: 2px solid Highlight; } }
 @media print { .store-app .store-desktop-rail, .store-app .store-mobile-toolbar, .store-app .store-quick-fab { display: none; } }

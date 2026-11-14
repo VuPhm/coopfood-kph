@@ -7,6 +7,17 @@ Báo cáo (menu/composer/history/document), Thông báo và đăng nhập.
 
 Owner đã cho phép merge bản cuối ngày 22/10; [nghiệm thu/tích hợp](../delivery/header-style-rollout/merge-2026-10-22.md).
 
+## Desktop shared chrome — 14/11/2026
+
+Theo yêu cầu owner mới hơn, từ900px Store và Admin dùng chung component trong
+`packages/ui/src/desktop-chrome.tsx`: rail248px/thu80px, header fixed72px theo
+bố cục Admin. StorePageHero chỉ giữ slot feature và cuộn cùng trang; topbar
+không còn cuộn trong hero. Store identity nằm trong header/account thay footer
+sidebar riêng. Mobile giữ page kit/hero sticky mô tả bên dưới. Quy tắc hình học
+desktop ở phần lịch sử sau đây được supersede bởi shared chrome này; business,
+route, focus, navigation và header form/modal riêng giữ nguyên.
+[Implementation/evidence](../delivery/kphon03-create-media/desktop-unify-r7.md).
+
 ## Một cấu trúc, ba vị trí lắp
 
 ```tsx

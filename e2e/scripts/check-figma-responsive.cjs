@@ -38,7 +38,7 @@ async function checkScreen(page, viewport) {
   if (viewport.width >= 900) {
     const desktopShell = await page.evaluate(() => {
       const app = document.querySelector('.store-app').getBoundingClientRect();
-      const rail = document.querySelector('.store-desktop-rail').getBoundingClientRect();
+      const rail = document.querySelector('.fresh-desktop-sidebar').getBoundingClientRect();
       const profile = getComputedStyle(document.querySelector('.store-profile-meta strong')).color;
       return {appLeft:app.left,appWidth:app.width,railLeft:rail.left,railWidth:rail.width,profile};
     });
@@ -72,7 +72,7 @@ async function checkScreen(page, viewport) {
     await page.getByRole('heading',{name:'Bánh quy bơ hộp 300 g'}).waitFor();
     await capture(page,`lookup-${tag}`);
     await page.getByRole('button',{name:'Về trang chủ'}).click();
-    await page.locator('.store-desktop-rail').getByRole('link', {name:'Quản lý DATE',exact:true}).click();
+    await page.locator('.fresh-desktop-sidebar').getByRole('link', {name:'Quản lý DATE',exact:true}).click();
   } else {
     await homeNavigate(page,viewport,'Quản lý DATE');
   }

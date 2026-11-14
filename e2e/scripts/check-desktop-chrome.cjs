@@ -12,7 +12,7 @@ const navPaint = el => {
   return Object.fromEntries(['color','backgroundImage','borderRadius','fontSize','lineHeight','minHeight'].map(key=>[key,style[key]]));
 };
 function mobilePresentation(rows) {
-  const rail=rows.findIndex(row=>row.cls==='store-desktop-rail');
+  const rail=rows.findIndex(row=>row.cls==='fresh-desktop-sidebar');
   const main=rows.findIndex(row=>row.cls==='store-main-column');
   // The official logo replaces the old artwork. Compare the remaining mobile
   // presentation; hidden desktop sidebar DOM is outside this visual baseline.
@@ -100,20 +100,20 @@ async function navigate(page, label) {
         await page.evaluate(()=>document.fonts.ready);
         await noOverflow(page);
         if(width>=900 && route!=='login') {
-          const rail=await page.locator('.store-desktop-rail').boundingBox();
+          const rail=await page.locator('.fresh-desktop-sidebar').boundingBox();
           const header=await page.locator('.store-header').boundingBox();
-          const brand=await page.locator('.store-sidebar-brand').boundingBox();
+          const brand=await page.locator('.fresh-sidebar-brand').boundingBox();
           assert.equal(rail.width,248);assert.equal(rail.x+rail.width,header.x);
           assert.equal(brand.y+brand.height,header.y+header.height);
           await expect(page.locator('.store-header')).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
           await expect(page.locator('.store-header h1')).toHaveCSS('color','rgb(255, 255, 255)');
           await expect(page.locator('.store-header')).toHaveCSS('border-bottom-width','0px');
-          await expect(page.locator('.store-desktop-rail')).toHaveCSS('border-right-width','0px');
-          await expect(page.locator('.store-sidebar-brand')).toHaveCSS('border-bottom-width','0px');
+          await expect(page.locator('.fresh-desktop-sidebar')).toHaveCSS('border-right-width','0px');
+          await expect(page.locator('.fresh-sidebar-brand')).toHaveCSS('border-bottom-width','0px');
           await expect(page.locator('.store-header-brand')).toBeHidden();
           await expect(page.locator('.store-sidebar-logo img')).toHaveAttribute('src','/brand/coopfood-logo-light.png');
           await expect(page.locator('.store-sidebar-logo img')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
-          assert.deepEqual(await page.locator('.store-desktop-rail [aria-current="page"]').evaluate(navPaint),desktopNavPaint,'Admin and Store paint the same navigation roles');
+          assert.deepEqual(await page.locator('.fresh-desktop-sidebar [aria-current="page"]').evaluate(navPaint),desktopNavPaint,'Admin and Store paint the same navigation roles');
           if(route==='home') await expect(page.locator('.store-header-copy > div')).toHaveCSS('clip-path','none');
         }
         if(width===390 && ['home','kph'].includes(route)) {
@@ -126,7 +126,7 @@ async function navigate(page, label) {
           await expect(page.locator('.store-header')).toHaveCSS('height','72px');
           await expect(page.locator('.store-header h1')).toHaveCSS('color','rgb(255, 255, 255)');
           await expect(page.locator('.store-mobile-toolbar')).toBeVisible();
-          await expect(page.locator('.store-desktop-rail')).toBeHidden();
+          await expect(page.locator('.fresh-desktop-sidebar')).toBeHidden();
           if(route==='home') await expect(page.locator('.store-header-brand img')).toHaveAttribute('src','/brand/coopfood-logo-dark.png');
         }
         await page.screenshot({path:`${output}/store-${route}-after-${width}.png`});

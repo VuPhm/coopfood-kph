@@ -1,3 +1,4 @@
+import { DesktopSidebar, DesktopNavItem } from "@coopfood-kph/ui";
 import { useEffect, useState } from "react";
 import { LayoutGrid, type LucideIcon } from "lucide-react";
 import { storeFeatures, storePrimaryNavigation, isStoreFeature, type Screen, type StoreFeatureScreen } from "./store-app-routes";
@@ -13,6 +14,7 @@ function readRecent(screen: Screen): StoreFeatureScreen | null {
 export function StoreNavigation({ screen, profile, navigate, onKphIntent, hidden = false }: {
   screen: Screen; profile: StoreProfile; navigate: (screen: Screen) => void; onKphIntent?: (() => void) | undefined; hidden?: boolean;
 }) {
+  const [collapsed, setCollapsed] = useState(false);
   const [recent, setRecent] = useState<StoreFeatureScreen | null>(() => readRecent(screen));
   useEffect(() => {
     if (!isStoreFeature(screen)) return;
@@ -25,13 +27,11 @@ export function StoreNavigation({ screen, profile, navigate, onKphIntent, hidden
     onPointerEnter={route === "kph" ? onKphIntent : undefined} onFocus={route === "kph" ? onKphIntent : undefined}><Icon size={21} strokeWidth={1.8} aria-hidden="true" /><span>{label}</span></a>;
   const primaryLinks = () => storePrimaryNavigation.map(item => link(item.screen, item.label, item.icon));
   return <>
-    <aside className="store-desktop-rail" aria-label="Điều hướng cửa hàng">
-      <a className="store-sidebar-brand" href="#home" aria-label="Co.op Food — Trang chủ"><span className="store-sidebar-logo"><img src={assetUrl("brand/coopfood-logo-light.png")} alt="Co.op Food" width={598} height={246} /></span><span>Vận hành cửa hàng</span></a>
-      <nav aria-label="Điều hướng chung">{primaryLinks()}</nav>
-      <p className="store-rail-label">TÍNH NĂNG</p>
-      <nav aria-label="Tính năng cửa hàng">{storeFeatures.map(feature => link(feature.screen, feature.sidebarLabel, feature.icon))}</nav>
-      <div className="store-rail-store"><small>CỬA HÀNG HIỆN TẠI</small><strong>{profile.storeName}</strong><span>Mã cửa hàng {profile.storeCode}</span></div>
-    </aside>
+    <DesktopSidebar label="Điều hướng cửa hàng" logo={assetUrl("brand/coopfood-logo-light.png")} appName="Store" homeHref="#home" homeLabel="Co.op Food — Trang chủ" collapsed={collapsed} onCollapsedChange={setCollapsed}>
+      <nav aria-label="Điều hướng chung">{storePrimaryNavigation.map(item => <DesktopNavItem key={item.screen} href={`#${item.screen}`} label={item.label} icon={<item.icon size={18} aria-hidden="true" />} active={screen === item.screen} />)}</nav>
+      <p className="fresh-sidebar-group-title">Tính năng</p>
+      <nav aria-label="Tính năng cửa hàng">{storeFeatures.map(feature => <DesktopNavItem key={feature.screen} href={`#${feature.screen}`} label={feature.sidebarLabel} icon={<feature.icon size={18} aria-hidden="true" />} active={screen === feature.screen} onIntent={feature.screen === "kph" ? onKphIntent : undefined} />)}</nav>
+    </DesktopSidebar>
     <nav className="store-mobile-toolbar" hidden={hidden} aria-label="Điều hướng chính trên mobile">
       {primaryLinks()}
       <a href={`#${latest?.screen ?? "home"}`} data-recent-feature={latest?.screen ?? ""} aria-current={latest && screen === latest.screen ? "page" : undefined}

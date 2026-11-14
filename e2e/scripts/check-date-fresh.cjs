@@ -107,7 +107,7 @@ async function audit(page, selector, state) {
       const nav = page.locator('.store-mobile-toolbar');
       if (!desktop) { await expect(nav.getByRole('link')).toHaveCount(4); await expect(nav.getByRole('link',{name:'DATE',exact:true})).toHaveAttribute('aria-current','page'); }
       await expect(page.locator('[href="#lookup"]')).toHaveCount(0);
-      await expect(page.locator('.store-desktop-rail').getByRole('button',{name:'Tra cứu',exact:true})).toHaveCount(0);
+      await expect(page.locator('.fresh-desktop-sidebar').getByRole('button',{name:'Tra cứu',exact:true})).toHaveCount(0);
       await shot('alerts');
       for (const control of await page.locator('.store-date-search-form button, .store-date .store-tabs button, .store-date .store-filter, .store-date-statuses button').all()) {
         const box = await control.boundingBox(); expect(box.width).toBeGreaterThanOrEqual(44); expect(box.height).toBeGreaterThanOrEqual(44);

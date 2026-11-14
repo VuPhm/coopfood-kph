@@ -13,7 +13,7 @@ async function fits(p){expect(await p.locator('html').evaluate(e=>e.scrollWidth<
   const p=await browser.newPage({viewport,serviceWorkers:'block',reducedMotion:'no-preference'}),old=await browser.newPage({viewport,serviceWorkers:'block',reducedMotion:'no-preference'});const errors=[];p.on('pageerror',e=>errors.push(e.message));
   await ready(p,base,'kph');await ready(old,baseline,'kph');
   const cap=await parity(p.locator('.store-page-surface'),old.locator('.store-page-surface'));
-  if(viewport.width>=900){await parity(p.locator('.store-desktop-rail'),old.locator('.store-desktop-rail'));expect((await props(p.locator('.store-desktop-rail'))).shadow).not.toBe('none');}
+  if(viewport.width>=900){await parity(p.locator('.fresh-desktop-sidebar'),old.locator('.fresh-desktop-sidebar'));expect((await props(p.locator('.fresh-desktop-sidebar'))).shadow).not.toBe('none');}
   else{await parity(p.locator('.store-mobile-toolbar'),old.locator('.store-mobile-toolbar'));expect((await props(p.locator('.store-mobile-toolbar'))).shadow).not.toBe('none');}
   await p.locator('.create-tpts').click();await old.locator('.create-tpts').click();await expect(p.locator('#supplier')).toBeVisible();await expect(old.locator('#supplier')).toBeVisible();
   const form=p.locator('.store-create-screen'),oldForm=old.locator('.store-create-screen');await parity(form,oldForm);

@@ -1,3 +1,4 @@
+import { DesktopAccountButton } from "@coopfood-kph/ui";
 import type { ComponentProps } from "react";
 import type { StoreProfile } from "./store-profile";
 
@@ -12,8 +13,6 @@ export function storeAccountRole(profile: StoreProfile) {
 
 /** The same account anchor is used before and after the app finishes loading. */
 export function StoreAccountTrigger({ profile, roleLabel = storeAccountRole(profile), ...props }: { profile: StoreProfile; roleLabel?: string | undefined } & ComponentProps<"button">) {
-  const { name, initials } = storeAccountIdentity(profile);
-  return <button type="button" className="store-account" aria-label="Tài khoản và cửa hàng" {...props}>
-    <span className="store-profile-avatar">{initials}</span><span className="store-profile-meta"><strong>{name}</strong><small>{roleLabel}</small></span>
-  </button>;
+  const { initials } = storeAccountIdentity(profile);
+  return <DesktopAccountButton className="store-account" aria-label="Tài khoản và cửa hàng" {...props} initials={initials} name={profile.fullName} detail={roleLabel} avatarClassName="store-profile-avatar" copyClassName="store-profile-meta" />;
 }

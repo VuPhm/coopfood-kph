@@ -1,11 +1,4 @@
 /* Fresh chrome and material bindings. */
-.admin-shell { --sidebar-width: var(--fresh-desktop-rail-width); }
-.admin-brand { gap: 12px; flex-shrink: 0; min-height: var(--fresh-desktop-header-height); padding: 11px 20px; border-bottom: 0; }
-.admin-brand .admin-logo { width: 112px; height: 48px; flex-shrink: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.admin-logo img { display: block; width: 112px; height: auto; }
-.admin-sidebar { inset: 0 auto 0 0; width: var(--sidebar-width); padding: 0; border: 0; border-radius: 0; background: var(--fresh-chrome-surface); box-shadow: none; }
-.admin-sidebar-footer { border-top: 0; }
-.admin-sidebar > nav { min-height: 0; overflow-y: auto; padding: 20px 12px; }
 .admin-nav-group { color: var(--admin-muted); font-size: var(--fresh-type-caption); letter-spacing: .6px; }
 .admin-nav-item { color: var(--fresh-nav-ink); min-height: var(--fresh-size-control-md); border-radius: var(--fresh-radius-control); font-weight: 600; line-height: 20px; }
 .admin-nav-item:hover { background: var(--fresh-nav-hover); color: var(--fresh-brand-deep); }
@@ -80,16 +73,9 @@ body:has(.admin-shell) .identity-user-action .identity-deactivate:not(:disabled)
 body:has(.admin-shell) .identity-user-action .identity-deactivate:hover:not(:disabled) { background: var(--fresh-error-soft); }
 body:has(.admin-shell) :is(input, textarea, select):not(:where(.fresh-password-dialog *)):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { background-color: var(--fresh-form-field-surface); border-color: var(--fresh-form-field-edge); border-radius: var(--fresh-radius-control); box-shadow: var(--fresh-form-field-shadow); }
 body:has(.admin-shell) :is(input, textarea, select):not(:where(.fresh-password-dialog *)):disabled { background-color: var(--fresh-form-disabled-surface); color: var(--fresh-ink-muted); }
-.admin-shell.is-collapsed { --sidebar-width: var(--fresh-desktop-rail-collapsed); }
-.is-collapsed .admin-sidebar { padding-inline: 0; }
-.is-collapsed .admin-brand { padding: 12px; justify-content: center; }
-.is-collapsed .admin-logo { width: 56px; height: 32px; }
-.is-collapsed .admin-logo img { width: 56px; }
-.is-collapsed .admin-nav-item { padding-inline: 8px; }
 @media (max-width:899px) {
   .admin-topbar { padding-inline: 16px; }
   .admin-content { padding: 22px 16px; }
-  .admin-shell, .admin-shell.is-collapsed { --sidebar-width: 0px; }
   body:has(.admin-shell) .admin-mobile-nav { border-radius: 0 var(--fresh-radius-group) var(--fresh-radius-group) 0; }
 }
 @media (prefers-reduced-motion:reduce), (prefers-reduced-transparency:reduce) {

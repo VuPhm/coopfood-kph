@@ -16,8 +16,8 @@ async function login(page, user='region.admin03') {
  if((page.viewportSize()?.width??0)>=900) {
   await expect(page.locator('.store-header')).toHaveCSS('background-image','linear-gradient(120deg, rgb(0, 95, 67), rgb(0, 122, 82) 58%, rgb(0, 128, 90))');
   await expect(page.locator('.store-header')).toHaveCSS('border-bottom-width','0px');
-  await expect(page.locator('.store-desktop-rail')).toHaveCSS('border-right-width','0px');
-  await expect(page.locator('.store-sidebar-brand img')).toHaveAttribute('src',/coopfood-logo-light\.png$/);
+  await expect(page.locator('.fresh-desktop-sidebar')).toHaveCSS('border-right-width','0px');
+  await expect(page.locator('.fresh-sidebar-brand img')).toHaveAttribute('src',/coopfood-logo-light\.png$/);
  }
  await page.evaluate(()=>location.hash='kph'); await expect(page.getByRole('button',{name:'Tạo phiếu TP tươi sống',exact:true})).toBeVisible();
 }

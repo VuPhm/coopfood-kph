@@ -8,7 +8,7 @@ import { mockProfile } from "./store-app-mock";
 const account = <button type="button">Tài khoản thử nghiệm</button>;
 
 describe("Global Store frame", () => {
-  it("keeps account/sidebar identity and route selection when a feature changes its header content", () => {
+  it("keeps account/store identity and route selection when a feature changes its header content", () => {
     const navigate = vi.fn(); const onBack = vi.fn();
     const titleRef = createRef<HTMLHeadingElement>();
     const profile = { ...mockProfile, storeName: "Cửa hàng kiểm tra" };
@@ -20,7 +20,7 @@ describe("Global Store frame", () => {
     const accountControl = screen.getByRole("button", { name: "Tài khoản thử nghiệm" });
     expect(titleRef.current).toBe(screen.getByRole("heading", { name: "Mẫu riêng" }));
     expect(within(sidebar).getByRole("link", { name: "Báo cáo" })).toHaveAttribute("aria-current", "page");
-    expect(within(sidebar).getByText("Cửa hàng kiểm tra")).toBeInTheDocument();
+    expect(header?.querySelector(".fresh-desktop-context")).toHaveTextContent("Cửa hàng kiểm tra");
     fireEvent.click(document.querySelector(".store-back")!);
     expect(onBack).toHaveBeenCalledOnce(); expect(navigate).not.toHaveBeenCalled();
     fireEvent.click(within(screen.getByRole("navigation", { name: "Vị trí hiện tại" })).getByRole("button", { name: "Về danh sách mẫu" }));

@@ -1,5 +1,12 @@
 # Công việc kế tiếp
 
+## Chrome desktop theo Admin
+
+Owner14/11 yêu cầu hai entry dùng chung sidebar/header. Revision7 chuyển cả
+Store/Admin sang component packages/ui dùng chung; mobile giữ riêng.
+[Evidence](delivery/kphon03-create-media/desktop-unify-r7.md). Owner xem chrome
+candidate trước khi tiếp slice review/export; hai vòng cuối vẫn pending.
+
 ## Hoàn tất vòng token hiện hành
 
 Vòng goal theo yêu cầu14/11 đã bàn giao kỹ thuật: Store account/chooser, shared

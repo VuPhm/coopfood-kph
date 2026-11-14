@@ -78,7 +78,7 @@ async function geometry(page) {
       await expect(page).toHaveURL(/#home$/);
       await expect(page.locator('.store-launcher-grid')).toBeVisible();
       if (viewport.width < 900) await page.getByRole('link', { name: 'DATE', exact: true }).click();
-      else await page.locator('.store-desktop-rail').getByRole('link', { name: 'Quản lý DATE', exact: true }).click();
+      else await page.locator('.fresh-desktop-sidebar').getByRole('link', { name: 'Quản lý DATE', exact: true }).click();
       await expect(page.locator('.store-date-lot').first()).toBeVisible();
       // Chromium's native link focus can settle within two CSS pixels of the top.
       await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(2);

@@ -40,7 +40,7 @@ function stable(before, after) {
         await page.route('**/brand/coopfood-home-*.webp', async route => { await art.promise; await route.continue(); });
         await page.goto(`${base}/#${screen}`, { waitUntil: 'domcontentloaded' });
         await expect(page.getByRole('button', { name: 'Tài khoản và cửa hàng', exact: true })).toBeDisabled();
-        const chrome = ['.store-header', '.store-account', '#store-content', viewport.width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail'];
+        const chrome = ['.store-header', '.store-account', '#store-content', viewport.width < 900 ? '.store-mobile-toolbar' : '.fresh-desktop-sidebar'];
         const selectors = screen === 'home'
           ? [...chrome, '.store-launcher-grid', '.store-home-attention', '.store-header-brand img']
           : [...chrome, '.store-create-actions', '.store-kph-toolbar', '.store-list-heading', '.store-kph-list-controls', '.store-kph-list-toolbar', '.store-sticky-tabs', '.store-tabs', '.store-kph-list', '.store-kph-more', viewport.width < 900 ? '.store-ticket' : '.store-kph-table'];

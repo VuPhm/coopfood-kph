@@ -16,10 +16,10 @@ async function hit(locator) {
       await expect(page.getByRole('button',{name:'Tài khoản và cửa hàng',exact:true})).toBeEnabled();
       await page.evaluate(()=>document.fonts.ready);
       const mobile=viewport.width<900;
-      const nav=page.locator(mobile?'.store-mobile-toolbar':'.store-desktop-rail');
+      const nav=page.locator(mobile?'.store-mobile-toolbar':'.fresh-desktop-sidebar');
       const tabs=page.locator('.store-mobile-toolbar');
       await expect(nav).toBeVisible();
-      await expect(page.locator(mobile?'.store-desktop-rail':'.store-mobile-toolbar')).toBeHidden();
+      await expect(page.locator(mobile?'.fresh-desktop-sidebar':'.store-mobile-toolbar')).toBeHidden();
       await expect(page.locator('.store-launcher-grid button')).toHaveCount(4);
       for(const name of ['Quản lý DATE','KPH','Báo cáo','Tra cứu lùi hàng']) await expect(page.locator('.store-launcher-grid').getByRole('button',{name,exact:true})).toBeVisible();
       if(mobile){
@@ -36,7 +36,7 @@ async function hit(locator) {
         await expect(features.getByRole('link')).toHaveText(['Quản lý DATE','KPH','Báo cáo','Tra hạn lùi']);
         for(const name of ['Trang chủ','Thông báo','Quản lý DATE','KPH','Báo cáo','Tra hạn lùi']) await expect(nav.getByRole('link',{name,exact:true})).toBeVisible();
       }
-      await audit(page,'.store-home-features, .store-home-attention, .store-mobile-toolbar, .store-desktop-rail',`navigation-home-${viewport.width}`);
+      await audit(page,'.store-home-features, .store-home-attention, .store-mobile-toolbar, .fresh-desktop-sidebar',`navigation-home-${viewport.width}`);
       await page.screenshot({path:`${output}/home-${viewport.width}.png`});
       const fab=page.getByRole('button',{name:'Mở tiện ích tra cứu lùi hàng',exact:true});
       await expect(fab).toBeVisible();await hit(fab);

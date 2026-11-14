@@ -2,6 +2,14 @@
 
 Ngày rà soát: 14/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
+## Sidebar/header desktop dùng chung — 14/11/2026
+
+Theo owner ưu tiên hướng Admin, Store/Admin dùng cùng DesktopSidebar/NavItem/
+Header/AccountButton trong packages/ui. Rail248/80px và header fixed72px từ900px;
+Store có collapse, account đầy đủ trên desktop; mobile giữ navigation riêng.
+[Phạm vi và kiểm revision7](delivery/kphon03-create-media/desktop-unify-r7.md).
+Không đổi quyền/API/D01/media; đây là candidate UI tiếp theo.
+
 ## Vòng hoàn tất token UI — 14/11/2026
 
 Theo owner “tiếp, đặt goal để out task”, đã đồng bộ account/chooser Store và

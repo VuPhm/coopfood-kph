@@ -37,7 +37,7 @@ async function bounds(l){const r=await l.boundingBox();expect(r).not.toBeNull();
     const a=await bounds(page.locator('.store-account'));expect(a.x+a.width).toBe(bar.x+bar.width);expect(a.y).toBe(bar.y);
     if(accountAnchor)expect(a).toEqual(accountAnchor);else accountAnchor=a;
     if(route!=='home'&&viewport.width<900){const b=await bounds(page.locator('.store-back'));expect(b.x).toBe(bar.x);expect(b.y).toBe(bar.y);if(backAnchor)expect(b).toEqual(backAnchor);else backAnchor=b;}
-   }else{await expect(page.locator('.store-account,.store-desktop-rail,.store-mobile-toolbar')).toHaveCount(0);}
+   }else{await expect(page.locator('.store-account,.fresh-desktop-sidebar,.store-mobile-toolbar')).toHaveCount(0);}
    await audit(page,'.store-header',`page-kit-${route}-${viewport.width}`);
    if([390,1920].includes(viewport.width))await page.screenshot({path:`${output}/${route}-${viewport.width}.png`});
    await page.evaluate(()=>scrollTo(0,200));await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(0);

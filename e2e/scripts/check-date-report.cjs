@@ -33,7 +33,7 @@ async function go(page, width, name) {
     await page.locator('.store-mobile-toolbar').getByRole('link', { name: 'Trang chủ', exact: true }).click();
     await page.locator('.store-launcher-grid').getByRole('button', { name: label, exact: true }).click();
   } else {
-    await page.locator('.store-desktop-rail').getByRole('link', { name: label, exact: true }).click();
+    await page.locator('.fresh-desktop-sidebar').getByRole('link', { name: label, exact: true }).click();
   }
 }
 async function summary(page) { await page.getByRole('button', { name: /^Báo cáo tổng hợp/ }).click(); await expect(page.getByRole('heading', { name: 'Báo cáo tổng hợp', exact: true })).toBeFocused(); }
@@ -60,7 +60,7 @@ async function bulk(page, name) {
       await page.goto(`${base}/#reports`);
       await expect(page.getByRole('heading', { name: 'Chọn báo cáo', exact: true })).toBeFocused();
       await expect(page.locator('.report-type-card')).toHaveCount(3);
-      const nav = page.locator(viewport.width < 900 ? '.store-mobile-toolbar' : '.store-desktop-rail');
+      const nav = page.locator(viewport.width < 900 ? '.store-mobile-toolbar' : '.fresh-desktop-sidebar');
       await expect(nav.getByRole('link', { name: 'Báo cáo', exact: true })).toHaveAttribute('aria-current', 'page');
       await inspect(page, 'menu', viewport.width);
       await page.getByRole('button', { name: 'Lịch sử', exact: true }).click();

@@ -34,9 +34,13 @@
 .store-header p { margin: 1px 0 0; color: #fff; font-size: 12px; line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .store-header-store { display: none; min-width: 0; border: 1px solid rgb(255 255 255 / 16%); border-radius: 999px; padding: 5px 10px; background: rgb(0 45 30 / 12%); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; font-size: 10px; line-height: 16px; overflow-wrap: anywhere; }
 .store-header-account { display: flex; align-items: center; justify-content: end; width: 44px; min-height: 44px; }
+.store-header .fresh-desktop-header-inner { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; min-height: 44px; }
+@media (max-width: 899px) {
 .store-header .store-account { display: flex; align-items: center; justify-content: center; width: 44px; min-width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; }
 .store-header .store-profile-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; background: #edfff7; color: #00724e; font-size: 13px; font-weight: 650; }
 .store-header .store-profile-meta { display: none; }
+  .store-header .fresh-desktop-account-chevron { display: none; }
+}
 .store-header :where(button):focus-visible { outline: 3px solid white; outline-offset: 3px; }
 .store-header h1[tabindex="-1"]:focus { outline: none; }
 .store-page-hero-content { min-width: 0; padding: 0 var(--store-header-gutter) 0; }
@@ -51,8 +55,6 @@
 
 /* Desktop uses the persistent sidebar and explicit ancestors, rather than a Back control. */
 @media (min-width: 900px) {
-  .store-app .store-header:not(.is-home) .store-appbar-row { grid-template-columns: minmax(0, 1fr) 44px; }
-  .store-app .store-header .store-back { display: none; }
   .store-header-location .store-header-ancestor { display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
   .store-header-ancestor > svg { flex-shrink: 0; color: #fff; }
 }

@@ -70,7 +70,7 @@ async function scrollBody(page, dialog, selector, desktop) {
       }
       await ready(page, 'kph');
       if (desktop) {
-        const rail = page.locator('.store-desktop-rail');
+        const rail = page.locator('.fresh-desktop-sidebar');
         const range = await rail.evaluate(el => el.scrollHeight - el.clientHeight);
         if (range > 1) {
           await rail.hover(); await page.mouse.wheel(0, 500);
