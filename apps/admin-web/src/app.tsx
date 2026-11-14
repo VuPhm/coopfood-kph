@@ -116,7 +116,7 @@ export function App({ gateway: providedGateway }: AppProps) {
     return <LoadFailure message="Không thể kiểm tra phiên Admin Web." onRetry={() => void sessionQuery.refetch()} />;
   }
 
-  const passwordDialog = <ChangePasswordDialog
+  const passwordDialog = <ChangePasswordDialog key={sessionQuery.data.user.id}
     open={changePasswordOpen}
     onOpenChange={setChangePasswordOpen}
     onSubmit={(currentPassword, newPassword) => gateway.changePassword(currentPassword, newPassword)}

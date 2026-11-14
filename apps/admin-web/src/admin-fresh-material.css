@@ -65,21 +65,21 @@
 .admin-account-menu .ui-dropdown-option svg { flex-shrink: 0; stroke-width: 1.8; }
 .admin-account-menu .ui-dropdown-option[data-highlighted] { background-image: var(--admin-item-image); outline: 2px solid var(--dropdown-focus); outline-offset: -2px; }
 .admin-account-menu .admin-signout { color: var(--fresh-error-ink); }
-body:has(.admin-shell) [data-slot="dialog-content"] { --cf-modal-header: var(--admin-primary-image); border-color: var(--fresh-soft-edge); box-shadow: var(--admin-panel-shadow); border-radius: var(--fresh-radius-sheet); }
-body:has(.admin-shell) [data-slot="dialog-title"] { font-weight: 650; }
-body:has(.admin-shell) [data-slot="button"] { border-radius: var(--fresh-radius-control); font-weight: 600; transform: none; translate: 0 0; transition: background-color var(--fresh-button-duration) ease-out; }
-body:has(.admin-shell) [data-slot="button"][data-variant="primary"] { background-color: var(--fresh-brand-action); background-image: var(--admin-primary-image); border: 1px solid var(--fresh-soft-edge); color: var(--fresh-surface); box-shadow: var(--admin-primary-shadow); }
-body:has(.admin-shell) [data-slot="button"][data-variant="secondary"] { background: var(--fresh-surface); background-image: var(--admin-item-image); border: 1px solid var(--fresh-soft-edge); color: var(--fresh-brand-deep); box-shadow: inset 0 1px 0 var(--fresh-layer-highlight); }
-body:has(.admin-shell) [data-slot="button"][data-variant="danger"] { background: var(--fresh-error-ink); color: var(--fresh-surface); box-shadow: var(--admin-primary-shadow); }
-body:has(.admin-shell) [data-slot="button"][data-variant="primary"]:hover:not(:disabled) { background: var(--fresh-brand-deep); }
-body:has(.admin-shell) [data-slot="button"][data-variant="secondary"]:hover:not(:disabled) { background-image: var(--admin-item-hover); }
-body:has(.admin-shell) [data-slot="button"][data-variant="danger"]:hover:not(:disabled) { background: var(--fresh-button-danger-hover); }
-.admin-nav-item:active, .admin-filter-button:active, .admin-account:active, body:has(.admin-shell) [data-slot="button"]:active:not(:disabled) { box-shadow: var(--admin-pressed-shadow); }
-body:has(.admin-shell) [data-slot="button"]:disabled { background: var(--fresh-form-disabled-surface); color: var(--fresh-button-disabled-ink); box-shadow: none; opacity: 1; }
+body:has(.admin-shell) [data-slot="dialog-content"]:not(.fresh-password-dialog) { --cf-modal-header: var(--admin-primary-image); border-color: var(--fresh-soft-edge); box-shadow: var(--admin-panel-shadow); border-radius: var(--fresh-radius-sheet); }
+body:has(.admin-shell) [data-slot="dialog-title"]:not(:where(.fresh-password-dialog *)) { font-weight: 650; }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *)) { border-radius: var(--fresh-radius-control); font-weight: 600; transform: none; translate: 0 0; transition: background-color var(--fresh-button-duration) ease-out; }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *))[data-variant="primary"] { background-color: var(--fresh-brand-action); background-image: var(--admin-primary-image); border: 1px solid var(--fresh-soft-edge); color: var(--fresh-surface); box-shadow: var(--admin-primary-shadow); }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *))[data-variant="secondary"] { background: var(--fresh-surface); background-image: var(--admin-item-image); border: 1px solid var(--fresh-soft-edge); color: var(--fresh-brand-deep); box-shadow: inset 0 1px 0 var(--fresh-layer-highlight); }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *))[data-variant="danger"] { background: var(--fresh-error-ink); color: var(--fresh-surface); box-shadow: var(--admin-primary-shadow); }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *))[data-variant="primary"]:hover:not(:disabled) { background: var(--fresh-brand-deep); }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *))[data-variant="secondary"]:hover:not(:disabled) { background-image: var(--admin-item-hover); }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *))[data-variant="danger"]:hover:not(:disabled) { background: var(--fresh-button-danger-hover); }
+.admin-nav-item:active, .admin-filter-button:active, .admin-account:active, body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *)):active:not(:disabled) { box-shadow: var(--admin-pressed-shadow); }
+body:has(.admin-shell) [data-slot="button"]:not(:where(.fresh-password-dialog *)):disabled { background: var(--fresh-form-disabled-surface); color: var(--fresh-button-disabled-ink); box-shadow: none; opacity: 1; }
 body:has(.admin-shell) .identity-user-action .identity-deactivate:not(:disabled) { color: var(--fresh-error-ink); background: var(--fresh-surface); border-color: var(--fresh-soft-edge); box-shadow: none; }
 body:has(.admin-shell) .identity-user-action .identity-deactivate:hover:not(:disabled) { background: var(--fresh-error-soft); }
-body:has(.admin-shell) :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { background-color: var(--fresh-form-field-surface); border-color: var(--fresh-form-field-edge); border-radius: var(--fresh-radius-control); box-shadow: var(--fresh-form-field-shadow); }
-body:has(.admin-shell) :is(input, textarea, select):disabled { background-color: var(--fresh-form-disabled-surface); color: var(--fresh-ink-muted); }
+body:has(.admin-shell) :is(input, textarea, select):not(:where(.fresh-password-dialog *)):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { background-color: var(--fresh-form-field-surface); border-color: var(--fresh-form-field-edge); border-radius: var(--fresh-radius-control); box-shadow: var(--fresh-form-field-shadow); }
+body:has(.admin-shell) :is(input, textarea, select):not(:where(.fresh-password-dialog *)):disabled { background-color: var(--fresh-form-disabled-surface); color: var(--fresh-ink-muted); }
 .admin-shell.is-collapsed { --sidebar-width: var(--fresh-desktop-rail-collapsed); }
 .is-collapsed .admin-sidebar { padding-inline: 0; }
 .is-collapsed .admin-brand { padding: 12px; justify-content: center; }
@@ -106,7 +106,7 @@ body:has(.admin-shell) :is(input, textarea, select):disabled { background-color:
 .admin-page-heading h1 { font-size: var(--fresh-type-page); }
 .kpi-value { font-size: var(--cf-font-size-display); }
 .admin-kpi p, .panel-heading p, .admin-data-table, .admin-status, .store-name-button small { font-size: var(--fresh-type-caption); }
-body:has(.admin-shell) :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { font-size: var(--fresh-type-input); line-height: var(--fresh-leading-input); }
+body:has(.admin-shell) :is(input, textarea, select):not(:where(.fresh-password-dialog *)):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { font-size: var(--fresh-type-input); line-height: var(--fresh-leading-input); }
 @media (max-width:767px) {
   .admin-page-heading h1 { font-size: var(--fresh-type-page); }
   .admin-icon-button, .chart-point-controls button, .admin-filter-button { min-height: var(--fresh-size-control-md); }

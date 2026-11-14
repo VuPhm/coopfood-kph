@@ -2,6 +2,15 @@
 
 Ngày rà soát: 14/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
+## Vòng hoàn tất token UI — 14/11/2026
+
+Theo owner “tiếp, đặt goal để out task”, đã đồng bộ account/chooser Store và
+control các workspace Admin theo Fresh; dùng chung form đổi mật khẩu với
+50px/16px input, close xóa draft và khóa khi gửi. Giữ source compact revision5,
+D01/scope/media hiện hành. Runtime local chạy độc lập với foreground chat.
+[Target, file, kiểm và bàn giao revision6](delivery/kphon03-create-media/ui-finish-r6.md).
+Đây là hoàn tất kỹ thuật vòng UI; owner acceptance và hai vòng toàn app cuối riêng.
+
 ## Compact KPH/DATE và nhóm hàng — 14/11/2026
 
 Owner phản hồi revision4 gần đúng nhưng nguồn còn sớm. Đã xác định chuỗi

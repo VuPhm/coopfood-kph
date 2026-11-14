@@ -11,7 +11,7 @@ export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 export { DismissableLayerBranch };
 
-export function DialogContent({ children, className, closeTone, closeLabel = "Đóng", onOpenAutoFocus, onCloseAutoFocus, ...props }: ComponentProps<typeof DialogPrimitive.Content> & { closeTone?: CloseButtonProps["tone"]; closeLabel?: string }) {
+export function DialogContent({ children, className, closeTone, closeLabel = "Đóng", closeDisabled = false, onOpenAutoFocus, onCloseAutoFocus, ...props }: ComponentProps<typeof DialogPrimitive.Content> & { closeTone?: CloseButtonProps["tone"]; closeLabel?: string; closeDisabled?: boolean }) {
   const openedFrom = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Portal>
@@ -38,7 +38,7 @@ export function DialogContent({ children, className, closeTone, closeLabel = "Đ
         }}
       >
         <DialogPrimitive.Close asChild>
-          <CloseButton data-slot="dialog-close" aria-label={closeLabel} className="dialog-close-hit-area absolute right-3 top-3" tone={closeTone ?? "inverse"} />
+          <CloseButton disabled={closeDisabled} data-slot="dialog-close" aria-label={closeLabel} className="dialog-close-hit-area absolute right-3 top-3" tone={closeTone ?? "inverse"} />
         </DialogPrimitive.Close>
         {children}
       </DialogPrimitive.Content>

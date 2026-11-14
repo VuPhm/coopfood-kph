@@ -36,7 +36,7 @@
 }
 
 /* Account actions are navigation, with equal weight and clear touch targets. */
-body:has(.store-app) .store-account-sheet .store-account-actions { display: grid; gap: 0; padding-top: 0; }
+body:has(.store-app) .store-account-sheet .store-account-actions { display: grid; gap: 0; padding-top: 0; border-top: 0; }
 body:has(.store-app) .store-account-sheet .store-online-actions { display: grid; gap: 0; }
 body:has(.store-app) .store-account-sheet .store-account-actions :is(.store-account-nav, .store-online-actions button) {
   --store-button-fill: transparent; --store-button-image: none; --store-button-ink: var(--fresh-brand-deep); --store-button-border: transparent; --store-button-shadow: none;

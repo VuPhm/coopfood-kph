@@ -1,12 +1,21 @@
 # Công việc kế tiếp
 
+## Hoàn tất vòng token hiện hành
+
+Vòng goal theo yêu cầu14/11 đã bàn giao kỹ thuật: Store account/chooser, shared
+password form và control5 workspace Admin. Giữ nguồn compact UI05 của revision5.
+[Evidence/checkpoint revision6](delivery/kphon03-create-media/ui-finish-r6.md).
+Owner UI acceptance còn riêng. Bước nhỏ tiếp là review/export KPH theo scope;
+chưa tự mở slice hoặc hai vòng toàn app cuối. Bảng dưới là lịch và phạm vi đã
+định hướng, không suy mọi feature prototype đã online.
+
 ## Lịch đồng bộ token Store và Admin
 
 Đã tìm đúng chuỗi compact có nhóm DATE và sửa login focus: DATE07/DATE08/UI05
 `53122ae`; POLISH03 `c7cc939` là mốc sớm. Đội Terra ba worktree đã phục hồi và
 rà hai lượt. [Target và evidence revision5](delivery/kphon03-create-media/compact-restore-r5.md).
 Bản mẫu4180 có nhóm DATE; Store online4173 giữ backend KPH hiện hành; Admin4175
-đã sửa proxy8082. Tiếp token Admin theo nhóm màn sau khi owner xem candidate.
+đã sửa proxy8082. Nhóm token Admin hiện hành đã thực hiện trong revision6.
 
 Mốc token đăng nhập vẫn là `1ea1937`, composition theo UI05 nói trên. Các số dưới đây là thứ tự thực hiện. Nhóm đầu đã bắt đầu ngay ngày 13/11. Mỗi vòng bàn giao một nhóm màn có thể thử trọn luồng.
 
