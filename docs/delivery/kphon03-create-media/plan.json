@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "kphon03-create-media",
-  "revision": 6,
+  "revision": 7,
   "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
@@ -14,91 +14,63 @@
     "Owner13/11 yêu cầu ưu tiên sửa SW/trang cũ trên cả Store/Admin; chưa đổi UI layout. Phục hồi preview đúng nguồn và kiểm stale workers/cache không mất dữ liệu.",
     "Owner14/11: khôi phục đúng Fresh sau compact/polish; đồng bộ sidebar Store/Admin, desktop cuộn tự nhiên, mobile giữ hero sticky; giữ draft đăng nhập Admin khi chuyển tab; chỉnh nhẹ token theo UI/UX.",
     "Revision5: compact list primitives UI05, KPH density/search, DATE group dropdown/chips trong mock entry, sửa runtime Admin proxy và smoke session thật.",
-    "Revision6: chọn store/account, password form dùng chung và token/control/tables/feedback Admin hiện có; không đổi business/API."
+    "Revision6: chọn store/account, password form dùng chung và token/control/tables/feedback Admin hiện có; không đổi business/API.",
+    "Revision7: shared desktop sidebar/nav/header/account trigger theo Admin, Store và Admin cùng layout fixed72/rail248–80; giữ mobile entry."
   ],
   "outOfScope": [
     "Review/export và DATE persistence",
     "Đổi backend/API/media contract sang paired stamped upload từ nhánh BE06 cũ",
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
-  "baseSha": "b39f3c7",
-  "candidateSha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
+  "baseSha": "638f982",
+  "candidateSha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
   "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
     "packages/ui/**",
-    "docs/**",
-    "apps/store-pwa/src/change-password-dialog.tsx",
-    "apps/admin-web/src/change-password-dialog.tsx",
-    "apps/admin-web/src/app.tsx"
+    "apps/store-pwa/src/**",
+    "apps/admin-web/src/**",
+    "e2e/**",
+    "docs/**"
   ],
   "reviewLimit": 2,
   "reviewRound": 2,
-  "teams": [
-    {
-      "id": "store",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr6-store",
-      "allowedPaths": [
-        "apps/store-pwa/src/store-online-app.tsx",
-        "apps/store-pwa/src/store-online-app.css",
-        "apps/store-pwa/src/store-online-app.test.tsx",
-        "apps/store-pwa/src/store-account-sheet.tsx",
-        "apps/store-pwa/src/store-account-trigger.tsx",
-        "apps/store-pwa/src/store-utility-polish.css",
-        "e2e/scripts/check-fresh-r6-store.cjs"
-      ],
-      "dependsOn": []
-    },
-    {
-      "id": "admin",
-      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/freshr6-admin",
-      "allowedPaths": [
-        "apps/admin-web/src/admin-fresh.css",
-        "apps/admin-web/src/admin-fresh-material.css",
-        "apps/admin-web/src/membership.css",
-        "apps/admin-web/src/identity-workspace.tsx",
-        "apps/admin-web/src/catalog-workspace.tsx",
-        "apps/admin-web/src/admin-overview.tsx",
-        "e2e/scripts/check-fresh-r6-admin.cjs"
-      ],
-      "dependsOn": []
-    }
-  ],
+  "teams": [],
   "gates": [
     {
       "id": "create-checks",
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 6,
-      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
-      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
+      "revision": 7,
+      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
+      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
       "status": "pass",
-      "revision": 6,
-      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
-      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
+      "revision": 7,
+      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
+      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
     },
     {
       "id": "owner-create",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 6,
-      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
-      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
+      "revision": 7,
+      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
+      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
     },
     {
       "id": "owner-green-ui",
       "kind": "user",
       "required": true,
       "status": "pending",
-      "revision": 6,
-      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
-      "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
+      "revision": 7,
+      "sha": "3fc1a6169854b370c1c19f2b72e2e23b5c00729e",
+      "evidence": "docs/delivery/kphon03-create-media/desktop-unify-r7.md"
     }
   ],
   "changes": [
@@ -136,10 +108,17 @@
       "source": "Owner chat14/11/2026",
       "impact": "Tiếp đồng bộ token/UI của các luồng đã có để bàn giao kỹ thuật; không tự suy owner acceptance cho revision5 hoặc mở backend mới.",
       "decision": "Goal active cho vòng hoàn tất; hai lượt rà giới hạn, Terra Store/Admin ở worktree riêng; root packages/ui và đổi mật khẩu dùng chung; kiểm390/1440, checkpoint sạch và hồ sơ out-task."
+    },
+    {
+      "revision": 7,
+      "request": "desktop admin và store cần dùng chung1dạng sidebar vàheader, ưu tiên hướngAdmin",
+      "source": "Owner chat14/11/2026 sau goalUIrevision6",
+      "impact": "Shareddesktopcomponents thật thay hai composition khác nhau; Store thêmthu/mở rail vàheader cố định theoAdmin, giữmobile vàcontracts. Invalidate frame/nav/browserchecks.",
+      "decision": "Rootsoleintegrationwriter cho packages/ui và2consumers; hai lượt kiểm390/834/900/1440, không mởbackend/module hoặcrollout."
     }
   ],
   "blockers": [],
-  "nextAction": "Goal hoàn tất kỹ thuật revision6 tại d6f750d;375unit tests/TypeScript/build/Playwright đạt, checkpoint sạch, preview/backend detached healthy. Bàn giao owner xem; không tự mở review/export hoặc coi hai vòng cuối đã chạy.",
+  "nextAction": "Bàn giao shareddesktopchrome theoAdmin tại 3fc1a61;375unit/TypeScript/build/Playwright390/834/900/1440 vàcreatebackendthậtđạt. Ownerđối chiếuStore4173/Admin4175; hai vòngcuốiriêng.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
