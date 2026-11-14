@@ -49,7 +49,7 @@ export function StoreAccountSheet({ open, onOpenChange, profile, initials, trigg
         </section>
         {onLoginPreview ? <p className="store-account-preview-note">Bản dùng thử · Thông tin mẫu</p> : null}
         <div className="store-account-actions">
-          <button className="store-account-home" onClick={onHome}><Home size={18} aria-hidden="true" />Trang chủ</button>
+          <button className="store-account-nav" onClick={onHome}><Home size={18} aria-hidden="true" />Trang chủ</button>
           {actions ?? (onLoginPreview ? <button className="store-account-login" onClick={onLoginPreview}>Xem trang đăng nhập<ArrowRight size={18} aria-hidden="true" /></button> : null)}
         </div>
       </div>

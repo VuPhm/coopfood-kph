@@ -34,3 +34,14 @@
   .store-barcode-scanner .barcode-scanner-error-title { font-size: 14px; line-height: 20px; }
   .store-barcode-scanner .barcode-scanner-error-message { font-size: 13px; line-height: 18px; margin-bottom: 8px; }
 }
+
+/* Account actions are navigation, with equal weight and clear touch targets. */
+body:has(.store-app) .store-account-sheet .store-account-actions { display: grid; gap: 0; padding-top: 0; }
+body:has(.store-app) .store-account-sheet .store-online-actions { display: grid; gap: 0; }
+body:has(.store-app) .store-account-sheet .store-account-actions :is(.store-account-nav, .store-online-actions button) {
+  --store-button-fill: transparent; --store-button-image: none; --store-button-ink: var(--fresh-brand-deep); --store-button-border: transparent; --store-button-shadow: none;
+  display: flex; align-items: center; gap: 8px; background: transparent; color: var(--fresh-brand-deep); font-weight: 650; width: 100%; min-height: 48px; height: auto; justify-content: flex-start; padding: 12px 8px; border: 0; border-radius: 8px; text-align: left; white-space: normal; overflow-wrap: anywhere;
+}
+body:has(.store-app) .store-account-sheet .store-account-actions :is(.store-account-nav, .store-online-actions button):hover { --store-button-fill: var(--fresh-surface-muted, #edf4ef); }
+.store-account-sheet .online-capabilities { padding: 12px 8px; border-block: 1px solid var(--store-soft-edge); }
+.store-account-sheet .store-account-identity h3, .store-account-sheet .store-account-store p { overflow-wrap: anywhere; }
