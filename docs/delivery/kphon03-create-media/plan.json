@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon03-create-media",
   "revision": 6,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối tạo KPH TPCN/TPTS trên Fresh online: context thật, original/private stamped media, review-before-send và retry idempotent.",
   "inScope": [
     "Tái sử dụng form/control Fresh và gateway/backend hiện hành",
@@ -22,7 +22,7 @@
     "Merge/push/deploy/Pages và hai vòng cuối"
   ],
   "baseSha": "b39f3c7",
-  "candidateSha": "",
+  "candidateSha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
   "integrationOwner": "Codex /root — integration owner; Terra hỗ trợ scope file độc lập theo owner",
   "sharedPaths": [
     "packages/ui/**",
@@ -32,7 +32,7 @@
     "apps/admin-web/src/app.tsx"
   ],
   "reviewLimit": 2,
-  "reviewRound": 1,
+  "reviewRound": 2,
   "teams": [
     {
       "id": "store",
@@ -68,18 +68,18 @@
       "id": "create-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 6,
-      "sha": "",
+      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
       "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending",
+      "status": "pass",
       "revision": 6,
-      "sha": "",
+      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
       "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     },
     {
@@ -88,7 +88,7 @@
       "required": true,
       "status": "pending",
       "revision": 6,
-      "sha": "",
+      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
       "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     },
     {
@@ -97,7 +97,7 @@
       "required": true,
       "status": "pending",
       "revision": 6,
-      "sha": "",
+      "sha": "d6f750db377dff1b7568a9f1324c2a14660ab91e",
       "evidence": "docs/delivery/kphon03-create-media/ui-finish-r6.md"
     }
   ],
@@ -139,7 +139,7 @@
     }
   ],
   "blockers": [],
-  "nextAction": "Thực thi goal hoàn tất token Store/Admin hiện có, hai lượt kiểm và bàn giao technical-ready; không tự đóng owner acceptance.",
+  "nextAction": "Goal hoàn tất kỹ thuật revision6 tại d6f750d;375unit tests/TypeScript/build/Playwright đạt, checkpoint sạch, preview/backend detached healthy. Bàn giao owner xem; không tự mở review/export hoặc coi hai vòng cuối đã chạy.",
   "initialRequest": {
     "request": "có vài điểm tối ưu, đặc biệt là giao diện nhưng cứ tiếp",
     "source": "Owner chat12/11/2026 sau KPHON02",
