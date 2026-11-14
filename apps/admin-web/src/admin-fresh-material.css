@@ -103,7 +103,7 @@ body:has(.admin-shell) :is(input, textarea, select):disabled { background-color:
 }
 .admin-shell, .admin-nav-item { font-size: var(--fresh-type-control); }
 .panel-heading h2 { font-size: var(--fresh-type-section); }
-.admin-page-heading h1 { font-size: var(--cf-font-size-display); }
+.admin-page-heading h1 { font-size: var(--fresh-type-page); }
 .kpi-value { font-size: var(--cf-font-size-display); }
 .admin-kpi p, .panel-heading p, .admin-data-table, .admin-status, .store-name-button small { font-size: var(--fresh-type-caption); }
 body:has(.admin-shell) :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.sr-only) { font-size: var(--fresh-type-input); line-height: var(--fresh-leading-input); }
@@ -118,3 +118,15 @@ body:has(.admin-shell) :is(input, textarea, select):not([type="checkbox"]):not([
 .admin-overview .admin-page-heading h1 { font-size: var(--fresh-type-page); color: var(--fresh-ink); }
 .admin-overview .admin-date-control select { min-height: var(--fresh-size-control-md); font-size: var(--fresh-type-input); }
 .admin-overview .admin-date-control { border-radius: var(--fresh-radius-control); }
+
+/* Workspaces share Fresh input and touch sizes without expanding data rows. */
+.admin-overview :is(.admin-filter-button, .admin-icon-button, .store-name-button, .chart-point-controls button),
+.admin-identity-content .identity-deactivate { min-height: var(--fresh-size-control-md); }
+.admin-overview .admin-icon-button { min-width: var(--fresh-size-control-md); height: auto; }
+.admin-overview .table-tools input { min-height: var(--fresh-size-control-md); font-size: var(--fresh-type-input); }
+.admin-overview .table-tools { flex-wrap: wrap; }
+body:has(.admin-shell) :is(.admin-content, .membership-dialog) :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(.sr-only) { min-height: var(--fresh-size-control-md); font-size: var(--fresh-type-input); }
+body:has(.admin-shell) :is(.admin-content, .membership-dialog) :is(input, textarea, select, button):focus-visible { outline: 2px solid var(--fresh-brand-deep); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .admin-overview *, .admin-business-workspace *, .membership-workspace *, .membership-dialog * { scroll-behavior: auto; transition-duration: 0s; animation-duration: 0s; }
+}
