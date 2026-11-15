@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "id": "kphon04-review-export",
+  "revision": 1,
+  "status": "EXECUTING",
+  "objective": "Nối duyệt/xuất KPH Fresh vào backend hiện có, bảo toàn UI de74077 làm nền tiếp tục sửa.",
+  "inScope": [
+    "Review APPROVED/REJECTED theo capability và refresh history D01",
+    "Selection trong trang hiện tại; export server-authorized SUBMITTED+APPROVED một store/type, ảnh private và audit",
+    "Bảo toàn chrome/layout/assets tại de74077; kiểm real-backend 390×844 và 1440×1024",
+    "Hai lượt review giới hạn theo lỗi chặn; technical và owner acceptance riêng"
+  ],
+  "outOfScope": [
+    "Redesign và final UI acceptance",
+    "DATE/notification/report persistence, C02, provisioning mở rộng",
+    "Merge main, push/deploy hoặc Pages cutover; không merge BE07/BE08 legacy"
+  ],
+  "baseSha": "82191c20cd9026fcd071d4273e460d8416d40e26",
+  "candidateSha": "",
+  "integrationOwner": "Codex /root",
+  "sharedPaths": [
+    "contracts/**",
+    "packages/api/**",
+    "packages/ui/**",
+    "package.json",
+    "package-lock.json",
+    "docs/**",
+    "apps/store-pwa/src/store-online-kph.tsx",
+    "apps/store-pwa/src/store-online-kph.test.tsx",
+    "apps/store-pwa/src/store-online-app.tsx",
+    "apps/store-pwa/src/store-session-api.ts",
+    "apps/store-pwa/src/store-online-kph.css"
+  ],
+  "reviewLimit": 2,
+  "reviewRound": 0,
+  "teams": [
+    {
+      "id": "backend",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/kphon04-backend",
+      "allowedPaths": [
+        "backend/src/test/java/vn/coopfood/kph/kph/**"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "export",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/kphon04-export",
+      "allowedPaths": [
+        "apps/store-pwa/src/store-online-export.ts",
+        "apps/store-pwa/src/store-online-export.test.ts"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "e2e",
+      "worktree": "/Users/vup/Documents/coopfood-kph/.local/worktrees/kphon04-e2e",
+      "allowedPaths": [
+        "e2e/scripts/check-kphon04-review-export.cjs"
+      ],
+      "dependsOn": []
+    }
+  ],
+  "gates": [
+    {
+      "id": "integrated-checks",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "real-backend-browser",
+      "kind": "technical",
+      "required": true,
+      "status": "pending"
+    },
+    {
+      "id": "owner-review-export",
+      "kind": "user",
+      "required": true,
+      "status": "pending"
+    }
+  ],
+  "changes": [],
+  "blockers": [],
+  "nextAction": "Dispatch team, root wiring; review blockers only in two rounds.",
+  "uiCheckpoint": "de740775569b70f60b819b9ff0832813271860dd",
+  "provenance": {
+    "reusable": "82191c2 contains de74077, KPHON01-03 and Admin03",
+    "superseded": "BE07/08 old UI not merged; use read-only evidence as needed",
+    "remoteFreshness": "local refs inspected15/11/2026; remote not queried; no push/deploy"
+  },
+  "initialRequest": "Owner15/11/2026: tiếp tục BE, giữ UI de74077 còn sửa; lập team/inloop/nghiệm thu tối ưu cận biên, không sa đà."
+}
