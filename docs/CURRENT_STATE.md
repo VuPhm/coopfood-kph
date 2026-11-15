@@ -2,6 +2,17 @@
 
 Ngày rà soát: 15/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
 
+## QA01 — tinh gọn test và cách làm — 15/11/2026
+
+Owner tạm dừng feature kế tiếp, lấy `1ad0907` làm checkpoint review/export mới
+nhất. Round này ở `store-app/qa01-lean-tests`, worktree `.local/worktrees/qa01-lean-tests`,
+writer Codex; chỉ sửa test tooling/skill/tài liệu, không đổi runtime app/API/DB.
+Bỏ bộ `delivery-cycle`, giữ một module `tdd` của Matt Pocock đã điều chỉnh;
+[chiến lược test](TEST_STRATEGY.md) và [bàn giao gọn](DELIVERY_WORKFLOW.md).
+QA01 đã bàn giao kỹ thuật: [kết quả và giới hạn](qa/QA01_LEAN_TESTS.md).
+KPHON04 vẫn là candidate; owner acceptance và hai vòng cuối chưa được suy thành
+PASS từ việc tinh gọn test. Các mục dưới là checkpoint feature trước QA01.
+
 ## KPHON04 — nối duyệt/xuất, giữ UI de74077 — 15/11/2026
 
 Theo owner tiếp tục BE với team/inloop có giới hạn, nhánh

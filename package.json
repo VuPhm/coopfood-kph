@@ -14,7 +14,9 @@
     "check:contracts": "node scripts/check-contracts.mjs",
     "check:api": "npm run generate:api && git diff --exit-code -- packages/api/src/generated/schema.d.ts",
     "check:docs": "node scripts/check-docs.mjs",
-    "verify": "npm run check:docs && npm run check:contracts && npm run check:api && npm run check && npm test && npm run build"
+    "verify": "npm run check:docs && npm run check:contracts && npm run check:api && npm run check && npm test && npm run build",
+    "test:kph": "npm --workspace @coopfood-kph/store-pwa test -- src/store-session-api.test.ts src/store-online-app.test.tsx src/store-barcode-lookup.test.tsx src/store-online-kph.test.tsx src/store-online-create.test.tsx src/store-online-export.test.ts src/online-kph.test.ts",
+    "test:kph:browser": "node e2e/scripts/check-kphon04-review-export.cjs"
   },
   "overrides": {
     "exceljs": {

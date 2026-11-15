@@ -2,20 +2,18 @@
 
 Áp dụng cho toàn bộ repository Co.op Food Store Operations App. Round 0 khóa
 baseline; R2-01 shell spine đã được chấp nhận, UI Fresh đã tích hợp qua FRESH01.
-UI mới vẫn dùng mock; nối KPH online là scope kế tiếp cần chốt. Trạng thái hiện
-hành nằm ở `docs/CURRENT_STATE.md`, thứ tự công việc ở `docs/NEXT.md`.
+KPH Fresh đã có candidate online đến KPHON04; DATE/report vẫn chưa nối backend.
+Trạng thái hiện hành nằm ở `docs/CURRENT_STATE.md`, thứ tự công việc ở `docs/NEXT.md`.
 
-## Thứ tự đọc bắt buộc
+## Đọc theo phạm vi
 
-1. `docs/CURRENT_STATE.md`
-2. `docs/NEXT.md`
-3. `docs/ENGINEERING_PRINCIPLES.md`
-4. `docs/STORE_APP_BASELINE.md` và `docs/product/STORE_APP_CONTRACTS.md`
-5. Tài liệu product/contract của feature đang làm
-6. ADR đã accepted trong `docs/adr/`
-
-Nếu tài liệu mâu thuẫn, contract nghiệp vụ và ADR accepted được ưu tiên. Dừng
-và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
+Đọc `docs/CURRENT_STATE.md` và `docs/NEXT.md` trước để xác định đúng checkpoint.
+Trước khi sửa, đọc code/test thực tế và phần liên quan trong
+`docs/product/STORE_APP_CONTRACTS.md`, contract feature và ADR accepted.
+Đọc `docs/ENGINEERING_PRINCIPLES.md` và `docs/STORE_APP_BASELINE.md` khi cần quyết
+định kiến trúc/baseline; không nạp toàn bộ hồ sơ lịch sử cho mỗi task nhỏ.
+Contract nghiệp vụ và ADR accepted được ưu tiên. Dừng và ghi rõ mâu thuẫn nếu
+không thể giải quyết an toàn.
 
 ## Ranh giới hệ thống
 
@@ -96,12 +94,19 @@ và ghi rõ mâu thuẫn nếu không thể giải quyết an toàn.
 - Không ghi đè frame Figma đã được chấp nhận. Sau khi xác minh bằng Playwright,
   đặt đề xuất phát sinh từ implementation vào khu candidate riêng để owner duyệt.
 
+## Test và chi phí cận biên
+
+Repo chỉ giữ module [`tdd`](tooling/skills/tdd/SKILL.md) của Matt Pocock đã điều
+chỉnh theo contract repo; dùng khi thêm/sửa hành vi hoặc tinh gọn test.
+Theo [`docs/TEST_STRATEGY.md`](docs/TEST_STRATEGY.md): chọn kiểm tra nhỏ nhất
+bắt được rủi ro của diff, giữ kiểm security/integrity bắt buộc, không lặp suite
+trên cùng source khi không có thay đổi hay nghi vấn mới. Không nhắm số lượng
+test/coverage tùy ý. Phần nghiệm thu hình ảnh, độ dễ dùng và thiết bị thật giao
+owner với thao tác ngắn, kết quả mong đợi và trạng thái còn chờ.
+
 ## Bàn giao
 
-Với milestone nhiều bước hoặc yêu cầu điều phối team, dùng
-`tooling/skills/delivery-cycle/SKILL.md` và `docs/DELIVERY_WORKFLOW.md`.
-Giữ kế hoạch hiện có khi resume; việc nhỏ không cần tạo hồ sơ đầy đủ. Phân biệt
-kiểm tra kỹ thuật đạt và nghiệm thu thực của owner; đóng vòng rồi dừng.
-
-Nêu file đã đổi, lệnh kiểm tra và kết quả, quyết định/giả định, rủi ro còn lại và
-một bước nhỏ tiếp theo.
+Dùng `docs/DELIVERY_WORKFLOW.md` gọn; không tạo plan JSON hoặc gọi team mặc định.
+Giữ checkpoint/evidence cũ làm provenance, không chuyển format hàng loạt.
+Nêu outcome, file đổi, lệnh/kết quả, phần chưa kiểm và một bước nhỏ tiếp theo.
+Technical PASS và owner acceptance là hai kết quả riêng; không tự merge/deploy.

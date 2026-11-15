@@ -1,6 +1,16 @@
 # Công việc kế tiếp
 
-## Active: KPHON04 duyệt/xuất trên UI de74077
+## QA01 đã bàn giao: giữ feature kế tiếp cho sau
+
+Theo owner15/11/2026: lấy `1ad0907` làm base, chưa mở feature mới. Áp dụng
+[TEST_STRATEGY](TEST_STRATEGY.md): test theo rủi ro tăng thêm, dừng khi evidence
+đủ; giao owner hình ảnh/độ dễ dùng và thiết bị thật bằng thao tác ngắn.
+QA01 đã hoàn tất phần tinh gọn kỹ thuật; kết quả và giới hạn được ghi ở [kết quả](qa/QA01_LEAN_TESTS.md).
+Bước nhỏ sau QA01 là owner thử duyệt/không duyệt và mở một Excel tổng hợp trên
+candidate KPHON04 khi tiếp tục nghiệm thu. UI/KPHON03–04 và hai vòng cuối vẫn
+còn chờ; không tự chạy feature DATE/C02 hay mở toàn bộ roadmap.
+
+## Checkpoint trước QA01: KPHON04 duyệt/xuất trên UI de74077
 
 Owner15/11 cho tiếp BE, giữ UI còn sửa. Thực hiện slice kế tiếp review/export
 trên nhánh `store-app/kphon04-review-export`, base `82191c2` chứa `de74077`.

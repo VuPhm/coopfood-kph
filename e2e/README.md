@@ -1,3 +1,8 @@
+> Chọn kiểm tra theo [TEST_STRATEGY](../docs/TEST_STRATEGY.md). Fresh KPHON04
+> dùng `npm run test:kph:browser` từ root, có `STORE_URL` tới Fresh online và
+> backend/DB tổng hợp đã xác minh. Suite Foundation bên dưới dùng entry online
+> cũ; không chạy toàn bộ script visual lịch sử như regression mặc định.
+
 # Foundation-01 browser E2E
 
 This package runs the browser acceptance slice against a real Store PWA build,
