@@ -551,6 +551,15 @@ class KphHttpIntegrationTest {
                         .queryParam("sort", "quantity").queryParam("direction", "ascending")
                         .session(manager.session()))
                 .andExpect(status().isForbidden());
+        // A valid record ID must not turn a URL in a different region into authority.
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", OTHER_STORE_ID, recordId)
+                        .contentType(MediaType.APPLICATION_JSON).content(approvalBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", OTHER_STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isForbidden());
         MvcResult pendingExport = mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
                         .contentType(MediaType.APPLICATION_JSON).content(exportBody)
                         .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
@@ -598,13 +607,130 @@ class KphHttpIntegrationTest {
                         .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
                 .andExpect(status().isForbidden());
 
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isForbidden());
+        assertThat(database.fetch("SELECT id FROM audit_events WHERE action = 'KPH_EXPORTED'")).hasSize(1);
+
         database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
+        // The same session gains chain scope without inventing a store membership.
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isOk());
         mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
                         .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"REJECTED\"}")
                         .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void storeManagerDowngradeDeniesReviewAndExportOnTheSameSessionWithoutLosingRead() throws Exception {
+        database.execute("UPDATE store_memberships SET role = 'STORE_MANAGER' WHERE user_id = ?", USER_ID);
+        Login manager = login();
+        UUID record = createReviewFixture(manager, STORE_ID, "manager-downgrade-01");
+        approveReviewFixture(manager, STORE_ID, record);
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportSelection(record))
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isOk());
+
+        database.execute("UPDATE store_memberships SET role = 'EMPLOYEE' WHERE user_id = ?", USER_ID);
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, record)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"REJECTED\"}")
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportSelection(record))
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/stores/{storeId}/kph", STORE_ID).session(manager.session()))
+                .andExpect(status().isOk());
+        assertThat(database.fetchOne("SELECT approval_status FROM kph_records WHERE id = ?", record)
+                .get("approval_status", String.class)).isEqualTo("APPROVED");
+        assertThat(database.fetch("SELECT id FROM kph_approval_history")).hasSize(1);
+        assertThat(database.fetch("SELECT id FROM audit_events WHERE action = 'KPH_REVIEWED'")).hasSize(1);
+        assertThat(database.fetch("SELECT id FROM audit_events WHERE action = 'KPH_EXPORTED'")).hasSize(1);
+    }
+
+    @Test
+    void exportRejectsMixedScopeTypeOrIneligibleSelectionAtomicallyAndAuditsExactOrder() throws Exception {
+        database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
+        Login chain = login();
+        UUID first = createReviewFixture(chain, STORE_ID, "export-selection-first");
+        UUID second = createReviewFixture(chain, STORE_ID, "export-selection-second");
+        UUID foreign = createReviewFixture(chain, OTHER_STORE_ID, "export-selection-foreign");
+        UUID otherType = createReviewFixture(chain, STORE_ID, "export-selection-other-type");
+        database.execute("UPDATE kph_records SET type = 'TPTS' WHERE id = ?", otherType);
+        for (UUID record : List.of(first, second, otherType)) approveReviewFixture(chain, STORE_ID, record);
+        approveReviewFixture(chain, OTHER_STORE_ID, foreign);
+
+        for (UUID invalid : List.of(foreign, otherType, first)) {
+            // Even chain scope cannot mix stores/types or repeat an ID in one export.
+            mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                            .contentType(MediaType.APPLICATION_JSON).content(exportSelection(first, invalid))
+                            .session(chain.session()).header("X-CSRF-TOKEN", chain.csrfToken()))
+                    .andExpect(status().isUnprocessableEntity());
+        }
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, second)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"REJECTED\"}")
+                        .session(chain.session()).header("X-CSRF-TOKEN", chain.csrfToken()))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportSelection(first, second))
+                        .session(chain.session()).header("X-CSRF-TOKEN", chain.csrfToken()))
+                .andExpect(status().isConflict());
+        approveReviewFixture(chain, STORE_ID, second);
+        database.execute("UPDATE kph_records SET lifecycle_state = 'INVALIDATED' WHERE id = ?", first);
+        mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportSelection(first, second))
+                        .session(chain.session()).header("X-CSRF-TOKEN", chain.csrfToken()))
+                .andExpect(status().isConflict());
+        assertThat(database.fetch("SELECT id FROM audit_events WHERE action = 'KPH_EXPORTED'")).isEmpty();
+
+        database.execute("UPDATE kph_records SET lifecycle_state = 'SUBMITTED' WHERE id = ?", first);
+        MvcResult result = mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
+                        .contentType(MediaType.APPLICATION_JSON).content(exportSelection(second, first))
+                        .session(chain.session()).header("X-CSRF-TOKEN", chain.csrfToken()))
+                .andExpect(status().isOk()).andReturn();
+        JsonNode body = objectMapper.readTree(result.getResponse().getContentAsByteArray());
+        assertThat(body.path("records").get(0).path("id").asText()).isEqualTo(second.toString());
+        assertThat(body.path("records").get(1).path("id").asText()).isEqualTo(first.toString());
+        assertThat(body.path("records").get(0).path("reviewedBy").path("displayName").asText())
+                .isEqualTo("KPH Demo");
+        var audit = database.fetchSingle("SELECT actor_user_id, store_id, target_id, metadata FROM audit_events WHERE action = 'KPH_EXPORTED'");
+        assertThat(audit.get("actor_user_id", UUID.class)).isEqualTo(USER_ID);
+        assertThat(audit.get("store_id", UUID.class)).isEqualTo(STORE_ID);
+        assertThat(audit.get("target_id", UUID.class).toString()).isEqualTo(body.path("exportId").asText());
+        JsonNode metadata = objectMapper.readTree(audit.get("metadata").toString());
+        assertThat(metadata.path("type").asText()).isEqualTo("TPCN");
+        assertThat(metadata.path("recordCount").asInt()).isEqualTo(2);
+        assertThat(metadata.path("recordIds").get(0).asText()).isEqualTo(second.toString());
+        assertThat(metadata.path("recordIds").get(1).asText()).isEqualTo(first.toString());
+    }
+
+    private UUID createReviewFixture(Login actor, UUID store, String key) throws Exception {
+        MvcResult created = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", store)
+                        .file(payload(null, "Synthetic review fixture"))
+                        .file(new MockMultipartFile("photos", "synthetic.jpg", "image/jpeg", jpeg(12, 12)))
+                        .session(actor.session()).header("X-CSRF-TOKEN", actor.csrfToken())
+                        .header("Idempotency-Key", key))
+                .andExpect(status().isCreated()).andReturn();
+        return UUID.fromString(objectMapper.readTree(created.getResponse().getContentAsByteArray()).path("id").asText());
+    }
+
+    private void approveReviewFixture(Login actor, UUID store, UUID record) throws Exception {
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", store, record)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"APPROVED\"}")
+                        .session(actor.session()).header("X-CSRF-TOKEN", actor.csrfToken()))
+                .andExpect(status().isOk());
+    }
+
+    private String exportSelection(UUID... records) throws Exception {
+        return "{\"type\":\"TPCN\",\"recordIds\":" + objectMapper.writeValueAsString(records) + "}";
     }
 
     @Test
