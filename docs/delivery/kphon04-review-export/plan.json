@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kphon04-review-export",
   "revision": 1,
-  "status": "EXECUTING",
+  "status": "AWAITING_ACCEPTANCE",
   "objective": "Nối duyệt/xuất KPH Fresh vào backend hiện có, bảo toàn UI de74077 làm nền tiếp tục sửa.",
   "inScope": [
     "Review APPROVED/REJECTED theo capability và refresh history D01",
@@ -16,7 +16,7 @@
     "Merge main, push/deploy hoặc Pages cutover; không merge BE07/BE08 legacy"
   ],
   "baseSha": "82191c20cd9026fcd071d4273e460d8416d40e26",
-  "candidateSha": "",
+  "candidateSha": "1ad090750bbc579554b4e685e97322f5157fc7e5",
   "integrationOwner": "Codex /root",
   "sharedPaths": [
     "contracts/**",
@@ -32,7 +32,7 @@
     "apps/store-pwa/src/store-online-kph.css"
   ],
   "reviewLimit": 2,
-  "reviewRound": 0,
+  "reviewRound": 2,
   "teams": [
     {
       "id": "backend",
@@ -40,7 +40,9 @@
       "allowedPaths": [
         "backend/src/test/java/vn/coopfood/kph/kph/**"
       ],
-      "dependsOn": []
+      "dependsOn": [],
+      "agentId": "/root/backend",
+      "returnedSha": "d24da847dd29e6ae712f779766aaf7912c6f8552"
     },
     {
       "id": "export",
@@ -49,7 +51,9 @@
         "apps/store-pwa/src/store-online-export.ts",
         "apps/store-pwa/src/store-online-export.test.ts"
       ],
-      "dependsOn": []
+      "dependsOn": [],
+      "agentId": "/root/export",
+      "returnedSha": "e931c5f11f943e8aff721ee9a8b947d3253fd2f6"
     },
     {
       "id": "e2e",
@@ -57,7 +61,9 @@
       "allowedPaths": [
         "e2e/scripts/check-kphon04-review-export.cjs"
       ],
-      "dependsOn": []
+      "dependsOn": [],
+      "agentId": "/root/e2e",
+      "returnedSha": "a87c3c8faf21ce95dccdce119c03d16725dc6be9"
     }
   ],
   "gates": [
@@ -65,29 +71,46 @@
       "id": "integrated-checks",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "1ad090750bbc579554b4e685e97322f5157fc7e5",
+      "evidence": "docs/delivery/kphon04-review-export/evidence.md"
     },
     {
       "id": "real-backend-browser",
       "kind": "technical",
       "required": true,
-      "status": "pending"
+      "status": "pass",
+      "revision": 1,
+      "sha": "1ad090750bbc579554b4e685e97322f5157fc7e5",
+      "evidence": "docs/delivery/kphon04-review-export/evidence.md"
     },
     {
       "id": "owner-review-export",
       "kind": "user",
       "required": true,
-      "status": "pending"
+      "status": "pending",
+      "revision": 1,
+      "sha": "1ad090750bbc579554b4e685e97322f5157fc7e5",
+      "evidence": "docs/delivery/kphon04-review-export/handoff.md"
     }
   ],
   "changes": [],
-  "blockers": [],
-  "nextAction": "Dispatch team, root wiring; review blockers only in two rounds.",
+  "blockers": [
+    {
+      "id": "review-commit-during-scope-refresh",
+      "status": "resolved",
+      "owner": "/root",
+      "nextAction": "Regression test delayed PUT/suspend/resume PASS; round2 reviewer no remaining blockers."
+    }
+  ],
+  "nextAction": "Owner thử3scenarios tại Store4176 theo handoff; ghi quyết định thật cho KPHON04. Giữ UI de74077 để sửa tiếp; không tự mở DATE hoặc hai vòng cuối.",
   "uiCheckpoint": "de740775569b70f60b819b9ff0832813271860dd",
   "provenance": {
     "reusable": "82191c2 contains de74077, KPHON01-03 and Admin03",
     "superseded": "BE07/08 old UI not merged; use read-only evidence as needed",
     "remoteFreshness": "local refs inspected15/11/2026; remote not queried; no push/deploy"
   },
-  "initialRequest": "Owner15/11/2026: tiếp tục BE, giữ UI de74077 còn sửa; lập team/inloop/nghiệm thu tối ưu cận biên, không sa đà."
+  "initialRequest": "Owner15/11/2026: tiếp tục BE, giữ UI de74077 còn sửa; lập team/inloop/nghiệm thu tối ưu cận biên, không sa đà.",
+  "uiAcceptance": "pending; owner15/11 yêu cầu giữ UI de74077 còn sửa tiếp, không tự sign-off KPHON03/UI."
 }
