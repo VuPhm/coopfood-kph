@@ -1,5 +1,18 @@
 # Công việc kế tiếp
 
+## Active: KPHON04 duyệt/xuất trên UI de74077
+
+Owner15/11 cho tiếp BE, giữ UI còn sửa. Thực hiện slice kế tiếp review/export
+trên nhánh `store-app/kphon04-review-export`, base `82191c2` chứa `de74077`.
+Tối đa hai lượt review lỗi chặn; dùng lại API/backend/export builder hiện có.
+[Plan/gate/ownership](delivery/kphon04-review-export/plan.json).
+Sau kiểm tích hợp, owner thử duyệt/không duyệt và tải Excel bằng dữ liệu tổng hợp;
+UI cuối vẫn chưa nghiệm thu. Các mục “chưa mở slice” dưới đây là checkpoint
+14/11, đã được yêu cầu15/11 thay thế riêng cho review/export.
+
+Bước nhỏ sau slice: chốt kết quả owner KPHON03–04, rồi một vòng kỹ thuật tổ hợp
+và một vòng UI/UX cuối đã hẹn. DATE persistence/C02/rollout không tự mở.
+
 ## Store desktop: workspace theo Admin
 
 Theo phản hồi owner mới nhất, revision8 bỏ cơ chế nền xanh/nắp trượt trên desktop

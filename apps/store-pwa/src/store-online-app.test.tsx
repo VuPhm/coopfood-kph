@@ -8,7 +8,7 @@ const employee = { id: "store-a", code: "0001", name: "Cửa hàng A", capabilit
 const manager = { ...employee, id: "store-b", code: "0002", name: "Cửa hàng B", capabilities: ["VIEW", "CREATE", "REVIEW", "EXPORT"] as ("VIEW" | "CREATE" | "REVIEW" | "EXPORT")[] };
 const session = { user: { id: "user", username: "test", displayName: "Người kiểm thử", globalRoles: [], stores: [] }, csrfToken: "synthetic" };
 function gateway(): StoreSessionGateway {
-  return { createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
+  return { reviewRecord: vi.fn(), prepareExport: vi.fn(), createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
 }
 async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Công việc cửa hàng" }); }
 describe("Store online session", () => {

@@ -7,7 +7,7 @@ import type { RecordView } from "./record-view";
 const session = { user: { id: "actor-real", username: "region", displayName: "Người dùng thật", globalRoles: [], stores: [] }, csrfToken: "synthetic" };
 const store = { id: "scope-real", code: "001", name: "Cửa hàng thật", capabilities: ["VIEW", "CREATE"] as ("VIEW" | "CREATE")[] };
 function gateway(): StoreSessionGateway {
-  return { getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([store]), login: vi.fn(), logout: vi.fn(), changePassword: vi.fn(), lookupBarcode: vi.fn().mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" }), createRecord: vi.fn().mockResolvedValue({ id: "saved" } as RecordView), loadHistory: vi.fn().mockResolvedValue({ records: [], page: 1, pageSize: 25, totalItems: 0, totalPages: 0, typeTotals: { TPCN: 0, TPTS: 0 } }) };
+  return { reviewRecord: vi.fn(), prepareExport: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([store]), login: vi.fn(), logout: vi.fn(), changePassword: vi.fn(), lookupBarcode: vi.fn().mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" }), createRecord: vi.fn().mockResolvedValue({ id: "saved" } as RecordView), loadHistory: vi.fn().mockResolvedValue({ records: [], page: 1, pageSize: 25, totalItems: 0, totalPages: 0, typeTotals: { TPCN: 0, TPTS: 0 } }) };
 }
 async function open(api: StoreSessionGateway) {
   window.history.replaceState(null, "", "#kph"); render(<StoreOnlineApp gateway={api} />);

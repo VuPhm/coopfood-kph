@@ -1,6 +1,21 @@
 # Trạng thái hiện tại
 
-Ngày rà soát: 14/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+Ngày rà soát: 15/11/2026. Mốc đối chiếu trước khi chuẩn hóa tài liệu là `04f7c4a`.
+
+## KPHON04 — nối duyệt/xuất, giữ UI de74077 — 15/11/2026
+
+Theo owner tiếp tục BE với team/inloop có giới hạn, nhánh
+`store-app/kphon04-review-export` tách từ `82191c2` chứa nguyên UI `de74077`.
+Nối REVIEW/EXPORT hiện có vào Store Fresh: duyệt/không duyệt, refresh history
+D01, chọn trong trang hiện tại và xuất server bundle với ảnh stamped private.
+Không đổi backend/API/schema; backend tiếp tục quyết định scope/eligibility/audit.
+Chrome, panel, mobile layout, Admin và packages/ui tại `de74077` giữ nguyên để
+owner còn sửa tiếp. Không nhập nguyên nhánh BE07/08 cũ.
+
+[Hồ sơ và gate](delivery/kphon04-review-export/plan.json).
+Owner acceptance KPHON03/UI vẫn pending; yêu cầu tiếp BE không biến thành
+nghiệm thu giao diện cuối. KPHON04 có gate owner riêng, hai vòng toàn app cuối
+vẫn để sau khi nối đủ KPH. Không merge main/push/deploy/Pages.
 
 ## Store desktop theo bố cục Admin — 14/11/2026
 

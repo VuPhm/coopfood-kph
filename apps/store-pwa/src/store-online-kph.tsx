@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import { ListChecks, SlidersHorizontal } from "lucide-react";
 import { StorePageLayout, StorePageHero, StorePageSurface } from "./store-page-hero";
 import { revealBelowStickyTabs } from "./store-sticky-tabs";
 import { KPH_DATE_SHORTCUTS, kphDateRange } from "./store-kph-history";
@@ -26,15 +26,30 @@ type Filters = { kind: KphKind; approval: "ALL" | ApprovalStatus; from: string; 
 const defaults: Filters = { kind: "TPTS", approval: "ALL", from: "", to: "", sort: "newest", direction: "descending", page: 1 };
 function iso(value: string) { try { return value ? parseDisplayDate(value) : undefined; } catch { return null; } }
 
-export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory, createRecord, lookupBarcode, profile, canCreate = false, onSessionExpired }: {
+export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory, createRecord, lookupBarcode, profile, canCreate = false, reviewRecord, prepareExport, canReview = false, canExport = false, onSessionExpired }: {
   suspended?: boolean; userId: string; storeId: string; loadHistory: StoreSessionGateway["loadHistory"]; onSessionExpired: () => void;
   createRecord?: StoreSessionGateway["createRecord"]; lookupBarcode?: StoreSessionGateway["lookupBarcode"];
   profile?: StoreProfile; canCreate?: boolean;
+  reviewRecord?: StoreSessionGateway["reviewRecord"]; prepareExport?: StoreSessionGateway["prepareExport"];
+  canReview?: boolean; canExport?: boolean;
 }) {
   const id = useId();
   const client = useQueryClient();
   const create = useRef<KphCreateHandle>(null);
   const [notice, setNotice] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [actionBusy, setActionBusy] = useState<"review" | "export" | null>(null);
+  const actionLock = useRef(false);
+  const authority = useRef({ userId, storeId, suspended, canReview, canExport, generation: 0 });
+  const previous = authority.current;
+  authority.current = { userId, storeId, suspended, canReview, canExport, generation: previous.generation + Number(previous.userId !== userId || previous.storeId !== storeId || previous.suspended !== suspended || previous.canReview !== canReview || previous.canExport !== canExport) };
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selection, setSelection] = useState<string[]>([]);
+  const [exportOpen, setExportOpen] = useState(false);
+  useEffect(() => {
+    if (!canExport) { setSelection([]); setSelectionMode(false); setExportOpen(false); }
+    if (suspended) { setActionError(""); setNotice(""); }
+  }, [canExport, suspended]);
   const [filterOpen, setFilterOpen] = useState(false);
   const [groupByDate, setGroupByDate] = useState(true);
   const mounted = useRef(true);
@@ -68,13 +83,15 @@ export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory
   useEffect(() => { if (expired) onSessionExpired(); }, [expired, onSessionExpired]);
   useEffect(() => {
     if (query.data && !query.isPlaceholderData && filters.page > Math.max(1, query.data.totalPages)) {
-      setActiveId(null); setImage(null); setCollapsed([]);
+      setActiveId(null); setImage(null); setCollapsed([]); setSelection([]); setExportOpen(false);
       setFilters(current => ({ ...current, page: Math.max(1, query.data.totalPages) }));
     }
   }, [query.data, query.isPlaceholderData, filters.page]);
   // Every parameter/page change clears detail and grouping state together.
   function change(patch: Partial<Filters>) {
-    setActiveId(null); setImage(null); setCollapsed([]);
+    if (actionLock.current) return;
+    setActionError(""); setNotice("");
+    setActiveId(null); setImage(null); setCollapsed([]); setSelection([]); setExportOpen(false);
     setFilters(current => ({ ...current, ...patch, page: patch.page ?? 1 }));
   }
   async function save(draft: CreatedRecordDraft) {
@@ -92,17 +109,59 @@ export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory
   }
   const records = !dateError && !query.isError ? query.data?.records ?? [] : [];
   const active = records.find(record => record.id === activeId) ?? null;
-  useEffect(() => { if (query.isError || dateError) { setActiveId(null); setImage(null); } }, [query.isError, dateError]);
-  const pending = query.isFetching || !!dateError;
+  useEffect(() => { if (query.isError || dateError) { setActiveId(null); setImage(null); setSelection([]); setExportOpen(false); } }, [query.isError, dateError]);
+  const pending = query.isFetching || !!dateError || !!actionBusy || suspended;
+  const selected = records.filter(record => selection.includes(record.id));
+  const eligible = selected.filter(record => record.approvalStatus === "APPROVED");
+  async function actOnRecord(action: "review" | "export", status?: "APPROVED" | "REJECTED") {
+    if (actionLock.current || pending || expired || (action === "review" ? !canReview || !reviewRecord || !active : !canExport || !prepareExport || !eligible.length)) return;
+    const generation = authority.current.generation;
+    const current = () => mounted.current && !authority.current.suspended && authority.current.generation === generation;
+    actionLock.current = true; setActionBusy(action); setActionError(""); setNotice("");
+    try {
+      if (action === "review" && active && reviewRecord && status) {
+        await reviewRecord(storeId, active.id, status);
+        if (current()) {
+          setActiveId(null); setImage(null); setSelection([]);
+          setNotice(status === "APPROVED" ? "Đã duyệt phiếu" : "Đã ghi nhận không duyệt");
+        }
+        // A benign context recheck may hide the response, but the committed
+        // mutation must still refresh the captured actor/store history.
+        await client.invalidateQueries({ queryKey: ["store-kph", userId, storeId] });
+      } else if (action === "export" && prepareExport) {
+        const bundle = await prepareExport(storeId, filters.kind, eligible.map(record => record.id));
+        if (!current()) return;
+        if (bundle.store.id !== storeId || bundle.records.length !== eligible.length || new Set(bundle.records.map(record => record.id)).size !== eligible.length || bundle.records.some(record => !eligible.some(item => item.id === record.id))) throw new Error("Dữ liệu xuất không khớp các phiếu đã chọn. Hãy tải lại danh sách.");
+        const { downloadOnlineKphExport } = await import("./store-online-export");
+        if (!current()) return;
+        if (await downloadOnlineKphExport(bundle, filters.kind, current) && current()) {
+          setNotice("Đã tạo file Excel"); setExportOpen(false); setSelection([]);
+        }
+      }
+    } catch (error) {
+      const sameScope = mounted.current && authority.current.userId === userId && authority.current.storeId === storeId;
+      if (sameScope && error instanceof OnlineApiError && (error.status === 401 || error.status === 403)) {
+        setSelection([]); setExportOpen(false); setActiveId(null); setImage(null); onSessionExpired();
+      } else if (current()) {
+        if (action === "review") void client.invalidateQueries({ queryKey: ["store-kph", userId, storeId] });
+        setActionError(action === "review" ? "Chưa cập nhật được trạng thái duyệt. Hãy tải lại phiếu để kiểm tra trước khi thử lại." : "Chưa tạo được file Excel. Hãy thử lại.");
+      }
+    } finally {
+      actionLock.current = false;
+      if (mounted.current) setActionBusy(null);
+    }
+  }
   const denied = query.error instanceof OnlineApiError && query.error.status === 403;
-  return <StorePageLayout className="store-kph store-online-kph" aria-label="Phiếu KPH" aria-busy={query.isFetching}>
+  return <StorePageLayout className="store-kph store-online-kph" aria-label="Phiếu KPH" aria-busy={query.isFetching || !!actionBusy}>
     <StorePageHero className="store-kph-underlay">
-      {canCreate && createRecord && lookupBarcode && profile ? <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled={suspended || expired} onPointerEnter={preloadKphCreateForm} onFocus={preloadKphCreateForm} onClick={() => { setNotice(""); create.current?.open(kind); }} />)}</div></section> : null}
+      {canCreate && createRecord && lookupBarcode && profile ? <section className="store-create-actions"><h2>Tạo phiếu KPH</h2><div className="store-two-col">{(["TPCN", "TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} disabled={suspended || expired || !!actionBusy} onPointerEnter={preloadKphCreateForm} onFocus={preloadKphCreateForm} onClick={() => { setNotice(""); create.current?.open(kind); }} />)}</div></section> : null}
     </StorePageHero>
     <StorePageSurface className="store-ticket-list" aria-label="Phiếu khai báo" onFocusCapture={revealBelowStickyTabs}>
     <StoreFoodKindTabs value={filters.kind} counts={(!dateError && !query.isError ? query.data?.typeTotals : undefined) ?? { TPCN: 0, TPTS: 0 }} onChange={kind => change({ kind })} />
-    <div className="store-kph-list-controls"><div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{query.data?.totalItems ?? 0} phiếu</span></div><div className="store-kph-list-toolbar"><button className="store-filter" aria-label="Lọc phiếu KPH" onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" /></button></div></div>
+    <div className="store-kph-list-controls"><div className="store-list-heading"><h2>Phiếu khai báo</h2><span className="store-result-count">{query.data?.totalItems ?? 0} phiếu</span></div><div className="store-kph-list-toolbar">{canExport && prepareExport ? <button className="store-compact" disabled={pending} aria-pressed={selectionMode} onClick={() => { setSelectionMode(!selectionMode); setSelection([]); setActionError(""); }}><ListChecks size={20} aria-hidden="true" /><span>{selectionMode ? "Xong" : "Chọn"}</span></button> : null}<button className="store-filter" aria-label="Lọc phiếu KPH" disabled={!!actionBusy || suspended} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" /></button></div></div>
     {notice ? <p role="status">{notice}</p> : null}
+    {actionError && !active && !exportOpen ? <p role="alert">{actionError}</p> : null}
+    {selectionMode && canExport ? <div className="store-batch"><span>{selected.length} đã chọn</span><small>Chỉ chọn phiếu ở trang hiện tại</small><Button className="store-export" disabled={pending || !selected.length} onClick={() => { setActionError(""); setExportOpen(true); }}>Xuất Excel</Button></div> : null}
     <StoreSheet open={filterOpen && !suspended} onOpenChange={setFilterOpen} className="store-kph-sheet store-kph-filter" title="Lọc & sắp xếp" description="Bộ lọc phiếu áp dụng ngay khi thay đổi">
     <div className="store-online-kph-filters">
       <section className="store-kph-filter-section"><h3>Ngày phát hiện hàng KPH</h3><div className="store-kph-date-shortcuts" role="group" aria-label="Lọc nhanh ngày phát hiện">{KPH_DATE_SHORTCUTS.map(shortcut => { const range = kphDateRange(shortcut.value); return <button type="button" key={shortcut.value} aria-pressed={filters.from === range.from && filters.to === range.to} onClick={() => change(range)}>{shortcut.label}</button>; })}</div></section>
@@ -113,22 +172,27 @@ export function StoreOnlineKph({ suspended = false, userId, storeId, loadHistory
       <label>Thứ tự<select aria-label="Thứ tự" value={filters.direction} disabled={filters.sort === "newest"} onChange={event => change({ direction: event.target.value as Filters["direction"] })}><option value="descending">Giảm dần</option><option value="ascending">Tăng dần</option></select></label>
       {dateError ? <p role="alert">{dateError}</p> : null}
       <label className="store-online-group"><input type="checkbox" checked={groupByDate} onChange={event => { setGroupByDate(event.target.checked); setCollapsed([]); }} />Nhóm theo ngày</label>
-      <Button variant="ghost" onClick={() => { setFilters(defaults); setActiveId(null); setImage(null); setCollapsed([]); setGroupByDate(true); }}>Đặt lại</Button>
+      <Button variant="ghost" onClick={() => { if (actionLock.current) return; setFilters(defaults); setActiveId(null); setImage(null); setCollapsed([]); setSelection([]); setExportOpen(false); setGroupByDate(true); }}>Đặt lại</Button>
       <Button onClick={() => setFilterOpen(false)}>Xong</Button>
     </div></StoreSheet>
     {dateError && !filterOpen ? <p role="alert">{dateError}</p> : null}
     {query.isError ? <div role="alert"><p>{denied ? "Không có quyền xem phiếu tại cửa hàng này." : "Không tải được phiếu."}</p>{!denied && !expired ? <Button variant="secondary" onClick={() => { void query.refetch(); }}>Thử lại</Button> : null}</div> : null}
     {!dateError && !query.isError ? <>
       {query.isFetching ? <span className="sr-only" role="status">Đang tải…</span> : null}
-      <StoreKphList desktop={desktop} visible={records} groupByDate={groupByDate} loading={pending} collapsedDates={collapsed} onToggleDate={date => setCollapsed(current => current.includes(date) ? current.filter(item => item !== date) : [...current, date])} setActive={record => { if (!pending) setActiveId(record.id); }} />
+      <StoreKphList desktop={desktop} visible={records} selectionMode={selectionMode && canExport} selection={selection} setSelection={setSelection} groupByDate={groupByDate} loading={pending} collapsedDates={collapsed} onToggleDate={date => setCollapsed(current => current.includes(date) ? current.filter(item => item !== date) : [...current, date])} setActive={record => { if (!pending) { setActionError(""); setActiveId(record.id); } }} />
       {!query.isPending && !query.isFetching && !records.length ? <p>Không có phiếu</p> : null}
       <nav className="store-online-pagination" aria-label="Phân trang"><Button variant="secondary" disabled={pending || filters.page <= 1} onClick={() => change({ page: filters.page - 1 })}>Trang trước</Button><span>Trang {query.data?.totalPages ? filters.page : 0}/{query.data?.totalPages ?? 0}</span><Button variant="secondary" disabled={pending || filters.page >= (query.data?.totalPages ?? 0)} onClick={() => change({ page: filters.page + 1 })}>Trang sau</Button></nav>
     </> : null}
     </StorePageSurface>
     {canCreate && createRecord && lookupBarcode && profile ? <KphCreateControl ref={create} profile={profile} suspended={suspended} onBarcodeLookup={lookup} onSaved={save} /> : null}
-    <StoreSheet open={!!active && !query.isError && !suspended} onOpenChange={open => { if (!open) { setActiveId(null); setImage(null); } }} title="Phiếu KPH" description="Chi tiết phiếu" className="store-kph-sheet store-kph-detail">
+    <StoreSheet open={!!active && !query.isError && !suspended} onOpenChange={open => { if (!open && !actionLock.current) { setActionError(""); setActiveId(null); setImage(null); } }} title="Phiếu KPH" description="Chi tiết phiếu" className="store-kph-sheet store-kph-detail">
       {active ? <><p className={`store-kph-detail-kind kind-${active.kind.toLowerCase()}`}>{active.kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"}</p><section><h3>Hàng hóa</h3><Summary rows={[["Tên hàng hóa", active.productName], ["SKU", active.sku], ["Barcode", active.barcode || "—"], ["NCC", active.supplier], ["Số lượng", active.quantity]]} /></section><section><h3>Phát hiện & xử lý</h3><Summary rows={[["Ngày phát hiện", active.detectedDate], ["Người phát hiện", active.detectedBy], ["Tình trạng", active.condition], ["Xử lý", active.resolution], ["Ngày xử lý", active.treatmentDate || "—"], ["Duyệt", approvalLabels[active.approvalStatus]], ["Người duyệt", active.reviewedBy || "—"]]} />
-        </section><section><h3>Ảnh minh chứng</h3>{active.note ? <p>{active.note}</p> : null}<div className="store-review-photos">{active.photos.map((photo, index) => <button key={photo.id} aria-label={`Xem ảnh ${index + 1}`} onClick={() => setImage(photo)}><img src={photo.src} alt={photo.alt} loading="lazy" /></button>)}</div></section></> : null}
+        </section><section><h3>Ảnh minh chứng</h3>{active.note ? <p>{active.note}</p> : null}<div className="store-review-photos">{active.photos.map((photo, index) => <button key={photo.id} aria-label={`Xem ảnh ${index + 1}`} onClick={() => setImage(photo)}><img src={photo.src} alt={photo.alt} loading="lazy" /></button>)}</div></section>{actionError ? <p role="alert">{actionError}</p> : null}{canReview && reviewRecord ? <div className="store-sheet-actions"><Button variant="ghost" disabled={pending || active.approvalStatus === "REJECTED"} onClick={() => void actOnRecord("review", "REJECTED")}>Không duyệt</Button><Button className="store-button" disabled={pending || active.approvalStatus === "APPROVED"} onClick={() => void actOnRecord("review", "APPROVED")}>{actionBusy === "review" ? "Đang cập nhật…" : "Duyệt phiếu"}</Button></div> : null}</> : null}
+    </StoreSheet>
+    <StoreSheet open={exportOpen && canExport && !suspended && !query.isError} onOpenChange={open => { if (!actionLock.current) { setExportOpen(open); setActionError(""); } }} title="Xuất Excel" description="Xác nhận xuất các phiếu đủ điều kiện" className="store-kph-sheet store-kph-export">
+      <Summary rows={[["Cửa hàng", profile?.storeName ?? storeId], ["Loại phiếu", filters.kind === "TPCN" ? "TP khô & khác" : "TP tươi sống"], ["Đủ điều kiện", `${eligible.length} phiếu đã duyệt`], ["Không đưa vào file", `${selected.length - eligible.length} phiếu`]]} />
+      {actionError ? <p role="alert">{actionError}</p> : null}
+      <div className="store-sheet-actions"><Button variant="ghost" disabled={!!actionBusy} onClick={() => setExportOpen(false)}>Hủy</Button><Button className="store-button" disabled={pending || !eligible.length} onClick={() => void actOnRecord("export")}>{actionBusy === "export" ? "Đang xuất…" : "Tải xuống"}</Button></div>
     </StoreSheet>
     <EvidenceImageViewer image={image} open={!!image && !!active && !query.isError && !suspended} presentation="screen" index={Math.max(0, active?.photos.findIndex(photo => photo.id === image?.id) ?? 0)} total={active?.photos.length ?? 0} onPrevious={() => { if (active && image) { const index = active.photos.findIndex(photo => photo.id === image.id); if (index > 0) setImage(active.photos[index - 1]!); } }} onNext={() => { if (active && image) { const index = active.photos.findIndex(photo => photo.id === image.id); if (index < active.photos.length - 1) setImage(active.photos[index + 1]!); } }} onOpenChange={open => { if (!open) setImage(null); }} />
   </StorePageLayout>;
