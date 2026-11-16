@@ -4,33 +4,37 @@ Cập nhật17/11/2026. [CURRENT_STATE](CURRENT_STATE.md). QA01 được owner �
 merge và dọn; giữ checkpoint KPHON04 cùng chiến lược test mới làm nền tiếp tục.
 Không có feature implementation mới tự khởi chạy trong lần tích hợp này.
 
-## Bước nhỏ kế tiếp: chốt KPHON03–04 trên main
+## Bước nhỏ kế tiếp: owner xem candidate UI/UX cuối
 
-Agent xác minh hoặc khởi động một Fresh online + Admin từ main bằng runtime/DB
-fixture tổng hợp, đưa URL/mode/source còn sống. Owner thử ngắn:
+Owner đã chốt17/11: “Đạt KPHON03–04, tiếp vòng kỹ thuật tổ hợp”. Vòng kỹ thuật
+tổ hợp đã PASS; [evidence/candidate KPHQA01](delivery/kphqa01-final-acceptance.md).
+Source production candidate chỉ sửa feedback lỗi gửi: tự đưa lỗi vào vùng nhìn/
+focus và hướng dẫn retry bằng tiếng Việt, giữ nguyên draft/ảnh/key.
 
-1. Xem mobile/desktop, tạo một phiếu có ảnh rồi mở lại.
-2. Duyệt một phiếu, không duyệt một phiếu; chọn và xuất một phiếu hợp lệ.
-3. Mở Excel tổng hợp trong Excel thực để xem độ dễ đọc/in và báo điểm gây khó dùng.
-
-Agent giữ kiểm quyền, race/retry, persistence và cấu trúc/bytes workbook; không
-bắt owner lặp security matrix. [Handoff KPHON04](delivery/kphon04-review-export/handoff.md)
-là nguồn scenarios, URL trong đó là lịch sử phải xác minh lại.
-Owner cho merge QA01 chưa tự trở thành nghiệm thu KPHON03–04 hoặc UI cuối.
+Store candidate <http://127.0.0.1:4181/#kph>, online cùng backend8082/DB tổng hợp;
+Admin <http://127.0.0.1:4175/>. Main4176 giữ bản vừa được nghiệm thu, chưa có
+patch UX. Agent phải probe lại URL/mode/source khi bàn giao, không dùng mock.
+Owner xem nhịp thao tác/bố cục candidate; không cần lặp security hoặc Excel.
+Gate iPhone **pending theo owner**: chưa có URL HTTPS/runtime hoặc thiết bị đã
+kết nối. Khi có, thử camera/quyền OS, bàn phím/safe area và chuyển ứng dụng rồi
+quay lại form. Không coi Chromium mobile là thiết bị thật; không tự mở tunnel/
+deploy để thay gate này. Chưa merge candidate main hoặc triển khai.
 
 ## Hai vòng đã hẹn trước nghiệm thu cuối
 
 Sau khi chốt feedback KPH đã nối, giữ thứ tự:
 
-1. Một vòng kỹ thuật tổ hợp trên source cuối: luồng Admin/session/scope →
+1. **Technical PASS17/11**, một vòng trên source cuối: luồng Admin/session/scope →
    lookup/history → create/media/retry → review/export; real backend và fixture
    tổng hợp. Chọn gate theo diff/evidence còn thiếu, không chạy lại mọi script
    visual lịch sử hoặc mọi tổ hợp viewport cho cùng một kiểm HTTP.
-2. Một vòng UI/UX cuối: owner quyết định bố cục/nhịp thao tác, camera, quyền OS,
+2. **Agent kiểm scoped PASS, owner/device pending**, một vòng UI/UX cuối:
+   owner quyết định bố cục/nhịp thao tác, camera, quyền OS,
    keyboard/safe area/gián đoạn trên iPhone thật. Agent sửa blocker xác định và
    chỉ kiểm lại phần ảnh hưởng.
 
-Cả hai còn pending. Áp dụng [TEST_STRATEGY](TEST_STRATEGY.md): mỗi kiểm tiếp theo
+Không mở thêm vòng audit/polish khi chưa có blocker cụ thể.
+Áp dụng [TEST_STRATEGY](TEST_STRATEGY.md): mỗi kiểm tiếp theo
 phải giảm thêm rủi ro đáng kể; giữ test bắt buộc, dừng khi evidence đủ. Không coi
 root verify khi merge là thay thế cho hai vòng này hoặc sign-off thiết bị thật.
 

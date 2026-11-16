@@ -1,8 +1,9 @@
 # Trạng thái hiện tại
 
-Cập nhật17/11/2026. Owner cho tích hợp và dọn QA01 để tiếp tục lộ trình.
+Cập nhật17/11/2026. Owner nghiệm thu KPHON03–04; vòng kỹ thuật tổ hợp PASS.
 Baseline tích hợp gồm KPHON04 `1ad0907`, hồ sơ `089dd17` và QA01 `f2b1404`;
-production source không thay đổi trong lần tích hợp này.
+main ở `2d1536f`. Candidate KPHQA01 sửa feedback lỗi gửi, chưa merge main.
+[Nghiệm thu và evidence hai vòng cuối](delivery/kphqa01-final-acceptance.md).
 
 ## Đã có trên baseline tích hợp
 
@@ -14,7 +15,8 @@ production source không thay đổi trong lần tích hợp này.
   dùng backend thật, chọn proxy theo môi trường, không lấy mock làm evidence quyền.
 - KPHON01 session/effective stores, KPHON02 lookup/history, KPHON03 create/private
   media và KPHON04 review/export đã có trên Fresh online. KPHON01–02 được owner
-  tạm chấp nhận có giới hạn; KPHON03–04 và UI cuối chưa có nghiệm thu cuối.
+  tạm chấp nhận có giới hạn; owner đã nghiệm thu KPHON03–04 ngày17/11.
+  UI/UX cuối vẫn chờ owner và thiết bị thật.
   [KPHON04 technical evidence](delivery/kphon04-review-export/evidence.md).
 - QA01 bỏ delivery-cycle, giữ một module `tdd` của Matt Pocock, tinh gọn kiểm
   lặp và workflow. Owner đồng ý merge17/11; áp dụng [TEST_STRATEGY](TEST_STRATEGY.md)
@@ -27,7 +29,7 @@ push/deploy. Các câu “chưa merge main” trong hồ sơ task cũ là checkp
 
 | Vùng | Đã có | Còn chờ |
 | --- | --- | --- |
-| Store Fresh online | Session, chọn effective store, lookup FOUND/NOT_FOUND, history D01/detail, create/retry, review và xuất Excel với ảnh stamped private | Owner KPHON03–04, một vòng kỹ thuật tổ hợp và một vòng UI/UX cuối |
+| Store Fresh online | KPHON03–04 owner accepted; kỹ thuật tổ hợp PASS (backend92 tests, real-backend browser nối Admin→KPH); candidate sửa feedback lỗi gửi | Owner xem candidate UI/UX cuối; iPhone pending theo owner vì chưa có đường truy cập thiết bị |
 | Admin Web | Lifecycle, user deactivation, credential self-service, catalog staging và store membership | UI nghiệm thu cuối trên bản tích hợp; provisioning/reset/bootstrap/recovery mở riêng |
 | Store/capability | GET `/api/v1/kph/stores` dùng policy backend cho store/region/chain, không membership giả | ADR0007 vẫn Proposed; discovery acceptance cuối chưa suy ra từ merge |
 | DATE/Thông báo/Báo cáo | Prototype/mock theo contract hiện có | Persistence, quantity/unit, audit, nhắc bền vững và snapshot kỳ chưa có backend; Fresh online không fallback dữ liệu mock |
@@ -56,8 +58,18 @@ Evidence trên `1ad0907`: root verify420 tests/build/PWA, backend targeted14 tes
 (clean migrations), real-backend browser hai viewport; QA01 có61 targeted tests
 và browser script tinh gọn PASS. Đây là evidence ngày15/11, không đổi ngày thành
 kết quả mới. Kết quả tích hợp17/11 và việc dọn nằm ở [QA01](qa/QA01_LEAN_TESTS.md).
-Full backend regression, remote CI, thiết bị thật và hai vòng cuối vẫn chưa được
-coi là PASS. Technical PASS và owner acceptance riêng.
+Evidence mới KPHQA01: full backend regression PASS92 tests/16 classes, không
+fail/error/skipped; clean migrations V1–V9. Journey hai phiên nối Admin đổi
+quyền → lookup → create3 ảnh/mất response/retry → review/export → revoke PASS.
+Sau sửa feedback lỗi gửi:29 tests form/create, online build/PWA và browser
+candidate4181 PASS; keyboard/focus/vùng cuộn được kiểm390×844/1440×1024.
+Không chạy lại full frontend suite trên diff UX nhỏ. Remote CI, owner UI/UX
+cuối và thiết bị thật chưa PASS. Technical PASS và owner acceptance riêng.
+
+Preview main4176/Admin4175 đã probe200; candidate Store4181 (online) ở task
+worktree KPHQA01, cùng backend/DB tổng hợp. URL phải probe lại khi bàn giao.
+Owner chọn giữ gate iPhone pending vì chưa có URL HTTPS/thiết bị kết nối;
+không tự mở tunnel/deploy. Main4176 chưa có bản sửa feedback của candidate.
 
 Không đổi nhánh `codex/github-pages-pwa` hoặc tag bảo tồn. Không push/deploy.
 Checkpoint trước tích hợp đọc bằng `git show f2b1404:docs/CURRENT_STATE.md`;
