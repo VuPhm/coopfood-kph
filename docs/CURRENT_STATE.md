@@ -8,6 +8,13 @@ main ở `2d1536f`. Candidate KPHQA01 revision2 sửa feedback lỗi gửi, tr�
 xác minh, logo/chrome và nối thêm/chọn đủ ngày theo feedback owner; chưa merge.
 [Nghiệm thu và evidence hai vòng cuối](delivery/kphqa01-final-acceptance.md).
 
+DATEON01 đã mở nhánh/worktree `store-app/dateon01-durable-contract` từ checkpoint
+`82b01b3`, chỉ chuẩn bị [contract DATE bền vững](product/DATE_DURABLE_CONTRACT.md).
+Owner đã chốt: lượng đang theo dõi, không tồn kho; xử lý từng phần và giữ lượng
+còn lại; lịch chung, chỉ quản lý sửa/hẹn. Contract có wire proposal, ADR0008
+Proposed và fixture9 scenarios; chưa sửa OpenAPI, schema hoặc app. Bước tiếp là
+DATEON02 lưu/xem/tạo/sửa entry với quyền/version/audit, không nhập BE/DATE cũ.
+
 ## Đã có trên baseline tích hợp
 
 - FRESH01 revision5 CLOSED27/10: UI Fresh đã vào main; R2-01 shell spine accepted

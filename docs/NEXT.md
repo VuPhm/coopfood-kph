@@ -13,6 +13,14 @@ lô, ownership/quyền/audit, DATE→KPH atomic và nhắc bền vững. Chỉ m
 migration/implementation sau khi quyết định nghiệp vụ còn thiếu được chốt.
 Các nhánh BE/DATE cũ vẫn chỉ là provenance; không tự merge làm nền.
 
+DATEON01 đã có [bản đề xuất để chốt](product/DATE_DURABLE_CONTRACT.md), base
+`82b01b3`, task/worktree riêng. Owner đã chọn A lượng đang theo dõi, không tồn
+kho; B xử lý từng phần, giữ lượng còn lại; C lịch chung, chỉ quản lý sửa/hẹn.
+Wire proposal, ADR0008 Proposed và fixture đã có. Bước implementation nhỏ tiếp
+là DATEON02 entry persistence/read/create/update + quyền/version/audit, gồm
+OpenAPI/examples/generated và migration mới; sau đó partial DATE→KPH nhiều link
+và reminder bền vững. Chưa khởi chạy DATEON02/schema trong slice chuẩn bị này.
+
 ## KPH đã chốt đủ để tiếp — provenance của vòng local
 
 Owner đã chốt17/11: “Đạt KPHON03–04, tiếp vòng kỹ thuật tổ hợp”. Vòng kỹ thuật
