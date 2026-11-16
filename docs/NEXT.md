@@ -4,7 +4,16 @@ Cập nhật17/11/2026. [CURRENT_STATE](CURRENT_STATE.md). QA01 được owner �
 merge và dọn; giữ checkpoint KPHON04 cùng chiến lược test mới làm nền tiếp tục.
 Không có feature implementation mới tự khởi chạy trong lần tích hợp này.
 
-## Bước nhỏ kế tiếp: owner xem candidate UI/UX cuối
+## Bước nhỏ kế tiếp: contract DATE bền vững
+
+Owner chốt sau candidate `fdcfd2f`: **“đủ để tiếp, tiếp”**. Vòng local KPH
+đủ để đi tiếp; giữ iPhone pending, không coi đây là quyền merge/push/deploy.
+Chuẩn bị contract DATE từ code/test prototype thực tế: quantity/unit, định danh
+lô, ownership/quyền/audit, DATE→KPH atomic và nhắc bền vững. Chỉ mở OpenAPI/
+migration/implementation sau khi quyết định nghiệp vụ còn thiếu được chốt.
+Các nhánh BE/DATE cũ vẫn chỉ là provenance; không tự merge làm nền.
+
+## KPH đã chốt đủ để tiếp — provenance của vòng local
 
 Owner đã chốt17/11: “Đạt KPHON03–04, tiếp vòng kỹ thuật tổ hợp”. Vòng kỹ thuật
 tổ hợp đã PASS; [evidence/candidate KPHQA01](delivery/kphqa01-final-acceptance.md).
@@ -33,7 +42,7 @@ Sau khi chốt feedback KPH đã nối, giữ thứ tự:
    lookup/history → create/media/retry → review/export; real backend và fixture
    tổng hợp. Chọn gate theo diff/evidence còn thiếu, không chạy lại mọi script
    visual lịch sử hoặc mọi tổ hợp viewport cho cùng một kiểm HTTP.
-2. **Agent kiểm scoped PASS, owner/device pending**, một vòng UI/UX cuối:
+2. **Agent kiểm scoped PASS, owner cho tiếp sau revision2; device pending**:
    owner quyết định bố cục/nhịp thao tác, camera, quyền OS,
    keyboard/safe area/gián đoạn trên iPhone thật. Agent sửa blocker xác định và
    chỉ kiểm lại phần ảnh hưởng.

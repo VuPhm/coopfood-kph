@@ -1,6 +1,8 @@
 # Trạng thái hiện tại
 
 Cập nhật17/11/2026. Owner nghiệm thu KPHON03–04; vòng kỹ thuật tổ hợp PASS.
+Sau revision2 `fdcfd2f`, owner chốt “đủ để tiếp, tiếp”: kết thúc vòng UI local
+ở mức đủ để đi tiếp DATE contract. iPhone vẫn pending; không suy rollout.
 Baseline tích hợp gồm KPHON04 `1ad0907`, hồ sơ `089dd17` và QA01 `f2b1404`;
 main ở `2d1536f`. Candidate KPHQA01 revision2 sửa feedback lỗi gửi, trạng thái
 xác minh, logo/chrome và nối thêm/chọn đủ ngày theo feedback owner; chưa merge.
@@ -17,7 +19,7 @@ xác minh, logo/chrome và nối thêm/chọn đủ ngày theo feedback owner; c
 - KPHON01 session/effective stores, KPHON02 lookup/history, KPHON03 create/private
   media và KPHON04 review/export đã có trên Fresh online. KPHON01–02 được owner
   tạm chấp nhận có giới hạn; owner đã nghiệm thu KPHON03–04 ngày17/11.
-  UI/UX cuối vẫn chờ owner và thiết bị thật.
+  Owner cho đi tiếp sau UI revision2; gate thiết bị thật vẫn pending.
   [KPHON04 technical evidence](delivery/kphon04-review-export/evidence.md).
 - QA01 bỏ delivery-cycle, giữ một module `tdd` của Matt Pocock, tinh gọn kiểm
   lặp và workflow. Owner đồng ý merge17/11; áp dụng [TEST_STRATEGY](TEST_STRATEGY.md)
@@ -30,7 +32,7 @@ push/deploy. Các câu “chưa merge main” trong hồ sơ task cũ là checkp
 
 | Vùng | Đã có | Còn chờ |
 | --- | --- | --- |
-| Store Fresh online | KPHON03–04 owner accepted; kỹ thuật tổ hợp PASS; candidate revision2 giữ chrome khi xác minh, logo official, nối thêm giữ chọn và chọn đủ ngày explicit | Owner xem revision2 UI/UX cuối; iPhone pending theo owner vì chưa có đường truy cập thiết bị |
+| Store Fresh online | KPHON03–04 owner accepted; kỹ thuật tổ hợp PASS; candidate revision2 giữ chrome khi xác minh, logo official, nối thêm giữ chọn và chọn đủ ngày explicit | Owner cho tiếp sau revision2; iPhone pending vì chưa có đường truy cập thiết bị |
 | Admin Web | Lifecycle, user deactivation, credential self-service, catalog staging và store membership | UI nghiệm thu cuối trên bản tích hợp; provisioning/reset/bootstrap/recovery mở riêng |
 | Store/capability | GET `/api/v1/kph/stores` dùng policy backend cho store/region/chain, không membership giả | ADR0007 vẫn Proposed; discovery acceptance cuối chưa suy ra từ merge |
 | DATE/Thông báo/Báo cáo | Prototype/mock theo contract hiện có | Persistence, quantity/unit, audit, nhắc bền vững và snapshot kỳ chưa có backend; Fresh online không fallback dữ liệu mock |
@@ -65,8 +67,8 @@ fail/error/skipped; clean migrations V1–V9. Journey hai phiên nối Admin đ�
 quyền → lookup → create3 ảnh/mất response/retry → review/export → revoke PASS.
 Sau sửa feedback lỗi gửi:29 tests form/create, online build/PWA và browser
 candidate4181 PASS; keyboard/focus/vùng cuộn được kiểm390×844/1440×1024.
-Không chạy lại full frontend suite trên diff UX nhỏ. Remote CI, owner UI/UX
-cuối và thiết bị thật chưa PASS. Technical PASS và owner acceptance riêng.
+Không chạy lại full frontend suite trên diff UX nhỏ ở revision1. Remote CI và
+thiết bị thật chưa PASS; quyết định owner revision2 nằm ở đầu checkpoint. Technical PASS và owner acceptance riêng.
 
 Revision2: profile KPH66 tests và real-backend browser390/1440 PASS cho append,
 selection, review/export và revoke/expiry. Browser chọn đủ ngày tổng hợp26 phiếu

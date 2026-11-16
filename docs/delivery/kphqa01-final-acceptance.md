@@ -190,3 +190,7 @@ URL revision2: Store4181/Admin4182, online, cùng backend8082/DB tổng hợp c�
 main4176/Admin4175 chưa có patch. Owner chỉ cần xem nhịp thao tác/brand và chọn
 ngày/nối thêm; không bắt lặp security/Excel. Gate iPhone vẫn pending theo lựa
 chọn owner. Không merge/push/deploy hoặc mở thêm vòng polish khi không có lỗi.
+
+Owner phản hồi sau revision2 `fdcfd2f`: **“đủ để tiếp, tiếp”**. Khép vòng local
+ở mức đủ để tiếp lộ trình DATE contract; giữ KPHON03–04 accepted và technical
+evidence trên, không nâng thành sign-off iPhone/rollout hoặc quyền merge/deploy.
