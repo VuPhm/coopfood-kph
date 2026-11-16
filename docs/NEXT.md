@@ -8,13 +8,18 @@ Không có feature implementation mới tự khởi chạy trong lần tích h�
 
 Owner đã chốt17/11: “Đạt KPHON03–04, tiếp vòng kỹ thuật tổ hợp”. Vòng kỹ thuật
 tổ hợp đã PASS; [evidence/candidate KPHQA01](delivery/kphqa01-final-acceptance.md).
-Source production candidate chỉ sửa feedback lỗi gửi: tự đưa lỗi vào vùng nhìn/
-focus và hướng dẫn retry bằng tiếng Việt, giữ nguyên draft/ảnh/key.
+Owner phản hồi tiếp17/11: trắng toàn màn khi xác minh, logo cũ/nhãn Store–Admin
+và phân trang cắt ngày/chọn theo trang gây phiền. Candidate revision2 đã xử lý:
+giữ chrome công khai và che riêng private khi xác minh; wordmark official không
+gắn nhãn Store–Admin; nối thêm giữ chọn và checkbox ngày chọn đủ ngày explicit.
+[Contract D01 đã cập nhật theo yêu cầu](product/HISTORY_PAGING_CONTRACT.md).
 
 Store candidate <http://127.0.0.1:4181/#kph>, online cùng backend8082/DB tổng hợp;
-Admin <http://127.0.0.1:4175/>. Main4176 giữ bản vừa được nghiệm thu, chưa có
-patch UX. Agent phải probe lại URL/mode/source khi bàn giao, không dùng mock.
-Owner xem nhịp thao tác/bố cục candidate; không cần lặp security hoặc Excel.
+Admin candidate <http://127.0.0.1:4182/>. Main4176/Admin4175 giữ bản vừa được
+nghiệm thu, chưa có patch UX. Agent phải probe lại URL/mode/source khi bàn giao,
+không dùng mock. Owner xem đổi Home↔KPH/đổi focus, wordmark mobile/sidebar, rồi
+Chọn → checkbox một ngày → Hiển thị thêm: lựa chọn giữ và số phiếu chưa tải rõ.
+Không cần lặp security matrix hoặc Excel.
 Gate iPhone **pending theo owner**: chưa có URL HTTPS/runtime hoặc thiết bị đã
 kết nối. Khi có, thử camera/quyền OS, bàn phím/safe area và chuyển ứng dụng rồi
 quay lại form. Không coi Chromium mobile là thiết bị thật; không tự mở tunnel/

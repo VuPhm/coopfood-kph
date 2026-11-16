@@ -78,6 +78,7 @@ describe("Store online session", () => {
     vi.mocked(api.listStoreAccess).mockReturnValueOnce(pending);
     fireEvent(window, new Event("focus"));
     await screen.findByText("Đang xác minh phiên và quyền cửa hàng…");
+    expect(screen.getByRole("navigation", { name: "Điều hướng chính trên mobile", hidden: true })).toBeVisible();
     expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
     resolve([employee]);
     expect(await screen.findByRole("heading", { name: "Người kiểm thử" })).toBeInTheDocument();
@@ -113,7 +114,7 @@ describe("Store online session", () => {
     vi.mocked(api.listStoreAccess).mockReturnValueOnce(new Promise(resolve => { release = resolve; }));
     fireEvent(window, new Event("focus"));
     await screen.findByText("Đang xác minh phiên và quyền cửa hàng…");
-    expect(input).not.toBeVisible();
+    expect(input.closest("[inert]")).toHaveAttribute("aria-hidden", "true");
     release([employee]);
     await waitFor(() => expect(input).toBeVisible());
     expect(input).toHaveValue("Bản nháp chưa lưu");

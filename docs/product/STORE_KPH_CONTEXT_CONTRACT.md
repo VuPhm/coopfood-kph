@@ -25,14 +25,18 @@ Fresh entry dùng `VITE_STORE_APP_MOCK=false VITE_STORE_APP_ONLINE=true`;
 entry mock và online/Pilot cũ giữ riêng. Login/session/CSRF/logout/password tái
 sử dụng client chuẩn. Chọn store explicit, không persist session/token/store
 selection vào browser storage. Refresh navigation/focus/reconnect/visibility và
-trước chọn store. KPHON02 giữ DOM/draft khi revalidate nhưng che nội dung,
-khóa tương tác và ẩn cả portal dialog; không hiển thị scope cũ. Lỗi xác minh
+trước chọn store. KPHON02 giữ DOM/draft khi revalidate nhưng che nội dung private,
+khóa tương tác và che dữ liệu portal; không hiển thị scope cũ. KPHQA01 theo
+feedback17/11 giữ chrome/điều hướng/logo không chứa dữ liệu private ở trạng thái
+chờ và feedback cục bộ thay full-screen trắng; không trì hoãn mask bằng timer
+hoặc animation. Header form giữ tên loại phiếu; field/ảnh và identity vẫn bị che. Lỗi xác minh
 tháo scope cũ. Đổi actor luôn yêu cầu chọn store lại. Scope mất không
 chọn store khác tự động; giảm quyền nhưng còn VIEW cập nhật capabilities.
 
 KPHON02 nối lookup và history/chi tiết chỉ đọc; giữ D01 filter/sort/count
 trước pagination, reset detail/grouping khi đổi page/filter/sort. KPHON04 nối review/export qua API hiện có; capability chỉ điều khiển UI,
-backend kiểm lại từng request. Selection D01 trong trang hiện tại; export dùng
+backend kiểm lại từng request. Owner17/11 đổi selection online sang nối thêm/giữ chọn và chọn đủ ngày explicit
+theo HISTORY_PAGING_CONTRACT; export dùng
 bundle đã được server authorize/audit và tải stamped photos private. Mất scope
 hoặc đổi actor khi async đang chạy không tải file hoặc báo thành công vào scope mới. KPHON03 nối create qua form Fresh và gateway
 hiện hành: ngày/actor read-only,1–3 original photos theo thứ tự, xem lại trước

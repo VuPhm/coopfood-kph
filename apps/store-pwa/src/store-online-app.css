@@ -14,7 +14,11 @@
 .store-online-content ul { list-style: disc; padding-inline-start: 24px; }
 
 /* Keep the mounted scope out of interaction while retaining draft and scroll. */
-.store-online-verifying { position: fixed; inset: 0; z-index: 100; max-width: none; background: var(--cf-color-canvas, #edf4ef); }
+/* Keep the public chrome painted; conceal only scoped content and identity immediately. */
+.store-online-shell[data-verifying] :is(.store-page-hero-content, .store-page-surface > *, .store-header-store, .store-header .fresh-desktop-header-actions) { visibility: hidden; }
+.store-online-verifying { position: fixed; top: calc(88px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; width: min(360px, calc(100% - 32px)); padding: 20px; display: grid; gap: 20px; border-radius: 16px; background: var(--fresh-surface); color: var(--fresh-ink-muted); box-shadow: 0 4px 20px rgb(0 60 40 / 8%); font-size: 14px; }
+.store-verifying-lines { display: block; height: 84px; border-radius: 10px; background: repeating-linear-gradient(to bottom, var(--fresh-canvas) 0 16px, transparent 16px 32px); }
+@media (min-width: 900px) { .store-online-verifying { left: calc(50% + 124px); top: 180px; } }
 @media (max-width: 899px) {
   .store-online-content { padding-bottom: calc(24px + var(--store-mobile-toolbar-height, 84px)); }
 }

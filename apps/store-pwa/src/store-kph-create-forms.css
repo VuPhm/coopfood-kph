@@ -89,5 +89,5 @@
 
 /* Revalidation preserves the mounted form and its selected original files. */
 .store-create-screen[data-suspended="true"] { z-index: 101; }
-.store-create-screen[data-suspended="true"] > :not([data-scope-status]) { visibility: hidden; pointer-events: none; }
-.store-create-screen [data-scope-status] { position: absolute; inset: 0; display: grid; place-content: center; padding: 24px; }
+.store-create-screen[data-suspended="true"] > :not([data-scope-status], .create-dialog-header) { visibility: hidden; pointer-events: none; }
+.store-create-screen [data-scope-status] { position: absolute; inset: 72px 0 0; display: grid; place-content: center; padding: 24px; }

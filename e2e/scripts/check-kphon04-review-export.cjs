@@ -175,11 +175,13 @@ async function workbook(download, approved, stampedBytes, name) {
       await workbook(await downloadPromise, approved, await stampedResponse.body(), name);
       if (await page.getByRole('dialog', exact('Xuất Excel')).isVisible()) await page.keyboard.press('Escape');
       await layout(page, `${name}-exported`, width);
-      // D01 clears selection when page, tab or filter changes, even when the same rows reappear.
+      // Owner17/11: append keeps selection; changing type/filter still clears it.
       await selection(page, [pending.catalogSnapshot.productName]);
       assert.ok(persisted.totalPages >= 2, 'Acceptance fixture must contain at least 26 TPTS records for D01 page gate');
-      await page.getByRole('button', exact('Trang sau')).click(); await noSelection(page);
-      await page.getByRole('button', exact('Trang trước')).click(); await noSelection(page);
+      const loaded = await page.locator('[data-record-id]').count();
+      await page.getByRole('button', { name: /Hiển thị thêm/ }).click();
+      await expect.poll(() => page.locator('[data-record-id]').count()).toBeGreaterThan(loaded);
+      await expect(page.getByRole('checkbox', exact(`Chọn ${pending.catalogSnapshot.productName}`))).toBeChecked();
       await selection(page, [pending.catalogSnapshot.productName]);
       await page.getByRole('button', { name: /TP khô & khác/ }).filter({ has: page.locator('small') }).click(); await noSelection(page);
       await page.getByRole('button', { name: /TP tươi sống/ }).filter({ has: page.locator('small') }).click(); await noSelection(page);
@@ -203,7 +205,7 @@ async function workbook(download, approved, stampedBytes, name) {
       }
       assert.deepEqual(errors, []);
       results.push({ viewport: name, result: 'PASS', approved: approved.id, rejected: rejected.id,
-        checks: ['APPROVED/REJECTED persisted with inherited reviewer', 'page/tab/filter selection reset', 'only selected approved record exported', 'BM-331.CF approver R and private stamped image bytes', 'responsive workspace controls', 'no overflow/pageerror'] });
+        checks: ['APPROVED/REJECTED persisted with inherited reviewer', 'append preserves selection; tab/filter selection reset', 'only selected approved record exported', 'BM-331.CF approver R and private stamped image bytes', 'responsive workspace controls', 'no overflow/pageerror'] });
       await context.close(); activePage = undefined;
     }
 

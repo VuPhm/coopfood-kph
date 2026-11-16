@@ -2,7 +2,8 @@
 
 Cập nhật17/11/2026. Owner nghiệm thu KPHON03–04; vòng kỹ thuật tổ hợp PASS.
 Baseline tích hợp gồm KPHON04 `1ad0907`, hồ sơ `089dd17` và QA01 `f2b1404`;
-main ở `2d1536f`. Candidate KPHQA01 sửa feedback lỗi gửi, chưa merge main.
+main ở `2d1536f`. Candidate KPHQA01 revision2 sửa feedback lỗi gửi, trạng thái
+xác minh, logo/chrome và nối thêm/chọn đủ ngày theo feedback owner; chưa merge.
 [Nghiệm thu và evidence hai vòng cuối](delivery/kphqa01-final-acceptance.md).
 
 ## Đã có trên baseline tích hợp
@@ -29,7 +30,7 @@ push/deploy. Các câu “chưa merge main” trong hồ sơ task cũ là checkp
 
 | Vùng | Đã có | Còn chờ |
 | --- | --- | --- |
-| Store Fresh online | KPHON03–04 owner accepted; kỹ thuật tổ hợp PASS (backend92 tests, real-backend browser nối Admin→KPH); candidate sửa feedback lỗi gửi | Owner xem candidate UI/UX cuối; iPhone pending theo owner vì chưa có đường truy cập thiết bị |
+| Store Fresh online | KPHON03–04 owner accepted; kỹ thuật tổ hợp PASS; candidate revision2 giữ chrome khi xác minh, logo official, nối thêm giữ chọn và chọn đủ ngày explicit | Owner xem revision2 UI/UX cuối; iPhone pending theo owner vì chưa có đường truy cập thiết bị |
 | Admin Web | Lifecycle, user deactivation, credential self-service, catalog staging và store membership | UI nghiệm thu cuối trên bản tích hợp; provisioning/reset/bootstrap/recovery mở riêng |
 | Store/capability | GET `/api/v1/kph/stores` dùng policy backend cho store/region/chain, không membership giả | ADR0007 vẫn Proposed; discovery acceptance cuối chưa suy ra từ merge |
 | DATE/Thông báo/Báo cáo | Prototype/mock theo contract hiện có | Persistence, quantity/unit, audit, nhắc bền vững và snapshot kỳ chưa có backend; Fresh online không fallback dữ liệu mock |
@@ -37,7 +38,8 @@ push/deploy. Các câu “chưa merge main” trong hồ sơ task cũ là checkp
 | Vận hành | Evidence kỹ thuật local theo slice | Thiết bị thật, restore, deployment profile/storage/retention và rollout |
 
 Backend là authority cho identity, store scope, quyền và dữ liệu. D01 online
-selection chỉ trang hiện tại; không áp hành vi grouping mock ngầm cho API.
+selection/nối thêm và chọn đủ ngày explicit đã được owner yêu cầu đổi17/11;
+API D01 vẫn phân trang server. Xem HISTORY_PAGING_CONTRACT, không suy từ mock.
 [Contract index](product/STORE_APP_CONTRACTS.md), [baseline/Pages](STORE_APP_BASELINE.md).
 
 ## Chạy và đọc evidence
@@ -66,8 +68,17 @@ candidate4181 PASS; keyboard/focus/vùng cuộn được kiểm390×844/1440×10
 Không chạy lại full frontend suite trên diff UX nhỏ. Remote CI, owner UI/UX
 cuối và thiết bị thật chưa PASS. Technical PASS và owner acceptance riêng.
 
-Preview main4176/Admin4175 đã probe200; candidate Store4181 (online) ở task
-worktree KPHQA01, cùng backend/DB tổng hợp. URL phải probe lại khi bàn giao.
+Revision2: profile KPH66 tests và real-backend browser390/1440 PASS cho append,
+selection, review/export và revoke/expiry. Browser chọn đủ ngày tổng hợp26 phiếu
+khi list mới tải25; báo rõ1 phiếu chưa hiển thị. Giữ kiểm DB quyền mỗi request,
+không cache auth theo TTL hoặc trì hoãn mask private để che lỗi nháy trắng.
+Full frontend `npm run verify` revision2 PASS425 tests (Admin27, Store355,
+API4, rules19, UI20), TypeScript/build/PWA, contracts và generated API không
+drift. Backend không đổi;92 tests cùng source ở revision1 không chạy lại.
+
+Preview main4176/Admin4175 giữ baseline; candidate Store4181 (online) và
+Admin4182 ở task worktree KPHQA01, cùng backend/DB tổng hợp. URL phải probe lại
+khi bàn giao. Các kiểm trước revision2 vẫn là evidence theo source/ngày cũ.
 Owner chọn giữ gate iPhone pending vì chưa có URL HTTPS/thiết bị kết nối;
 không tự mở tunnel/deploy. Main4176 chưa có bản sửa feedback của candidate.
 

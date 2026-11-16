@@ -10,18 +10,18 @@ import { KPH_BATCH_SIZE, kphDateRuns } from "./store-kph-history";
 import { useStorePrint } from "./use-store-print";
 import "./store-kph-items.css";
 
-function DayHeading({ date, shown, total, checked, partial, disabled, selectionMode, expanded, contentId, onToggle, onChange }: {
-  date: string; shown: number; total: number; checked: boolean; partial: boolean;
+function DayHeading({ date, shown, total, checked, partial, disabled, selectionMode, expanded, contentId, onToggle, onChange, wholeDay = false }: {
+  wholeDay?: boolean; date: string; shown: number; total: number; checked: boolean; partial: boolean;
   disabled: boolean; selectionMode: boolean; expanded: boolean; contentId: string;
   onToggle: () => void; onChange: (checked: boolean) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
   useEffect(() => { if (input.current) input.current.indeterminate = partial; }, [partial, selectionMode]);
   const dateLabel = <span className="store-kph-day-date">{date}</span>;
-  const count = <span className="store-kph-day-count">{shown < total ? `${shown}/${total} phiếu đã hiện` : `${shown} phiếu`}</span>;
+  const count = <span className="store-kph-day-count">{shown < total ? `${shown}/${total} phiếu đã hiện` : `${shown} phiếu${wholeDay ? " đã tải" : ""}`}</span>;
   return <div className="store-kph-day-heading">
     {selectionMode ? <label className="store-kph-day-selector">
-      <input ref={input} type="checkbox" aria-label={`Chọn ngày ${date}`} aria-description="Chỉ chọn các phiếu đã hiển thị thuộc ngày này" checked={checked} disabled={disabled} onChange={event => onChange(event.target.checked)} />
+      <input ref={input} type="checkbox" aria-label={`${wholeDay ? "Chọn toàn bộ ngày" : "Chọn ngày"} ${date}`} aria-description={wholeDay ? "Chọn tất cả phiếu đúng bộ lọc của ngày này, kể cả chưa hiển thị" : "Chỉ chọn các phiếu đã hiển thị thuộc ngày này"} checked={checked} disabled={disabled} onChange={event => onChange(event.target.checked)} />
     </label> : null}
     <button type="button" className="store-kph-day-toggle" disabled={disabled} aria-label={`${expanded ? "Thu gọn" : "Mở rộng"} ngày ${date}`} aria-expanded={expanded} aria-controls={contentId} onClick={onToggle}>
       <ChevronDown size={16} aria-hidden="true" />{dateLabel}{count}
@@ -29,12 +29,12 @@ function DayHeading({ date, shown, total, checked, partial, disabled, selectionM
   </div>;
 }
 
-export function StoreKphMore({ shown, total, loading = false, onMore }: {
-  shown: number; total: number; loading?: boolean; onMore?: () => void;
+export function StoreKphMore({ shown, total, loading = false, onMore, hasMore = shown < total }: {
+  shown: number; total: number; loading?: boolean; onMore?: () => void; hasMore?: boolean;
 }) {
   if (!total) return null;
   return <div className="store-kph-more"><p role={loading ? undefined : "status"}>Đã hiển thị {shown}/{total} phiếu</p>
-    {shown < total ? <button type="button" disabled={loading} onClick={onMore}>Hiển thị thêm <span>· {Math.min(KPH_BATCH_SIZE, total - shown)} phiếu</span></button> : null}
+    {hasMore ? <button type="button" disabled={loading} onClick={onMore}>Hiển thị thêm <span>· {Math.min(KPH_BATCH_SIZE, total - shown)} phiếu</span></button> : null}
   </div>;
 }
 
@@ -52,7 +52,8 @@ function KphTicketMeta({ record, identifier, groupByDate }: {
   return <span className="store-ticket-quick"><span className="store-ticket-sku store-sku">{identifier}</span><span className="store-ticket-meta">{record.quantity}</span>{!groupByDate ? <span className="store-ticket-date"><CalendarDays size={13} aria-hidden="true" /><span className="sr-only">Ngày phát hiện: </span>{record.detectedDate}</span> : null}</span>;
 }
 
-export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true, selectionMode = false, selection = [], setSelection = () => {}, collapsedDates = [], onToggleDate = () => {}, setActive = () => {}, loading = false }: {
+export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true, selectionMode = false, selection = [], setSelection = () => {}, collapsedDates = [], onToggleDate = () => {}, setActive = () => {}, loading = false, onSelectDate, selectedDates, allSelectionLabel = "Chọn tất cả" }: {
+  allSelectionLabel?: string; onSelectDate?: (date: string, checked: boolean) => void; selectedDates?: ReadonlySet<string>;
   desktop: boolean; visible: RecordView[]; groupByDate?: boolean; totalByDate?: ReadonlyMap<string, number>; selectionMode?: boolean; selection?: string[];
   setSelection?: (ids: string[]) => void; collapsedDates?: string[]; onToggleDate?: (date: string) => void; setActive?: (record: RecordView) => void; loading?: boolean;
 }) {
@@ -78,8 +79,8 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     const records = byDate.get(date)!;
     const selected = records.filter(record => selection.includes(record.id)).length;
     return <DayHeading date={date} shown={records.length} total={totalByDate?.get(date) ?? records.length}
-      checked={selected === records.length} partial={selected > 0 && selected < records.length}
-      disabled={loading} selectionMode={selectionMode} expanded={expanded} contentId={contentId} onToggle={() => onToggleDate(date)} onChange={checked => selectRecords(records, checked)} />;
+      wholeDay={!!onSelectDate} checked={onSelectDate ? !!selectedDates?.has(date) : selected === records.length} partial={onSelectDate ? selected > 0 && !selectedDates?.has(date) : selected > 0 && selected < records.length}
+      disabled={loading} selectionMode={selectionMode} expanded={expanded} contentId={contentId} onToggle={() => onToggleDate(date)} onChange={checked => onSelectDate ? onSelectDate(date, checked) : selectRecords(records, checked)} />;
   };
   const marker = (record: RecordView) => <ListItemMarker variant="bar" tone={getKphLabelPresentation("condition", record.condition).tone} />;
   const selector = (record: RecordView, className: string) => <label className={className}><input type="checkbox" aria-label={`Chọn ${record.productName}`} checked={selection.includes(record.id)} disabled={loading} onChange={event => selectRecords([record], event.target.checked)} /></label>;
@@ -89,7 +90,7 @@ export function StoreKphList({ desktop, visible, totalByDate, groupByDate = true
     ? selectionMode ? [8, 23, 12, 8, 18, 15, 12, 4] : [27, 13, 8, 19, 16, 13, 4]
     : selectionMode ? [8, 19, 12, 10, 7, 15, 12, 13, 4] : [25, 12, 10, 7, 16, 13, 13, 4];
   return <div className={loading ? "store-kph-list store-kph-list-loading" : "store-kph-list"} aria-hidden={loading || undefined}>{desktop ? <div className="store-kph-table-wrap"><table className="store-kph-table"><colgroup>{widths.map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup><thead><tr>
-    {selectionMode ? <th><label className="store-kph-table-selector"><input type="checkbox" aria-label="Chọn tất cả" disabled={loading} ref={node => { if (node) node.indeterminate = visible.some(record => selection.includes(record.id)) && !visible.every(record => selection.includes(record.id)); }} checked={visible.length > 0 && visible.every(record => selection.includes(record.id))} onChange={event => selectRecords(visible, event.target.checked)} /></label></th> : null}
+    {selectionMode ? <th><label className="store-kph-table-selector"><input type="checkbox" aria-label={allSelectionLabel} disabled={loading} ref={node => { if (node) node.indeterminate = visible.some(record => selection.includes(record.id)) && !visible.every(record => selection.includes(record.id)); }} checked={visible.length > 0 && visible.every(record => selection.includes(record.id))} onChange={event => selectRecords(visible, event.target.checked)} /></label></th> : null}
     <th>Hàng hóa</th><th>SKU / UPC</th>{!groupByDate ? <th>Ngày phát hiện</th> : null}<th>SL</th><th>Tình trạng</th><th>Xử lý</th><th>Trạng thái</th><th><span className="sr-only">Mở chi tiết</span></th>
   </tr></thead>{groups.map(group => {
     const expanded = !groupByDate || !collapsedDates.includes(group.date);

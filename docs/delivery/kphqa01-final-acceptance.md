@@ -118,3 +118,75 @@ Owner chọn17/11: **“Chưa có — giữ gate iPhone pending”** vì chưa c
 tới runtime tổng hợp/thiết bị kết nối. Camera, quyền OS, bàn phím, safe area và
 gián đoạn trên iPhone thật chưa kiểm; không tự mở tunnel/deploy. Remote CI và
 rollout chưa kiểm. UI/UX cuối chưa được coi accepted; không tự tiếp DATE/C02.
+
+## Revision2 — feedback owner17/11: xác minh, logo và chọn ngày
+
+Tiếp `17794a6` trong cùng task/worktree. Owner báo nháy trắng toàn màn khi
+thao tác, logo cũ/nhãn Store–Admin chưa đẹp, và page25 cắt ngày/selection gây
+phiền. Đây là yêu cầu đổi interaction D01 rõ ràng; đã cập nhật contract/index/
+context, không suy thay đổi từ mock hoặc tự mở API/backend slice.
+
+- Xác minh: bỏ `visibility:hidden` của toàn frame và màn loading phủ kín.
+  Chrome/module title/điều hướng không private giữ paint; field/ảnh, nội dung
+  theo store và identity vẫn che ngay, frame inert trong lúc kiểm. Portal form
+  giữ header tên loại phiếu, che body. Không delay mask private hoặc fade-out
+  dữ liệu cũ để làm mượt; draft/scroll vẫn mounted và revoke/expiry đóng scope.
+- Đã xem BE: `PrincipalRefreshFilter` gọi credential-version + user + role +
+  membership queries mỗi request (tổng4 SQL read trên luồng refresh hợp lệ),
+  sau đó store policy query lại quyền đúng store. Có khoảng tối ưu hợp query
+  principal/context hoặc projection theo request, nhưng chưa có evidence đây
+  là bottleneck UI. Nguyên nhân blank đã xác định trực tiếp ở FE. Không đổi
+  authentication/authorization, TTL cache, schema hoặc giới hạn freshness;
+  SQL consolidation là cơ hội riêng cần query/latency trace trước khi thay.
+- Logo: sidebar chỉ wordmark official, bỏ chữ Store/Admin ghép cạnh logo;
+  entry point phân biệt bằng document title, heading và accessible navigation.
+  Mobile Home dùng wordmark92px không khung; fallback entry `app.tsx` bỏ logo
+  slogan cũ, trỏ asset official đã có. Không sửa logo asset hoặc Pages branch.
+- List: TanStack infinite query nối page25 đúng thứ tự server và de-duplicate
+  ID; không tải toàn tập khi mở. Đang nối/lỗi mạng không ẩn/loại dòng đã tải
+  hoặc selection. Type/filter/sort/scope reset như contract. Checkbox chung
+  ghi rõ phiếu đã tải; checkbox ngày explicit lấy đủ ngày với page100, giữ
+  snapshot selection cho phần chưa hiển thị và báo số đó trước export.
+  Fetch ngày phải đủ count/unique IDs, có abort/generation guard; lỗi, count
+  đổi hoặc vượt500 không commit một phần. Backend reauthorize từng ID, chỉ
+  selected APPROVED đúng store/type. Không tăng export limit500.
+
+Kiểm mới revision2:
+
+- `VITEST_MAX_WORKERS=1 npm run test:kph` — PASS66 tests/7 files. RED đã bắt
+  thiếu Hiển thị thêm/checkbox cả ngày trước implementation; GREEN thêm append,
+  giữ chọn, mất mạng/retry đúng page, cả ngày ngoài loaded window, hủy response
+  muộn khi đổi filter và deny/limit. Giữ race/review/export/security tests cũ.
+- `NODE_PATH=/Users/vup/Documents/coopfood-kph/e2e/node_modules STORE_URL=http://127.0.0.1:4181 npm run test:kph:browser`
+  — PASS390×844/1440×1024: approve/reject persisted, append giữ chọn, type/filter
+  reset, workbook/ảnh thật, employee forged/downgrade/cross-region deny,
+  anonymous private media401 và expiry. Membership restore trong finally.
+- Local `ux-feedback.cjs` — PASS cả390/1440: giữ response discovery thật để
+  xem pending; public header/navigation vẫn paint, private bị che. Một cặp
+  session/discovery cho navigation đã đo theo request count, không tuyên bố
+  latency/performance SLO. Wordmark đúng, không nhãn Store/Admin; append giữ
+  checkbox đầu. Ngày tổng hợp26 phiếu: list tải25, chọn ngày ra26 và báo rõ
+  1 chưa hiển thị; mở confirm, không giả export success. Root xem screenshot.
+  Khi fixture thiếu, bổ sung phiếu qua create API thật để đủ26, không seed/
+  truncate/reset DB. Sau đó dataset tiếp tục được giữ.
+- Journey hai entry point đã chạy lại với Store4181/Admin4182 — PASS; lost
+  response3ảnh/retry, inherited review/export và Admin revoke→next request403;
+  phiếu `25a5a14c-be43-4a76-a66e-d60b27fc3aa8`, restore role/active PASS.
+- Full frontend `VITEST_MAX_WORKERS=1 npm run verify` — **PASS425 tests**, exit0:
+  Admin27, Store355, API4, rules19, UI20; docs/contract30 resources/22 fixtures,
+  generated API không drift, TypeScript/build/PWA94 entries. Lượt đầu typecheck bắt
+  generic `unknown` ở infinite query. Đã thêm kiểu `OnlineHistoryPage` cho
+  callback (không đổi runtime), targeted TypeScript rồi full gate PASS. Không
+  gọi lượt lỗi này là technical PASS. Backend source không đổi nên92 tests ở revision1
+  còn là evidence BE cùng source, không chạy lại hoặc đổi ngày thành lượt mới.
+- Build entry online riêng với `VITE_STORE_APP_MOCK=false VITE_STORE_APP_ONLINE=true`
+  — PASS, exit0, TypeScript/Vite/PWA102 entries. Warning chunk size hiện có;
+  không dùng build entry mặc định thay evidence online.
+
+Artifact thêm ở cùng `.local/verification/kphqa01-final/`: `ux-*.log`,
+`ux-feedback-results.json`, brand/pending/whole-day screenshots; KPHON04
+workbooks/results ở `.local/verification/kphon04-review-export/` của task.
+URL revision2: Store4181/Admin4182, online, cùng backend8082/DB tổng hợp cũ;
+main4176/Admin4175 chưa có patch. Owner chỉ cần xem nhịp thao tác/brand và chọn
+ngày/nối thêm; không bắt lặp security/Excel. Gate iPhone vẫn pending theo lựa
+chọn owner. Không merge/push/deploy hoặc mở thêm vòng polish khi không có lỗi.

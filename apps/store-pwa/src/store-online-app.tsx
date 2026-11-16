@@ -106,7 +106,7 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     <Button onClick={() => { void scope.refetch(); }}>Tải lại quyền cửa hàng</Button>{actions}{passwordDialog}
   </main>;
   const currentScreen = screen === "login" ? "home" : screen;
-  return <><div style={scope.isFetching ? { visibility: "hidden" } : undefined} inert={scope.isFetching || undefined} aria-hidden={scope.isFetching || undefined}><StoreAppFrame key={`${session.user.id}:${store.id}`} screen={currentScreen} profile={profile}
+  return <><div className="store-online-shell" data-verifying={scope.isFetching || undefined} inert={scope.isFetching || undefined} aria-hidden={scope.isFetching || undefined}><StoreAppFrame key={`${session.user.id}:${store.id}`} screen={currentScreen} profile={profile}
     navigate={next => { window.location.hash = next; }} account={<>
       <StoreAccountTrigger ref={accountTrigger} aria-label="Tài khoản" profile={profile} roleLabel={session.user.username} onClick={() => setAccountOpen(true)} />
       <StoreAccountSheet open={accountOpen && !scope.isFetching} onOpenChange={setAccountOpen} profile={profile}
@@ -119,5 +119,5 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     {currentScreen === "date" && <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content"><StoreBarcodeLookup suspended={scope.isFetching} userId={session.user.id} storeId={store.id} lookupBarcode={gateway.lookupBarcode} onSessionExpired={refreshScope} /></StorePageSurface></StorePageLayout>}
     {(currentScreen === "reports" || currentScreen === "notifications") && <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content"><h1>{storeScreens[currentScreen].title} chưa kết nối</h1><p role="status">{storeScreens[currentScreen].title} chưa được kết nối trong phiên online.</p></StorePageSurface></StorePageLayout>}
     {message && <p role="alert">{message}</p>}
-  </StoreAppFrame></div>{scope.isFetching ? <main className="store-online-state store-online-verifying" role="status">Đang xác minh phiên và quyền cửa hàng…</main> : null}</>;
+  </StoreAppFrame></div>{scope.isFetching ? <div className="store-online-verifying" role="status"><strong>Đang xác minh phiên và quyền cửa hàng…</strong><span aria-hidden="true" className="store-verifying-lines" /></div> : null}</>;
 }

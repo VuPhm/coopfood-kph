@@ -2,13 +2,13 @@ import { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { ChevronDown, ChevronRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import "./desktop-chrome.css";
 
-export function DesktopSidebar({ logo, appName, homeHref, homeLabel, onHome, label, collapsed, onCollapsedChange, className = "", children }: {
-  logo: string; appName: string; homeHref: string; homeLabel: string; onHome?: () => void;
+export function DesktopSidebar({ logo, homeHref, homeLabel, onHome, label, collapsed, onCollapsedChange, className = "", children }: {
+  logo: string; homeHref: string; homeLabel: string; onHome?: () => void;
   label: string; collapsed: boolean; onCollapsedChange(value: boolean): void; className?: string; children: ReactNode;
 }) {
   return <aside className={`fresh-desktop-sidebar ${className}`.trim()} aria-label={label} data-collapsed={collapsed}>
     <a className="fresh-sidebar-brand" href={homeHref} aria-label={homeLabel} onClick={onHome}>
-      <span className="fresh-sidebar-logo"><img src={logo} alt="Co.op Food" width={598} height={246} /></span><span className="fresh-sidebar-brand-label">{appName}</span>
+      <span className="fresh-sidebar-logo"><img src={logo} alt="Co.op Food" width={598} height={246} /></span>
     </a>
     <div className="fresh-sidebar-navigation">{children}</div>
     <div className="fresh-sidebar-footer"><button type="button" className="fresh-sidebar-item" aria-label={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"} title={collapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"} aria-expanded={!collapsed} onClick={() => onCollapsedChange(!collapsed)}>
