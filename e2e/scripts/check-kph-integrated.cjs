@@ -96,7 +96,7 @@ async function layout(page, name) {
     const page = track(await employee.newPage());
     await login(page, storeBase, 'employee.admin03'); await selectStore(page);
     const identity = await session(employee); assert.equal(identity.user.id, employeeId);
-    await page.getByRole('button', exact('Tra mã hàng')).click();
+    await page.getByRole('button', exact('Quản lý DATE')).click();
     await page.getByLabel('Barcode', { exact: true }).fill('0890123456789');
     await page.getByRole('button', exact('Tra cứu')).click();
     await expect(page.getByRole('status').filter({ hasText: 'Đã tìm thấy sản phẩm.' })).toBeVisible();

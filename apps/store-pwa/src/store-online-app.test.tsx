@@ -93,6 +93,21 @@ describe("Store online session", () => {
     expect(screen.queryByRole("button", { name: "Tạo lô" })).not.toBeInTheDocument();
     window.history.replaceState(null, "", "#home");
   });
+  it("opens the existing DATE management workspace while keeping unconnected data explicit", async () => {
+    const api = gateway();
+    render(<StoreOnlineApp gateway={api} />); await selectA();
+    fireEvent.click(screen.getByRole("button", { name: "Quản lý DATE" }));
+    await screen.findByRole("heading", { name: "Lô DATE" });
+    expect(screen.getByRole("region", { name: "Danh sách lô DATE" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Thêm theo dõi DATE" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Lọc DATE" })).toBeDisabled();
+    expect(screen.getByText("Danh sách DATE chưa kết nối")).toBeVisible();
+    expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(0);
+    expect(screen.queryByText("Cải thìa VietGAP 500 g")).not.toBeInTheDocument();
+    expect(api.lookupBarcode).not.toHaveBeenCalled();
+    expect(api.createRecord).not.toHaveBeenCalled();
+    window.history.replaceState(null, "", "#home");
+  });
   it("handles no effective stores and logs out through the gateway", async () => {
     const api = gateway(); vi.mocked(api.listStoreAccess).mockResolvedValue([]); render(<StoreOnlineApp gateway={api} />);
     await screen.findByText("Tài khoản chưa có quyền truy cập cửa hàng đang hoạt động.");
@@ -104,7 +119,7 @@ describe("Store online session", () => {
     const api = gateway();
     vi.mocked(api.lookupBarcode).mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" });
     render(<StoreOnlineApp gateway={api} />); await selectA();
-    fireEvent.click(screen.getByRole("button", { name: "Tra mã hàng" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quản lý DATE" }));
     fireEvent.change(await screen.findByLabelText("Barcode"), { target: { value: "000123" } });
     fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
     fireEvent.click(await screen.findByRole("button", { name: "Nhập tay" }));

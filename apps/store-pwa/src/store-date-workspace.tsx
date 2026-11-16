@@ -1,6 +1,6 @@
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import { revealBelowStickyTabs } from "./store-sticky-tabs";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { Button, Input, ListItemMarker } from "@coopfood-kph/ui";
 import { ArrowDownWideNarrow, CalendarDays, Check, ChevronDown, ChevronRight, CircleCheck, Package, Search, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import { acknowledgeDateLot, dateLotKphSeed } from "./store-date-actions";
@@ -43,7 +43,18 @@ function remainingText(remaining: number | null) {
   return remaining < 0 ? `Quá ${Math.abs(remaining)} ngày` : remaining === 0 ? "HSD hôm nay" : `Còn ${remaining} ngày`;
 }
 
-export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCreateKph, initialLotId }: { lots: MockDateLot[]; onLotsChange: (lots: MockDateLot[]) => void; today?: LocalDate; onCreateKph: (draft: CreatedRecordDraft) => Promise<string>; initialLotId?: string | undefined }) {
+const EMPTY_DATE_LOTS: MockDateLot[] = [];
+type DateWorkspaceProps = { today?: LocalDate; initialLotId?: string | undefined } & (
+  | { mode?: "prototype"; lots: MockDateLot[]; onLotsChange: (lots: MockDateLot[]) => void; onCreateKph: (draft: CreatedRecordDraft) => Promise<string> }
+  | { mode: "unconnected"; lookupContent: ReactNode }
+);
+
+export function DateWorkspace(props: DateWorkspaceProps) {
+  const unconnected = props.mode === "unconnected";
+  const lots = props.mode === "unconnected" ? EMPTY_DATE_LOTS : props.lots;
+  const onLotsChange = props.mode === "unconnected" ? undefined : props.onLotsChange;
+  const onCreateKph = props.mode === "unconnected" ? undefined : props.onCreateKph;
+  const { today: businessToday, initialLotId } = props;
   const [query, setQuery] = useState(initialLotId ?? "");
   const [groupFilter, setGroupFilter] = useState("all");
   const [intakeOpen, setIntakeOpen] = useState(false);
@@ -60,7 +71,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
   const [busy, setBusy] = useState(false);
   const requestId = useRef(0);
   const desktop = useStoreDesktopLayout();
-  const product = findProduct(query, lots);
+  const product = unconnected ? undefined : findProduct(query, lots);
   const metadata = product ? mockProductMetadata[product.id] : undefined;
   const active = lots.find(lot => lot.id === activeId && lot.status !== "resolved");
   const today = businessToday ?? formatBusinessDate(new Date()).iso;
@@ -95,6 +106,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
     }
   }
   async function search(value = query) {
+    if (unconnected) return;
     const term = value.trim();
     changeQuery(term);
     if (!term) { setMessage("Nhập SKU, barcode, tên hàng hoặc số lô cần tìm."); return; }
@@ -111,14 +123,14 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
     } finally { if (current === requestId.current) setBusy(false); }
   }
   function confirmReminder() {
-    if (!active || active.status === "resolved") return;
+    if (unconnected || !onLotsChange || !active || active.status === "resolved") return;
     onLotsChange(lots.map(lot => lot.id === active.id ? acknowledgeDateLot(lot, today, reminderDays) : lot));
     setActionNotice(`Đã hẹn báo lại ${formatDisplayDate(addDays(today, reminderDays))}.`);
     setReminderPicking(false);
     setActiveId("");
   }
   function startProcessing(lot: MockDateLot, chosenKind?: KphKind) {
-    if (lot.status === "resolved" || lot.kphRecordId) return;
+    if (unconnected || lot.status === "resolved" || lot.kphRecordId) return;
     const { kind, seed } = dateLotKphSeed(lot, today);
     const row = Array.from(document.querySelectorAll<HTMLElement>("[data-date-lot-id]")).find(el => el.dataset.dateLotId === lot.id);
     const opener = row?.querySelector<HTMLElement>(".store-kph-row-open") ?? row;
@@ -129,6 +141,7 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
     createFrame.current = window.requestAnimationFrame(() => createRef.current?.open(chosenKind ?? kind!, seed, opener));
   }
   async function finishKph(draft: CreatedRecordDraft) {
+    if (unconnected || !onCreateKph || !onLotsChange) throw new Error("DATE chưa kết nối; chưa thể tạo phiếu từ lô.");
     const source = processingLot.current;
     if (!source || draft.skuCode !== source.sku) throw new Error("Mã hàng trên phiếu phải khớp lô DATE. Hủy để mở lại phiếu từ đúng lô.");
     const recordId = await onCreateKph(draft);
@@ -161,24 +174,24 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
   }
   return <StorePageLayout className="store-date">
     <StorePageHero className="store-date-search-panel" contentLabel="Tra mã hàng">
-      <form className="store-date-search-form" onSubmit={event => { event.preventDefault(); void search(); }}>
+      {props.mode === "unconnected" ? <div className="store-date-online-lookup">{props.lookupContent}</div> : <form className="store-date-search-form" onSubmit={event => { event.preventDefault(); void search(); }}>
         <label className="store-date-search-wrap"><Search className="store-date-search-icon" size={18} aria-hidden="true" /><span className="sr-only">Tìm SKU, barcode, tên hàng hoặc lô</span><Input className="store-date-search" placeholder="Mã hàng, lô" autoComplete="off" value={query} onChange={event => changeQuery(event.target.value)} /></label>
         <button type="button" className="store-date-scan" aria-label="Quét mã để tìm lô DATE" onClick={() => setScannerOpen(true)}><img className="store-date-scan-icon" data-figma-asset-slot="date-scan" src={figmaAsset("279-1398", "imgFeatherMaximize")} alt="" /></button>
         <Button className="store-button" type="submit" disabled={busy} aria-label={busy ? "Đang tìm…" : "Tìm mã hàng"} aria-busy={busy}>{busy ? "Tìm…" : "Tìm"}</Button>
-      </form>
-      <DateCreateButton onClick={() => setIntakeOpen(true)} />
+      </form>}
+      <DateCreateButton disabled={unconnected} onClick={() => setIntakeOpen(true)} />
       {message ? <p className="store-date-message" role="status">{message}</p> : null}
     </StorePageHero>
     <StorePageSurface className="store-date-workspace" onFocusCapture={revealBelowStickyTabs}>
 
       <section className="store-date-browser" aria-label="Danh sách lô DATE">
-        <DateGroupFilter groups={DEFAULT_DATE_GROUPS} value={groupFilter} onChange={setGroupFilter} />
+        <DateGroupFilter disabled={unconnected} groups={unconnected ? [] : DEFAULT_DATE_GROUPS} value={groupFilter} onChange={setGroupFilter} />
         <div className="store-date-list-controls store-kph-list-controls">
-          <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><span className="store-date-result-count">{visible.length} lô</span></div>
+          <div className="store-date-list-heading store-list-heading"><h2>Lô DATE</h2><span className="store-date-result-count">{unconnected ? "Chưa kết nối dữ liệu" : `${visible.length} lô`}</span></div>
           <div className="store-date-toolbar store-kph-list-toolbar">
 
-            <button className="store-compact" aria-pressed={attentionOnly} onClick={() => { setAttentionOnly(!attentionOnly); setStatus("all"); }}><TriangleAlert size={20} aria-hidden="true" /><span>Cần chú ý</span><small>{attentionCount}</small></button>
-            <button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button>
+            <button className="store-compact" disabled={unconnected} aria-pressed={attentionOnly} onClick={() => { setAttentionOnly(!attentionOnly); setStatus("all"); }}><TriangleAlert size={20} aria-hidden="true" /><span>Cần chú ý</span><small>{unconnected ? "—" : attentionCount}</small></button>
+            <button className={`store-filter ${activeFilterCount ? "is-filtered" : ""}`} aria-label="Lọc DATE" disabled={unconnected} aria-describedby={filterSummaryId} onClick={() => setFilterOpen(true)}><SlidersHorizontal size={20} aria-hidden="true" />{activeFilterCount ? <span className="store-filter-count" aria-hidden="true">{activeFilterCount}</span> : null}</button>
           </div>
           <span className="sr-only" id={filterSummaryId}>{activeFilterCount ? `${activeFilterCount} tiêu chí lọc hoặc sắp xếp đang dùng` : "Đang dùng bộ lọc mặc định"}</span>
         </div>
@@ -222,12 +235,12 @@ export function DateWorkspace({ lots, onLotsChange, today: businessToday, onCrea
             <small id={`${filterSummaryId}-${encodeURIComponent(lot.id)}-dates`} className="store-date-lot-dates">{lot.manufactured ? <span>NSX {lot.manufactured}</span> : null}<span>HSD {displayDate(lot.date)}</span></small>
           </div>;
         })}</div>}
-        {!visible.length ? <section className="store-date-empty"><Package size={28} aria-hidden="true" /><h3>Không có lô phù hợp</h3><p>{product ? "Mã hàng đã nhận diện. Thử trạng thái khác hoặc bỏ lọc để xem các lô." : "Thử mã hàng, tên hoặc số lô khác; bạn cũng có thể quét lại."}</p><Button variant="ghost" onClick={() => { changeQuery(""); setGroupFilter("all"); setAttentionOnly(false); setStatus("all"); setPhaseFilter("all"); }}>Xem tất cả lô</Button></section> : null}
+        {!visible.length ? <section className="store-date-empty"><Package size={28} aria-hidden="true" /><h3>{unconnected ? "Danh sách DATE chưa kết nối" : "Không có lô phù hợp"}</h3><p>{unconnected ? "Bạn vẫn có thể tra mã hàng. Theo dõi, ghi nhận và xử lý lô sẽ khả dụng khi kết nối dữ liệu DATE." : product ? "Mã hàng đã nhận diện. Thử trạng thái khác hoặc bỏ lọc để xem các lô." : "Thử mã hàng, tên hoặc số lô khác; bạn cũng có thể quét lại."}</p>{!unconnected ? <Button variant="ghost" onClick={() => { changeQuery(""); setGroupFilter("all"); setAttentionOnly(false); setStatus("all"); setPhaseFilter("all"); }}>Xem tất cả lô</Button> : null}</section> : null}
       </section>
 
     </StorePageSurface>
-    {intakeOpen ? <DateIntake today={today} groups={DEFAULT_DATE_GROUPS} existingLots={lots} onCancel={() => setIntakeOpen(false)} onSave={lot => { onLotsChange([...lots, lot]); setIntakeOpen(false); setGroupFilter(lot.group?.id ?? "unclassified"); }} /> : null}
-    <KphCreateControl ref={createRef} onSaved={finishKph} />
+    {intakeOpen && onLotsChange && !unconnected ? <DateIntake today={today} groups={DEFAULT_DATE_GROUPS} existingLots={lots} onCancel={() => setIntakeOpen(false)} onSave={lot => { onLotsChange([...lots, lot]); setIntakeOpen(false); setGroupFilter(lot.group?.id ?? "unclassified"); }} /> : null}
+    {!unconnected ? <KphCreateControl ref={createRef} onSaved={finishKph} /> : null}
     <StoreSheet className="store-date-sheet store-date-kind-sheet" open={!!kindChoice} onOpenChange={open => { if (!open) { const row = Array.from(document.querySelectorAll<HTMLElement>("[data-date-lot-id]")).find(el => el.dataset.dateLotId === kindChoice?.id); setKindChoice(null); window.requestAnimationFrame(() => (row?.querySelector<HTMLElement>(".store-kph-row-open") ?? row)?.focus()); } }} title="Chọn loại phiếu KPH" description="Chưa có phân loại hàng; chọn biểu mẫu phù hợp.">{kindChoice ? <><p>{kindChoice.name} · SKU {kindChoice.sku}</p><div className="store-two-col">{(["TPCN","TPTS"] as const).map(kind => <KphCreateButton key={kind} kind={kind} onClick={() => startProcessing(kindChoice, kind)} />)}</div></> : null}</StoreSheet>
     <BarcodeScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} onScan={value => { void search(value); }} presentation="screen" />
     <StoreSheet className="store-date-sheet store-date-filter" open={filterOpen} onOpenChange={setFilterOpen} title="Lọc DATE" description="Bộ lọc và sắp xếp áp dụng ngay khi thay đổi">

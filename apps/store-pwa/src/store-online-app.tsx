@@ -12,6 +12,7 @@ import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-h
 import { readStoreScreen, storeScreens, type Screen } from "./store-app-routes";
 import { OnlineApiError } from "./online-kph";
 import { createStoreSessionGateway, type StoreSessionGateway } from "./store-session-api";
+import { DateWorkspace } from "./store-date-workspace";
 import { StoreBarcodeLookup } from "./store-barcode-lookup";
 import { StoreOnlineKph } from "./store-online-kph";
 import "./store-online-app.css";
@@ -113,10 +114,10 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
         initials={storeAccountIdentity(profile).initials} triggerRef={accountTrigger} roleLabel={session.user.username}
         onHome={() => { setAccountOpen(false); window.location.hash = "home"; }} actions={actions} />
       {passwordDialog}</>}>
-    {currentScreen === "home" && <StoreHomeContent profile={profile} lookupOnly navigate={next => { window.location.hash = next; }} />}
+    {currentScreen === "home" && <StoreHomeContent profile={profile} navigate={next => { window.location.hash = next; }} />}
     {currentScreen === "kph" && <StoreOnlineKph suspended={scope.isFetching} userId={session.user.id} storeId={store.id} loadHistory={gateway.loadHistory} reviewRecord={gateway.reviewRecord} prepareExport={gateway.prepareExport} canReview={store.capabilities.includes("REVIEW")} canExport={store.capabilities.includes("EXPORT")} createRecord={gateway.createRecord} lookupBarcode={gateway.lookupBarcode} profile={profile} canCreate={store.capabilities.includes("CREATE")} onSessionExpired={refreshScope} />}
     {currentScreen === "shelf" && <StorePageLayout><StorePageHero /><StorePageSurface className="store-shelf-surface"><div className="store-shelf-page"><ShelfLifeScreen /></div></StorePageSurface></StorePageLayout>}
-    {currentScreen === "date" && <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content"><StoreBarcodeLookup suspended={scope.isFetching} userId={session.user.id} storeId={store.id} lookupBarcode={gateway.lookupBarcode} onSessionExpired={refreshScope} /></StorePageSurface></StorePageLayout>}
+    {currentScreen === "date" && <DateWorkspace mode="unconnected" lookupContent={<StoreBarcodeLookup suspended={scope.isFetching} userId={session.user.id} storeId={store.id} lookupBarcode={gateway.lookupBarcode} onSessionExpired={refreshScope} />} />}
     {(currentScreen === "reports" || currentScreen === "notifications") && <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content"><h1>{storeScreens[currentScreen].title} chưa kết nối</h1><p role="status">{storeScreens[currentScreen].title} chưa được kết nối trong phiên online.</p></StorePageSurface></StorePageLayout>}
     {message && <p role="alert">{message}</p>}
   </StoreAppFrame></div>{scope.isFetching ? <div className="store-online-verifying" role="status"><strong>Đang xác minh phiên và quyền cửa hàng…</strong><span aria-hidden="true" className="store-verifying-lines" /></div> : null}</>;

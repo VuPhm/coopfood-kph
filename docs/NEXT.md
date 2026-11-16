@@ -4,7 +4,21 @@ Cập nhật17/11/2026. [CURRENT_STATE](CURRENT_STATE.md). QA01 được owner �
 merge và dọn; giữ checkpoint KPHON04 cùng chiến lược test mới làm nền tiếp tục.
 Không có feature implementation mới tự khởi chạy trong lần tích hợp này.
 
-## Bước nhỏ kế tiếp: contract DATE bền vững
+## Bước nhỏ kế tiếp: checkpoint UI danh sách DATE trước backend
+
+Owner17/11 yêu cầu đưa danh sách quản lý DATE đã có, theo KPH đang dùng, lên
+candidate trước khi tiếp bước khác. DATEUI01 từ `60ba810` đã lắp lại workspace
+DATE thật trong source vào entry online, không thay bằng màn lookup đơn lẻ.
+[Checkpoint/source/evidence](delivery/dateui01-list-checkpoint.md).
+
+- Xem đầy đủ UI: <http://127.0.0.1:4184/#date>, fixture7 lô/mode mock riêng.
+  Xem list mobile/desktop → lọc/nhóm → mở một lô/detail; cùng chrome/row/nhãn KPH.
+- Online: <http://127.0.0.1:4183/#date>, cùng backend8082/DB tổng hợp; chọn001.
+  Lookup thật, workspace hiện unknown/khóa write DATE; không lô mẫu trong online.
+- Probe lại URL/mode/source khi bàn giao. Không dùng fixture proof cho DATE
+  persistence/partial/quyền. Checkpoint UI trước, chưa tự chạy DATEON02.
+
+## DATEON01 đã chuẩn bị — bước sau checkpoint UI
 
 Owner chốt sau candidate `fdcfd2f`: **“đủ để tiếp, tiếp”**. Vòng local KPH
 đủ để đi tiếp; giữ iPhone pending, không coi đây là quyền merge/push/deploy.

@@ -15,6 +15,13 @@ còn lại; lịch chung, chỉ quản lý sửa/hẹn. Contract có wire propos
 Proposed và fixture9 scenarios; chưa sửa OpenAPI, schema hoặc app. Bước tiếp là
 DATEON02 lưu/xem/tạo/sửa entry với quyền/version/audit, không nhập BE/DATE cũ.
 
+**Owner sửa ưu tiên17/11:** phải đưa UI danh sách DATE đã có lên trước backend.
+DATEUI01 từ `60ba810` đã đưa lại `DateWorkspace` vào route online/Home Quản lý
+DATE, dùng cùng chrome/list roles KPH hiện tại. [Checkpoint UI](delivery/dateui01-list-checkpoint.md).
+Xem đủ7 fixture ở Store UI4184; online4183 giữ lookup thật, list unknown và
+khóa DATE write vì chưa có backend. Chưa tiếp DATEON02; không suy mock thành
+dữ liệu vận hành/persistence hoặc nghiệm thu partial KPH.
+
 ## Đã có trên baseline tích hợp
 
 - FRESH01 revision5 CLOSED27/10: UI Fresh đã vào main; R2-01 shell spine accepted
@@ -42,7 +49,7 @@ push/deploy. Các câu “chưa merge main” trong hồ sơ task cũ là checkp
 | Store Fresh online | KPHON03–04 owner accepted; kỹ thuật tổ hợp PASS; candidate revision2 giữ chrome khi xác minh, logo official, nối thêm giữ chọn và chọn đủ ngày explicit | Owner cho tiếp sau revision2; iPhone pending vì chưa có đường truy cập thiết bị |
 | Admin Web | Lifecycle, user deactivation, credential self-service, catalog staging và store membership | UI nghiệm thu cuối trên bản tích hợp; provisioning/reset/bootstrap/recovery mở riêng |
 | Store/capability | GET `/api/v1/kph/stores` dùng policy backend cho store/region/chain, không membership giả | ADR0007 vẫn Proposed; discovery acceptance cuối chưa suy ra từ merge |
-| DATE/Thông báo/Báo cáo | Prototype/mock theo contract hiện có | Persistence, quantity/unit, audit, nhắc bền vững và snapshot kỳ chưa có backend; Fresh online không fallback dữ liệu mock |
+| DATE/Thông báo/Báo cáo | Workspace DATE đã hiện lại ở candidate online; UI đầy đủ có preview fixture riêng4184 | Checkpoint UI trước DATEON02; persistence/partial quantity/audit/reminder/snapshot chưa có backend; không mock fallback online |
 | Catalog | Lookup published/current và staging C01 | Chốt primary supplier/lookup current và publish C02 |
 | Vận hành | Evidence kỹ thuật local theo slice | Thiết bị thật, restore, deployment profile/storage/retention và rollout |
 

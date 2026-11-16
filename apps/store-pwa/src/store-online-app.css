@@ -37,3 +37,12 @@
   border: 1px solid var(--fresh-line);
   border-radius: var(--fresh-radius-control);
 }
+
+/* Mount the retained DATE workspace with live lookup while DATE persistence is pending. */
+.store-date-online-lookup { padding: 16px; border-radius: 16px; background: var(--fresh-surface); color: var(--fresh-ink); }
+.store-date-online-lookup .store-barcode-lookup, .store-date-online-lookup form, .store-date-online-lookup .store-barcode-manual { display: grid; gap: 12px; min-width: 0; }
+.store-date-online-lookup :is(label, legend) { font-size: 13px; font-weight: 600; }
+.store-date-online-lookup input { width: 100%; min-width: 0; min-height: 44px; border: 1px solid var(--fresh-line); border-radius: 12px; padding: 8px 12px; background: var(--fresh-surface); color: var(--fresh-ink); font-size: 16px; }
+.store-date-online-lookup dl { display: grid; grid-template-columns: minmax(90px, auto) minmax(0, 1fr); gap: 6px 12px; font-size: 13px; }
+.store-date-online-lookup dd { margin: 0; overflow-wrap: anywhere; }
+@media (min-width: 900px) { .store-date-online-lookup { padding: 0; } }
