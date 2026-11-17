@@ -15,7 +15,8 @@ DATE thật trong source vào entry online, không thay bằng màn lookup đơn
   Xem list mobile/desktop → lọc/nhóm → mở một lô/detail; cùng chrome/row/nhãn KPH.
 - Online: <http://127.0.0.1:4183/#date>, cùng backend8082/DB tổng hợp; chọn001.
   Lookup thật, workspace hiện unknown/khóa write DATE; không lô mẫu trong online.
-- Probe lại URL/mode/source khi bàn giao. Không dùng fixture proof cho DATE
+- Lúc dọn/push17/11 preview4183/4184 đã dừng; start lại bằng launcher từ
+  worktree DATEUI01 rồi probe URL/mode/source khi bàn giao. Không dùng fixture proof cho DATE
   persistence/partial/quyền. Checkpoint UI trước, chưa tự chạy DATEON02.
 
 ## DATEON01 đã chuẩn bị — bước sau checkpoint UI
@@ -89,3 +90,8 @@ cùng slice khi API đổi; ADR0007 vẫn Proposed đến khi có quyết địn
 Push/deploy/Pages cutover vẫn là việc riêng có yêu cầu explicit và đường quay lại.
 
 Checkpoint NEXT trước tích hợp: `git show f2b1404:docs/NEXT.md`.
+
+Dọn theo owner17/11: worktree KPHQA01 và DATEON01 đã được kế thừa/archived rồi
+gỡ; branch provenance vẫn giữ. Tiếp tục tại worktree DATEUI01, không mở lại
+đường dẫn worktree đã dọn. Chỉ nhánh checkpoint được phép push; main/Pages và
+nghiệm thu thiết bị/DATE backend vẫn là gate riêng.

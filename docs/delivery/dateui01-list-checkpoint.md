@@ -62,3 +62,23 @@ Checkpoint UI này đi **trước DATEON02**. Contract DATEON01 `60ba810`, parti
 quantity và manager-only sửa/hẹn vẫn giữ nguyên; prototype single-link không
 được lấy làm implementation bền vững. Owner xem đúng list UI trước khi tiếp
 persistence/API. iPhone/camera/OS vẫn pending; chưa nghiệm thu DATE backend.
+
+## Dọn trước push theo owner17/11
+
+Owner yêu cầu “làm sạch rồi push”. Worktree DATEUI01 sạch tại `e919aae`; chỉ
+push nhánh checkpoint, không tự merge main hoặc phát hành Pages/tag. Đã kiểm
+remote: main vẫn `04f7c4a`, nhánh checkpoint chưa có; Pages local `1f93377` và
+tag preserve peeled `c789714870eff5912e10fe89361bd845d9e3983d` được giữ nguyên.
+
+Dọn worktree docs DATEON01 (`60ba810`) và KPHQA01 (`82b01b3`), đều sạch và là
+ancestor của DATEUI01. Không dùng force, không xóa branch provenance. Trước đó
+đã kiểm không process cwd/dependency symlink từ workspace khác dùng hai target;
+ports4181–4184 không có listener. Giữ worktree/dependencies DATEUI01 để tiếp tục,
+không dọn DB/media KPHON02, main hoặc các task khác. Evidence KPHQA01 và92-test
+Surefire reports được sao lưu tại repo chính
+`.local/verification/dateui01-cleanup-2026-11-17/`.
+
+Diff dọn chỉ docs; kiểm docs/links/diff, không chạy lại app suites trên source
+production không đổi. Preview cần start/probe lại khi owner review; không coi
+URL ở evidence trước là còn sống. Chỉ push ref nhánh, tắt follow-tags; không
+remote CI/deploy thủ công.

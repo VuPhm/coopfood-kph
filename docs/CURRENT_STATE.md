@@ -8,7 +8,7 @@ main ở `2d1536f`. Candidate KPHQA01 revision2 sửa feedback lỗi gửi, tr�
 xác minh, logo/chrome và nối thêm/chọn đủ ngày theo feedback owner; chưa merge.
 [Nghiệm thu và evidence hai vòng cuối](delivery/kphqa01-final-acceptance.md).
 
-DATEON01 đã mở nhánh/worktree `store-app/dateon01-durable-contract` từ checkpoint
+DATEON01 đã chốt trên nhánh `store-app/dateon01-durable-contract` từ checkpoint
 `82b01b3`, chỉ chuẩn bị [contract DATE bền vững](product/DATE_DURABLE_CONTRACT.md).
 Owner đã chốt: lượng đang theo dõi, không tồn kho; xử lý từng phần và giữ lượng
 còn lại; lịch chung, chỉ quản lý sửa/hẹn. Contract có wire proposal, ADR0008
@@ -92,12 +92,24 @@ Full frontend `npm run verify` revision2 PASS425 tests (Admin27, Store355,
 API4, rules19, UI20), TypeScript/build/PWA, contracts và generated API không
 drift. Backend không đổi;92 tests cùng source ở revision1 không chạy lại.
 
-Preview main4176/Admin4175 giữ baseline; candidate Store4181 (online) và
-Admin4182 ở task worktree KPHQA01, cùng backend/DB tổng hợp. URL phải probe lại
-khi bàn giao. Các kiểm trước revision2 vẫn là evidence theo source/ngày cũ.
+Các URL preview4176/4175/4181/4182 là checkpoint lịch sử, không cam kết đang
+chạy. Worktree KPHQA01 đã dọn sau khi kế thừa vào DATEUI01 và lưu evidence;
+source/runtime mới tiếp tục từ worktree DATEUI01. Các kiểm trước revision2
+vẫn là evidence theo source/ngày cũ.
 Owner chọn giữ gate iPhone pending vì chưa có URL HTTPS/thiết bị kết nối;
 không tự mở tunnel/deploy. Main4176 chưa có bản sửa feedback của candidate.
 
 Không đổi nhánh `codex/github-pages-pwa` hoặc tag bảo tồn. Không push/deploy.
 Checkpoint trước tích hợp đọc bằng `git show f2b1404:docs/CURRENT_STATE.md`;
 [NEXT](NEXT.md) là bước tiếp hiện hành.
+
+## Dọn và quyền push17/11
+
+Owner yêu cầu “làm sạch rồi push” sau checkpoint DATEUI01 `e919aae`. Chỉ push
+nhánh `store-app/dateui01-list-checkpoint`, không merge/push main, Pages hoặc tag.
+Đã dọn hai worktree ancestor sạch KPHQA01/DATEON01 sau khi kiểm không có process/
+dependency dùng; giữ branch provenance và worktree DATEUI01 cho bước tiếp.
+Evidence KPHQA01/Surefire giữ local tại repo chính
+`.local/verification/dateui01-cleanup-2026-11-17/`; DB/media KPHON02 và các
+worktree khác không đổi. Ports4181–4184 không có listener lúc dọn; nếu review
+lại phải start/probe preview đúng source/mode, không tái dùng URL như đang sống.
