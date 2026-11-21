@@ -56,7 +56,10 @@ export function App({ gateway: providedGateway }: AppProps) {
   const canLifecycle = hasChainAdmin || targetsQuery.isSuccess;
   const membershipStoresQuery = useQuery({ queryKey: [...membershipRootKey, "stores", sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listMembershipStores(signal), enabled: Boolean(sessionQuery.data), retry: false });
   const canMemberships = hasChainAdmin || membershipStoresQuery.isSuccess;
-  const activeWorkspace = workspace === "catalog" && !hasCatalog || (workspace === "identity" || workspace === "kph") && !hasChainAdmin || workspace === "lifecycle" && !canLifecycle || workspace === "memberships" && !canMemberships ? "overview" : workspace;
+  // The management store list contains only active chain or regional assignments.
+  const canMonitorKph = membershipStoresQuery.isSuccess;
+  const monitorScope = [sessionQuery.data?.user.id, ...(membershipStoresQuery.data ?? []).map(store => store.id)].join(":");
+  const activeWorkspace = workspace === "catalog" && !hasCatalog || workspace === "identity" && !hasChainAdmin || workspace === "kph" && !canMonitorKph || workspace === "lifecycle" && !canLifecycle || workspace === "memberships" && !canMemberships ? "overview" : workspace;
   const schedulesQuery = useQuery({ queryKey: [...queryKeys.schedules, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listSchedules(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "lifecycle", retry: false });
   const usersQuery = useQuery({ queryKey: [...queryKeys.users, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listUsers(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "identity", retry: false });
   const clearSession = useCallback(() => {
@@ -76,6 +79,12 @@ export function App({ gateway: providedGateway }: AppProps) {
     queryClient.removeQueries({ queryKey: ["catalog-import"] });
   }, [queryClient]);
   const handleError = useCallback((error: unknown) => { if (isUnauthorized(error)) clearSession(); }, [clearSession]);
+  const handleKphError = useCallback((error: unknown) => {
+    handleError(error);
+    if (typeof error === "object" && error !== null && "status" in error && error.status === 403) {
+      void queryClient.invalidateQueries({ queryKey: [...membershipRootKey, "stores"] });
+    }
+  }, [handleError, queryClient]);
   const expired = isUnauthorized(targetsQuery.error) || isUnauthorized(schedulesQuery.error) || isUnauthorized(usersQuery.error) || isUnauthorized(membershipStoresQuery.error);
   useEffect(() => {
     if (expired) {
@@ -132,7 +141,7 @@ export function App({ gateway: providedGateway }: AppProps) {
 
   return <AdminShell
     session={sessionQuery.data} workspace={activeWorkspace}
-    canIdentity={hasChainAdmin} canCatalog={hasCatalog} canLifecycle={canLifecycle} canMemberships={canMemberships}
+    canMonitorKph={canMonitorKph} canIdentity={hasChainAdmin} canCatalog={hasCatalog} canLifecycle={canLifecycle} canMemberships={canMemberships}
     onNavigate={navigate} onChangePassword={() => setChangePasswordOpen(true)}
     onLogout={() => logout.mutate()} logoutBusy={logout.isPending}
   >
@@ -144,8 +153,9 @@ export function App({ gateway: providedGateway }: AppProps) {
       stores={membershipStoresQuery.data ?? []} loading={membershipStoresQuery.isPending}
       loadError={membershipStoresQuery.error} onRefreshStores={() => void membershipStoresQuery.refetch()} onError={handleError}
     />}
-    {activeWorkspace === "kph" && <ChainKphWorkspace key={sessionQuery.data.user.id}
-      gateway={gateway} actorId={sessionQuery.data.user.id} onError={handleError}
+    {activeWorkspace === "kph" && membershipStoresQuery.isSuccess && <ChainKphWorkspace key={monitorScope}
+      gateway={gateway} scope={monitorScope} stores={membershipStoresQuery.data} chain={hasChainAdmin}
+      refreshScope={() => void membershipStoresQuery.refetch()} onError={handleKphError}
     />}
     {activeWorkspace === "overview" && <AdminOverview />}
     {activeWorkspace === "catalog" && <CatalogWorkspace gateway={gateway} session={sessionQuery.data} onError={handleError} />}

@@ -1,10 +1,10 @@
 import { formatDisplayDate, KPH_OPTIONS, parseDisplayDate, resolveChoiceLabel, type LocalDate } from "@coopfood-kph/kph-rules";
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Field, Input } from "@coopfood-kph/ui";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 
-import type { ChainKphQuery, KphDecision, KphRecord, LifecycleAdminGateway } from "./lifecycle-admin";
+import type { ChainKphQuery, KphRecord, LifecycleAdminGateway, MembershipStore } from "./lifecycle-admin";
 import "./chain-kph.css";
 
 export const chainKphRootKey = ["admin-chain-kph"] as const;
@@ -20,29 +20,22 @@ function product(record: KphRecord) {
   return record.catalogSnapshot.productName || record.catalogSnapshot.skuCode || record.barcode || "Hàng nhập tay";
 }
 
-type Gateway = Pick<LifecycleAdminGateway, "listChainKphRecords" | "listKphStores" | "reviewKphRecord">;
+type Gateway = Pick<LifecycleAdminGateway, "listChainKphRecords">;
 
-export function ChainKphWorkspace({ gateway, actorId, onError }: {
-  gateway: Gateway; actorId: string; onError(error: unknown): void;
+export function ChainKphWorkspace({ gateway, scope, stores, chain, refreshScope, onError }: {
+  gateway: Gateway; scope: string; stores: MembershipStore[]; chain: boolean;
+  refreshScope(): void; onError(error: unknown): void;
 }) {
-  const client = useQueryClient();
   const [query, setQuery] = useState<ChainKphQuery>({ page: 1 });
   const [selectedId, setSelectedId] = useState("");
-  const [notice, setNotice] = useState("");
-  const [reviewError, setReviewError] = useState("");
   const [filterError, setFilterError] = useState("");
-  const stores = useQuery({
-    queryKey: [...chainKphRootKey, actorId, "stores"], queryFn: ({ signal }) => gateway.listKphStores(signal),
-    retry: false, gcTime: 0,
-  });
   const list = useQuery({
-    queryKey: [...chainKphRootKey, actorId, "list", query], queryFn: ({ signal }) => gateway.listChainKphRecords(query, signal),
+    queryKey: [...chainKphRootKey, scope, query], queryFn: ({ signal }) => gateway.listChainKphRecords(query, signal),
     retry: false, gcTime: 0,
   });
   useEffect(() => {
     if (list.error) onError(list.error);
-    if (stores.error) onError(stores.error);
-  }, [list.error, stores.error, onError]);
+  }, [list.error, onError]);
   const page = list.isSuccess ? list.data : null;
   const record = page?.items.find(item => item.id === selectedId);
   useEffect(() => {
@@ -51,27 +44,6 @@ export function ChainKphWorkspace({ gateway, actorId, onError }: {
     }
   }, [page]);
 
-  const review = useMutation({
-    mutationFn: ({ record, decision }: { record: KphRecord; decision: KphDecision }) =>
-      gateway.reviewKphRecord(record.store.id, record.id, decision),
-  });
-  function decide(record: KphRecord, decision: KphDecision) {
-    setNotice("");
-    setReviewError("");
-    review.mutate({ record, decision }, {
-      onSuccess(updated) {
-        setSelectedId("");
-        setNotice(`${approvalLabels[updated.approvalStatus]} · ${product(updated)}`);
-        void client.invalidateQueries({ queryKey: [...chainKphRootKey, actorId, "list"] });
-      },
-      onError(error) {
-        setSelectedId("");
-        setReviewError(message(error));
-        onError(error);
-        void client.resetQueries({ queryKey: [...chainKphRootKey, actorId, "list"] });
-      },
-    });
-  }
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -87,8 +59,6 @@ export function ChainKphWorkspace({ gateway, actorId, onError }: {
         ...(detectedTo && { detectedTo }), ...(approval && { approvalStatus: approval }) });
       setSelectedId("");
       setFilterError("");
-      setNotice("");
-      setReviewError("");
     } catch (error) {
       setFilterError(message(error));
     }
@@ -98,11 +68,11 @@ export function ChainKphWorkspace({ gateway, actorId, onError }: {
     <section className="admin-panel" aria-labelledby="chain-kph-heading">
       <header className="chain-kph-heading"><h1 id="chain-kph-heading">Phiếu KPH</h1>
         <Button variant="secondary" size="icon" aria-label="Tải lại phiếu KPH" disabled={list.isFetching}
-          onClick={() => void list.refetch()}><RefreshCw size={18} aria-hidden="true" /></Button></header>
+          onClick={() => { refreshScope(); void list.refetch(); }}><RefreshCw size={18} aria-hidden="true" /></Button></header>
       <form className="chain-kph-filters" onSubmit={apply}>
-        <Field label="Cửa hàng" htmlFor="kph-store"><select id="kph-store" name="store" disabled={!stores.isSuccess}>
-          <option value="">Tất cả cửa hàng</option>
-          {stores.data?.map(store => <option key={store.id} value={store.id}>{store.code} · {store.name}</option>)}
+        <Field label="Cửa hàng" htmlFor="kph-store"><select id="kph-store" name="store">
+          <option value="">{chain ? "Toàn chuỗi" : "Các vùng được giao"}</option>
+          {stores.map(store => <option key={store.id} value={store.id}>{store.code} · {store.name}</option>)}
         </select></Field>
         <Field label="Từ ngày phát hiện" htmlFor="kph-from"><Input id="kph-from" name="from" placeholder="dd/mm/yyyy" /></Field>
         <Field label="Đến ngày phát hiện" htmlFor="kph-to"><Input id="kph-to" name="to" placeholder="dd/mm/yyyy" /></Field>
@@ -113,13 +83,10 @@ export function ChainKphWorkspace({ gateway, actorId, onError }: {
         <Button type="submit">Lọc phiếu</Button>
       </form>
       {filterError && <p role="alert" className="admin-error">{filterError}</p>}
-      {stores.isError && <p role="alert" className="admin-error">{message(stores.error)} <button onClick={() => void stores.refetch()}>Tải lại cửa hàng</button></p>}
     </section>
     <section className="admin-panel" aria-labelledby="chain-kph-list">
       <header className="chain-kph-heading"><h2 id="chain-kph-list">Danh sách phiếu</h2>
         {page && <span className="chain-kph-count">{page.totalItems} phiếu</span>}</header>
-      {notice && <p role="status" className="membership-notice">{notice}</p>}
-      {reviewError && <p role="alert" className="admin-error">{reviewError}</p>}
       {list.isPending && <p role="status">Đang tải phiếu…</p>}
       {list.isError && <p role="alert" className="admin-error">{message(list.error)} <button onClick={() => void list.refetch()}>Thử lại</button></p>}
       {page && (page.items.length === 0 ? <p>Không có phiếu phù hợp.</p> : <ul className="chain-kph-list">
@@ -139,13 +106,12 @@ export function ChainKphWorkspace({ gateway, actorId, onError }: {
           onClick={() => setQuery({ ...query, page: page.page + 1 })}><ChevronRight aria-hidden="true" size={18} /></Button>
       </nav>}
     </section>
-    {record && <RecordDetail record={record} pending={review.isPending} onClose={() => setSelectedId("")}
-      onDecision={decision => decide(record, decision)} />}
+    {record && <RecordDetail record={record} onClose={() => setSelectedId("")} />}
   </div>;
 }
 
-function RecordDetail({ record, pending, onClose, onDecision }: {
-  record: KphRecord; pending: boolean; onClose(): void; onDecision(decision: KphDecision): void;
+function RecordDetail({ record, onClose }: {
+  record: KphRecord; onClose(): void;
 }) {
   const { catalogSnapshot: catalog, store } = record;
   const choices = KPH_OPTIONS[record.type];
@@ -161,18 +127,15 @@ function RecordDetail({ record, pending, onClose, onDecision }: {
     ["Ngày xử lý", record.processedDate && formatDisplayDate(record.processedDate as LocalDate)],
     ["Trạng thái duyệt", approvalLabels[record.approvalStatus]], ["Người duyệt", record.reviewedBy?.displayName], ["Ghi chú", record.note],
   ];
-  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}>
-    <DialogContent closeTone="neutral" closeDisabled={pending} className="chain-kph-detail">
+  return <Dialog open onOpenChange={open => { if (!open) onClose(); }}>
+    <DialogContent closeTone="neutral" className="chain-kph-detail">
       <DialogHeader><DialogTitle>{product(record)}</DialogTitle>
         <DialogDescription>{store.code} · {store.name}</DialogDescription></DialogHeader>
       <dl>{rows.map(([label, value]) => value && <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
       <div className="chain-kph-photos">{record.photos.map(photo => <a key={photo.ordinal} href={photo.stampedContentPath}
         target="_blank" rel="noreferrer" aria-label={`Mở ảnh minh chứng ${photo.ordinal}`}>
         <img src={photo.stampedContentPath} alt={`Ảnh minh chứng ${photo.ordinal}`} /></a>)}</div>
-      {record.lifecycleState === "SUBMITTED" ? <div className="chain-kph-actions" aria-busy={pending}>
-        <Button variant="secondary" disabled={pending || record.approvalStatus === "REJECTED"} onClick={() => onDecision("REJECTED")}>Không duyệt</Button>
-        <Button disabled={pending || record.approvalStatus === "APPROVED"} onClick={() => onDecision("APPROVED")}>Duyệt phiếu</Button>
-      </div> : <p>Phiếu đã vô hiệu hóa.</p>}
+      {record.lifecycleState === "INVALIDATED" && <p>Phiếu đã vô hiệu hóa.</p>}
     </DialogContent>
   </Dialog>;
 }

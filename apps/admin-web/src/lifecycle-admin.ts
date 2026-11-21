@@ -12,8 +12,6 @@ export type AdminUser = components["schemas"]["AdminUser"];
 export type ChainKphQuery = NonNullable<operations["listChainKphRecords"]["parameters"]["query"]>;
 export type ChainKphPage = components["schemas"]["ChainKphRecordPage"];
 export type KphRecord = components["schemas"]["KphRecord"];
-export type KphDecision = Exclude<KphRecord["approvalStatus"], "PENDING">;
-type KphStore = components["schemas"]["KphStoreAccess"];
 
 export type MembershipStore = components["schemas"]["AdminMembershipStore"];
 export type StoreMembership = components["schemas"]["AdminStoreMembership"];
@@ -37,9 +35,7 @@ export type LifecycleAdminGateway = {
   login(username: string, password: string): Promise<AdminSession>;
   logout(): Promise<void>;
   changePassword(currentPassword: string, newPassword: string): Promise<void>;
-  listKphStores(signal?: AbortSignal): Promise<KphStore[]>;
   listChainKphRecords(query: ChainKphQuery, signal?: AbortSignal): Promise<ChainKphPage>;
-  reviewKphRecord(storeId: string, recordId: string, status: KphDecision): Promise<KphRecord>;
   listTargets(signal?: AbortSignal): Promise<LifecycleTarget[]>;
   listSchedules(signal?: AbortSignal): Promise<LifecycleSchedule[]>;
   createSchedule(input: {
@@ -101,26 +97,11 @@ export function createLifecycleAdminGateway(
     csrfToken = "";
   }
 
-  async function listKphStores(signal?: AbortSignal) {
-    const response = await client.GET("/api/v1/kph/stores", signal ? { signal } : {});
-    if (response.error || !response.data) throw apiError(response, "Không thể tải danh sách cửa hàng.");
-    return response.data;
-  }
-
   async function listChainKphRecords(query: ChainKphQuery, signal?: AbortSignal) {
     const response = await client.GET("/api/v1/admin/kph", {
       params: { query }, ...(signal ? { signal } : {}),
     });
-    if (response.error || !response.data) throw apiError(response, "Không thể tải phiếu KPH toàn chuỗi.");
-    return response.data;
-  }
-
-  async function reviewKphRecord(storeId: string, recordId: string, status: KphDecision) {
-    const response = await client.PUT("/api/v1/stores/{storeId}/kph/{recordId}/approval", {
-      params: { path: { storeId, recordId }, header: { "X-CSRF-TOKEN": csrfToken } },
-      body: { status },
-    });
-    if (response.error || !response.data) throw apiError(response, "Chưa xác nhận được kết quả duyệt phiếu. Hãy tải lại danh sách.");
+    if (response.error || !response.data) throw apiError(response, "Không thể tải danh sách phiếu KPH.");
     return response.data;
   }
 
@@ -261,7 +242,7 @@ export function createLifecycleAdminGateway(
     getSession, login, logout, changePassword,
     listTargets, listSchedules, createSchedule, reschedule, cancel, execute,
     listCatalogImports, getCatalogImport, uploadCatalogImport,
-    listUsers, deactivateUser, listKphStores, listChainKphRecords, reviewKphRecord,
+    listUsers, deactivateUser, listChainKphRecords,
     listMembershipStores, listStoreMemberships, lookupMembershipUser, upsertMembership, revokeMembership,
   };
 }

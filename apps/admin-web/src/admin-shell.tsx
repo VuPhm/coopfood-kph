@@ -13,15 +13,15 @@ const destinations = [
   { id: "lifecycle", label: "Lifecycle", icon: CalendarClock, group: "Quản lý vận hành" },
 ] as const;
 
-export function AdminShell({ session, workspace, canIdentity, canCatalog, canLifecycle, canMemberships, onNavigate, onChangePassword, onLogout, logoutBusy, children }: {
-  session: AdminSession; workspace: AdminWorkspace; canIdentity: boolean; canCatalog: boolean; canLifecycle: boolean; canMemberships: boolean;
+export function AdminShell({ session, workspace, canMonitorKph, canIdentity, canCatalog, canLifecycle, canMemberships, onNavigate, onChangePassword, onLogout, logoutBusy, children }: {
+  session: AdminSession; workspace: AdminWorkspace; canMonitorKph: boolean; canIdentity: boolean; canCatalog: boolean; canLifecycle: boolean; canMemberships: boolean;
   onNavigate(workspace: AdminWorkspace): void; onChangePassword(): void; onLogout(): void; logoutBusy: boolean; children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const items = destinations.filter(item => item.id === "overview" || (item.id === "kph" || item.id === "identity") && canIdentity || item.id === "catalog" && canCatalog || item.id === "lifecycle" && canLifecycle || item.id === "memberships" && canMemberships);
+  const items = destinations.filter(item => item.id === "overview" || item.id === "kph" && canMonitorKph || item.id === "identity" && canIdentity || item.id === "catalog" && canCatalog || item.id === "lifecycle" && canLifecycle || item.id === "memberships" && canMemberships);
   const current = destinations.find(item => item.id === workspace)!;
-  const role = canIdentity ? "Quản trị chuỗi" : canCatalog && !canLifecycle ? "Quản trị catalog" : canLifecycle ? "Quản lý vận hành" : "Tài khoản";
+  const role = canIdentity ? "Quản trị chuỗi" : canMonitorKph ? "Quản trị vùng" : canCatalog && !canLifecycle ? "Quản trị catalog" : canLifecycle ? "Quản lý vận hành" : "Tài khoản";
   function navigate(id: AdminWorkspace) { onNavigate(id); setMobileOpen(false); }
   const nav = <nav aria-label="Điều hướng Admin">{items.map((item, index) => <div key={item.id}>
     {(index > 0 && item.group !== items[index - 1]?.group) && <p className="admin-nav-group fresh-sidebar-group-title">{item.group}</p>}

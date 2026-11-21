@@ -33,8 +33,6 @@ function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdmin
     logout: vi.fn().mockResolvedValue(undefined),
     changePassword: vi.fn().mockResolvedValue(undefined),
     listChainKphRecords: vi.fn().mockResolvedValue(kphPage),
-    listKphStores: vi.fn().mockResolvedValue([]),
-    reviewKphRecord: vi.fn().mockResolvedValue({ ...kphPage.items[0], approvalStatus: "APPROVED" }),
     listTargets: vi.fn().mockResolvedValue(targets),
     listSchedules: vi.fn().mockResolvedValue(schedules),
     createSchedule: vi.fn().mockResolvedValue(schedules[0]),
@@ -314,7 +312,7 @@ describe("Phiếu KPH toàn chuỗi", () => {
   it("filters before paging and distinguishes a failed load from an empty result", async () => {
     const record = kphPage.items[0]!;
     const api = gateway({
-      listKphStores: vi.fn().mockResolvedValue([{ ...record.store, capabilities: ["REVIEW"] }]),
+      listMembershipStores: vi.fn().mockResolvedValue([record.store]),
       listChainKphRecords: vi.fn()
         .mockResolvedValueOnce({ ...kphPage, totalPages: 2, totalItems: 26 })
         .mockResolvedValueOnce({ ...kphPage, page: 2, totalPages: 2, totalItems: 26 })
@@ -337,18 +335,39 @@ describe("Phiếu KPH toàn chuỗi", () => {
     fireEvent.click(screen.getByRole("button", { name: "Thử lại" }));
     expect(await screen.findByText("Không có phiếu phù hợp.")).toBeVisible();
   });
-  it("opens the chain list and reviews the selected store and record", async () => {
-    const api = gateway();
-    renderApp(api, "overview");
-    fireEvent.click(await screen.findByRole("button", { name: "Phiếu KPH" }));
+  it.each([true, false])("opens read-only result and its scoped photo, chain=%s", async chain => {
     const record = kphPage.items[0]!;
+    const photoPath = `/api/v1/admin/kph/stores/${record.store.id}/records/${record.id}/photos/1`;
+    const reviewed = { ...record, approvalStatus: "APPROVED", reviewedBy: record.detectedBy,
+      photos: [{ ...record.photos[0], stampedContentPath: photoPath }] };
+    const actor = { ...sessionFixture.user, globalRoles: chain ? ["CHAIN_ADMIN"] : [],
+      stores: [{ ...record.store, id: "outside", name: "Ngoài vùng", role: "STORE_MANAGER" }] };
+    const api = gateway({
+      getSession: vi.fn().mockResolvedValue({ ...sessionFixture, user: actor }),
+      listMembershipStores: vi.fn().mockResolvedValue([record.store]),
+      listChainKphRecords: vi.fn().mockResolvedValue({ ...kphPage, items: [reviewed] }),
+    });
+    renderApp(api, "kph");
+    const store = await screen.findByRole("combobox", { name: "Cửa hàng" });
+    expect(within(store).getByRole("option", { name: new RegExp(record.store.name) })).toBeVisible();
+    expect(within(store).queryByRole("option", { name: /Ngoài vùng/ })).toBeNull();
+    expect(screen.getByTitle(chain ? "Quản trị chuỗi" : "Quản trị vùng")).toBeInTheDocument();
     fireEvent.click(await screen.findByRole("button", { name: record.catalogSnapshot.productName }));
     const dialog = screen.getByRole("dialog");
     expect(within(dialog).getByText(record.id)).toBeVisible();
-    expect(within(dialog).getByText(record.store.name, { exact: false })).toBeVisible();
-    fireEvent.click(within(dialog).getByRole("button", { name: "Duyệt phiếu" }));
-    await waitFor(() => expect(api.reviewKphRecord).toHaveBeenCalledWith(record.store.id, record.id, "APPROVED"));
-    await waitFor(() => expect(api.listChainKphRecords).toHaveBeenCalledTimes(2));
+    expect(within(dialog).getByText("Đã duyệt")).toBeVisible();
+    expect(within(dialog).getByRole("link", { name: "Mở ảnh minh chứng 1" })).toHaveAttribute("href", photoPath);
+    expect(within(dialog).queryByRole("button", { name: /duyệt/i })).toBeNull();
+  });
+
+  it("keeps a store manager without an admin scope out of the aggregate workspace", async () => {
+    const denied = Object.assign(new Error("Ngoài phạm vi"), { status: 403 });
+    const api = gateway({ getSession: vi.fn().mockResolvedValue(sessionFixture),
+      listMembershipStores: vi.fn().mockRejectedValue(denied), listTargets: vi.fn().mockRejectedValue(denied) });
+    renderApp(api, "kph");
+    await screen.findByRole("heading", { name: "Tổng quan vận hành" });
+    expect(screen.queryByRole("button", { name: "Phiếu KPH" })).not.toBeInTheDocument();
+    expect(api.listChainKphRecords).not.toHaveBeenCalled();
   });
 });
 
@@ -378,7 +397,7 @@ describe("Admin Fresh shell and overview", () => {
     expect(screen.queryByRole("button", { name: "Tài khoản" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Catalog" })).not.toBeInTheDocument();
     expect(api.listUsers).not.toHaveBeenCalled();
-    expect(screen.queryByRole("button", { name: "Phiếu KPH" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Phiếu KPH" })).toBeVisible();
     expect(api.listChainKphRecords).not.toHaveBeenCalled();
   });
 
