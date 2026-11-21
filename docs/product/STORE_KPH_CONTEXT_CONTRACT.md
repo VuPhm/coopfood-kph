@@ -11,8 +11,10 @@ Session hợp lệ không scope nhận200[], hết/thu hồi phiên401. Giữ `/
 và session.user.stores membership-only; không role hoặc membership giả.
 
 - EMPLOYEE membership: VIEW, CREATE.
-- STORE_MANAGER membership, active REGION_MANAGER assignment đúng region,
-  CHAIN_ADMIN: thêm REVIEW, EXPORT trong scope tương ứng.
+- STORE_MANAGER membership active đúng cửa hàng có thêm REVIEW và EXPORT.
+- REGION_MANAGER đúng active region assignment và CHAIN_ADMIN có thêm EXPORT
+  trong scope. REVIEW chỉ đến từ membership cửa hàng trưởng đúng cửa hàng.
+  [Quyết định 21/11](KPH_APPROVAL_SCOPE.md).
 - Catalog-only không có store. Không suy capability DATE/report/notification,
   catalog administration hoặc Admin. Lookup sản phẩm vẫn dùng P01 VIEW/CREATE
   theo CatalogService; sửa mô tả OpenAPI lệch membership-only, không đổi policy.

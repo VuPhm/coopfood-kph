@@ -36,8 +36,10 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
 - Ngoài ngoại lệ pilot, quyền KPH online kế thừa theo scope đã chốt tại P01:
   `STORE_MANAGER` (CHT) có active membership đúng cửa hàng;
   `REGION_MANAGER` có active assignment tới region đang chứa cửa hàng; và
-  `CHAIN_ADMIN` có scope toàn chuỗi. Ba cấp được xem/tạo/duyệt/xuất trong scope
-  tương ứng nhưng không được xóa hoặc vô hiệu hóa phiếu. Backend phải xác định
+  `CHAIN_ADMIN` có scope toàn chuỗi. Ba cấp được xem/tạo/xuất trong scope tương ứng.
+  Theo [quyết định ngày 21/11](KPH_APPROVAL_SCOPE.md), duyệt phiếu cần
+  membership cửa hàng trưởng active đúng cửa hàng. Store PWA không cho xóa
+  hoặc vô hiệu hóa phiếu. Backend phải xác định
   store → region từ dữ liệu authoritative khi authorize; thay đổi scope có hiệu
   lực chậm nhất ở request kế tiếp. Luôn test deny cross-store/cross-region;
   UI visibility không thay authorization.
@@ -83,7 +85,7 @@ Mọi thay đổi trong file này cần acceptance test và xác nhận nghiệp
   trạng thái gồm `PENDING`, `APPROVED`, `REJECTED`; Foundation-02 ban đầu chỉ có
   `STORE_MANAGER` đúng active membership. P01 ngày 17/09/2026 mở rộng explicit
   cho `REGION_MANAGER` đúng region và `CHAIN_ADMIN` toàn chuỗi; mọi thay đổi phải
-  ghi history/audit. Export online chỉ nhận các record `SUBMITTED` và `APPROVED`
+  ghi history/audit. Từ quyết định 21/11, quyền duyệt trở về cửa hàng trưởng đúng cửa hàng. Export online chỉ nhận các record `SUBMITTED` và `APPROVED`
   cùng store/type, ghi tên người duyệt vào cột R; không đặt cửa sổ thời gian
   duyệt khi nghiệp vụ chưa chốt. Export Pilot local-only tiếp tục giữ hành vi
   baseline riêng.

@@ -4,6 +4,12 @@
 `delivery-cycle` trước đây; không cần skill điều phối hoặc plan JSON cho việc mới.
 Hồ sơ cũ trong `docs/delivery/` là provenance, giữ nguyên trạng thái nghiệm thu.
 
+- Điều phối viết một spec ngắn trước khi giao Luna. Ghi actor và scope, quyền
+  đọc/ghi, đầu vào/đầu ra, ví dụ chấp nhận và việc cố ý để sau. Luna nhận
+  worktree, phạm vi sửa và tiêu chí bàn giao. Khi đổi quyết định nghiệp vụ,
+  cập nhật spec và contract có thẩm quyền rồi mới sửa implementation.
+- Review trên luồng vận hành thật với fixture tổng hợp. Chỉ bổ sung kiểm khi
+  nó bắt được rủi ro còn hở hoặc bắt buộc theo TEST_STRATEGY.
 - Bắt đầu bằng outcome, base SHA, scope sửa và rủi ro chính. Task branch/worktree
   riêng, một writer; chỉ chia agent khi có yêu cầu và scope thực sự độc lập.
 - Giữ kế hoạch đang có khi resume; chỉ cập nhật điều thay đổi. Chọn test theo

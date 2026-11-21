@@ -195,8 +195,7 @@ tách hai dòng và hai nút tạo vẫn ở vị trí nổi bật. Safe area d�
   accessible name nhưng ẩn nhãn hiển thị. Các toolbar không bọc thêm panel nhiều
   lớp, dùng nhịp dọc tối thiểu và không phóng lớn theo card.
 - Trạng thái duyệt có ba giá trị “Chờ duyệt”, “Đã duyệt”, “Không duyệt”. UI demo
-  cho phép thao tác; online cho `STORE_MANAGER` đúng store, `REGION_MANAGER`
-  đúng region và `CHAIN_ADMIN` toàn chuỗi. `EMPLOYEE` chỉ xem/tạo. Backend vẫn
+  cho phép thao tác; online áp [quyền duyệt của cửa hàng trưởng](KPH_APPROVAL_SCOPE.md). `EMPLOYEE` chỉ xem/tạo. Backend vẫn
   kiểm effective scope; UI không phải authorization boundary.
 - Export chỉ bật khi có selection; “chọn tất cả” áp dụng trong loại phiếu hiện
   hành, không xuyên tab. Với online, selection/select-all chỉ thuộc trang hiện

@@ -60,10 +60,10 @@ không thể giải quyết an toàn.
 - Not-found cho phép scan lại hoặc nhập tay với trạng thái `NOT_FOUND`, không
   suy diễn sản phẩm.
 - KPH giữ catalog snapshot, 1-3 ảnh theo thứ tự, original và stamped đều private.
-- Quyền KPH kế thừa phải explicit: `STORE_MANAGER` đúng store,
-  `REGION_MANAGER` có active assignment tới region chứa store, và `CHAIN_ADMIN`
-  trên toàn chuỗi được duyệt/xuất trong scope tương ứng; luôn test cross-store/
-  cross-region. Store PWA không cho xóa/vô hiệu hóa.
+- Chỉ cửa hàng trưởng có membership active đúng cửa hàng được duyệt KPH.
+  Admin vùng theo dõi các cửa hàng thuộc active region assignment, Admin chuỗi
+  theo dõi toàn chuỗi. Quyền xuất độc lập theo scope. Kiểm cross-store/cross-region.
+  [Spec quyền KPH](docs/product/KPH_APPROVAL_SCOPE.md). Store PWA không cho xóa/vô hiệu hóa.
 - Giữ workflow và interaction nghiệp vụ đã accepted; shell, navigation, IA,
   screen composition và visual tokens có thể đổi trong Round 1. Xem
   [contract index](docs/product/STORE_APP_CONTRACTS.md) và
@@ -106,6 +106,7 @@ owner với thao tác ngắn, kết quả mong đợi và trạng thái còn ch�
 
 ## Bàn giao
 
+Điều phối viết spec theo nghiệp vụ trước khi giao Luna và review bằng luồng vận hành thật theo chi phí cận biên.
 Dùng `docs/DELIVERY_WORKFLOW.md` gọn; không tạo plan JSON hoặc gọi team mặc định.
 Giữ checkpoint/evidence cũ làm provenance, không chuyển format hàng loạt.
 Nêu outcome, file đổi, lệnh/kết quả, phần chưa kiểm và một bước nhỏ tiếp theo.

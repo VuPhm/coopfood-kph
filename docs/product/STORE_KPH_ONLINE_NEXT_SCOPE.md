@@ -28,8 +28,8 @@ Ví dụ cho một quản lý có quyền tại một cửa hàng (định danh 
 | --- | --- |
 | EMPLOYEE có membership | Đúng store, VIEW và CREATE |
 | STORE_MANAGER có membership | Đúng store, đủ bốn thao tác |
-| REGION_MANAGER có active assignment | Store thuộc vùng được giao, đủ bốn thao tác |
-| CHAIN_ADMIN | Mọi store hợp lệ toàn chuỗi, đủ bốn thao tác |
+| REGION_MANAGER có active assignment | Store thuộc vùng được giao, VIEW/CREATE/EXPORT |
+| CHAIN_ADMIN | Mọi store hợp lệ toàn chuỗi, VIEW/CREATE/EXPORT |
 
 Đề xuất lấy hợp các scope và trả mỗi store một lần, kể cả khi user vừa có
 membership vừa quản lý vùng. Session hợp lệ hết quyền nhận `200 []`. Phiên hết

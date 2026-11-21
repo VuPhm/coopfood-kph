@@ -1,7 +1,7 @@
 # Provisioning policy
 
 Trạng thái: **Accepted — P01 owner decision 2026-09-17; lifecycle addendum 2026-09-21**
-Cập nhật: 2026-09-21
+Cập nhật quyền KPH ngày 21/11/2026 theo [quyết định của owner](KPH_APPROVAL_SCOPE.md).
 
 ## Mục tiêu và ranh giới
 
@@ -25,7 +25,9 @@ global role hoặc store membership hiện có.
 | Capability | EMPLOYEE | STORE_MANAGER | REGION_MANAGER | CATALOG_ADMIN | CHAIN_ADMIN | Bootstrap operator |
 | --- | --- | --- | --- | --- | --- | --- |
 | Xem/tạo KPH | Đúng store | Đúng store | Mọi store đúng region | Không | Mọi store | Không |
-| Duyệt/xuất KPH | Không | Đúng store | Mọi store đúng region | Không | Mọi store | Không |
+| Duyệt KPH | Không | Đúng store | Không | Không | Không | Không |
+| Tổng hợp phiếu trên Admin | Không | Không | Mọi store đúng region | Không | Mọi store | Không |
+| Xuất KPH | Không | Đúng store | Mọi store đúng region | Không | Mọi store | Không |
 | Đổi password của chính mình | Có | Có | Có | Có | Có | Không |
 | Đọc admin directory/audit | Không | Không | Đúng region, tối thiểu cần thiết | Không | Toàn chuỗi | Không |
 | Quản lý store profile/lifecycle | Không | Không | Đúng region | Không | Toàn chuỗi | Không |

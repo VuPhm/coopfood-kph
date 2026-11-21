@@ -1,6 +1,9 @@
 # ADR 0004 — Scoped management hierarchy
 
-Status: Accepted — 2026-09-17
+Status: Accepted — 2026-09-17. Quyết định 21/11/2026 thay phần quyền duyệt KPH.
+Các quyết định tháng 9 bên dưới là provenance. Quyền REVIEW cần membership
+STORE_MANAGER active đúng cửa hàng, độc lập với EXPORT kế thừa theo phạm vi.
+[Spec hiện hành](../product/KPH_APPROVAL_SCOPE.md).
 
 ## Bối cảnh
 
@@ -12,7 +15,7 @@ Project owner quyết định ngày 17/09/2026: quản lý vùng chỉ đi xuố
 đúng vùng được giao; admin tổng phía trên đi xuống mọi store. Các policy còn lại
 theo security standard của P01.
 
-## Quyết định
+## Quyết định ban đầu ngày 17/09/2026
 
 - `CHAIN_ADMIN` là global role cấp toàn chuỗi. Role này có thể quản trị
   identity/region/store/assignment và thực hiện KPH trong mọi active store.
