@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from "react";
-import { Boxes, CalendarClock, KeyRound, LayoutDashboard, LogOut, Menu, UserRoundCog, Users } from "lucide-react";
+import { Boxes, ClipboardList, CalendarClock, KeyRound, LayoutDashboard, LogOut, Menu, UserRoundCog, Users } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DesktopSidebar, DesktopNavItem, DesktopHeader, DesktopAccountButton } from "@coopfood-kph/ui";
 import type { AdminSession } from "./lifecycle-admin";
 
-export type AdminWorkspace = "overview" | "identity" | "catalog" | "lifecycle" | "memberships";
+export type AdminWorkspace = "overview" | "kph" | "identity" | "catalog" | "lifecycle" | "memberships";
 const destinations = [
   { id: "overview", label: "Tổng quan", icon: LayoutDashboard, group: "Không gian làm việc" },
+  { id: "kph", label: "Phiếu KPH", icon: ClipboardList, group: "Quản lý vận hành" },
   { id: "identity", label: "Tài khoản", icon: Users, group: "Quản lý vận hành" },
   { id: "memberships", label: "Quyền cửa hàng", icon: UserRoundCog, group: "Quản lý vận hành" },
   { id: "catalog", label: "Catalog", icon: Boxes, group: "Quản lý vận hành" },
@@ -18,7 +19,7 @@ export function AdminShell({ session, workspace, canIdentity, canCatalog, canLif
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const items = destinations.filter(item => item.id === "overview" || item.id === "identity" && canIdentity || item.id === "catalog" && canCatalog || item.id === "lifecycle" && canLifecycle || item.id === "memberships" && canMemberships);
+  const items = destinations.filter(item => item.id === "overview" || (item.id === "kph" || item.id === "identity") && canIdentity || item.id === "catalog" && canCatalog || item.id === "lifecycle" && canLifecycle || item.id === "memberships" && canMemberships);
   const current = destinations.find(item => item.id === workspace)!;
   const role = canIdentity ? "Quản trị chuỗi" : canCatalog && !canLifecycle ? "Quản trị catalog" : canLifecycle ? "Quản lý vận hành" : "Tài khoản";
   function navigate(id: AdminWorkspace) { onNavigate(id); setMobileOpen(false); }

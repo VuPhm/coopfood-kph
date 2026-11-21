@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider, focusManager } from "@tanstack/react-
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import kphPage from "../../../contracts/fixtures/api/kph-page.json";
 import schedulesFixture from "../../../contracts/fixtures/api/lifecycle-schedules.json";
 import targetsFixture from "../../../contracts/fixtures/api/lifecycle-targets.json";
 import catalogImportsFixture from "../../../contracts/fixtures/api/catalog-imports.json";
@@ -31,6 +32,9 @@ function gateway(overrides: Partial<LifecycleAdminGateway> = {}): LifecycleAdmin
     login: vi.fn().mockResolvedValue(session),
     logout: vi.fn().mockResolvedValue(undefined),
     changePassword: vi.fn().mockResolvedValue(undefined),
+    listChainKphRecords: vi.fn().mockResolvedValue(kphPage),
+    listKphStores: vi.fn().mockResolvedValue([]),
+    reviewKphRecord: vi.fn().mockResolvedValue({ ...kphPage.items[0], approvalStatus: "APPROVED" }),
     listTargets: vi.fn().mockResolvedValue(targets),
     listSchedules: vi.fn().mockResolvedValue(schedules),
     createSchedule: vi.fn().mockResolvedValue(schedules[0]),
@@ -306,6 +310,48 @@ describe("Admin identity workspace", () => {
 });
 
 
+describe("Phiếu KPH toàn chuỗi", () => {
+  it("filters before paging and distinguishes a failed load from an empty result", async () => {
+    const record = kphPage.items[0]!;
+    const api = gateway({
+      listKphStores: vi.fn().mockResolvedValue([{ ...record.store, capabilities: ["REVIEW"] }]),
+      listChainKphRecords: vi.fn()
+        .mockResolvedValueOnce({ ...kphPage, totalPages: 2, totalItems: 26 })
+        .mockResolvedValueOnce({ ...kphPage, page: 2, totalPages: 2, totalItems: 26 })
+        .mockRejectedValueOnce(new Error("Mất kết nối"))
+        .mockResolvedValue({ ...kphPage, items: [], totalItems: 0, totalPages: 0 }),
+    });
+    renderApp(api, "kph");
+    await screen.findByText("26 phiếu");
+    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    await screen.findByText("Trang 2 / 2");
+    fireEvent.change(screen.getByLabelText("Cửa hàng"), { target: { value: record.store.id } });
+    fireEvent.change(screen.getByLabelText("Từ ngày phát hiện"), { target: { value: "16/01/2026" } });
+    fireEvent.change(screen.getByLabelText("Trạng thái duyệt"), { target: { value: "PENDING" } });
+    fireEvent.click(screen.getByRole("button", { name: "Lọc phiếu" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Mất kết nối");
+    expect(api.listChainKphRecords).toHaveBeenLastCalledWith(
+      { storeId: record.store.id, page: 1, detectedFrom: "2026-01-16", approvalStatus: "PENDING" }, expect.anything(),
+    );
+    expect(screen.queryByText("Không có phiếu phù hợp.")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Thử lại" }));
+    expect(await screen.findByText("Không có phiếu phù hợp.")).toBeVisible();
+  });
+  it("opens the chain list and reviews the selected store and record", async () => {
+    const api = gateway();
+    renderApp(api, "overview");
+    fireEvent.click(await screen.findByRole("button", { name: "Phiếu KPH" }));
+    const record = kphPage.items[0]!;
+    fireEvent.click(await screen.findByRole("button", { name: record.catalogSnapshot.productName }));
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText(record.id)).toBeVisible();
+    expect(within(dialog).getByText(record.store.name, { exact: false })).toBeVisible();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Duyệt phiếu" }));
+    await waitFor(() => expect(api.reviewKphRecord).toHaveBeenCalledWith(record.store.id, record.id, "APPROVED"));
+    await waitFor(() => expect(api.listChainKphRecords).toHaveBeenCalledTimes(2));
+  });
+});
+
 describe("Admin Fresh shell and overview", () => {
   it("keeps mock overview separate from API data and filters its sample table", async () => {
     const api = gateway();
@@ -332,6 +378,8 @@ describe("Admin Fresh shell and overview", () => {
     expect(screen.queryByRole("button", { name: "Tài khoản" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Catalog" })).not.toBeInTheDocument();
     expect(api.listUsers).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button", { name: "Phiếu KPH" })).not.toBeInTheDocument();
+    expect(api.listChainKphRecords).not.toHaveBeenCalled();
   });
 
   it("hides lifecycle on server scope denial and allows catalog via navigation", async () => {

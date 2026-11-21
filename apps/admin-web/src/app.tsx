@@ -5,6 +5,7 @@ import { CalendarClock, CheckCircle2, Clock3, MapPinned, RefreshCw, ShieldCheck,
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { AdminShell, type AdminWorkspace } from "./admin-shell";
+import { ChainKphWorkspace, chainKphRootKey } from "./chain-kph-workspace";
 import { AdminOverview } from "./admin-overview";
 import { CatalogWorkspace } from "./catalog-workspace";
 import { MembershipWorkspace, membershipRootKey } from "./membership-workspace";
@@ -15,7 +16,7 @@ import { createLifecycleAdminGateway, type LifecycleAdminGateway, type Lifecycle
 type AppProps = { gateway?: LifecycleAdminGateway };
 function workspaceFromHash(): AdminWorkspace {
   const hash = window.location.hash.slice(1);
-  return hash === "identity" || hash === "catalog" || hash === "lifecycle" || hash === "memberships" ? hash : "overview";
+  return hash === "kph" || hash === "identity" || hash === "catalog" || hash === "lifecycle" || hash === "memberships" ? hash : "overview";
 }
 
 type ScheduleAction = "reschedule" | "cancel" | "execute";
@@ -55,11 +56,12 @@ export function App({ gateway: providedGateway }: AppProps) {
   const canLifecycle = hasChainAdmin || targetsQuery.isSuccess;
   const membershipStoresQuery = useQuery({ queryKey: [...membershipRootKey, "stores", sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listMembershipStores(signal), enabled: Boolean(sessionQuery.data), retry: false });
   const canMemberships = hasChainAdmin || membershipStoresQuery.isSuccess;
-  const activeWorkspace = workspace === "catalog" && !hasCatalog || workspace === "identity" && !hasChainAdmin || workspace === "lifecycle" && !canLifecycle || workspace === "memberships" && !canMemberships ? "overview" : workspace;
+  const activeWorkspace = workspace === "catalog" && !hasCatalog || (workspace === "identity" || workspace === "kph") && !hasChainAdmin || workspace === "lifecycle" && !canLifecycle || workspace === "memberships" && !canMemberships ? "overview" : workspace;
   const schedulesQuery = useQuery({ queryKey: [...queryKeys.schedules, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listSchedules(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "lifecycle", retry: false });
   const usersQuery = useQuery({ queryKey: [...queryKeys.users, sessionQuery.data?.user.id], queryFn: ({ signal }) => gateway.listUsers(signal), enabled: Boolean(sessionQuery.data) && activeWorkspace === "identity", retry: false });
   const clearSession = useCallback(() => {
     queryClient.setQueryData(queryKeys.session, null);
+    queryClient.removeQueries({ queryKey: chainKphRootKey });
     void queryClient.cancelQueries({ queryKey: membershipRootKey });
     queryClient.removeQueries({ queryKey: membershipRootKey });
     void queryClient.cancelQueries({ queryKey: queryKeys.targets });
@@ -78,6 +80,7 @@ export function App({ gateway: providedGateway }: AppProps) {
   useEffect(() => {
     if (expired) {
       queryClient.setQueryData(queryKeys.session, null);
+      queryClient.removeQueries({ queryKey: chainKphRootKey });
       void queryClient.cancelQueries({ queryKey: membershipRootKey });
       queryClient.removeQueries({ queryKey: membershipRootKey });
       queryClient.removeQueries({ queryKey: queryKeys.targets });
@@ -116,7 +119,7 @@ export function App({ gateway: providedGateway }: AppProps) {
     return <LoadFailure message="Không thể kiểm tra phiên Admin Web." onRetry={() => void sessionQuery.refetch()} />;
   }
 
-  const passwordDialog = <ChangePasswordDialog key={sessionQuery.data.user.id}
+  const passwordDialog = <ChangePasswordDialog key={`password-${sessionQuery.data.user.id}`}
     open={changePasswordOpen}
     onOpenChange={setChangePasswordOpen}
     onSubmit={(currentPassword, newPassword) => gateway.changePassword(currentPassword, newPassword)}
@@ -140,6 +143,9 @@ export function App({ gateway: providedGateway }: AppProps) {
       key={sessionQuery.data.user.id} gateway={gateway} actorId={sessionQuery.data.user.id}
       stores={membershipStoresQuery.data ?? []} loading={membershipStoresQuery.isPending}
       loadError={membershipStoresQuery.error} onRefreshStores={() => void membershipStoresQuery.refetch()} onError={handleError}
+    />}
+    {activeWorkspace === "kph" && <ChainKphWorkspace key={sessionQuery.data.user.id}
+      gateway={gateway} actorId={sessionQuery.data.user.id} onError={handleError}
     />}
     {activeWorkspace === "overview" && <AdminOverview />}
     {activeWorkspace === "catalog" && <CatalogWorkspace gateway={gateway} session={sessionQuery.data} onError={handleError} />}
