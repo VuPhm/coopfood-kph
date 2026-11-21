@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -126,12 +127,23 @@ class KphService {
             KphApprovalStatus approvalStatus, KphHistorySort sort, KphHistorySortDirection direction,
             int page, int pageSize, Authentication authentication) {
         accessPolicy.requireViewCreate(storeId, authentication);
+        validateDateRange(detectedFrom, detectedTo);
+        return repository.findPage(storeId, type, detectedFrom, detectedTo, approvalStatus, sort, direction,
+                page, pageSize);
+    }
+
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    KphPage listChain(UUID storeId, LocalDate detectedFrom, LocalDate detectedTo, KphApprovalStatus approvalStatus,
+            int page, int pageSize) {
+        validateDateRange(detectedFrom, detectedTo);
+        return repository.findChainPage(storeId, detectedFrom, detectedTo, approvalStatus, page, pageSize);
+    }
+
+    private void validateDateRange(LocalDate detectedFrom, LocalDate detectedTo) {
         if (detectedFrom != null && detectedTo != null && detectedFrom.isAfter(detectedTo)) {
             throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "DATE_RANGE_INVALID",
                     "detectedFrom must be on or before detectedTo.");
         }
-        return repository.findPage(storeId, type, detectedFrom, detectedTo, approvalStatus, sort, direction,
-                page, pageSize);
     }
 
     @Transactional

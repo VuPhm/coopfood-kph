@@ -103,13 +103,11 @@ class KphRepository {
     KphRecordPageResponse findPage(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
             KphApprovalStatus approvalStatus, KphHistorySort sort, KphHistorySortDirection direction,
             int page, int pageSize) {
-        SqlFragment filtered = filters(storeId, type, detectedFrom, detectedTo, approvalStatus);
-        long totalItems = database.fetchOne(
-                "SELECT count(*) AS total FROM kph_records r WHERE " + filtered.sql(),
-                filtered.params().toArray()).get("total", Long.class);
-        long totalPages = totalItems == 0 ? 0 : (totalItems + pageSize - 1) / pageSize;
+        SqlFragment store = new SqlFragment("r.store_id = ?", List.of(storeId));
+        SqlFragment filtered = filters(store, type, detectedFrom, detectedTo, approvalStatus);
+        KphPage records = fetchPage(filtered, orderBy(sort, direction), page, pageSize);
 
-        SqlFragment typeScope = filters(storeId, null, detectedFrom, detectedTo, null);
+        SqlFragment typeScope = filters(store, null, detectedFrom, detectedTo, null);
         Record totals = database.fetchOne("""
                 SELECT count(*) FILTER (WHERE r.type = 'TPCN') AS tpcn,
                        count(*) FILTER (WHERE r.type = 'TPTS') AS tpts
@@ -119,7 +117,32 @@ class KphRepository {
         var typeTotals = new KphRecordPageResponse.TypeTotals(
                 totals.get("tpcn", Long.class), totals.get("tpts", Long.class));
 
-        String orderBy = orderBy(sort, direction);
+        return new KphRecordPageResponse(records.items(), page, pageSize, records.totalItems(),
+                records.totalPages(), typeTotals);
+    }
+
+    KphPage findChainPage(UUID storeId, LocalDate detectedFrom, LocalDate detectedTo,
+            KphApprovalStatus approvalStatus, int page, int pageSize) {
+        String activeStores = """
+                r.store_id IN (
+                    SELECT s.id FROM stores s
+                    JOIN regions region ON region.id = s.region_id AND region.active
+                    WHERE s.active
+                )
+                """;
+        SqlFragment scope = storeId == null
+                ? new SqlFragment(activeStores, List.of())
+                : new SqlFragment(activeStores + " AND r.store_id = ?", List.of(storeId));
+        SqlFragment filtered = filters(scope, null, detectedFrom, detectedTo, approvalStatus);
+        return fetchPage(filtered, "r.created_at DESC, r.id DESC", page, pageSize);
+    }
+
+    private KphPage fetchPage(SqlFragment filtered, String orderBy, int page, int pageSize) {
+        long totalItems = database.fetchOne(
+                "SELECT count(*) AS total FROM kph_records r WHERE " + filtered.sql(),
+                filtered.params().toArray()).get("total", Long.class);
+        long totalPages = totalItems == 0 ? 0 : (totalItems + pageSize - 1) / pageSize;
+
         List<Object> pageParams = new ArrayList<>(filtered.params());
         pageParams.add(pageSize);
         pageParams.add((long) (page - 1) * pageSize);
@@ -140,14 +163,13 @@ class KphRepository {
                 ORDER BY
                 """ + orderBy + ", p.ordinal";
         List<KphRecordResponse> items = mapRows(database.fetch(sql, pageParams.toArray()));
-        return new KphRecordPageResponse(items, page, pageSize, totalItems, totalPages, typeTotals);
+        return new KphPage(items, page, pageSize, totalItems, totalPages);
     }
 
-    private SqlFragment filters(UUID storeId, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
+    private SqlFragment filters(SqlFragment scope, KphType type, LocalDate detectedFrom, LocalDate detectedTo,
             KphApprovalStatus approvalStatus) {
-        StringBuilder sql = new StringBuilder("r.store_id = ?");
-        List<Object> params = new ArrayList<>();
-        params.add(storeId);
+        StringBuilder sql = new StringBuilder(scope.sql());
+        List<Object> params = new ArrayList<>(scope.params());
         if (type != null) {
             sql.append(" AND r.type = ?");
             params.add(type.name());

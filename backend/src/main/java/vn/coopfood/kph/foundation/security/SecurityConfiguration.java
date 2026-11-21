@@ -94,6 +94,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/v1/admin/stores/*/membership-user-lookup",
                                 "/api/v1/admin/stores/*/memberships/*/revoke").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/admin/stores/*/memberships/*").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/kph").hasRole("CHAIN_ADMIN")
                         .requestMatchers("/api/v1/admin/users/**").authenticated()
                         .requestMatchers("/api/v1/admin/lifecycle/**").authenticated()
                         .requestMatchers("/api/v1/admin/catalog/imports/**").authenticated()

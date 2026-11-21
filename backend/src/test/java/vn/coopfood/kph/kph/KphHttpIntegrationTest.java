@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.awt.image.BufferedImage;
@@ -710,6 +711,47 @@ class KphHttpIntegrationTest {
         assertThat(metadata.path("recordCount").asInt()).isEqualTo(2);
         assertThat(metadata.path("recordIds").get(0).asText()).isEqualTo(second.toString());
         assertThat(metadata.path("recordIds").get(1).asText()).isEqualTo(first.toString());
+    }
+
+    @Test
+    void chainHistoryFiltersAndPagesActiveStoresAndRechecksRole() throws Exception {
+        String url = "/api/v1/admin/kph";
+        database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
+        Login chain = login();
+        UUID first = createReviewFixture(chain, STORE_ID, "chain-history-first");
+        UUID second = createReviewFixture(chain, OTHER_STORE_ID, "chain-history-second");
+        database.execute("UPDATE kph_records SET created_at = ? WHERE id = ?", Timestamp.from(NOW.minusSeconds(1)), first);
+        approveReviewFixture(chain, OTHER_STORE_ID, second);
+
+        mockMvc.perform(get(url).session(chain.session()).param("pageSize", "1"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2)).andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(second.toString()))
+                .andExpect(jsonPath("$.items[0].store.id").value(OTHER_STORE_ID.toString()));
+        mockMvc.perform(get(url).session(chain.session()).param("pageSize", "1").param("page", "2"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].id").value(first.toString()));
+        mockMvc.perform(get(url).session(chain.session()).param("storeId", STORE_ID.toString())
+                        .param("approvalStatus", "APPROVED"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(0));
+        mockMvc.perform(get(url).session(chain.session()).param("detectedTo", "2026-09-05"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(0));
+        mockMvc.perform(get(url).session(chain.session()).param("detectedFrom", "2026-09-06")
+                        .param("detectedTo", "2026-09-06").param("approvalStatus", "PENDING"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(first.toString()));
+
+        database.execute("UPDATE stores SET active = FALSE WHERE id = ?", OTHER_STORE_ID);
+        database.execute("UPDATE regions SET active = FALSE WHERE id = ?", OTHER_REGION_ID);
+        mockMvc.perform(get(url).session(chain.session()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(first.toString()));
+        database.execute("""
+                INSERT INTO user_region_assignments (user_id, region_id, active, created_at, updated_at)
+                VALUES (?, ?, TRUE, ?, ?)
+                """, USER_ID, REGION_ID, Timestamp.from(NOW), Timestamp.from(NOW));
+        database.execute("DELETE FROM user_roles WHERE user_id = ?", USER_ID);
+        mockMvc.perform(get(url).session(chain.session())).andExpect(status().isForbidden());
+        mockMvc.perform(get(url)).andExpect(status().isUnauthorized());
     }
 
     private UUID createReviewFixture(Login actor, UUID store, String key) throws Exception {

@@ -201,10 +201,10 @@ export interface paths {
         get?: never;
         /**
          * Set the approval decision for one KPH record
-         * @description Only a STORE_MANAGER with an active membership in this exact store may
-         *     review a record. Global CHAIN_ADMIN does not bypass store membership or
-         *     the STORE_MANAGER role. Every state change is appended to review history
-         *     and the audit trail; repeating the same decision is idempotent.
+         * @description Requires STORE_MANAGER membership in this store, REGION_MANAGER assignment
+         *     to its region, or global CHAIN_ADMIN. The store, region and applicable
+         *     membership or assignment must be active. Each changed decision is
+         *     appended to review history and the audit trail. Repeated decisions are idempotent.
          */
         put: operations["reviewKphRecord"];
         post?: never;
@@ -250,6 +250,26 @@ export interface paths {
          * @description Original evidence remains private and is not exposed by this endpoint.
          */
         get: operations["getStampedKphPhoto"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/kph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List KPH records across active stores for chain administrators
+         * @description Requires an active CHAIN_ADMIN. Includes only active stores in active regions. Results are ordered by createdAt descending, then id descending. An unmatched store filter returns an empty page.
+         */
+        get: operations["listChainKphRecords"];
         put?: never;
         post?: never;
         delete?: never;
@@ -914,6 +934,15 @@ export interface components {
             totalPages: number;
             typeTotals: components["schemas"]["KphTypeTotals"];
         };
+        ChainKphRecordPage: {
+            items: components["schemas"]["KphRecord"][];
+            page: number;
+            pageSize: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int64 */
+            totalPages: number;
+        };
         KphTypeTotals: {
             /** Format: int64 */
             tpcn: number;
@@ -1506,6 +1535,40 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    listChainKphRecords: {
+        parameters: {
+            query?: {
+                storeId?: string;
+                /** @description Inclusive lower bound of the KPH detected date. */
+                detectedFrom?: string;
+                /** @description Inclusive upper bound of the KPH detected date. Must not precede detectedFrom. */
+                detectedTo?: string;
+                approvalStatus?: components["schemas"]["KphApprovalStatus"];
+                /** @description One-based page number. */
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Chain history and total count matching all active filters before pagination. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChainKphRecordPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["UnprocessableEntity"];
         };
     };
     listAdminUsers: {
