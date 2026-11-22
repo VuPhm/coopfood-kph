@@ -25,7 +25,8 @@ async function layout(page,name) {
   await login(page);
   assert.equal(await page.getByRole('button',{name:/^002 ·/}).count(),0);
   assert.equal((await c.request.get(`${base}/api/v1/stores/${outside}/kph`)).status(),403);
-  await page.getByRole('button',{name:'Tra mã hàng',exact:true}).click();
+  await page.getByRole('button',{name:'Quản lý DATE',exact:true}).click();
+  await page.getByRole('button',{name:'Quét / tra mã hàng',exact:true}).click();
   await page.getByLabel('Barcode',{exact:true}).fill('0890123456789');
   await page.getByRole('button',{name:'Tra cứu',exact:true}).click();
   await expect(page.getByRole('status').filter({hasText:'Đã tìm thấy sản phẩm.'})).toBeVisible();

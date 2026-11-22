@@ -109,7 +109,11 @@ describe("Store online session", () => {
     const api = gateway();
     vi.mocked(api.lookupBarcode).mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" });
     render(<StoreOnlineApp gateway={api} />); await selectA();
-    fireEvent.click(screen.getByRole("button", { name: "Tra mã hàng" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quản lý DATE" }));
+    expect(await screen.findByRole("heading", { name: "Danh sách lô DATE" })).toBeVisible();
+    expect(screen.getByText("Chưa có lô trong phiên này.")).toBeVisible();
+    expect(screen.queryByRole("textbox", { name: "Barcode" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Quét / tra mã hàng" }));
     fireEvent.change(await screen.findByLabelText("Barcode"), { target: { value: "000123" } });
     fireEvent.click(screen.getByRole("button", { name: "Tra cứu" }));
     fireEvent.click(await screen.findByRole("button", { name: "Nhập tay" }));

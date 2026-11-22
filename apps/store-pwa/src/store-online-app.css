@@ -13,8 +13,10 @@
 .store-online-content h1 { font-size: 1.5rem; }
 .store-online-content ul { list-style: disc; padding-inline-start: 24px; }
 
-/* Keep the mounted scope out of interaction while retaining draft and scroll. */
-.store-online-verifying { position: fixed; inset: 0; z-index: 100; max-width: none; background: var(--cf-color-canvas, #edf4ef); }
+.store-scope-placeholder { position: absolute; inset: 0 0 auto; pointer-events: none; }
+.store-frame-canvas:has(.store-scope-placeholder) { position: relative; }
+.store-scope-progress { position: fixed; z-index: 100; top: 5rem; left: 50%; transform: translateX(-50%); width: max-content; max-width: 90vw; padding: .4rem .8rem; border-radius: var(--fresh-radius-control); background: var(--cf-color-canvas, #edf4ef); color: var(--fresh-ink); font-size: .875rem; animation: store-scope-message .18s step-end; }
+@keyframes store-scope-message { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 899px) {
   .store-online-content { padding-bottom: calc(24px + var(--store-mobile-toolbar-height, 84px)); }
 }
@@ -33,3 +35,7 @@
   border: 1px solid var(--fresh-line);
   border-radius: var(--fresh-radius-control);
 }
+
+.store-online-content .online-date-lots { list-style: none; padding: 0; margin: 0; }
+.online-date-lots li { display: grid; gap: .25rem; padding-block: .75rem; border-top: 1px solid var(--fresh-line); overflow-wrap: anywhere; }
+.online-date-lots li span { color: var(--fresh-ink-muted); font-size: .875rem; }
