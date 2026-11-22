@@ -39,7 +39,7 @@
       "photos": [
         {
           "ordinal": 1,
-          "stampedContentPath": "/api/v1/stores/20000000-0000-4000-8000-000000000002/kph/40000000-0000-4000-8000-000000000002/photos/1",
+          "stampedContentPath": "/api/v1/admin/kph/stores/20000000-0000-4000-8000-000000000002/records/40000000-0000-4000-8000-000000000002/photos/1",
           "capturedAt": "2026-01-16T08:30:00+07:00"
         }
       ],
@@ -81,7 +81,7 @@
       "photos": [
         {
           "ordinal": 1,
-          "stampedContentPath": "/api/v1/stores/20000000-0000-4000-8000-000000000001/kph/40000000-0000-4000-8000-000000000001/photos/1",
+          "stampedContentPath": "/api/v1/admin/kph/stores/20000000-0000-4000-8000-000000000001/records/40000000-0000-4000-8000-000000000001/photos/1",
           "capturedAt": "2026-01-16T08:30:00+07:00"
         }
       ],

@@ -27,6 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 import vn.coopfood.kph.catalog.CatalogService;
 import vn.coopfood.kph.foundation.time.TimeConfiguration;
 import vn.coopfood.kph.foundation.web.ApiProblemException;
+import vn.coopfood.kph.identity.ManagementStoreScope;
 import vn.coopfood.kph.store.KphStoreAccessPolicy;
 import vn.coopfood.kph.store.StoreRef;
 
@@ -36,15 +37,17 @@ class KphService {
     private final KphRepository repository;
     private final CatalogService catalog;
     private final KphStoreAccessPolicy accessPolicy;
+    private final ManagementStoreScope management;
     private final LocalPrivateMediaStorage media;
     private final Clock clock;
     private final ObjectMapper objectMapper;
 
     KphService(KphRepository repository, CatalogService catalog, KphStoreAccessPolicy accessPolicy,
-            LocalPrivateMediaStorage media, Clock clock, ObjectMapper objectMapper) {
+            ManagementStoreScope management, LocalPrivateMediaStorage media, Clock clock, ObjectMapper objectMapper) {
         this.repository = repository;
         this.catalog = catalog;
         this.accessPolicy = accessPolicy;
+        this.management = management;
         this.media = media;
         this.clock = clock;
         this.objectMapper = objectMapper;
@@ -134,9 +137,10 @@ class KphService {
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     KphPage listChain(UUID storeId, LocalDate detectedFrom, LocalDate detectedTo, KphApprovalStatus approvalStatus,
-            int page, int pageSize) {
+            int page, int pageSize, Authentication authentication) {
+        UUID actorId = management.requireActor(authentication).userId();
         validateDateRange(detectedFrom, detectedTo);
-        return repository.findChainPage(storeId, detectedFrom, detectedTo, approvalStatus, page, pageSize);
+        return repository.findChainPage(actorId, storeId, detectedFrom, detectedTo, approvalStatus, page, pageSize);
     }
 
     private void validateDateRange(LocalDate detectedFrom, LocalDate detectedTo) {
@@ -149,7 +153,7 @@ class KphService {
     @Transactional
     KphRecordResponse review(UUID storeId, UUID recordId, KphApprovalRequest request,
             Authentication authentication) {
-        StoreRef store = accessPolicy.requireReviewExport(storeId, authentication);
+        StoreRef store = accessPolicy.requireReview(storeId, authentication);
         var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
         var current = repository.lockReviewState(storeId, recordId)
                 .orElseThrow(() -> problem(HttpStatus.NOT_FOUND, "KPH_RECORD_NOT_FOUND",
@@ -172,7 +176,7 @@ class KphService {
 
     @Transactional
     KphExportResponse prepareExport(UUID storeId, KphExportRequest request, Authentication authentication) {
-        StoreRef store = accessPolicy.requireReviewExport(storeId, authentication);
+        StoreRef store = accessPolicy.requireExport(storeId, authentication);
         var principal = (vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal();
         if (new HashSet<>(request.recordIds()).size() != request.recordIds().size()) {
             throw problem(HttpStatus.UNPROCESSABLE_ENTITY, "EXPORT_SELECTION_DUPLICATE",
@@ -208,6 +212,19 @@ class KphService {
     @Transactional(readOnly = true)
     byte[] stampedPhoto(UUID storeId, UUID recordId, int ordinal, Authentication authentication) {
         accessPolicy.requireViewCreate(storeId, authentication);
+        return readStampedPhoto(storeId, recordId, ordinal);
+    }
+
+    @Transactional(readOnly = true)
+    byte[] adminStampedPhoto(UUID storeId, UUID recordId, int ordinal, Authentication authentication) {
+        UUID actorId = management.requireActor(authentication).userId();
+        if (management.findStore(actorId, storeId).isEmpty()) {
+            throw problem(HttpStatus.FORBIDDEN, "STORE_ACCESS_DENIED", "The store is outside active management scope.");
+        }
+        return readStampedPhoto(storeId, recordId, ordinal);
+    }
+
+    private byte[] readStampedPhoto(UUID storeId, UUID recordId, int ordinal) {
         if (ordinal < 1 || ordinal > 3) {
             throw problem(HttpStatus.NOT_FOUND, "PHOTO_NOT_FOUND", "The evidence photo does not exist.");
         }

@@ -97,10 +97,10 @@ class KphStoreDiscoveryHttpIntegrationTest {
         HttpClient client = login();
         JsonNode items = access(client);
         assertThat(items.size()).isEqualTo(1);
-        assertItem(items.get(0), FIRST, "0001", false);
+        assertItem(items.get(0), FIRST, "0001");
         assertThat(get(client, "/api/v1/stores/" + OTHER + "/kph").statusCode()).isEqualTo(403);
         database.execute("UPDATE store_memberships SET role = 'STORE_MANAGER' WHERE user_id = ?", USER);
-        assertItem(access(client).get(0), FIRST, "0001", true);
+        assertItem(access(client).get(0), FIRST, "0001", "REVIEW", "EXPORT");
         database.execute("UPDATE store_memberships SET active = FALSE WHERE user_id = ?", USER);
         assertThat(access(client).size()).isZero();
         assertThat(get(client, "/api/v1/stores/" + FIRST + "/kph").statusCode()).isEqualTo(403);
@@ -112,8 +112,8 @@ class KphStoreDiscoveryHttpIntegrationTest {
         HttpClient client = login();
         JsonNode items = access(client);
         assertThat(items.size()).isEqualTo(2);
-        assertItem(items.get(0), FIRST, "0001", true);
-        assertItem(items.get(1), SECOND, "0002", true);
+        assertItem(items.get(0), FIRST, "0001", "EXPORT");
+        assertItem(items.get(1), SECOND, "0002", "EXPORT");
         assertThat(get(client, "/api/v1/stores/" + OTHER + "/kph").statusCode()).isEqualTo(403);
         assertThat(mapper.readTree(get(client, "/api/v1/stores").body()).size()).isZero();
         database.execute("UPDATE user_region_assignments SET active = FALSE WHERE user_id = ?", USER);
@@ -127,9 +127,9 @@ class KphStoreDiscoveryHttpIntegrationTest {
         HttpClient client = login();
         JsonNode items = access(client);
         assertThat(items.size()).isEqualTo(3);
-        assertItem(items.get(0), FIRST, "0001", true);
-        assertItem(items.get(1), SECOND, "0002", true);
-        assertItem(items.get(2), OTHER, "0010", true);
+        assertItem(items.get(0), FIRST, "0001", "EXPORT");
+        assertItem(items.get(1), SECOND, "0002", "EXPORT");
+        assertItem(items.get(2), OTHER, "0010", "EXPORT");
         assertThat(mapper.readTree(get(client, "/api/v1/stores").body()).size()).isZero();
         assertThat(mapper.readTree(get(client, "/api/v1/auth/session").body())
                 .path("user").path("stores").size()).isZero();
@@ -145,14 +145,14 @@ class KphStoreDiscoveryHttpIntegrationTest {
         role("CHAIN_ADMIN");
         HttpClient client = login();
         assertThat(access(client).size()).isEqualTo(3);
-        assertItem(access(client).get(0), FIRST, "0001", true);
+        assertItem(access(client).get(0), FIRST, "0001", "EXPORT");
         database.execute("DELETE FROM user_roles WHERE user_id = ?", USER);
         database.execute("UPDATE user_region_assignments SET active = FALSE WHERE user_id = ? AND region_id = ?",
                 USER, REGION);
         JsonNode remaining = access(client);
         assertThat(remaining.size()).isEqualTo(2);
-        assertItem(remaining.get(0), FIRST, "0001", false);
-        assertItem(remaining.get(1), OTHER, "0010", true);
+        assertItem(remaining.get(0), FIRST, "0001");
+        assertItem(remaining.get(1), OTHER, "0010", "EXPORT");
     }
 
     @Test
@@ -166,7 +166,7 @@ class KphStoreDiscoveryHttpIntegrationTest {
         database.execute("UPDATE regions SET active = FALSE WHERE id = ?", REGION);
         JsonNode items = access(client);
         assertThat(items.size()).isEqualTo(1);
-        assertItem(items.get(0), OTHER, "0010", true);
+        assertItem(items.get(0), OTHER, "0010", "EXPORT");
         assertThat(get(client, "/api/v1/stores/" + FIRST + "/kph").statusCode()).isEqualTo(403);
     }
 
@@ -178,7 +178,7 @@ class KphStoreDiscoveryHttpIntegrationTest {
         database.execute("UPDATE stores SET region_id = ? WHERE id = ?", OTHER_REGION, FIRST);
         JsonNode items = access(client);
         assertThat(items.size()).isEqualTo(1);
-        assertItem(items.get(0), SECOND, "0002", true);
+        assertItem(items.get(0), SECOND, "0002", "EXPORT");
         assertThat(get(client, "/api/v1/stores/" + FIRST + "/kph").statusCode()).isEqualTo(403);
     }
 
@@ -193,16 +193,16 @@ class KphStoreDiscoveryHttpIntegrationTest {
         assertThat(get(second, "/api/v1/kph/stores").statusCode()).isEqualTo(401);
     }
 
-    private void assertItem(JsonNode item, UUID id, String code, boolean manager) {
+    private void assertItem(JsonNode item, UUID id, String code, String... extraCapabilities) {
         assertThat(item.size()).isEqualTo(4);
         assertThat(item.path("id").asText()).isEqualTo(id.toString());
         assertThat(item.path("code").asText()).isEqualTo(code);
         assertThat(item.path("name").asText()).isEqualTo("Synthetic store " + code);
         var capabilities = new java.util.ArrayList<String>();
         item.path("capabilities").forEach(value -> capabilities.add(value.asText()));
-        assertThat(capabilities).containsExactlyElementsOf(manager
-                ? java.util.List.of("VIEW", "CREATE", "REVIEW", "EXPORT")
-                : java.util.List.of("VIEW", "CREATE"));
+        var expected = new java.util.ArrayList<>(java.util.List.of("VIEW", "CREATE"));
+        expected.addAll(java.util.List.of(extraCapabilities));
+        assertThat(capabilities).containsExactlyElementsOf(expected);
     }
 
     private JsonNode access(HttpClient client) throws Exception {

@@ -520,7 +520,7 @@ class KphHttpIntegrationTest {
     }
 
     @Test
-    void scopedManagersReviewAndExportWithNextRequestEffectWhileEmployeeCannot() throws Exception {
+    void reviewRequiresExactStoreManagerWhileExportRetainsRegionalAndChainScope() throws Exception {
         Login employee = login();
         MvcResult created = mockMvc.perform(multipart("/api/v1/stores/{storeId}/kph", STORE_ID)
                         .file(payload(null, "Review product"))
@@ -541,6 +541,7 @@ class KphHttpIntegrationTest {
                         .session(employee.session()).header("X-CSRF-TOKEN", employee.csrfToken()))
                 .andExpect(status().isForbidden());
 
+        database.execute("UPDATE store_memberships SET active = FALSE WHERE user_id = ?", USER_ID);
         Timestamp now = Timestamp.from(NOW);
         database.execute("""
                 INSERT INTO user_region_assignments (user_id, region_id, active, created_at, updated_at)
@@ -567,6 +568,11 @@ class KphHttpIntegrationTest {
                 .andExpect(status().isConflict()).andReturn();
         assertThat(objectMapper.readTree(pendingExport.getResponse().getContentAsByteArray()).path("code").asText())
                 .isEqualTo("EXPORT_RECORD_NOT_APPROVED");
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
+                        .contentType(MediaType.APPLICATION_JSON).content(approvalBody)
+                        .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
+                .andExpect(status().isForbidden());
+        database.execute("UPDATE store_memberships SET active = TRUE, role = 'STORE_MANAGER' WHERE user_id = ? AND store_id = ?", USER_ID, STORE_ID);
         MvcResult reviewed = mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
                         .contentType(MediaType.APPLICATION_JSON).content(approvalBody)
                         .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
@@ -587,6 +593,7 @@ class KphHttpIntegrationTest {
                 .isEqualTo(1);
         assertThat(database.fetch("SELECT id FROM audit_events WHERE action = 'KPH_REVIEWED'")).hasSize(1);
 
+        database.execute("UPDATE store_memberships SET active = FALSE WHERE user_id = ? AND store_id = ?", USER_ID, STORE_ID);
         MvcResult exported = mockMvc.perform(post("/api/v1/stores/{storeId}/kph/exports", STORE_ID)
                         .contentType(MediaType.APPLICATION_JSON).content(exportBody)
                         .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
@@ -623,7 +630,7 @@ class KphHttpIntegrationTest {
         mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, recordId)
                         .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"REJECTED\"}")
                         .session(manager.session()).header("X-CSRF-TOKEN", manager.csrfToken()))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
         mockMvc.perform(get("/api/v1/stores/{storeId}/kph", OTHER_STORE_ID).session(manager.session()))
                 .andExpect(status().isOk());
     }
@@ -661,6 +668,8 @@ class KphHttpIntegrationTest {
     void exportRejectsMixedScopeTypeOrIneligibleSelectionAtomicallyAndAuditsExactOrder() throws Exception {
         database.execute("INSERT INTO user_roles (user_id, role) VALUES (?, 'CHAIN_ADMIN')", USER_ID);
         Login chain = login();
+        database.execute("UPDATE store_memberships SET role = 'STORE_MANAGER' WHERE user_id = ? AND store_id = ?", USER_ID, STORE_ID);
+        grantOtherStoreManager();
         UUID first = createReviewFixture(chain, STORE_ID, "export-selection-first");
         UUID second = createReviewFixture(chain, STORE_ID, "export-selection-second");
         UUID foreign = createReviewFixture(chain, OTHER_STORE_ID, "export-selection-foreign");
@@ -721,6 +730,11 @@ class KphHttpIntegrationTest {
         UUID first = createReviewFixture(chain, STORE_ID, "chain-history-first");
         UUID second = createReviewFixture(chain, OTHER_STORE_ID, "chain-history-second");
         database.execute("UPDATE kph_records SET created_at = ? WHERE id = ?", Timestamp.from(NOW.minusSeconds(1)), first);
+        grantOtherStoreManager();
+        mockMvc.perform(put("/api/v1/stores/{storeId}/kph/{recordId}/approval", STORE_ID, first)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"APPROVED\"}")
+                        .session(chain.session()).header("X-CSRF-TOKEN", chain.csrfToken()))
+                .andExpect(status().isForbidden());
         approveReviewFixture(chain, OTHER_STORE_ID, second);
 
         mockMvc.perform(get(url).session(chain.session()).param("pageSize", "1"))
@@ -740,18 +754,46 @@ class KphHttpIntegrationTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(1))
                 .andExpect(jsonPath("$.items[0].id").value(first.toString()));
 
-        database.execute("UPDATE stores SET active = FALSE WHERE id = ?", OTHER_STORE_ID);
-        database.execute("UPDATE regions SET active = FALSE WHERE id = ?", OTHER_REGION_ID);
-        mockMvc.perform(get(url).session(chain.session()))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(1))
-                .andExpect(jsonPath("$.items[0].id").value(first.toString()));
+        String firstPhoto = "/api/v1/admin/kph/stores/" + STORE_ID + "/records/" + first + "/photos/1";
+        String secondPhoto = "/api/v1/admin/kph/stores/" + OTHER_STORE_ID + "/records/" + second + "/photos/1";
+        mockMvc.perform(get(url).session(chain.session()).param("storeId", OTHER_STORE_ID.toString()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].photos[0].stampedContentPath").value(secondPhoto));
+        mockMvc.perform(get(secondPhoto).session(chain.session())).andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", containsString("no-store")));
+
         database.execute("""
                 INSERT INTO user_region_assignments (user_id, region_id, active, created_at, updated_at)
                 VALUES (?, ?, TRUE, ?, ?)
                 """, USER_ID, REGION_ID, Timestamp.from(NOW), Timestamp.from(NOW));
         database.execute("DELETE FROM user_roles WHERE user_id = ?", USER_ID);
+        // Region A and an independent store manager membership in B: Admin shows only A.
+        mockMvc.perform(get(url).session(chain.session()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1)).andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(first.toString()))
+                .andExpect(jsonPath("$.items[0].photos[0].stampedContentPath").value(firstPhoto));
+        mockMvc.perform(get(url).session(chain.session()).param("storeId", OTHER_STORE_ID.toString()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(0))
+                .andExpect(jsonPath("$.items.length()").value(0));
+        mockMvc.perform(get("/api/v1/admin/membership-stores").session(chain.session()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(STORE_ID.toString()));
+        mockMvc.perform(get(firstPhoto).session(chain.session())).andExpect(status().isOk());
+        mockMvc.perform(get(secondPhoto).session(chain.session())).andExpect(status().isForbidden());
+        database.execute("UPDATE stores SET active = FALSE WHERE id = ?", STORE_ID);
+        mockMvc.perform(get(url).session(chain.session()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalItems").value(0));
+        database.execute("UPDATE user_region_assignments SET active = FALSE WHERE user_id = ?", USER_ID);
         mockMvc.perform(get(url).session(chain.session())).andExpect(status().isForbidden());
+        mockMvc.perform(get(firstPhoto).session(chain.session())).andExpect(status().isForbidden());
         mockMvc.perform(get(url)).andExpect(status().isUnauthorized());
+    }
+
+    private void grantOtherStoreManager() {
+        database.execute("""
+                INSERT INTO store_memberships (user_id, store_id, role, active, created_at, updated_at)
+                VALUES (?, ?, 'STORE_MANAGER', TRUE, ?, ?)
+                """, USER_ID, OTHER_STORE_ID, Timestamp.from(NOW), Timestamp.from(NOW));
     }
 
     private UUID createReviewFixture(Login actor, UUID store, String key) throws Exception {

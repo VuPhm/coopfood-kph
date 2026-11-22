@@ -2,7 +2,7 @@
   "id": "P01-PROVISIONING-POLICY-01",
   "provenance": "synthetic",
   "approvalStatus": "accepted",
-  "policyVersion": 2,
+  "policyVersion": 3,
   "conventions": {
     "listedGrantsAreActive": true,
     "storeRegionSource": "SERVER_AUTHORITY"
@@ -34,14 +34,14 @@
       "action": "KPH_APPROVE",
       "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
       "context": { "store": "STORE-001" },
-      "expected": { "decision": "ALLOW", "reason": "CHAIN_WIDE_ADMIN", "effects": ["AUDIT"] }
+      "expected": { "decision": "DENY", "reason": "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED", "effects": [] }
     },
     {
       "caseId": "ID-P01-005",
       "action": "KPH_APPROVE",
       "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
       "context": { "store": "STORE-001", "storeRegion": "REGION-SOUTH" },
-      "expected": { "decision": "ALLOW", "reason": "REGION_SCOPED_MANAGER", "effects": ["AUDIT"] }
+      "expected": { "decision": "DENY", "reason": "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED", "effects": [] }
     },
     {
       "caseId": "ID-P01-006",
@@ -188,7 +188,7 @@
       "action": "KPH_APPROVE",
       "actor": { "globalRoles": [], "regionAssignments": ["REGION-SOUTH"], "memberships": [] },
       "context": { "store": "STORE-901", "storeRegion": "REGION-NORTH" },
-      "expected": { "decision": "DENY", "reason": "ACTIVE_REGION_ASSIGNMENT_REQUIRED", "effects": [] }
+      "expected": { "decision": "DENY", "reason": "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED", "effects": [] }
     },
     {
       "caseId": "ID-P01-027",
@@ -259,6 +259,13 @@
       "actor": { "globalRoles": ["CHAIN_ADMIN"], "memberships": [] },
       "context": { "store": "STORE-901", "storeRegion": "REGION-NORTH" },
       "expected": { "decision": "ALLOW", "reason": "CHAIN_WIDE_ADMIN", "effects": ["AUDIT"] }
+    },
+    {
+      "caseId": "ID-P01-037",
+      "action": "KPH_APPROVE",
+      "actor": { "globalRoles": [], "memberships": [{ "store": "STORE-001", "role": "STORE_MANAGER" }] },
+      "context": { "store": "STORE-001", "storeRegion": "REGION-SOUTH" },
+      "expected": { "decision": "ALLOW", "reason": "STORE_SCOPED_MANAGER", "effects": ["AUDIT"] }
     }
   ]
 }

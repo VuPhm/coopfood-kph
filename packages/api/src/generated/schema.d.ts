@@ -123,8 +123,9 @@ export interface paths {
          * @description Complete unpaginated list of active stores in active regions, using the
          *     union of active membership, active regional assignment and CHAIN_ADMIN.
          *     Each store occurs once; ordered by code (PostgreSQL C collation), then id.
-         *     EMPLOYEE has VIEW/CREATE; STORE_MANAGER, regional and chain scopes add
-         *     REVIEW/EXPORT. Codes remain strings. No synthetic roles or memberships.
+         *     REVIEW requires an active STORE_MANAGER membership in this store.
+         *     EXPORT is available to that manager, the assigned region manager or a
+         *     chain admin. Codes remain strings. No synthetic roles or memberships.
          *     Recomputed every request, including permission downgrades and revocation.
          *     Capabilities describe navigation; every business request rechecks scope.
          *     No DATE/report/notification, catalog administration or Admin rights are
@@ -201,9 +202,9 @@ export interface paths {
         get?: never;
         /**
          * Set the approval decision for one KPH record
-         * @description Requires STORE_MANAGER membership in this store, REGION_MANAGER assignment
-         *     to its region, or global CHAIN_ADMIN. The store, region and applicable
-         *     membership or assignment must be active. Each changed decision is
+         * @description Requires an active STORE_MANAGER membership in the record's own active
+         *     store within an active region. Regional and chain oversight alone
+         *     grants no review authority. Each changed decision is
          *     appended to review history and the audit trail. Repeated decisions are idempotent.
          */
         put: operations["reviewKphRecord"];
@@ -225,7 +226,8 @@ export interface paths {
         put?: never;
         /**
          * Authorize and snapshot one online KPH Excel export
-         * @description Only a STORE_MANAGER with active membership may export. All requested
+         * @description Requires active STORE_MANAGER membership in the store, an active regional
+         *     assignment covering it, or CHAIN_ADMIN. The store and region must be active. All requested
          *     records must belong to this store, share the requested type, remain
          *     SUBMITTED and already be APPROVED. The response is the authoritative
          *     ordered snapshot used by the Store PWA to build the workbook; the backend
@@ -266,10 +268,37 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List KPH records across active stores for chain administrators
-         * @description Requires an active CHAIN_ADMIN. Includes only active stores in active regions. Results are ordered by createdAt descending, then id descending. An unmatched store filter returns an empty page.
+         * List KPH records for regional and chain oversight
+         * @description A chain admin sees active stores in active regions. A regional manager sees
+         *     only active stores in the active regions assigned to them. Additional store
+         *     memberships do not expand the scope. Filtering and paging apply after this
+         *     scope. An out-of-scope store filter returns an empty page. Results are
+         *     ordered by createdAt descending, then id descending. Photo paths returned
+         *     by this operation recheck the same oversight scope when accessed.
          */
         get: operations["listChainKphRecords"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/kph/stores/{storeId}/records/{recordId}/photos/{ordinal}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read a private stamped KPH photo within oversight scope
+         * @description Rechecks the chain or assigned regional scope for this active store.
+         *     The record must belong to that store. A store membership alone grants
+         *     no access through this Admin endpoint.
+         */
+        get: operations["getAdminStampedKphPhoto"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1556,7 +1585,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Chain history and total count matching all active filters before pagination. */
+            /** @description Scoped history and total count matching all active filters before pagination. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1569,6 +1598,35 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             422: components["responses"]["UnprocessableEntity"];
+        };
+    };
+    getAdminStampedKphPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                recordId: string;
+                ordinal: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private stamped JPEG with no-store cache policy. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     listAdminUsers: {

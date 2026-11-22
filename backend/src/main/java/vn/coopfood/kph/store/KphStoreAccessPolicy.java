@@ -27,9 +27,17 @@ public class KphStoreAccessPolicy {
         return storeRef(access);
     }
 
-    public StoreRef requireReviewExport(UUID storeId, Authentication authentication) {
+    public StoreRef requireReview(UUID storeId, Authentication authentication) {
         StoreAccessRepository.AccessSnapshot access = resolver.requireActiveStore(storeId, authentication);
-        if (!access.canReviewExport()) {
+        if (!access.canReview()) {
+            throw forbidden("STORE_MANAGER_REQUIRED", "Active store manager membership in this store is required for review.");
+        }
+        return storeRef(access);
+    }
+
+    public StoreRef requireExport(UUID storeId, Authentication authentication) {
+        StoreAccessRepository.AccessSnapshot access = resolver.requireActiveStore(storeId, authentication);
+        if (!access.canExport()) {
             throw forbidden(
                     "STORE_MANAGER_REQUIRED",
                     "Active KPH manager scope for this store, its region or the chain is required.");

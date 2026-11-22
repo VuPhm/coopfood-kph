@@ -1,5 +1,6 @@
 package vn.coopfood.kph.store;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,12 +31,12 @@ class StoreAccessResolver {
 
     List<KphStoreAccess> listActiveAccess(Authentication authentication) {
         return repository.findAllActiveAccess(requirePrincipal(authentication).userId()).stream()
-                .map(access -> new KphStoreAccess(
-                        access.storeId(), access.storeCode(), access.storeName(),
-                        access.canReviewExport()
-                                ? List.of(KphStoreAccess.Capability.VIEW, KphStoreAccess.Capability.CREATE,
-                                        KphStoreAccess.Capability.REVIEW, KphStoreAccess.Capability.EXPORT)
-                                : List.of(KphStoreAccess.Capability.VIEW, KphStoreAccess.Capability.CREATE)))
+                .map(access -> {
+                    var capabilities = new ArrayList<>(List.of(KphStoreAccess.Capability.VIEW, KphStoreAccess.Capability.CREATE));
+                    if (access.canReview()) capabilities.add(KphStoreAccess.Capability.REVIEW);
+                    if (access.canExport()) capabilities.add(KphStoreAccess.Capability.EXPORT);
+                    return new KphStoreAccess(access.storeId(), access.storeCode(), access.storeName(), List.copyOf(capabilities));
+                })
                 .toList();
     }
 

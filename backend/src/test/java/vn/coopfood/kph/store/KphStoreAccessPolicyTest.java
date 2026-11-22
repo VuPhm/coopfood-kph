@@ -53,16 +53,16 @@ class KphStoreAccessPolicyTest {
     }
 
     @Test
-    void reviewAndExportAcceptOnlyStoreRegionOrChainManagerScope() {
+    void exportAcceptsStoreRegionOrChainManagerScope() {
         repository.answers.add(Optional.of(access(StoreRole.STORE_MANAGER, false, false)));
         repository.answers.add(Optional.of(access(null, true, false)));
         repository.answers.add(Optional.of(access(null, false, true)));
         repository.answers.add(Optional.of(access(StoreRole.EMPLOYEE, false, false)));
 
-        policy.requireReviewExport(STORE_ID, authentication);
-        policy.requireReviewExport(STORE_ID, authentication);
-        policy.requireReviewExport(STORE_ID, authentication);
-        assertThatThrownBy(() -> policy.requireReviewExport(STORE_ID, authentication))
+        policy.requireExport(STORE_ID, authentication);
+        policy.requireExport(STORE_ID, authentication);
+        policy.requireExport(STORE_ID, authentication);
+        assertThatThrownBy(() -> policy.requireExport(STORE_ID, authentication))
                 .isInstanceOfSatisfying(ApiProblemException.class, problem -> {
                     assertThat(problem.status()).isEqualTo(HttpStatus.FORBIDDEN);
                     assertThat(problem.code()).isEqualTo("STORE_MANAGER_REQUIRED");

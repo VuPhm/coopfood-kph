@@ -147,8 +147,9 @@ paths:
         Complete unpaginated list of active stores in active regions, using the
         union of active membership, active regional assignment and CHAIN_ADMIN.
         Each store occurs once; ordered by code (PostgreSQL C collation), then id.
-        EMPLOYEE has VIEW/CREATE; STORE_MANAGER, regional and chain scopes add
-        REVIEW/EXPORT. Codes remain strings. No synthetic roles or memberships.
+        REVIEW requires an active STORE_MANAGER membership in this store.
+        EXPORT is available to that manager, the assigned region manager or a
+        chain admin. Codes remain strings. No synthetic roles or memberships.
         Recomputed every request, including permission downgrades and revocation.
         Capabilities describe navigation; every business request rechecks scope.
         No DATE/report/notification, catalog administration or Admin rights are
@@ -342,9 +343,9 @@ paths:
       operationId: reviewKphRecord
       summary: Set the approval decision for one KPH record
       description: |
-        Requires STORE_MANAGER membership in this store, REGION_MANAGER assignment
-        to its region, or global CHAIN_ADMIN. The store, region and applicable
-        membership or assignment must be active. Each changed decision is
+        Requires an active STORE_MANAGER membership in the record's own active
+        store within an active region. Regional and chain oversight alone
+        grants no review authority. Each changed decision is
         appended to review history and the audit trail. Repeated decisions are idempotent.
       parameters:
         - $ref: '#/components/parameters/StoreIdPath'
@@ -385,7 +386,8 @@ paths:
       operationId: prepareKphExport
       summary: Authorize and snapshot one online KPH Excel export
       description: |
-        Only a STORE_MANAGER with active membership may export. All requested
+        Requires active STORE_MANAGER membership in the store, an active regional
+        assignment covering it, or CHAIN_ADMIN. The store and region must be active. All requested
         records must belong to this store, share the requested type, remain
         SUBMITTED and already be APPROVED. The response is the authoritative
         ordered snapshot used by the Store PWA to build the workbook; the backend
@@ -462,9 +464,14 @@ paths:
     get:
       tags: [KPH]
       operationId: listChainKphRecords
-      summary: List KPH records across active stores for chain administrators
-      description: Requires an active CHAIN_ADMIN. Includes only active stores in active regions.
-        Results are ordered by createdAt descending, then id descending. An unmatched store filter returns an empty page.
+      summary: List KPH records for regional and chain oversight
+      description: |
+        A chain admin sees active stores in active regions. A regional manager sees
+        only active stores in the active regions assigned to them. Additional store
+        memberships do not expand the scope. Filtering and paging apply after this
+        scope. An out-of-scope store filter returns an empty page. Results are
+        ordered by createdAt descending, then id descending. Photo paths returned
+        by this operation recheck the same oversight scope when accessed.
       parameters:
         - name: storeId
           in: query
@@ -509,11 +516,14 @@ paths:
             default: 25
       responses:
         '200':
-          description: Chain history and total count matching all active filters before pagination.
+          description: Scoped history and total count matching all active filters before pagination.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChainKphRecordPage'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/chain-kph-page.json
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -522,6 +532,50 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/admin/kph/stores/{storeId}/records/{recordId}/photos/{ordinal}:
+    get:
+      tags: [KPH]
+      operationId: getAdminStampedKphPhoto
+      summary: Read a private stamped KPH photo within oversight scope
+      description: |
+        Rechecks the chain or assigned regional scope for this active store.
+        The record must belong to that store. A store membership alone grants
+        no access through this Admin endpoint.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - name: recordId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: ordinal
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 3
+      responses:
+        '200':
+          description: Private stamped JPEG with no-store cache policy.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /api/v1/admin/users:
     get:

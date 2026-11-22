@@ -78,10 +78,14 @@ class KphController {
     @GetMapping("/{recordId}/photos/{ordinal}")
     ResponseEntity<byte[]> stampedPhoto(@PathVariable UUID storeId, @PathVariable UUID recordId,
             @PathVariable int ordinal, Authentication authentication) {
+        return privatePhotoResponse(service.stampedPhoto(storeId, recordId, ordinal, authentication));
+    }
+
+    static ResponseEntity<byte[]> privatePhotoResponse(byte[] bytes) {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .cacheControl(CacheControl.noStore().cachePrivate())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
-                .body(service.stampedPhoto(storeId, recordId, ordinal, authentication));
+                .body(bytes);
     }
 }

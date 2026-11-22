@@ -14,6 +14,8 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.springframework.stereotype.Repository;
 
+import vn.coopfood.kph.identity.ManagementStoreScope;
+
 @Repository
 class KphRepository {
 
@@ -105,7 +107,7 @@ class KphRepository {
             int page, int pageSize) {
         SqlFragment store = new SqlFragment("r.store_id = ?", List.of(storeId));
         SqlFragment filtered = filters(store, type, detectedFrom, detectedTo, approvalStatus);
-        KphPage records = fetchPage(filtered, orderBy(sort, direction), page, pageSize);
+        KphPage records = fetchPage(filtered, orderBy(sort, direction), page, pageSize, false);
 
         SqlFragment typeScope = filters(store, null, detectedFrom, detectedTo, null);
         Record totals = database.fetchOne("""
@@ -121,23 +123,17 @@ class KphRepository {
                 records.totalPages(), typeTotals);
     }
 
-    KphPage findChainPage(UUID storeId, LocalDate detectedFrom, LocalDate detectedTo,
+    KphPage findChainPage(UUID actorId, UUID storeId, LocalDate detectedFrom, LocalDate detectedTo,
             KphApprovalStatus approvalStatus, int page, int pageSize) {
-        String activeStores = """
-                r.store_id IN (
-                    SELECT s.id FROM stores s
-                    JOIN regions region ON region.id = s.region_id AND region.active
-                    WHERE s.active
-                )
-                """;
+        String activeStores = "r.store_id IN (SELECT managed.id FROM (" + ManagementStoreScope.STORE_PROJECTION + ") managed)";
         SqlFragment scope = storeId == null
-                ? new SqlFragment(activeStores, List.of())
-                : new SqlFragment(activeStores + " AND r.store_id = ?", List.of(storeId));
+                ? new SqlFragment(activeStores, List.of(actorId, actorId))
+                : new SqlFragment(activeStores + " AND r.store_id = ?", List.of(actorId, actorId, storeId));
         SqlFragment filtered = filters(scope, null, detectedFrom, detectedTo, approvalStatus);
-        return fetchPage(filtered, "r.created_at DESC, r.id DESC", page, pageSize);
+        return fetchPage(filtered, "r.created_at DESC, r.id DESC", page, pageSize, true);
     }
 
-    private KphPage fetchPage(SqlFragment filtered, String orderBy, int page, int pageSize) {
+    private KphPage fetchPage(SqlFragment filtered, String orderBy, int page, int pageSize, boolean adminPhotos) {
         long totalItems = database.fetchOne(
                 "SELECT count(*) AS total FROM kph_records r WHERE " + filtered.sql(),
                 filtered.params().toArray()).get("total", Long.class);
@@ -162,7 +158,7 @@ class KphRepository {
                 JOIN kph_photos p ON p.kph_record_id = r.id
                 ORDER BY
                 """ + orderBy + ", p.ordinal";
-        List<KphRecordResponse> items = mapRows(database.fetch(sql, pageParams.toArray()));
+        List<KphRecordResponse> items = mapRows(database.fetch(sql, pageParams.toArray()), adminPhotos);
         return new KphPage(items, page, pageSize, totalItems, totalPages);
     }
 
@@ -249,7 +245,7 @@ class KphRepository {
         params.add(storeId);
         params.add(type.name());
         params.addAll(recordIds);
-        return mapRows(database.fetch(sql, params.toArray()));
+        return mapRows(database.fetch(sql, params.toArray()), false);
     }
 
     Optional<KphRecordResponse> findOne(UUID storeId, UUID recordId) {
@@ -265,7 +261,7 @@ class KphRepository {
                 WHERE r.store_id = ? AND r.id = ?
                 ORDER BY p.ordinal
                 """;
-        List<KphRecordResponse> records = mapRows(database.fetch(sql, storeId, recordId));
+        List<KphRecordResponse> records = mapRows(database.fetch(sql, storeId, recordId), false);
         return records.stream().findFirst();
     }
 
@@ -338,7 +334,7 @@ class KphRepository {
                 .map(row -> new PhotoStorageKey(row.get("stamped_storage_key", String.class)));
     }
 
-    private List<KphRecordResponse> mapRows(List<? extends Record> rows) {
+    private List<KphRecordResponse> mapRows(List<? extends Record> rows, boolean adminPhotos) {
         List<KphRecordResponse> records = new ArrayList<>();
         UUID currentId = null;
         KphRecordResponse.Builder builder = null;
@@ -383,10 +379,12 @@ class KphRepository {
                                 row.get("display_name", String.class)),
                         toInstant(row.get("created_at")));
             }
-            builder.photo(new KphRecordResponse.Photo(
-                    row.get("photo_ordinal", Integer.class),
-                    "/api/v1/stores/" + row.get("store_id", UUID.class)
-                            + "/kph/" + id + "/photos/" + row.get("photo_ordinal", Integer.class),
+            UUID storeId = row.get("store_id", UUID.class);
+            int ordinal = row.get("photo_ordinal", Integer.class);
+            String recordPath = adminPhotos
+                    ? "/api/v1/admin/kph/stores/" + storeId + "/records/" + id
+                    : "/api/v1/stores/" + storeId + "/kph/" + id;
+            builder.photo(new KphRecordResponse.Photo(ordinal, recordPath + "/photos/" + ordinal,
                     toInstant(row.get("captured_at"))));
         }
         if (builder != null) {

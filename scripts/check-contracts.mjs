@@ -478,7 +478,7 @@ async function validateProvisioningPolicyCases() {
   const fixture = await readJson(provisioningPolicyFixturePath);
   assert.equal(fixture.provenance, "synthetic", "Provisioning fixture must remain synthetic.");
   assert.equal(fixture.approvalStatus, "accepted", "P01 fixture must reflect owner acceptance.");
-  assert.equal(fixture.policyVersion, 2, "Unexpected provisioning policy fixture version.");
+  assert.equal(fixture.policyVersion, 3, "Unexpected provisioning policy fixture version.");
   assert.equal(
     fixture.conventions?.listedGrantsAreActive,
     true,
@@ -506,8 +506,8 @@ async function validateProvisioningPolicyCases() {
   assertProvisioningCase(casesById, "ID-P01-001", "ALLOW", "CHAIN_ADMIN_PROVISIONS_IDENTITY");
   assertProvisioningCase(casesById, "ID-P01-002", "DENY", "IDENTITY_ADMIN_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-003", "DENY", "IDENTITY_ADMIN_REQUIRED");
-  assertProvisioningCase(casesById, "ID-P01-004", "ALLOW", "CHAIN_WIDE_ADMIN");
-  assertProvisioningCase(casesById, "ID-P01-005", "ALLOW", "REGION_SCOPED_MANAGER");
+  assertProvisioningCase(casesById, "ID-P01-004", "DENY", "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-005", "DENY", "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-006", "DENY", "SELF_LOCKOUT_FORBIDDEN");
   assertProvisioningCase(casesById, "ID-P01-007", "DENY", "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-009", "DENY", "LAST_ACTIVE_CHAIN_ADMIN_REQUIRED");
@@ -525,7 +525,7 @@ async function validateProvisioningPolicyCases() {
   assertProvisioningCase(casesById, "ID-P01-023", "DENY", "SOFT_LIFECYCLE_ONLY");
   assertProvisioningCase(casesById, "ID-P01-024", "DENY", "LAST_ACTIVE_STORE_MANAGER_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-025", "DENY", "LAST_ACTIVE_STORE_MANAGER_REQUIRED");
-  assertProvisioningCase(casesById, "ID-P01-026", "DENY", "ACTIVE_REGION_ASSIGNMENT_REQUIRED");
+  assertProvisioningCase(casesById, "ID-P01-026", "DENY", "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-027", "ALLOW", "STORE_SCOPED_MANAGER");
   assertProvisioningCase(casesById, "ID-P01-028", "DENY", "ACTIVE_STORE_MANAGER_MEMBERSHIP_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-029", "ALLOW", "REGION_SCOPED_MEMBERSHIP_ADMIN");
@@ -537,6 +537,7 @@ async function validateProvisioningPolicyCases() {
   assertProvisioningCase(casesById, "ID-P01-035", "DENY", "ACTIVE_REGION_REQUIRED");
   assertProvisioningCase(casesById, "ID-P01-036", "ALLOW", "CHAIN_WIDE_ADMIN");
 
+  assertProvisioningCase(casesById, "ID-P01-037", "ALLOW", "STORE_SCOPED_MANAGER");
   assert.deepEqual(
     casesById.get("ID-P01-004").actor.globalRoles,
     ["CHAIN_ADMIN"],
@@ -545,12 +546,12 @@ async function validateProvisioningPolicyCases() {
   assert.deepEqual(
     casesById.get("ID-P01-005").actor.regionAssignments,
     ["REGION-SOUTH"],
-    "Regional KPH approval must require an explicit region assignment.",
+    "The denied regional reviewer must hold a regional assignment.",
   );
   assert.equal(
     casesById.get("ID-P01-005").context.storeRegion,
     "REGION-SOUTH",
-    "Regional allow case must resolve a store inside the assigned region.",
+    "An assignment within the same region alone cannot approve.",
   );
   assert.equal(
     casesById.get("ID-P01-026").context.storeRegion,

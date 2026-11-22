@@ -18,5 +18,15 @@
       "REVIEW",
       "EXPORT"
     ]
+  },
+  {
+    "id": "73000000-0000-4000-8000-000000000003",
+    "code": "003",
+    "name": "Cửa hàng mẫu 003",
+    "capabilities": [
+      "VIEW",
+      "CREATE",
+      "EXPORT"
+    ]
   }
 ]

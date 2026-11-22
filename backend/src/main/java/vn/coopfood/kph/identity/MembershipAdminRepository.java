@@ -18,39 +18,6 @@ class MembershipAdminRepository {
         this.database = database;
     }
 
-    boolean hasCapability(SessionPrincipal actor) {
-        return Boolean.TRUE.equals(database.fetchValue("""
-                SELECT EXISTS (
-                    SELECT 1 FROM app_users u
-                    WHERE u.id = ? AND u.active AND u.credential_version = ?
-                    AND (EXISTS (SELECT 1 FROM user_roles ur
-                                 WHERE ur.user_id = u.id AND ur.role = 'CHAIN_ADMIN')
-                        OR EXISTS (SELECT 1 FROM user_region_assignments a
-                                   JOIN regions r ON r.id = a.region_id AND r.active
-                                   WHERE a.user_id = u.id AND a.active))
-                )
-                """, actor.userId(), actor.credentialVersion()));
-    }
-
-    private static final String STORE_PROJECTION = """
-            SELECT s.id, s.store_code, s.store_name, r.id AS region_id, r.region_code, r.region_name
-            FROM stores s JOIN regions r ON r.id = s.region_id
-            WHERE s.active AND r.active
-            AND (EXISTS (SELECT 1 FROM user_roles ur WHERE ur.user_id = ? AND ur.role = 'CHAIN_ADMIN')
-                 OR EXISTS (SELECT 1 FROM user_region_assignments a
-                            WHERE a.user_id = ? AND a.region_id = r.id AND a.active))
-            """;
-
-    List<MembershipStoreResponse> listStores(UUID actorId) {
-        return database.fetch(STORE_PROJECTION + " ORDER BY r.region_code, s.store_code, s.id",
-                actorId, actorId).map(this::store);
-    }
-
-    Optional<MembershipStoreResponse> findStore(UUID actorId, UUID storeId) {
-        return database.fetchOptional(STORE_PROJECTION + " AND s.id = ?", actorId, actorId, storeId)
-                .map(this::store);
-    }
-
     void lockStore(UUID storeId) {
         // User target -> store. Region activity is protected by the active-store FK.
         // Scope is read again in a separate statement after this lock is acquired.
@@ -104,12 +71,6 @@ class MembershipAdminRepository {
                 """, UUID.randomUUID(), actorId, action, userId, store.id(), store.regionId().toString(), reason,
                 previous == null ? null : previous.role().name(), role.name(),
                 previous == null ? null : previous.active(), active, Timestamp.from(now));
-    }
-
-    private MembershipStoreResponse store(Record row) {
-        return new MembershipStoreResponse(row.get("id", UUID.class), row.get("store_code", String.class),
-                row.get("store_name", String.class), row.get("region_id", UUID.class),
-                row.get("region_code", String.class), row.get("region_name", String.class));
     }
 
     private StoreMembershipResponse membership(Record row) {
