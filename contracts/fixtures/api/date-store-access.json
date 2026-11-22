@@ -1,0 +1,21 @@
+[
+  {
+    "id": "20000000-0000-4000-8000-000000000001",
+    "code": "001",
+    "name": "Cửa hàng mẫu 001",
+    "capabilities": [
+      "VIEW",
+      "CREATE"
+    ]
+  },
+  {
+    "id": "20000000-0000-4000-8000-000000000002",
+    "code": "002",
+    "name": "Cửa hàng mẫu 002",
+    "capabilities": [
+      "VIEW",
+      "CREATE",
+      "UPDATE"
+    ]
+  }
+]

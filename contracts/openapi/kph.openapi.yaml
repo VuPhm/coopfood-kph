@@ -16,6 +16,7 @@ tags:
   - name: Stores
   - name: Catalog
   - name: KPH
+  - name: DATE
   - name: Admin identity
   - name: Admin membership
     description: ADMIN03 backend and Admin Web implemented; owner acceptance is pending.
@@ -174,6 +175,249 @@ paths:
                   externalValue: ../fixtures/api/kph-store-access.json
         '401':
           $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/date/stores:
+    get:
+      tags: [DATE]
+      operationId: listDateStores
+      summary: List active stores where this actor can manage tracked expiry dates
+      description: |
+        Active store membership, an active assignment to the store's active region, or
+        CHAIN_ADMIN grants VIEW and CREATE. UPDATE additionally requires a store manager
+        membership at this store, an assigned region or CHAIN_ADMIN. Each effective
+        store occurs once. No effective DATE scope returns an empty array. Business
+        endpoints recheck scope and capability on every request.
+      responses:
+        '200':
+          description: Effective DATE access for this actor.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DateStoreAccess'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-store-access.json
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/stores/{storeId}/date-lots:
+    get:
+      tags: [DATE]
+      operationId: listDateLots
+      summary: Browse unresolved DATE entries in one authorized store
+      description: |
+        Search, filter and sort the full authorized result before paging. q matches a
+        literal case-insensitive substring of SKU, product name, barcode or lot code. attentionCount
+        is counted across open rows matching q, before phase, attentionOnly and paging.
+        A row needs attention in WARNING, DANGER, EXPIRED or MISSING. Phases use today's
+        Asia/Ho_Chi_Minh business date, inclusive shelf life and the published date rules.
+        An absent manufacture date yields EXPIRED after expiry or MISSING otherwise.
+        Default order is newest created first, expiry order is earliest expiry first and
+        name order uses product name ascending with PostgreSQL vi-x-icu collation.
+        Each order ends in ID ascending.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - $ref: '#/components/parameters/DateQuery'
+        - name: phase
+          in: query
+          schema: { type: string, enum: [SAFE, WARNING, DANGER, EXPIRED, BEFORE_NSX, MISSING] }
+        - name: attentionOnly
+          in: query
+          schema: { type: boolean, default: false }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [default, expiry, name], default: default }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+      responses:
+        '200':
+          description: One page of tracked expiry entries.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateLotPage'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-lot-page.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [DATE]
+      operationId: createDateLot
+      summary: Save a DATE entry and remember its SKU and name for this store
+      description: |
+        Requires CREATE. An accepted write saves the lot, audit event and store-scoped
+        suggestion atomically. Retrying the same key and request for the same actor and
+        store returns the original result. A changed payload with the same key returns
+        409. A duplicate warning does not merge entries or their quantities.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateLotCreateRequest'
+            examples:
+              synthetic:
+                externalValue: ../fixtures/api/date-lot-create.json
+      responses:
+        '201':
+          description: Committed lot and duplicate warning, including idempotent replay.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateLotWriteResult'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-lot-write-result.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/DateLotValidation'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/stores/{storeId}/date-lots/{lotId}:
+    parameters:
+      - $ref: '#/components/parameters/StoreIdPath'
+      - $ref: '#/components/parameters/DateLotIdPath'
+    get:
+      tags: [DATE]
+      operationId: getDateLot
+      summary: Read the current snapshot and authoritative quantities for one DATE entry
+      responses:
+        '200':
+          description: Current entry in the authorized store.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateLot'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-lot-detail.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [DATE]
+      operationId: updateDateLot
+      summary: Update the editable fields of one DATE entry with an audit reason
+      description: |
+        Requires UPDATE at the requested store. All editable fields are sent together
+        with expectedVersion. A stale version returns 409 without changing the lot or
+        suggestion. An edit that keeps the product identity preserves its existing
+        snapshot. A successful write increments the version and records the actor,
+        reason and change. A resolved entry is read-only.
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateLotUpdateRequest'
+            examples:
+              synthetic:
+                externalValue: ../fixtures/api/date-lot-update.json
+      responses:
+        '200':
+          description: Updated lot and duplicate warning.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateLotWriteResult'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-lot-update-result.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/DateLotValidation'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/stores/{storeId}/date-sku-suggestions:
+    get:
+      tags: [DATE]
+      operationId: listDateSkuSuggestions
+      summary: Suggest previously saved SKU and product names within this store
+      description: |
+        Requires VIEW. q matches a literal case-insensitive substring of SKU or name.
+        An omitted or empty query returns recent suggestions. At most ten distinct SKU
+        codes are returned, most recently saved first and then by SKU code ascending.
+        A suggestion is scoped to the store and never establishes a published catalog match.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - $ref: '#/components/parameters/DateQuery'
+      responses:
+        '200':
+          description: Matching store SKU and name suggestions.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DateSkuSuggestion'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-sku-suggestions.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
 
   /api/v1/catalog/barcodes/{barcode}:
     get:
@@ -1147,6 +1391,15 @@ components:
       name: KPH_SESSION
 
   parameters:
+    DateQuery:
+      name: q
+      in: query
+      schema: { type: string, maxLength: 200 }
+    DateLotIdPath:
+      name: lotId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
     StoreIdPath:
       name: storeId
       in: path
@@ -1237,6 +1490,12 @@ components:
             $ref: '#/components/schemas/Problem'
     Conflict:
       description: Idempotency key conflict or concurrent state conflict.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    DateLotValidation:
+      description: Invalid DATE business data, quantity or audit reason.
       content:
         application/problem+json:
           schema:
@@ -1424,6 +1683,141 @@ components:
     KphCapability:
       type: string
       enum: [VIEW, CREATE, REVIEW, EXPORT]
+
+    DateStoreAccess:
+      type: object
+      additionalProperties: false
+      required: [id, code, name, capabilities]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        capabilities:
+          type: array
+          uniqueItems: true
+          items: { type: string, enum: [VIEW, CREATE, UPDATE] }
+          allOf:
+            - contains: { const: VIEW }
+            - contains: { const: CREATE }
+
+    DateSkuSuggestion:
+      type: object
+      additionalProperties: false
+      required: [skuCode, productName]
+      properties:
+        skuCode: { type: string, minLength: 1, maxLength: 50 }
+        productName: { type: string, minLength: 1, maxLength: 200 }
+
+    DateQuantity:
+      type: string
+      description: Plain nonnegative decimal without exponent. Keep exact decimal precision in transit.
+      pattern: '^[0-9]+(\.[0-9]+)?$'
+      maxLength: 128
+
+    DateLotFields:
+      type: object
+      required: [lookupStatus, barcode, skuCode, productName, lotCode, manufacturedOn, expiresOn, trackedQuantity, unit]
+      description: |
+        Leading zeros in identifiers are significant. Dates are local business dates.
+        FOUND resolves against the published catalog on create or a change of identity.
+        NOT_FOUND retains the scanned barcode with the explicitly entered SKU and name.
+        A stored suggestion supplies text for manual entry and does not establish a catalog match.
+      properties:
+        lookupStatus:
+          $ref: '#/components/schemas/KphLookupStatus'
+        barcode: { type: [string, 'null'], minLength: 1, maxLength: 128 }
+        skuCode: { type: string, minLength: 1, maxLength: 50 }
+        productName: { type: string, minLength: 1, maxLength: 200 }
+        lotCode: { type: [string, 'null'], minLength: 1, maxLength: 128 }
+        manufacturedOn: { type: [string, 'null'], format: date }
+        expiresOn:
+          type: string
+          format: date
+          description: Must follow manufacturedOn when supplied.
+        trackedQuantity:
+          $ref: '#/components/schemas/DateQuantity'
+          description: Positive quantity being tracked. EA must be a whole number. kg accepts decimals without rounding.
+          not: { pattern: '^0+(\.0+)?$' }
+        unit:
+          $ref: '#/components/schemas/KphUnit'
+      allOf:
+        - if:
+            properties: { lookupStatus: { const: MANUAL } }
+          then:
+            properties: { barcode: { type: 'null' } }
+          else:
+            properties: { barcode: { type: string } }
+        - if:
+            properties: { unit: { const: EA } }
+          then:
+            properties: { trackedQuantity: { pattern: '^[0-9]+(\.0+)?$' } }
+
+    DateLotCreateRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/DateLotFields'
+      unevaluatedProperties: false
+
+    DateLotUpdateRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/DateLotFields'
+      unevaluatedProperties: false
+      required: [expectedVersion, reason]
+      properties:
+        expectedVersion: { type: integer, format: int64, minimum: 1 }
+        reason: { type: string, minLength: 1, maxLength: 500 }
+
+    DateLot:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/DateLotFields'
+      unevaluatedProperties: false
+      required: [id, storeId, supplierCode, supplierName, processedQuantity, remainingQuantity, processingStatus, version, createdBy, updatedBy, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        storeId: { type: string, format: uuid }
+        supplierCode: { type: [string, 'null'] }
+        supplierName: { type: [string, 'null'] }
+        processedQuantity:
+          $ref: '#/components/schemas/DateQuantity'
+        remainingQuantity:
+          $ref: '#/components/schemas/DateQuantity'
+          description: Server-calculated amount still under monitoring.
+        processingStatus: { type: string, enum: [OPEN, RESOLVED] }
+        version: { type: integer, format: int64, minimum: 1 }
+        createdBy:
+          $ref: '#/components/schemas/ActorSnapshot'
+        updatedBy:
+          $ref: '#/components/schemas/ActorSnapshot'
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    DateLotPage:
+      type: object
+      additionalProperties: false
+      required: [items, page, pageSize, totalItems, totalPages, attentionCount]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateLot'
+        page: { type: integer, minimum: 1 }
+        pageSize: { type: integer, minimum: 1, maximum: 100 }
+        totalItems: { type: integer, format: int64, minimum: 0 }
+        totalPages: { type: integer, minimum: 0 }
+        attentionCount: { type: integer, format: int64, minimum: 0 }
+
+    DateLotWriteResult:
+      type: object
+      additionalProperties: false
+      required: [lot, duplicateWarning]
+      properties:
+        lot:
+          $ref: '#/components/schemas/DateLot'
+        duplicateWarning:
+          type: boolean
+          description: Another entry at this store has the same SKU, lot code, manufacture and expiry dates. Both entries are retained.
 
     KphStoreAccess:
       type: object

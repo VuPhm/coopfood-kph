@@ -19,6 +19,14 @@ const contractSchemaId = "urn:coopfood-kph:openapi";
 const acceptedKphLookupStatuses = ["FOUND", "NOT_FOUND", "MANUAL"];
 
 const apiFixtureSchemas = new Map([
+  ["api/date-store-access.json", "DateStoreAccess"],
+  ["api/date-lot-create.json", "DateLotCreateRequest"],
+  ["api/date-lot-update.json", "DateLotUpdateRequest"],
+  ["api/date-lot-write-result.json", "DateLotWriteResult"],
+  ["api/date-lot-update-result.json", "DateLotWriteResult"],
+  ["api/date-lot-detail.json", "DateLot"],
+  ["api/date-lot-page.json", "DateLotPage"],
+  ["api/date-sku-suggestions.json", "DateSkuSuggestion"],
   ["api/kph-store-access.json", "KphStoreAccess"],
   ["api/session.json", "SessionResponse"],
   ["api/admin-users.json", "AdminUser"],
@@ -217,6 +225,14 @@ async function validateApiFixtures(openApi) {
     }
     fixtures.set(resource, fixture);
   }
+
+  const dateCreate = fixtures.get("api/date-lot-create.json");
+  expectInvalid(ajv, "DateLotCreateRequest", { ...dateCreate, storeId: "other-store" },
+    "unevaluatedProperties", "DATE authority is resolved from the route and authenticated scope");
+  expectInvalid(ajv, "DateLotCreateRequest", { ...dateCreate, trackedQuantity: 0.37525 },
+    "type", "DATE decimals stay exact strings on the wire");
+  expectInvalid(ajv, "DateLotCreateRequest", { ...dateCreate, unit: "EA" },
+    "pattern", "An EA count cannot contain a fraction");
 
   const [effectiveStore] = fixtures.get("api/kph-store-access.json");
   expectInvalid(ajv, "KphStoreAccess", { ...effectiveStore, role: "STORE_MANAGER" }, "additionalProperties", "Discovery cannot synthesize a role");

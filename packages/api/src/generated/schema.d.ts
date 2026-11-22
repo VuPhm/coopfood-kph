@@ -141,6 +141,117 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/date/stores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List active stores where this actor can manage tracked expiry dates
+         * @description Active store membership, an active assignment to the store's active region, or
+         *     CHAIN_ADMIN grants VIEW and CREATE. UPDATE additionally requires a store manager
+         *     membership at this store, an assigned region or CHAIN_ADMIN. Each effective
+         *     store occurs once. No effective DATE scope returns an empty array. Business
+         *     endpoints recheck scope and capability on every request.
+         */
+        get: operations["listDateStores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/date-lots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Browse unresolved DATE entries in one authorized store
+         * @description Search, filter and sort the full authorized result before paging. q matches a
+         *     literal case-insensitive substring of SKU, product name, barcode or lot code. attentionCount
+         *     is counted across open rows matching q, before phase, attentionOnly and paging.
+         *     A row needs attention in WARNING, DANGER, EXPIRED or MISSING. Phases use today's
+         *     Asia/Ho_Chi_Minh business date, inclusive shelf life and the published date rules.
+         *     An absent manufacture date yields EXPIRED after expiry or MISSING otherwise.
+         *     Default order is newest created first, expiry order is earliest expiry first and
+         *     name order uses product name ascending with PostgreSQL vi-x-icu collation.
+         *     Each order ends in ID ascending.
+         */
+        get: operations["listDateLots"];
+        put?: never;
+        /**
+         * Save a DATE entry and remember its SKU and name for this store
+         * @description Requires CREATE. An accepted write saves the lot, audit event and store-scoped
+         *     suggestion atomically. Retrying the same key and request for the same actor and
+         *     store returns the original result. A changed payload with the same key returns
+         *     409. A duplicate warning does not merge entries or their quantities.
+         */
+        post: operations["createDateLot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/date-lots/{lotId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                lotId: components["parameters"]["DateLotIdPath"];
+            };
+            cookie?: never;
+        };
+        /** Read the current snapshot and authoritative quantities for one DATE entry */
+        get: operations["getDateLot"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update the editable fields of one DATE entry with an audit reason
+         * @description Requires UPDATE at the requested store. All editable fields are sent together
+         *     with expectedVersion. A stale version returns 409 without changing the lot or
+         *     suggestion. An edit that keeps the product identity preserves its existing
+         *     snapshot. A successful write increments the version and records the actor,
+         *     reason and change. A resolved entry is read-only.
+         */
+        patch: operations["updateDateLot"];
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/date-sku-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suggest previously saved SKU and product names within this store
+         * @description Requires VIEW. q matches a literal case-insensitive substring of SKU or name.
+         *     An omitted or empty query returns recent suggestions. At most ten distinct SKU
+         *     codes are returned, most recently saved first and then by SKU code ascending.
+         *     A suggestion is scoped to the store and never establishes a published catalog match.
+         */
+        get: operations["listDateSkuSuggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/catalog/barcodes/{barcode}": {
         parameters: {
             query?: never;
@@ -690,6 +801,84 @@ export interface components {
         };
         /** @enum {string} */
         KphCapability: "VIEW" | "CREATE" | "REVIEW" | "EXPORT";
+        DateStoreAccess: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            capabilities: ("VIEW" | "CREATE" | "UPDATE")[] & (unknown & unknown);
+        };
+        DateSkuSuggestion: {
+            skuCode: string;
+            productName: string;
+        };
+        /** @description Plain nonnegative decimal without exponent. Keep exact decimal precision in transit. */
+        DateQuantity: string;
+        /**
+         * @description Leading zeros in identifiers are significant. Dates are local business dates.
+         *     FOUND resolves against the published catalog on create or a change of identity.
+         *     NOT_FOUND retains the scanned barcode with the explicitly entered SKU and name.
+         *     A stored suggestion supplies text for manual entry and does not establish a catalog match.
+         */
+        DateLotFields: {
+            lookupStatus: components["schemas"]["KphLookupStatus"];
+            barcode: string | null;
+            skuCode: string;
+            productName: string;
+            lotCode: string | null;
+            /** Format: date */
+            manufacturedOn: string | null;
+            /**
+             * Format: date
+             * @description Must follow manufacturedOn when supplied.
+             */
+            expiresOn: string;
+            /** @description Positive quantity being tracked. EA must be a whole number. kg accepts decimals without rounding. */
+            trackedQuantity: components["schemas"]["DateQuantity"];
+            unit: components["schemas"]["KphUnit"];
+        } & (unknown & unknown);
+        DateLotCreateRequest: components["schemas"]["DateLotFields"];
+        DateLotUpdateRequest: {
+            /** Format: int64 */
+            expectedVersion: number;
+            reason: string;
+        } & components["schemas"]["DateLotFields"];
+        DateLot: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            storeId: string;
+            supplierCode: string | null;
+            supplierName: string | null;
+            processedQuantity: components["schemas"]["DateQuantity"];
+            /** @description Server-calculated amount still under monitoring. */
+            remainingQuantity: components["schemas"]["DateQuantity"];
+            /** @enum {string} */
+            processingStatus: "OPEN" | "RESOLVED";
+            /** Format: int64 */
+            version: number;
+            createdBy: components["schemas"]["ActorSnapshot"];
+            updatedBy: components["schemas"]["ActorSnapshot"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        } & components["schemas"]["DateLotFields"];
+        DateLotPage: {
+            items: components["schemas"]["DateLot"][];
+            page: number;
+            pageSize: number;
+            /** Format: int64 */
+            totalItems: number;
+            totalPages: number;
+            /** Format: int64 */
+            attentionCount: number;
+        };
+        DateLotWriteResult: {
+            lot: components["schemas"]["DateLot"];
+            /** @description Another entry at this store has the same SKU, lot code, manufacture and expiry dates. Both entries are retained. */
+            duplicateWarning: boolean;
+        };
         KphStoreAccess: {
             /** Format: uuid */
             id: string;
@@ -1103,6 +1292,15 @@ export interface components {
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
+        /** @description Invalid DATE business data, quantity or audit reason. */
+        DateLotValidation: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
         /** @description Business validation failed. */
         UnprocessableEntity: {
             headers: {
@@ -1177,6 +1375,8 @@ export interface components {
         };
     };
     parameters: {
+        DateQuery: string;
+        DateLotIdPath: string;
         /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
         StoreIdPath: string;
         /** @description Server rechecks active store and region against chain or assigned regional scope. */
@@ -1354,6 +1554,196 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    listDateStores: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Effective DATE access for this actor. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateStoreAccess"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listDateLots: {
+        parameters: {
+            query?: {
+                q?: components["parameters"]["DateQuery"];
+                phase?: "SAFE" | "WARNING" | "DANGER" | "EXPIRED" | "BEFORE_NSX" | "MISSING";
+                attentionOnly?: boolean;
+                sort?: "default" | "expiry" | "name";
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of tracked expiry entries. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateLotPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    createDateLot: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+                /** @description Client-generated opaque key scoped to the authenticated actor. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DateLotCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Committed lot and duplicate warning, including idempotent replay. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateLotWriteResult"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["DateLotValidation"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getDateLot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                lotId: components["parameters"]["DateLotIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current entry in the authorized store. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateLot"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateDateLot: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                lotId: components["parameters"]["DateLotIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DateLotUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated lot and duplicate warning. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateLotWriteResult"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["DateLotValidation"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listDateSkuSuggestions: {
+        parameters: {
+            query?: {
+                q?: components["parameters"]["DateQuery"];
+            };
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Matching store SKU and name suggestions. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateSkuSuggestion"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     lookupBarcode: {

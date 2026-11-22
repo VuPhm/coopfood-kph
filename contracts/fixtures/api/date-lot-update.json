@@ -1,0 +1,13 @@
+{
+  "lookupStatus": "NOT_FOUND",
+  "barcode": "0890123456790",
+  "skuCode": "000042",
+  "productName": "Sản phẩm mẫu",
+  "lotCode": "000007",
+  "manufacturedOn": null,
+  "expiresOn": "2026-11-18",
+  "trackedQuantity": "0.5",
+  "unit": "kg",
+  "expectedVersion": 1,
+  "reason": "Cân lại lượng đang theo dõi."
+}
