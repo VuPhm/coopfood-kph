@@ -1,8 +1,23 @@
 # Trạng thái hiện tại
 
-Cập nhật17/11/2026. Owner cho tích hợp và dọn QA01 để tiếp tục lộ trình.
+Cập nhật ngày 22/11/2026. Baseline main đã tích hợp QA01 ngày 17/11.
 Baseline tích hợp gồm KPHON04 `1ad0907`, hồ sơ `089dd17` và QA01 `f2b1404`;
 production source không thay đổi trong lần tích hợp này.
+
+## Candidate CHAIN01 · 22/11/2026
+
+Trên nhánh `store-app/plan01-store-chain`, phần ứng dụng tại `3163a91` đã qua
+kiểm tích hợp với PostgreSQL 17 và dữ liệu tổng hợp. Nhân viên A gửi phiếu có
+ảnh, cửa hàng trưởng B nhận 403 khi duyệt phiếu A, cửa hàng trưởng A duyệt rồi
+nhân viên A tải lại thấy đúng ID và người duyệt. Admin vùng A trên 390×844 thấy
+1 phiếu. Admin chuỗi trên 1440×1024 thấy 2 phiếu thuộc hai vùng. Cả hai mở được
+ảnh trong scope và chỉ xem kết quả.
+
+Luna API đã kiểm 18 ca liên quan tới policy, HTTP, discovery và membership.
+Luna Admin kiểm 23 ca trong app.test.tsx. Store kiểm capability EXPORT khi thiếu
+REVIEW. TypeScript Admin đạt trên source chung. [Spec CHAIN01](product/KPH_APPROVAL_SCOPE.md)
+ghi quy tắc mới. Các checkpoint KPHON03–04 dưới đây mô tả baseline lịch sử.
+Nghiệm thu thao tác của owner, Excel thực và iPhone thật còn chờ.
 
 ## Đã có trên baseline tích hợp
 
