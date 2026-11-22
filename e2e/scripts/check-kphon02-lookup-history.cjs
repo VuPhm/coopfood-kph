@@ -2,7 +2,9 @@
 const { chromium, expect } = require('@playwright/test');
 const assert = require('node:assert/strict');
 const { mkdirSync, writeFileSync } = require('node:fs');
-const base='http://127.0.0.1:4173', store='73000000-0000-4000-8000-000000000001', outside='73000000-0000-4000-8000-000000000002';
+const base=process.env.STORE_URL || 'http://127.0.0.1:4173';
+assert.ok(['localhost', '127.0.0.1'].includes(new URL(base).hostname), 'Synthetic localhost runtime required');
+const store='73000000-0000-4000-8000-000000000001', outside='73000000-0000-4000-8000-000000000002';
 const output='.local/verification/fresh-restore/kphon02';
 async function login(page, username='region.admin03') {
  await page.goto(base); await page.getByLabel('Tên đăng nhập',{exact:true}).fill(username);
@@ -46,7 +48,7 @@ async function layout(page,name) {
   const firstPage=await (await c.request.get(historyUrl)).json();
   assert.ok(firstPage.totalItems > 25); assert.ok(firstPage.totalPages >= 2);
   await route(page,'kph'); await expect(page.getByText(`${firstPage.totalItems} phiếu`,{exact:true})).toBeVisible();
-  await expect(page.getByText(`Trang 1/${firstPage.totalPages}`,{exact:true})).toBeVisible();
+  await expect(page.getByText(`Đã hiển thị ${firstPage.items.length}/${firstPage.totalItems} phiếu`,{exact:true})).toBeVisible();
   const opens=page.getByRole('button',{name:/^Mở phiếu/}); await expect(opens).toHaveCount(firstPage.items.length);
   await opens.first().click(); await expect(page.getByRole('dialog',{name:'Phiếu KPH',exact:true})).toBeVisible();
   const image=page.getByRole('button',{name:'Xem ảnh 1',exact:true}).locator('img');
@@ -56,15 +58,17 @@ async function layout(page,name) {
   const anon=await browser.newContext(); assert.equal((await anon.request.get(`${base}${mediaPath}`)).status(),401); await anon.close();
   await page.screenshot({path:`${output}/${name}-detail.png`,fullPage:true});
   await page.keyboard.press('Escape'); await expect(page.getByRole('dialog',{name:'Phiếu KPH',exact:true})).toHaveCount(0);
-  await page.getByRole('button',{name:'Trang sau',exact:true}).click();
+  await page.getByRole('button',{name:/^Hiển thị thêm/}).click();
   const secondPage=await (await c.request.get(historyUrl.replace('page=1','page=2'))).json();
-  await expect(page.getByText(`Trang 2/${secondPage.totalPages}`,{exact:true})).toBeVisible(); await expect(opens).toHaveCount(secondPage.items.length);
+  const loaded = firstPage.items.length + secondPage.items.length;
+  await expect(page.getByText(`Đã hiển thị ${loaded}/${secondPage.totalItems} phiếu`,{exact:true})).toBeVisible();
+  await expect(opens).toHaveCount(loaded);
   await page.getByRole('button',{name:'Lọc phiếu KPH',exact:true}).click();
   await page.getByLabel('Sắp xếp',{exact:true}).selectOption('quantity');
   await page.getByLabel('Thứ tự',{exact:true}).selectOption('ascending');
   const sorted=await (await c.request.get(historyUrl+'&sort=quantity&direction=ascending')).json();
   await page.getByRole('button',{name:'Xong',exact:true}).click();
-  await expect(page.getByText(`Trang 1/${sorted.totalPages}`,{exact:true})).toBeVisible(); await expect(opens).toHaveCount(sorted.items.length);
+  await expect(page.getByText(`Đã hiển thị ${sorted.items.length}/${sorted.totalItems} phiếu`,{exact:true})).toBeVisible(); await expect(opens).toHaveCount(sorted.items.length);
   await page.getByRole('button',{name:'Lọc phiếu KPH',exact:true}).click();
   await page.getByLabel('Trạng thái',{exact:true}).selectOption('APPROVED');
   const approved=await (await c.request.get(historyUrl+'&sort=quantity&direction=ascending&approvalStatus=APPROVED')).json();

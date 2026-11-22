@@ -27,7 +27,7 @@ export function StoreNavigation({ screen, profile, navigate, onKphIntent, hidden
     onPointerEnter={route === "kph" ? onKphIntent : undefined} onFocus={route === "kph" ? onKphIntent : undefined}><Icon size={21} strokeWidth={1.8} aria-hidden="true" /><span>{label}</span></a>;
   const primaryLinks = () => storePrimaryNavigation.map(item => link(item.screen, item.label, item.icon));
   return <>
-    <DesktopSidebar label="Điều hướng cửa hàng" logo={assetUrl("brand/coopfood-logo-light.png")} appName="Store" homeHref="#home" homeLabel="Co.op Food — Trang chủ" collapsed={collapsed} onCollapsedChange={setCollapsed}>
+    <DesktopSidebar label="Điều hướng cửa hàng" logo={assetUrl("brand/coopfood-logo-light.png")} homeHref="#home" homeLabel="Co.op Food — Trang chủ" collapsed={collapsed} onCollapsedChange={setCollapsed}>
       <nav aria-label="Điều hướng chung">{storePrimaryNavigation.map(item => <DesktopNavItem key={item.screen} href={`#${item.screen}`} label={item.label} icon={<item.icon size={18} aria-hidden="true" />} active={screen === item.screen} />)}</nav>
       <p className="fresh-sidebar-group-title">Tính năng</p>
       <nav aria-label="Tính năng cửa hàng">{storeFeatures.map(feature => <DesktopNavItem key={feature.screen} href={`#${feature.screen}`} label={feature.sidebarLabel} icon={<feature.icon size={18} aria-hidden="true" />} active={screen === feature.screen} onIntent={feature.screen === "kph" ? onKphIntent : undefined} />)}</nav>

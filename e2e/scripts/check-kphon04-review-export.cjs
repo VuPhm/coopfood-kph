@@ -6,12 +6,12 @@ const { mkdirSync, writeFileSync, readFileSync } = require('node:fs');
 const { randomUUID, createHash } = require('node:crypto');
 const path = require('node:path');
 
-const base = (process.env.STORE_URL || 'http://127.0.0.1:4176').replace(/\/$/, '');
+const base = (process.env.STORE_URL || 'http://127.0.0.1:4781').replace(/\/$/, '');
 const store = '73000000-0000-4000-8000-000000000001';
 const outside = '73000000-0000-4000-8000-000000000002';
 const employee = '71000000-0000-4000-8000-000000000003';
 const password = 'admin-e2e-password'; // Synthetic acceptance account only.
-const output = '.local/verification/kphon04-review-export';
+const output = '.local/verification/chain01-kphon04-review-export';
 const contextOptions = { locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh', reducedMotion: 'reduce' };
 const results = [];
 const api = suffix => `${base}/api/v1${suffix}`;
@@ -28,10 +28,13 @@ async function session(context) {
   return response.json();
 }
 async function selectStore(page) {
-  await page.getByRole('button', { name: /^001 ·/ }).click();
-  await expect(page.getByRole('button', exact('Tài khoản'))).toBeVisible();
+  await expect(page.locator('.store-chooser, .store-online-shell')).toHaveCount(1, { timeout: 15000 });
+  if (await page.locator('.store-chooser').count()) {
+    await page.getByRole('button', { name: /^001 ·/ }).click();
+  }
+  await expect(page.locator('.store-online-shell')).toBeVisible({ timeout: 15000 });
   await page.evaluate(() => { location.hash = 'kph'; });
-  await expect(page.locator('.store-online-kph[aria-label="Phiếu KPH"]')).toBeVisible();
+  await expect(page.locator('.store-online-kph[aria-label="Phiếu KPH"]')).toBeVisible({ timeout: 15000 });
 }
 async function login(page, username = 'manager.admin03') {
   await page.goto(base);
@@ -175,11 +178,13 @@ async function workbook(download, approved, stampedBytes, name) {
       await workbook(await downloadPromise, approved, await stampedResponse.body(), name);
       if (await page.getByRole('dialog', exact('Xuất Excel')).isVisible()) await page.keyboard.press('Escape');
       await layout(page, `${name}-exported`, width);
-      // D01 clears selection when page, tab or filter changes, even when the same rows reappear.
+      // Owner17/11: append keeps selection; changing type/filter still clears it.
       await selection(page, [pending.catalogSnapshot.productName]);
       assert.ok(persisted.totalPages >= 2, 'Acceptance fixture must contain at least 26 TPTS records for D01 page gate');
-      await page.getByRole('button', exact('Trang sau')).click(); await noSelection(page);
-      await page.getByRole('button', exact('Trang trước')).click(); await noSelection(page);
+      const loaded = await page.locator('[data-record-id]').count();
+      await page.getByRole('button', { name: /Hiển thị thêm/ }).click();
+      await expect.poll(() => page.locator('[data-record-id]').count()).toBeGreaterThan(loaded);
+      await expect(page.getByRole('checkbox', exact(`Chọn ${pending.catalogSnapshot.productName}`))).toBeChecked();
       await selection(page, [pending.catalogSnapshot.productName]);
       await page.getByRole('button', { name: /TP khô & khác/ }).filter({ has: page.locator('small') }).click(); await noSelection(page);
       await page.getByRole('button', { name: /TP tươi sống/ }).filter({ has: page.locator('small') }).click(); await noSelection(page);
@@ -206,7 +211,7 @@ async function workbook(download, approved, stampedBytes, name) {
       }
       assert.deepEqual(errors, []);
       results.push({ viewport: name, result: 'PASS', approved: approved.id, rejected: rejected.id,
-        checks: ['APPROVED/REJECTED persisted with store manager reviewer', 'page/tab/filter selection reset', 'only selected approved record exported', 'BM-331.CF approver R and private stamped image bytes', 'responsive workspace controls', 'no overflow/pageerror'] });
+        checks: ['APPROVED/REJECTED persisted by the store manager', 'append preserves selection; tab/filter selection reset', 'only selected approved record exported', 'BM-331.CF approver R and private stamped image bytes', 'responsive workspace controls', 'no overflow/pageerror'] });
       await context.close(); activePage = undefined;
     }
 

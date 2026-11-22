@@ -1,17 +1,7 @@
 # Công việc kế tiếp
 
-Round CHAIN01 dùng [spec người duyệt và phạm vi theo dõi](product/KPH_APPROVAL_SCOPE.md).
-Owner đã chốt bốn cấp ngày 21/11/2026. Nhân viên gửi, cửa hàng trưởng quyết định,
-Admin vùng và Admin chuỗi theo dõi theo phạm vi. Candidate chung đã kiểm được luồng bốn vai với backend thật ngày 22/11.
+Bắt đầu nhánh backend từ `store-app/ui09-restored-baseline` để kế thừa giao diện Store/Admin và quy tắc CHAIN01. [Trạng thái và nguồn tích hợp](CURRENT_STATE.md) · [Evidence UI09](delivery/ui09-restored-baseline.md).
 
-Bước kế tiếp là nghiệm thu thao tác. Owner mở phiếu đã duyệt ở Store, rồi mở
-cùng phiếu ở mục Phiếu KPH của Admin để xem trạng thái và người duyệt. Tài khoản
-fixture dùng cho hai phiên ở handoff ADMIN03. Link local tại lần bàn giao là
-[Store online](http://127.0.0.1:4776/) và [Admin KPH](http://127.0.0.1:4775/#kph).
-Kiểm lại runtime khi mở vào ngày khác. Phần KPHON03–04 còn Excel thực và
-UI/UX thiết bị thật. [Tài khoản fixture](delivery/admin03-store-membership/handoff.md). [Trạng thái baseline](CURRENT_STATE.md) ·
-[Chiến lược test](TEST_STRATEGY.md) · [Handoff KPHON04](delivery/kphon04-review-export/handoff.md).
-
-Tiếp theo cho DATE là lưu mã và tên hàng đã nhập thành công theo từng cửa hàng
-để gợi ý cho lần sau, kể cả qua tuần. Danh mục SKU tập trung và C02 xếp sau.
-Backlog nhắc DATE, báo cáo và rollout ở checkpoint `2d1536f:docs/NEXT.md`.
+1. DATEON02 bổ sung lưu, đọc, tạo và sửa lô theo cửa hàng, có quyền, version và audit. Đưa OpenAPI, examples, generated client và migration nối tiếp vào cùng slice. Nối kết quả backend vào workspace hiện có. Ưu tiên nhu cầu ghi nhớ mã và tên hàng đã nhập thành công theo cửa hàng để tuần sau còn gợi ý. [Contract DATE](product/DATE_DURABLE_CONTRACT.md) · [ADR0008 Proposed](adr/0008-durable-date-partial-processing.md).
+2. Triển khai xử lý từng phần DATE → KPH và lịch nhắc chung theo contract. Quantity là lượng đang theo dõi. Chỉ quản lý trong scope được sửa lịch. Báo cáo snapshot kỳ và C02 catalog publish ở các slice sau.
+3. Owner xem cùng một phiếu đã duyệt ở Store và Admin theo vai CHAIN01. Trên iPhone thật kiểm camera, bàn phím, safe area và quay lại form sau khi đổi ứng dụng. Còn kiểm độ dễ đọc/in của Excel thực và các gate restore/deployment trước rollout. [Quyết định bốn vai](product/KPH_APPROVAL_SCOPE.md) · [Bàn giao KPH](delivery/kphon04-review-export/handoff.md).

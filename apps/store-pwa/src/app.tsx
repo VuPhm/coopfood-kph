@@ -1047,7 +1047,7 @@ function WorkspaceApp() {
         <div className="app-header-inner">
           <img
             className="app-brand-logo"
-            src={assetUrl("brand/coopfood-logo.png")}
+            src={assetUrl("brand/coopfood-logo-dark.png")}
             alt="Co.op Food - an toàn, tiện lợi, tươi ngon"
           />
           <TodayDate />

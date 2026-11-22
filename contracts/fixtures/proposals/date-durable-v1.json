@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 1,
+  "status": "PROPOSED_SCENARIOS_NOT_RUNTIME_EVIDENCE",
+  "businessDecisions": {
+    "A": "TRACKED_QUANTITY_NOT_INVENTORY",
+    "B": "PARTIAL_PROCESSING",
+    "C": "STORE_SHARED_REMINDER_MANAGERS_EDIT_REMIND"
+  },
+  "quantityEncoding": "Decimal strings preserve literal precision in this language-independent fixture; public wire proposal follows numeric KPH quantities.",
+  "cases": [
+    {
+      "id": "partial-replay-final",
+      "initial": {
+        "trackedQuantity": "10",
+        "processedQuantity": "0",
+        "remainingQuantity": "10",
+        "version": 1,
+        "status": "OPEN",
+        "links": 0
+      },
+      "steps": [
+        {
+          "action": "PROCESS",
+          "amount": "3",
+          "unit": "EA",
+          "expectedVersion": 1,
+          "key": "synthetic-partial-a",
+          "expected": {
+            "processedQuantity": "3",
+            "remainingQuantity": "7",
+            "version": 2,
+            "status": "OPEN",
+            "links": 1,
+            "kphId": "synthetic-kph-a",
+            "kphApproval": "PENDING"
+          }
+        },
+        {
+          "action": "REPLAY",
+          "amount": "3",
+          "unit": "EA",
+          "expectedVersion": 1,
+          "key": "synthetic-partial-a",
+          "expected": {
+            "processedQuantity": "3",
+            "remainingQuantity": "7",
+            "version": 2,
+            "status": "OPEN",
+            "links": 1,
+            "kphId": "synthetic-kph-a"
+          }
+        },
+        {
+          "action": "PROCESS",
+          "amount": "7",
+          "unit": "EA",
+          "expectedVersion": 2,
+          "key": "synthetic-final-b",
+          "expected": {
+            "processedQuantity": "10",
+            "remainingQuantity": "0",
+            "version": 3,
+            "status": "RESOLVED",
+            "remindOn": null,
+            "links": 2,
+            "kphId": "synthetic-kph-b"
+          }
+        }
+      ]
+    },
+    {
+      "id": "decimal-server-authority",
+      "initial": {
+        "trackedQuantity": "0.3",
+        "processedQuantity": "0",
+        "remainingQuantity": "0.3",
+        "unit": "kg",
+        "version": 1
+      },
+      "steps": [
+        {
+          "action": "PROCESS",
+          "amount": "0.1",
+          "unit": "kg",
+          "expectedVersion": 1,
+          "key": "synthetic-decimal",
+          "expected": {
+            "processedQuantity": "0.1",
+            "remainingQuantity": "0.2",
+            "version": 2,
+            "status": "OPEN",
+            "links": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "replay-receipt-is-not-current-remaining",
+      "initial": {
+        "trackedQuantity": "20",
+        "processedQuantity": "0",
+        "remainingQuantity": "20",
+        "version": 1
+      },
+      "steps": [
+        {
+          "action": "PROCESS",
+          "amount": "5",
+          "expectedVersion": 1,
+          "key": "synthetic-replay-a",
+          "expected": {
+            "processedQuantity": "5",
+            "remainingQuantity": "15",
+            "version": 2,
+            "links": 1,
+            "kphId": "synthetic-a"
+          }
+        },
+        {
+          "action": "PROCESS",
+          "amount": "4",
+          "expectedVersion": 2,
+          "key": "synthetic-replay-b",
+          "expected": {
+            "processedQuantity": "9",
+            "remainingQuantity": "11",
+            "version": 3,
+            "links": 2,
+            "kphId": "synthetic-b"
+          }
+        },
+        {
+          "action": "REPLAY",
+          "amount": "5",
+          "expectedVersion": 1,
+          "key": "synthetic-replay-a",
+          "expected": {
+            "processedQuantity": "9",
+            "remainingQuantity": "11",
+            "version": 3,
+            "links": 2,
+            "kphId": "synthetic-a",
+            "receiptRemainingAfter": "15",
+            "mustReloadSource": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "same-version-concurrency",
+      "initial": {
+        "trackedQuantity": "5",
+        "processedQuantity": "0",
+        "remainingQuantity": "5",
+        "version": 7
+      },
+      "attempts": [
+        {
+          "actor": "synthetic-one",
+          "amount": "4",
+          "expectedVersion": 7
+        },
+        {
+          "actor": "synthetic-two",
+          "amount": "3",
+          "expectedVersion": 7
+        }
+      ],
+      "winner": "synthetic-one",
+      "expected": {
+        "processedQuantity": "4",
+        "remainingQuantity": "1",
+        "version": 8,
+        "links": 1,
+        "loserStatus": 409,
+        "loserWrites": 0
+      }
+    },
+    {
+      "id": "over-remaining-no-partial-write",
+      "initial": {
+        "trackedQuantity": "5",
+        "processedQuantity": "3",
+        "remainingQuantity": "2",
+        "version": 4
+      },
+      "request": {
+        "action": "PROCESS",
+        "amount": "3",
+        "unit": "EA",
+        "expectedVersion": 4
+      },
+      "expected": {
+        "httpStatus": 422,
+        "processedQuantity": "3",
+        "remainingQuantity": "2",
+        "version": 4,
+        "writes": 0
+      }
+    },
+    {
+      "id": "media-failure-rolls-back-source-and-kph",
+      "initial": {
+        "trackedQuantity": "8",
+        "processedQuantity": "0",
+        "remainingQuantity": "8",
+        "version": 1
+      },
+      "request": {
+        "action": "PROCESS",
+        "amount": "2",
+        "expectedVersion": 1,
+        "failure": "PRIVATE_MEDIA_STORAGE"
+      },
+      "expected": {
+        "processedQuantity": "0",
+        "remainingQuantity": "8",
+        "version": 1,
+        "links": 0,
+        "committedKph": 0,
+        "auditProcessingEvents": 0
+      }
+    },
+    {
+      "id": "permissions-explicit",
+      "scope": "active-store-a",
+      "expectedCapabilities": {
+        "EMPLOYEE": [
+          "VIEW",
+          "CREATE",
+          "PROCESS"
+        ],
+        "STORE_MANAGER": [
+          "VIEW",
+          "CREATE",
+          "UPDATE",
+          "REMIND",
+          "PROCESS"
+        ],
+        "REGION_MANAGER_ACTIVE_REGION_A": [
+          "VIEW",
+          "CREATE",
+          "UPDATE",
+          "REMIND",
+          "PROCESS"
+        ],
+        "CHAIN_ADMIN": [
+          "VIEW",
+          "CREATE",
+          "UPDATE",
+          "REMIND",
+          "PROCESS"
+        ],
+        "CATALOG_ADMIN_ONLY": []
+      },
+      "denials": [
+        {
+          "actor": "EMPLOYEE",
+          "action": "UPDATE",
+          "status": 403
+        },
+        {
+          "actor": "EMPLOYEE",
+          "action": "REMIND",
+          "status": 403
+        },
+        {
+          "actor": "REGION_MANAGER_REGION_B",
+          "action": "PROCESS",
+          "status": 403
+        },
+        {
+          "actor": "STORE_MANAGER_OTHER_STORE",
+          "action": "PROCESS",
+          "status": 403
+        },
+        {
+          "actor": "REVOKED_EMPLOYEE_SAME_SESSION",
+          "action": "PROCESS",
+          "status": 403
+        }
+      ],
+      "processAlsoRequires": "KPH_CREATE"
+    },
+    {
+      "id": "partial-keeps-shared-reminder-due-derived",
+      "initial": {
+        "trackedQuantity": "5",
+        "processedQuantity": "0",
+        "remainingQuantity": "5",
+        "version": 3,
+        "status": "ACKNOWLEDGED",
+        "remindOn": "2026-11-18"
+      },
+      "businessDate": "2026-11-17",
+      "steps": [
+        {
+          "action": "PROCESS",
+          "actor": "EMPLOYEE",
+          "amount": "2",
+          "expectedVersion": 3,
+          "expected": {
+            "processedQuantity": "2",
+            "remainingQuantity": "3",
+            "version": 4,
+            "status": "ACKNOWLEDGED",
+            "remindOn": "2026-11-18",
+            "links": 1
+          }
+        },
+        {
+          "action": "READ",
+          "businessDate": "2026-11-18",
+          "phase": "SAFE",
+          "expected": {
+            "processedQuantity": "2",
+            "remainingQuantity": "3",
+            "version": 4,
+            "status": "OPEN",
+            "remindOn": "2026-11-18",
+            "due": true,
+            "readAuditMutations": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "business-identifiers-and-missing-nsx",
+      "input": {
+        "sku": "000042",
+        "barcode": "0890123456789",
+        "lotCode": "000007",
+        "manufacturedOn": null,
+        "expiresOn": "2026-11-16",
+        "lookupStatus": "NOT_FOUND",
+        "unit": "EA",
+        "trackedQuantity": "2"
+      },
+      "businessDate": "2026-11-17",
+      "expected": {
+        "sku": "000042",
+        "barcode": "0890123456789",
+        "lotCode": "000007",
+        "phase": "EXPIRED",
+        "timeline": null,
+        "shelfPercent": null,
+        "inferredProduct": false
+      }
+    }
+  ]
+}

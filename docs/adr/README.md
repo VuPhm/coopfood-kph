@@ -25,3 +25,9 @@ ADR accepted hiện hành:
 ADR proposed đang có implementation candidate:
 
 - [0007-kph-effective-store-context.md](0007-kph-effective-store-context.md): discovery KPH riêng, giữ membership/session compatibility và backend authority; owner context acceptance pending.
+
+ADR proposed ở bước contract, chưa có implementation:
+
+- [0008-durable-date-partial-processing.md](0008-durable-date-partial-processing.md):
+  DATE quantity theo dõi, partial KPH atomic/nhiều link, quyền/lịch nhắc chung;
+  quyết định nghiệp vụ A/B/C đã chốt17/11, public wire/schema chưa triển khai.

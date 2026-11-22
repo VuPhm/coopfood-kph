@@ -21,17 +21,17 @@ describe("online KPH history", () => {
     expect(screen.queryByRole("button", { name: "Duyệt phiếu" })).not.toBeInTheDocument();
     expect(load).toHaveBeenCalledWith("store-a", { type: "TPTS", page: 1, pageSize: 25 }, expect.any(AbortSignal));
   });
-  it("paginates server-side, disables old rows while loading, and replaces rather than appends", async () => {
+  it("appends server pages without losing loaded rows or disabling them while loading", async () => {
     let release!: (value: OnlineHistoryPage) => void;
     const load = vi.fn().mockResolvedValueOnce(page).mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
-    setup(load); await screen.findByText("31 phiếu"); fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    setup(load); await screen.findByText("31 phiếu"); fireEvent.click(screen.getByRole("button", { name: /Hiển thị thêm/ }));
     await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
-    expect(screen.getByRole("button", { name: "Trang sau" })).toBeDisabled();
-    expect(document.querySelector('.store-kph-row-open, .store-ticket-open')).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Hiển thị thêm/ })).toBeDisabled();
+    expect(document.querySelector('.store-kph-row-open, .store-ticket-open')).toBeEnabled();
     await act(async () => release({ ...page, page: 2, records: [{ ...record, id: "record-b", productName: "Sản phẩm B" }] }));
     await screen.findByRole("button", { name: "Mở phiếu Sản phẩm B" });
-    expect(screen.queryByRole("button", { name: "Mở phiếu Sản phẩm A" })).not.toBeInTheDocument();
-    expect(screen.getByText("Trang 2/2")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mở phiếu Sản phẩm A" })).toBeInTheDocument();
+    expect(screen.getByText("Đã hiển thị 2/31 phiếu")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /TP khô/ }));
     await waitFor(() => expect(load).toHaveBeenLastCalledWith("store-a", expect.objectContaining({ type: "TPCN", page: 1 }), expect.any(AbortSignal)));
   });
@@ -51,7 +51,7 @@ describe("online KPH history", () => {
   });
   it("does not show old records after a denied page request", async () => {
     const load = vi.fn().mockResolvedValueOnce(page).mockRejectedValue(new OnlineApiError("denied", 403));
-    const { expired } = setup(load); await screen.findByText("31 phiếu"); fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    const { expired } = setup(load); await screen.findByText("31 phiếu"); fireEvent.click(screen.getByRole("button", { name: /Hiển thị thêm/ }));
     await screen.findByText("Không có quyền xem phiếu tại cửa hàng này.");
     expect(screen.queryByRole("button", { name: "Mở phiếu Sản phẩm A" })).not.toBeInTheDocument();
     await waitFor(() => expect(expired).toHaveBeenCalledOnce());
@@ -63,6 +63,69 @@ describe("online KPH history", () => {
 });
 
 describe("online KPH privileged actions", () => {
+  it("discards a late whole-day selection after the filter changes", async () => {
+    let release!: (value: OnlineHistoryPage) => void;
+    let signal!: AbortSignal;
+    const load = vi.fn().mockImplementation((_store, filter, requestSignal) => filter.pageSize === 100
+      ? new Promise(resolve => { release = resolve; signal = requestSignal; }) : Promise.resolve(page));
+    setup(load, vi.fn(), { canExport: true, prepareExport: vi.fn() });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Chọn" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Chọn" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn toàn bộ ngày 09/09/2026" }));
+    await screen.findByText("Đang chọn đủ phiếu trong ngày…");
+    fireEvent.click(screen.getByRole("button", { name: "Lọc phiếu KPH" }));
+    fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "APPROVED" } });
+    expect(signal.aborted).toBe(true);
+    await act(async () => release({ ...page, totalItems: 1, totalPages: 1 }));
+    expect(screen.getByText("0 đã chọn")).toBeInTheDocument();
+  });
+  it("retains selected loaded records after an append fails and retries the missing page", async () => {
+    const load = vi.fn().mockResolvedValueOnce(page).mockRejectedValueOnce(new TypeError("offline"))
+      .mockResolvedValue({ ...page, page: 2, records: [{ ...record, id: "second", productName: "Trang nối" }] });
+    setup(load, vi.fn(), { canExport: true, prepareExport: vi.fn() });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Chọn" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Chọn" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn Sản phẩm A" }));
+    fireEvent.click(screen.getByRole("button", { name: /Hiển thị thêm/ }));
+    await screen.findByText(/Các phiếu đã tải và lựa chọn vẫn được giữ/);
+    expect(screen.getByText("1 đã chọn")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Chọn Sản phẩm A" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "Thử lại" }));
+    await screen.findByRole("checkbox", { name: "Chọn Trang nối" });
+    expect(load).toHaveBeenLastCalledWith("store-a", expect.objectContaining({ page: 2 }), expect.any(AbortSignal));
+    expect(screen.getByRole("checkbox", { name: "Chọn Sản phẩm A" })).toBeChecked();
+  });
+  it.each([403, 501])("does not partially select a denied or over-limit day (%s)", async failure => {
+    const expired = vi.fn();
+    const load = vi.fn().mockImplementation((_store, filter) => filter.pageSize === 100
+      ? failure === 403 ? Promise.reject(new OnlineApiError("denied", 403)) : Promise.resolve({ ...page, totalItems: 501, totalPages: 6 })
+      : Promise.resolve(page));
+    setup(load, expired, { canExport: true, prepareExport: vi.fn() });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Chọn" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Chọn" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn toàn bộ ngày 09/09/2026" }));
+    if (failure === 403) await waitFor(() => expect(expired).toHaveBeenCalledOnce());
+    else await screen.findByText(/Ngày này có hơn 500 phiếu/);
+    expect(screen.getByText("0 đã chọn")).toBeInTheDocument();
+  });
+  it("selects a complete filtered day beyond the loaded window and exports those explicit IDs", async () => {
+    const approved = { ...record, approvalStatus: "APPROVED" as const };
+    const unseen = { ...approved, id: "day-b", productName: "Cùng ngày chưa tải" };
+    const load = vi.fn().mockImplementation((_store, filter) => Promise.resolve(filter.pageSize === 100
+      ? { ...page, totalItems: 2, totalPages: 1, records: [approved, unseen] }
+      : { ...page, records: [approved] }));
+    const prepareExport = vi.fn().mockRejectedValue(new Error("offline"));
+    setup(load, vi.fn(), { canExport: true, prepareExport });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Chọn" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Chọn" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Chọn toàn bộ ngày 09/09/2026" }));
+    await screen.findByText("2 đã chọn");
+    expect(load).toHaveBeenLastCalledWith("store-a", expect.objectContaining({ type: "TPTS", detectedFrom: "2026-09-09", detectedTo: "2026-09-09", page: 1, pageSize: 100 }), expect.any(AbortSignal));
+    expect(screen.getByText(/1 phiếu được chọn theo ngày chưa nằm trong danh sách đã tải/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Xuất Excel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tải xuống" }));
+    await waitFor(() => expect(prepareExport).toHaveBeenCalledExactlyOnceWith("store-a", "TPTS", ["record-a", "day-b"]));
+  });
   it("persists review through the gateway, blocks duplicate/close while pending and refreshes D01", async () => {
     let release!: (value: RecordView) => void;
     const reviewRecord = vi.fn().mockImplementation(() => new Promise(resolve => { release = resolve; }));
@@ -82,7 +145,7 @@ describe("online KPH privileged actions", () => {
     expect(screen.getByRole("dialog")).toHaveTextContent("Quản lý");
     expect(screen.getByRole("button", { name: "Duyệt phiếu" })).toBeDisabled();
   });
-  it("uses only approved selected records from the current page and resets on page/filter/type", async () => {
+  it("keeps selections when appending, exports selected approved rows, and resets on filter/type", async () => {
     const approved = { ...record, approvalStatus: "APPROVED" as const };
     const load = vi.fn().mockResolvedValue({ ...page, records: [approved, { ...record, id: "pending", productName: "Chờ" }] });
     const prepareExport = vi.fn().mockRejectedValue(new Error("offline"));
@@ -100,9 +163,9 @@ describe("online KPH privileged actions", () => {
     expect(prepareExport).toHaveBeenCalledExactlyOnceWith("store-a", "TPTS", ["record-a"]);
     expect(screen.queryByText("Đã tạo file Excel")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
-    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    fireEvent.click(screen.getByRole("button", { name: /Hiển thị thêm/ }));
     await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
-    expect(screen.getByText("0 đã chọn")).toBeInTheDocument();
+    expect(screen.getByText("2 đã chọn")).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole("checkbox", { name: "Chọn Sản phẩm A" })).toBeEnabled());
     fireEvent.click(screen.getByRole("checkbox", { name: "Chọn Sản phẩm A" }));
     fireEvent.click(screen.getByRole("button", { name: "Lọc phiếu KPH" }));

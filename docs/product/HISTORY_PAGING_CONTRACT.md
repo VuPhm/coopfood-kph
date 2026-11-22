@@ -1,11 +1,13 @@
 # D01 — Hợp đồng phân trang lịch sử KPH online
 
-Trạng thái: Accepted — owner chấp nhận D01 revision 2 ngày 2026-09-24.
+Trạng thái: Accepted — API D01 revision2 ngày24/09/2026; interaction online
+được owner yêu cầu đổi17/11/2026 trong vòng UI/UX KPHQA01.
 Bản tích hợp trên baseline P04/P05; owner decision tại handoff D01.
 
 Store Fresh có [UI compact/Hiển thị thêm đã duyệt22/10](KPH_COMPACT_HISTORY.md) theo
-owner ngày22/10/2026, áp dụng workspace fixture trong phiên. Candidate đó giữ
-selection trên phần đã hiện khi nối thêm, không áp dụng cho online D01 bên dưới.
+owner ngày22/10/2026 là provenance. Yêu cầu owner17/11 thay interaction online:
+không giới hạn lựa chọn theo trang, chọn đủ ngày dù ngày vượt mốc25. API phân
+trang backend giữ nguyên; không thay contract này ngầm theo mock.
 
 ## Outcome
 
@@ -37,22 +39,32 @@ trang. Pilot local-only theo ADR-0002 giữ nguyên authority và hành vi hiệ
 - Backend resolve store scope từ session/database như hiện tại; client không thể
   dùng paging/filter/sort để vượt store.
 
-## Store PWA
+## Store PWA — interaction owner17/11/2026
 
-- Online gửi active type, khoảng ngày, approval filter, sort và page vào request;
-  các giá trị này cùng user/store nằm trong TanStack Query key.
-- Đổi user/store/tab/filter/sort đưa về trang 1, xóa selection và trạng thái mở
-  card. Đổi trang cũng xóa selection để không thao tác trên dòng đã ẩn.
-- Checkbox “chọn tất cả” chỉ chọn các phiếu ở trang hiện tại. Duyệt và xuất chỉ
-  dùng selection của trang hiện tại; không suy diễn select-all xuyên nhiều trang.
-- Badge cạnh tiêu đề hiển thị `totalItems`; count hai tab dùng `typeTotals`, không
-  dùng số item của trang hiện tại.
-- Điều hướng hiển thị trang hiện tại/tổng trang, nút trước/sau có accessible name,
-  disabled state đúng và vùng chạm tối thiểu `44×44px`. Khi request trang mới
-  đang chạy, dữ liệu cũ có thể được giữ để tránh nhảy layout nhưng phải có trạng
-  thái loading/busy rõ.
-- Sau create/review thành công, invalidate history scope tương ứng; nếu page hiện
-  tại vượt quá `totalPages` mới thì đưa về page cuối hợp lệ.
+- Backend vẫn lọc/sắp xếp toàn tập trước khi trả từng page25. Frontend dùng
+  “Hiển thị thêm” nối page tiếp vào tập đã tải; deduplicate theo record ID,
+  giữ thứ tự server. Không tự fetch toàn bộ lịch sử khi vào màn.
+- Nối thêm không xóa selection, không thay/ẩn dòng đã tải khi chờ page mới;
+  lỗi tải thêm giữ tập đã tải/selection và cho retry đúng page thiếu.401/403
+  vẫn đóng dữ liệu/scope theo policy, không giữ data private để làm mượt.
+- Đổi user/store/tab/filter/sort xóa tập đã tải, selection và detail. Refetch
+  sau create/review vẫn invalidate đúng actor/store; không tự duyệt lại khi
+  response bị mất.
+- Checkbox chung chọn các phiếu đã tải. Checkbox ngày mang nghĩa explicit
+  **“Chọn toàn bộ ngày dd/mm/yyyy”** trong type/bộ lọc hiện hành, kể cả chưa
+  hiển thị. Frontend query đúng ngày với pageSize100, tối đa500 records để
+  giữ export limit; chỉ commit selection sau khi đã lấy đủ, không chọn một
+  phần khi lỗi, dataset đổi count/duplicate hoặc vượt giới hạn.
+- Số đã tải và tổng selection là hai số riêng. Nếu lựa chọn theo ngày có phiếu
+  chưa nằm trong list, giao diện nêu rõ số phiếu đó trước export. Bỏ chọn ngày
+  bỏ cả phần chưa hiện. Request chọn ngày bị abort/loại response khi đổi bộ lọc,
+  actor/store, mất scope hoặc capability; backend vẫn reauthorize từng ID.
+- Badge/tổng tab lấy totalItems/typeTotals của backend, không dùng độ dài page.
+  Group theo ngày không đổi thứ tự sort toàn tập; cùng ngày nối qua page không
+  thành các màn riêng. Với sort khác ngày, date runs giữ thứ tự server như cũ.
+- Confirm export chỉ selected APPROVED đúng store/type và vẫn tối đa500 phiếu;
+  phần chưa duyệt/không duyệt được nêu là bị bỏ qua. Không có select-all ngầm
+  trên toàn query, API bulk mới hoặc export scope dựa vào frontend.
 
 ## Verification
 
@@ -61,13 +73,13 @@ trang. Pilot local-only theo ADR-0002 giữ nguyên authority và hành vi hiệ
   page không trùng/mất trên dataset không đổi và cross-store denial.
 - Query chọn record IDs trước rồi mới nạp ảnh; ghi query plan/baseline với dữ liệu
   tổng hợp. Chỉ thêm index khi số đo chứng minh cần.
-- Frontend test query key/request, reset state, page-local selection, counts,
+- Frontend test query key/request, reset state, append/whole-day selection, cancellation, counts,
   loading/error và Pilot regression.
 - Browser backend thật kiểm desktop/mobile đổi filter/sort/page, quay lại không
   trùng/mất và thao tác chỉ tác động selection trang hiện tại.
 
 ## Ngoài phạm vi
 
-Cursor pagination, infinite scroll, select-all xuyên trang, bulk API mới,
+Cursor pagination, tự động infinite scroll, select-all toàn query, bulk API mới,
 full-text search, production load/SLO và thay đổi export limit 500 thuộc outcome
 khác.

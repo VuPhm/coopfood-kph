@@ -54,8 +54,10 @@ với backend/DB tổng hợp thật, Fresh online đúng source. Script tạo p
 tạm đổi membership có restore; xác minh runtime trước, không dùng DB vận hành.
 Không seed/reset lại runtime đang dùng chỉ để chạy test.
 
-- Giữ duyệt/không duyệt, reload, selection reset và tải workbook thật ở cả
+- Giữ duyệt/không duyệt, reload và tải workbook thật ở cả
   mobile390×844 và desktop1440×1024: hai composition có thể hỏng độc lập.
+  Owner17/11 thay page-local bằng Hiển thị thêm giữ selection và chọn đủ ngày;
+  script active đã đổi assertion append, giữ reset khi đổi type/filter.
 - Review/export cross-region403 và stamped-media anonymous401 dùng cùng các
   endpoint ở hai viewport, không phụ thuộc layout: kiểm một lần. Giảm từ6 xuống3 request deny, bốn
   lần đọc session phục vụ chúng xuống hai, và bỏ một anonymous context.

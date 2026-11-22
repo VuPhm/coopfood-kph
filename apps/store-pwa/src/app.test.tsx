@@ -10,7 +10,7 @@ describe("Store workspace", () => {
     render(<App />);
     const today = formatBusinessDate(new Date());
 
-    expect(screen.getByRole("img", { name: /Co\.op Food/i })).toHaveAttribute("src", "/brand/coopfood-logo.png");
+    expect(screen.getByRole("img", { name: /Co\.op Food/i })).toHaveAttribute("src", "/brand/coopfood-logo-dark.png");
     expect(screen.getByLabelText(`Hôm nay: ${today.display}`)).toContainElement(screen.getByText(today.display));
     expect(screen.getByText(today.display)).toHaveAttribute("datetime", today.iso);
   });

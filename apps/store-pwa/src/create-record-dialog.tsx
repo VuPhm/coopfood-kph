@@ -181,6 +181,12 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
   const photoSession = useRef(0);
   const processingPhotosRef = useRef(false);
   const photoFeedbackRef = useRef<HTMLParagraphElement>(null);
+  const reviewNoticeRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (!photoError || !reviewing || suspended) return;
+    const frame = window.requestAnimationFrame(() => reviewNoticeRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [photoError, reviewing, suspended]);
   const {
     formState: { errors },
     handleSubmit,
@@ -379,7 +385,9 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
       idempotencyKeyRef.current = null;
       onOpenChange(false);
     } catch (error) {
-      setPhotoError(error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
+      setPhotoError(onlineMode && error instanceof TypeError
+        ? "Chưa nhận được xác nhận. Kiểm tra kết nối rồi bấm “Gửi phiếu” để thử lại. Nội dung và ảnh vẫn được giữ."
+        : error instanceof Error ? error.message : "Không thể lưu phiếu trên thiết bị");
     } finally {
       setSavingRecord(false);
       savingRecordRef.current = false;
@@ -484,7 +492,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
           </DialogHeader> : null}
 
           {screenPresentation && reviewing ? <div className="store-form-review" inert={suspended || undefined} aria-hidden={suspended || undefined} onFocusCapture={revealCreateFocus}>
-            <p className={cn("store-review-notice", photoError && "is-error")} role={photoError ? "alert" : "status"}><img src={figmaAsset(photoError ? "280-1915" : "279-1299", photoError ? "imgFeatherWifiOff" : "imgFeatherAlertCircle")} alt="" /><span><strong>{photoError ? "Chưa gửi được phiếu" : "Chưa gửi"}</strong><small>{photoError || "Phiếu chỉ được tạo sau khi bạn bấm “Gửi phiếu”."}</small></span></p>
+            <p ref={reviewNoticeRef} tabIndex={-1} className={cn("store-review-notice", photoError && "is-error")} role={photoError ? "alert" : "status"}><img src={figmaAsset(photoError ? "280-1915" : "279-1299", photoError ? "imgFeatherWifiOff" : "imgFeatherAlertCircle")} alt="" /><span><strong>{photoError ? "Chưa gửi được phiếu" : "Chưa gửi"}</strong><small>{photoError || "Phiếu chỉ được tạo sau khi bạn bấm “Gửi phiếu”."}</small></span></p>
             <ReviewSection title="Hàng hóa" rows={[["Cửa hàng", profile.storeName], ["Ngày phát hiện", getValues("detectedDate")], ["Mã SKU / UPC", getValues("barcode") || "—"], ["Tên hàng hóa", getValues("productName") || "—"], ["Nhà cung cấp", getValues("supplier") || "—"], ["Số lượng", `${getValues("quantity")} ${getValues("unit")}`]]} />
             <ReviewSection title="Xử lý" rows={[["Tình trạng", resolveChoiceLabel(options.conditions.find(c => c.value === getValues("condition"))!, getValues("conditionDetail"))], ["Biện pháp", resolveChoiceLabel(options.resolutions.find(c => c.value === getValues("resolution"))!, getValues("resolutionDetail"))], ["Ngày xử lý", getValues("treatmentDate") || "Chưa có"]]} />
             <ReviewSection title="Ghi nhận" rows={[["Người phát hiện", getValues("detectedBy")], ["Ghi chú", getValues("note") || "Không có"]]}>

@@ -39,11 +39,12 @@ describe("Fresh online create", () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:synthetic"); expect(api.createRecord).not.toHaveBeenCalled();
   });
   it("reviews before send, retries failure with the same key and refreshes history only after success", async () => {
-    const api = gateway(); vi.mocked(api.createRecord).mockRejectedValueOnce(new Error("Mất kết nối")).mockResolvedValue({ id: "saved" } as RecordView);
+    const api = gateway(); vi.mocked(api.createRecord).mockRejectedValueOnce(new TypeError("Failed to fetch")).mockResolvedValue({ id: "saved" } as RecordView);
     const name = await open(api); fireEvent.change(name, { target: { value: "Hàng nhập tay" } }); await attach();
     fireEvent.click(screen.getByRole("button", { name: "Xem lại" })); await screen.findByRole("button", { name: "Gửi phiếu" }); expect(api.createRecord).not.toHaveBeenCalled();
     const loaded = vi.mocked(api.loadHistory).mock.calls.length;
-    fireEvent.click(screen.getByRole("button", { name: "Gửi phiếu" })); await waitFor(() => expect(screen.getByRole("alert", { hidden: false })).toHaveTextContent("Mất kết nối"));
+    fireEvent.click(screen.getByRole("button", { name: "Gửi phiếu" })); await waitFor(() => expect(screen.getByRole("alert", { hidden: false })).toHaveTextContent("Kiểm tra kết nối rồi bấm “Gửi phiếu” để thử lại"));
+    await waitFor(() => expect(screen.getByRole("alert", { hidden: false })).toHaveFocus());
     expect(api.loadHistory).toHaveBeenCalledTimes(loaded);
     fireEvent.click(screen.getByRole("button", { name: "Gửi phiếu" })); await screen.findByText("Đã gửi phiếu");
     expect(api.createRecord).toHaveBeenCalledTimes(2);

@@ -3,8 +3,12 @@ const { chromium, expect } = require('@playwright/test');
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
 
-const storeUrl = 'http://127.0.0.1:4776';
-const adminUrl = 'http://127.0.0.1:4775';
+const storeUrl = process.env.STORE_URL || 'http://127.0.0.1:4776';
+const adminUrl = process.env.ADMIN_URL || 'http://127.0.0.1:4775';
+for (const origin of [storeUrl, adminUrl]) {
+  const url = new URL(origin);
+  assert.ok(origin === url.origin && url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname), 'Expected a local synthetic runtime');
+}
 const storeA = '73000000-0000-4000-8000-000000000001';
 const storeB = '73000000-0000-4000-8000-000000000002';
 const storeRecords = id => storeUrl + '/api/v1/stores/' + id + '/kph';
