@@ -65,7 +65,10 @@ async function layout(page,name) {
    await login(page,'region.admin03');
    const regionSession=await(await c.request.get(`${storeUrl}/api/v1/auth/session`)).json();assert.equal(regionSession.user.stores.length,0);
    assert.equal(await page.getByRole('button',{name:/^001 ·/}).count(),1);
-   await select(page);await expect(page.getByText('Duyệt phiếu',{exact:true})).toBeVisible();
+   await select(page);
+   const regionAccess=await c.request.get(`${storeUrl}/api/v1/kph/stores`);
+   assert.equal(regionAccess.status(),200);
+   assert.deepEqual((await regionAccess.json()).find(s=>s.id===storeId).capabilities,['VIEW','CREATE','EXPORT']);
    await page.evaluate(()=>{location.hash='date';});
    await expect(page.getByText(/chưa được kết nối trong phiên online/)).toBeVisible();
    await expect(page.getByRole('button',{name:'Tạo lô',exact:true})).toHaveCount(0);

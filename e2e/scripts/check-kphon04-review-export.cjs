@@ -33,7 +33,7 @@ async function selectStore(page) {
   await page.evaluate(() => { location.hash = 'kph'; });
   await expect(page.locator('.store-online-kph[aria-label="Phiếu KPH"]')).toBeVisible();
 }
-async function login(page, username = 'region.admin03') {
+async function login(page, username = 'manager.admin03') {
   await page.goto(base);
   await page.getByLabel('Tên đăng nhập', { exact: true }).fill(username);
   await page.getByLabel('Mật khẩu', { exact: true }).fill(password);
@@ -82,7 +82,7 @@ async function review(page, record, label, status) {
   assert.equal(result.status(), 200, await result.text());
   const updated = await result.json();
   assert.equal(updated.approvalStatus, status);
-  assert.equal(updated.reviewedBy.displayName, 'Quản lý vùng Nam mẫu');
+  assert.equal(updated.reviewedBy.displayName, 'Quản lý cửa hàng mẫu');
   await expect(page.getByText(status === 'APPROVED' ? 'Đã duyệt phiếu' : 'Đã ghi nhận không duyệt', { exact: true })).toBeVisible();
   if (await sheet.isVisible()) await closeDetail(page);
   return updated;
@@ -118,7 +118,7 @@ async function workbook(download, approved, stampedBytes, name) {
   const sheet = book.getWorksheet('Thực phẩm tươi sống');
   assert.ok(sheet); assert.equal(sheet.pageSetup.orientation, 'landscape');
   assert.equal(sheet.getCell('D9').value, approved.catalogSnapshot.productName);
-  assert.equal(sheet.getCell('R9').value, 'Quản lý vùng Nam mẫu');
+  assert.equal(sheet.getCell('R9').value, 'Quản lý cửa hàng mẫu');
   assert.equal(sheet.getCell('D10').value, null, 'Only the selected approved record enters workbook');
   const images = sheet.getImages(); assert.equal(images.length, 1);
   const embedded = book.getImage(images[0].imageId);
@@ -158,9 +158,9 @@ async function workbook(download, approved, stampedBytes, name) {
       const persisted = await history(context);
       assert.equal(persisted.items.find(r => r.id === approved.id).approvalStatus, 'APPROVED');
       assert.equal(persisted.items.find(r => r.id === rejected.id).approvalStatus, 'REJECTED');
-      assert.equal(persisted.items.find(r => r.id === approved.id).reviewedBy.displayName, 'Quản lý vùng Nam mẫu');
+      assert.equal(persisted.items.find(r => r.id === approved.id).reviewedBy.displayName, 'Quản lý cửa hàng mẫu');
       const sheet = await detail(page, approved.catalogSnapshot.productName);
-      await expect(sheet.getByText('Quản lý vùng Nam mẫu', { exact: true }).last()).toBeVisible();
+      await expect(sheet.getByText('Quản lý cửa hàng mẫu', { exact: true }).last()).toBeVisible();
       await page.screenshot({ path: `${output}/${name}-reviewed.png` }); await closeDetail(page);
       await selection(page, [approved.catalogSnapshot.productName, pending.catalogSnapshot.productName]);
       await page.getByRole('button', exact('Xuất Excel')).click();
@@ -190,12 +190,15 @@ async function workbook(download, approved, stampedBytes, name) {
       await noSelection(page);
       // These HTTP guards do not depend on viewport. Keep them once, against real API/media.
       if (name === 'desktop') {
-        assert.equal((await context.request.put(api(`/stores/${outside}/kph/${approved.id}/approval`), {
-          headers: { 'X-CSRF-TOKEN': (await session(context)).csrfToken }, data: { status: 'APPROVED' },
+        const region = await browser.newContext();
+        const regionSession = await apiSession(region, 'region.admin03');
+        assert.equal((await region.request.put(api(`/stores/${outside}/kph/${approved.id}/approval`), {
+          headers: { 'X-CSRF-TOKEN': regionSession.csrfToken }, data: { status: 'APPROVED' },
         })).status(), 403);
-        assert.equal((await context.request.post(api(`/stores/${outside}/kph/exports`), {
-          headers: { 'X-CSRF-TOKEN': (await session(context)).csrfToken }, data: { type: 'TPTS', recordIds: [approved.id] },
+        assert.equal((await region.request.post(api(`/stores/${outside}/kph/exports`), {
+          headers: { 'X-CSRF-TOKEN': regionSession.csrfToken }, data: { type: 'TPTS', recordIds: [approved.id] },
         })).status(), 403);
+        await region.close();
         const anon = await browser.newContext();
         assert.equal((await anon.request.get(base + approved.photos[0].stampedContentPath)).status(), 401); await anon.close();
         results.push({ scenario: 'http-scope-and-private-media', result: 'PASS',
@@ -203,7 +206,7 @@ async function workbook(download, approved, stampedBytes, name) {
       }
       assert.deepEqual(errors, []);
       results.push({ viewport: name, result: 'PASS', approved: approved.id, rejected: rejected.id,
-        checks: ['APPROVED/REJECTED persisted with inherited reviewer', 'page/tab/filter selection reset', 'only selected approved record exported', 'BM-331.CF approver R and private stamped image bytes', 'responsive workspace controls', 'no overflow/pageerror'] });
+        checks: ['APPROVED/REJECTED persisted with store manager reviewer', 'page/tab/filter selection reset', 'only selected approved record exported', 'BM-331.CF approver R and private stamped image bytes', 'responsive workspace controls', 'no overflow/pageerror'] });
       await context.close(); activePage = undefined;
     }
 

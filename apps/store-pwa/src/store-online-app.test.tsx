@@ -33,14 +33,20 @@ describe("Store online session", () => {
   });
 
 
-  it("uses effective stores with no synthetic membership and switches scope without old content", async () => {
-    render(<StoreOnlineApp gateway={gateway()} />); await selectA();
+  it("switches to an inherited store with export capability and no review capability", async () => {
+    const api = gateway();
+    const assigned = { id: employee.id, code: employee.code, name: employee.name, role: "EMPLOYEE" as const };
+    vi.mocked(api.getSession).mockResolvedValue({ ...session, user: { ...session.user, stores: [assigned] } });
+    vi.mocked(api.listStoreAccess).mockResolvedValue([employee, { ...manager, capabilities: ["VIEW", "CREATE", "EXPORT"] }]);
+    render(<StoreOnlineApp gateway={api} />); await selectA();
     fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
     expect(screen.getByText("Xem phiếu")).toBeInTheDocument(); expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Đổi cửa hàng" }));
     fireEvent.click(await screen.findByRole("button", { name: "0002 · Cửa hàng B" }));
     await screen.findByRole("heading", { name: "Công việc cửa hàng" }); fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
-    await screen.findByText("Duyệt phiếu"); expect(screen.queryByText("Mã cửa hàng · 0001")).not.toBeInTheDocument();
+    expect(await screen.findByText("Xuất phiếu")).toBeVisible();
+    expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mã cửa hàng · 0001")).not.toBeInTheDocument();
   });
   it("removes revoked store at the next refresh and does not select another store automatically", async () => {
     const api = gateway(); render(<StoreOnlineApp gateway={api} />); await selectA();
