@@ -6,7 +6,7 @@
     "B": "PARTIAL_PROCESSING",
     "C": "STORE_SHARED_REMINDER_MANAGERS_EDIT_REMIND"
   },
-  "quantityEncoding": "Decimal strings preserve literal precision in this language-independent fixture; public wire proposal follows numeric KPH quantities.",
+  "quantityEncoding": "Decimal strings preserve precision in this fixture and in the DATE processing endpoint. The standalone KPH create endpoint retains its numeric quantity.",
   "cases": [
     {
       "id": "partial-replay-final",

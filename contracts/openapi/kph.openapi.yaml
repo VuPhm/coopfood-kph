@@ -1866,6 +1866,12 @@ components:
         - $ref: '#/components/schemas/DateLot'
         - type: object
           required: [kphType, processingHistory]
+          properties:
+            kphType: { type: [string, 'null'], enum: [TPCN, TPTS, null] }
+            processingHistory:
+              type: array
+              items:
+                $ref: '#/components/schemas/DateLotProcessingReceipt'
 
     DateLotProcessingRequest:
       type: object

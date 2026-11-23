@@ -892,7 +892,11 @@ export interface components {
             kphType?: "TPCN" | "TPTS" | null;
             processingHistory?: components["schemas"]["DateLotProcessingReceipt"][];
         } & components["schemas"]["DateLotFields"];
-        DateLotDetail: components["schemas"]["DateLot"] & Record<string, never>;
+        DateLotDetail: components["schemas"]["DateLot"] & {
+            /** @enum {string|null} */
+            kphType: "TPCN" | "TPTS" | null;
+            processingHistory: components["schemas"]["DateLotProcessingReceipt"][];
+        };
         DateLotProcessingRequest: {
             /** Format: int64 */
             expectedVersion: number;
