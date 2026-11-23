@@ -184,7 +184,10 @@ export interface paths {
          *     An absent manufacture date yields EXPIRED after expiry or MISSING otherwise.
          *     Default order is newest created first, expiry order is earliest expiry first and
          *     name order uses product name ascending with PostgreSQL vi-x-icu collation.
-         *     Each order ends in ID ascending.
+         *     For notifications, use attentionOnly=true with sort=notification.
+         *     It orders expiry groups before due reminders, then sorts by expiry within
+         *     expiry groups and by reminder date within the due group. A due reminder
+         *     belongs only to the due group. Each order ends in ID ascending.
          */
         get: operations["listDateLots"];
         put?: never;
@@ -981,6 +984,11 @@ export interface components {
             totalPages: number;
             /** Format: int64 */
             attentionCount: number;
+            /**
+             * Format: date
+             * @description Asia/Ho_Chi_Minh business date used to assess this page.
+             */
+            businessDate: string;
         };
         DateLotWriteResult: {
             lot: components["schemas"]["DateLot"];
@@ -1692,7 +1700,7 @@ export interface operations {
                 q?: components["parameters"]["DateQuery"];
                 phase?: "SAFE" | "WARNING" | "DANGER" | "EXPIRED" | "BEFORE_NSX" | "MISSING";
                 attentionOnly?: boolean;
-                sort?: "default" | "expiry" | "name";
+                sort?: "default" | "expiry" | "name" | "notification";
                 page?: number;
                 pageSize?: number;
             };

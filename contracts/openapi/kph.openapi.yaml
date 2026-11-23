@@ -221,7 +221,10 @@ paths:
         An absent manufacture date yields EXPIRED after expiry or MISSING otherwise.
         Default order is newest created first, expiry order is earliest expiry first and
         name order uses product name ascending with PostgreSQL vi-x-icu collation.
-        Each order ends in ID ascending.
+        For notifications, use attentionOnly=true with sort=notification.
+        It orders expiry groups before due reminders, then sorts by expiry within
+        expiry groups and by reminder date within the due group. A due reminder
+        belongs only to the due group. Each order ends in ID ascending.
       parameters:
         - $ref: '#/components/parameters/StoreIdPath'
         - $ref: '#/components/parameters/DateQuery'
@@ -233,7 +236,7 @@ paths:
           schema: { type: boolean, default: false }
         - name: sort
           in: query
-          schema: { type: string, enum: [default, expiry, name], default: default }
+          schema: { type: string, enum: [default, expiry, name, notification], default: default }
         - name: page
           in: query
           schema: { type: integer, minimum: 1, default: 1 }
@@ -2003,7 +2006,7 @@ components:
     DateLotPage:
       type: object
       additionalProperties: false
-      required: [items, page, pageSize, totalItems, totalPages, attentionCount]
+      required: [items, page, pageSize, totalItems, totalPages, attentionCount, businessDate]
       properties:
         items:
           type: array
@@ -2014,6 +2017,10 @@ components:
         totalItems: { type: integer, format: int64, minimum: 0 }
         totalPages: { type: integer, minimum: 0 }
         attentionCount: { type: integer, format: int64, minimum: 0 }
+        businessDate:
+          type: string
+          format: date
+          description: Asia/Ho_Chi_Minh business date used to assess this page.
 
     DateLotWriteResult:
       type: object
