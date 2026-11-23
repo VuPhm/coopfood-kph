@@ -23,7 +23,8 @@ function row(lot: DateLot): WorkspaceLot {
   return { id: lot.id, lotCode: lot.lotCode, sku: lot.skuCode, name: lot.productName, date: lot.expiresOn as LocalDate,
     ...(lot.manufacturedOn && { manufactured: formatDisplayDate(lot.manufacturedOn as LocalDate) }),
     remindOn: lot.remindOn as LocalDate | null, reminderState: lot.reminderState, version: lot.version,
-    status: lot.processingStatus === "RESOLVED" ? "resolved" : "open" };
+    status: lot.processingStatus === "RESOLVED" ? "resolved"
+      : lot.reminderState === "SCHEDULED" ? "acknowledged" : "open" };
 }
 
 export function StoreOnlineDate({ suspended = false, verifiedAt, api, storeId, userId, csrf, kphCreate = false, ...lookup }: Props & { kphCreate?: boolean }) {

@@ -205,10 +205,27 @@ export function DateWorkspace(props: DateWorkspaceProps) {
       </section>
       {lot.remindOn && lot.status !== "resolved" && (!online || lot.reminderState === "DUE" || lot.reminderState === "SCHEDULED") ? <p className="store-date-remind-note">{online ? (lot.reminderState === "DUE" ? "Đã đến lịch báo lại" : "Báo lại") : (lot.remindOn > today ? "Báo lại" : "Đã đến lịch báo lại")} {formatDisplayDate(lot.remindOn)}</p> : null}
       {lot.kphRecordId ? <p className="store-date-remind-note" role="status">Đã tạo phiếu KPH cho lô này.</p> : null}
-      {actionNotice ? <p className="store-date-remind-note" role="status">{actionNotice}</p> : null}
-      {reminderPicking ? <fieldset className="store-date-reminder-choices"><legend>Báo lại sau</legend>{([1,7] as const).map(days => <label key={days}><input type="radio" name="date-reminder" checked={reminderDays === days} onChange={() => setReminderDays(days)} /><span>{days === 1 ? "Sau 1 ngày" : "Sau 7 ngày"}{!online && <small>{formatDisplayDate(addDays(today, days))}</small>}</span></label>)}</fieldset> : null}
+      {online && actionNotice ? <p className="store-date-remind-note" role="status">{actionNotice}</p> : null}
+      {reminderPicking ? <fieldset className="store-date-reminder-choices" disabled={online && (busy || suspended)}><legend>Báo lại sau</legend>{([1,7] as const).map(days => <label key={days}><input type="radio" name="date-reminder" checked={reminderDays === days} onChange={() => setReminderDays(days)} /><span>{days === 1 ? "Sau 1 ngày" : "Sau 7 ngày"}{!online && <small>{formatDisplayDate(addDays(today, days))}</small>}</span></label>)}</fieldset> : null}
       {online && props.detailFacts}
-      <div className="store-sheet-actions">{online ? <>{props.detailActions}{reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" disabled={busy} onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" disabled={busy || suspended || !props.reminder} onClick={() => void confirmReminder()}>{busy ? "Đang lưu…" : "Xác nhận hẹn"}</Button></> : props.reminder && lot.status !== "resolved" ? <Button type="button" variant="secondary" disabled={suspended} onClick={() => { setActionNotice(""); setReminderDays(1); setReminderExpectedVersion(lot.version ?? null); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn ? "Đổi lịch nhắc" : "Hẹn nhắc"}</Button> : null}</> : reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" onClick={() => void confirmReminder()}>Hẹn báo lại</Button></> : <><Button className="store-date-acknowledge" disabled={lot.status === "resolved"} onClick={() => { setReminderDays(1); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn && lot.status === "acknowledged" ? "Đổi lịch nhắc" : "Ghi nhận"}</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => startProcessing(lot)}>{lot.status === "resolved" ? "Đã xử lý" : "Xử lý"}</Button></>}</div>
+      <div className="store-sheet-actions">
+        {online ? (reminderPicking ? <>
+          <Button className="store-button store-date-reminder-cancel" variant="ghost" disabled={busy}
+            onClick={() => setReminderPicking(false)}>Hủy</Button>
+          <Button className="store-button" disabled={busy || suspended || !props.reminder}
+            onClick={() => void confirmReminder()}>{busy ? "Đang lưu…" : "Xác nhận hẹn"}</Button>
+        </> : <>
+          {props.detailActions}
+          {props.reminder && lot.status !== "resolved" && <Button type="button" variant="secondary" disabled={suspended}
+            onClick={() => {
+              setActionNotice("");
+              setReminderDays(1);
+              setReminderExpectedVersion(lot.version ?? null);
+              setReminderPicking(true);
+              window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus());
+            }}>{lot.remindOn ? "Đổi lịch nhắc" : "Hẹn nhắc"}</Button>}
+        </>) : reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" onClick={() => void confirmReminder()}>Hẹn báo lại</Button></> : <><Button className="store-date-acknowledge" disabled={lot.status === "resolved"} onClick={() => { setReminderDays(1); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn && lot.status === "acknowledged" ? "Đổi lịch nhắc" : "Ghi nhận"}</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => startProcessing(lot)}>{lot.status === "resolved" ? "Đã xử lý" : "Xử lý"}</Button></>}
+      </div>
     </>;
   }
   return <StorePageLayout className="store-date">
@@ -240,7 +257,7 @@ export function DateWorkspace(props: DateWorkspaceProps) {
         </div>
       {product ? <section className="store-date-product" aria-label="Thông tin mã hàng"><details key={product.id}><summary className="store-date-product-heading" aria-label={`Thông tin mã hàng: ${product.name}`}><div><h2>{product.name}</h2><p>SKU {product.skuCode} · UPC {product.barcode}</p></div><ChevronDown size={18} aria-hidden="true" /></summary><dl><div><dt>Nhóm hàng</dt><dd>{metadata?.group ?? "Chưa có dữ liệu"}</dd></div><div><dt>Nhà cung cấp</dt><dd>{product.primarySupplier.code} · {product.primarySupplier.name}</dd></div><div><dt>Đơn vị</dt><dd>{metadata?.unit ?? "Chưa có dữ liệu"}</dd></div><div><dt>Cửa hàng</dt><dd>{mockProfile.storeName}</dd></div></dl></details></section> : null}
 
-        {actionNotice ? <p className="store-date-action-notice" role="status">{actionNotice}</p> : null}
+        {!online && actionNotice ? <p className="store-date-action-notice" role="status">{actionNotice}</p> : null}
         {desktop ? <div className="store-kph-table-wrap"><table className="store-kph-table store-date-table">
           <colgroup>{[23, 10, 22, 10, 21, 10, 4].map((width, index) => <col key={index} style={{width: `${width}%`}} />)}</colgroup>
           <thead><tr><th>Hàng hóa</th><th>SKU</th><th>Lô · Ngày</th><th>HSD còn lại</th><th>Nhóm / DATE</th><th>Xử lý</th><th><span className="sr-only">Mở chi tiết</span></th></tr></thead>

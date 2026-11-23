@@ -7,8 +7,9 @@ revision2 `fdcfd2f` được owner cho “đủ để tiếp”. Nhánh
 không tự merge/push/deploy hoặc nhập nhánh BE/DATE cũ.
 
 Cập nhật triển khai 23/11/2026. DATEON02 đã nối lô bền vững và gợi ý SKU,
-DATEON03 đã nối xử lý từng phần với receipt cố định. Wire triển khai nằm trong
-[OpenAPI](../../contracts/openapi/kph.openapi.yaml). Quyết định nhắc chung còn ở DATEON04.
+DATEON03 đã nối xử lý từng phần với receipt cố định. DATEON04 lưu hẹn nhắc
+chung 1/7 ngày theo cửa hàng và tính đến lịch khi đọc. Wire triển khai nằm trong
+[OpenAPI](../../contracts/openapi/kph.openapi.yaml).
 
 ## Authority và evidence
 

@@ -31,3 +31,28 @@ Kiểm một lượt thật với hai phiên cùng store cho hẹn 1/7 ngày, re
 đọc và xác nhận hủy. Backend test với Clock ổn định cho đúng ngày hẹn, lô SAFE
 vào Cần chú ý, khác store/cũ version và partial/final. Push, unread và báo
 cáo kỳ thuộc slice sau.
+
+## Kiểm trên candidate ngày 23/11/2026
+
+- OpenAPI, 35 API fixtures và client sinh từ schema đạt. TypeScript Store
+  đạt với UI package tại chính candidate. Các test API và workspace DATE đạt
+  11 ca có mục tiêu.
+- PostgreSQL 17 sạch áp dụng V1–V12. Bản sao V11 có bảy lô và bốn liên kết
+  xử lý nâng cấp thành công. `DateLotHttpIntegrationTest` đạt 5 ca. Bao gồm
+  quyền cửa hàng/vùng/chuỗi và sau thu hồi, hẹn 1/7 ngày, đúng nửa đêm HCM,
+  lô SAFE vào Cần chú ý, đọc giữ audit, xử lý một phần giữ lịch và xử lý hết
+  xóa lịch hiệu lực.
+- Playwright trên 390×844 và 1440×1024 với hai phiên trong cùng cửa hàng.
+  Hủy giữ nguyên phiên bản, hẹn 1 ngày và đổi sang 7 ngày được lưu. Lịch cũ
+  trả 409 và form yêu cầu chọn lại. Nhân viên thấy ngày hẹn và gửi PUT bị 403.
+  Đặt ngày hẹn trùng hôm nay trong fixture riêng để kiểm focus. Lô chuyển
+  từ Đã ghi nhận sang Mở, xuất hiện trong Cần chú ý dù HSD còn xa.
+- [Store online](http://127.0.0.1:4785/) dùng backend và fixture riêng.
+  [Tài khoản mẫu](admin03-store-membership/handoff.md). Nghiệm thu owner
+  và thiết bị thật còn chờ.
+
+## Tiến độ và khoảng cách tới target
+
+DATE online lõi đạt kỹ thuật 3/3 mốc. Lô bền vững và gợi ý SKU theo cửa hàng,
+xử lý từng phần qua KPH, lịch nhắc chung đã có trên cùng candidate. Hạng mục
+tiếp theo là Thông báo dùng DATE thật, sau đó báo cáo snapshot kỳ và gate rollout.
