@@ -55,11 +55,11 @@ class DateLotService {
             Authentication auth) {
         access.requireAccess(store,auth);
         if (phase != null && !Set.of("SAFE","WARNING","DANGER","EXPIRED","BEFORE_NSX","MISSING").contains(phase)
-                || !Set.of("default","expiry","name").contains(sort) || page < 1 || size < 1 || size > 100) {
+                || !Set.of("default","expiry","name","notification").contains(sort) || page < 1 || size < 1 || size > 100) {
             throw new ApiProblemException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Invalid DATE list parameters.");
         }
-        return lots.page(store, LocalDate.now(clock.withZone(TimeConfiguration.BUSINESS_ZONE)),
-                query(q),phase,attention,sort,page,size);
+        LocalDate businessDate = LocalDate.now(clock.withZone(TimeConfiguration.BUSINESS_ZONE));
+        return lots.page(store,businessDate,query(q),phase,attention,sort,page,size);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)

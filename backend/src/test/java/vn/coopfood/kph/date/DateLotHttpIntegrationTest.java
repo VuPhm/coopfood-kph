@@ -162,6 +162,29 @@ class DateLotHttpIntegrationTest {
                 .andExpect(jsonPath("$.reminderState").value("NONE"));
     }
 
+    @Test void notificationSortGroupsBeforePagingAndReturnsBusinessDateWithinStoreScope() throws Exception {
+        String expired=createLot("1.25"), danger=createLot("1.25"), warning=createLot("1.25"),
+                missing=createLot("1.25"), due=createLot("1.25");
+        db.execute("UPDATE date_lots SET expires_on='2026-11-22', manufactured_on='2026-10-01' WHERE id=?",UUID.fromString(expired));
+        db.execute("UPDATE date_lots SET expires_on='2026-11-27', manufactured_on='2026-10-28' WHERE id=?",UUID.fromString(danger));
+        db.execute("UPDATE date_lots SET expires_on='2026-11-30', manufactured_on='2026-11-01' WHERE id=?",UUID.fromString(warning));
+        db.execute("UPDATE date_lots SET expires_on='2026-12-01', manufactured_on=NULL WHERE id=?",UUID.fromString(missing));
+        db.execute("UPDATE date_lots SET expires_on='2026-12-25', manufactured_on='2026-11-01', remind_on='2026-11-22' WHERE id=?",UUID.fromString(due));
+
+        mvc.perform(get(lots).param("attentionOnly","true").param("sort","notification").param("page","1").param("pageSize","2").with(actor))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.businessDate").value("2026-11-23"))
+                .andExpect(jsonPath("$.totalItems").value(5)).andExpect(jsonPath("$.totalPages").value(3))
+                .andExpect(jsonPath("$.items[0].id").value(expired)).andExpect(jsonPath("$.items[1].id").value(danger));
+        mvc.perform(get(lots).param("attentionOnly","true").param("sort","notification").param("page","2").param("pageSize","2").with(actor))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].id").value(warning))
+                .andExpect(jsonPath("$.items[1].id").value(missing));
+        mvc.perform(get(lots).param("attentionOnly","true").param("sort","notification").param("page","3").param("pageSize","2").with(actor))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(due));
+        mvc.perform(get("/api/v1/stores/"+b+"/date-lots").param("sort","notification").with(actor))
+                .andExpect(status().isForbidden());
+    }
+
     @Test void saveReplayAndEditShareStoreMemoryAndKeepOneAuditPerWrite() throws Exception {
         mvc.perform(get("/api/v1/date/stores").with(actor)).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].capabilities.length()").value(3));
@@ -269,7 +292,7 @@ class DateLotHttpIntegrationTest {
 
     private String createLot(String quantity) throws Exception {
         String body=input.replace("1.2345",quantity);
-        var response=mvc.perform(post(lots).with(actor).with(csrf()).header("Idempotency-Key","date-lot-process-01")
+        var response=mvc.perform(post(lots).with(actor).with(csrf()).header("Idempotency-Key","date-create-"+UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isCreated()).andReturn().getResponse().getContentAsByteArray();
         return mapper.readTree(response).path("lot").path("id").asText();
     }

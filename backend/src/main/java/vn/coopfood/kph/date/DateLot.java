@@ -15,7 +15,8 @@ record DateLot(UUID id, UUID storeId, String lookupStatus, String barcode, Strin
     }
     record Actor(UUID id, String displayName) {}
     record WriteResult(DateLot lot, boolean duplicateWarning) {}
-    record Page(List<DateLot> items, int page, int pageSize, long totalItems, long totalPages, long attentionCount) {}
+    record Page(List<DateLot> items, int page, int pageSize, long totalItems, long totalPages, long attentionCount,
+            LocalDate businessDate) {}
     record Suggestion(String skuCode, String productName) {}
     record ProcessingReceipt(UUID recordId, String quantity, String unit, long sourceVersion, long resultingVersion,
             String remainingAfter, Instant processedAt, Actor actor) {}

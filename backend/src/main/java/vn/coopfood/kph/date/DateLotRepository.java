@@ -164,12 +164,13 @@ class DateLotRepository {
         String order = switch (sort) {
             case "expiry" -> "expires_on ASC";
             case "name" -> "product_name COLLATE \"vi-x-icu\" ASC";
+            case "notification" -> "CASE WHEN reminder_state='DUE' THEN 4 WHEN phase='EXPIRED' THEN 0 WHEN phase='DANGER' THEN 1 WHEN phase='WARNING' THEN 2 WHEN phase IN ('MISSING','INVALID') THEN 3 ELSE 5 END ASC, CASE WHEN reminder_state='DUE' THEN remind_on ELSE expires_on END ASC";
             default -> "created_at DESC";
         };
         args.add(size); args.add(((long) page - 1) * size);
         var items = db.fetch(ASSESSED + "SELECT * FROM assessed WHERE " + filter + " ORDER BY " + order
                 + ", id ASC LIMIT ? OFFSET ?",args.toArray()).map(this::lot);
-        return new DateLot.Page(items,page,size,total,(total+size-1)/size,counts.get(1,Long.class));
+        return new DateLot.Page(items,page,size,total,(total+size-1)/size,counts.get(1,Long.class),today);
     }
 
     private DateLot lot(Record r) {
