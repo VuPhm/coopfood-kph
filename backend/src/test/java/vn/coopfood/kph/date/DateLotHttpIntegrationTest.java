@@ -17,6 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 import java.util.concurrent.CompletableFuture;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +30,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,13 +51,27 @@ import vn.coopfood.kph.foundation.time.TimeConfiguration;
 
 @Testcontainers
 @SpringBootTest
+@Import(DateLotHttpIntegrationTest.TestClockConfiguration.class)
 class DateLotHttpIntegrationTest {
+    @TestConfiguration
+    static class TestClockConfiguration {
+        @Bean @Primary AdjustableClock dateLotTestClock() { return new AdjustableClock(); }
+    }
+
+    static class AdjustableClock extends Clock {
+        private volatile Instant instant = Instant.parse("2026-11-23T05:00:00Z");
+        void set(Instant value) { instant = value; }
+        @Override public ZoneId getZone() { return ZoneOffset.UTC; }
+        @Override public Clock withZone(ZoneId zone) { return Clock.fixed(instant,zone); }
+        @Override public Instant instant() { return instant; }
+    }
     @Container @ServiceConnection
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:17-alpine");
 
     @Autowired WebApplicationContext context;
     @Autowired DSLContext db;
     @Autowired ObjectMapper mapper;
+    @Autowired AdjustableClock clock;
     @Value("${kph.media-root:./.data/kph-media}") String mediaRootValue;
     MockMvc mvc;
     final UUID employee = UUID.randomUUID(), a = UUID.randomUUID(), b = UUID.randomUUID();
@@ -63,6 +85,7 @@ class DateLotHttpIntegrationTest {
     RequestPostProcessor actor;
 
     @BeforeEach void seed() {
+        clock.set(Instant.parse("2026-11-23T05:00:00Z"));
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
         db.execute("TRUNCATE app_users, regions, stores CASCADE");
         db.execute("INSERT INTO app_users(id, username, display_name, password_hash, active, created_at, updated_at) VALUES (?, 'date.test', 'DATE Test', 'fixture', true, now(), now())", employee);
@@ -73,6 +96,70 @@ class DateLotHttpIntegrationTest {
         db.execute("INSERT INTO store_memberships(user_id,store_id,role,active,created_at,updated_at) VALUES (?,?,'EMPLOYEE',true,now(),now())",employee,a);
         var principal = new SessionPrincipal(new SessionUser(employee,"date.test","DATE Test",Set.of(),List.of()));
         actor = authentication(UsernamePasswordAuthenticationToken.authenticated(principal,null,principal.authorities()));
+    }
+
+    @Test void reminderIsScopedVersionedDurableAndMakesSafeLotsAttentionWhenDue() throws Exception {
+        String lotId=createLot("1.25");
+        String endpoint=lots+"/"+lotId;
+        String reminder=endpoint+"/reminder";
+        mvc.perform(get("/api/v1/date/stores").with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].capabilities").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem("REMIND"))));
+        mvc.perform(put(reminder).with(actor).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"expectedVersion\":1,\"afterDays\":1}")).andExpect(status().isForbidden());
+        db.execute("UPDATE store_memberships SET role='STORE_MANAGER' WHERE user_id=? AND store_id=?",employee,a);
+        mvc.perform(get("/api/v1/date/stores").with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].capabilities").value(org.hamcrest.Matchers.hasItem("REMIND")));
+        mvc.perform(put("/api/v1/stores/"+b+"/date-lots/"+lotId+"/reminder").with(actor).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON).content("{\"expectedVersion\":1,\"afterDays\":1}")).andExpect(status().isForbidden());
+        mvc.perform(put(reminder).with(actor).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"expectedVersion\":1,\"afterDays\":1}")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.remindOn").value("2026-11-24"))
+                .andExpect(jsonPath("$.reminderState").value("SCHEDULED"))
+                .andExpect(jsonPath("$.version").value(2));
+        db.execute("UPDATE store_memberships SET role='EMPLOYEE' WHERE user_id=? AND store_id=?",employee,a);
+        db.execute("INSERT INTO user_region_assignments(user_id,region_id,active,created_at,updated_at) VALUES (?,?,true,now(),now())",employee,regionA);
+        mvc.perform(put(reminder).with(actor).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"expectedVersion\":2,\"afterDays\":7}")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.remindOn").value("2026-11-30"))
+                .andExpect(jsonPath("$.version").value(3))
+                .andExpect(jsonPath("$.reminderState").value("SCHEDULED"));
+        mvc.perform(put(reminder).with(actor).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"expectedVersion\":2,\"afterDays\":1}")).andExpect(status().isConflict());
+        db.execute("UPDATE user_region_assignments SET active=false WHERE user_id=? AND region_id=?",employee,regionA);
+        mvc.perform(put(reminder).with(actor).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"expectedVersion\":3,\"afterDays\":1}")).andExpect(status().isForbidden());
+        db.execute("INSERT INTO user_roles(user_id,role) VALUES (?,'CHAIN_ADMIN')",employee);
+        mvc.perform(put(reminder).with(actor).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"expectedVersion\":3,\"afterDays\":7}")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value(4)).andExpect(jsonPath("$.remindOn").value("2026-11-30"));
+        db.execute("DELETE FROM user_roles WHERE user_id=? AND role='CHAIN_ADMIN'",employee);
+        db.execute("UPDATE store_memberships SET role='STORE_MANAGER' WHERE user_id=? AND store_id=?",employee,a);
+        assertThat(db.fetchValue("SELECT count(*) FROM audit_events WHERE target_id=?",UUID.fromString(lotId))).isEqualTo(4L);
+        clock.set(Instant.parse("2026-11-29T16:59:59Z")); // One second before 2026-11-30 in Ho Chi Minh City.
+        mvc.perform(get(endpoint).with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.reminderState").value("SCHEDULED"));
+        mvc.perform(get(lots).param("attentionOnly","true").with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(0)).andExpect(jsonPath("$.attentionCount").value(0));
+        clock.set(Instant.parse("2026-11-29T17:00:00Z")); // Exact HCM midnight beginning the due date.
+        mvc.perform(get(endpoint).with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.reminderState").value("DUE"));
+        mvc.perform(get(lots).param("attentionOnly","true").with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(1))
+                .andExpect(jsonPath("$.attentionCount").value(1))
+                .andExpect(jsonPath("$.items[0].reminderState").value("DUE"));
+        assertThat(db.fetchValue("SELECT count(*) FROM audit_events WHERE target_id=?",UUID.fromString(lotId))).isEqualTo(4L);
+        assertThat(db.fetchOne("SELECT remind_on FROM date_lots WHERE id=?",UUID.fromString(lotId)).get("remind_on",java.time.LocalDate.class))
+                .isEqualTo(java.time.LocalDate.parse("2026-11-30"));
+        String processEndpoint=endpoint+"/kph";
+        mvc.perform(multipart(processEndpoint).file(part(processPayload(4,"0.25"))).file(photo()).with(actor).with(csrf())
+                .header("Idempotency-Key","date-reminder-part-01")).andExpect(status().isCreated());
+        mvc.perform(get(endpoint).with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.remindOn").value("2026-11-30"));
+        mvc.perform(multipart(processEndpoint).file(part(processPayload(5,"1.00"))).file(photo()).with(actor).with(csrf())
+                .header("Idempotency-Key","date-reminder-final-01")).andExpect(status().isCreated());
+        mvc.perform(get(endpoint).with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.remindOn").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$.reminderState").value("NONE"));
     }
 
     @Test void saveReplayAndEditShareStoreMemoryAndKeepOneAuditPerWrite() throws Exception {
@@ -187,7 +274,7 @@ class DateLotHttpIntegrationTest {
         return mapper.readTree(response).path("lot").path("id").asText();
     }
     private String processPayload(long version,String quantity) {
-        return "{\"expectedVersion\":"+version+",\"kph\":{\"type\":\"TPCN\",\"detectedDate\":\""+java.time.LocalDate.now(TimeConfiguration.BUSINESS_ZONE)+"\",\"quantity\":\""+quantity+"\",\"unit\":\"kg\",\"condition\":\"OTHER\",\"resolution\":\"OTHER\"}}";
+        return "{\"expectedVersion\":"+version+",\"kph\":{\"type\":\"TPCN\",\"detectedDate\":\""+java.time.LocalDate.now(clock.withZone(TimeConfiguration.BUSINESS_ZONE))+"\",\"quantity\":\""+quantity+"\",\"unit\":\"kg\",\"condition\":\"OTHER\",\"resolution\":\"OTHER\"}}";
     }
     private MockMultipartFile part(String body) { return new MockMultipartFile("payload","payload.json","application/json",body.getBytes(java.nio.charset.StandardCharsets.UTF_8)); }
     private MockMultipartFile photo() throws Exception {

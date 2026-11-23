@@ -88,6 +88,7 @@ public class SecurityConfiguration {
                                 "/api/v1/stores/*/date-lots/*", "/api/v1/stores/*/date-sku-suggestions").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/date-lots").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/date-lots/*/kph").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/stores/*/date-lots/*/reminder").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/stores/*/date-lots/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/password/change").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/catalog/barcodes/*").authenticated()

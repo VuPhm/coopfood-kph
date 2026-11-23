@@ -42,6 +42,12 @@ class DateLotController {
         return ok(service.get(storeId,lotId,auth));
     }
 
+    @PutMapping("/stores/{storeId}/date-lots/{lotId}/reminder")
+    ResponseEntity<DateLot> scheduleReminder(@PathVariable UUID storeId, @PathVariable UUID lotId,
+            @RequestBody ObjectNode body, Authentication auth) {
+        return ok(service.scheduleReminder(storeId,lotId,body,auth));
+    }
+
     @GetMapping("/stores/{storeId}/date-sku-suggestions")
     ResponseEntity<List<DateLot.Suggestion>> suggestions(@PathVariable UUID storeId, @RequestParam(required=false) String q,
             Authentication auth) {

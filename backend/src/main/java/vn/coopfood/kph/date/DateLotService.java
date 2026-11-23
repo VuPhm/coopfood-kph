@@ -65,7 +65,33 @@ class DateLotService {
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     DateLot get(UUID store, UUID id, Authentication auth) {
         access.requireAccess(store,auth);
-        return entry(store,id,false).lot();
+        return entry(store,id,false).lot().withReminderState(LocalDate.now(clock.withZone(TimeConfiguration.BUSINESS_ZONE)));
+    }
+
+    @Transactional
+    DateLot scheduleReminder(UUID store, UUID id, ObjectNode body, Authentication auth) {
+        access.requireRemind(store,auth);
+        if (body == null || body.propertyNames().stream().anyMatch(name -> !Set.of("expectedVersion","afterDays").contains(name)))
+            throw new ApiProblemException(HttpStatus.BAD_REQUEST,"MALFORMED_REQUEST","Invalid reminder request.");
+        var expected = body.get("expectedVersion");
+        var afterDays = body.get("afterDays");
+        if (expected == null || !expected.isIntegralNumber() || !expected.canConvertToLong() || expected.asLong()<1)
+            throw DateLotInput.invalid("A positive expectedVersion is required.");
+        if (afterDays == null || !afterDays.isIntegralNumber() || !afterDays.canConvertToInt()
+                || (afterDays.asInt()!=1 && afterDays.asInt()!=7))
+            throw DateLotInput.invalid("Reminder must be scheduled after 1 or 7 days.");
+        var current = entry(store,id,true).lot();
+        if (current.version()!=expected.asLong())
+            throw new ApiProblemException(HttpStatus.CONFLICT,"DATE_VERSION_CONFLICT","Reload the lot before scheduling a reminder.");
+        if (!"OPEN".equals(current.processingStatus()) || new BigDecimal(current.remainingQuantity()).signum()<=0)
+            throw new ApiProblemException(HttpStatus.CONFLICT,"DATE_LOT_RESOLVED","Resolved DATE lots cannot be scheduled.");
+        LocalDate today = LocalDate.now(clock.withZone(TimeConfiguration.BUSINESS_ZONE));
+        LocalDate remindOn = today.plusDays(afterDays.asInt());
+        var updated = lots.scheduleReminder(store,id,remindOn,(SessionPrincipal)auth.getPrincipal(),clock.instant());
+        lots.audit("DATE_LOT_REMINDER_SCHEDULED",updated,json.writeValueAsString(Map.of(
+                "before",Map.of("remindOn",current.remindOn()==null?"":current.remindOn().toString(),"version",current.version()),
+                "after",Map.of("remindOn",remindOn.toString(),"version",updated.version()))));
+        return updated.withReminderState(today);
     }
 
     @Transactional(readOnly = true)
@@ -133,7 +159,7 @@ class DateLotService {
         var updated = lots.update(store,id,input,product,(SessionPrincipal)auth.getPrincipal(),clock.instant());
         lots.audit("DATE_LOT_UPDATED",updated,json.writeValueAsString(new Change(AuditSnapshot.from(current.lot()),
                 AuditSnapshot.from(updated),reason)));
-        return new DateLot.WriteResult(updated,lots.duplicate(updated));
+        return new DateLot.WriteResult(updated.withReminderState(LocalDate.now(clock.withZone(TimeConfiguration.BUSINESS_ZONE))),lots.duplicate(updated));
     }
 
     @Transactional

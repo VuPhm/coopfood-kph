@@ -54,6 +54,13 @@ class DateLotRepository {
                 row.get("supplier_code",String.class),row.get("supplier_name",String.class))));
     }
 
+    DateLot scheduleReminder(UUID store, UUID id, LocalDate remindOn, SessionPrincipal actor, Instant now) {
+        return withHistory(lot(db.fetchSingle("""
+                UPDATE date_lots SET remind_on=?, updated_by=?, updated_by_name=?, updated_at=?, version=version+1
+                WHERE store_id=? AND id=? RETURNING *
+                """,remindOn,actor.userId(),actor.user().displayName(),Timestamp.from(now),store,id)));
+    }
+
     void lockProcess(UUID store, UUID lot, UUID actor, String key) {
         db.fetch("SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", "date-process:"+store+":"+lot+":"+actor+":"+key);
     }
@@ -65,7 +72,7 @@ class DateLotRepository {
         db.execute("INSERT INTO date_lot_process_receipts(store_id,lot_id,actor_id,idempotency_key,request_hash,kph_record_id,response) VALUES (?,?,?,?,?,?,CAST(? AS jsonb))",store,lot,actor,key,hash,kph,response);
     }
     DateLot applyProcessing(UUID store, UUID id, java.math.BigDecimal amount, String type, SessionPrincipal actor, Instant now) {
-        return lot(db.fetchSingle("UPDATE date_lots SET processed_quantity=processed_quantity+?, kph_type=COALESCE(kph_type,?), processing_status=CASE WHEN processed_quantity+?=tracked_quantity THEN 'RESOLVED' ELSE 'OPEN' END, updated_by=?,updated_by_name=?,updated_at=?,version=version+1 WHERE store_id=? AND id=? RETURNING *",amount,type,amount,actor.userId(),actor.user().displayName(),Timestamp.from(now),store,id));
+        return lot(db.fetchSingle("UPDATE date_lots SET processed_quantity=processed_quantity+?, kph_type=COALESCE(kph_type,?), processing_status=CASE WHEN processed_quantity+?=tracked_quantity THEN 'RESOLVED' ELSE 'OPEN' END, remind_on=CASE WHEN processed_quantity+?=tracked_quantity THEN NULL ELSE remind_on END, updated_by=?,updated_by_name=?,updated_at=?,version=version+1 WHERE store_id=? AND id=? RETURNING *",amount,type,amount,amount,actor.userId(),actor.user().displayName(),Timestamp.from(now),store,id));
     }
     void insertProcessing(UUID id, DateLot before, DateLot after, UUID recordId, java.math.BigDecimal amount, SessionPrincipal actor, Instant at, String snapshot) {
         db.execute("INSERT INTO date_lot_processing_links(id,store_id,lot_id,kph_record_id,actor_id,actor_name,quantity,unit,source_version,resulting_version,remaining_after,processed_at,source_snapshot) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,CAST(? AS jsonb))",id,before.storeId(),before.id(),recordId,actor.userId(),actor.user().displayName(),amount,before.unit(),before.version(),after.version(),new BigDecimal(after.remainingQuantity()),Timestamp.from(at),snapshot);
@@ -73,7 +80,7 @@ class DateLotRepository {
     private DateLot withHistory(DateLot lot) {
         var history = db.fetch("SELECT kph_record_id,quantity,unit,source_version,resulting_version,remaining_after,processed_at,actor_id,actor_name FROM date_lot_processing_links WHERE lot_id=? ORDER BY source_version",lot.id())
                 .map(r -> new DateLot.ProcessingReceipt(r.get(0,UUID.class),r.get(1,BigDecimal.class).toPlainString(),r.get(2,String.class),r.get(3,Long.class),r.get(4,Long.class),r.get(5,BigDecimal.class).toPlainString(),r.get(6,Timestamp.class).toInstant(),new DateLot.Actor(r.get(7,UUID.class),r.get(8,String.class))));
-        return new DateLot(lot.id(),lot.storeId(),lot.lookupStatus(),lot.barcode(),lot.skuCode(),lot.productName(),lot.supplierCode(),lot.supplierName(),lot.lotCode(),lot.manufacturedOn(),lot.expiresOn(),lot.unit(),lot.trackedQuantity(),lot.processedQuantity(),lot.remainingQuantity(),lot.processingStatus(),lot.version(),lot.createdBy(),lot.updatedBy(),lot.createdAt(),lot.updatedAt(),lot.kphType(),history);
+        return new DateLot(lot.id(),lot.storeId(),lot.lookupStatus(),lot.barcode(),lot.skuCode(),lot.productName(),lot.supplierCode(),lot.supplierName(),lot.lotCode(),lot.manufacturedOn(),lot.expiresOn(),lot.unit(),lot.trackedQuantity(),lot.processedQuantity(),lot.remainingQuantity(),lot.processingStatus(),lot.version(),lot.createdBy(),lot.updatedBy(),lot.createdAt(),lot.updatedAt(),lot.kphType(),history,lot.remindOn(),lot.reminderState());
     }
 
     DateLot insert(UUID store, UUID lot, DateLotInput input, Product product, SessionPrincipal actor, Instant now) {
@@ -139,12 +146,13 @@ class DateLotRepository {
                     WHEN today<manufactured_on THEN 'BEFORE_NSX'
                     WHEN today>=expires_on-(CASE WHEN days<10 THEN 0 ELSE round(days*0.2)::int END) THEN 'DANGER'
                     WHEN days>=10 AND today>=expires_on-round(days*0.4)::int THEN 'WARNING'
-                    ELSE 'SAFE' END AS phase FROM scoped
+                    ELSE 'SAFE' END AS phase,
+                    CASE WHEN remind_on IS NULL THEN 'NONE' WHEN remind_on<=today THEN 'DUE' ELSE 'SCHEDULED' END AS reminder_state FROM scoped
             )
             """;
 
     DateLot.Page page(UUID store, LocalDate today, String q, String phase, boolean attention, String sort, int page, int size) {
-        String attentionPredicate = "phase NOT IN ('SAFE','BEFORE_NSX')";
+        String attentionPredicate = "((remind_on IS NOT NULL AND remind_on<=today) OR (remind_on IS NULL AND phase NOT IN ('SAFE','BEFORE_NSX')))";
         List<Object> scope = List.of(today,store,q,q,q,q);
         var args = new ArrayList<>(scope);
         String filter = "TRUE";
@@ -176,6 +184,7 @@ class DateLotRepository {
                 quantity,processed.toPlainString(),remaining.toPlainString(),r.get("processing_status",String.class)==null?"OPEN":r.get("processing_status",String.class),r.get("version",Long.class),
                 new DateLot.Actor(r.get("created_by",UUID.class),r.get("created_by_name",String.class)),
                 new DateLot.Actor(r.get("updated_by",UUID.class),r.get("updated_by_name",String.class)),
-                r.get("created_at",Timestamp.class).toInstant(),r.get("updated_at",Timestamp.class).toInstant(),r.get("kph_type",String.class),List.of());
+                r.get("created_at",Timestamp.class).toInstant(),r.get("updated_at",Timestamp.class).toInstant(),r.get("kph_type",String.class),List.of(),
+                r.get("remind_on",LocalDate.class),r.field("reminder_state")==null?null:r.get("reminder_state",String.class));
     }
 }
