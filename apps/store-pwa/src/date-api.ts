@@ -42,6 +42,11 @@ export function createDateApi(options: KphApiClientOptions = {}) {
         params: { path: { storeId, lotId }, header: { "X-CSRF-TOKEN": csrf } }, body,
       }), "Chưa thể sửa lô DATE. Kiểm tra thông tin rồi thử lại.");
     },
+    async scheduleReminder(storeId: string, lotId: string, body: components["schemas"]["DateLotReminderRequest"], csrf: string) {
+      return read(await client.PUT("/api/v1/stores/{storeId}/date-lots/{lotId}/reminder", {
+        params: { path: { storeId, lotId }, header: { "X-CSRF-TOKEN": csrf } }, body,
+      }), "Chưa thể hẹn lịch nhắc. Thử tải lại chi tiết lô.") as DateLotDetail;
+    },
     async process(storeId: string, lot: DateLotDetail, draft: CreatedRecordDraft, csrf: string) {
       const payload: components["schemas"]["DateLotProcessingRequest"] = {
         expectedVersion: lot.version,

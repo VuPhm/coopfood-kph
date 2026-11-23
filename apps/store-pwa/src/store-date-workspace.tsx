@@ -24,7 +24,7 @@ import { mockBarcodeLookup, mockCatalogProducts, mockProductMetadata, mockProfil
 
 import type { DateFilters } from "./date-api";
 
-export type WorkspaceLot = MockDateLot & { lotCode?: string | null };
+export type WorkspaceLot = MockDateLot & { lotCode?: string | null; reminderState?: "NONE" | "SCHEDULED" | "DUE"; version?: number };
 const lotLabel = (lot: WorkspaceLot) => lot.lotCode === undefined ? lot.id : lot.lotCode ?? "—";
 
 type ActiveDateStatus = Exclude<MockDateLotStatus, "resolved">;
@@ -55,7 +55,8 @@ type DateWorkspaceProps = { today?: LocalDate; initialLotId?: string | undefined
       total?: number | undefined; attentionCount?: number | undefined; listState: ReactNode; footer: ReactNode;
       filters: DateFilters; changeFilters: (change: DateFilters) => void;
       onCreate?: (() => void) | undefined; selectLot: (id: string) => void; selectedId: string;
-      detailLot?: WorkspaceLot | undefined; detailState: ReactNode; detailFacts: ReactNode; detailActions: ReactNode; }
+      detailLot?: WorkspaceLot | undefined; detailState: ReactNode; detailFacts: ReactNode; detailActions: ReactNode;
+      reminder?: boolean | undefined; scheduleReminder?: ((days: 1 | 7, expectedVersion: number) => Promise<void>) | undefined; }
   | { mode: "unconnected"; lookupContent: ReactNode }
 );
 
@@ -101,13 +102,14 @@ export function DateWorkspace(props: DateWorkspaceProps) {
   const [reminderPicking, setReminderPicking] = useState(false);
   const [actionNotice, setActionNotice] = useState("");
   const [reminderDays, setReminderDays] = useState<1 | 7>(1);
+  const [reminderExpectedVersion, setReminderExpectedVersion] = useState<number | null>(null);
   const [lookupOpen, setLookupOpen] = useState(false);
   const [kindChoice, setKindChoice] = useState<MockDateLot | null>(null);
   const createRef = useRef<KphCreateHandle>(null);
   const processingLot = useRef<MockDateLot | null>(null);
   const createFrame = useRef(0);
   const latestLots = useRef(lots); latestLots.current = lots;
-  useEffect(() => { setReminderPicking(false); setReminderDays(1); }, [activeId]);
+  useEffect(() => { setReminderPicking(false); setReminderDays(1); setActionNotice(""); }, [activeId]);
   useEffect(() => () => window.cancelAnimationFrame(createFrame.current), []);
   const assessments = useMemo(() => new Map(lots.map(lot => [lot.id, assessDateLot(lot, today)])), [lots, today]);
   const requiresAttention = (lot: MockDateLot) => needsDateAttention(assessments.get(lot.id)!) || !!(lot.remindOn && lot.remindOn <= today);
@@ -119,6 +121,9 @@ export function DateWorkspace(props: DateWorkspaceProps) {
     (status === "all" || lot.status === status) && (phaseFilter === "all" || assessments.get(lot.id)!.phase === phaseFilter) &&
     (!needle || `${lot.name} ${lot.sku} ${lot.id}`.toLocaleLowerCase("vi").includes(needle) || (product?.barcode === needle && lot.sku === product.skuCode)))
     .sort((a, b) => sort === "expiry" ? a.date.localeCompare(b.date) : sort === "name" ? a.name.localeCompare(b.name, "vi") : 0);
+  const reminderText = (lot: WorkspaceLot) => online
+    ? lot.reminderState === "DUE" ? "Đã đến lịch báo lại" : lot.reminderState === "SCHEDULED" ? "Báo lại" : ""
+    : lot.remindOn && lot.remindOn <= today ? "Đã đến lịch báo lại" : "Báo lại";
 
   function changeQuery(value: string) {
     requestId.current++;
@@ -146,12 +151,20 @@ export function DateWorkspace(props: DateWorkspaceProps) {
       if (current === requestId.current) setMessage(error instanceof Error ? error.message : "Chưa thể tra cứu danh mục. Thử lại.");
     } finally { if (current === requestId.current) setBusy(false); }
   }
-  function confirmReminder() {
-    if (unconnected || online || !onLotsChange || !active || active.status === "resolved") return;
+  async function confirmReminder() {
+    if (unconnected || !active || active.status === "resolved") return;
+    if (online) {
+      if (!props.scheduleReminder || !props.reminder || suspended || busy || reminderExpectedVersion === null) return;
+      setBusy(true);
+      try { await props.scheduleReminder(reminderDays, reminderExpectedVersion); setActionNotice("Đã cập nhật lịch nhắc."); setReminderPicking(false); }
+      catch (error) { setActionNotice(error instanceof Error ? error.message : "Chưa thể hẹn lịch nhắc. Thử lại."); setReminderPicking(false); }
+      finally { setBusy(false); }
+      return;
+    }
+    if (!onLotsChange) return;
     onLotsChange(lots.map(lot => lot.id === active.id ? acknowledgeDateLot(lot, today, reminderDays) : lot));
     setActionNotice(`Đã hẹn báo lại ${formatDisplayDate(addDays(today, reminderDays))}.`);
-    setReminderPicking(false);
-    setActiveId("");
+    setReminderPicking(false); setActiveId("");
   }
   function startProcessing(lot: MockDateLot, chosenKind?: KphKind) {
     if (unconnected || online || lot.status === "resolved" || lot.kphRecordId) return;
@@ -190,11 +203,12 @@ export function DateWorkspace(props: DateWorkspaceProps) {
         </> : <div className="store-date-missing-dates"><p>{assessment.message}</p><dl className="store-date-milestone-facts">{lot.manufactured ? <div><dt>NSX</dt><dd>{lot.manufactured}</dd></div> : null}<div><dt>HSD</dt><dd>{displayDate(lot.date)}</dd></div></dl></div>}
         </div>
       </section>
-      {lot.remindOn && lot.status !== "resolved" ? <p className="store-date-remind-note">{lot.remindOn > today ? "Báo lại" : "Đã đến lịch báo lại"} {formatDisplayDate(lot.remindOn)}</p> : null}
+      {lot.remindOn && lot.status !== "resolved" && (!online || lot.reminderState === "DUE" || lot.reminderState === "SCHEDULED") ? <p className="store-date-remind-note">{online ? (lot.reminderState === "DUE" ? "Đã đến lịch báo lại" : "Báo lại") : (lot.remindOn > today ? "Báo lại" : "Đã đến lịch báo lại")} {formatDisplayDate(lot.remindOn)}</p> : null}
       {lot.kphRecordId ? <p className="store-date-remind-note" role="status">Đã tạo phiếu KPH cho lô này.</p> : null}
-      {reminderPicking && !online ? <fieldset className="store-date-reminder-choices"><legend>Báo lại sau</legend>{([1,7] as const).map(days => <label key={days}><input type="radio" name="date-reminder" checked={reminderDays === days} onChange={() => setReminderDays(days)} /><span>{days === 1 ? "1 ngày" : "1 tuần"}<small>{formatDisplayDate(addDays(today, days))}</small></span></label>)}</fieldset> : null}
+      {actionNotice ? <p className="store-date-remind-note" role="status">{actionNotice}</p> : null}
+      {reminderPicking ? <fieldset className="store-date-reminder-choices"><legend>Báo lại sau</legend>{([1,7] as const).map(days => <label key={days}><input type="radio" name="date-reminder" checked={reminderDays === days} onChange={() => setReminderDays(days)} /><span>{days === 1 ? "Sau 1 ngày" : "Sau 7 ngày"}{!online && <small>{formatDisplayDate(addDays(today, days))}</small>}</span></label>)}</fieldset> : null}
       {online && props.detailFacts}
-      <div className="store-sheet-actions">{online ? props.detailActions : reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" onClick={confirmReminder}>Hẹn báo lại</Button></> : <><Button className="store-date-acknowledge" disabled={lot.status === "resolved"} onClick={() => { setReminderDays(1); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn && lot.status === "acknowledged" ? "Đổi lịch nhắc" : "Ghi nhận"}</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => startProcessing(lot)}>{lot.status === "resolved" ? "Đã xử lý" : "Xử lý"}</Button></>}</div>
+      <div className="store-sheet-actions">{online ? <>{props.detailActions}{reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" disabled={busy} onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" disabled={busy || suspended || !props.reminder} onClick={() => void confirmReminder()}>{busy ? "Đang lưu…" : "Xác nhận hẹn"}</Button></> : props.reminder && lot.status !== "resolved" ? <Button type="button" variant="secondary" disabled={suspended} onClick={() => { setActionNotice(""); setReminderDays(1); setReminderExpectedVersion(lot.version ?? null); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn ? "Đổi lịch nhắc" : "Hẹn nhắc"}</Button> : null}</> : reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" onClick={() => void confirmReminder()}>Hẹn báo lại</Button></> : <><Button className="store-date-acknowledge" disabled={lot.status === "resolved"} onClick={() => { setReminderDays(1); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn && lot.status === "acknowledged" ? "Đổi lịch nhắc" : "Ghi nhận"}</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => startProcessing(lot)}>{lot.status === "resolved" ? "Đã xử lý" : "Xử lý"}</Button></>}</div>
     </>;
   }
   return <StorePageLayout className="store-date">
@@ -244,7 +258,7 @@ export function DateWorkspace(props: DateWorkspaceProps) {
               <td><strong>Lô {lotLabel(lot)}</strong><small>{lot.manufactured ? `NSX ${lot.manufactured} · ` : ""}HSD {displayDate(lot.date)}</small></td>
               <td><strong className="store-date-percent-value store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}>{percent === null ? "Chưa đủ dữ liệu" : `${percent}%`}</strong></td>
               <td><StoreTagStrip label={`Nhóm và tình trạng ${lot.name}`}><DateGroupChip group={lot.group} /><DateConditionLabel phase={assessment.phase} /></StoreTagStrip></td>
-              <td><DateProcessingLabel status={lot.status} />{lot.remindOn ? <small>Báo lại {formatDisplayDate(lot.remindOn)}</small> : null}</td>
+              <td><DateProcessingLabel status={lot.status} />{lot.remindOn && reminderText(lot) ? <small>{reminderText(lot)} {formatDisplayDate(lot.remindOn)}</small> : null}</td>
               <td className="store-kph-chevron-cell"><ChevronRight size={16} aria-hidden="true" /></td>
             </tr>;
           })}</tbody>
@@ -258,7 +272,7 @@ export function DateWorkspace(props: DateWorkspaceProps) {
               <span className="store-date-lot-end"><strong id={`${filterSummaryId}-${encodeURIComponent(lot.id)}-percent`} className="store-date-percent" data-tone={getDatePhaseTone(assessment.phase)}><span className="sr-only">HSD còn lại: </span>{percent === null ? "Chưa đủ dữ liệu" : `${percent}%`}</strong><ChevronRight size={16} aria-hidden="true" /></span>
             </button>
             <span id={`${filterSummaryId}-${encodeURIComponent(lot.id)}-facts`} className="store-date-lot-footer"><small className="store-date-lot-identifiers store-sku" title={lot.sku}><span className="sr-only">SKU </span>{lot.sku}<span className="sr-only"> · Lô {lotLabel(lot)}</span></small>
-              <StoreTagStrip className="store-date-lot-labels" label={`Nhãn lô ${lot.name}`}><DateGroupChip group={lot.group} /><DateConditionLabel phase={assessment.phase} />{lot.remindOn ? <span className="store-date-remind-label">Báo lại {formatDisplayDate(lot.remindOn)}</span> : null}</StoreTagStrip>
+              <StoreTagStrip className="store-date-lot-labels" label={`Nhãn lô ${lot.name}`}><DateGroupChip group={lot.group} /><DateConditionLabel phase={assessment.phase} />{lot.remindOn && reminderText(lot) ? <span className="store-date-remind-label">{reminderText(lot)} {formatDisplayDate(lot.remindOn)}</span> : null}</StoreTagStrip>
               <span className="store-date-lot-processing"><DateProcessingLabel status={lot.status} /></span>
             </span>
             <small id={`${filterSummaryId}-${encodeURIComponent(lot.id)}-dates`} className="store-date-lot-dates">{lot.manufactured ? <span>NSX {lot.manufactured}</span> : null}<span>HSD {displayDate(lot.date)}</span></small>

@@ -8,6 +8,7 @@ import { StoreBarcodeLookup } from "./store-barcode-lookup";
 import { DateEditor } from "./store-date-editor";
 import { OnlineApiError } from "./online-kph";
 import { formatBusinessDate } from "./business-date";
+import { useBusinessDate } from "./use-business-date";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
 import type { DateApi, DateFilters, DateLot, DateLotDetail } from "./date-api";
 import { StoreSheet } from "./store-sheet";
@@ -21,6 +22,7 @@ const queryOptions = { retry: false, gcTime: 0, refetchOnWindowFocus: false } as
 function row(lot: DateLot): WorkspaceLot {
   return { id: lot.id, lotCode: lot.lotCode, sku: lot.skuCode, name: lot.productName, date: lot.expiresOn as LocalDate,
     ...(lot.manufacturedOn && { manufactured: formatDisplayDate(lot.manufacturedOn as LocalDate) }),
+    remindOn: lot.remindOn as LocalDate | null, reminderState: lot.reminderState, version: lot.version,
     status: lot.processingStatus === "RESOLVED" ? "resolved" : "open" };
 }
 
@@ -42,13 +44,15 @@ export function StoreOnlineDate({ suspended = false, verifiedAt, api, storeId, u
     </StorePageSurface></StorePageLayout>;
   }
   return <DateRecords key={`${userId}:${storeId}`} {...lookup} api={api} userId={userId} storeId={storeId} csrf={csrf}
-    suspended={suspended || access.isPlaceholderData} create={capabilities.includes("CREATE")} update={capabilities.includes("UPDATE")}
+    suspended={suspended || access.isPlaceholderData} create={capabilities.includes("CREATE")} update={capabilities.includes("UPDATE")} reminder={capabilities.includes("REMIND")}
     process={capabilities.includes("PROCESS") && kphCreate} {...(lookup.profile ? { profile: lookup.profile } : {})} />;
 }
 
-function DateRecords({ api, storeId, userId, csrf, suspended, create, update, process, profile, ...lookup }: Omit<Props, "verifiedAt"> & { create: boolean; update: boolean; process: boolean }) {
+function DateRecords({ api, storeId, userId, csrf, suspended, create, update, reminder, process, profile, ...lookup }: Omit<Props, "verifiedAt"> & { create: boolean; update: boolean; reminder: boolean; process: boolean }) {
   const client = useQueryClient();
   const rootKey = ["date-lots", userId, storeId];
+  const businessToday = useBusinessDate();
+  const previousBusinessToday = useRef(businessToday);
   const [filters, setFilters] = useState<DateFilters>({ q: "", page: 1 });
   const [selectedId, selectLot] = useState("");
   const [editor, setEditor] = useState<"create" | DateLot | null>(null);
@@ -62,6 +66,23 @@ function DateRecords({ api, storeId, userId, csrf, suspended, create, update, pr
     queryFn: ({ signal }) => api.list(storeId, filters, signal), enabled: !suspended });
   const detail = useQuery({ ...queryOptions, queryKey: [...rootKey, "detail", selectedId],
     queryFn: ({ signal }) => api.detail(storeId, selectedId, signal), enabled: !!selectedId && !suspended });
+  useEffect(() => {
+    if (previousBusinessToday.current === businessToday) return;
+    previousBusinessToday.current = businessToday;
+    // The list's attention count and due state change at HCM midnight without polling.
+    void client.invalidateQueries({ queryKey: [...rootKey, "list"] });
+    if (selectedId) void client.invalidateQueries({ queryKey: [...rootKey, "detail", selectedId] });
+  }, [businessToday, client, userId, storeId, selectedId]);
+  useEffect(() => {
+    const refreshDate = () => {
+      if (document.visibilityState !== "visible") return;
+      void client.invalidateQueries({ queryKey: [...rootKey, "list"] });
+      if (selectedId) void client.invalidateQueries({ queryKey: [...rootKey, "detail", selectedId] });
+    };
+    window.addEventListener("focus", refreshDate);
+    document.addEventListener("visibilitychange", refreshDate);
+    return () => { window.removeEventListener("focus", refreshDate); document.removeEventListener("visibilitychange", refreshDate); };
+  }, [client, userId, storeId, selectedId]);
   const denied = [list.error, detail.error].some(error => error instanceof OnlineApiError && (error.status === 401 || error.status === 403));
   const deniedRefresh = useRef(false);
   useEffect(() => {
@@ -122,6 +143,23 @@ function DateRecords({ api, storeId, userId, csrf, suspended, create, update, pr
       throw error;
     }
   }
+  async function scheduleReminder(days: 1 | 7, expectedVersion: number) {
+    const source = detail.data;
+    if (!source || !reminder || suspended) throw new Error("Tài khoản chưa có quyền hẹn nhắc lô DATE này.");
+    try {
+      const updated = await api.scheduleReminder(storeId, source.id, { expectedVersion, afterDays: days }, csrf);
+      client.setQueryData([...rootKey, "detail", source.id], updated);
+      await client.invalidateQueries({ queryKey: [...rootKey, "list"] });
+    } catch (error) {
+      if (error instanceof OnlineApiError && error.status === 409) {
+        const refreshed = await detail.refetch({ cancelRefetch: false });
+        if (refreshed.isError) throw new Error("Lô DATE vừa được cập nhật. Chưa hẹn lịch; hãy tải lại chi tiết rồi chọn lại.");
+        throw new Error("Lô DATE vừa được cập nhật. Hãy chọn lại lịch nhắc.");
+      }
+      if (error instanceof OnlineApiError && (error.status === 401 || error.status === 403)) lookup.onSessionExpired();
+      throw error;
+    }
+  }
   return <>
     <DateWorkspace mode="online" suspended={!!suspended} lots={page?.items.map(row) ?? []}
       filters={filters} changeFilters={changeFilters} total={page?.totalItems} attentionCount={page?.attentionCount}
@@ -146,6 +184,7 @@ function DateRecords({ api, storeId, userId, csrf, suspended, create, update, pr
           <a href="#kph">Mở lịch sử KPH</a>
         </section>}
       </>}
+      reminder={reminder} scheduleReminder={scheduleReminder}
       detailActions={selected && <>
         {mayEdit && <Button type="button" variant="secondary" onClick={() => setEditor(selected)}>Sửa lô</Button>}
         {process && selected.processingStatus === "OPEN" && <Button type="button" disabled={!!suspended}

@@ -6,6 +6,17 @@ import type { CreatedRecordDraft } from "./create-record-dialog";
 import { createDateApi } from "./date-api";
 
 describe("DATE partial processing API", () => {
+  it("schedules a shared reminder with the current version and CSRF token", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({ id: "lot-1" }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    const api = createDateApi({ baseUrl: "http://localhost", fetch: fetcher });
+    await api.scheduleReminder("store-1", "lot-1", { expectedVersion: 4, afterDays: 7 }, "csrf-token");
+    const request = fetcher.mock.calls[0]![0] as Request;
+    expect(request.method).toBe("PUT");
+    expect(request.url).toBe("http://localhost/api/v1/stores/store-1/date-lots/lot-1/reminder");
+    expect(request.headers.get("X-CSRF-TOKEN")).toBe("csrf-token");
+    expect(await request.json()).toEqual({ expectedVersion: 4, afterDays: 7 });
+  });
+
   it("keeps decimal text exact and sends only KPH fields with a source version", async () => {
     const receipt = { recordId: "record-1", quantity: "0.37525", unit: "kg", sourceVersion: 4,
       resultingVersion: 5, remainingAfter: "0.875", processedAt: "2026-11-23T04:00:00Z", actor: { id: "user-1", displayName: "Nhân viên" } };
@@ -18,6 +29,7 @@ describe("DATE partial processing API", () => {
       productName: "Hàng thử", supplierCode: null, supplierName: null, lotCode: null,
       manufacturedOn: null, expiresOn: "2026-11-30", trackedQuantity: "1.25025", processedQuantity: "0",
       remainingQuantity: "1.25025", unit: "kg", processingStatus: "OPEN", version: 4,
+      remindOn: null, reminderState: "NONE",
       createdBy: { id: "user-1", displayName: "Nhân viên" }, updatedBy: { id: "user-1", displayName: "Nhân viên" },
       createdAt: "2026-11-23T04:00:00Z", updatedAt: "2026-11-23T04:00:00Z", kphType: null, processingHistory: [],
     } satisfies components["schemas"]["DateLotDetail"];

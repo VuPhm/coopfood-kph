@@ -18,6 +18,32 @@ beforeEach(() => vi.stubGlobal("matchMedia", () => ({matches: false, addEventLis
 afterEach(() => vi.unstubAllGlobals());
 
 describe("DATE food-kind workspace", () => {
+  it("only changes the shared schedule after an explicit confirmation", async () => {
+    const scheduleReminder = vi.fn().mockResolvedValue(undefined);
+    const lot = { ...mockDateLots[0]!, remindOn: null, reminderState: "NONE" as const, version: 4 };
+    render(<ControlledDateWorkspace mode="online" today="2026-10-07" lots={[lot]} lookupContent={null} suspended={false}
+      total={1} attentionCount={0} listState={null} footer={null} filters={{ q: "", page: 1 }} changeFilters={vi.fn()}
+      selectLot={vi.fn()} selectedId="C24-118" detailLot={lot} detailState={null} detailFacts={null} detailActions={null}
+      reminder={true} scheduleReminder={scheduleReminder} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Hẹn nhắc" }));
+    fireEvent.click(screen.getByLabelText("Sau 7 ngày"));
+    fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
+    expect(scheduleReminder).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Hẹn nhắc" }));
+    fireEvent.click(screen.getByLabelText("Sau 7 ngày"));
+    fireEvent.click(screen.getByRole("button", { name: "Xác nhận hẹn" }));
+    await waitFor(() => expect(scheduleReminder).toHaveBeenCalledWith(7, 4));
+  });
+
+  it("uses backend reminder state for due display even when the local clock disagrees", async () => {
+    const lot = { ...mockDateLots[0]!, remindOn: "2027-01-04" as const, reminderState: "DUE" as const, version: 4 };
+    render(<ControlledDateWorkspace mode="online" today="2026-10-07" lots={[lot]} lookupContent={null} suspended={false}
+      total={1} attentionCount={1} listState={null} footer={null} filters={{ q: "", page: 1 }} changeFilters={vi.fn()}
+      selectLot={vi.fn()} selectedId="C24-118" detailLot={lot} detailState={null} detailFacts={null} detailActions={null}
+      reminder={true} scheduleReminder={vi.fn().mockResolvedValue(undefined)} />);
+    expect(await screen.findAllByText("Đã đến lịch báo lại 04/01/2027")).toHaveLength(2);
+  });
+
   it("clears a detail when acknowledgement excludes its lot from an explicit open filter", async () => {
     render(<DateWorkspace />); statusFilter("Mở");
     fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
