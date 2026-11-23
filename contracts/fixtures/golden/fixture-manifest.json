@@ -20,6 +20,8 @@
     {"resource":"api/date-lot-write-result.json","tracePrefix":"DATEON02-"},
     {"resource":"api/date-lot-update-result.json","tracePrefix":"DATEON02-"},
     {"resource":"api/date-lot-detail.json","tracePrefix":"DATEON02-"},
+    {"resource":"api/date-lot-reminder-request.json","tracePrefix":"DATEON04-"},
+    {"resource":"api/date-lot-reminder-result.json","tracePrefix":"DATEON04-"},
     {"resource":"api/date-lot-processing-request.json","tracePrefix":"DATEON03-"},
     {"resource":"api/date-lot-processing-receipt.json","tracePrefix":"DATEON03-"},
     {"resource":"api/date-lot-page.json","tracePrefix":"DATEON02-"},

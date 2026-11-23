@@ -1,0 +1,47 @@
+{
+  "id": "40000000-0000-4000-8000-000000000020",
+  "storeId": "20000000-0000-4000-8000-000000000001",
+  "lookupStatus": "NOT_FOUND",
+  "barcode": "0890123456790",
+  "skuCode": "000042",
+  "productName": "Sản phẩm mẫu",
+  "lotCode": "000007",
+  "manufacturedOn": null,
+  "expiresOn": "2026-11-18",
+  "trackedQuantity": "0.37525",
+  "unit": "kg",
+  "supplierCode": null,
+  "supplierName": null,
+  "processedQuantity": "0.12525",
+  "remainingQuantity": "0.25",
+  "processingStatus": "OPEN",
+  "version": 3,
+  "createdBy": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "displayName": "Nhân viên mẫu"
+  },
+  "updatedBy": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "displayName": "Nhân viên mẫu"
+  },
+  "createdAt": "2026-11-17T08:30:00+07:00",
+  "updatedAt": "2026-11-17T08:50:00+07:00",
+  "kphType": "TPCN",
+  "processingHistory": [
+    {
+      "recordId": "40000000-0000-4000-8000-000000000021",
+      "quantity": "0.12525",
+      "unit": "kg",
+      "sourceVersion": 1,
+      "resultingVersion": 2,
+      "remainingAfter": "0.25",
+      "processedAt": "2026-11-17T08:42:00+07:00",
+      "actor": {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "displayName": "Nhân viên mẫu"
+      }
+    }
+  ],
+  "remindOn": "2026-11-24",
+  "reminderState": "SCHEDULED"
+}

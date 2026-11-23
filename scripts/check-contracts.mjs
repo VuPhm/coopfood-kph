@@ -25,6 +25,8 @@ const apiFixtureSchemas = new Map([
   ["api/date-lot-write-result.json", "DateLotWriteResult"],
   ["api/date-lot-update-result.json", "DateLotWriteResult"],
   ["api/date-lot-detail.json", "DateLotDetail"],
+  ["api/date-lot-reminder-request.json", "DateLotReminderRequest"],
+  ["api/date-lot-reminder-result.json", "DateLotDetail"],
   ["api/date-lot-processing-request.json", "DateLotProcessingRequest"],
   ["api/date-lot-processing-receipt.json", "DateLotProcessingReceipt"],
   ["api/date-lot-page.json", "DateLotPage"],

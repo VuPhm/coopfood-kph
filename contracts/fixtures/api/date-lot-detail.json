@@ -41,5 +41,7 @@
         "displayName": "Nhân viên mẫu"
       }
     }
-  ]
+  ],
+  "remindOn": null,
+  "reminderState": "NONE"
 }

@@ -214,6 +214,8 @@ paths:
         Search, filter and sort the full authorized result before paging. q matches a
         literal case-insensitive substring of SKU, product name, barcode or lot code. attentionCount
         is counted across open rows matching q, before phase, attentionOnly and paging.
+        Future reminders are excluded from attention. Due reminders count
+        independently of the lot's shelf-life phase.
         A row needs attention in WARNING, DANGER, EXPIRED or MISSING. Phases use today's
         Asia/Ho_Chi_Minh business date, inclusive shelf life and the published date rules.
         An absent manufacture date yields EXPIRED after expiry or MISSING otherwise.
@@ -368,6 +370,56 @@ paths:
               examples:
                 synthetic:
                   externalValue: ../fixtures/api/date-lot-update-result.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/DateLotValidation'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/stores/{storeId}/date-lots/{lotId}/reminder:
+    put:
+      tags: [DATE]
+      operationId: scheduleDateLotReminder
+      summary: Schedule or reschedule a shared DATE lot reminder
+      description: |
+        Requires REMIND in this store. The backend adds one or seven calendar
+        days to the current Asia/Ho_Chi_Minh business day. It checks the version
+        of the open lot and updates the schedule, version and audit together.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - $ref: '#/components/parameters/DateLotIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateLotReminderRequest'
+            examples:
+              synthetic:
+                externalValue: ../fixtures/api/date-lot-reminder-request.json
+      responses:
+        '200':
+          description: Current lot with the shared schedule and processing history.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateLotDetail'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-lot-reminder-result.json
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1758,7 +1810,7 @@ components:
         capabilities:
           type: array
           uniqueItems: true
-          items: { type: string, enum: [VIEW, CREATE, UPDATE, PROCESS] }
+          items: { type: string, enum: [VIEW, CREATE, UPDATE, PROCESS, REMIND] }
           allOf:
             - contains: { const: VIEW }
             - contains: { const: CREATE }
@@ -1836,7 +1888,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/DateLotFields'
       unevaluatedProperties: false
-      required: [id, storeId, supplierCode, supplierName, processedQuantity, remainingQuantity, processingStatus, version, createdBy, updatedBy, createdAt, updatedAt]
+      required: [id, storeId, supplierCode, supplierName, processedQuantity, remainingQuantity, processingStatus, remindOn, reminderState, version, createdBy, updatedBy, createdAt, updatedAt]
       properties:
         id: { type: string, format: uuid }
         storeId: { type: string, format: uuid }
@@ -1848,6 +1900,14 @@ components:
           $ref: '#/components/schemas/DateQuantity'
           description: Server-calculated amount still under monitoring.
         processingStatus: { type: string, enum: [OPEN, RESOLVED] }
+        remindOn:
+          type: [string, 'null']
+          format: date
+          description: Shared business date for the current reminder, cleared after final processing.
+        reminderState:
+          type: string
+          enum: [NONE, SCHEDULED, DUE]
+          description: Derived by the backend against the current Asia/Ho_Chi_Minh business date.
         version: { type: integer, format: int64, minimum: 1 }
         createdBy:
           $ref: '#/components/schemas/ActorSnapshot'
@@ -1872,6 +1932,14 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/DateLotProcessingReceipt'
+
+    DateLotReminderRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, afterDays]
+      properties:
+        expectedVersion: { type: integer, format: int64, minimum: 1 }
+        afterDays: { type: integer, enum: [1, 7] }
 
     DateLotProcessingRequest:
       type: object

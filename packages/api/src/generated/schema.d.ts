@@ -177,6 +177,8 @@ export interface paths {
          * @description Search, filter and sort the full authorized result before paging. q matches a
          *     literal case-insensitive substring of SKU, product name, barcode or lot code. attentionCount
          *     is counted across open rows matching q, before phase, attentionOnly and paging.
+         *     Future reminders are excluded from attention. Due reminders count
+         *     independently of the lot's shelf-life phase.
          *     A row needs attention in WARNING, DANGER, EXPIRED or MISSING. Phases use today's
          *     Asia/Ho_Chi_Minh business date, inclusive shelf life and the published date rules.
          *     An absent manufacture date yields EXPIRED after expiry or MISSING otherwise.
@@ -227,6 +229,28 @@ export interface paths {
          *     reason and change. A resolved entry is read-only.
          */
         patch: operations["updateDateLot"];
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/date-lots/{lotId}/reminder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Schedule or reschedule a shared DATE lot reminder
+         * @description Requires REMIND in this store. The backend adds one or seven calendar
+         *     days to the current Asia/Ho_Chi_Minh business day. It checks the version
+         *     of the open lot and updates the schedule, version and audit together.
+         */
+        put: operations["scheduleDateLotReminder"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/stores/{storeId}/date-lots/{lotId}/kph": {
@@ -831,7 +855,7 @@ export interface components {
             id: string;
             code: string;
             name: string;
-            capabilities: ("VIEW" | "CREATE" | "UPDATE" | "PROCESS")[] & (unknown & unknown);
+            capabilities: ("VIEW" | "CREATE" | "UPDATE" | "PROCESS" | "REMIND")[] & (unknown & unknown);
         };
         DateSkuSuggestion: {
             skuCode: string;
@@ -880,6 +904,16 @@ export interface components {
             remainingQuantity: components["schemas"]["DateQuantity"];
             /** @enum {string} */
             processingStatus: "OPEN" | "RESOLVED";
+            /**
+             * Format: date
+             * @description Shared business date for the current reminder, cleared after final processing.
+             */
+            remindOn: string | null;
+            /**
+             * @description Derived by the backend against the current Asia/Ho_Chi_Minh business date.
+             * @enum {string}
+             */
+            reminderState: "NONE" | "SCHEDULED" | "DUE";
             /** Format: int64 */
             version: number;
             createdBy: components["schemas"]["ActorSnapshot"];
@@ -896,6 +930,12 @@ export interface components {
             /** @enum {string|null} */
             kphType: "TPCN" | "TPTS" | null;
             processingHistory: components["schemas"]["DateLotProcessingReceipt"][];
+        };
+        DateLotReminderRequest: {
+            /** Format: int64 */
+            expectedVersion: number;
+            /** @enum {integer} */
+            afterDays: 1 | 7;
         };
         DateLotProcessingRequest: {
             /** Format: int64 */
@@ -1774,6 +1814,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DateLotWriteResult"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["DateLotValidation"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    scheduleDateLotReminder: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                lotId: components["parameters"]["DateLotIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DateLotReminderRequest"];
+            };
+        };
+        responses: {
+            /** @description Current lot with the shared schedule and processing history. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateLotDetail"];
                 };
             };
             400: components["responses"]["BadRequest"];
