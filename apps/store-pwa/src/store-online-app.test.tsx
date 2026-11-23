@@ -7,7 +7,7 @@ import type { StoreSessionGateway } from "./store-session-api";
 const employee = { id: "store-a", code: "0001", name: "Cửa hàng A", capabilities: ["VIEW", "CREATE"] as ("VIEW" | "CREATE" | "REVIEW" | "EXPORT")[] };
 const manager = { ...employee, id: "store-b", code: "0002", name: "Cửa hàng B", capabilities: ["VIEW", "CREATE", "REVIEW", "EXPORT"] as ("VIEW" | "CREATE" | "REVIEW" | "EXPORT")[] };
 const session = { user: { id: "user", username: "test", displayName: "Người kiểm thử", globalRoles: [], stores: [] }, csrfToken: "synthetic" };
-const emptyDatePage = { items: [], page: 1, pageSize: 25, totalItems: 0, totalPages: 0, attentionCount: 0 };
+const emptyDatePage = { items: [], page: 1, pageSize: 25, totalItems: 0, totalPages: 0, attentionCount: 0, businessDate: "2026-11-23" };
 function gateway(): StoreSessionGateway {
   return { date: { listStores: vi.fn().mockResolvedValue([employee, manager]), list: vi.fn().mockResolvedValue(emptyDatePage),
     detail: vi.fn(), create: vi.fn(), update: vi.fn(), scheduleReminder: vi.fn(), process: vi.fn(), suggest: vi.fn().mockResolvedValue([]) }, reviewRecord: vi.fn(), prepareExport: vi.fn(), createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
@@ -115,6 +115,35 @@ describe("Store online session", () => {
     expect(screen.queryByText("Cải thìa VietGAP 500 g")).not.toBeInTheDocument();
     expect(api.lookupBarcode).not.toHaveBeenCalled();
     expect(api.createRecord).not.toHaveBeenCalled();
+    window.history.replaceState(null, "", "#home");
+  });
+  it("loads grouped DATE notices from the scoped paged API and opens the exact lot detail", async () => {
+    const api = gateway();
+    const dueLot = { id: "lot-outside-page", storeId: employee.id, lookupStatus: "MANUAL", barcode: null,
+      skuCode: "000045", productName: "Cải thìa", supplierCode: null, supplierName: null, lotCode: "LOT-REAL-7",
+      manufacturedOn: "2026-11-01", expiresOn: "2026-12-15", trackedQuantity: "2", processedQuantity: "0",
+      remainingQuantity: "2", unit: "EA", processingStatus: "OPEN", version: 2, remindOn: "2026-11-23",
+      reminderState: "DUE" };
+    const firstLot = { ...dueLot, id: "page-one-lot", productName: "Cà rốt", lotCode: "LOT-FIRST" };
+    vi.mocked(api.date.list).mockImplementation(async (_storeId, query) => query.page === 2
+      ? { ...emptyDatePage, items: [dueLot], page: 2, totalItems: 26, totalPages: 2 } as Awaited<ReturnType<typeof api.date.list>>
+      : { ...emptyDatePage, items: [firstLot], totalItems: 26, totalPages: 2 } as Awaited<ReturnType<typeof api.date.list>>);
+    vi.mocked(api.date.detail).mockResolvedValue({ ...dueLot, createdBy: { id: "user", displayName: "Người kiểm thử" },
+      updatedBy: { id: "user", displayName: "Người kiểm thử" }, createdAt: "2026-11-01T00:00:00Z",
+      updatedAt: "2026-11-23T00:00:00Z", kphType: null, processingHistory: [] } as Awaited<ReturnType<typeof api.date.detail>>);
+    render(<StoreOnlineApp gateway={api} />); await selectA();
+    fireEvent.click(screen.getByRole("button", { name: "Thông báo" }));
+    expect(await screen.findByRole("heading", { name: "DATE" })).toBeVisible();
+    expect(api.date.list).toHaveBeenCalledWith(employee.id,
+      { attentionOnly: true, sort: "notification", page: 1, pageSize: 25 }, expect.anything());
+    expect(screen.queryByText(/Lô LOT-REAL-7/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Tải thêm" }));
+    expect(await screen.findByText(/Lô LOT-REAL-7/)).toBeVisible();
+    expect(api.date.list).toHaveBeenCalledWith(employee.id,
+      { attentionOnly: true, sort: "notification", page: 2, pageSize: 25 }, expect.anything());
+    fireEvent.click(screen.getByRole("button", { name: /Cải thìa/ }));
+    await waitFor(() => expect(api.date.detail).toHaveBeenCalledWith(employee.id, dueLot.id, expect.anything()));
+    expect(await screen.findByRole("heading", { name: "Chi tiết lô DATE" })).toBeVisible();
     window.history.replaceState(null, "", "#home");
   });
   it("sends the measured quantity and explicit unit, masks the draft on refresh and clears old store data", async () => {

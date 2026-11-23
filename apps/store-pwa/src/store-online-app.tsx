@@ -13,6 +13,7 @@ import { readStoreScreen, storeScreens, type Screen } from "./store-app-routes";
 import { OnlineApiError } from "./online-kph";
 import { createStoreSessionGateway, type StoreSessionGateway } from "./store-session-api";
 import { StoreOnlineDate } from "./store-online-date";
+import { StoreOnlineNotifications } from "./store-online-notifications";
 import { StoreOnlineKph } from "./store-online-kph";
 import "./store-online-app.css";
 
@@ -29,6 +30,7 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
   const selectionTicket = useRef(0);
   const selectedActor = useRef<string | undefined>(undefined);
   const [selectedId, setSelectedId] = useState<string>();
+  const [notificationTarget, setNotificationTarget] = useState<{ id: string; userId: string; storeId: string }>();
   const [screen, setScreen] = useState<Screen>(readStoreScreen);
   const [accountOpen, setAccountOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
@@ -51,6 +53,10 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     if (scope.isError) { setPasswordOpen(false); setAccountOpen(false); }
     if (scope.isError || (scope.data && (scope.data.session.user.id !== selectedActor.current || !scope.data.stores.some(store => store.id === selectedId)))) setSelectedId(undefined);
   }, [scope.data, scope.isError, selectedId]);
+  useEffect(() => {
+    if (notificationTarget && (scope.isError || notificationTarget.userId !== scope.data?.session.user.id ||
+      !scope.data?.stores.some(item => item.id === notificationTarget.storeId) || selectedId !== notificationTarget.storeId)) setNotificationTarget(undefined);
+  }, [notificationTarget, scope.data, scope.isError, selectedId]);
   const refreshScope = useCallback(() => { void scope.refetch({ cancelRefetch: false }); }, [scope.refetch]);
   useEffect(() => {
     let frame: number | undefined;
@@ -58,7 +64,7 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
       if (document.visibilityState !== "visible" || frame !== undefined) return;
       frame = requestAnimationFrame(() => { frame = undefined; refreshScope(); });
     };
-    const sync = () => { ++selectionTicket.current; setScreen(readStoreScreen()); refreshScope(); };
+    const sync = () => { ++selectionTicket.current; const next = readStoreScreen(); setScreen(next); if (next !== "date") setNotificationTarget(undefined); refreshScope(); };
     window.addEventListener("hashchange", sync);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
@@ -106,6 +112,7 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     <Button onClick={() => { void scope.refetch(); }}>Tải lại quyền cửa hàng</Button>{actions}{passwordDialog}
   </main>;
   const currentScreen = screen === "login" ? "home" : screen;
+  const openDateLot = (id: string) => { setNotificationTarget({ id, userId: session.user.id, storeId: store.id }); window.location.hash = "date"; };
   return <><div className="store-online-shell" data-verifying={scope.isFetching || undefined} inert={scope.isFetching || undefined} aria-hidden={scope.isFetching || undefined}><StoreAppFrame key={`${session.user.id}:${store.id}`} screen={currentScreen} profile={profile}
     navigate={next => { window.location.hash = next; }} account={<>
       <StoreAccountTrigger ref={accountTrigger} aria-label="Tài khoản" profile={profile} roleLabel={session.user.username} onClick={() => setAccountOpen(true)} />
@@ -116,8 +123,9 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     {currentScreen === "home" && <StoreHomeContent profile={profile} navigate={next => { window.location.hash = next; }} />}
     {currentScreen === "kph" && <StoreOnlineKph suspended={scope.isFetching} userId={session.user.id} storeId={store.id} loadHistory={gateway.loadHistory} reviewRecord={gateway.reviewRecord} prepareExport={gateway.prepareExport} canReview={store.capabilities.includes("REVIEW")} canExport={store.capabilities.includes("EXPORT")} createRecord={gateway.createRecord} lookupBarcode={gateway.lookupBarcode} profile={profile} canCreate={store.capabilities.includes("CREATE")} onSessionExpired={refreshScope} />}
     {currentScreen === "shelf" && <StorePageLayout><StorePageHero /><StorePageSurface className="store-shelf-surface"><div className="store-shelf-page"><ShelfLifeScreen /></div></StorePageSurface></StorePageLayout>}
-    {currentScreen === "date" && <StoreOnlineDate suspended={scope.isFetching} verifiedAt={scope.dataUpdatedAt} csrf={session.csrfToken} userId={session.user.id} storeId={store.id} api={gateway.date} lookupBarcode={gateway.lookupBarcode} onSessionExpired={refreshScope} profile={profile} kphCreate={store.capabilities.includes("CREATE")} />}
-    {(currentScreen === "reports" || currentScreen === "notifications") && <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content"><h1>{storeScreens[currentScreen].title} chưa kết nối</h1><p role="status">{storeScreens[currentScreen].title} chưa được kết nối trong phiên online.</p></StorePageSurface></StorePageLayout>}
+    {currentScreen === "date" && <StoreOnlineDate suspended={scope.isFetching} verifiedAt={scope.dataUpdatedAt} csrf={session.csrfToken} userId={session.user.id} storeId={store.id} api={gateway.date} lookupBarcode={gateway.lookupBarcode} onSessionExpired={refreshScope} profile={profile} kphCreate={store.capabilities.includes("CREATE")} initialLotId={notificationTarget?.userId === session.user.id && notificationTarget.storeId === store.id ? notificationTarget.id : undefined} onInitialLotConsumed={() => setNotificationTarget(undefined)} />}
+    {currentScreen === "notifications" && <StoreOnlineNotifications api={gateway.date} userId={session.user.id} storeId={store.id} suspended={scope.isFetching} navigate={next => { window.location.hash = next; }} onOpenDateLot={openDateLot} onSessionExpired={refreshScope} />}
+    {currentScreen === "reports" && <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content"><h1>{storeScreens[currentScreen].title} chưa kết nối</h1><p role="status">{storeScreens[currentScreen].title} chưa được kết nối trong phiên online.</p></StorePageSurface></StorePageLayout>}
     {message && <p role="alert">{message}</p>}
   </StoreAppFrame></div>{scope.isFetching ? <div className="store-online-verifying" role="status"><strong>Đang xác minh phiên và quyền cửa hàng…</strong><span aria-hidden="true" className="store-verifying-lines" /></div> : null}</>;
 }

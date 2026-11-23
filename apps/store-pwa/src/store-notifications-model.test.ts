@@ -1,9 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { groupDateNotifications } from "./store-notifications-model";
+import { groupDateNotifications, groupOnlineDateNotifications } from "./store-notifications-model";
+import type { DateLot } from "./date-api";
 import type { MockDateLot } from "./store-app-mock";
 const base: MockDateLot = { id: "lot", sku: "00001", name: "Lô thử", manufactured: "01/10/2026", date: "2026-10-10", status: "open" };
 const { manufactured: _nsx, ...withoutNsx } = base;
 describe("DATE notification groups", () => {
+  it("uses server reminder state and the page business date for online notices", () => {
+    const item = (id: string, reminderState: DateLot["reminderState"], remindOn: string | null): DateLot => ({
+      id, storeId: "store", lookupStatus: "MANUAL", barcode: null, skuCode: "00001", productName: "Hàng thử",
+      supplierCode: null, supplierName: null, lotCode: "LOT-CODE", manufacturedOn: "2026-10-01", expiresOn: "2026-10-20",
+      trackedQuantity: "1", processedQuantity: "0", remainingQuantity: "1", unit: "EA", processingStatus: "OPEN",
+      version: 1, remindOn, reminderState,
+    } as DateLot);
+    expect(groupOnlineDateNotifications([item("scheduled", "SCHEDULED", "2026-10-10")], "2026-10-11")).toEqual([]);
+    const groups = groupOnlineDateNotifications([{ ...item("due", "DUE", "2026-10-12"), expiresOn: "2026-10-18" }], "2026-10-11");
+    expect(groups.map(group => group.id)).toEqual(["reminder"]);
+    expect(groups[0]?.items[0]?.assessment.phase).toBe("WARNING");
+  });
   it("groups actual milestones and due reminders once per lot", () => {
     const groups = groupDateNotifications([
       { ...base, id: "expired", date: "2026-10-08" },

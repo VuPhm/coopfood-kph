@@ -16,7 +16,7 @@ import { KphCreateButton } from "./store-kph-create-button";
 import { KphCreateControl, type KphCreateHandle } from "./store-kph-create-control";
 import type { CreatedRecordDraft } from "./create-record-dialog";
 
-type Props = ComponentProps<typeof StoreBarcodeLookup> & { api: DateApi; verifiedAt: number; csrf: string; profile?: import("./store-profile").StoreProfile };
+type Props = ComponentProps<typeof StoreBarcodeLookup> & { api: DateApi; verifiedAt: number; csrf: string; profile?: import("./store-profile").StoreProfile; initialLotId?: string | undefined; onInitialLotConsumed?: (() => void) | undefined };
 const queryOptions = { retry: false, gcTime: 0, refetchOnWindowFocus: false } as const;
 
 function row(lot: DateLot): WorkspaceLot {
@@ -45,17 +45,19 @@ export function StoreOnlineDate({ suspended = false, verifiedAt, api, storeId, u
     </StorePageSurface></StorePageLayout>;
   }
   return <DateRecords key={`${userId}:${storeId}`} {...lookup} api={api} userId={userId} storeId={storeId} csrf={csrf}
+    initialLotId={lookup.initialLotId} onInitialLotConsumed={lookup.onInitialLotConsumed}
     suspended={suspended || access.isPlaceholderData} create={capabilities.includes("CREATE")} update={capabilities.includes("UPDATE")} reminder={capabilities.includes("REMIND")}
     process={capabilities.includes("PROCESS") && kphCreate} {...(lookup.profile ? { profile: lookup.profile } : {})} />;
 }
 
-function DateRecords({ api, storeId, userId, csrf, suspended, create, update, reminder, process, profile, ...lookup }: Omit<Props, "verifiedAt"> & { create: boolean; update: boolean; reminder: boolean; process: boolean }) {
+function DateRecords({ api, storeId, userId, csrf, suspended, create, update, reminder, process, profile, initialLotId, onInitialLotConsumed, ...lookup }: Omit<Props, "verifiedAt"> & { create: boolean; update: boolean; reminder: boolean; process: boolean }) {
   const client = useQueryClient();
   const rootKey = ["date-lots", userId, storeId];
   const businessToday = useBusinessDate();
   const previousBusinessToday = useRef(businessToday);
   const [filters, setFilters] = useState<DateFilters>({ q: "", page: 1 });
   const [selectedId, selectLot] = useState("");
+  const initialTargetApplied = useRef(false);
   const [editor, setEditor] = useState<"create" | DateLot | null>(null);
   const [notice, setNotice] = useState("");
   const [typeChoice, setTypeChoice] = useState<DateLotDetail | null>(null);
@@ -67,6 +69,12 @@ function DateRecords({ api, storeId, userId, csrf, suspended, create, update, re
     queryFn: ({ signal }) => api.list(storeId, filters, signal), enabled: !suspended });
   const detail = useQuery({ ...queryOptions, queryKey: [...rootKey, "detail", selectedId],
     queryFn: ({ signal }) => api.detail(storeId, selectedId, signal), enabled: !!selectedId && !suspended });
+  useEffect(() => {
+    if (!initialLotId || initialTargetApplied.current) return;
+    initialTargetApplied.current = true;
+    selectLot(initialLotId);
+    onInitialLotConsumed?.();
+  }, [initialLotId, onInitialLotConsumed]);
   useEffect(() => {
     if (previousBusinessToday.current === businessToday) return;
     previousBusinessToday.current = businessToday;
@@ -166,7 +174,7 @@ function DateRecords({ api, storeId, userId, csrf, suspended, create, update, re
       filters={filters} changeFilters={changeFilters} total={page?.totalItems} attentionCount={page?.attentionCount}
       lookupContent={<StoreBarcodeLookup {...lookup} userId={userId} storeId={storeId} suspended={!!suspended} />}
       onCreate={create ? () => { setNotice(""); setEditor("create"); } : undefined}
-      selectLot={selectLot} selectedId={editor ? "" : selectedId} detailLot={selected && row(selected)}
+      initialLotId={initialLotId} selectLot={selectLot} selectedId={editor ? "" : selectedId} detailLot={selected && row(selected)}
       listState={list.isError ? <div role="alert">Chưa tải được danh sách lô DATE. <Button onClick={() => void list.refetch()}>Thử lại</Button></div>
         : list.isPending ? <p role="status">Đang tải lô DATE…</p> : notice && <p role="status">{notice}</p>}
       detailState={detail.isError ? <div role="alert">Chưa tải được chi tiết lô. <Button onClick={() => void detail.refetch()}>Thử lại</Button></div> : <p role="status">Đang tải chi tiết…</p>}

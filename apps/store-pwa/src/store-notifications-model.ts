@@ -1,6 +1,7 @@
 import type { LocalDate } from "@coopfood-kph/kph-rules";
 import { assessDateLot, type DateAssessment } from "./store-date-assessment";
 import type { MockDateLot } from "./store-app-mock";
+import type { DateLot } from "./date-api";
 
 export const DATE_NOTICE_GROUPS = [
   { id: "expired", title: "Hết HSD", description: "Kiểm tra và lập phiếu KPH", tone: "danger" },
@@ -10,15 +11,17 @@ export const DATE_NOTICE_GROUPS = [
   { id: "reminder", title: "Đến lịch báo lại", description: "Các lô đã hẹn cần xem lại", tone: "info" },
 ] as const;
 export type DateNoticeGroupId = typeof DATE_NOTICE_GROUPS[number]["id"];
-export type DateNotice = { lot: MockDateLot; assessment: DateAssessment };
+export type NoticeLot = MockDateLot & { lotCode?: string | null; reminderState?: DateLot["reminderState"] };
+export type DateNotice = { lot: NoticeLot; assessment: DateAssessment };
 
 // One current actionable notice per lot. This is a view of DATE, not an event history.
-export function groupDateNotifications(lots: MockDateLot[], today: LocalDate) {
+export function groupDateNotifications(lots: NoticeLot[], today: LocalDate) {
   const groups = DATE_NOTICE_GROUPS.map(group => ({ ...group, items: [] as DateNotice[] }));
   for (const lot of lots) {
     if (lot.status === "resolved") continue;
-    const due = !!lot.remindOn && lot.remindOn <= today;
+    const due = lot.reminderState === undefined ? !!lot.remindOn && lot.remindOn <= today : lot.reminderState === "DUE";
     if (lot.status === "acknowledged" && !due) continue;
+    if (lot.reminderState === "SCHEDULED" && !due) continue;
     const assessment = assessDateLot(lot, today);
     const id: DateNoticeGroupId | undefined = due ? "reminder" :
       assessment.phase === "EXPIRED" ? "expired" : assessment.phase === "DANGER" ? "withdrawal" :
@@ -31,4 +34,17 @@ export function groupDateNotifications(lots: MockDateLot[], today: LocalDate) {
     return dateA.localeCompare(dateB) || a.lot.id.localeCompare(b.lot.id);
   });
   return groups.filter(group => group.items.length > 0);
+}
+
+// Online reminders are server-authoritative: a scheduled reminder must not be
+// promoted locally before the backend changes it to DUE.
+export function groupOnlineDateNotifications(lots: DateLot[], today: LocalDate) {
+  const rows: NoticeLot[] = lots.map(lot => ({
+    id: lot.id, lotCode: lot.lotCode, sku: lot.skuCode, name: lot.productName,
+    date: lot.expiresOn as LocalDate,
+    ...(lot.manufacturedOn ? { manufactured: lot.manufacturedOn.split("-").reverse().join("/") } : {}),
+    status: lot.processingStatus === "RESOLVED" ? "resolved" : lot.reminderState === "SCHEDULED" ? "acknowledged" : "open",
+    remindOn: lot.remindOn as LocalDate | null, reminderState: lot.reminderState,
+  }));
+  return groupDateNotifications(rows, today);
 }
