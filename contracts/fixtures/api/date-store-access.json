@@ -5,7 +5,8 @@
     "name": "Cửa hàng mẫu 001",
     "capabilities": [
       "VIEW",
-      "CREATE"
+      "CREATE",
+      "PROCESS"
     ]
   },
   {
@@ -15,7 +16,8 @@
     "capabilities": [
       "VIEW",
       "CREATE",
-      "UPDATE"
+      "UPDATE",
+      "PROCESS"
     ]
   }
 ]

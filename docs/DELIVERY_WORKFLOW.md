@@ -16,6 +16,9 @@ Hồ sơ cũ trong `docs/delivery/` là provenance, giữ nguyên trạng thái 
   [TEST_STRATEGY](TEST_STRATEGY.md), không mở review vòng mới chỉ vì đã hết lượt.
 - Ghi một kết quả ngắn: candidate/source, lệnh và kết quả, giới hạn và bước tiếp.
   Evidence chi tiết chỉ thêm khi giúp tái hiện lỗi hoặc đưa ra quyết định.
+- Cuối mỗi phiên thêm mục ngắn **Tiến độ và khoảng cách tới target**. Ghi mốc
+  đã đạt hoặc đang kiểm, mốc còn lại để đạt target và bước kế tiếp. Dùng trạng
+  thái/hạng mục có bằng chứng, ưu tiên số mốc cụ thể khi phạm vi đã chốt.
 - Nếu cần owner thử, đưa đúng URL/mode/source đã xác minh, dữ liệu tổng hợp,
   thao tác ngắn và kết quả mong đợi. Chỉ giao phần cần phán đoán con người hoặc
   thiết bị thật; không bắt owner lặp ma trận authorization mà máy đã kiểm.

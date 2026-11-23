@@ -1,0 +1,13 @@
+{
+  "recordId": "40000000-0000-4000-8000-000000000021",
+  "quantity": "0.12525",
+  "unit": "kg",
+  "sourceVersion": 1,
+  "resultingVersion": 2,
+  "remainingAfter": "0.25",
+  "processedAt": "2026-11-17T08:42:00+07:00",
+  "actor": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "displayName": "Nhân viên mẫu"
+  }
+}

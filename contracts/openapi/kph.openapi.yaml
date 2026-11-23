@@ -322,7 +322,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DateLot'
+                $ref: '#/components/schemas/DateLotDetail'
               examples:
                 synthetic:
                   externalValue: ../fixtures/api/date-lot-detail.json
@@ -368,6 +368,69 @@ paths:
               examples:
                 synthetic:
                   externalValue: ../fixtures/api/date-lot-update-result.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/DateLotValidation'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/v1/stores/{storeId}/date-lots/{lotId}/kph:
+    post:
+      tags: [DATE]
+      operationId: processDateLot
+      summary: Create a KPH record for part or all of an open DATE lot
+      description: |
+        Requires DATE PROCESS and KPH create at the route store. The backend
+        derives product identity from the source lot and locks the KPH type
+        on its first committed processing. The amount must fit the remaining
+        tracked quantity. KPH, receipt, audit and lot version commit together.
+        Repeating the same key, payload and photos returns the original receipt.
+        A receipt records the remaining amount at the time of that processing.
+      parameters:
+        - $ref: '#/components/parameters/StoreIdPath'
+        - $ref: '#/components/parameters/DateLotIdPath'
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [payload, photos]
+              properties:
+                payload:
+                  $ref: '#/components/schemas/DateLotProcessingRequest'
+                photos:
+                  type: array
+                  minItems: 1
+                  maxItems: 3
+                  items: { type: string, format: binary }
+            encoding:
+              payload:
+                contentType: application/json
+      responses:
+        '201':
+          description: Immutable receipt for the committed KPH record.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateLotProcessingReceipt'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-lot-processing-receipt.json
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1695,7 +1758,7 @@ components:
         capabilities:
           type: array
           uniqueItems: true
-          items: { type: string, enum: [VIEW, CREATE, UPDATE] }
+          items: { type: string, enum: [VIEW, CREATE, UPDATE, PROCESS] }
           allOf:
             - contains: { const: VIEW }
             - contains: { const: CREATE }
@@ -1792,6 +1855,76 @@ components:
           $ref: '#/components/schemas/ActorSnapshot'
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
+        kphType: { type: [string, 'null'], enum: [TPCN, TPTS, null] }
+        processingHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateLotProcessingReceipt'
+
+    DateLotDetail:
+      allOf:
+        - $ref: '#/components/schemas/DateLot'
+        - type: object
+          required: [kphType, processingHistory]
+
+    DateLotProcessingRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, kph]
+      properties:
+        expectedVersion: { type: integer, format: int64, minimum: 1 }
+        kph:
+          $ref: '#/components/schemas/DateLotKphFields'
+
+    DateLotKphFields:
+      type: object
+      additionalProperties: false
+      required: [type, detectedDate, quantity, unit, condition, resolution]
+      description: KPH fields supplied by the user. Product identity comes from the DATE source snapshot.
+      properties:
+        type:
+          $ref: '#/components/schemas/KphType'
+        detectedDate: { type: string, format: date }
+        processedDate: { type: [string, 'null'], format: date }
+        quantity:
+          $ref: '#/components/schemas/DateQuantity'
+          not: { pattern: '^0+(\.0+)?$' }
+        unit:
+          $ref: '#/components/schemas/KphUnit'
+        condition:
+          $ref: '#/components/schemas/KphCondition'
+        conditionDetail: { type: [string, 'null'], maxLength: 255 }
+        resolution:
+          $ref: '#/components/schemas/KphResolution'
+        resolutionDetail: { type: [string, 'null'], maxLength: 255 }
+        note: { type: [string, 'null'], maxLength: 255 }
+        photoLastModified:
+          type: array
+          maxItems: 3
+          items: { type: [string, 'null'], format: date-time }
+      allOf:
+        - if:
+            properties: { unit: { const: EA } }
+          then:
+            properties: { quantity: { pattern: '^[0-9]+(\.0+)?$' } }
+
+    DateLotProcessingReceipt:
+      type: object
+      additionalProperties: false
+      required: [recordId, quantity, unit, sourceVersion, resultingVersion, remainingAfter, processedAt, actor]
+      properties:
+        recordId: { type: string, format: uuid }
+        quantity:
+          $ref: '#/components/schemas/DateQuantity'
+        unit:
+          $ref: '#/components/schemas/KphUnit'
+        sourceVersion: { type: integer, format: int64, minimum: 1 }
+        resultingVersion: { type: integer, format: int64, minimum: 2 }
+        remainingAfter:
+          $ref: '#/components/schemas/DateQuantity'
+        processedAt: { type: string, format: date-time }
+        actor:
+          $ref: '#/components/schemas/ActorSnapshot'
 
     DateLotPage:
       type: object

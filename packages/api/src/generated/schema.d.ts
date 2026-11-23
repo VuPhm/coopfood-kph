@@ -229,6 +229,31 @@ export interface paths {
         patch: operations["updateDateLot"];
         trace?: never;
     };
+    "/api/v1/stores/{storeId}/date-lots/{lotId}/kph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a KPH record for part or all of an open DATE lot
+         * @description Requires DATE PROCESS and KPH create at the route store. The backend
+         *     derives product identity from the source lot and locks the KPH type
+         *     on its first committed processing. The amount must fit the remaining
+         *     tracked quantity. KPH, receipt, audit and lot version commit together.
+         *     Repeating the same key, payload and photos returns the original receipt.
+         *     A receipt records the remaining amount at the time of that processing.
+         */
+        post: operations["processDateLot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stores/{storeId}/date-sku-suggestions": {
         parameters: {
             query?: never;
@@ -806,7 +831,7 @@ export interface components {
             id: string;
             code: string;
             name: string;
-            capabilities: ("VIEW" | "CREATE" | "UPDATE")[] & (unknown & unknown);
+            capabilities: ("VIEW" | "CREATE" | "UPDATE" | "PROCESS")[] & (unknown & unknown);
         };
         DateSkuSuggestion: {
             skuCode: string;
@@ -863,7 +888,46 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            /** @enum {string|null} */
+            kphType?: "TPCN" | "TPTS" | null;
+            processingHistory?: components["schemas"]["DateLotProcessingReceipt"][];
         } & components["schemas"]["DateLotFields"];
+        DateLotDetail: components["schemas"]["DateLot"] & Record<string, never>;
+        DateLotProcessingRequest: {
+            /** Format: int64 */
+            expectedVersion: number;
+            kph: components["schemas"]["DateLotKphFields"];
+        };
+        /** @description KPH fields supplied by the user. Product identity comes from the DATE source snapshot. */
+        DateLotKphFields: {
+            type: components["schemas"]["KphType"];
+            /** Format: date */
+            detectedDate: string;
+            /** Format: date */
+            processedDate?: string | null;
+            quantity: components["schemas"]["DateQuantity"];
+            unit: components["schemas"]["KphUnit"];
+            condition: components["schemas"]["KphCondition"];
+            conditionDetail?: string | null;
+            resolution: components["schemas"]["KphResolution"];
+            resolutionDetail?: string | null;
+            note?: string | null;
+            photoLastModified?: (string | null)[];
+        } & unknown;
+        DateLotProcessingReceipt: {
+            /** Format: uuid */
+            recordId: string;
+            quantity: components["schemas"]["DateQuantity"];
+            unit: components["schemas"]["KphUnit"];
+            /** Format: int64 */
+            sourceVersion: number;
+            /** Format: int64 */
+            resultingVersion: number;
+            remainingAfter: components["schemas"]["DateQuantity"];
+            /** Format: date-time */
+            processedAt: string;
+            actor: components["schemas"]["ActorSnapshot"];
+        };
         DateLotPage: {
             items: components["schemas"]["DateLot"][];
             page: number;
@@ -1670,7 +1734,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DateLot"];
+                    "application/json": components["schemas"]["DateLotDetail"];
                 };
             };
             400: components["responses"]["BadRequest"];
@@ -1706,6 +1770,49 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DateLotWriteResult"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["DateLotValidation"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    processDateLot: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+                /** @description Client-generated opaque key scoped to the authenticated actor. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                lotId: components["parameters"]["DateLotIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    payload: components["schemas"]["DateLotProcessingRequest"];
+                    photos: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Immutable receipt for the committed KPH record. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateLotProcessingReceipt"];
                 };
             };
             400: components["responses"]["BadRequest"];

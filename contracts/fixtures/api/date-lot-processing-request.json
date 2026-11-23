@@ -1,0 +1,11 @@
+{
+  "expectedVersion": 1,
+  "kph": {
+    "type": "TPCN",
+    "detectedDate": "2026-11-17",
+    "quantity": "0.12525",
+    "unit": "kg",
+    "condition": "NEAR_EXPIRY",
+    "resolution": "RETURN"
+  }
+}

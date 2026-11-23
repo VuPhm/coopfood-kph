@@ -12,10 +12,10 @@
   "unit": "kg",
   "supplierCode": null,
   "supplierName": null,
-  "processedQuantity": "0",
-  "remainingQuantity": "0.37525",
+  "processedQuantity": "0.12525",
+  "remainingQuantity": "0.25",
   "processingStatus": "OPEN",
-  "version": 1,
+  "version": 2,
   "createdBy": {
     "id": "10000000-0000-4000-8000-000000000001",
     "displayName": "Nhân viên mẫu"
@@ -25,5 +25,21 @@
     "displayName": "Nhân viên mẫu"
   },
   "createdAt": "2026-11-17T08:30:00+07:00",
-  "updatedAt": "2026-11-17T08:30:00+07:00"
+  "updatedAt": "2026-11-17T08:42:00+07:00",
+  "kphType": "TPCN",
+  "processingHistory": [
+    {
+      "recordId": "40000000-0000-4000-8000-000000000021",
+      "quantity": "0.12525",
+      "unit": "kg",
+      "sourceVersion": 1,
+      "resultingVersion": 2,
+      "remainingAfter": "0.25",
+      "processedAt": "2026-11-17T08:42:00+07:00",
+      "actor": {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "displayName": "Nhân viên mẫu"
+      }
+    }
+  ]
 }
