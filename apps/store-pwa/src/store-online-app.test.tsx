@@ -7,8 +7,10 @@ import type { StoreSessionGateway } from "./store-session-api";
 const employee = { id: "store-a", code: "0001", name: "Cửa hàng A", capabilities: ["VIEW", "CREATE"] as ("VIEW" | "CREATE" | "REVIEW" | "EXPORT")[] };
 const manager = { ...employee, id: "store-b", code: "0002", name: "Cửa hàng B", capabilities: ["VIEW", "CREATE", "REVIEW", "EXPORT"] as ("VIEW" | "CREATE" | "REVIEW" | "EXPORT")[] };
 const session = { user: { id: "user", username: "test", displayName: "Người kiểm thử", globalRoles: [], stores: [] }, csrfToken: "synthetic" };
+const emptyDatePage = { items: [], page: 1, pageSize: 25, totalItems: 0, totalPages: 0, attentionCount: 0 };
 function gateway(): StoreSessionGateway {
-  return { reviewRecord: vi.fn(), prepareExport: vi.fn(), createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
+  return { date: { listStores: vi.fn().mockResolvedValue([employee, manager]), list: vi.fn().mockResolvedValue(emptyDatePage),
+    detail: vi.fn(), create: vi.fn(), update: vi.fn(), suggest: vi.fn().mockResolvedValue([]) }, reviewRecord: vi.fn(), prepareExport: vi.fn(), createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
 }
 async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Công việc cửa hàng" }); }
 beforeEach(() => { window.history.replaceState(null, "", "#home"); });
@@ -100,14 +102,14 @@ describe("Store online session", () => {
     expect(screen.queryByRole("button", { name: "Tạo lô" })).not.toBeInTheDocument();
     window.history.replaceState(null, "", "#home");
   });
-  it("opens the compact DATE workspace with real lookup and manual session intake", async () => {
+  it("opens the compact DATE workspace with scoped server list and catalog lookup", async () => {
     const api = gateway();
     render(<StoreOnlineApp gateway={api} />); await selectA();
     fireEvent.click(screen.getByRole("button", { name: "Quản lý DATE" }));
     await screen.findByRole("heading", { name: "Lô DATE" });
-    expect(screen.getByRole("region", { name: "Danh sách lô DATE" })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "Danh sách lô DATE" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Thêm theo dõi DATE" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Lọc DATE" })).toBeEnabled();
+    expect(api.date.list).toHaveBeenCalledWith(employee.id, { q: "", page: 1 }, expect.anything());
     expect(screen.getByRole("button", { name: "Quét / tra mã hàng" })).toHaveAttribute("aria-expanded", "false");
     expect(document.querySelectorAll("[data-date-lot-id]")).toHaveLength(0);
     expect(screen.queryByText("Cải thìa VietGAP 500 g")).not.toBeInTheDocument();
@@ -115,15 +117,17 @@ describe("Store online session", () => {
     expect(api.createRecord).not.toHaveBeenCalled();
     window.history.replaceState(null, "", "#home");
   });
-  it("keeps manually added DATE lots in the selected store session only", async () => {
+  it("sends the measured quantity and explicit unit, masks the draft on refresh and clears old store data", async () => {
     const api = gateway(); render(<StoreOnlineApp gateway={api} />); await selectA();
     fireEvent.click(screen.getByRole("button", { name: "Quản lý DATE" }));
     fireEvent.click(await screen.findByRole("button", { name: "Thêm theo dõi DATE" }));
     await screen.findByRole("heading", { name: "Thêm theo dõi DATE" });
-    fireEvent.change(await screen.findByLabelText(/SKU/), { target: { value: "000045" } });
-    fireEvent.change(await screen.findByLabelText(/Tên hàng/), { target: { value: "Lô kiểm thử cửa hàng A" } });
+    vi.mocked(api.date.suggest).mockResolvedValue([{ skuCode: "000045", productName: "Lô kiểm thử cửa hàng A" }]);
+    fireEvent.change(document.querySelector<HTMLInputElement>("#date-online-sku")!, { target: { value: "000045" } });
+    fireEvent.click(await screen.findByRole("option", { name: "000045 · Lô kiểm thử cửa hàng A" }));
     fireEvent.change(await screen.findByLabelText(/Số lô/), { target: { value: "LOT-A-ONLY" } });
-    fireEvent.change(await screen.findByLabelText(/NSX/), { target: { value: "01/11/2026" } });
+    fireEvent.change(await screen.findByLabelText(/Số lượng đang theo dõi/), { target: { value: "0.125" } });
+    fireEvent.change(await screen.findByLabelText(/Đơn vị/), { target: { value: "kg" } });
     fireEvent.change(await screen.findByLabelText(/HSD/), { target: { value: "30/11/2026" } });
     let release!: (stores: typeof employee[]) => void;
     vi.mocked(api.listStoreAccess).mockReturnValueOnce(new Promise(resolve => { release = resolve; }));
@@ -132,9 +136,23 @@ describe("Store online session", () => {
     expect(screen.queryByDisplayValue("Lô kiểm thử cửa hàng A")).not.toBeInTheDocument();
     release([employee, manager]);
     expect(await screen.findByDisplayValue("Lô kiểm thử cửa hàng A")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Lưu lô trong phiên" }));
+    const saved = { id: "real-lot-id", storeId: employee.id, skuCode: "000045", productName: "Lô kiểm thử cửa hàng A",
+      lotCode: "LOT-A-ONLY", trackedQuantity: "0.125", remainingQuantity: "0.125", processedQuantity: "0", unit: "kg",
+      manufacturedOn: null, expiresOn: "2026-11-30", processingStatus: "OPEN", lookupStatus: "MANUAL", version: 1 };
+    vi.mocked(api.date.create).mockRejectedValueOnce(new OnlineApiError("temporary", 503))
+      .mockResolvedValueOnce({ lot: saved, duplicateWarning: false } as Awaited<ReturnType<typeof api.date.create>>);
+    vi.mocked(api.date.list).mockImplementation(async id => id === employee.id
+      ? { ...emptyDatePage, items: [saved], totalItems: 1, totalPages: 1 } as Awaited<ReturnType<typeof api.date.list>>
+      : emptyDatePage);
+    fireEvent.click(screen.getByRole("button", { name: "Lưu lô" }));
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getByRole("button", { name: "Lưu lô" }));
+    await waitFor(() => expect(api.date.create).toHaveBeenCalledWith(employee.id,
+      expect.objectContaining({ skuCode: "000045", productName: saved.productName, lotCode: "LOT-A-ONLY", trackedQuantity: "0.125", unit: "kg", manufacturedOn: null }),
+      expect.any(String), expect.any(String)));
+    expect(vi.mocked(api.date.create).mock.calls[0]?.[2]).toBe(vi.mocked(api.date.create).mock.calls[1]?.[2]);
     expect(await screen.findByRole("button", { name: /Lô kiểm thử cửa hàng A/ })).toBeVisible();
-    expect(document.querySelectorAll('[data-date-lot-id="LOT-A-ONLY"]')).toHaveLength(1);
+    expect(document.querySelectorAll('[data-date-lot-id="real-lot-id"]')).toHaveLength(1);
     expect(api.createRecord).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Tài khoản" }));
