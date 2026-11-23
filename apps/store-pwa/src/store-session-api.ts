@@ -1,6 +1,7 @@
 import { createKphApiClient, type components } from "@coopfood-kph/api";
 import { createOnlineGateway, OnlineApiError } from "./online-kph";
 
+import { createReportGateway } from "./store-report-api";
 import { createDateApi } from "./date-api";
 
 export type StoreAccess = components["schemas"]["KphStoreAccess"];
@@ -8,6 +9,7 @@ export function createStoreSessionGateway(options: { baseUrl?: string; fetch?: t
   const identity = createOnlineGateway(options);
   const client = createKphApiClient(options);
   return {
+    reports: createReportGateway(options),
     date: createDateApi(options),
     getSession: identity.getSession,
     lookupBarcode: identity.lookupBarcode,

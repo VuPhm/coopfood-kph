@@ -136,7 +136,7 @@ class DateLotRepository {
     private static final String ASSESSED = """
             WITH scoped AS (
                 SELECT d.*, CAST(? AS date) AS today, expires_on-manufactured_on+1 AS days
-                FROM date_lots d WHERE store_id=? AND processing_status='OPEN'
+                FROM date_lots d WHERE store_id=? AND (?='ALL' OR processing_status=?)
                   AND (strpos(lower(sku_code),lower(?))>0 OR strpos(lower(product_name),lower(?))>0
                     OR strpos(lower(barcode),lower(?))>0 OR strpos(lower(lot_code),lower(?))>0)
             ), assessed AS (
@@ -152,8 +152,13 @@ class DateLotRepository {
             """;
 
     DateLot.Page page(UUID store, LocalDate today, String q, String phase, boolean attention, String sort, int page, int size) {
-        String attentionPredicate = "((remind_on IS NOT NULL AND remind_on<=today) OR (remind_on IS NULL AND phase NOT IN ('SAFE','BEFORE_NSX')))";
-        List<Object> scope = List.of(today,store,q,q,q,q);
+        return page(store,today,q,phase,attention,sort,page,size,"OPEN");
+    }
+
+    DateLot.Page page(UUID store, LocalDate today, String q, String phase, boolean attention, String sort,
+            int page, int size, String status) {
+        String attentionPredicate = "(processing_status='OPEN' AND ((remind_on IS NOT NULL AND remind_on<=today) OR (remind_on IS NULL AND phase NOT IN ('SAFE','BEFORE_NSX'))))";
+        List<Object> scope = List.of(today,store,status,status,q,q,q,q);
         var args = new ArrayList<>(scope);
         String filter = "TRUE";
         if (phase != null) { filter += " AND phase=?"; args.add(phase); }
@@ -171,6 +176,11 @@ class DateLotRepository {
         var items = db.fetch(ASSESSED + "SELECT * FROM assessed WHERE " + filter + " ORDER BY " + order
                 + ", id ASC LIMIT ? OFFSET ?",args.toArray()).map(this::lot);
         return new DateLot.Page(items,page,size,total,(total+size-1)/size,counts.get(1,Long.class),today);
+    }
+
+    List<DateLot> reportSnapshots(UUID store, List<UUID> ids, LocalDate date) {
+        return db.fetch("SELECT * FROM date_lots WHERE store_id=? AND id=ANY(CAST(? AS uuid[])) ORDER BY expires_on,id",
+                store,ids.toArray(UUID[]::new)).map(row -> lot(row).withReminderState(date));
     }
 
     private DateLot lot(Record r) {

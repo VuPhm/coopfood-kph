@@ -9,7 +9,7 @@ const manager = { ...employee, id: "store-b", code: "0002", name: "Cửa hàng B
 const session = { user: { id: "user", username: "test", displayName: "Người kiểm thử", globalRoles: [], stores: [] }, csrfToken: "synthetic" };
 const emptyDatePage = { items: [], page: 1, pageSize: 25, totalItems: 0, totalPages: 0, attentionCount: 0, businessDate: "2026-11-23" };
 function gateway(): StoreSessionGateway {
-  return { date: { listStores: vi.fn().mockResolvedValue([employee, manager]), list: vi.fn().mockResolvedValue(emptyDatePage),
+  return { reports: { source: vi.fn(), create: vi.fn(), history: vi.fn(), rows: vi.fn() }, date: { listStores: vi.fn().mockResolvedValue([employee, manager]), list: vi.fn().mockResolvedValue(emptyDatePage),
     detail: vi.fn(), create: vi.fn(), update: vi.fn(), scheduleReminder: vi.fn(), process: vi.fn(), suggest: vi.fn().mockResolvedValue([]) }, reviewRecord: vi.fn(), prepareExport: vi.fn(), createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
 }
 async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Công việc cửa hàng" }); }
@@ -94,10 +94,10 @@ describe("Store online session", () => {
     expect(screen.getByText("Xem phiếu")).toBeVisible();
     expect(screen.queryByText("Duyệt phiếu")).not.toBeInTheDocument();
   });
-  it("shows explicit unavailable states on unwired routes instead of mock operational data", async () => {
+  it("checks DATE report capability before showing the report library", async () => {
     render(<StoreOnlineApp gateway={gateway()} />); await selectA();
     window.history.replaceState(null, "", "#reports"); fireEvent(window, new Event("hashchange"));
-    await screen.findByText(/chưa được kết nối trong phiên online/);
+    await screen.findByText("Tài khoản chưa có quyền báo cáo tại cửa hàng này.");
     expect(screen.queryByText("Vào bản dùng thử")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Tạo lô" })).not.toBeInTheDocument();
     window.history.replaceState(null, "", "#home");

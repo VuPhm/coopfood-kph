@@ -84,6 +84,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/session", "/api/v1/stores", "/api/v1/kph/stores").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/stores/*/date-reports", "/api/v1/stores/*/date-reports/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/date-reports").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/date/stores", "/api/v1/stores/*/date-lots",
                                 "/api/v1/stores/*/date-lots/*", "/api/v1/stores/*/date-sku-suggestions").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/stores/*/date-lots").authenticated()

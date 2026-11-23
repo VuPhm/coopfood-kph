@@ -22,7 +22,7 @@ public class DateStoreAccessPolicy {
     public List<Store> list(Authentication authentication) {
         return resolver.listActiveScopes(authentication).stream()
                 .map(access -> new Store(access.storeId(), access.storeCode(), access.storeName(),
-                        access.hasManagementScope() ? List.of("VIEW", "CREATE", "UPDATE", "REMIND", "PROCESS") : List.of("VIEW", "CREATE", "PROCESS")))
+                        access.hasManagementScope() ? List.of("VIEW", "CREATE", "UPDATE", "REMIND", "PROCESS", "REPORT") : List.of("VIEW", "CREATE", "PROCESS")))
                 .toList();
     }
 
@@ -36,6 +36,14 @@ public class DateStoreAccessPolicy {
         if (!resolver.requireActiveStore(storeId, authentication).hasManagementScope()) {
             throw new ApiProblemException(HttpStatus.FORBIDDEN, "DATE_UPDATE_DENIED", "DATE management scope is required.");
         }
+    }
+
+    public Store requireReport(UUID storeId, Authentication authentication) {
+        var scope = resolver.requireActiveStore(storeId, authentication);
+        if (!scope.hasManagementScope()) {
+            throw new ApiProblemException(HttpStatus.FORBIDDEN, "DATE_REPORT_DENIED", "Report management scope is required.");
+        }
+        return new Store(scope.storeId(), scope.storeCode(), scope.storeName(), List.of("REPORT"));
     }
 
     public void requireRemind(UUID storeId, Authentication authentication) {

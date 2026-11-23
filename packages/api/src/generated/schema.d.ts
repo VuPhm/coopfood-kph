@@ -165,6 +165,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/stores/{storeId}/date-reports/source": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read current DATE lots with manager report scope */
+        get: operations["listDateReportSource"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/date-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read immutable report history in the authorized store */
+        get: operations["listDateReports"];
+        put?: never;
+        /**
+         * Freeze selected current lots in one report
+         * @description Manager report scope and CSRF required. Source versions are rechecked. Atomic header/rows/idempotency/audit; replay same actor/key/payload returns the original report before source checks. No past period or client-supplied snapshots.
+         */
+        post: operations["createDateReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/date-reports/{reportId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read frozen report metadata */
+        get: operations["getDateReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores/{storeId}/date-reports/{reportId}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read frozen rows in immutable ordinal order */
+        get: operations["listDateReportRows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stores/{storeId}/date-lots": {
         parameters: {
             query?: never;
@@ -858,7 +930,7 @@ export interface components {
             id: string;
             code: string;
             name: string;
-            capabilities: ("VIEW" | "CREATE" | "UPDATE" | "PROCESS" | "REMIND")[] & (unknown & unknown);
+            capabilities: ("VIEW" | "CREATE" | "UPDATE" | "PROCESS" | "REMIND" | "REPORT")[] & (unknown & unknown);
         };
         DateSkuSuggestion: {
             skuCode: string;
@@ -895,6 +967,51 @@ export interface components {
             expectedVersion: number;
             reason: string;
         } & components["schemas"]["DateLotFields"];
+        DateReportCreate: {
+            /** Format: date */
+            periodStart: string;
+            /** Format: date */
+            periodEnd: string;
+            title: string;
+            items: components["schemas"]["DateReportSelection"][];
+        };
+        DateReportSelection: {
+            /** Format: uuid */
+            lotId: string;
+            version: number;
+        };
+        DateReportSummary: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            periodStart: string;
+            /** Format: date */
+            periodEnd: string;
+            title: string;
+            /** Format: date */
+            asOf: string;
+            /** Format: date-time */
+            createdAt: string;
+            store: components["schemas"]["KphStoreSnapshot"];
+            createdBy: components["schemas"]["ActorSnapshot"];
+            rowCount: number;
+            totalEa: string;
+            totalKg: string;
+        };
+        DateReportPage: {
+            items: components["schemas"]["DateReportSummary"][];
+            page: number;
+            pageSize: number;
+            totalItems: number;
+            totalPages: number;
+        };
+        DateReportRowsPage: {
+            items: components["schemas"]["DateLot"][];
+            page: number;
+            pageSize: number;
+            totalItems: number;
+            totalPages: number;
+        };
         DateLot: {
             /** Format: uuid */
             id: string;
@@ -1692,6 +1809,413 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    listDateReportSource: {
+        parameters: {
+            query?: {
+                collection?: "ALL" | "OPEN" | "RESOLVED";
+                q?: string;
+                attentionOnly?: boolean;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private no-store response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateLotPage"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listDateReports: {
+        parameters: {
+            query?: {
+                q?: string;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private no-store response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateReportPage"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    createDateReport: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-TOKEN": components["parameters"]["CsrfHeader"];
+                "Idempotency-Key": string;
+            };
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DateReportCreate"];
+            };
+        };
+        responses: {
+            /** @description Report created or replayed */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateReportSummary"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getDateReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                reportId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private no-store response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateReportSummary"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listDateReportRows: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Requested scope; backend rechecks active store/region and effective KPH authority. */
+                storeId: components["parameters"]["StoreIdPath"];
+                reportId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private no-store response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DateReportRowsPage"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation, scope, source conflict or sanitized storage error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     listDateLots: {

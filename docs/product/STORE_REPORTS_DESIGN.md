@@ -1,5 +1,9 @@
 # Báo cáo DATE — RPT01 revision 14
 
+## Báo cáo kỳ online · REPORTON01
+
+Store chốt các lô đã chọn theo dữ liệu hiện tại. Ngày chốt tại Việt Nam phải nằm trong kỳ. Lô đã lưu mang lượng theo dõi, đã xử lý và còn lại tại thời điểm tạo. Lịch sử dùng bản đã lưu để xem kỳ cũ. [Hợp đồng và quyền](../delivery/reporton01-date-snapshots.md).
+
 ## RPT02 — Co.op Fresh khối mềm, đã duyệt23/10/2026
 
 Owner yêu cầu áp giao diện mới cho vùng Báo cáo, từ main3b0da6c đã có

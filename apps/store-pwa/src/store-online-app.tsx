@@ -9,9 +9,10 @@ import { ShelfLifeScreen } from "./store-shelf-life";
 import { StoreLogin } from "./store-login";
 import { StoreAppFrame } from "./store-app-frame";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
-import { readStoreScreen, storeScreens, type Screen } from "./store-app-routes";
+import { readStoreScreen, type Screen } from "./store-app-routes";
 import { OnlineApiError } from "./online-kph";
 import { createStoreSessionGateway, type StoreSessionGateway } from "./store-session-api";
+import { StoreOnlineReports } from "./store-online-reports";
 import { StoreOnlineDate } from "./store-online-date";
 import { StoreOnlineNotifications } from "./store-online-notifications";
 import { StoreOnlineKph } from "./store-online-kph";
@@ -125,7 +126,8 @@ function StoreOnlineSession({ gateway }: { gateway: StoreSessionGateway }) {
     {currentScreen === "shelf" && <StorePageLayout><StorePageHero /><StorePageSurface className="store-shelf-surface"><div className="store-shelf-page"><ShelfLifeScreen /></div></StorePageSurface></StorePageLayout>}
     {currentScreen === "date" && <StoreOnlineDate suspended={scope.isFetching} verifiedAt={scope.dataUpdatedAt} csrf={session.csrfToken} userId={session.user.id} storeId={store.id} api={gateway.date} lookupBarcode={gateway.lookupBarcode} onSessionExpired={refreshScope} profile={profile} kphCreate={store.capabilities.includes("CREATE")} initialLotId={notificationTarget?.userId === session.user.id && notificationTarget.storeId === store.id ? notificationTarget.id : undefined} onInitialLotConsumed={() => setNotificationTarget(undefined)} />}
     {currentScreen === "notifications" && <StoreOnlineNotifications api={gateway.date} userId={session.user.id} storeId={store.id} suspended={scope.isFetching} navigate={next => { window.location.hash = next; }} onOpenDateLot={openDateLot} onSessionExpired={refreshScope} />}
-    {currentScreen === "reports" && <StorePageLayout><StorePageHero /><StorePageSurface className="store-online-content"><h1>{storeScreens[currentScreen].title} chưa kết nối</h1><p role="status">{storeScreens[currentScreen].title} chưa được kết nối trong phiên online.</p></StorePageSurface></StorePageLayout>}
+    {currentScreen === "reports" && <StoreOnlineReports userId={session.user.id} storeId={store.id} gateway={gateway}
+      csrf={session.csrfToken} suspended={scope.isFetching} verifiedAt={scope.dataUpdatedAt} refreshScope={refreshScope} />}
     {message && <p role="alert">{message}</p>}
   </StoreAppFrame></div>{scope.isFetching ? <div className="store-online-verifying" role="status"><strong>Đang xác minh phiên và quyền cửa hàng…</strong><span aria-hidden="true" className="store-verifying-lines" /></div> : null}</>;
 }

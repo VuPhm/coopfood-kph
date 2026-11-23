@@ -98,6 +98,45 @@ class DateLotHttpIntegrationTest {
         actor = authentication(UsernamePasswordAuthenticationToken.authenticated(principal,null,principal.authorities()));
     }
 
+    @Test void reportFreezesSelectedLotsAndReplaysAfterSourceChanges() throws Exception {
+        String id = createLot("1.2345");
+        String reports = "/api/v1/stores/" + a + "/date-reports";
+        String body = """
+                {"title":"Kỳ tháng 11","periodStart":"2026-11-01","periodEnd":"2026-11-30",
+                 "items":[{"lotId":"%s","version":1}]}
+                """.formatted(id);
+        mvc.perform(get(reports).with(actor)).andExpect(status().isForbidden());
+        db.execute("UPDATE store_memberships SET role='STORE_MANAGER' WHERE user_id=?",employee);
+        var request = post(reports).with(actor).with(csrf()).header("Idempotency-Key",key)
+                .contentType(MediaType.APPLICATION_JSON).content(body);
+        mvc.perform(post(reports).with(actor).header("Idempotency-Key",key)
+                .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isForbidden());
+        mvc.perform(get(reports+"/source").with(actor).param("q","00123")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].id").value(id));
+        var response = mvc.perform(request).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.totalKg").value("1.2345")).andReturn().getResponse();
+        String report = mapper.readTree(response.getContentAsByteArray()).path("id").asText();
+        db.execute("UPDATE date_lots SET tracked_quantity=2,version=2 WHERE id=?",UUID.fromString(id));
+        clock.set(Instant.parse("2026-12-01T05:00:00Z"));
+        mvc.perform(request).andExpect(status().isCreated()).andExpect(jsonPath("$.id").value(report));
+        mvc.perform(get(reports+"/"+report+"/rows").with(actor)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].remainingQuantity").value("1.2345"));
+        mvc.perform(get(reports).with(actor)).andExpect(jsonPath("$.items[0].periodEnd").value("2026-11-30"));
+        assertThat(db.fetchValue("SELECT count(*) FROM audit_events WHERE target_id=?",UUID.fromString(report))).isEqualTo(1L);
+        mvc.perform(post(reports).with(actor).with(csrf()).header("Idempotency-Key","another-report-key")
+                .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isUnprocessableEntity());
+        clock.set(Instant.parse("2026-11-23T05:00:00Z"));
+        mvc.perform(post(reports).with(actor).with(csrf()).header("Idempotency-Key","another-report-key")
+                .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isConflict());
+        db.execute("UPDATE store_memberships SET active=false WHERE user_id=?",employee);
+        db.execute("INSERT INTO user_region_assignments(user_id,region_id,active,created_at,updated_at) VALUES (?,?,true,now(),now())",employee,regionB);
+        mvc.perform(get(reports+"/"+report+"/rows").with(actor)).andExpect(status().isForbidden());
+        String foreign="/api/v1/stores/"+b+"/date-reports";
+        mvc.perform(get(foreign+"/"+report).with(actor)).andExpect(status().isNotFound());
+        mvc.perform(post(foreign).with(actor).with(csrf()).header("Idempotency-Key","foreign-report-key")
+                .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isNotFound());
+    }
+
     @Test void reminderIsScopedVersionedDurableAndMakesSafeLotsAttentionWhenDue() throws Exception {
         String lotId=createLot("1.25");
         String endpoint=lots+"/"+lotId;
