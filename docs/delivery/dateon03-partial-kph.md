@@ -27,3 +27,25 @@ Sol sở hữu OpenAPI, fixtures, generated client, tích hợp và browser. Lun
 backend sở hữu migration và test quyền, retry, rollback, cạnh tranh. Luna Store
 dùng lại màn tạo KPH và trang chi tiết lô. Review một lượt mobile/desktop với
 cùng hai lần xử lý và hai cửa hàng tổng hợp.
+
+## Kiểm trên candidate ngày 23/11/2026
+
+- PostgreSQL 17 sạch áp dụng V11. Bản sao fixture riêng có bốn lô từ V10
+  nâng cấp thành công. Test DATE 4 ca, KPH 11 ca, kiểm kiến trúc 1 ca đều
+  đạt. Đã kiểm gửi lại sau khi đóng lô, phạm vi cửa hàng, quá lượng,
+  xung đột cùng version và rollback dữ liệu cùng ảnh private.
+- OpenAPI, 33 API fixtures, client sinh lại và TypeScript Store đạt.
+  Hai file test form và vận chuyển multipart đạt 28 ca.
+- Playwright trên Store 390×844 và 1440×1024. Nhân viên xử lý 0.37525 kg,
+  cửa hàng trưởng thấy còn 0.87500 kg và xử lý hết. PostgreSQL giữ hai
+  receipt, lô chuyển RESOLVED ở version 3 và rời danh sách mở. Hai phiếu
+  giữ SKU gốc, có ảnh đã đóng tem và đều Chờ duyệt.
+- [Store online](http://127.0.0.1:4784/) dùng backend và fixture riêng.
+  [Tài khoản mẫu](admin03-store-membership/handoff.md). Còn nghiệm thu owner
+  và thiết bị thật.
+
+## Tiến độ và khoảng cách tới target
+
+DATE online lõi đạt kỹ thuật hai trong ba mốc từ DATEON02 đến DATEON04.
+Đã có lô bền vững, gợi ý SKU và xử lý từng phần. Mốc còn lại là lịch nhắc
+chung DATEON04. Thông báo, báo cáo kỳ và kiểm rollout theo NEXT.

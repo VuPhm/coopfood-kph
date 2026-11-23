@@ -6,6 +6,10 @@ revision2 `fdcfd2f` được owner cho “đủ để tiếp”. Nhánh
 `store-app/dateon01-durable-contract`, một writer. Main vẫn `2d1536f`;
 không tự merge/push/deploy hoặc nhập nhánh BE/DATE cũ.
 
+Cập nhật triển khai 23/11/2026. DATEON02 đã nối lô bền vững và gợi ý SKU,
+DATEON03 đã nối xử lý từng phần với receipt cố định. Wire triển khai nằm trong
+[OpenAPI](../../contracts/openapi/kph.openapi.yaml). Quyết định nhắc chung còn ở DATEON04.
+
 ## Authority và evidence
 
 Đã đọc [model DATE](DATE_MILESTONE_MODEL.md), [domain](DOMAIN_RULES.md),

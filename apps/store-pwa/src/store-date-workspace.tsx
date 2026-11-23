@@ -55,7 +55,7 @@ type DateWorkspaceProps = { today?: LocalDate; initialLotId?: string | undefined
       total?: number | undefined; attentionCount?: number | undefined; listState: ReactNode; footer: ReactNode;
       filters: DateFilters; changeFilters: (change: DateFilters) => void;
       onCreate?: (() => void) | undefined; selectLot: (id: string) => void; selectedId: string;
-      detailLot?: WorkspaceLot | undefined; detailState: ReactNode; detailActions: ReactNode; }
+      detailLot?: WorkspaceLot | undefined; detailState: ReactNode; detailFacts: ReactNode; detailActions: ReactNode; }
   | { mode: "unconnected"; lookupContent: ReactNode }
 );
 
@@ -193,6 +193,7 @@ export function DateWorkspace(props: DateWorkspaceProps) {
       {lot.remindOn && lot.status !== "resolved" ? <p className="store-date-remind-note">{lot.remindOn > today ? "Báo lại" : "Đã đến lịch báo lại"} {formatDisplayDate(lot.remindOn)}</p> : null}
       {lot.kphRecordId ? <p className="store-date-remind-note" role="status">Đã tạo phiếu KPH cho lô này.</p> : null}
       {reminderPicking && !online ? <fieldset className="store-date-reminder-choices"><legend>Báo lại sau</legend>{([1,7] as const).map(days => <label key={days}><input type="radio" name="date-reminder" checked={reminderDays === days} onChange={() => setReminderDays(days)} /><span>{days === 1 ? "1 ngày" : "1 tuần"}<small>{formatDisplayDate(addDays(today, days))}</small></span></label>)}</fieldset> : null}
+      {online && props.detailFacts}
       <div className="store-sheet-actions">{online ? props.detailActions : reminderPicking ? <><Button className="store-button store-date-reminder-cancel" variant="ghost" onClick={() => setReminderPicking(false)}>Hủy</Button><Button className="store-button" onClick={confirmReminder}>Hẹn báo lại</Button></> : <><Button className="store-date-acknowledge" disabled={lot.status === "resolved"} onClick={() => { setReminderDays(1); setReminderPicking(true); window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>(".store-date-reminder-choices input:checked")?.focus()); }}>{lot.remindOn && lot.status === "acknowledged" ? "Đổi lịch nhắc" : "Ghi nhận"}</Button><Button className="store-button" disabled={lot.status === "resolved"} onClick={() => startProcessing(lot)}>{lot.status === "resolved" ? "Đã xử lý" : "Xử lý"}</Button></>}</div>
     </>;
   }

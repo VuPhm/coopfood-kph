@@ -131,13 +131,26 @@ function DateRecords({ api, storeId, userId, csrf, suspended, create, update, pr
       listState={list.isError ? <div role="alert">Chưa tải được danh sách lô DATE. <Button onClick={() => void list.refetch()}>Thử lại</Button></div>
         : list.isPending ? <p role="status">Đang tải lô DATE…</p> : notice && <p role="status">{notice}</p>}
       detailState={detail.isError ? <div role="alert">Chưa tải được chi tiết lô. <Button onClick={() => void detail.refetch()}>Thử lại</Button></div> : <p role="status">Đang tải chi tiết…</p>}
-      detailActions={selected && <><p>Số lượng đang theo dõi: <strong>{selected.trackedQuantity} {selected.unit}</strong></p>
-        <p>Đã xử lý: <strong>{selected.processedQuantity} {selected.unit}</strong> · Còn lại: <strong>{selected.remainingQuantity} {selected.unit}</strong></p>
-        {selected.processingHistory?.length ? <section aria-label="Lịch sử xử lý"><h3>Lịch sử xử lý KPH</h3><a href="#kph">Mở lịch sử KPH</a><ol>{selected.processingHistory.map((receipt, index) => <li key={`${receipt.recordId}-${index}`}>
-          Phiếu {receipt.recordId} · {receipt.quantity} {receipt.unit} · Còn {receipt.remainingAfter} {receipt.unit} · {new Date(receipt.processedAt).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
-        </li>)}</ol></section> : null}
-        {process && selected.processingStatus === "OPEN" && <Button type="button" disabled={!!suspended} onClick={() => selected.kphType ? openProcessor(selected, selected.kphType) : setTypeChoice(selected)}>Xử lý một phần</Button>}
-        {mayEdit && <Button type="button" onClick={() => setEditor(selected)}>Sửa lô</Button>}</>}
+      detailFacts={selected && <>
+        <dl className="store-date-milestone-facts" aria-label="Số lượng theo dõi">
+          <div><dt>Đang theo dõi</dt><dd>{selected.trackedQuantity} {selected.unit}</dd></div>
+          <div><dt>Đã xử lý</dt><dd>{selected.processedQuantity} {selected.unit}</dd></div>
+          <div><dt>Còn lại</dt><dd>{selected.remainingQuantity} {selected.unit}</dd></div>
+        </dl>
+        {selected.processingHistory.length > 0 && <section className="store-date-processing-history" aria-label="Lịch sử xử lý">
+          <h3>Lịch sử xử lý KPH</h3>
+          <ol>{selected.processingHistory.map(receipt => <li key={receipt.recordId}>
+            <p>{receipt.quantity} {receipt.unit} · Còn {receipt.remainingAfter} {receipt.unit}</p>
+            <small>{new Date(receipt.processedAt).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })} · Phiếu {receipt.recordId}</small>
+          </li>)}</ol>
+          <a href="#kph">Mở lịch sử KPH</a>
+        </section>}
+      </>}
+      detailActions={selected && <>
+        {mayEdit && <Button type="button" variant="secondary" onClick={() => setEditor(selected)}>Sửa lô</Button>}
+        {process && selected.processingStatus === "OPEN" && <Button type="button" disabled={!!suspended}
+          onClick={() => selected.kphType ? openProcessor(selected, selected.kphType) : setTypeChoice(selected)}>Xử lý một phần</Button>}
+      </>}
       footer={page && page.totalPages > 1 && <nav className="store-online-pagination" aria-label="Phân trang lô DATE">
         <Button variant="secondary" disabled={page.page <= 1} onClick={() => changeFilters({ page: page.page - 1 })}>Trang trước</Button>
         <span>Trang {page.page}/{page.totalPages}</span>

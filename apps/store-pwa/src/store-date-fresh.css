@@ -234,3 +234,10 @@
 .store-date-search-icon { position: absolute; z-index: 1; top: 15px; left: 14px; color: var(--store-ink-muted); pointer-events: none; }
 .store-date-search { width: 100%; height: 48px; border: 1px solid var(--store-control-line); border-radius: 14px; padding: 0 12px 0 42px; background: var(--store-canvas); font-size: 16px; color: var(--store-ink); }
 .store-date-search-panel .store-date-search-form > .store-button { min-width: 56px; height: 48px; padding-inline: 12px; background: var(--store-surface); color: var(--store-brand-action); }
+
+.store-date-processing-history { display: grid; gap: .5rem; min-width: 0; }
+.store-date-processing-history h3 { font-weight: 650; }
+.store-date-processing-history li { padding-block: .5rem; border-top: 1px solid var(--store-holder-edge); }
+.store-date-processing-history small { color: var(--store-ink-muted); overflow-wrap: anywhere; }
+.store-date-processing-history a { justify-self: start; min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; }
+.store-date-lot-sheet .store-sheet-actions:empty { display: none; }

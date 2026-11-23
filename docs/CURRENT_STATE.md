@@ -14,12 +14,15 @@ Owner đã nghiệm thu KPHON03–04 và cho tiếp sau vòng UI local ngày 17/
 
 ## DATE
 
-Candidate DATEON02 trên `store-app/dateon02-durable-lots` lấy base UI09
-`4d671a6`. Store online đọc, tạo và sửa lô qua PostgreSQL. Lô và gợi ý SKU/tên
-hàng được phân theo cửa hàng. Nhân viên xem/tạo, quản lý trong phạm vi mới
-được sửa. API kiểm phiên bản khi sửa và ghi audit. Đã kiểm từ V9 lên V10 và
-chạy luồng qua Store ở hai kích thước. Nghiệm thu owner, xử lý từng phần
-DATE → KPH, lịch nhắc chung và báo cáo kỳ còn chờ.
-[Evidence DATEON02](delivery/dateon02-durable-lots.md) · [Contract DATE](product/DATE_DURABLE_CONTRACT.md).
+Candidate DATEON03 trên `store-app/dateon03-partial-kph` lấy base DATEON02
+`86c00f8`. Store đọc, tạo, sửa lô và gợi ý SKU/tên theo từng cửa hàng.
+DATEON03 tạo một hoặc nhiều phiếu KPH từ lô, ghi lượng đã xử lý và giữ lại
+lượng còn theo dõi. Lô xử lý hết rời danh sách đang mở. Phiếu mới ở Chờ duyệt.
+Đã kiểm PostgreSQL từ V10 lên V11 và luồng Store trên hai kích thước.
+[DATEON02](delivery/dateon02-durable-lots.md) ·
+[DATEON03](delivery/dateon03-partial-kph.md) · [Contract DATE](product/DATE_DURABLE_CONTRACT.md).
+
+DATEON04 còn lịch nhắc chung theo cửa hàng. Thông báo và báo cáo kỳ dùng dữ liệu
+DATE thật ở các slice sau. Nghiệm thu owner trên candidate vẫn còn chờ.
 
 [Xác minh UI09](delivery/ui09-restored-baseline.md) · [Bước kế tiếp](NEXT.md). Nghiệm thu thiết bị thật, camera/quyền hệ điều hành và rollout vẫn đang chờ. Nhánh Pages và tag bảo tồn theo [baseline](STORE_APP_BASELINE.md).
