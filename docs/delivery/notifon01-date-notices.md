@@ -26,3 +26,25 @@ giữ API DATE hiện có. Luna Store nối màn Thông báo, lấy lại view/g
 giữ scope và xử lý mở detail theo target. Gate một lượt PostgreSQL thật với hai
 cửa hàng, lịch nhắc trước/sau đến hạn, click mở đúng lô và lô ngoài scope.
 Push, unread, event history và báo cáo kỳ thuộc các slice sau.
+
+## Kiểm trên candidate ngày 23/11/2026
+
+- Contract có 43 tài nguyên manifest và 35 fixture API. Generated client
+  sinh lại khớp. PostgreSQL 17 kiểm `DateLotHttpIntegrationTest` đạt 6 ca,
+  gồm toàn bộ thứ tự nhóm qua các trang, DUE ưu tiên và quyền khác cửa hàng.
+- TypeScript Store đạt cùng 20 test có mục tiêu cho nhóm, hiển thị và
+  mở ID ngoài trang đầu. Mock và Store online dùng chung view và rule nhóm.
+- Playwright 390×844 và 1440×1024 trên PostgreSQL fixture V12. Báo Hết HSD,
+  Cảnh báo và lịch đến hạn xếp đúng nhóm. Nhấn mở đúng ID và mã lô. Hẹn lô hết
+  HSD ẩn thông báo, lô SAFE đến lịch xuất hiện một lần sau focus. Chuyển
+  từ cửa hàng A sang B hiển thị lô B và gỡ lô A. Kiểm màu tab đang chọn trên
+  mobile giữ tương phản khi hover.
+- [Store online](http://127.0.0.1:4786/) dùng backend phiên thật và dữ liệu
+  tổng hợp. [Tài khoản mẫu](admin03-store-membership/handoff.md).
+  Nghiệm thu owner và thiết bị thật còn chờ.
+
+## Tiến độ và khoảng cách tới target
+
+DATE online lõi đã đạt kỹ thuật 3/3 mốc. Thông báo đạt mốc đầu trong hai mốc
+nối tiếp sau phần lõi. Còn báo cáo snapshot kỳ trên dữ liệu DATE thật.
+Các gate nghiệm thu và rollout theo NEXT.

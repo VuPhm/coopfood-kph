@@ -1,5 +1,11 @@
 # Thông báo cửa hàng — nhóm DATE, 23/10/2026
 
+Cập nhật 23/11/2026. NOTIFON01 đã nối bản online với DATE theo cửa hàng
+bằng `attentionOnly=true&sort=notification`. API sắp nhóm trước phân trang
+và cung cấp ngày nghiệp vụ. Thông báo mở detail theo ID, kể cả lô ngoài
+trang đầu. [Spec và evidence online](../delivery/notifon01-date-notices.md).
+Phần thiết kế prototype tháng 10 bên dưới là nguồn hành vi.
+
 Theo owner: bỏ phần Đã xử lý của DATE vì đã là KPH; triển khai Thông báo theo
 nhóm, đầu tiên cho cảnh báo DATE và để thêm nguồn thông báo khác ở lượt sau.
 UI prototype Store Fresh; authority ngày theo [DATE](DATE_MILESTONE_MODEL.md).

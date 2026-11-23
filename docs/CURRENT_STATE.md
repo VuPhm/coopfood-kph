@@ -23,7 +23,14 @@ backend thật với fixture nâng từ V11 lên V12.
 [DATEON02](delivery/dateon02-durable-lots.md) · [DATEON03](delivery/dateon03-partial-kph.md) ·
 [DATEON04](delivery/dateon04-shared-reminders.md) · [Contract DATE](product/DATE_DURABLE_CONTRACT.md).
 
-Nghiệm thu owner trên candidate còn chờ. Lộ trình sau mốc lõi gồm Thông báo
-và báo cáo kỳ dùng dữ liệu DATE thật.
+Nghiệm thu owner trên candidate còn chờ.
+
+## Thông báo
+
+Candidate NOTIFON01 trên `store-app/notifon01-date-notices` lấy base DATEON04
+`8a97a1f`. Thông báo đọc lô DATE theo cửa hàng, nhóm theo HSD và lịch đã hẹn,
+mở đúng chi tiết lô theo ID. Thứ tự nhóm được áp dụng trước phân trang.
+Đã kiểm mobile và desktop với backend V12 thật. Báo cáo kỳ dùng dữ liệu DATE
+là mốc tiếp theo. [Evidence NOTIFON01](delivery/notifon01-date-notices.md).
 
 [Xác minh UI09](delivery/ui09-restored-baseline.md) · [Bước kế tiếp](NEXT.md). Nghiệm thu thiết bị thật, camera/quyền hệ điều hành và rollout vẫn đang chờ. Nhánh Pages và tag bảo tồn theo [baseline](STORE_APP_BASELINE.md).
