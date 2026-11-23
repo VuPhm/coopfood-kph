@@ -6,8 +6,10 @@ import { formatDisplayDate, type LocalDate } from "@coopfood-kph/kph-rules";
 import type { DateLot } from "./date-api";
 import { OnlineApiError } from "./online-kph";
 import { StorePageHero, StorePageLayout, StorePageSurface } from "./store-page-hero";
-import { assessDateLot, DATE_PHASE_LABELS } from "./store-date-assessment";
+import { assessDateLot } from "./store-date-assessment";
 import { periodLabel, presetPeriod } from "./store-date-report-model";
+import { DateConditionLabel, DateProcessingLabel } from "./store-date-label";
+import { StoreActionDock } from "./store-action-dock";
 import { StoreSearchField } from "./store-search-field";
 import type { StoreSessionGateway } from "./store-session-api";
 import { StoreSheet } from "./store-sheet";
@@ -15,6 +17,7 @@ import type { ReportPreset, ReportSummary } from "./store-report-api";
 import { useBusinessDate } from "./use-business-date";
 import "./store-date-report.css";
 import "./store-report-soft.css";
+import "./store-online-reports.css";
 
 const presets = [
   { id: "all", title: "Báo cáo tổng hợp", icon: FileText, tone: "mint" },
@@ -35,7 +38,7 @@ export function StoreOnlineReports(props: Props) {
   useEffect(() => { if (expired) refreshScope(); }, [expired, refreshScope]);
   const allowed = scope.data?.some(store => store.id === storeId && store.capabilities.includes("REPORT"));
   const verifying = suspended || scope.isFetching;
-  if (!allowed || scope.isError) return <StorePageLayout><StorePageHero/><StorePageSurface className="store-online-content">
+  if (!allowed || scope.isError) return <StorePageLayout><StorePageHero header={{subtitle:"Lô theo dõi DATE"}}/><StorePageSurface className="store-online-content">
     {verifying ? <p role="status">Đang kiểm tra quyền báo cáo…</p> : scope.isError ?
       <div role="alert">Chưa tải được quyền báo cáo. <Button onClick={() => void scope.refetch()}>Thử lại</Button></div> :
       <p role="status">Tài khoản chưa có quyền báo cáo tại cửa hàng này.</p>}
@@ -124,12 +127,17 @@ function ReportWorkspace({ userId, storeId, gateway, csrf, suspended, refreshSco
     {mode!=="document" && <StoreSearchField label={mode==="history" ? "Tìm báo cáo" : "Tìm lô"} placeholder={mode==="history" ? "Tên hoặc mã báo cáo" : "SKU, tên hàng hoặc mã lô"} value={search} onValueChange={changeSearch} maxLength={128}/>}
     {mode==="source" && <div className="report-online-controls"><label>Kỳ báo cáo <select value={kind} onChange={e=>setKind(e.target.value as typeof kind)}>
       <option value="month">Tháng này</option><option value="week">Tuần này</option></select></label>
-      <Button disabled={!selected.size || selected.size>1000 || !period || source.isError} onClick={()=>{ if (period && asOf) { setConfirmation({period,date:asOf}); setNaming(true); } }}>Tạo bản báo cáo · {selected.size}</Button>
-      {selected.size>1000 && <span role="alert">Mỗi báo cáo tối đa 1.000 lô.</span>}</div>}
+      {period && <span>{periodLabel(period)}</span>}</div>}
     {mode==="document" && document && <div className="report-online-summary">
       <strong>{dateLabel(document.periodStart)} – {dateLabel(document.periodEnd)}</strong>
       <span>Chốt {dateLabel(document.asOf)} · {document.createdBy.displayName} · {document.store.name}</span>
       <p>{document.rowCount} lô · Còn theo dõi {qty(document.totalEa,"EA")} · {qty(document.totalKg,"kg")}</p>
+    </div>}
+    {mode==="source" && <div className="report-online-select">
+      <Button variant="secondary" disabled={!source.data?.items.length || source.isFetching || source.isError}
+        onClick={()=>setSelected(previous=>new Map([...previous,...(source.data?.items ?? []).map(lot=>[lot.id,lot.version] as const)]))}>
+        Chọn trang này</Button>
+      <Button variant="ghost" disabled={!selected.size} onClick={()=>setSelected(new Map())}>Bỏ chọn tất cả</Button>
     </div>}
     {active.isError ? <div role="alert">Chưa tải được danh sách. <Button onClick={()=>void active.refetch()}>Thử lại</Button></div> :
       active.isPending ? <p role="status">Đang tải…</p> : active.data?.totalItems===0 ?
@@ -144,19 +152,24 @@ function ReportWorkspace({ userId, storeId, gateway, csrf, suspended, refreshSco
       <Button variant="secondary" disabled={page<=1} onClick={()=>setPage(page-1)}>Trang trước</Button>
       <span>Trang {page}{pages>0 && " / "+pages}</span>
       <Button variant="secondary" disabled={page>=pages} onClick={()=>setPage(page+1)}>Trang sau</Button></nav> : null}
+    {mode==="source" && <StoreActionDock label="Thao tác báo cáo" summary={<span aria-live="polite">{selected.size ? selected.size+" lô đã chọn" : "Chọn lô cần báo cáo"}</span>}>
+      <Button disabled={!selected.size || selected.size>1000 || !period || source.isError}
+        onClick={()=>{ if (period && asOf) { setConfirmation({period,date:asOf}); setNaming(true); } }}>Tạo bản báo cáo</Button>
+      {selected.size>1000 && <span role="alert">Mỗi báo cáo tối đa 1.000 lô.</span>}
+    </StoreActionDock>}
   </>;
-  return <StorePageLayout className="store-report-page report-online"><StorePageHero header={mode==="menu" ? {} : {onBack:back,backLabel:mode==="document" ? "Về lịch sử" : "Về loại báo cáo"}}/>
+  return <StorePageLayout className="store-report-page report-online"><StorePageHero header={{ title:suspended || denied ? "Báo cáo" : heading ?? "Báo cáo DATE", subtitle:"Lô theo dõi DATE",
+      ...(mode!=="menu" ? {onBack:back,backLabel:mode==="document" ? "Về lịch sử" : "Về loại báo cáo"} : {}) }}/>
     <StorePageSurface className="store-report-page-cap"><div className="date-report report-hub">
       {suspended || denied ? <p role="status">Đang xác minh quyền báo cáo…</p> : <>
-        <header className="date-report-heading"><div><h2>{heading}</h2></div>
-          {mode==="menu" ? <button className="report-history-entry" onClick={()=>navigate("history")}><History size={18} aria-hidden="true"/>Lịch sử</button> :
-          <Button variant="secondary" onClick={back}>{mode==="document" ? "Lịch sử" : "Loại báo cáo"}</Button>}</header>
+        {mode==="menu" && <header className="date-report-heading"><div><h2>Loại báo cáo</h2></div>
+          <button className="report-history-entry" onClick={()=>navigate("history")}><History size={18} aria-hidden="true"/>Lịch sử</button></header>}
         {error && !naming && <p role="alert">{error}</p>}{content}</>}
     </div></StorePageSurface>
     <StoreSheet open={naming && !suspended && !denied} onOpenChange={open=>{if (!saving) setNaming(open);}} title="Tạo báo cáo" description={confirmation ? periodLabel(confirmation.period) : ""}>
       <form className="report-online-form" onSubmit={event=>{event.preventDefault(); void save();}}>
-        <Field label="Tên báo cáo"><Input value={title} onChange={e=>setTitle(e.target.value)} maxLength={120} disabled={saving}/></Field>
-        <p>{selected.size} lô · Chốt tại ngày {confirmation && dateLabel(confirmation.date)}</p>
+        <Field label="Tên báo cáo" htmlFor="date-report-title"><Input id="date-report-title" value={title} onChange={e=>setTitle(e.target.value)} maxLength={120} disabled={saving}/></Field>
+        <p>{confirmation && periodLabel(confirmation.period)}<br/>{selected.size} lô · Ngày chốt {confirmation && dateLabel(confirmation.date)}</p>
         {error && <p role="alert">{error}</p>}<Button type="submit" disabled={saving || !title.trim()}>{saving ? "Đang lưu…" : "Lưu báo cáo"}</Button>
       </form></StoreSheet>
   </StorePageLayout>;
@@ -164,10 +177,14 @@ function ReportWorkspace({ userId, storeId, gateway, csrf, suspended, refreshSco
 
 function ReportLotRow({lot,date,checked,toggle}:{lot:DateLot; date:LocalDate; checked?:boolean; toggle?:()=>void}) {
   const phase = assessDateLot({date:lot.expiresOn as LocalDate,manufactured:lot.manufacturedOn ? dateLabel(lot.manufacturedOn) : undefined},date).phase;
-  return <article className="report-online-row">
-    <label>{toggle && <input type="checkbox" checked={checked} onChange={toggle}/>}<strong>{lot.productName}</strong></label>
-    <span>SKU {lot.skuCode}{lot.lotCode && " · Lô "+lot.lotCode}</span>
-    <span>HSD {dateLabel(lot.expiresOn)} · {DATE_PHASE_LABELS[phase]}</span>
-    <span>Đã xử lý {qty(lot.processedQuantity,lot.unit)} · Còn {qty(lot.remainingQuantity,lot.unit)}</span>
+  const name = <strong>{lot.productName}</strong>;
+  return <article className="report-online-row" data-selected={checked || undefined}>
+    <div className="report-online-lot-title">{toggle ? <label>
+      <input type="checkbox" checked={checked} onChange={toggle} aria-label={`Chọn ${lot.productName}, SKU ${lot.skuCode}, lô ${lot.lotCode ?? "chưa có mã"}`}/>{name}
+    </label> : name}<b>{qty(lot.remainingQuantity,lot.unit)}<small>Còn theo dõi</small></b></div>
+    <span className="report-online-identifiers">SKU {lot.skuCode}{lot.lotCode && " · Lô "+lot.lotCode}</span>
+    <div className="report-online-badges"><DateConditionLabel phase={phase}/><DateProcessingLabel status={lot.processingStatus==="RESOLVED" ? "resolved" : "open"}/></div>
+    <div className="report-online-facts"><span>NSX {lot.manufacturedOn ? dateLabel(lot.manufacturedOn) : "—"} · HSD {dateLabel(lot.expiresOn)}</span>
+      <span>Theo dõi {qty(lot.trackedQuantity,lot.unit)} · Đã xử lý {qty(lot.processedQuantity,lot.unit)}</span></div>
   </article>;
 }

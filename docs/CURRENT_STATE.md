@@ -34,3 +34,7 @@ mở đúng chi tiết lô theo ID. Thứ tự nhóm được áp dụng trướ
 là mốc tiếp theo. [Evidence NOTIFON01](delivery/notifon01-date-notices.md).
 
 [Xác minh UI09](delivery/ui09-restored-baseline.md) · [Bước kế tiếp](NEXT.md). Nghiệm thu thiết bị thật, camera/quyền hệ điều hành và rollout vẫn đang chờ. Nhánh Pages và tag bảo tồn theo [baseline](STORE_APP_BASELINE.md).
+
+## Báo cáo kỳ
+
+Trên nhánh REPORTON01, Store đọc lô DATE thật và lưu bản chốt tuần/tháng vào PostgreSQL V13. Lịch sử theo cửa hàng, lưu số lượng chính xác đến từng đơn vị và ngày chốt theo giờ Việt Nam. DATE lõi đạt 3/3 mốc kỹ thuật, Thông báo và Báo cáo đạt 2/2 mốc tiếp theo. Nghiệm thu chung Alpha/Delta/Beta và thiết bị thật còn chờ. [Bàn giao REPORTON01](delivery/reporton01-date-snapshots.md).

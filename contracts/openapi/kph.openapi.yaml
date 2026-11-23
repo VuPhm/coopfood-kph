@@ -253,37 +253,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/DateLotPage'
         '400':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Validation, scope, source conflict or sanitized storage error
+          description: Report storage failure.
           content:
             application/problem+json:
               schema:
@@ -322,37 +302,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/DateReportPage'
         '400':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Validation, scope, source conflict or sanitized storage error
+          description: Report storage failure.
           content:
             application/problem+json:
               schema:
@@ -382,6 +342,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DateReportCreate'
+            examples:
+              synthetic:
+                externalValue: ../fixtures/api/date-report-create.json
       responses:
         '201':
           description: Report created or replayed
@@ -389,38 +352,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DateReportSummary'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-report.json
         '400':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Validation, scope, source conflict or sanitized storage error
+          $ref: '#/components/responses/Conflict'
+        '422':
+          description: The period excludes the current business date or a lot was selected twice.
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
         '500':
-          description: Validation, scope, source conflict or sanitized storage error
+          description: Report storage failure.
           content:
             application/problem+json:
               schema:
@@ -446,38 +398,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DateReportSummary'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-report.json
         '400':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Validation, scope, source conflict or sanitized storage error
+          description: Report storage failure.
           content:
             application/problem+json:
               schema:
@@ -516,38 +451,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DateReportRowsPage'
+              examples:
+                synthetic:
+                  externalValue: ../fixtures/api/date-report-rows.json
         '400':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Validation, scope, source conflict or sanitized storage error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Validation, scope, source conflict or sanitized storage error
+          description: Report storage failure.
           content:
             application/problem+json:
               schema:

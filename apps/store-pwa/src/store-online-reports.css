@@ -1,0 +1,46 @@
+.report-online .report-hub { width: 100%; min-width: 0; }
+.report-online-controls, .report-online-summary, .report-online-row {
+  padding: 12px 16px;
+  border: 1px solid var(--store-line);
+  border-radius: 14px;
+}
+.report-online-controls, .report-online-facts, .report-online-paging, .report-online-lot-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.report-online-controls, .report-online-facts, .report-online-paging { flex-wrap: wrap; }
+.report-online-controls { background: var(--store-canvas); }
+.report-online-select { display: flex; flex-wrap: wrap; gap: 8px; }
+.report-online .store-action-buttons { --store-action-columns: 1; }
+.report-online-controls label { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.report-online-controls select {
+  min-height: 44px;
+  color: var(--store-ink);
+  background: var(--store-surface);
+  border: 1px solid var(--store-control-line);
+  border-radius: 10px;
+  padding: 0 8px;
+}
+.report-online-controls > span, .report-online-identifiers, .report-online-facts,
+.report-online-lot-title small, .report-online-summary span { font-size: 13px; color: var(--store-ink-muted); }
+.report-online-row, .report-online-summary, .report-online-form { display: grid; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.report-online-row + .report-online-row { margin-top: 8px; }
+.report-online-row[data-selected] { border-color: var(--store-brand-action); }
+.report-online-lot-title { align-items: flex-start; }
+.report-online-lot-title label { min-height: 44px; display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
+.report-online-lot-title input { width: 20px; height: 20px; flex: none; accent-color: var(--store-brand-action); }
+.report-online-lot-title > b { display: grid; text-align: end; max-width: 46%; color: var(--store-brand-action); font-variant-numeric: tabular-nums; }
+.report-online-lot-title small { font-weight: 400; }
+.report-online-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.report-online-summary { background: var(--store-canvas); }
+.report-online-summary p { margin: 0; font-weight: 600; }
+.report-online-form { gap: 16px; padding: 4px 0; }
+.report-online-form button { min-height: 44px; }
+@media (min-width: 768px) {
+  .report-online-row { grid-template-columns: minmax(0, 1fr) minmax(180px, auto); gap: 6px 24px; align-items: center; }
+  .report-online-lot-title { grid-column: 1 / -1; align-items: center; }
+  .report-online-badges { justify-content: flex-end; }
+  .report-online-facts { grid-column: 1 / -1; }
+}
