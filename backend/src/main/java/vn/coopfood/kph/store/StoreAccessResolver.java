@@ -30,7 +30,7 @@ class StoreAccessResolver {
     }
 
     List<KphStoreAccess> listActiveAccess(Authentication authentication) {
-        return repository.findAllActiveAccess(requirePrincipal(authentication).userId()).stream()
+        return listActiveScopes(authentication).stream()
                 .map(access -> {
                     var capabilities = new ArrayList<>(List.of(KphStoreAccess.Capability.VIEW, KphStoreAccess.Capability.CREATE));
                     if (access.canReview()) capabilities.add(KphStoreAccess.Capability.REVIEW);
@@ -38,6 +38,10 @@ class StoreAccessResolver {
                     return new KphStoreAccess(access.storeId(), access.storeCode(), access.storeName(), List.copyOf(capabilities));
                 })
                 .toList();
+    }
+
+    List<StoreAccessRepository.AccessSnapshot> listActiveScopes(Authentication authentication) {
+        return repository.findAllActiveAccess(requirePrincipal(authentication).userId());
     }
 
     private SessionPrincipal requirePrincipal(Authentication authentication) {

@@ -85,8 +85,12 @@ class StoreAccessRepository {
             return membershipRole == StoreRole.STORE_MANAGER;
         }
 
+        boolean hasManagementScope() {
+            return membershipRole == StoreRole.STORE_MANAGER || regionManager || chainAdmin;
+        }
+
         boolean canExport() {
-            return canReview() || regionManager || chainAdmin;
+            return hasManagementScope();
         }
     }
 }
