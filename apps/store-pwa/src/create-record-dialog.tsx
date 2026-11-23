@@ -90,6 +90,8 @@ export type CreatedRecordDraft = {
   supplier: string;
   productName: string;
   quantity: number;
+  /** Exact user-entered quantity text for source-linked DATE processing. */
+  quantityText?: string;
   unit: "EA" | "kg";
   condition: string;
   conditionValue: components["schemas"]["KphCondition"];
@@ -104,7 +106,7 @@ export type CreatedRecordDraft = {
   photos: readonly { id: string; fileName: string; blob: Blob; originalFile: File; capturedAt: Date }[];
 };
 
-export type CreateRecordSeed = { barcode: string; skuCode: string; productName: string; supplier: string; unit: "EA" | "kg"; note: string; condition?: "NEAR_EXPIRY" | "EXPIRED" };
+export type CreateRecordSeed = { barcode: string; skuCode: string; productName: string; supplier: string; unit: "EA" | "kg"; note: string; condition?: "NEAR_EXPIRY" | "EXPIRED"; quantityText?: string };
 
 type CreateRecordDialogProps = {
   initialValues?: CreateRecordSeed | undefined;
@@ -122,6 +124,7 @@ type CreateRecordDialogProps = {
   profile?: StoreProfile;
   actorReadOnly?: boolean;
   onlineMode?: boolean;
+  sourceLocked?: boolean;
   onOpenChange: (open: boolean) => void;
   onSaved: (draft: CreatedRecordDraft) => Promise<void> | void;
   onBarcodeLookup?: ((barcode: string) => Promise<components["schemas"]["BarcodeLookupResponse"]>) | undefined;
@@ -139,7 +142,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile, initial?: CreateRec
     barcode: initial?.barcode ?? "",
     supplier: initial?.supplier ?? "",
     productName: initial?.productName ?? "",
-    quantity: "1",
+    quantity: initial?.quantityText ?? "1",
     unit: initial?.unit ?? "EA",
     condition: initial?.condition ?? options.defaultCondition,
     conditionDetail: "",
@@ -151,7 +154,7 @@ function defaultValues(kind: KphKind, profile: StoreProfile, initial?: CreateRec
   };
 }
 
-export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, initialValues, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, presentation = "dialog", embedded = false, suspended = false, onReviewingChange }: CreateRecordDialogProps) {
+export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpenChange, onSaved, onBarcodeLookup, initialScrollTop = 0, initialValues, onOpenAutoFocus, onCloseAutoFocus, open, profile = DEFAULT_STORE_PROFILE, actorReadOnly = false, onlineMode = false, sourceLocked = false, presentation = "dialog", embedded = false, suspended = false, onReviewingChange }: CreateRecordDialogProps) {
   const activeKind = kind ?? "TPCN";
   const options = KPH_OPTIONS[activeKind];
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
@@ -197,7 +200,9 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
     setValue,
     watch,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(sourceLocked ? schema.refine(({ quantity, unit }) =>
+      /^\d+(?:\.\d+)?$/.test(quantity) && Number(quantity) > 0 && (unit !== "EA" || /^\d+$/.test(quantity)),
+    { message: "Nhập số lượng dương dạng thập phân; EA phải là số nguyên.", path: ["quantity"] }) : schema),
     defaultValues: defaultValues(activeKind, profile, initialValues),
   });
 
@@ -361,6 +366,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
         supplier: values.supplier.trim(),
         productName: values.productName.trim(),
         quantity: Number(values.quantity),
+        ...(initialValues?.quantityText !== undefined ? { quantityText: values.quantity } : {}),
         unit: values.unit,
         condition: resolveChoiceLabel(conditionChoice, values.conditionDetail),
         conditionValue: conditionChoice.value as components["schemas"]["KphCondition"],
@@ -478,7 +484,7 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
                 <fieldset className="unit-fieldset">
                   <legend className="text-sm font-bold">Đơn vị</legend>
                   <div className="unit-options">
-                    {(["EA", "kg"] as const).map((unit) => <label key={unit}><input className="sr-only" type="radio" value={unit} {...register("unit")} /><span>{unit}</span></label>)}
+                    {(["EA", "kg"] as const).map((unit) => <label key={unit}><input className="sr-only" type="radio" value={unit} disabled={sourceLocked} {...register("unit")} /><span>{unit}</span></label>)}
                   </div>
                 </fieldset>
               </div>;
@@ -508,23 +514,23 @@ export const CreateRecordDialog = memo(function CreateRecordDialog({ kind, onOpe
                 </Field>
                 <Field label="Mã SKU / UPC" htmlFor="barcode" error={errors.barcode?.message}>
                   <div className="relative">
-                  <Input {...feedback("barcode", "barcode")} id="barcode" className="pr-12" autoComplete="off" placeholder="Nhập hoặc quét mã" {...register("barcode", { onChange: (event) => {
+                  <Input {...feedback("barcode", "barcode")} id="barcode" className="pr-12" autoComplete="off" readOnly={sourceLocked} placeholder="Nhập hoặc quét mã" {...register("barcode", { onChange: (event) => {
                     lookupRequestId.current += 1;
                     setBarcodeLookupMessage("");
                     setLookupRetryValue("");
                     if (autoFilledLookup.current.barcode && event.target.value.trim() !== autoFilledLookup.current.barcode) clearAutoFilledLookup();
-                  }, onBlur: () => void lookupBarcode() })} />
-                    <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
+                  }, onBlur: () => { if (!sourceLocked) void lookupBarcode(); } })} />
+                    {!sourceLocked && <button type="button" className="field-input-action" aria-label="Quét mã barcode" onClick={() => setScannerOpen(true)}>
                       {screenPresentation ? <StoreScanIcon /> : <ScanLine aria-hidden="true" size={18} />}
-                    </button>
+                    </button>}
                   </div>
                   {barcodeLookupMessage ? <p className={cn("mt-1 text-xs text-ink-muted", screenPresentation && "store-lookup-notice")} role="status">{barcodeLookupMessage}{lookupRetryValue ? <button type="button" className="ml-2 underline" onClick={() => void lookupBarcode(lookupRetryValue)}>Thử tra cứu lại</button> : null}{screenPresentation && !barcodeLookupMessage.startsWith("Đã tìm thấy") && !barcodeLookupMessage.startsWith("Đang") ? <button type="button" onClick={() => setScannerOpen(true)}>Quét lại</button> : null}</p> : null}
                 </Field>
                 <Field label="Nhà cung cấp" htmlFor="supplier" error={errors.supplier?.message}>
-                  <Input {...feedback("supplier", "supplier")} id="supplier" placeholder="Điền tên NCC" {...register("supplier")} />
+                  <Input {...feedback("supplier", "supplier")} id="supplier" readOnly={sourceLocked} placeholder="Điền tên NCC" {...register("supplier")} />
                 </Field>
                 <Field label="Tên hàng hóa" htmlFor="product-name" error={errors.productName?.message}>
-                  <Input {...feedback("productName", "product-name")} id="product-name" placeholder="Điền tên hàng hóa" {...register("productName")} />
+                  <Input {...feedback("productName", "product-name")} id="product-name" readOnly={sourceLocked} placeholder="Điền tên hàng hóa" {...register("productName")} />
                 </Field>
               </div>
               {screenPresentation ? <div className="kph-create-quantity">{quantityFields}</div> : null}

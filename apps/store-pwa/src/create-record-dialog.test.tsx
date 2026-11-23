@@ -17,6 +17,17 @@ function renderDialog(kind: "TPCN" | "TPTS" = "TPCN", onSaved = vi.fn<(draft: Cr
 describe("Create KPH record", () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it("keeps DATE source identity and unit locked while requiring an explicit processing amount", () => {
+    render(<CreateRecordDialog kind="TPTS" open embedded onlineMode sourceLocked presentation="screen"
+      onOpenChange={vi.fn()} onSaved={vi.fn()} initialValues={{ barcode: "000123", skuCode: "000045", productName: "Lô thử", supplier: "NCC thử", unit: "kg", note: "", quantityText: "" }} />);
+    expect(screen.getByRole("textbox", { name: "Mã SKU / UPC" })).toHaveValue("000123");
+    expect(screen.getByRole("textbox", { name: "Mã SKU / UPC" })).toHaveAttribute("readonly");
+    expect(screen.getByRole("textbox", { name: "Tên hàng hóa" })).toHaveAttribute("readonly");
+    expect(screen.getByRole("textbox", { name: "Số lượng" })).toHaveValue("");
+    expect(screen.getByRole("radio", { name: "kg" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "kg" })).toBeDisabled();
+  });
+
   it("keeps the accepted section order and operational fields", () => {
     renderDialog();
     const headings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);

@@ -323,7 +323,7 @@ async function createRequestSignature(
   return fallbackHash(input);
 }
 
-async function readFileBytes(file: File): Promise<ArrayBuffer> {
+export async function readFileBytes(file: File): Promise<ArrayBuffer> {
   if (typeof file.arrayBuffer === "function") return file.arrayBuffer();
   if (typeof FileReader !== "undefined") {
     return new Promise<ArrayBuffer>((resolve, reject) => {

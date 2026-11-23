@@ -10,7 +10,7 @@ const session = { user: { id: "user", username: "test", displayName: "Người k
 const emptyDatePage = { items: [], page: 1, pageSize: 25, totalItems: 0, totalPages: 0, attentionCount: 0 };
 function gateway(): StoreSessionGateway {
   return { date: { listStores: vi.fn().mockResolvedValue([employee, manager]), list: vi.fn().mockResolvedValue(emptyDatePage),
-    detail: vi.fn(), create: vi.fn(), update: vi.fn(), suggest: vi.fn().mockResolvedValue([]) }, reviewRecord: vi.fn(), prepareExport: vi.fn(), createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
+    detail: vi.fn(), create: vi.fn(), update: vi.fn(), process: vi.fn(), suggest: vi.fn().mockResolvedValue([]) }, reviewRecord: vi.fn(), prepareExport: vi.fn(), createRecord: vi.fn(), lookupBarcode: vi.fn(), loadHistory: vi.fn(), getSession: vi.fn().mockResolvedValue(session), listStoreAccess: vi.fn().mockResolvedValue([employee, manager]), login: vi.fn().mockResolvedValue(session), logout: vi.fn().mockResolvedValue(undefined), changePassword: vi.fn().mockResolvedValue(undefined) };
 }
 async function selectA() { fireEvent.click(await screen.findByRole("button", { name: "0001 · Cửa hàng A" })); await screen.findByRole("heading", { name: "Công việc cửa hàng" }); }
 beforeEach(() => { window.history.replaceState(null, "", "#home"); });
@@ -124,7 +124,7 @@ describe("Store online session", () => {
     await screen.findByRole("heading", { name: "Thêm theo dõi DATE" });
     vi.mocked(api.lookupBarcode).mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" });
     fireEvent.change(screen.getByLabelText(/Barcode \(nếu có\)/), { target: { value: "000123" } });
-    fireEvent.click(screen.getByRole("button", { name: "Tra barcode", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Tra barcode" }));
     await screen.findByText(/Không tìm thấy barcode/);
     vi.mocked(api.date.suggest).mockResolvedValue([{ skuCode: "000045", productName: "Lô kiểm thử cửa hàng A" }]);
     fireEvent.change(document.querySelector<HTMLInputElement>("#date-online-sku")!, { target: { value: "000045" } });

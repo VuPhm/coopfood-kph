@@ -10,7 +10,7 @@ import "./store-kph-create-forms.css";
 const labels: Record<KphKind, string> = { TPCN: "TP khô & khác", TPTS: "TP tươi sống" };
 const loadCreateForm = () => import("./create-record-dialog");
 export function preloadKphCreateForm() { void loadCreateForm().catch(() => {}); }
-export type KphCreateHandle = { open: (kind: KphKind, initialValues?: CreateRecordSeed, returnFocus?: HTMLElement | null) => void };
+export type KphCreateHandle = { open: (kind: KphKind, initialValues?: CreateRecordSeed, returnFocus?: HTMLElement | null, sourceLocked?: boolean) => void };
 export const KphCreateControl = memo(function KphCreateControl({ ref, onSaved, profile = mockProfile, onBarcodeLookup = mockBarcodeLookup, suspended = false }: {
   ref: Ref<KphCreateHandle>; onSaved: (draft: CreatedRecordDraft) => Promise<void>;
   profile?: StoreProfile; suspended?: boolean;
@@ -22,6 +22,7 @@ export const KphCreateControl = memo(function KphCreateControl({ ref, onSaved, p
   const [kind, setKind] = useState<KphKind>("TPTS");
   const [open, setOpen] = useState(false);
   const [initialValues, setInitialValues] = useState<CreateRecordSeed | undefined>();
+  const [sourceLocked, setSourceLocked] = useState(false);
   const [session, setSession] = useState(0);
   const [entranceReady, setEntranceReady] = useState(false);
   const [readySession, setReadySession] = useState<number | null>(null);
@@ -32,10 +33,11 @@ export const KphCreateControl = memo(function KphCreateControl({ ref, onSaved, p
   const dialog = useRef<HTMLDivElement | null>(null);
   const pendingScroll = useRef(0);
   const initialScroll = useRef(0);
-  useImperativeHandle(ref, () => ({ open: (value, initial, returnFocus) => {
+  useImperativeHandle(ref, () => ({ open: (value, initial, returnFocus, lockSource = false) => {
     if (blocked.current || saving.current) return;
     opener.current = returnFocus ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     setInitialValues(initial);
+    setSourceLocked(lockSource);
     pendingScroll.current = 0;
     initialScroll.current = 0;
     setReviewing(false);
@@ -95,7 +97,7 @@ export const KphCreateControl = memo(function KphCreateControl({ ref, onSaved, p
     <DialogDescription id="kph-create-description" className="sr-only">Tạo phiếu hàng không phù hợp; trường có dấu sao là bắt buộc.</DialogDescription>
     {readySession !== session && !failed ? <p className="sr-only" role="status">Đang tải biểu mẫu tạo phiếu…</p> : null}
     {/* Keep the body intact through the close animation; each open starts a new draft. */}
-    {Form && readySession === session ? <Form key={session} embedded onReviewingChange={setReviewing} initialScrollTop={initialScroll.current} initialValues={initialValues} kind={kind} open onOpenChange={changeOpen} suspended={suspended} onSaved={save} onBarcodeLookup={onBarcodeLookup} profile={profile} actorReadOnly onlineMode presentation="screen" />
+    {Form && readySession === session ? <Form key={session} embedded onReviewingChange={setReviewing} initialScrollTop={initialScroll.current} initialValues={initialValues} kind={kind} open onOpenChange={changeOpen} suspended={suspended} onSaved={save} onBarcodeLookup={onBarcodeLookup} profile={profile} actorReadOnly onlineMode sourceLocked={sourceLocked} presentation="screen" />
       : failed ? <div className="store-create-loading-body"><p role="alert">Chưa tải được biểu mẫu. Kiểm tra kết nối rồi tải lại ứng dụng.</p><button type="button" className="store-button" onClick={() => window.location.reload()}>Tải lại ứng dụng</button><button type="button" onClick={() => changeOpen(false)}>Hủy mở phiếu</button></div>
       : <KphFormSkeleton kind={kind} onCancel={() => changeOpen(false)} />}
   </DialogContent></Dialog>;
