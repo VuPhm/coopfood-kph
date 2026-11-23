@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.node.ObjectNode;
 import vn.coopfood.kph.store.DateStoreAccessPolicy;
 
@@ -56,6 +58,14 @@ class DateLotController {
     ResponseEntity<DateLot.WriteResult> update(@PathVariable UUID storeId, @PathVariable UUID lotId,
             @RequestBody ObjectNode body, Authentication auth) {
         return ok(service.update(storeId,lotId,body,auth));
+    }
+
+    @PostMapping(value="/stores/{storeId}/date-lots/{lotId}/kph",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<DateLotProcessingReceipt> process(@PathVariable UUID storeId,@PathVariable UUID lotId,
+            @RequestHeader("Idempotency-Key") String key,@RequestPart("payload") ObjectNode body,
+            @RequestPart("photos") List<MultipartFile> photos,Authentication auth) {
+        return ResponseEntity.status(HttpStatus.CREATED).cacheControl(CacheControl.noStore())
+                .body(service.process(storeId,lotId,key,body,photos,auth));
     }
 
     private static <T> ResponseEntity<T> ok(T value) {

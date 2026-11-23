@@ -22,6 +22,7 @@ class DateLotRepository {
     record Product(String sku, String name, UUID productId, UUID versionId, String supplierCode, String supplierName) {}
     record Entry(DateLot lot, Product product) {}
     record Receipt(String hash, String response) {}
+    record ProcessReceipt(String hash, String response) {}
 
     void lockCreate(UUID storeId, UUID actorId, String key) {
         db.fetch("SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", "date-create:" + storeId + ":" + actorId + ":" + key);
@@ -48,9 +49,31 @@ class DateLotRepository {
 
     Optional<Entry> find(UUID store, UUID id, boolean lock) {
         return db.fetchOptional("SELECT * FROM date_lots WHERE store_id = ? AND id = ?" + (lock ? " FOR UPDATE" : ""),
-                store,id).map(row -> new Entry(lot(row),new Product(row.get("sku_code",String.class),
+                store,id).map(row -> new Entry(withHistory(lot(row)),new Product(row.get("sku_code",String.class),
                 row.get("product_name",String.class),row.get("product_id",UUID.class),row.get("catalog_version_id",UUID.class),
                 row.get("supplier_code",String.class),row.get("supplier_name",String.class))));
+    }
+
+    void lockProcess(UUID store, UUID lot, UUID actor, String key) {
+        db.fetch("SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", "date-process:"+store+":"+lot+":"+actor+":"+key);
+    }
+    Optional<ProcessReceipt> processReceipt(UUID store, UUID lot, UUID actor, String key) {
+        return db.fetchOptional("SELECT request_hash,response::text FROM date_lot_process_receipts WHERE store_id=? AND lot_id=? AND actor_id=? AND idempotency_key=?",store,lot,actor,key)
+                .map(r -> new ProcessReceipt(r.get(0,String.class),r.get(1,String.class)));
+    }
+    void saveProcessReceipt(UUID store, UUID lot, UUID actor, String key, String hash, UUID kph, String response) {
+        db.execute("INSERT INTO date_lot_process_receipts(store_id,lot_id,actor_id,idempotency_key,request_hash,kph_record_id,response) VALUES (?,?,?,?,?,?,CAST(? AS jsonb))",store,lot,actor,key,hash,kph,response);
+    }
+    DateLot applyProcessing(UUID store, UUID id, java.math.BigDecimal amount, String type, SessionPrincipal actor, Instant now) {
+        return lot(db.fetchSingle("UPDATE date_lots SET processed_quantity=processed_quantity+?, kph_type=COALESCE(kph_type,?), processing_status=CASE WHEN processed_quantity+?=tracked_quantity THEN 'RESOLVED' ELSE 'OPEN' END, updated_by=?,updated_by_name=?,updated_at=?,version=version+1 WHERE store_id=? AND id=? RETURNING *",amount,type,amount,actor.userId(),actor.user().displayName(),Timestamp.from(now),store,id));
+    }
+    void insertProcessing(UUID id, DateLot before, DateLot after, UUID recordId, java.math.BigDecimal amount, SessionPrincipal actor, Instant at, String snapshot) {
+        db.execute("INSERT INTO date_lot_processing_links(id,store_id,lot_id,kph_record_id,actor_id,actor_name,quantity,unit,source_version,resulting_version,remaining_after,processed_at,source_snapshot) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,CAST(? AS jsonb))",id,before.storeId(),before.id(),recordId,actor.userId(),actor.user().displayName(),amount,before.unit(),before.version(),after.version(),new BigDecimal(after.remainingQuantity()),Timestamp.from(at),snapshot);
+    }
+    private DateLot withHistory(DateLot lot) {
+        var history = db.fetch("SELECT kph_record_id,quantity,unit,source_version,resulting_version,remaining_after,processed_at,actor_id,actor_name FROM date_lot_processing_links WHERE lot_id=? ORDER BY source_version",lot.id())
+                .map(r -> new DateLot.ProcessingReceipt(r.get(0,UUID.class),r.get(1,BigDecimal.class).toPlainString(),r.get(2,String.class),r.get(3,Long.class),r.get(4,Long.class),r.get(5,BigDecimal.class).toPlainString(),r.get(6,Timestamp.class).toInstant(),new DateLot.Actor(r.get(7,UUID.class),r.get(8,String.class))));
+        return new DateLot(lot.id(),lot.storeId(),lot.lookupStatus(),lot.barcode(),lot.skuCode(),lot.productName(),lot.supplierCode(),lot.supplierName(),lot.lotCode(),lot.manufacturedOn(),lot.expiresOn(),lot.unit(),lot.trackedQuantity(),lot.processedQuantity(),lot.remainingQuantity(),lot.processingStatus(),lot.version(),lot.createdBy(),lot.updatedBy(),lot.createdAt(),lot.updatedAt(),lot.kphType(),history);
     }
 
     DateLot insert(UUID store, UUID lot, DateLotInput input, Product product, SessionPrincipal actor, Instant now) {
@@ -106,7 +129,7 @@ class DateLotRepository {
     private static final String ASSESSED = """
             WITH scoped AS (
                 SELECT d.*, CAST(? AS date) AS today, expires_on-manufactured_on+1 AS days
-                FROM date_lots d WHERE store_id=?
+                FROM date_lots d WHERE store_id=? AND processing_status='OPEN'
                   AND (strpos(lower(sku_code),lower(?))>0 OR strpos(lower(product_name),lower(?))>0
                     OR strpos(lower(barcode),lower(?))>0 OR strpos(lower(lot_code),lower(?))>0)
             ), assessed AS (
@@ -143,13 +166,16 @@ class DateLotRepository {
 
     private DateLot lot(Record r) {
         String quantity = r.get("tracked_quantity",BigDecimal.class).toPlainString();
+        BigDecimal processed = r.get("processed_quantity",BigDecimal.class);
+        if (processed == null) processed = BigDecimal.ZERO;
+        BigDecimal remaining = r.get("tracked_quantity",BigDecimal.class).subtract(processed);
         return new DateLot(r.get("id",UUID.class),r.get("store_id",UUID.class),r.get("lookup_status",String.class),
                 r.get("barcode",String.class),r.get("sku_code",String.class),r.get("product_name",String.class),
                 r.get("supplier_code",String.class),r.get("supplier_name",String.class),r.get("lot_code",String.class),
                 r.get("manufactured_on",LocalDate.class),r.get("expires_on",LocalDate.class),r.get("unit",String.class),
-                quantity,"0",quantity,"OPEN",r.get("version",Long.class),
+                quantity,processed.toPlainString(),remaining.toPlainString(),r.get("processing_status",String.class)==null?"OPEN":r.get("processing_status",String.class),r.get("version",Long.class),
                 new DateLot.Actor(r.get("created_by",UUID.class),r.get("created_by_name",String.class)),
                 new DateLot.Actor(r.get("updated_by",UUID.class),r.get("updated_by_name",String.class)),
-                r.get("created_at",Timestamp.class).toInstant(),r.get("updated_at",Timestamp.class).toInstant());
+                r.get("created_at",Timestamp.class).toInstant(),r.get("updated_at",Timestamp.class).toInstant(),r.get("kph_type",String.class),List.of());
     }
 }

@@ -32,7 +32,7 @@ import vn.coopfood.kph.store.KphStoreAccessPolicy;
 import vn.coopfood.kph.store.StoreRef;
 
 @Service
-class KphService {
+public class KphService {
 
     private final KphRepository repository;
     private final CatalogService catalog;
@@ -56,28 +56,60 @@ class KphService {
     @Transactional
     KphRecordResponse create(UUID storeId, KphCreateRequest request, List<MultipartFile> photos,
             String idempotencyKey, Authentication authentication) {
+        return createInternal(storeId, request, photos, idempotencyKey, authentication, null);
+    }
+
+    @Transactional
+    public KphRecordResponse createFromDate(UUID storeId, KphCreateRequest request, List<MultipartFile> photos,
+            Authentication authentication, KphDateSource source) {
+        accessPolicy.requireViewCreate(storeId, authentication);
+        return createInternal(storeId, request, photos, null, authentication, source);
+    }
+
+    public String fingerprintDateRequest(UUID storeId, UUID lotId, UUID actorId, String key,
+            Object request, List<MultipartFile> photos) {
+        try {
+            MessageDigest digest=MessageDigest.getInstance("SHA-256");
+            digest.update(objectMapper.writeValueAsBytes(List.of("DATE",storeId,lotId,actorId,key,request)));
+            if(photos!=null) for(MultipartFile photo:photos) {
+                byte[] bytes=media.readBounded(photo);
+                digest.update((byte)0); digest.update(Long.toString(bytes.length).getBytes(StandardCharsets.UTF_8)); digest.update((byte)0); digest.update(bytes);
+            }
+            return java.util.HexFormat.of().formatHex(digest.digest());
+        } catch(vn.coopfood.kph.foundation.web.ApiProblemException e) { throw e; }
+        catch(Exception e) { throw new IllegalStateException("Could not fingerprint DATE processing.",e); }
+    }
+
+    private KphRecordResponse createInternal(UUID storeId, KphCreateRequest request, List<MultipartFile> photos,
+            String idempotencyKey, Authentication authentication, KphDateSource source) {
         StoreRef store = accessPolicy.requireViewCreate(storeId, authentication);
         UUID actorId = ((vn.coopfood.kph.identity.SessionPrincipal) authentication.getPrincipal()).userId();
-        validateIdempotencyKey(idempotencyKey);
-        String requestHash = fingerprint(request, photos);
-
-        repository.lockIdempotency(actorId, idempotencyKey);
-        var existing = repository.findIdempotency(actorId, idempotencyKey);
-        if (existing.isPresent()) {
-            if (!existing.orElseThrow().requestHash().equals(requestHash)) {
-                throw problem(HttpStatus.CONFLICT, "IDEMPOTENCY_KEY_REUSED",
-                        "The idempotency key was already used for a different request.");
+        String requestHash = null;
+        if (source == null) {
+            validateIdempotencyKey(idempotencyKey);
+            requestHash = fingerprint(request, photos);
+            repository.lockIdempotency(actorId, idempotencyKey);
+            var existing = repository.findIdempotency(actorId, idempotencyKey);
+            if (existing.isPresent()) {
+                if (!existing.orElseThrow().requestHash().equals(requestHash)) {
+                    throw problem(HttpStatus.CONFLICT, "IDEMPOTENCY_KEY_REUSED",
+                            "The idempotency key was already used for a different request.");
+                }
+                return repository.findOne(storeId, existing.orElseThrow().recordId())
+                        .orElseThrow(() -> problem(HttpStatus.CONFLICT, "IDEMPOTENCY_RECORD_UNAVAILABLE",
+                                "The idempotent record is no longer available."));
             }
-            return repository.findOne(storeId, existing.orElseThrow().recordId())
-                    .orElseThrow(() -> problem(HttpStatus.CONFLICT, "IDEMPOTENCY_RECORD_UNAVAILABLE",
-                            "The idempotent record is no longer available."));
         }
 
         validateBusiness(request, photos);
         String barcode = normalize(request.barcode());
         KphRepository.CatalogValues catalogValues;
         String lookupStatus;
-        if (barcode != null) {
+        if (source != null) {
+            lookupStatus = source.lookupStatus();
+            catalogValues = new KphRepository.CatalogValues(source.catalogVersionId(),source.productId(),source.skuCode(),source.productName(),source.supplierCode(),source.supplierName());
+            barcode = source.barcode();
+        } else if (barcode != null) {
             var resolved = catalog.resolveCurrent(barcode);
             if (resolved.isPresent()) {
                 var value = resolved.orElseThrow();
@@ -117,7 +149,7 @@ class KphService {
                 repository.insertPhoto(UUID.randomUUID(), recordId, index + 1, photo.photo(), photo.capturedAt(), createdAt);
             }
             repository.insertAudit(actorId, recordId, storeId, createdAt);
-            repository.insertIdempotency(actorId, idempotencyKey, requestHash, recordId, createdAt);
+            if (source == null) repository.insertIdempotency(actorId, idempotencyKey, requestHash, recordId, createdAt);
             return repository.findOne(storeId, recordId).orElseThrow();
         } catch (RuntimeException exception) {
             cleanup.deleteNow();
@@ -346,4 +378,5 @@ class KphService {
 
     private record StoredMedia(KphRepository.StoredPhoto photo, Instant capturedAt) {
     }
+
 }

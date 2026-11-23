@@ -1,14 +1,18 @@
 package vn.coopfood.kph.date;
 
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -23,6 +27,9 @@ import vn.coopfood.kph.foundation.time.TimeConfiguration;
 import vn.coopfood.kph.foundation.web.ApiProblemException;
 import vn.coopfood.kph.identity.SessionPrincipal;
 import vn.coopfood.kph.store.DateStoreAccessPolicy;
+import vn.coopfood.kph.kph.KphService;
+import vn.coopfood.kph.kph.KphCreateRequest;
+import vn.coopfood.kph.kph.KphDateSource;
 
 @Service
 class DateLotService {
@@ -31,14 +38,16 @@ class DateLotService {
     private final CatalogService catalog;
     private final ObjectMapper json;
     private final Clock clock;
+    private final KphService kph;
 
     DateLotService(DateLotRepository lots, DateStoreAccessPolicy access, CatalogService catalog,
-            ObjectMapper json, Clock clock) {
+            ObjectMapper json, Clock clock, KphService kph) {
         this.lots = lots;
         this.access = access;
         this.catalog = catalog;
         this.json = json;
         this.clock = clock;
+        this.kph = kph;
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
@@ -53,7 +62,7 @@ class DateLotService {
                 query(q),phase,attention,sort,page,size);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     DateLot get(UUID store, UUID id, Authentication auth) {
         access.requireAccess(store,auth);
         return entry(store,id,false).lot();
@@ -105,6 +114,17 @@ class DateLotService {
         if (current.lot().version() != expected.asLong()) {
             throw new ApiProblemException(HttpStatus.CONFLICT,"DATE_VERSION_CONFLICT","Reload the lot before editing.");
         }
+        if (!"OPEN".equals(current.lot().processingStatus())) {
+            throw new ApiProblemException(HttpStatus.CONFLICT,"DATE_LOT_RESOLVED","Resolved DATE lots are read-only.");
+        }
+        if (input.trackedQuantity().compareTo(new BigDecimal(current.lot().processedQuantity())) <= 0) {
+            throw DateLotInput.invalid("Tracked quantity must remain greater than processed quantity.");
+        }
+        if (!current.lot().processingHistory().isEmpty() && (!current.lot().skuCode().equals(input.skuCode())
+                || !current.lot().productName().equals(input.productName())
+                || !current.lot().unit().equals(input.unit()) || !current.lot().lookupStatus().equals(input.lookupStatus())
+                || !Objects.equals(current.lot().barcode(),input.barcode())))
+            throw new ApiProblemException(HttpStatus.CONFLICT,"DATE_IDENTITY_LOCKED","Product identity and unit are locked after processing starts.");
         boolean sameIdentity = current.lot().lookupStatus().equals(input.lookupStatus())
                 && Objects.equals(current.lot().barcode(),input.barcode())
                 && current.lot().skuCode().equals(input.skuCode()) && current.lot().productName().equals(input.productName());
@@ -114,6 +134,58 @@ class DateLotService {
         lots.audit("DATE_LOT_UPDATED",updated,json.writeValueAsString(new Change(AuditSnapshot.from(current.lot()),
                 AuditSnapshot.from(updated),reason)));
         return new DateLot.WriteResult(updated,lots.duplicate(updated));
+    }
+
+    @Transactional
+    DateLotProcessingReceipt process(UUID store, UUID id, String key, ObjectNode body,
+            List<MultipartFile> photos, Authentication auth) {
+        access.requireProcess(store, auth);
+        if (key == null || key.length() < 16 || key.length() > 128 || !key.equals(key.strip())) {
+            throw new ApiProblemException(HttpStatus.BAD_REQUEST,"VALIDATION_ERROR","Invalid Idempotency-Key.");
+        }
+        var principal = (SessionPrincipal) auth.getPrincipal();
+        var request = DateLotProcessingRequest.parse(body,json);
+        String hash = kph.fingerprintDateRequest(store,id,principal.userId(),key,body,photos);
+        lots.lockProcess(store,id,principal.userId(),key);
+        var prior = lots.processReceipt(store,id,principal.userId(),key);
+        if (prior.isPresent()) {
+            if (!prior.get().hash().equals(hash)) {
+                throw new ApiProblemException(HttpStatus.CONFLICT,"IDEMPOTENCY_KEY_REUSED","This key identifies a different processing request.");
+            }
+            return json.readValue(prior.get().response(),DateLotProcessingReceipt.class);
+        }
+        var entry = entry(store,id,true);
+        var lot = entry.lot();
+        if (!"OPEN".equals(lot.processingStatus())) {
+            throw new ApiProblemException(HttpStatus.CONFLICT,"DATE_LOT_RESOLVED","This DATE lot is already resolved.");
+        }
+        if (lot.version() != request.expectedVersion()) {
+            throw new ApiProblemException(HttpStatus.CONFLICT,"DATE_VERSION_CONFLICT","Reload the lot before processing.");
+        }
+        request.validate(lot);
+        KphCreateRequest payload = withSourceIdentity(request.kph(),lot);
+        var source = new KphDateSource(lot.lookupStatus(),lot.barcode(),entry.product().versionId(),entry.product().productId(),
+                lot.skuCode(),lot.productName(),lot.supplierCode(),lot.supplierName());
+        var record = kph.createFromDate(store,payload,photos,auth,source);
+        Instant now = clock.instant();
+        DateLot after = lots.applyProcessing(store,id,payload.quantity(),payload.type().name(),principal,now);
+        String snapshot = json.writeValueAsString(Map.of("skuCode",lot.skuCode(),"productName",lot.productName(),
+                "barcode",lot.barcode()==null?"":lot.barcode(),"lookupStatus",lot.lookupStatus(),"unit",lot.unit(),
+                "lotCode",lot.lotCode()==null?"":lot.lotCode(),"manufacturedOn",lot.manufacturedOn()==null?"":lot.manufacturedOn().toString(),
+                "expiresOn",lot.expiresOn().toString(),"trackedQuantity",lot.trackedQuantity(),"kphType",payload.type().name()));
+        lots.insertProcessing(UUID.randomUUID(),lot,after,record.id(),payload.quantity(),principal,now,snapshot);
+        lots.audit("DATE_LOT_PROCESSED",after,json.writeValueAsString(Map.of("sourceVersion",lot.version(),
+                "resultingVersion",after.version(),"kphRecordId",record.id(),"quantity",payload.quantity().toPlainString())));
+        var receipt = new DateLotProcessingReceipt(record.id(),payload.quantity().toPlainString(),lot.unit(),lot.version(),
+                after.version(),after.remainingQuantity(),now,new DateLot.Actor(principal.userId(),principal.user().displayName()));
+        lots.saveProcessReceipt(store,id,principal.userId(),key,hash,record.id(),json.writeValueAsString(receipt));
+        return receipt;
+    }
+
+    private static KphCreateRequest withSourceIdentity(KphCreateRequest r, DateLot lot) {
+        return new KphCreateRequest(r.type(), r.detectedDate(), r.processedDate(), r.quantity(), r.unit(),
+                r.condition(), r.conditionDetail(), r.resolution(), r.resolutionDetail(), null, lot.skuCode(),
+                lot.productName(), lot.supplierName(), r.note(), r.photoLastModified());
     }
 
     private DateLotRepository.Entry entry(UUID store, UUID id, boolean lock) {
