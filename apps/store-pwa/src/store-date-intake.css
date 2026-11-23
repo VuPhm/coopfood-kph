@@ -19,3 +19,24 @@
 @media (max-width: 359px) { .date-intake-dates { grid-template-columns: 1fr; } }
 
 .store-date-intake { display: grid; gap: 12px; min-width: 0; }
+
+.store-date-editor select {
+  min-height: var(--fresh-size-field, 44px);
+  padding-inline: 12px;
+}
+.store-date-suggestions {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.store-date-suggestions button {
+  width: 100%;
+  min-height: 44px;
+  height: auto;
+  justify-content: flex-start;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

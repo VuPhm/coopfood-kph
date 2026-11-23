@@ -122,9 +122,13 @@ describe("Store online session", () => {
     fireEvent.click(screen.getByRole("button", { name: "Quản lý DATE" }));
     fireEvent.click(await screen.findByRole("button", { name: "Thêm theo dõi DATE" }));
     await screen.findByRole("heading", { name: "Thêm theo dõi DATE" });
+    vi.mocked(api.lookupBarcode).mockResolvedValue({ status: "NOT_FOUND", barcode: "000123" });
+    fireEvent.change(screen.getByLabelText(/Barcode \(nếu có\)/), { target: { value: "000123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Tra barcode", exact: true }));
+    await screen.findByText(/Không tìm thấy barcode/);
     vi.mocked(api.date.suggest).mockResolvedValue([{ skuCode: "000045", productName: "Lô kiểm thử cửa hàng A" }]);
     fireEvent.change(document.querySelector<HTMLInputElement>("#date-online-sku")!, { target: { value: "000045" } });
-    fireEvent.click(await screen.findByRole("option", { name: "000045 · Lô kiểm thử cửa hàng A" }));
+    fireEvent.click(await screen.findByRole("button", { name: "000045 · Lô kiểm thử cửa hàng A" }));
     fireEvent.change(await screen.findByLabelText(/Số lô/), { target: { value: "LOT-A-ONLY" } });
     fireEvent.change(await screen.findByLabelText(/Số lượng đang theo dõi/), { target: { value: "0.125" } });
     fireEvent.change(await screen.findByLabelText(/Đơn vị/), { target: { value: "kg" } });
@@ -148,7 +152,7 @@ describe("Store online session", () => {
     await screen.findByRole("alert");
     fireEvent.click(screen.getByRole("button", { name: "Lưu lô" }));
     await waitFor(() => expect(api.date.create).toHaveBeenCalledWith(employee.id,
-      expect.objectContaining({ skuCode: "000045", productName: saved.productName, lotCode: "LOT-A-ONLY", trackedQuantity: "0.125", unit: "kg", manufacturedOn: null }),
+      expect.objectContaining({ skuCode: "000045", productName: saved.productName, lotCode: "LOT-A-ONLY", trackedQuantity: "0.125", unit: "kg", manufacturedOn: null, lookupStatus: "NOT_FOUND", barcode: "000123" }),
       expect.any(String), expect.any(String)));
     expect(vi.mocked(api.date.create).mock.calls[0]?.[2]).toBe(vi.mocked(api.date.create).mock.calls[1]?.[2]);
     expect(await screen.findByRole("button", { name: /Lô kiểm thử cửa hàng A/ })).toBeVisible();

@@ -30,20 +30,18 @@ export function DateEditor({ api, csrf, storeId, userId, suspended, lookupBarcod
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [scanner, setScanner] = useState(false);
-  const [suggestion, setSuggestion] = useState("");
   const key = useRef<{ payload: string; value: string }>({ payload: "", value: "" });
   const lookupToken = useRef(0);
   const suggestions = useQuery({ queryKey: ["date-suggestions", userId, storeId, query], queryFn: ({ signal }) => api.suggest(storeId, query, signal), enabled: !original && query.trim().length >= 2 && !suspended, retry: false, gcTime: 0 });
   const unauthorized = suggestions.error instanceof OnlineApiError && (suggestions.error.status === 401 || suggestions.error.status === 403);
   useEffect(() => { if (unauthorized) onSessionExpired(); }, [unauthorized, onSessionExpired]);
-  useEffect(() => { if (!suspended) return; }, [suspended]);
-  async function findBarcode() {
-    const value = barcode.trim(); if (!value || busy) return;
+  async function findBarcode(input = barcode) {
+    const value = input.trim(); if (!value || busy) return;
     const token = ++lookupToken.current; setBusy(true); setMessage("");
     try {
       const result = await lookupBarcode(storeId, value, new AbortController().signal);
       if (token !== lookupToken.current) return;
-      if (result.status === "FOUND") { setLookupStatus("FOUND"); setBarcode(result.barcode); setSku(result.product.skuCode); setName(result.product.name); setMessage("Đã tìm thấy sản phẩm trong danh mục."); }
+      if (result.status === "FOUND") { setLookupStatus("FOUND"); setBarcode(result.barcode); setSku(result.product.skuCode); setName(result.product.name); setQuery(""); setMessage("Đã tìm thấy sản phẩm trong danh mục."); }
       else { setLookupStatus("NOT_FOUND"); setBarcode(result.barcode); setMessage("Không tìm thấy barcode. Có thể nhập SKU và tên hàng thủ công."); }
     } catch (error) {
       if (token !== lookupToken.current) return;
@@ -53,7 +51,13 @@ export function DateEditor({ api, csrf, storeId, userId, suspended, lookupBarcod
     } finally { if (token === lookupToken.current) setBusy(false); }
   }
   function useSuggestion(item: { skuCode: string; productName: string }) {
-    setSku(item.skuCode); setName(item.productName); setBarcode(""); setLookupStatus("MANUAL"); setSuggestion("");
+    setSku(item.skuCode);
+    setName(item.productName);
+    if (lookupStatus !== "NOT_FOUND") {
+      setBarcode("");
+      setLookupStatus("MANUAL");
+    }
+    setQuery("");
   }
   async function submit(event: React.FormEvent) {
     event.preventDefault(); if (busy) return; setMessage("");
@@ -61,6 +65,7 @@ export function DateEditor({ api, csrf, storeId, userId, suspended, lookupBarcod
       const skuValue = sku.trim(), nameValue = name.trim(), amount = quantity.trim();
       if (!skuValue || !nameValue) throw new Error("Nhập SKU và tên hàng.");
       if (!unit) throw new Error("Chọn đơn vị theo dõi.");
+      if (lookupStatus === "MANUAL" && barcode.trim()) throw new Error("Tra barcode đã nhập hoặc xóa barcode để lưu bằng SKU.");
       if (!/^\d+(?:\.\d+)?$/.test(amount) || Number(amount) <= 0 || (unit === "EA" && !/^\d+$/.test(amount))) throw new Error(unit === "EA" ? "Số lượng EA phải là số nguyên dương." : "Số lượng kg phải lớn hơn 0.");
       const expiresOn = parseDisplayDate(expires);
       const manufacturedOn = manufactured ? parseDisplayDate(manufactured) : null;
@@ -81,19 +86,27 @@ export function DateEditor({ api, csrf, storeId, userId, suspended, lookupBarcod
     } catch (error) {
       if (error instanceof OnlineApiError) {
         if (error.status === 401 || error.status === 403) { onSessionExpired(); setMessage("Phiên hoặc quyền cửa hàng đã thay đổi."); }
-        else if (error.status === 409 && original) { setMessage("Lô đã được cập nhật nơi khác. Đã tải phiên bản mới; kiểm tra thay đổi rồi lưu lại với lý do."); await onReload(); }
-        else setMessage(error.status === 409 ? "Yêu cầu tạo đang được xác nhận. Thử lưu lại để gửi lại cùng mã yêu cầu." : error.message);
+        else if (error.code === "DATE_VERSION_CONFLICT" && original) {
+          setMessage("Lô đã được cập nhật nơi khác. Đang tải phiên bản mới.");
+          if (!await onReload()) setMessage("Chưa tải được phiên bản mới. Đóng form rồi mở lại lô.");
+        } else if (error.code === "DATE_CATALOG_CHANGED") {
+          setMessage("Thông tin danh mục đã thay đổi. Tra lại barcode trước khi lưu.");
+        } else setMessage(error.message);
       } else setMessage(error instanceof Error ? error.message : "Không thể lưu lô DATE.");
     } finally { setBusy(false); }
   }
   if (suspended) return null;
-  const duplicate = suggestions.data ?? [];
+  const remembered = suggestions.data ?? [];
   return <><StoreSheet className="store-date-sheet" open onOpenChange={open => { if (!open) onClose(); }} title={original ? "Sửa lô DATE" : "Thêm theo dõi DATE"} description={original ? "Cập nhật thông tin có kiểm soát phiên bản." : "Tạo lô theo dõi trong cửa hàng đang chọn."}>
-    <form className="store-date-intake" onSubmit={submit}>
-      <Field label="Barcode (nếu có)" htmlFor="date-online-barcode"><Input id="date-online-barcode" value={barcode} onChange={event => { lookupToken.current++; setBarcode(event.target.value); setLookupStatus("MANUAL"); }} /><Button type="button" variant="secondary" onClick={() => setScanner(true)}>Quét barcode</Button><Button type="button" variant="secondary" disabled={busy || !barcode.trim()} onClick={() => void findBarcode()}>Tra barcode</Button></Field>
-      <Field label="SKU" htmlFor="date-online-sku" required><Input id="date-online-sku" value={sku} onChange={event => { setSku(event.target.value); if (lookupStatus === "FOUND") { setLookupStatus("MANUAL"); setBarcode(""); } setQuery(event.target.value.trim()); }} /></Field>
-      {!original && duplicate.length > 0 ? <div role="listbox" aria-label="Gợi ý SKU và tên hàng">{duplicate.map(item => <button key={`${item.skuCode}:${item.productName}`} type="button" role="option" aria-selected={suggestion === item.skuCode} onClick={() => useSuggestion(item)}>{item.skuCode} · {item.productName}</button>)}</div> : null}
-      <Field label="Tên hàng" htmlFor="date-online-name" required><Input id="date-online-name" value={name} onChange={event => { setName(event.target.value); if (lookupStatus === "FOUND") { setLookupStatus("MANUAL"); setBarcode(""); } setQuery(event.target.value.trim()); }} /></Field>
+    <form className="store-date-intake store-date-editor" onSubmit={submit}>
+      <Field label="Barcode (nếu có)" htmlFor="date-online-barcode"><Input id="date-online-barcode" disabled={busy} value={barcode} onChange={event => { setBarcode(event.target.value); setLookupStatus("MANUAL"); }} /><Button type="button" variant="secondary" disabled={busy} onClick={() => setScanner(true)}>Quét barcode</Button><Button type="button" variant="secondary" disabled={busy || !barcode.trim()} onClick={() => void findBarcode()}>Tra barcode</Button></Field>
+      <Field label="SKU" htmlFor="date-online-sku" required><Input id="date-online-sku" disabled={busy} value={sku} onChange={event => { setSku(event.target.value); if (lookupStatus === "FOUND") { setLookupStatus("MANUAL"); setBarcode(""); } setQuery(event.target.value.trim()); }} /></Field>
+      {!original && remembered.length > 0 && <ul className="store-date-suggestions" aria-label="Gợi ý SKU và tên hàng">
+        {remembered.map(item => <li key={item.skuCode}>
+          <Button type="button" variant="ghost" disabled={busy} onClick={() => useSuggestion(item)}>{item.skuCode} · {item.productName}</Button>
+        </li>)}
+      </ul>}
+      <Field label="Tên hàng" htmlFor="date-online-name" required><Input id="date-online-name" disabled={busy} value={name} onChange={event => { setName(event.target.value); if (lookupStatus === "FOUND") { setLookupStatus("MANUAL"); setBarcode(""); } setQuery(event.target.value.trim()); }} /></Field>
       <Field label="Số lô (nếu có)" htmlFor="date-online-lot"><Input id="date-online-lot" value={lotCode} onChange={event => setLotCode(event.target.value)} /></Field>
       <Field label="Số lượng đang theo dõi" htmlFor="date-online-quantity" required><Input id="date-online-quantity" inputMode="decimal" value={quantity} onChange={event => setQuantity(event.target.value)} /></Field>
       <Field label="Đơn vị" htmlFor="date-online-unit"><select id="date-online-unit" value={unit} onChange={event => setUnit(event.target.value as "" | "EA" | "kg")}><option value="">Chọn đơn vị</option><option value="EA">EA</option><option value="kg">kg</option></select></Field>
@@ -104,8 +117,5 @@ export function DateEditor({ api, csrf, storeId, userId, suspended, lookupBarcod
       {message ? <p role="alert">{message}</p> : null}
       <div className="store-sheet-actions"><Button type="button" variant="ghost" disabled={busy} onClick={onClose}>Hủy</Button><Button type="submit" disabled={busy}>{busy ? "Đang lưu…" : original ? "Lưu thay đổi" : "Lưu lô"}</Button></div>
     </form>
-  </StoreSheet><BarcodeScannerDialog appearance="store" open={scanner && !suspended} onOpenChange={setScanner} onScan={value => { setScanner(false); setBarcode(value); setLookupStatus("MANUAL"); void lookupBarcode(storeId, value, new AbortController().signal).then(result => {
-    if (result.status === "FOUND") { setLookupStatus("FOUND"); setBarcode(result.barcode); setSku(result.product.skuCode); setName(result.product.name); setMessage("Đã tìm thấy sản phẩm trong danh mục."); }
-    else { setLookupStatus("NOT_FOUND"); setBarcode(result.barcode); setMessage("Không tìm thấy barcode. Có thể nhập SKU và tên hàng thủ công."); }
-  }).catch(() => setMessage("Chưa tra được barcode. Kiểm tra kết nối hoặc tiếp tục nhập tay.")); }} /></>;
+  </StoreSheet><BarcodeScannerDialog appearance="store" open={scanner && !suspended} onOpenChange={setScanner} onScan={value => { setScanner(false); setBarcode(value); setLookupStatus("MANUAL"); void findBarcode(value); }} /></>;
 }

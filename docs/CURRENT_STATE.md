@@ -14,6 +14,12 @@ Owner đã nghiệm thu KPHON03–04 và cho tiếp sau vòng UI local ngày 17/
 
 ## DATE
 
-Store online tra mã qua backend. Lô thêm thủ công thuộc phiên của tài khoản và cửa hàng đang chọn. Chuyển về Home rồi mở lại DATE giữ lô, tải lại trang hoặc rời scope xóa lô trong phiên. Bản mock có dữ liệu mẫu để xem đầy đủ các trạng thái và thao tác. DATE bền vững, nhắc chung và báo cáo kỳ còn chờ backend. [Checkpoint DATEUI01](delivery/dateui01-list-checkpoint.md) · [Bổ sung STOREUI01](delivery/storeui01-date-list.md) · [Contract DATE](product/DATE_DURABLE_CONTRACT.md).
+Candidate DATEON02 trên `store-app/dateon02-durable-lots` lấy base UI09
+`4d671a6`. Store online đọc, tạo và sửa lô qua PostgreSQL. Lô và gợi ý SKU/tên
+hàng được phân theo cửa hàng. Nhân viên xem/tạo, quản lý trong phạm vi mới
+được sửa. API kiểm phiên bản khi sửa và ghi audit. Đã kiểm từ V9 lên V10 và
+chạy luồng qua Store ở hai kích thước. Nghiệm thu owner, xử lý từng phần
+DATE → KPH, lịch nhắc chung và báo cáo kỳ còn chờ.
+[Evidence DATEON02](delivery/dateon02-durable-lots.md) · [Contract DATE](product/DATE_DURABLE_CONTRACT.md).
 
 [Xác minh UI09](delivery/ui09-restored-baseline.md) · [Bước kế tiếp](NEXT.md). Nghiệm thu thiết bị thật, camera/quyền hệ điều hành và rollout vẫn đang chờ. Nhánh Pages và tag bảo tồn theo [baseline](STORE_APP_BASELINE.md).
