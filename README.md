@@ -1,10 +1,9 @@
 # Co.op Food Store Operations App
 
 Repository đang tiến hóa từ KPH online thành Store Operations App mobile-first
-theo [Store App baseline](docs/STORE_APP_BASELINE.md). KPH là capability hiện có;
-Round 1 thiết kế UI/UX/Brand DNA và chưa triển khai app shell mới. Business
-contract và bằng chứng hiện hành được dẫn từ
-[contract index](docs/product/STORE_APP_CONTRACTS.md).
+theo [Store App baseline](docs/STORE_APP_BASELINE.md). Xem
+[contract index](docs/product/STORE_APP_CONTRACTS.md) cho hợp đồng nghiệp vụ và
+[CURRENT_STATE](docs/CURRENT_STATE.md) cho trạng thái tích hợp.
 
 ## Thành phần
 
@@ -20,6 +19,7 @@ Backend và frontend build độc lập. OpenAPI cùng fixtures là seam tích h
 vẫn là nguồn quyết định authorization và nghiệp vụ.
 
 Đọc `AGENTS.md`, `docs/CURRENT_STATE.md` và `docs/NEXT.md` trước khi thay đổi.
+[Xem cách mở workspace và bàn giao với Antigravity](docs/ANTIGRAVITY.md).
 
 ## Chạy kiểm tra
 
